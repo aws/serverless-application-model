@@ -1,3 +1,3 @@
 {
-    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [InvalidType] is invalid. Invalid value for property PassthroughCondition. Resource with id [UnsupportedIntrinsic] is invalid. Unsupported intrinsic: the only intrinsic functions supported for property PassthroughCondition are FindInMap and parameter Refs."
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [InvalidType] is invalid. Invalid value for property PassthroughCondition. Resource with id [UnsupportedIntrinsic] is invalid. Unsupported intrinsic: the only intrinsic functions supported for property PassthroughCondition are FindInMap and parameter Refs."
 }

@@ -1,160 +1,160 @@
 {
   "Parameters": {
     "CorsParam": {
-      "Default": true, 
+      "Default": true,
       "Type": "String"
     },
     "PayloadFormatVersion": {
-        "Default": "1.0",
-        "Type": "String"
+      "Default": "1.0",
+      "Type": "String"
     }
-  }, 
+  },
   "Resources": {
-    "HttpApiFunctionSimpleCasePermission": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "HttpApiFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
     "HttpApiFunction": {
-      "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "Handler": "index.restapi", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "todo_list.zip"
-        }, 
+        },
+        "Handler": "index.restapi",
         "Role": {
           "Fn::GetAtt": [
-            "HttpApiFunctionRole", 
+            "HttpApiFunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "nodejs12.x", 
+        },
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    }, 
-    "MyApiProdStage": {
-      "Type": "AWS::ApiGatewayV2::Stage", 
-      "Properties": {
-        "AutoDeploy": true,
-        "StageVariables": {
-          "VarName": "VarValue"
-        },
-        "ApiId": {
-          "Ref": "MyApi"
-        }, 
-        "StageName": "Prod", 
-        "AccessLogSettings": {
-          "DestinationArn": "arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName", 
-          "Format": "$context.requestId"
-        }, 
-        "RouteSettings": {
-          "$default": {
-            "ThrottlingRateLimit": 0.7, 
-            "DataTraceEnabled": true, 
-            "ThrottlingBurstLimit": 300, 
-            "LoggingLevel": "INFO"
-          }
-        }, 
-        "Tags": {
-          "httpapi:createdBy": "SAM"
-        }
-      }
-    }, 
+      },
+      "Type": "AWS::Lambda::Function"
+    },
     "HttpApiFunctionRole": {
-      "Type": "AWS::IAM::Role", 
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }, 
+          ],
+          "Version": "2012-10-17"
+        },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    }, 
-    "MyApi": {
-      "Type": "AWS::ApiGatewayV2::Api", 
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "HttpApiFunctionSimpleCasePermission": {
       "Properties": {
-        "FailOnWarnings": true,
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "HttpApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*",
+            {
+              "__ApiId__": {
+                "Ref": "MyApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyApi": {
+      "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
             "title": {
               "Ref": "AWS::StackName"
-            }
-          }, 
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
           "paths": {
             "$default": {
               "x-amazon-apigateway-any-method": {
+                "isDefaultRoute": true,
+                "responses": {},
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
-                  "uri": {
-                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
-                  }, 
+                  "httpMethod": "POST",
                   "payloadFormatVersion": {
                     "Ref": "PayloadFormatVersion"
+                  },
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
                   }
-                }, 
-                "isDefaultRoute": true, 
-                "responses": {}
+                }
               }
             }
-          }, 
+          },
+          "tags": [
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ],
           "x-amazon-apigateway-cors": {
             "allowOrigins": [
               "*"
             ]
-          }, 
-          "openapi": "3.0.1", 
-          "tags": [
-            {
-              "name": "httpapi:createdBy", 
-              "x-amazon-apigateway-tag-value": "SAM"
-            }
-          ]
+          }
+        },
+        "FailOnWarnings": true
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "MyApiProdStage": {
+      "Properties": {
+        "AccessLogSettings": {
+          "DestinationArn": "arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName",
+          "Format": "$context.requestId"
+        },
+        "ApiId": {
+          "Ref": "MyApi"
+        },
+        "AutoDeploy": true,
+        "RouteSettings": {
+          "$default": {
+            "DataTraceEnabled": true,
+            "LoggingLevel": "INFO",
+            "ThrottlingBurstLimit": 300,
+            "ThrottlingRateLimit": 0.7
+          }
+        },
+        "StageName": "Prod",
+        "StageVariables": {
+          "VarName": "VarValue"
+        },
+        "Tags": {
+          "httpapi:createdBy": "SAM"
         }
-      }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
     }
   }
 }

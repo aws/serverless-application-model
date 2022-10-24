@@ -11,6 +11,12 @@
         }
       ]
     },
+    "explicithello1condition": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    },
     "explicithello2condition": {
       "Fn::Equals": [
         true,
@@ -28,447 +34,19 @@
         true,
         false
       ]
-    },
-    "explicithello1condition": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
     }
   },
+  "Description": "A template to test for API condition handling with a mix of explicit and implicit api events.",
   "Resources": {
-    "explicithello2": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "MemorySize": 128,
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "explicithello2Role",
-            "Arn"
-          ]
-        },
-        "Timeout": 3,
-        "Runtime": "nodejs12.x"
-      },
-      "Condition": "explicithello2condition"
-    },
-    "implicithello2Role": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "implicithello2condition"
-    },
-    "explicithello1": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "MemorySize": 128,
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "explicithello1Role",
-            "Arn"
-          ]
-        },
-        "Timeout": 3,
-        "Runtime": "nodejs12.x"
-      },
-      "Condition": "explicithello1condition"
-    },
-    "ServerlessRestApiDeploymentafcab1755e": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: afcab1755e409da73b339b6deff571f5b8a821da",
-        "StageName": "Stage"
-      },
-      "Condition": "ServerlessRestApiCondition"
-    },
-    "explicitapiProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "explicitapiDeploymentc5102c0776"
-        },
-        "RestApiId": {
-          "Ref": "explicitapi"
-        },
-        "StageName": "Prod"
-      }
-    },
-    "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentafcab1755e"
-        },
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "StageName": "Prod"
-      },
-      "Condition": "ServerlessRestApiCondition"
-    },
-    "explicithello2Role": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "explicithello2condition"
-    },
-    "explicithello1ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "explicithello1"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello1",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "explicitapi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "explicithello1condition"
-    },
-    "implicithello2": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "MemorySize": 128,
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "implicithello2Role",
-            "Arn"
-          ]
-        },
-        "Timeout": 3,
-        "Runtime": "nodejs12.x"
-      },
-      "Condition": "implicithello2condition"
-    },
-    "implicithello1ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "implicithello1"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello1",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "implicithello1condition"
-    },
-    "explicitapiDeploymentc5102c0776": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "explicitapi"
-        },
-        "Description": "RestApi deployment id: c5102c077632f46b21ecf1230d4056848be72538",
-        "StageName": "Stage"
-      }
-    },
-    "implicithello1": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "MemorySize": 128,
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "implicithello1Role",
-            "Arn"
-          ]
-        },
-        "Timeout": 3,
-        "Runtime": "nodejs12.x"
-      },
-      "Condition": "implicithello1condition"
-    },
-    "explicithello2ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "explicithello2"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello2",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "explicitapi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "explicithello2condition"
-    },
-    "explicitapi": {
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {
-            "/explicit/hello2": {
-              "Fn::If": [
-                "explicithello2condition",
-                {
-                  "get": {
-                    "Fn::If": [
-                      "explicithello2condition",
-                      {
-                        "x-amazon-apigateway-integration": {
-                          "httpMethod": "POST",
-                          "type": "aws_proxy",
-                          "uri": {
-                            "Fn::If": [
-                              "explicithello2condition",
-                              {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${explicithello2.Arn}/invocations"
-                              },
-                              {
-                                "Ref": "AWS::NoValue"
-                              }
-                            ]
-                          }
-                        },
-                        "responses": {}
-                      },
-                      {
-                        "Ref": "AWS::NoValue"
-                      }
-                    ]
-                  }
-                },
-                {
-                  "Ref": "AWS::NoValue"
-                }
-              ]
-            },
-            "/explicit/hello1": {
-              "Fn::If": [
-                "explicithello1condition",
-                {
-                  "get": {
-                    "Fn::If": [
-                      "explicithello1condition",
-                      {
-                        "x-amazon-apigateway-integration": {
-                          "httpMethod": "POST",
-                          "type": "aws_proxy",
-                          "uri": {
-                            "Fn::If": [
-                              "explicithello1condition",
-                              {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${explicithello1.Arn}/invocations"
-                              },
-                              {
-                                "Ref": "AWS::NoValue"
-                              }
-                            ]
-                          }
-                        },
-                        "responses": {}
-                      },
-                      {
-                        "Ref": "AWS::NoValue"
-                      }
-                    ]
-                  }
-                },
-                {
-                  "Ref": "AWS::NoValue"
-                }
-              ]
-            }
-          },
-          "swagger": "2.0"
-        },
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        },
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        }
-      }
-    },
-    "implicithello2ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "implicithello2"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello2",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "implicithello2condition"
-    },
-    "explicithello1Role": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "explicithello1condition"
-    },
     "ServerlessRestApi": {
-      "Type": "AWS::ApiGateway::RestApi",
+      "Condition": "ServerlessRestApiCondition",
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
-            }
+            },
+            "version": "1.0"
           },
           "paths": {
             "/implicit/hello1": {
@@ -479,6 +57,7 @@
                     "Fn::If": [
                       "implicithello1condition",
                       {
+                        "responses": {},
                         "x-amazon-apigateway-integration": {
                           "httpMethod": "POST",
                           "type": "aws_proxy",
@@ -493,8 +72,7 @@
                               }
                             ]
                           }
-                        },
-                        "responses": {}
+                        }
                       },
                       {
                         "Ref": "AWS::NoValue"
@@ -515,6 +93,7 @@
                     "Fn::If": [
                       "implicithello2condition",
                       {
+                        "responses": {},
                         "x-amazon-apigateway-integration": {
                           "httpMethod": "POST",
                           "type": "aws_proxy",
@@ -529,8 +108,7 @@
                               }
                             ]
                           }
-                        },
-                        "responses": {}
+                        }
                       },
                       {
                         "Ref": "AWS::NoValue"
@@ -555,22 +133,201 @@
           "endpointConfigurationTypes": "REGIONAL"
         }
       },
-      "Condition": "ServerlessRestApiCondition"
+      "Type": "AWS::ApiGateway::RestApi"
     },
-    "implicithello1Role": {
-      "Type": "AWS::IAM::Role",
+    "ServerlessRestApiDeploymentafcab1755e": {
+      "Condition": "ServerlessRestApiCondition",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
+        "Description": "RestApi deployment id: afcab1755e409da73b339b6deff571f5b8a821da",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ServerlessRestApiProdStage": {
+      "Condition": "ServerlessRestApiCondition",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeploymentafcab1755e"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "explicitapi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/explicit/hello1": {
+              "Fn::If": [
+                "explicithello1condition",
+                {
+                  "get": {
+                    "Fn::If": [
+                      "explicithello1condition",
+                      {
+                        "responses": {},
+                        "x-amazon-apigateway-integration": {
+                          "httpMethod": "POST",
+                          "type": "aws_proxy",
+                          "uri": {
+                            "Fn::If": [
+                              "explicithello1condition",
+                              {
+                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${explicithello1.Arn}/invocations"
+                              },
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            },
+            "/explicit/hello2": {
+              "Fn::If": [
+                "explicithello2condition",
+                {
+                  "get": {
+                    "Fn::If": [
+                      "explicithello2condition",
+                      {
+                        "responses": {},
+                        "x-amazon-apigateway-integration": {
+                          "httpMethod": "POST",
+                          "type": "aws_proxy",
+                          "uri": {
+                            "Fn::If": [
+                              "explicithello2condition",
+                              {
+                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${explicithello2.Arn}/invocations"
+                              },
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "explicitapiDeploymentc5102c0776": {
+      "Properties": {
+        "Description": "RestApi deployment id: c5102c077632f46b21ecf1230d4056848be72538",
+        "RestApiId": {
+          "Ref": "explicitapi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "explicitapiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "explicitapiDeploymentc5102c0776"
+        },
+        "RestApiId": {
+          "Ref": "explicitapi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "explicithello1": {
+      "Condition": "explicithello1condition",
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "explicithello1Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "explicithello1ApiEventPermissionProd": {
+      "Condition": "explicithello1condition",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "explicithello1"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello1",
+            {
+              "__ApiId__": {
+                "Ref": "explicitapi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "explicithello1Role": {
+      "Condition": "explicithello1condition",
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -583,11 +340,254 @@
                 ]
               }
             }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "explicithello2": {
+      "Condition": "explicithello2condition",
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "explicithello2Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "explicithello2ApiEventPermissionProd": {
+      "Condition": "explicithello2condition",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "explicithello2"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello2",
+            {
+              "__ApiId__": {
+                "Ref": "explicitapi"
+              },
+              "__Stage__": "*"
+            }
           ]
         }
       },
-      "Condition": "implicithello1condition"
+      "Type": "AWS::Lambda::Permission"
+    },
+    "explicithello2Role": {
+      "Condition": "explicithello2condition",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "implicithello1": {
+      "Condition": "implicithello1condition",
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "implicithello1Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "implicithello1ApiEventPermissionProd": {
+      "Condition": "implicithello1condition",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "implicithello1"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello1",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "implicithello1Role": {
+      "Condition": "implicithello1condition",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "implicithello2": {
+      "Condition": "implicithello2condition",
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "implicithello2Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "implicithello2ApiEventPermissionProd": {
+      "Condition": "implicithello2condition",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "implicithello2"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello2",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "implicithello2Role": {
+      "Condition": "implicithello2condition",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
-  },
-  "Description": "A template to test for API condition handling with a mix of explicit and implicit api events."
+  }
 }

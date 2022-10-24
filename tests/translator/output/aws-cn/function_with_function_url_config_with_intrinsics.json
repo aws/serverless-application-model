@@ -1,22 +1,21 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Parameters": {
-    "AuthorizationTypeRef": {
-      "Type": "String",
-      "Default": "NONE"
+    "AllowMethodsRef": {
+      "Default": "GET",
+      "Type": "CommaDelimitedList"
     },
     "AllowOriginsRef": {
-      "Type": "CommaDelimitedList",
-      "Default": "https://example.com"
+      "Default": "https://example.com",
+      "Type": "CommaDelimitedList"
     },
-    "AllowMethodsRef": {
-      "Type": "CommaDelimitedList",
-      "Default": "GET"
+    "AuthorizationTypeRef": {
+      "Default": "NONE",
+      "Type": "String"
     }
   },
   "Resources": {
     "MyFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -32,39 +31,19 @@
           ]
         },
         "Runtime": "nodejs12.x",
-        "Timeout": 3,
         "Tags": [
           {
             "Key": "lambda:createdBy",
             "Value": "SAM"
           }
-        ]
-      }
-    },
-    "MyFunctionUrl": {
-      "Type": "AWS::Lambda::Url",
-      "Properties": {
-        "TargetFunctionArn": {
-          "Ref": "MyFunction"
-        },
-        "AuthType": {
-          "Ref": "AuthorizationTypeRef"
-        },
-        "Cors": {
-          "AllowOrigins": {
-            "Ref": "AllowOriginsRef"
-          },
-          "AllowMethods": {
-            "Ref": "AllowMethodsRef"
-          }
-        }
-      }
+        ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "MyFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -77,7 +56,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -88,7 +68,27 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyFunctionUrl": {
+      "Properties": {
+        "AuthType": {
+          "Ref": "AuthorizationTypeRef"
+        },
+        "Cors": {
+          "AllowMethods": {
+            "Ref": "AllowMethodsRef"
+          },
+          "AllowOrigins": {
+            "Ref": "AllowOriginsRef"
+          }
+        },
+        "TargetFunctionArn": {
+          "Ref": "MyFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Url"
     }
   }
 }

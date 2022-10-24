@@ -2,295 +2,295 @@
   "Conditions": {
     "condition": {
       "Fn::Equals": [
-        true, 
+        true,
         true
       ]
     }
-  }, 
+  },
   "Resources": {
-    "HttpApiFunctionSimpleCasePermission": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "HttpApiFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApi"
-              }
-            }
-          ]
-        }
-      }, 
-      "Condition": "condition"
-    }, 
-    "MyApiApiGatewayDefaultStage": {
-      "Type": "AWS::ApiGatewayV2::Stage", 
-      "Properties": {
-        "ApiId": {
-          "Ref": "MyApi"
-        }, 
-        "AutoDeploy": true, 
-        "StageName": "$default", 
-        "Tags": {
-          "httpapi:createdBy": "SAM", 
-          "Tag1": "value1", 
-          "Tag2": "value2"
-        }
-      }
-    }, 
     "HttpApiFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Condition": "condition",
       "Properties": {
-        "Handler": "index.restapi", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "todo_list.zip"
-        }, 
+        },
+        "Handler": "index.restapi",
         "Role": {
           "Fn::GetAtt": [
-            "HttpApiFunctionRole", 
+            "HttpApiFunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python3.7", 
+        },
+        "Runtime": "python3.7",
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }, 
-      "Condition": "condition"
-    }, 
+      },
+      "Type": "AWS::Lambda::Function"
+    },
     "HttpApiFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Condition": "condition",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }, 
+          ],
+          "Version": "2012-10-17"
+        },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }, 
-      "Condition": "condition"
-    }, 
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "HttpApiFunctionSimpleCasePermission": {
+      "Condition": "condition",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "HttpApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*",
+            {
+              "__ApiId__": {
+                "Ref": "MyApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
     "MyApi": {
-      "Type": "AWS::ApiGatewayV2::Api", 
       "Properties": {
         "Body": {
+          "components": {
+            "securitySchemes": {
+              "OAuth2": {
+                "type": "oauth2",
+                "x-amazon-apigateway-authorizer": {
+                  "identitySource": "$request.querystring.param",
+                  "jwtConfiguration": {
+                    "audience": [
+                      "MyApi"
+                    ],
+                    "issuer": "https://www.example.com/v1/connect/oidc"
+                  },
+                  "type": "jwt"
+                }
+              },
+              "OpenIdAuth": {
+                "type": "openIdConnect",
+                "x-amazon-apigateway-authorizer": {
+                  "identitySource": "$request.querystring.param",
+                  "jwtConfiguration": {
+                    "audience": [
+                      "MyApi"
+                    ],
+                    "issuer": "https://www.example.com/v1/connect/oidc"
+                  },
+                  "openIdConnectUrl": "https://www.example.com/v1/connect",
+                  "type": "jwt"
+                }
+              },
+              "oauth2Auth": {
+                "type": "oauth2",
+                "x-amazon-apigateway-authorizer": {
+                  "identitySource": "$request.querystring.param",
+                  "jwtConfiguration": {
+                    "audience": [
+                      "MyApi"
+                    ],
+                    "issuer": "https://www.example.com/v1/connect/oidc"
+                  },
+                  "type": "jwt"
+                }
+              }
+            }
+          },
           "info": {
-            "version": "1.0", 
             "title": {
               "Ref": "AWS::StackName"
-            }
-          }, 
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
           "paths": {
-            "/basic": {
-              "post": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
-                  "uri": {
-                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations"
-                  }, 
-                  "payloadFormatVersion": "2.0"
-                }, 
-                "security": [
+            "$default": {
+              "x-amazon-apigateway-any-method": {
+                "Fn::If": [
+                  "condition",
                   {
-                    "OpenIdAuth": [
-                      "scope3"
-                    ]
+                    "isDefaultRoute": true,
+                    "responses": {},
+                    "security": [
+                      {
+                        "OpenIdAuth": [
+                          "scope1",
+                          "scope2"
+                        ]
+                      }
+                    ],
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST",
+                      "payloadFormatVersion": "2.0",
+                      "type": "aws_proxy",
+                      "uri": {
+                        "Fn::If": [
+                          "condition",
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
+                          },
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "Ref": "AWS::NoValue"
                   }
-                ], 
-                "responses": {}
-              }, 
+                ]
+              }
+            },
+            "/basic": {
               "get": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
-                  "uri": {
-                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations"
-                  }, 
-                  "payloadFormatVersion": "1.0"
-                }, 
+                "responses": {},
                 "security": [
                   {
                     "OAuth2": [
                       "basic"
                     ]
                   }
-                ], 
-                "responses": {}
-              }
-            }, 
-            "/integration": {
-              "post": {
+                ],
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "payloadFormatVersion": "1.0",
+                  "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
-                  }, 
-                  "payloadFormatVersion": "1.0"
-                }, 
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations"
+                  }
+                }
+              },
+              "post": {
+                "responses": {},
                 "security": [
                   {
                     "OpenIdAuth": [
-                      "scope1", 
+                      "scope3"
+                    ]
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "payloadFormatVersion": "2.0",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations"
+                  }
+                }
+              }
+            },
+            "/integration": {
+              "post": {
+                "responses": {},
+                "security": [
+                  {
+                    "OpenIdAuth": [
+                      "scope1",
                       "scope2"
                     ]
                   }
-                ], 
-                "responses": {}
-              }
-            }, 
-            "$default": {
-              "x-amazon-apigateway-any-method": {
-                "Fn::If": [
-                  "condition", 
-                  {
-                    "security": [
-                      {
-                        "OpenIdAuth": [
-                          "scope1", 
-                          "scope2"
-                        ]
-                      }
-                    ], 
-                    "isDefaultRoute": true, 
-                    "x-amazon-apigateway-integration": {
-                      "httpMethod": "POST", 
-                      "type": "aws_proxy", 
-                      "uri": {
-                        "Fn::If": [
-                          "condition", 
-                          {
-                            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
-                          }, 
-                          {
-                            "Ref": "AWS::NoValue"
-                          }
-                        ]
-                      }, 
-                      "payloadFormatVersion": "2.0"
-                    }, 
-                    "responses": {}
-                  }, 
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              }
-            }, 
-            "/oauth2": {
-              "post": {
+                ],
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "payloadFormatVersion": "1.0",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
-                  }, 
-                  "payloadFormatVersion": "1.0"
-                }, 
+                  }
+                }
+              }
+            },
+            "/oauth2": {
+              "post": {
+                "responses": {},
                 "security": [
                   {
                     "oauth2Auth": [
                       "scope4"
                     ]
                   }
-                ], 
-                "responses": {}
-              }
-            }
-          }, 
-          "components": {
-            "securitySchemes": {
-              "oauth2Auth": {
-                "type": "oauth2", 
-                "x-amazon-apigateway-authorizer": {
-                  "identitySource": "$request.querystring.param", 
-                  "type": "jwt", 
-                  "jwtConfiguration": {
-                    "audience": [
-                      "MyApi"
-                    ], 
-                    "issuer": "https://www.example.com/v1/connect/oidc"
+                ],
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "payloadFormatVersion": "1.0",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
                   }
-                }
-              }, 
-              "OAuth2": {
-                "type": "oauth2", 
-                "x-amazon-apigateway-authorizer": {
-                  "identitySource": "$request.querystring.param", 
-                  "type": "jwt", 
-                  "jwtConfiguration": {
-                    "audience": [
-                      "MyApi"
-                    ], 
-                    "issuer": "https://www.example.com/v1/connect/oidc"
-                  }
-                }
-              }, 
-              "OpenIdAuth": {
-                "type": "openIdConnect", 
-                "x-amazon-apigateway-authorizer": {
-                  "identitySource": "$request.querystring.param", 
-                  "type": "jwt", 
-                  "jwtConfiguration": {
-                    "audience": [
-                      "MyApi"
-                    ], 
-                    "issuer": "https://www.example.com/v1/connect/oidc"
-                  }, 
-                  "openIdConnectUrl": "https://www.example.com/v1/connect"
                 }
               }
             }
-          }, 
-          "openapi": "3.0.1", 
+          },
           "tags": [
             {
-              "name": "httpapi:createdBy", 
+              "name": "httpapi:createdBy",
               "x-amazon-apigateway-tag-value": "SAM"
             },
             {
-              "name": "Tag1", 
-              "x-amazon-apigateway-tag-value": "value1",
-              "description": "this tag exists, but doesn't have an amazon extension value"
-            }, 
+              "description": "this tag exists, but doesn't have an amazon extension value",
+              "name": "Tag1",
+              "x-amazon-apigateway-tag-value": "value1"
+            },
             {
-              "name": "Tag2", 
+              "name": "Tag2",
               "x-amazon-apigateway-tag-value": "value2"
             }
           ]
         }
-      }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "MyApiApiGatewayDefaultStage": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        },
+        "AutoDeploy": true,
+        "StageName": "$default",
+        "Tags": {
+          "Tag1": "value1",
+          "Tag2": "value2",
+          "httpapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
     }
   }
 }

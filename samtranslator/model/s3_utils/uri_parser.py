@@ -2,7 +2,7 @@ from urllib.parse import urlparse, parse_qs
 from samtranslator.model.exceptions import InvalidResourceException
 
 
-def parse_s3_uri(uri):
+def parse_s3_uri(uri):  # type: ignore[no-untyped-def]
     """Parses a S3 Uri into a dictionary of the Bucket, Key, and VersionId
 
     :return: a BodyS3Location dict or None if not an S3 Uri
@@ -22,7 +22,7 @@ def parse_s3_uri(uri):
     return None
 
 
-def to_s3_uri(code_dict):
+def to_s3_uri(code_dict):  # type: ignore[no-untyped-def]
     """Constructs a S3 URI string from given code dictionary
 
     :param dict code_dict: Dictionary containing Lambda function Code S3 location of the form
@@ -43,7 +43,7 @@ def to_s3_uri(code_dict):
     return uri
 
 
-def construct_image_code_object(image_uri, logical_id, property_name):
+def construct_image_code_object(image_uri, logical_id, property_name):  # type: ignore[no-untyped-def]
     """Constructs a Lambda `Code` or `Content` property, from the SAM `ImageUri` property.
     This follows the current scheme for Lambda Functions.
 
@@ -54,14 +54,14 @@ def construct_image_code_object(image_uri, logical_id, property_name):
     :rtype: dict
     """
     if not image_uri:
-        raise InvalidResourceException(
+        raise InvalidResourceException(  # type: ignore[no-untyped-call]
             logical_id, "'{}' requires that a image hosted at a registry be specified.".format(property_name)
         )
 
     return {"ImageUri": image_uri}
 
 
-def construct_s3_location_object(location_uri, logical_id, property_name):
+def construct_s3_location_object(location_uri, logical_id, property_name):  # type: ignore[no-untyped-def]
     """Constructs a Lambda `Code` or `Content` property, from the SAM `CodeUri` or `ContentUri` property.
     This follows the current scheme for Lambda Functions and LayerVersions.
 
@@ -74,7 +74,7 @@ def construct_s3_location_object(location_uri, logical_id, property_name):
     if isinstance(location_uri, dict):
         if not location_uri.get("Bucket") or not location_uri.get("Key"):
             # location_uri is a dictionary but does not contain Bucket or Key property
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 logical_id, "'{}' requires Bucket and Key properties to be specified.".format(property_name)
             )
 
@@ -82,7 +82,7 @@ def construct_s3_location_object(location_uri, logical_id, property_name):
 
     else:
         # location_uri is NOT a dictionary. Parse it as a string
-        s3_pointer = parse_s3_uri(location_uri)
+        s3_pointer = parse_s3_uri(location_uri)  # type: ignore[no-untyped-call]
 
         if s3_pointer is None:
             raise InvalidResourceException(

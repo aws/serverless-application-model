@@ -1,57 +1,57 @@
 {
   "Resources": {
+    "StateMachine": {
+      "Properties": {
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "my-state-machine.asl.json"
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StateMachineRole",
+            "Arn"
+          ]
+        },
+        "StateMachineName": "MyStateMachineWithManagedPolicy",
+        "StateMachineType": "STANDARD",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
     "StateMachineRole": {
-      "Type": "AWS::IAM::Role", 
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "states.amazonaws.com"
                 ]
               }
             }
-          ]
-        }, 
+          ],
+          "Version": "2012-10-17"
+        },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess"
-        ], 
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "stateMachine:createdBy"
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    }, 
-    "StateMachine": {
-      "Type": "AWS::StepFunctions::StateMachine", 
-      "Properties": {
-        "RoleArn": {
-          "Fn::GetAtt": [
-            "StateMachineRole", 
-            "Arn"
-          ]
-        }, 
-        "StateMachineName": "MyStateMachineWithManagedPolicy", 
-        "DefinitionS3Location": {
-          "Bucket": "sam-demo-bucket", 
-          "Key": "my-state-machine.asl.json"
-        }, 
-        "StateMachineType": "STANDARD", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "stateMachine:createdBy"
-          }
-        ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

@@ -1,733 +1,733 @@
 {
-    "Resources": {
-        "MyApiWithCognitoAuth": {
-            "Type": "AWS::ApiGateway::RestApi", 
-            "Properties": {
-                "Body": {
-                    "info": {
-                        "version": "1.0", 
-                        "title": {
-                            "Ref": "AWS::StackName"
-                        }
-                    }, 
-                    "paths": {
-                        "/cognitowithauthnone": {
-                            "get": {
-                                "x-amazon-apigateway-integration": {
-                                    "responses": {
-                                        "200": {
-                                            "statusCode": "200"
-                                        }, 
-                                        "400": {
-                                            "statusCode": "400"
-                                        }
-                                    }, 
-                                    "uri": {
-                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
-                                    "requestTemplates": {
-                                        "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
-                                        }
-                                    }, 
-                                    "credentials": {
-                                        "Fn::GetAtt": [
-                                            "MyStateMachineCognitoWithAuthNoneRole", 
-                                            "Arn"
-                                        ]
-                                    }, 
-                                    "type": "aws"
-                                }, 
-                                "security": [
-                                    {
-                                        "NONE": []
-                                    }
-                                ], 
-                                "responses": {
-                                    "200": {
-                                        "description": "OK"
-                                    }, 
-                                    "400": {
-                                        "description": "Bad Request"
-                                    }
-                                }
-                            }
-                        }, 
-                        "/cognitodefaultauthdefaultscopesnone": {
-                            "get": {
-                                "x-amazon-apigateway-integration": {
-                                    "responses": {
-                                        "200": {
-                                            "statusCode": "200"
-                                        }, 
-                                        "400": {
-                                            "statusCode": "400"
-                                        }
-                                    }, 
-                                    "uri": {
-                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
-                                    "requestTemplates": {
-                                        "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
-                                        }
-                                    }, 
-                                    "credentials": {
-                                        "Fn::GetAtt": [
-                                            "MyStateMachineCognitoDefaultAuthDefaultScopesNoneRole", 
-                                            "Arn"
-                                        ]
-                                    }, 
-                                    "type": "aws"
-                                }, 
-                                "security": [
-                                    {
-                                        "MyCognitoAuthWithDefaultScopes": []
-                                    }
-                                ], 
-                                "responses": {
-                                    "200": {
-                                        "description": "OK"
-                                    }, 
-                                    "400": {
-                                        "description": "Bad Request"
-                                    }
-                                }
-                            }
-                        }, 
-                        "/cognitodefaultscopesnone": {
-                            "get": {
-                                "x-amazon-apigateway-integration": {
-                                    "responses": {
-                                        "200": {
-                                            "statusCode": "200"
-                                        }, 
-                                        "400": {
-                                            "statusCode": "400"
-                                        }
-                                    }, 
-                                    "uri": {
-                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
-                                    "requestTemplates": {
-                                        "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
-                                        }
-                                    }, 
-                                    "credentials": {
-                                        "Fn::GetAtt": [
-                                            "MyStateMachineCognitoDefaultScopesNoneRole", 
-                                            "Arn"
-                                        ]
-                                    }, 
-                                    "type": "aws"
-                                }, 
-                                "security": [
-                                    {
-                                        "MyDefaultCognitoAuth": []
-                                    }
-                                ], 
-                                "responses": {
-                                    "200": {
-                                        "description": "OK"
-                                    }, 
-                                    "400": {
-                                        "description": "Bad Request"
-                                    }
-                                }
-                            }
-                        }, 
-                        "/cognitoauthorizerwithdefaultscopes": {
-                            "get": {
-                                "x-amazon-apigateway-integration": {
-                                    "responses": {
-                                        "200": {
-                                            "statusCode": "200"
-                                        }, 
-                                        "400": {
-                                            "statusCode": "400"
-                                        }
-                                    }, 
-                                    "uri": {
-                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
-                                    "requestTemplates": {
-                                        "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
-                                        }
-                                    }, 
-                                    "credentials": {
-                                        "Fn::GetAtt": [
-                                            "MyStateMachineCognitoAuthorizerWithDefaultScopesRole", 
-                                            "Arn"
-                                        ]
-                                    }, 
-                                    "type": "aws"
-                                }, 
-                                "security": [
-                                    {
-                                        "MyCognitoAuthWithDefaultScopes": [
-                                            "default.delete", 
-                                            "default.update"
-                                        ]
-                                    }
-                                ], 
-                                "responses": {
-                                    "200": {
-                                        "description": "OK"
-                                    }, 
-                                    "400": {
-                                        "description": "Bad Request"
-                                    }
-                                }
-                            }
-                        }, 
-                        "/cognitoauthorizercopesoverwritten": {
-                            "get": {
-                                "x-amazon-apigateway-integration": {
-                                    "responses": {
-                                        "200": {
-                                            "statusCode": "200"
-                                        }, 
-                                        "400": {
-                                            "statusCode": "400"
-                                        }
-                                    }, 
-                                    "uri": {
-                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
-                                    "requestTemplates": {
-                                        "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
-                                        }
-                                    }, 
-                                    "credentials": {
-                                        "Fn::GetAtt": [
-                                            "MyStateMachineCognitoAuthorizerScopesOverwrittenRole", 
-                                            "Arn"
-                                        ]
-                                    }, 
-                                    "type": "aws"
-                                }, 
-                                "security": [
-                                    {
-                                        "MyCognitoAuthWithDefaultScopes": [
-                                            "overwritten.read", 
-                                            "overwritten.write"
-                                        ]
-                                    }
-                                ], 
-                                "responses": {
-                                    "200": {
-                                        "description": "OK"
-                                    }, 
-                                    "400": {
-                                        "description": "Bad Request"
-                                    }
-                                }
-                            }
-                        }, 
-                        "/cognitodefaultscopesoverwritten": {
-                            "get": {
-                                "x-amazon-apigateway-integration": {
-                                    "responses": {
-                                        "200": {
-                                            "statusCode": "200"
-                                        }, 
-                                        "400": {
-                                            "statusCode": "400"
-                                        }
-                                    }, 
-                                    "uri": {
-                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
-                                    "requestTemplates": {
-                                        "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
-                                        }
-                                    }, 
-                                    "credentials": {
-                                        "Fn::GetAtt": [
-                                            "MyStateMachineCognitoDefaultScopesWithOverwrittenRole", 
-                                            "Arn"
-                                        ]
-                                    }, 
-                                    "type": "aws"
-                                }, 
-                                "security": [
-                                    {
-                                        "MyDefaultCognitoAuth": [
-                                            "overwritten.read", 
-                                            "overwritten.write"
-                                        ]
-                                    }
-                                ], 
-                                "responses": {
-                                    "200": {
-                                        "description": "OK"
-                                    }, 
-                                    "400": {
-                                        "description": "Bad Request"
-                                    }
-                                }
-                            }
-                        }, 
-                        "/cognitodefaultscopesdefaultauthorizer": {
-                            "get": {
-                                "x-amazon-apigateway-integration": {
-                                    "responses": {
-                                        "200": {
-                                            "statusCode": "200"
-                                        }, 
-                                        "400": {
-                                            "statusCode": "400"
-                                        }
-                                    }, 
-                                    "uri": {
-                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
-                                    "requestTemplates": {
-                                        "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
-                                        }
-                                    }, 
-                                    "credentials": {
-                                        "Fn::GetAtt": [
-                                            "MyStateMachineCognitoDefaultScopesDefaultAuthorizerRole", 
-                                            "Arn"
-                                        ]
-                                    }, 
-                                    "type": "aws"
-                                }, 
-                                "security": [
-                                    {
-                                        "MyDefaultCognitoAuth": [
-                                            "default.write", 
-                                            "default.read"
-                                        ]
-                                    }
-                                ], 
-                                "responses": {
-                                    "200": {
-                                        "description": "OK"
-                                    }, 
-                                    "400": {
-                                        "description": "Bad Request"
-                                    }
-                                }
-                            }
-                        }
-                    }, 
-                    "openapi": "3.0.1", 
-                    "components": {
-                        "securitySchemes": {
-                            "MyCognitoAuthWithDefaultScopes": {
-                                "in": "header", 
-                                "type": "apiKey", 
-                                "name": "Authorization", 
-                                "x-amazon-apigateway-authorizer": {
-                                    "providerARNs": [
-                                        "arn:aws:2"
-                                    ], 
-                                    "type": "cognito_user_pools"
-                                }, 
-                                "x-amazon-apigateway-authtype": "cognito_user_pools"
-                            }, 
-                            "MyDefaultCognitoAuth": {
-                                "in": "header", 
-                                "type": "apiKey", 
-                                "name": "Authorization", 
-                                "x-amazon-apigateway-authorizer": {
-                                    "providerARNs": [
-                                        "arn:aws:1"
-                                    ], 
-                                    "type": "cognito_user_pools"
-                                }, 
-                                "x-amazon-apigateway-authtype": "cognito_user_pools"
-                            }
-                        }
-                    }
-                }, 
-                "EndpointConfiguration": {
-                    "Types": [
-                        "REGIONAL"
+  "Resources": {
+    "MyApiWithCognitoAuth": {
+      "Properties": {
+        "Body": {
+          "components": {
+            "securitySchemes": {
+              "MyCognitoAuthWithDefaultScopes": {
+                "in": "header",
+                "name": "Authorization",
+                "type": "apiKey",
+                "x-amazon-apigateway-authorizer": {
+                  "providerARNs": [
+                    "arn:aws:2"
+                  ],
+                  "type": "cognito_user_pools"
+                },
+                "x-amazon-apigateway-authtype": "cognito_user_pools"
+              },
+              "MyDefaultCognitoAuth": {
+                "in": "header",
+                "name": "Authorization",
+                "type": "apiKey",
+                "x-amazon-apigateway-authorizer": {
+                  "providerARNs": [
+                    "arn:aws:1"
+                  ],
+                  "type": "cognito_user_pools"
+                },
+                "x-amazon-apigateway-authtype": "cognito_user_pools"
+              }
+            }
+          },
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {
+            "/cognitoauthorizercopesoverwritten": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "security": [
+                  {
+                    "MyCognitoAuthWithDefaultScopes": [
+                      "overwritten.read",
+                      "overwritten.write"
                     ]
-                }, 
-                "Parameters": {
-                    "endpointConfigurationTypes": "REGIONAL"
-                }
-            }
-        }, 
-        "MyStateMachineCognitoWithAuthNoneRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "MyStateMachineCognitoWithAuthNoneRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "MyStateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "MyStateMachineCognitoDefaultScopesNoneRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "MyStateMachineCognitoDefaultScopesNoneRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "MyStateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "MyStateMachineCognitoDefaultAuthDefaultScopesNoneRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "MyStateMachineCognitoDefaultAuthDefaultScopesNoneRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "MyStateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "MyStateMachineCognitoDefaultScopesWithOverwrittenRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "MyStateMachineCognitoDefaultScopesWithOverwrittenRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "MyStateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "MyApiWithCognitoAuthProdStage": {
-            "Type": "AWS::ApiGateway::Stage", 
-            "Properties": {
-                "DeploymentId": {
-                    "Ref": "MyApiWithCognitoAuthDeployment57b57dfc88"
-                }, 
-                "RestApiId": {
-                    "Ref": "MyApiWithCognitoAuth"
-                }, 
-                "StageName": "Prod"
-            }
-        }, 
-        "MyApiWithCognitoAuthDeployment57b57dfc88": {
-            "Type": "AWS::ApiGateway::Deployment", 
-            "Properties": {
-                "RestApiId": {
-                    "Ref": "MyApiWithCognitoAuth"
-                }, 
-                "Description": "RestApi deployment id: 57b57dfc88b1b438a0437eadd869d77e938eedb6"
-            }
-        }, 
-        "MyStateMachineCognitoDefaultScopesDefaultAuthorizerRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "MyStateMachineCognitoDefaultScopesDefaultAuthorizerRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "MyStateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "MyStateMachine": {
-            "Type": "AWS::StepFunctions::StateMachine", 
-            "Properties": {
-                "RoleArn": {
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
                     "Fn::GetAtt": [
-                        "MyStateMachineRole", 
-                        "Arn"
+                      "MyStateMachineCognitoAuthorizerScopesOverwrittenRole",
+                      "Arn"
                     ]
-                }, 
-                "StateMachineName": "MyStateMachine", 
-                "DefinitionString": {
-                    "Fn::Join": [
-                        "\n", 
-                        [
-                            "{", 
-                            "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",", 
-                            "    \"StartAt\": \"Hello\",", 
-                            "    \"States\": {", 
-                            "        \"Hello\": {", 
-                            "            \"Next\": \"World\",", 
-                            "            \"Result\": \"Hello\",", 
-                            "            \"Type\": \"Pass\"", 
-                            "        },", 
-                            "        \"World\": {", 
-                            "            \"End\": true,", 
-                            "            \"Result\": \"World\",", 
-                            "            \"Type\": \"Pass\"", 
-                            "        }", 
-                            "    }", 
-                            "}"
-                        ]
-                    ]
-                }, 
-                "Tags": [
-                    {
-                        "Value": "SAM", 
-                        "Key": "stateMachine:createdBy"
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                     }
-                ]
-            }
-        }, 
-        "MyStateMachineCognitoAuthorizerWithDefaultScopesRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "MyStateMachineCognitoAuthorizerWithDefaultScopesRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "MyStateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
                     }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
                 }
-            }
-        }, 
-        "MyStateMachineCognitoAuthorizerScopesOverwrittenRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "MyStateMachineCognitoAuthorizerScopesOverwrittenRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "MyStateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
+              }
+            },
+            "/cognitoauthorizerwithdefaultscopes": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "security": [
+                  {
+                    "MyCognitoAuthWithDefaultScopes": [
+                      "default.delete",
+                      "default.update"
                     ]
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "MyStateMachineCognitoAuthorizerWithDefaultScopesRole",
+                      "Arn"
+                    ]
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                    }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
+                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
                 }
-            }
-        }, 
-        "MyStateMachineRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "states.amazonaws.com"
-                                ]
-                            }
-                        }
+              }
+            },
+            "/cognitodefaultauthdefaultscopesnone": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "security": [
+                  {
+                    "MyCognitoAuthWithDefaultScopes": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "MyStateMachineCognitoDefaultAuthDefaultScopesNoneRole",
+                      "Arn"
                     ]
-                }, 
-                "ManagedPolicyArns": [], 
-                "Policies": [
-                    {
-                        "PolicyName": "MyStateMachineRolePolicy0", 
-                        "PolicyDocument": {
-                            "Version": "2012-10-17", 
-                            "Statement": [
-                                {
-                                    "Action": "*", 
-                                    "Resource": "*", 
-                                    "Effect": "Deny"
-                                }
-                            ]
-                        }
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                     }
-                ], 
-                "Tags": [
-                    {
-                        "Value": "SAM", 
-                        "Key": "stateMachine:createdBy"
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
                     }
-                ]
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
+                }
+              }
+            },
+            "/cognitodefaultscopesdefaultauthorizer": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "security": [
+                  {
+                    "MyDefaultCognitoAuth": [
+                      "default.write",
+                      "default.read"
+                    ]
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "MyStateMachineCognitoDefaultScopesDefaultAuthorizerRole",
+                      "Arn"
+                    ]
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                    }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
+                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
+                }
+              }
+            },
+            "/cognitodefaultscopesnone": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "security": [
+                  {
+                    "MyDefaultCognitoAuth": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "MyStateMachineCognitoDefaultScopesNoneRole",
+                      "Arn"
+                    ]
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                    }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
+                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
+                }
+              }
+            },
+            "/cognitodefaultscopesoverwritten": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "security": [
+                  {
+                    "MyDefaultCognitoAuth": [
+                      "overwritten.read",
+                      "overwritten.write"
+                    ]
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "MyStateMachineCognitoDefaultScopesWithOverwrittenRole",
+                      "Arn"
+                    ]
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                    }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
+                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
+                }
+              }
+            },
+            "/cognitowithauthnone": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "security": [
+                  {
+                    "NONE": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "MyStateMachineCognitoWithAuthNoneRole",
+                      "Arn"
+                    ]
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                    }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
+                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
+                }
+              }
             }
+          }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiWithCognitoAuthDeployment57b57dfc88": {
+      "Properties": {
+        "Description": "RestApi deployment id: 57b57dfc88b1b438a0437eadd869d77e938eedb6",
+        "RestApiId": {
+          "Ref": "MyApiWithCognitoAuth"
+        }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiWithCognitoAuthProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithCognitoAuthDeployment57b57dfc88"
+        },
+        "RestApiId": {
+          "Ref": "MyApiWithCognitoAuth"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyStateMachine": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",",
+              "    \"StartAt\": \"Hello\",",
+              "    \"States\": {",
+              "        \"Hello\": {",
+              "            \"Next\": \"World\",",
+              "            \"Result\": \"Hello\",",
+              "            \"Type\": \"Pass\"",
+              "        },",
+              "        \"World\": {",
+              "            \"End\": true,",
+              "            \"Result\": \"World\",",
+              "            \"Type\": \"Pass\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MyStateMachineRole",
+            "Arn"
+          ]
+        },
+        "StateMachineName": "MyStateMachine",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "MyStateMachineCognitoAuthorizerScopesOverwrittenRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "MyStateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MyStateMachineCognitoAuthorizerScopesOverwrittenRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyStateMachineCognitoAuthorizerWithDefaultScopesRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "MyStateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MyStateMachineCognitoAuthorizerWithDefaultScopesRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyStateMachineCognitoDefaultAuthDefaultScopesNoneRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "MyStateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MyStateMachineCognitoDefaultAuthDefaultScopesNoneRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyStateMachineCognitoDefaultScopesDefaultAuthorizerRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "MyStateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MyStateMachineCognitoDefaultScopesDefaultAuthorizerRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyStateMachineCognitoDefaultScopesNoneRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "MyStateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MyStateMachineCognitoDefaultScopesNoneRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyStateMachineCognitoDefaultScopesWithOverwrittenRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "MyStateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MyStateMachineCognitoDefaultScopesWithOverwrittenRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyStateMachineCognitoWithAuthNoneRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "MyStateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MyStateMachineCognitoWithAuthNoneRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyStateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "*",
+                  "Effect": "Deny",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "MyStateMachineRolePolicy0"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
+  }
 }

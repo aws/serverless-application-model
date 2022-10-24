@@ -1,16 +1,118 @@
 {
   "Resources": {
-    "MyFunction": {
-      "Type": "AWS::Lambda::Function"
+    "ApiV1ToLambdaWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "ApiV1ToLambda": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::ApiGateway::RestApi"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceQualifier": "Prod/GET/foobar",
+              "SourceResourceId": {
+                "Ref": "MyApiV1"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
-    "MyRule": {
-      "Type": "AWS::Events::Rule"
+    "ApiV2ToLambdaWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "ApiV2ToLambda": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::ApiGatewayV2::Api"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceQualifier": "*",
+              "SourceResourceId": {
+                "Ref": "MyApiV2"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
-    "MyQueue": {
-      "Type": "AWS::SQS::Queue"
-    },
-    "MyTopic": {
-      "Type": "AWS::SNS::Topic"
+    "LambdaToQueuePolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "LambdaToQueue": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:DeleteMessage",
+                "sqs:SendMessage",
+                "sqs:ChangeMessageVisibility",
+                "sqs:PurgeQueue"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          "MyCoolRole"
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
     },
     "MyApiV1": {
       "Type": "AWS::ApiGateway::RestApi"
@@ -18,79 +120,190 @@
     "MyApiV2": {
       "Type": "AWS::ApiGatewayV2::Api"
     },
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyRule": {
+      "Type": "AWS::Events::Rule"
+    },
     "MySfn": {
       "Type": "AWS::StepFunctions::StateMachine"
     },
+    "MyTopic": {
+      "Type": "AWS::SNS::Topic"
+    },
     "RuleToTopicTopicPolicy": {
-      "Type": "AWS::SNS::TopicPolicy",
       "Metadata": {
         "aws:sam:connectors": {
           "RuleToTopic": {
-            "Source": {
-              "Type": "AWS::Events::Rule"
-            },
             "Destination": {
               "Type": "AWS::SNS::Topic"
+            },
+            "Source": {
+              "Type": "AWS::Events::Rule"
             }
           }
         }
       },
       "Properties": {
         "PolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
+              "Action": "sns:Publish",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Fn::GetAtt": [
+                      "MyRule",
+                      "Arn"
+                    ]
+                  }
+                }
+              },
               "Effect": "Allow",
               "Principal": {
                 "Service": "events.amazonaws.com"
               },
               "Resource": {
-                "Fn::GetAtt": ["Egg", "Baz"]
-              },
-              "Action": "sns:Publish",
-              "Condition": {
-                "ArnEquals": {
-                  "aws:SourceArn": {
-                    "Fn::GetAtt": ["MyRule", "Arn"]
-                  }
-                }
+                "Fn::GetAtt": [
+                  "Egg",
+                  "Baz"
+                ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "Topics": [
           {
-            "Fn::GetAtt": ["Egg", "Baz"]
+            "Fn::GetAtt": [
+              "Egg",
+              "Baz"
+            ]
           }
         ]
-      }
+      },
+      "Type": "AWS::SNS::TopicPolicy"
     },
-    "TopicToQueueQueuePolicy": {
-      "Type": "AWS::SQS::QueuePolicy",
+    "SfnToSfnPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "TopicToQueue": {
-            "Source": {
-              "Type": "AWS::SNS::Topic"
-            },
+          "SfnToSfn": {
             "Destination": {
-              "Type": "AWS::SQS::Queue"
+              "Type": "AWS::StepFunctions::StateMachine"
+            },
+            "Source": {
+              "Type": "AWS::StepFunctions::StateMachine"
             }
           }
         }
       },
       "Properties": {
         "PolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
+              "Action": [
+                "states:DescribeExecution"
+              ],
               "Effect": "Allow",
-              "Principal": {
-                "Service": "sns.amazonaws.com"
-              },
-              "Resource": {
-                "Ref": "MyQueue"
-              },
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
+                    {
+                      "DestinationName": {
+                        "Fn::GetAtt": [
+                          "MySfn",
+                          "Name"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "events:DescribeRule"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+                }
+              ]
+            },
+            {
+              "Action": [
+                "states:StartExecution"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "some-other-arn"
+              ]
+            },
+            {
+              "Action": [
+                "states:StopExecution"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
+                    {
+                      "DestinationName": {
+                        "Fn::GetAtt": [
+                          "MySfn",
+                          "Name"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "events:PutTargets",
+                "events:PutRule"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          "MyRoleNice"
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "TopicToQueueQueuePolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "TopicToQueue": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::SNS::Topic"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
               "Action": "sqs:SendMessage",
               "Condition": {
                 "ArnEquals": {
@@ -98,9 +311,17 @@
                     "Ref": "MyTopic"
                   }
                 }
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Resource": {
+                "Ref": "MyQueue"
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "Queues": [
           {
@@ -115,188 +336,8 @@
             ]
           }
         ]
-      }
-    },
-    "LambdaToQueuePolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Metadata": {
-        "aws:sam:connectors": {
-          "LambdaToQueue": {
-            "Source": {
-              "Type": "AWS::Lambda::Function"
-            },
-            "Destination": {
-              "Type": "AWS::SQS::Queue"
-            }
-          }
-        }
       },
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "sqs:DeleteMessage",
-                "sqs:SendMessage",
-                "sqs:ChangeMessageVisibility",
-                "sqs:PurgeQueue"
-              ],
-              "Resource": [
-                {
-                  "Fn::GetAtt": ["MyQueue", "Arn"]
-                }
-              ]
-            }
-          ]
-        },
-        "Roles": ["MyCoolRole"]
-      }
-    },
-    "ApiV1ToLambdaWriteLambdaPermission": {
-      "Type": "AWS::Lambda::Permission",
-      "Metadata": {
-        "aws:sam:connectors": {
-          "ApiV1ToLambda": {
-            "Source": {
-              "Type": "AWS::ApiGateway::RestApi"
-            },
-            "Destination": {
-              "Type": "AWS::Lambda::Function"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": ["MyFunction", "Arn"]
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
-            {
-              "SourceResourceId": {
-                "Ref": "MyApiV1"
-              },
-              "SourceQualifier": "Prod/GET/foobar"
-            }
-          ]
-        }
-      }
-    },
-    "ApiV2ToLambdaWriteLambdaPermission": {
-      "Type": "AWS::Lambda::Permission",
-      "Metadata": {
-        "aws:sam:connectors": {
-          "ApiV2ToLambda": {
-            "Source": {
-              "Type": "AWS::ApiGatewayV2::Api"
-            },
-            "Destination": {
-              "Type": "AWS::Lambda::Function"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": ["MyFunction", "Arn"]
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
-            {
-              "SourceResourceId": {
-                "Ref": "MyApiV2"
-              },
-              "SourceQualifier": "*"
-            }
-          ]
-        }
-      }
-    },
-    "SfnToSfnPolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Metadata": {
-        "aws:sam:connectors": {
-          "SfnToSfn": {
-            "Source": {
-              "Type": "AWS::StepFunctions::StateMachine"
-            },
-            "Destination": {
-              "Type": "AWS::StepFunctions::StateMachine"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": ["states:DescribeExecution"],
-              "Resource": [
-                {
-                  "Fn::Sub": [
-                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
-                    {
-                      "DestinationName": {
-                        "Fn::GetAtt": ["MySfn", "Name"]
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": ["events:DescribeRule"],
-              "Resource": [
-                {
-                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
-                }
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": ["states:StartExecution"],
-              "Resource": ["some-other-arn"]
-            },
-            {
-              "Effect": "Allow",
-              "Action": ["states:StopExecution"],
-              "Resource": [
-                {
-                  "Fn::Sub": [
-                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
-                    {
-                      "DestinationName": {
-                        "Fn::GetAtt": ["MySfn", "Name"]
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": ["events:PutTargets", "events:PutRule"],
-              "Resource": [
-                {
-                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
-                }
-              ]
-            }
-          ]
-        },
-        "Roles": ["MyRoleNice"]
-      }
+      "Type": "AWS::SQS::QueuePolicy"
     }
   }
 }

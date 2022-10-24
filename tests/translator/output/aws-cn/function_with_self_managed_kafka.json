@@ -3,7 +3,6 @@
   "Parameters": {},
   "Resources": {
     "KafkaFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -23,13 +22,48 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "KafkaFunctionMyKafkaCluster": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "KafkaFunction"
+        },
+        "SelfManagedEventSource": {
+          "Endpoints": {
+            "KafkaBootstrapServers": [
+              "abc.xyz.com:9092",
+              "123.45.67.89:9096"
+            ]
+          }
+        },
+        "SelfManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": "consumergroup1"
+        },
+        "SourceAccessConfigurations": [
+          {
+            "Type": "SASL_SCRAM_512_AUTH",
+            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
+          },
+          {
+            "Type": "VPC_SUBNET",
+            "URI": "subnet:subnet-12345"
+          },
+          {
+            "Type": "VPC_SECURITY_GROUP",
+            "URI": "security_group:sg-67890"
+          }
+        ],
+        "Topics": [
+          "Topic1"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
     },
     "KafkaFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -42,7 +76,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -82,43 +117,8 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "KafkaFunctionMyKafkaCluster": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "KafkaFunction"
-        },
-        "Topics": [
-          "Topic1"
-        ],
-        "SourceAccessConfigurations": [
-          {
-            "Type": "SASL_SCRAM_512_AUTH",
-            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
-          },
-          {
-            "Type": "VPC_SUBNET",
-            "URI": "subnet:subnet-12345"
-          },
-          {
-            "Type": "VPC_SECURITY_GROUP",
-            "URI": "security_group:sg-67890"
-          }
-        ],
-        "SelfManagedEventSource": {
-          "Endpoints": {
-            "KafkaBootstrapServers": [
-              "abc.xyz.com:9092",
-              "123.45.67.89:9096"
-            ]
-          }
-        },
-        "SelfManagedKafkaEventSourceConfig": {
-          "ConsumerGroupId": "consumergroup1"
-        }
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

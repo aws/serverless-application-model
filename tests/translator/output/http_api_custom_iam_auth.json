@@ -2,22 +2,42 @@
   "Resources": {
     "HttpApiFunction": {
       "Properties": {
-        "Code": { "S3Bucket": "sam-demo-bucket", "S3Key": "todo_list.zip" },
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "todo_list.zip"
+        },
         "Handler": "index.restapi",
-        "Role": { "Fn::GetAtt": ["Arn", "HttpApiFunctionRole"] },
+        "Role": {
+          "Fn::GetAtt": [
+            "Arn",
+            "HttpApiFunctionRole"
+          ]
+        },
         "Runtime": "python3.7",
-        "Tags": [{ "Key": "lambda:createdBy", "Value": "SAM" }]
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       },
       "Type": "AWS::Lambda::Function"
     },
     "HttpApiFunctionHelloAWSIAMAuthPermission": {
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "FunctionName": { "Ref": "HttpApiFunction" },
+        "FunctionName": {
+          "Ref": "HttpApiFunction"
+        },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            { "__ApiId__": { "Ref": "MyApi" }, "__Stage__": "*" },
+            {
+              "__ApiId__": {
+                "Ref": "MyApi"
+              },
+              "__Stage__": "*"
+            },
             "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/hello-aws-iam-auth"
           ]
         }
@@ -29,9 +49,15 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
-              "Principal": { "Service": ["lambda.amazonaws.com"] }
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
             }
           ],
           "Version": "2012-10-17"
@@ -39,7 +65,12 @@
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
-        "Tags": [{ "Key": "lambda:createdBy", "Value": "SAM" }]
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       },
       "Type": "AWS::IAM::Role"
     },
@@ -53,7 +84,10 @@
                 "x-amazon-apigateway-authorizer": {
                   "identitySource": "$request.header.Authorization",
                   "jwtConfiguration": {
-                    "audience": ["audience1", "audience2"],
+                    "audience": [
+                      "audience1",
+                      "audience2"
+                    ],
                     "issuer": "https://www.example.com/v1/connect/oidc"
                   },
                   "type": "jwt"
@@ -61,13 +95,22 @@
               }
             }
           },
-          "info": { "title": { "Ref": "AWS::StackName" }, "version": "1.0" },
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
           "openapi": "3.0.1",
           "paths": {
             "/hello-aws-iam-auth": {
               "get": {
                 "responses": {},
-                "security": [{ "AWS_IAM": [] }],
+                "security": [
+                  {
+                    "AWS_IAM": []
+                  }
+                ],
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST",
                   "payloadFormatVersion": "2.0",
@@ -80,8 +123,14 @@
             }
           },
           "tags": [
-            { "name": "Tag1", "x-amazon-apigateway-tag-value": "value1" },
-            { "name": "Tag2", "x-amazon-apigateway-tag-value": "value2" },
+            {
+              "name": "Tag1",
+              "x-amazon-apigateway-tag-value": "value1"
+            },
+            {
+              "name": "Tag2",
+              "x-amazon-apigateway-tag-value": "value2"
+            },
             {
               "name": "httpapi:createdBy",
               "x-amazon-apigateway-tag-value": "SAM"
@@ -93,7 +142,9 @@
     },
     "MyApiApiGatewayDefaultStage": {
       "Properties": {
-        "ApiId": { "Ref": "MyApi" },
+        "ApiId": {
+          "Ref": "MyApi"
+        },
         "AutoDeploy": true,
         "StageName": "$default",
         "Tags": {
@@ -106,11 +157,24 @@
     },
     "MyAuthFn": {
       "Properties": {
-        "Code": { "S3Bucket": "bucket", "S3Key": "key" },
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
         "Handler": "index.handler",
-        "Role": { "Fn::GetAtt": ["Arn", "MyAuthFnRole"] },
+        "Role": {
+          "Fn::GetAtt": [
+            "Arn",
+            "MyAuthFnRole"
+          ]
+        },
         "Runtime": "nodejs12.x",
-        "Tags": [{ "Key": "lambda:createdBy", "Value": "SAM" }]
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       },
       "Type": "AWS::Lambda::Function"
     },
@@ -119,9 +183,15 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
-              "Principal": { "Service": ["lambda.amazonaws.com"] }
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
             }
           ],
           "Version": "2012-10-17"
@@ -129,7 +199,12 @@
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
-        "Tags": [{ "Key": "lambda:createdBy", "Value": "SAM" }]
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       },
       "Type": "AWS::IAM::Role"
     }

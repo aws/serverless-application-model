@@ -1,25 +1,25 @@
 {
-    "Resources": {
-      "MinimalTable": {
-        "Type": "AWS::DynamoDB::Table", 
-        "Properties": {
-          "BillingMode": "PAY_PER_REQUEST",
-          "SSESpecification": {
-              "SSEEnabled": true
-          },
-          "AttributeDefinitions": [
-            {
-              "AttributeName": "id", 
-              "AttributeType": "S"
-            }
-          ], 
-          "KeySchema": [
-            {
-              "KeyType": "HASH", 
-              "AttributeName": "id"
-            }
-          ]
+  "Resources": {
+    "MinimalTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "SSESpecification": {
+          "SSEEnabled": true
         }
-      }
+      },
+      "Type": "AWS::DynamoDB::Table"
     }
   }
+}

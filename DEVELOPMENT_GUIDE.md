@@ -127,6 +127,25 @@ will not work in Python3.6). If you want to test in many versions, you can creat
 each version and flip between them (sourcing the activate script). Typically, we run all tests in
 one python version locally and then have our ci (appveyor) run all supported versions.
 
+### Transform tests
+When adding new transform tests, we have provided a script to help generate the transform test input 
+and output files in the correct directory given a template.yaml file.
+```bash
+python3 bin/add_transform_test.py --template-file template.yaml
+```
+
+This script will automatically generate the input and output files. It will guarantee that the output
+files have the correct AWS partition (e.g. aws-cn, aws-us-gov). 
+
+For `AWS::ApiGateway::RestApi`, the script will automatically append `REGIONAL` EndpointConfiguration.
+To disable this feature, run the following command instead.
+```bash
+python3 bin/add_transform_test.py --template-file template.yaml --disable-api-configuration
+```
+
+Note that please always check the generated output is as expected. This tool does not guarantee correct output.
+
+
 ### Integration tests
 
 Integration tests are covered in detail in the [INTEGRATION_TESTS.md file](INTEGRATION_TESTS.md) of this repository.
@@ -184,4 +203,4 @@ bin/sam-translate.py --template-file=output-template.yaml
 # Deploy your transformed CloudFormation template
 # Replace MY_STACK_NAME with a unique name each time you deploy
 aws cloudformation deploy --template-file cfn-template.json --capabilities CAPABILITY_NAMED_IAM --stack-name MY_STACK_NAME
-   ```
+```

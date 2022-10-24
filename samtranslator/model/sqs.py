@@ -9,20 +9,20 @@ class SQSQueue(Resource):
     resource_type = "AWS::SQS::Queue"
     property_types: Dict[str, PropertyType] = {}
     runtime_attrs = {
-        "queue_url": lambda self: ref(self.logical_id),
-        "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),
+        "queue_url": lambda self: ref(self.logical_id),  # type: ignore[no-untyped-call]
+        "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),  # type: ignore[no-untyped-call]
     }
 
 
 class SQSQueuePolicy(Resource):
     resource_type = "AWS::SQS::QueuePolicy"
-    property_types = {"PolicyDocument": PropertyType(True, is_type(dict)), "Queues": PropertyType(True, list_of(str))}
-    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
+    property_types = {"PolicyDocument": PropertyType(True, is_type(dict)), "Queues": PropertyType(True, list_of(str))}  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
+    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "Arn")}  # type: ignore[no-untyped-call]
 
 
 class SQSQueuePolicies:
     @staticmethod
-    def sns_topic_send_message_role_policy(topic_arn, queue_arn):
+    def sns_topic_send_message_role_policy(topic_arn, queue_arn):  # type: ignore[no-untyped-def]
         document = {
             "Version": "2012-10-17",
             "Statement": [
@@ -38,7 +38,7 @@ class SQSQueuePolicies:
         return document
 
     @staticmethod
-    def eventbridge_dlq_send_message_resource_based_policy(rule_arn, queue_arn):
+    def eventbridge_dlq_send_message_resource_based_policy(rule_arn, queue_arn):  # type: ignore[no-untyped-def]
         document = {
             "Version": "2012-10-17",
             "Statement": [
