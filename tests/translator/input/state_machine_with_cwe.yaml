@@ -8,6 +8,7 @@ Resources:
         CWEvent:
           Type: CloudWatchEvent
           Properties:
+            RuleName: MyRule
             State: ENABLED
             Pattern:
               detail:

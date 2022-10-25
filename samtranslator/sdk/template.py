@@ -10,7 +10,7 @@ class SamTemplate(object):
     Class representing the SAM template
     """
 
-    def __init__(self, template_dict):
+    def __init__(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Initialize with a template dictionary, that contains "Resources" dictionary
 
@@ -19,7 +19,7 @@ class SamTemplate(object):
         self.template_dict = template_dict
         self.resources = template_dict["Resources"]
 
-    def iterate(self, resource_types=None):
+    def iterate(self, resource_types=None):  # type: ignore[no-untyped-def]
         """
         Iterate over all resources within the SAM template, optionally filtering by type
 
@@ -30,15 +30,15 @@ class SamTemplate(object):
             resource_types = {}
         for logicalId, resource_dict in self.resources.items():
 
-            resource = SamResource(resource_dict)
-            needs_filter = resource.valid()
+            resource = SamResource(resource_dict)  # type: ignore[no-untyped-call]
+            needs_filter = resource.valid()  # type: ignore[no-untyped-call]
             if resource_types:
                 needs_filter = needs_filter and resource.type in resource_types
 
             if needs_filter:
                 yield logicalId, resource
 
-    def set(self, logicalId, resource):
+    def set(self, logicalId, resource):  # type: ignore[no-untyped-def]
         """
         Adds the resource to dictionary with given logical Id. It will overwrite, if the logicalId is already used.
 
@@ -48,11 +48,11 @@ class SamTemplate(object):
 
         resource_dict = resource
         if isinstance(resource, SamResource):
-            resource_dict = resource.to_dict()
+            resource_dict = resource.to_dict()  # type: ignore[no-untyped-call]
 
         self.resources[logicalId] = resource_dict
 
-    def get(self, logicalId):
+    def get(self, logicalId):  # type: ignore[no-untyped-def]
         """
         Gets the resource at the given logicalId if present
 
@@ -62,9 +62,9 @@ class SamTemplate(object):
         if logicalId not in self.resources:
             return None
 
-        return SamResource(self.resources.get(logicalId))
+        return SamResource(self.resources.get(logicalId))  # type: ignore[no-untyped-call]
 
-    def delete(self, logicalId):
+    def delete(self, logicalId):  # type: ignore[no-untyped-def]
         """
         Deletes a resource at the given ID
 
@@ -74,7 +74,7 @@ class SamTemplate(object):
         if logicalId in self.resources:
             del self.resources[logicalId]
 
-    def to_dict(self):
+    def to_dict(self):  # type: ignore[no-untyped-def]
         """
         Returns the template as a dictionary
 

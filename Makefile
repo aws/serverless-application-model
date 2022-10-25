@@ -26,10 +26,10 @@ black-check:
 	bin/json-format.py --check tests
 
 lint:
+	# mypy performs type check
+	mypy --strict samtranslator bin
 	# Linter performs static analysis to catch latent bugs
 	pylint --rcfile .pylintrc samtranslator
-	# mypy performs type check
-	mypy samtranslator bin/add_transform_test.py bin/json-format.py
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup

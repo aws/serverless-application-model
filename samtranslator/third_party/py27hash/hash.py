@@ -8,7 +8,7 @@ import ctypes
 import math
 
 
-def hash27(value):
+def hash27(value):  # type: ignore[no-untyped-def]
     """
     Wrapper call to Hash.hash()
 
@@ -19,7 +19,7 @@ def hash27(value):
         Python 2.7 hash
     """
 
-    return Hash.hash(value)
+    return Hash.hash(value)  # type: ignore[no-untyped-call]
 
 
 class Hash(object):
@@ -28,7 +28,7 @@ class Hash(object):
     """
 
     @staticmethod
-    def hash(value):
+    def hash(value):  # type: ignore[no-untyped-def]
         """
         Returns a Python 2.7 hash for a value.
 
@@ -40,18 +40,18 @@ class Hash(object):
         """
 
         if isinstance(value, tuple):
-            return Hash.thash(value)
+            return Hash.thash(value)  # type: ignore[no-untyped-call]
         if isinstance(value, float):
-            return Hash.fhash(value)
+            return Hash.fhash(value)  # type: ignore[no-untyped-call]
         if isinstance(value, int):
             return hash(value)
         if isinstance(value, ("".__class__, bytes)) or type(value).__name__ == "buffer":
-            return Hash.shash(value)
+            return Hash.shash(value)  # type: ignore[no-untyped-call]
 
         raise TypeError("unhashable type: '%s'" % (type(value).__name__))
 
     @staticmethod
-    def thash(value):
+    def thash(value):  # type: ignore[no-untyped-def]
         """
         Returns a Python 2.7 hash for a tuple.
 
@@ -73,7 +73,7 @@ class Hash(object):
         for y in value:
             length -= 1
 
-            y = Hash.hash(y)
+            y = Hash.hash(y)  # type: ignore[no-untyped-call]
             x = (x ^ y) * mult
             mult += 82520 + length + length
 
@@ -86,7 +86,7 @@ class Hash(object):
         return ctypes.c_long(x).value
 
     @staticmethod
-    def fhash(value):
+    def fhash(value):  # type: ignore[no-untyped-def]
         """
         Returns a Python 2.7 hash for a float.
 
@@ -123,7 +123,7 @@ class Hash(object):
         return ctypes.c_long(x).value
 
     @staticmethod
-    def shash(value):
+    def shash(value):  # type: ignore[no-untyped-def]
         """
         Returns a Python 2.7 hash for a string.
 
@@ -142,9 +142,9 @@ class Hash(object):
         if length == 0:
             return 0
 
-        x = Hash.ordinal(value[0]) << 7
+        x = Hash.ordinal(value[0]) << 7  # type: ignore[no-untyped-call]
         for c in value:
-            x = (1000003 * x) ^ Hash.ordinal(c)
+            x = (1000003 * x) ^ Hash.ordinal(c)  # type: ignore[no-untyped-call]
 
         x ^= length
         x &= 0xFFFFFFFFFFFFFFFF
@@ -155,7 +155,7 @@ class Hash(object):
         return ctypes.c_long(x).value
 
     @staticmethod
-    def ordinal(value):
+    def ordinal(value):  # type: ignore[no-untyped-def]
         """
         Converts value to an ordinal or returns the input value if it's an int.
 

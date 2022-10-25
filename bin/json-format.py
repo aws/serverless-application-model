@@ -52,7 +52,7 @@ class JSONFormatter:
                     continue
                 self.process_file(file_path)
 
-    def output_summary(self):
+    def output_summary(self):  # type: ignore[no-untyped-def]
         print(f"{self.scanned_file_found} file(s) scanned.")
         if self.write:
             print(f"{self.unformatted_file_count} file(s) reformatted.")
@@ -98,7 +98,7 @@ def main() -> None:
         else:
             raise ValueError(f"{path}: Unsupported path")
 
-    formatter.output_summary()
+    formatter.output_summary()  # type: ignore[no-untyped-call]
 
 
 if __name__ == "__main__":

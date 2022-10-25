@@ -27,13 +27,13 @@ import sys
 
 import boto3
 
-from docopt import docopt
+from docopt import docopt  # type: ignore[import]
 from functools import reduce
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
 
-from samtranslator.public.translator import ManagedPolicyLoader
+from samtranslator.public.translator import ManagedPolicyLoader  # type: ignore[attr-defined]
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
 from samtranslator.model.exceptions import InvalidDocumentException
@@ -49,7 +49,7 @@ else:
     logging.basicConfig()
 
 
-def execute_command(command, args):
+def execute_command(command, args):  # type: ignore[no-untyped-def]
     try:
         aws_cmd = "aws" if platform.system().lower() != "windows" else "aws.cmd"
         command_with_args = [aws_cmd, "cloudformation", command] + list(args)
@@ -65,7 +65,7 @@ def execute_command(command, args):
         sys.exit(e.returncode)
 
 
-def get_input_output_file_paths():
+def get_input_output_file_paths():  # type: ignore[no-untyped-def]
     input_file_option = cli_options.get("--template-file")
     output_file_option = cli_options.get("--output-template")
     input_file_path = os.path.join(cwd, input_file_option)
@@ -74,7 +74,7 @@ def get_input_output_file_paths():
     return input_file_path, output_file_path
 
 
-def package(input_file_path, output_file_path):
+def package(input_file_path, output_file_path):  # type: ignore[no-untyped-def]
     template_file = input_file_path
     package_output_template_file = input_file_path + "._sam_packaged_.yaml"
     s3_bucket = cli_options.get("--s3-bucket")
@@ -87,17 +87,17 @@ def package(input_file_path, output_file_path):
         s3_bucket,
     ]
 
-    execute_command("package", args)
+    execute_command("package", args)  # type: ignore[no-untyped-call]
 
     return package_output_template_file
 
 
-def transform_template(input_file_path, output_file_path):
+def transform_template(input_file_path, output_file_path):  # type: ignore[no-untyped-def]
     with open(input_file_path, "r") as f:
-        sam_template = yaml_parse(f)
+        sam_template = yaml_parse(f)  # type: ignore[no-untyped-call]
 
     try:
-        cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))
+        cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))  # type: ignore[no-untyped-call]
         cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=1)
 
         with open(output_file_path, "w") as f:
@@ -107,29 +107,29 @@ def transform_template(input_file_path, output_file_path):
     except InvalidDocumentException as e:
         errorMessage = reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
         LOG.error(errorMessage)
-        errors = map(lambda cause: cause.message, e.causes)
+        errors = map(lambda cause: cause.message, e.causes)  # type: ignore[no-any-return]
         LOG.error(errors)
 
 
-def deploy(template_file):
+def deploy(template_file):  # type: ignore[no-untyped-def]
     capabilities = cli_options.get("--capabilities")
     stack_name = cli_options.get("--stack-name")
     args = ["--template-file", template_file, "--capabilities", capabilities, "--stack-name", stack_name]
 
-    execute_command("deploy", args)
+    execute_command("deploy", args)  # type: ignore[no-untyped-call]
 
     return package_output_template_file
 
 
 if __name__ == "__main__":
-    input_file_path, output_file_path = get_input_output_file_paths()
+    input_file_path, output_file_path = get_input_output_file_paths()  # type: ignore[no-untyped-call]
 
     if cli_options.get("package"):
-        package_output_template_file = package(input_file_path, output_file_path)
-        transform_template(package_output_template_file, output_file_path)
+        package_output_template_file = package(input_file_path, output_file_path)  # type: ignore[no-untyped-call]
+        transform_template(package_output_template_file, output_file_path)  # type: ignore[no-untyped-call]
     elif cli_options.get("deploy"):
-        package_output_template_file = package(input_file_path, output_file_path)
-        transform_template(package_output_template_file, output_file_path)
-        deploy(output_file_path)
+        package_output_template_file = package(input_file_path, output_file_path)  # type: ignore[no-untyped-call]
+        transform_template(package_output_template_file, output_file_path)  # type: ignore[no-untyped-call]
+        deploy(output_file_path)  # type: ignore[no-untyped-call]
     else:
-        transform_template(input_file_path, output_file_path)
+        transform_template(input_file_path, output_file_path)  # type: ignore[no-untyped-call]

@@ -10,58 +10,58 @@ APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
 class ApiGatewayV2HttpApi(Resource):
     resource_type = "AWS::ApiGatewayV2::Api"
     property_types = {
-        "Body": PropertyType(False, is_type(dict)),
-        "BodyS3Location": PropertyType(False, is_type(dict)),
-        "Description": PropertyType(False, is_str()),
-        "FailOnWarnings": PropertyType(False, is_type(bool)),
-        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
-        "BasePath": PropertyType(False, is_str()),
-        "CorsConfiguration": PropertyType(False, is_type(dict)),
+        "Body": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "BodyS3Location": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "FailOnWarnings": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "BasePath": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "CorsConfiguration": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
     }
 
-    runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}
+    runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
 
 
 class ApiGatewayV2Stage(Resource):
     resource_type = "AWS::ApiGatewayV2::Stage"
     property_types = {
-        "AccessLogSettings": PropertyType(False, is_type(dict)),
-        "DefaultRouteSettings": PropertyType(False, is_type(dict)),
-        "RouteSettings": PropertyType(False, is_type(dict)),
-        "ClientCertificateId": PropertyType(False, is_str()),
-        "Description": PropertyType(False, is_str()),
-        "ApiId": PropertyType(True, is_str()),
-        "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Tags": PropertyType(False, is_type(dict)),
-        "StageVariables": PropertyType(False, is_type(dict)),
-        "AutoDeploy": PropertyType(False, is_type(bool)),
+        "AccessLogSettings": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "DefaultRouteSettings": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "RouteSettings": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "ClientCertificateId": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "ApiId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
+        "Tags": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "StageVariables": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "AutoDeploy": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
     }
 
-    runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
+    runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
 
 
 class ApiGatewayV2DomainName(Resource):
     resource_type = "AWS::ApiGatewayV2::DomainName"
     property_types = {
-        "DomainName": PropertyType(True, is_str()),
-        "DomainNameConfigurations": PropertyType(False, list_of(is_type(dict))),
-        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
-        "Tags": PropertyType(False, is_type(dict)),
+        "DomainName": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "DomainNameConfigurations": PropertyType(False, list_of(is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
+        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Tags": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
     }
 
 
 class ApiGatewayV2ApiMapping(Resource):
     resource_type = "AWS::ApiGatewayV2::ApiMapping"
     property_types = {
-        "ApiId": PropertyType(True, is_str()),
-        "ApiMappingKey": PropertyType(False, is_str()),
-        "DomainName": PropertyType(True, is_str()),
-        "Stage": PropertyType(True, is_str()),
+        "ApiId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "ApiMappingKey": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "DomainName": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Stage": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
     }
 
 
 class ApiGatewayV2Authorizer(object):
-    def __init__(
+    def __init__(  # type: ignore[no-untyped-def]
         self,
         api_logical_id=None,
         name=None,
@@ -90,106 +90,106 @@ class ApiGatewayV2Authorizer(object):
         self.enable_simple_responses = enable_simple_responses
         self.is_aws_iam_authorizer = is_aws_iam_authorizer
 
-        self._validate_input_parameters()
+        self._validate_input_parameters()  # type: ignore[no-untyped-call]
 
-        authorizer_type = self._get_auth_type()
+        authorizer_type = self._get_auth_type()  # type: ignore[no-untyped-call]
 
         # Validate necessary parameters exist
         if authorizer_type == "JWT":
-            self._validate_jwt_authorizer()
+            self._validate_jwt_authorizer()  # type: ignore[no-untyped-call]
 
         if authorizer_type == "REQUEST":
-            self._validate_lambda_authorizer()
+            self._validate_lambda_authorizer()  # type: ignore[no-untyped-call]
 
-    def _get_auth_type(self):
+    def _get_auth_type(self):  # type: ignore[no-untyped-def]
         if self.is_aws_iam_authorizer:
             return "AWS_IAM"
         if self.jwt_configuration:
             return "JWT"
         return "REQUEST"
 
-    def _validate_input_parameters(self):
-        authorizer_type = self._get_auth_type()
+    def _validate_input_parameters(self):  # type: ignore[no-untyped-def]
+        authorizer_type = self._get_auth_type()  # type: ignore[no-untyped-call]
 
         if self.authorization_scopes is not None and not isinstance(self.authorization_scopes, list):
-            raise InvalidResourceException(self.api_logical_id, "AuthorizationScopes must be a list.")
+            raise InvalidResourceException(self.api_logical_id, "AuthorizationScopes must be a list.")  # type: ignore[no-untyped-call]
 
         if self.authorization_scopes is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, "AuthorizationScopes must be defined only for OAuth2 Authorizer."
             )
 
         if self.jwt_configuration is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, "JwtConfiguration must be defined only for OAuth2 Authorizer."
             )
 
         if self.id_source is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, "IdentitySource must be defined only for OAuth2 Authorizer."
             )
 
         if self.function_arn is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, "FunctionArn must be defined only for Lambda Authorizer."
             )
 
         if self.function_invoke_role is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, "FunctionInvokeRole must be defined only for Lambda Authorizer."
             )
 
         if self.identity is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(self.api_logical_id, "Identity must be defined only for Lambda Authorizer.")
+            raise InvalidResourceException(self.api_logical_id, "Identity must be defined only for Lambda Authorizer.")  # type: ignore[no-untyped-call]
 
         if self.authorizer_payload_format_version is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, "AuthorizerPayloadFormatVersion must be defined only for Lambda Authorizer."
             )
 
         if self.enable_simple_responses is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, "EnableSimpleResponses must be defined only for Lambda Authorizer."
             )
 
-    def _validate_jwt_authorizer(self):
+    def _validate_jwt_authorizer(self):  # type: ignore[no-untyped-def]
         if not self.jwt_configuration:
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, f"{self.name} OAuth2 Authorizer must define 'JwtConfiguration'."
             )
         if not self.id_source:
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, f"{self.name} OAuth2 Authorizer must define 'IdentitySource'."
             )
 
-    def _validate_lambda_authorizer(self):
+    def _validate_lambda_authorizer(self):  # type: ignore[no-untyped-def]
         if not self.function_arn:
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, f"{self.name} Lambda Authorizer must define 'FunctionArn'."
             )
         if not self.authorizer_payload_format_version:
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.api_logical_id, f"{self.name} Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
             )
 
         if self.identity:
             if not isinstance(self.identity, dict):
-                raise InvalidResourceException(
+                raise InvalidResourceException(  # type: ignore[no-untyped-call]
                     self.api_logical_id, self.name + " Lambda Authorizer property 'identity' is of invalid type."
                 )
             headers = self.identity.get("Headers")
             if headers:
                 if not isinstance(headers, list) or any((not isinstance(header, str) for header in headers)):
-                    raise InvalidResourceException(
+                    raise InvalidResourceException(  # type: ignore[no-untyped-call]
                         self.api_logical_id,
                         self.name + " Lambda Authorizer property identity's 'Headers' is of invalid type.",
                     )
 
-    def generate_openapi(self):
+    def generate_openapi(self):  # type: ignore[no-untyped-def]
         """
         Generates OAS for the securitySchemes section
         """
-        authorizer_type = self._get_auth_type()
+        authorizer_type = self._get_auth_type()  # type: ignore[no-untyped-call]
 
         if authorizer_type == "AWS_IAM":
             openapi = {
@@ -201,7 +201,7 @@ class ApiGatewayV2Authorizer(object):
 
         if authorizer_type == "JWT":
             openapi = {"type": "oauth2"}
-            openapi[APIGATEWAY_AUTHORIZER_KEY] = {
+            openapi[APIGATEWAY_AUTHORIZER_KEY] = {  # type: ignore[assignment]
                 "jwtConfiguration": self.jwt_configuration,
                 "identitySource": self.id_source,
                 "type": "jwt",
@@ -213,71 +213,71 @@ class ApiGatewayV2Authorizer(object):
                 "name": "Unused",
                 "in": "header",
             }
-            openapi[APIGATEWAY_AUTHORIZER_KEY] = {"type": "request"}
+            openapi[APIGATEWAY_AUTHORIZER_KEY] = {"type": "request"}  # type: ignore[assignment]
 
             # Generate the lambda arn
-            partition = ArnGenerator.get_partition_name()
+            partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
-            authorizer_uri = fnSub(
-                ArnGenerator.generate_arn(
+            authorizer_uri = fnSub(  # type: ignore[no-untyped-call]
+                ArnGenerator.generate_arn(  # type: ignore[no-untyped-call]
                     partition=partition, service="apigateway", resource=resource, include_account_id=False
                 ),
                 {"__FunctionArn__": self.function_arn},
             )
-            openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerUri"] = authorizer_uri
+            openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerUri"] = authorizer_uri  # type: ignore[index]
 
             # Set authorizerCredentials if present
-            function_invoke_role = self._get_function_invoke_role()
+            function_invoke_role = self._get_function_invoke_role()  # type: ignore[no-untyped-call]
             if function_invoke_role:
-                openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerCredentials"] = function_invoke_role
+                openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerCredentials"] = function_invoke_role  # type: ignore[index]
 
             # Set authorizerResultTtlInSeconds if present
-            reauthorize_every = self._get_reauthorize_every()
+            reauthorize_every = self._get_reauthorize_every()  # type: ignore[no-untyped-call]
             if reauthorize_every is not None:
-                openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerResultTtlInSeconds"] = reauthorize_every
+                openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerResultTtlInSeconds"] = reauthorize_every  # type: ignore[index]
 
             # Set identitySource if present
             if self.identity:
-                openapi[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()
+                openapi[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()  # type: ignore[no-untyped-call, index]
 
             # Set authorizerPayloadFormatVersion. It's a required parameter
-            openapi[APIGATEWAY_AUTHORIZER_KEY][
+            openapi[APIGATEWAY_AUTHORIZER_KEY][  # type: ignore[index]
                 "authorizerPayloadFormatVersion"
             ] = self.authorizer_payload_format_version
 
             # Set authorizerPayloadFormatVersion. It's a required parameter
             if self.enable_simple_responses:
-                openapi[APIGATEWAY_AUTHORIZER_KEY]["enableSimpleResponses"] = self.enable_simple_responses
+                openapi[APIGATEWAY_AUTHORIZER_KEY]["enableSimpleResponses"] = self.enable_simple_responses  # type: ignore[index]
 
         return openapi
 
-    def _get_function_invoke_role(self):
+    def _get_function_invoke_role(self):  # type: ignore[no-untyped-def]
         if not self.function_invoke_role or self.function_invoke_role == "NONE":
             return None
 
         return self.function_invoke_role
 
-    def _get_identity_source(self):
+    def _get_identity_source(self):  # type: ignore[no-untyped-def]
         identity_source_headers = []
         identity_source_query_strings = []
         identity_source_stage_variables = []
         identity_source_context = []
 
         if self.identity.get("Headers"):
-            identity_source_headers = list(map(lambda h: "$request.header." + h, self.identity.get("Headers")))
+            identity_source_headers = list(map(lambda h: "$request.header." + h, self.identity.get("Headers")))  # type: ignore[no-any-return]
 
         if self.identity.get("QueryStrings"):
             identity_source_query_strings = list(
-                map(lambda qs: "$request.querystring." + qs, self.identity.get("QueryStrings"))
+                map(lambda qs: "$request.querystring." + qs, self.identity.get("QueryStrings"))  # type: ignore[no-any-return]
             )
 
         if self.identity.get("StageVariables"):
             identity_source_stage_variables = list(
-                map(lambda sv: "$stageVariables." + sv, self.identity.get("StageVariables"))
+                map(lambda sv: "$stageVariables." + sv, self.identity.get("StageVariables"))  # type: ignore[no-any-return]
             )
 
         if self.identity.get("Context"):
-            identity_source_context = list(map(lambda c: "$context." + c, self.identity.get("Context")))
+            identity_source_context = list(map(lambda c: "$context." + c, self.identity.get("Context")))  # type: ignore[no-any-return]
 
         identity_source = (
             identity_source_headers
@@ -288,7 +288,7 @@ class ApiGatewayV2Authorizer(object):
 
         return identity_source
 
-    def _get_reauthorize_every(self):
+    def _get_reauthorize_every(self):  # type: ignore[no-untyped-def]
         if not self.identity:
             return None
 

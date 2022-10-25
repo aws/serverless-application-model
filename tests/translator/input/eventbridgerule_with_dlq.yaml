@@ -24,6 +24,7 @@ Resources:
           Type: EventBridgeRule
           Properties:
             EventBusName: ExternalEventBridge
+            RuleName: MyRule
             State: ENABLED
             Pattern:
               detail:

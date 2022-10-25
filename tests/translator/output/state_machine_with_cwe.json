@@ -25,6 +25,7 @@
             ]
           }
         },
+        "Name": "MyRule",
         "State": "ENABLED",
         "Targets": [
           {

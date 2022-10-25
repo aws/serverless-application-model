@@ -2,8 +2,8 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.plugins import BasePlugin
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
-from samtranslator.public.sdk.resource import SamResourceType
-from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.public.sdk.resource import SamResourceType  # type: ignore[attr-defined]
+from samtranslator.public.sdk.template import SamTemplate  # type: ignore[attr-defined]
 
 
 class DefaultDefinitionBodyPlugin(BasePlugin):
@@ -14,15 +14,15 @@ class DefaultDefinitionBodyPlugin(BasePlugin):
     to a minimum Swagger definition and sets `__MANAGE_SWAGGER: true`.
     """
 
-    def __init__(self):
+    def __init__(self):  # type: ignore[no-untyped-def]
         """
         Initialize the plugin.
         """
 
-        super(DefaultDefinitionBodyPlugin, self).__init__(DefaultDefinitionBodyPlugin.__name__)
+        super(DefaultDefinitionBodyPlugin, self).__init__(DefaultDefinitionBodyPlugin.__name__)  # type: ignore[no-untyped-call]
 
-    @cw_timer(prefix="Plugin-DefaultDefinitionBody")
-    def on_before_transform_template(self, template_dict):
+    @cw_timer(prefix="Plugin-DefaultDefinitionBody")  # type: ignore[no-untyped-call]
+    def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Hook method that gets called before the SAM template is processed.
         The template has passed the validation and is guaranteed to contain a non-empty "Resources" section.
@@ -41,9 +41,9 @@ class DefaultDefinitionBodyPlugin(BasePlugin):
                     # If "Properties" is not set in the template, set them here
                     if not api.properties:
                         template.set(logicalId, api)
-                    api.properties["DefinitionBody"] = OpenApiEditor.gen_skeleton()
+                    api.properties["DefinitionBody"] = OpenApiEditor.gen_skeleton()  # type: ignore[no-untyped-call]
 
                 if api_type is SamResourceType.Api.value:
-                    api.properties["DefinitionBody"] = SwaggerEditor.gen_skeleton()
+                    api.properties["DefinitionBody"] = SwaggerEditor.gen_skeleton()  # type: ignore[no-untyped-call]
 
                 api.properties["__MANAGE_SWAGGER"] = True

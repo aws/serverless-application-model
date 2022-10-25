@@ -5,13 +5,13 @@ class SupportedResourceReferences(object):
     collection which is finally used to resolve all the references in output CFN template.
     """
 
-    def __init__(self):
+    def __init__(self):  # type: ignore[no-untyped-def]
 
         # This is a two level map like:
         # { "LogicalId": {"Property": "Value"} }
         self._refs = {}
 
-    def add(self, logical_id, property, value):
+    def add(self, logical_id, property, value):  # type: ignore[no-untyped-def]
         """
         Add the information that resource with given `logical_id` supports the given `property`, and that a reference
         to `logical_id.property` resolves to given `value.
@@ -40,7 +40,7 @@ class SupportedResourceReferences(object):
 
         self._refs[logical_id][property] = value
 
-    def get(self, logical_id, property):
+    def get(self, logical_id, property):  # type: ignore[no-untyped-def]
         """
         Returns the value of the reference for given logical_id at given property. Ex: MyFunction.Alias
 
@@ -50,12 +50,12 @@ class SupportedResourceReferences(object):
         """
 
         # By defaulting to empty dictionary, we can handle the case where logical_id is not in map without if statements
-        prop_values = self.get_all(logical_id)
+        prop_values = self.get_all(logical_id)  # type: ignore[no-untyped-call]
         if prop_values:
             return prop_values.get(property, None)
         return None
 
-    def get_all(self, logical_id):
+    def get_all(self, logical_id):  # type: ignore[no-untyped-def]
         """
         Get all properties and their values supported by the resource with given logical ID
 
@@ -64,12 +64,12 @@ class SupportedResourceReferences(object):
         """
         return self._refs.get(logical_id, None)
 
-    def __len__(self):
+    def __len__(self):  # type: ignore[no-untyped-def]
         """
         To make len(this_object) work
         :return: Number of resource references available
         """
         return len(self._refs)
 
-    def __str__(self):
+    def __str__(self):  # type: ignore[no-untyped-def]
         return str(self._refs)

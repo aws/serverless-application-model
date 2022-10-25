@@ -18,7 +18,7 @@ class SamTemplateValidator:
     # Example: "u'integer'" -> "'integer'"
     UNICODE_TYPE_REGEX = re.compile("u('[^']+')")
 
-    def __init__(self, schema=None):
+    def __init__(self, schema=None):  # type: ignore[no-untyped-def]
         """
         Constructor
 
@@ -28,7 +28,7 @@ class SamTemplateValidator:
             Path to a schema to use for validation, by default None, the default schema.json will be used
         """
         if not schema:
-            schema = self._read_json(sam_schema.SCHEMA_NEW_FILE)
+            schema = self._read_json(sam_schema.SCHEMA_NEW_FILE)  # type: ignore[no-untyped-call]
 
         # Helps resolve the $Ref to external files
         # For cross platform resolving, we have to load the sub schemas into
@@ -44,7 +44,7 @@ class SamTemplateValidator:
                     schema_content = f.read()
                 schema_store[sub_schema] = json.loads(schema_content)
 
-        resolver = jsonschema.RefResolver.from_schema(schema, store=schema_store)
+        resolver = jsonschema.RefResolver.from_schema(schema, store=schema_store)  # type: ignore[no-untyped-call]
 
         SAMValidator = jsonschema.validators.extend(
             jsonschema.Draft7Validator,
@@ -55,7 +55,7 @@ class SamTemplateValidator:
         self.validator = SAMValidator(schema, resolver=resolver)
 
     @staticmethod
-    def validate(template_dict, schema=None):
+    def validate(template_dict, schema=None):  # type: ignore[no-untyped-def]
         """
         Validates a SAM Template
 
@@ -77,11 +77,11 @@ class SamTemplateValidator:
         str
             Validation errors separated by commas ","
         """
-        validator = SamTemplateValidator(schema)
+        validator = SamTemplateValidator(schema)  # type: ignore[no-untyped-call]
 
-        return ", ".join(validator.get_errors(template_dict))
+        return ", ".join(validator.get_errors(template_dict))  # type: ignore[no-untyped-call]
 
-    def get_errors(self, template_dict):
+    def get_errors(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Validates a SAM Template
 
@@ -104,17 +104,17 @@ class SamTemplateValidator:
 
         # Set of "[Path.To.Element] Error message"
         # To track error uniqueness, Dict instead of List, for speed
-        errors_set = {}
+        errors_set = {}  # type: ignore[var-annotated]
 
         for e in validation_errors:
-            self._process_error(e, errors_set)
+            self._process_error(e, errors_set)  # type: ignore[no-untyped-call]
 
         # To be consistent across python versions 2 and 3, we have to sort the final result
         # It seems that the validator is not receiving the properties in the same order between python 2 and 3
         # It thus returns errors in a different order
         return sorted(errors_set.keys())
 
-    def _process_error(self, error, errors_set):
+    def _process_error(self, error, errors_set):  # type: ignore[no-untyped-def]
         """
         Processes the validation errors recursively
         error is actually a tree of errors
@@ -136,7 +136,7 @@ class SamTemplateValidator:
             # [Path.To.Element] Error message
             error_path = ".".join([str(p) for p in error.absolute_path]) if error.absolute_path else "."
 
-            error_content = "[{}] {}".format(error_path, self._cleanup_error_message(error))
+            error_content = "[{}] {}".format(error_path, self._cleanup_error_message(error))  # type: ignore[no-untyped-call]
 
             if error_content not in errors_set:
                 # We set the value to None as we don't use it
@@ -145,9 +145,9 @@ class SamTemplateValidator:
 
         for context_error in error.context:
             # Each "context" item is also a validation error
-            self._process_error(context_error, errors_set)
+            self._process_error(context_error, errors_set)  # type: ignore[no-untyped-call]
 
-    def _cleanup_error_message(self, error):
+    def _cleanup_error_message(self, error):  # type: ignore[no-untyped-def]
         """
         Cleans an error message up to remove unecessary clutter or replace
         it with a more meaningful one
@@ -173,7 +173,7 @@ class SamTemplateValidator:
 
         return final_message
 
-    def _read_json(self, filepath):
+    def _read_json(self, filepath):  # type: ignore[no-untyped-def]
         """
         Returns the content of a JSON file
 
@@ -213,7 +213,7 @@ INTRINSIC_ATTR = {
 }
 
 
-def is_object(checker, instance):
+def is_object(checker, instance):  # type: ignore[no-untyped-def]
     """
     'object' type definition
     Overloaded to exclude intrinsic functions
@@ -230,10 +230,10 @@ def is_object(checker, instance):
     boolean
         True if an object, False otherwise
     """
-    return isinstance(instance, dict) and not has_intrinsic_attr(instance)
+    return isinstance(instance, dict) and not has_intrinsic_attr(instance)  # type: ignore[no-untyped-call]
 
 
-def is_intrinsic(checker, instance):
+def is_intrinsic(checker, instance):  # type: ignore[no-untyped-def]
     """
     'intrinsic' type definition
 
@@ -249,10 +249,10 @@ def is_intrinsic(checker, instance):
     [type]
         [description]
     """
-    return isinstance(instance, dict) and has_intrinsic_attr(instance)
+    return isinstance(instance, dict) and has_intrinsic_attr(instance)  # type: ignore[no-untyped-call]
 
 
-def has_intrinsic_attr(instance):
+def has_intrinsic_attr(instance):  # type: ignore[no-untyped-def]
     """
     Returns a value indicating whether the instance has an intrinsic attribute
     Only one attribute which must be one of the intrinsics

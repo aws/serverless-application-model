@@ -46,7 +46,7 @@ class DeploymentPreference(DeploymentPreferenceTuple):
     """
 
     @classmethod
-    def from_dict(cls, logical_id, deployment_preference_dict, condition=None):
+    def from_dict(cls, logical_id, deployment_preference_dict, condition=None):  # type: ignore[no-untyped-def]
         """
         :param logical_id: the logical_id of the resource that owns this deployment preference
         :param deployment_preference_dict: the dict object taken from the SAM template
@@ -60,12 +60,12 @@ class DeploymentPreference(DeploymentPreferenceTuple):
             return DeploymentPreference(None, None, None, None, False, None, None, None)
 
         if "Type" not in deployment_preference_dict:
-            raise InvalidResourceException(logical_id, "'DeploymentPreference' is missing required Property 'Type'")
+            raise InvalidResourceException(logical_id, "'DeploymentPreference' is missing required Property 'Type'")  # type: ignore[no-untyped-call]
 
         deployment_type = deployment_preference_dict["Type"]
         hooks = deployment_preference_dict.get("Hooks", {})
         if not isinstance(hooks, dict):
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 logical_id, "'Hooks' property of 'DeploymentPreference' must be a dictionary"
             )
 
