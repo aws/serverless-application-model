@@ -1,16 +1,20 @@
 import copy
 
+from typing import Any, Dict, Optional, Type, Union
+
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import make_combined_condition
 from samtranslator.model.eventsources.push import Api
-from samtranslator.public.plugins import BasePlugin  # type: ignore[attr-defined]
-from samtranslator.public.exceptions import InvalidDocumentException, InvalidResourceException, InvalidEventException  # type: ignore[attr-defined, attr-defined, attr-defined]
-from samtranslator.public.sdk.resource import SamResourceType  # type: ignore[attr-defined]
-from samtranslator.public.sdk.template import SamTemplate  # type: ignore[attr-defined]
+from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.public.plugins import BasePlugin
+from samtranslator.public.exceptions import InvalidDocumentException, InvalidResourceException, InvalidEventException
+from samtranslator.public.sdk.resource import SamResource, SamResourceType
+from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.utils.py27hash_fix import Py27Dict
 
 
-class ImplicitApiPlugin(BasePlugin):  # type: ignore[misc]
+class ImplicitApiPlugin(BasePlugin):
     """
     This plugin provides Implicit API shorthand syntax in the SAM Spec.
     https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -32,21 +36,28 @@ class ImplicitApiPlugin(BasePlugin):  # type: ignore[misc]
 
     """
 
-    def __init__(self, name):  # type: ignore[no-untyped-def]
+    implicit_api_logical_id: str  # "ServerlessRestApi" or "ServerlessHttpApi"
+    implicit_api_condition: str  # "ServerlessHttpApiCondition" or "ServerlessRestApiCondition"
+    api_event_type: str  # "HttpApi" or "Api"
+    api_type: str  # SamResourceType
+    api_id_property: str  # "ApiId" or "RestApiId"
+    editor: Union[Type[OpenApiEditor], Type[SwaggerEditor]]
+
+    def __init__(self, name: str) -> None:
         """
         Initialize the plugin
         """
         super(ImplicitApiPlugin, self).__init__(name)
 
-        self.existing_implicit_api_resource = None
+        self.existing_implicit_api_resource: Optional[SamResource] = None
         # dict containing condition (or None) for each resource path+method for all APIs. dict format:
         # {api_id: {path: {method: condition_name_or_None}}}
-        self.api_conditions = {}
-        self.api_deletion_policies = {}
-        self.api_update_replace_policies = {}
-        self._setup_api_properties()  # type: ignore[no-untyped-call]
+        self.api_conditions: Dict[str, Any] = {}
+        self.api_deletion_policies: Dict[str, Any] = {}
+        self.api_update_replace_policies: Dict[str, Any] = {}
+        self._setup_api_properties()
 
-    def _setup_api_properties(self):  # type: ignore[no-untyped-def]
+    def _setup_api_properties(self) -> None:
         raise NotImplementedError(
             "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
@@ -272,19 +283,19 @@ class ImplicitApiPlugin(BasePlugin):  # type: ignore[misc]
         :param dict template_dict: SAM template dictionary
         """
         # Short-circuit if template doesn't have any functions with implicit API events
-        if not self.api_deletion_policies.get(self.implicit_api_logical_id, {}):
+        implicit_api_deletion_policies = self.api_deletion_policies.get(self.implicit_api_logical_id)
+        if not implicit_api_deletion_policies:
             return
 
         # Add a deletion policy to the API resource if its resources contains DeletionPolicy.
-        implicit_api_deletion_policies = self.api_deletion_policies.get(self.implicit_api_logical_id)
-        at_least_one_resource_method = len(implicit_api_deletion_policies) > 0  # type: ignore[arg-type]
+        at_least_one_resource_method = len(implicit_api_deletion_policies) > 0
         one_resource_method_contains_deletion_policy = False
         contains_retain = False
         contains_delete = False
         # If multiple functions with multiple different policies reference the Implicit Api,
         # we set DeletionPolicy to Retain if Retain is present in one of the functions,
         # else Delete if Delete is present
-        for iterated_policy in implicit_api_deletion_policies:  # type: ignore[union-attr]
+        for iterated_policy in implicit_api_deletion_policies:
             if iterated_policy:
                 one_resource_method_contains_deletion_policy = True
                 if iterated_policy == "Retain":
@@ -304,12 +315,12 @@ class ImplicitApiPlugin(BasePlugin):  # type: ignore[misc]
         :param dict template_dict: SAM template dictionary
         """
         # Short-circuit if template doesn't have any functions with implicit API events
-        if not self.api_update_replace_policies.get(self.implicit_api_logical_id, {}):
+        implicit_api_update_replace_policies = self.api_update_replace_policies.get(self.implicit_api_logical_id)
+        if not implicit_api_update_replace_policies:
             return
 
         # Add a update replace policy to the API resource if its resources contains UpdateReplacePolicy.
-        implicit_api_update_replace_policies = self.api_update_replace_policies.get(self.implicit_api_logical_id)
-        at_least_one_resource_method = len(implicit_api_update_replace_policies) > 0  # type: ignore[arg-type]
+        at_least_one_resource_method = len(implicit_api_update_replace_policies) > 0
         one_resource_method_contains_update_replace_policy = False
         contains_retain = False
         contains_snapshot = False
@@ -317,7 +328,7 @@ class ImplicitApiPlugin(BasePlugin):  # type: ignore[misc]
         # If multiple functions with multiple different policies reference the Implicit Api,
         # we set UpdateReplacePolicy to Retain if Retain is present in one of the functions,
         # Snapshot if Snapshot is present, else Delete if Delete is present
-        for iterated_policy in implicit_api_update_replace_policies:  # type: ignore[union-attr]
+        for iterated_policy in implicit_api_update_replace_policies:
             if iterated_policy:
                 one_resource_method_contains_update_replace_policy = True
                 if iterated_policy == "Retain":

@@ -27,7 +27,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
 
         # Plugin name is the class name for easy disambiguation
         _plugin_name = PolicyTemplatesForResourcePlugin.__name__
-        super(PolicyTemplatesForResourcePlugin, self).__init__(_plugin_name)  # type: ignore[no-untyped-call]
+        super(PolicyTemplatesForResourcePlugin, self).__init__(_plugin_name)
 
         self._policy_template_processor = policy_template_processor
 
@@ -107,9 +107,9 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
 
         except InsufficientParameterValues as ex:
             # Exception's message will give lot of specific details
-            raise InvalidResourceException(logical_id, str(ex))  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(logical_id, str(ex))
         except InvalidParameterValues:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 logical_id, "Must specify valid parameter values for policy template '{}'".format(template_name)
             )
 

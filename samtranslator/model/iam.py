@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import is_type, is_str, list_of
 from samtranslator.model.intrinsics import ref, fnGetAtt
@@ -108,7 +110,7 @@ class IAMRolePolicies:
         }
 
     @classmethod
-    def sqs_send_message_role_policy(cls, queue_arn, logical_id):  # type: ignore[no-untyped-def]
+    def sqs_send_message_role_policy(cls, queue_arn: Any, logical_id: str) -> Dict[str, Any]:
         document = {
             "PolicyName": logical_id + "SQSPolicy",
             "PolicyDocument": {"Statement": [{"Action": "sqs:SendMessage", "Effect": "Allow", "Resource": queue_arn}]},
@@ -116,7 +118,7 @@ class IAMRolePolicies:
         return document
 
     @classmethod
-    def sns_publish_role_policy(cls, topic_arn, logical_id):  # type: ignore[no-untyped-def]
+    def sns_publish_role_policy(cls, topic_arn: Any, logical_id: str) -> Dict[str, Any]:
         document = {
             "PolicyName": logical_id + "SNSPolicy",
             "PolicyDocument": {"Statement": [{"Action": "sns:publish", "Effect": "Allow", "Resource": topic_arn}]},
@@ -124,7 +126,7 @@ class IAMRolePolicies:
         return document
 
     @classmethod
-    def event_bus_put_events_role_policy(cls, event_bus_arn, logical_id):  # type: ignore[no-untyped-def]
+    def event_bus_put_events_role_policy(cls, event_bus_arn: Any, logical_id: str) -> Dict[str, Any]:
         document = {
             "PolicyName": logical_id + "EventBridgePolicy",
             "PolicyDocument": {
@@ -134,7 +136,7 @@ class IAMRolePolicies:
         return document
 
     @classmethod
-    def lambda_invoke_function_role_policy(cls, function_arn, logical_id):  # type: ignore[no-untyped-def]
+    def lambda_invoke_function_role_policy(cls, function_arn: Any, logical_id: str) -> Dict[str, Any]:
         document = {
             "PolicyName": logical_id + "LambdaPolicy",
             "PolicyDocument": {

@@ -171,7 +171,7 @@ class ResourcePolicies(object):
         try:
             validate_intrinsic_if_items(intrinsic_if_value)
         except ValueError as e:
-            raise InvalidTemplateException(e)  # type: ignore[no-untyped-call]
+            raise InvalidTemplateException(str(e))
 
         if_data = intrinsic_if_value[1]
         else_data = intrinsic_if_value[2]
@@ -188,7 +188,7 @@ class ResourcePolicies(object):
         if is_intrinsic_no_value(else_data):
             return if_data_type
 
-        raise InvalidTemplateException(  # type: ignore[no-untyped-call]
+        raise InvalidTemplateException(
             "Different policy types within the same Fn::If statement is unsupported. "
             "Separate different policy types into different Fn::If statements"
         )

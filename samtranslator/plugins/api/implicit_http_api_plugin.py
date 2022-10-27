@@ -1,9 +1,9 @@
 from samtranslator.model.intrinsics import make_conditional
 from samtranslator.model.naming import GeneratedLogicalId
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
-from samtranslator.public.open_api import OpenApiEditor  # type: ignore[attr-defined]
-from samtranslator.public.exceptions import InvalidEventException  # type: ignore[attr-defined]
-from samtranslator.public.sdk.resource import SamResourceType, SamResource  # type: ignore[attr-defined, attr-defined]
+from samtranslator.public.open_api import OpenApiEditor
+from samtranslator.public.exceptions import InvalidEventException
+from samtranslator.public.sdk.resource import SamResourceType, SamResource
 
 
 class ImplicitHttpApiPlugin(ImplicitApiPlugin):
@@ -24,11 +24,11 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
                                              in OpenApi. Does **not** configure the API by any means.
     """
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         """
         Initializes the plugin
         """
-        super(ImplicitHttpApiPlugin, self).__init__(ImplicitHttpApiPlugin.__name__)  # type: ignore[no-untyped-call]
+        super(ImplicitHttpApiPlugin, self).__init__(ImplicitHttpApiPlugin.__name__)
 
     def _setup_api_properties(self):  # type: ignore[no-untyped-def]
         """
@@ -173,13 +173,13 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         template.set(api_id, resource)
 
 
-class ImplicitHttpApiResource(SamResource):  # type: ignore[misc]
+class ImplicitHttpApiResource(SamResource):
     """
     Returns a AWS::Serverless::HttpApi resource representing the Implicit APIs. The returned resource
     includes the empty OpenApi along with default values for other properties.
     """
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         open_api = OpenApiEditor.gen_skeleton()
 
         resource = {

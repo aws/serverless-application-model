@@ -93,10 +93,10 @@ class HttpApiGenerator(object):
         :returns: the HttpApi to which this SAM Api corresponds
         :rtype: model.apigatewayv2.ApiGatewayHttpApi
         """
-        http_api = ApiGatewayV2HttpApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)  # type: ignore[no-untyped-call]
+        http_api = ApiGatewayV2HttpApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         if self.definition_uri and self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
             )
         if self.cors_configuration:
@@ -119,7 +119,7 @@ class HttpApiGenerator(object):
         elif self.definition_body:
             http_api.Body = self.definition_body
         else:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "'DefinitionUri' or 'DefinitionBody' are required properties of an "
                 "'AWS::Serverless::HttpApi'. Add a value for one of these properties or "
@@ -141,7 +141,7 @@ class HttpApiGenerator(object):
 
         """
         if self.disable_execute_api_endpoint is not None and not self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
         editor = OpenApiEditor(self.definition_body)  # type: ignore[no-untyped-call]
@@ -162,7 +162,7 @@ class HttpApiGenerator(object):
         """
 
         if self.cors_configuration and not self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Cors works only with inline OpenApi specified in 'DefinitionBody' property."
             )
 
@@ -179,15 +179,15 @@ class HttpApiGenerator(object):
         elif isinstance(self.cors_configuration, dict):
             # Make sure keys in the dict are recognized
             if not all(key in CorsProperties._fields for key in self.cors_configuration.keys()):
-                raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")
 
             properties = CorsProperties(**self.cors_configuration)
 
         else:
-            raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")
 
-        if not OpenApiEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+        if not OpenApiEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Cors configuration because "
                 "'DefinitionBody' does not contain a valid "
@@ -195,7 +195,7 @@ class HttpApiGenerator(object):
             )
 
         if properties.AllowCredentials is True and properties.AllowOrigins == [_CORS_WILDCARD]:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Cors configuration because "
                 "'AllowCredentials' can not be true when "
@@ -225,7 +225,7 @@ class HttpApiGenerator(object):
             return None, None, None
 
         if self.domain.get("DomainName") is None or self.domain.get("CertificateArn") is None:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Custom Domains only works if both DomainName and CertificateArn are provided."
             )
 
@@ -233,7 +233,7 @@ class HttpApiGenerator(object):
             "ApiGatewayDomainNameV2", LogicalIdGenerator("", self.domain.get("DomainName")).gen()  # type: ignore[no-untyped-call, no-untyped-call]
         )
 
-        domain = ApiGatewayV2DomainName(  # type: ignore[no-untyped-call]
+        domain = ApiGatewayV2DomainName(
             self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes
         )
         domain_config = {}
@@ -246,7 +246,7 @@ class HttpApiGenerator(object):
             # to make sure that default is always REGIONAL
             self.domain["EndpointConfiguration"] = "REGIONAL"
         elif endpoint not in ["REGIONAL"]:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
             )
@@ -272,7 +272,7 @@ class HttpApiGenerator(object):
                         if key not in {"TruststoreUri", "TruststoreVersion"}:
                             invalid_keys.append(key)
                     invalid_keys.sort()
-                    raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                    raise InvalidResourceException(
                         ",".join(invalid_keys),
                         "Available MutualTlsAuthentication fields are {}.".format(
                             ["TruststoreUri", "TruststoreVersion"]
@@ -284,7 +284,7 @@ class HttpApiGenerator(object):
                 if mutual_tls_auth.get("TruststoreVersion", None):
                     domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]  # type: ignore[attr-defined]
             else:
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     mutual_tls_auth,
                     "MutualTlsAuthentication must be a map with at least one of the following fields {}.".format(
                         ["TruststoreUri", "TruststoreVersion"]
@@ -310,13 +310,13 @@ class HttpApiGenerator(object):
             return
         route53 = self.domain.get("Route53")
         if not isinstance(route53, dict):
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Invalid property type '{}' for Route53. "
                 "Expected a map defines an Amazon Route 53 configuration'.".format(type(route53).__name__),
             )
         if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
             )
@@ -326,7 +326,7 @@ class HttpApiGenerator(object):
 
         record_set_group = route53_record_set_groups.get(logical_id)
         if not record_set_group:
-            record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)  # type: ignore[no-untyped-call]
+            record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
             if "HostedZoneId" in route53:
                 record_set_group.HostedZoneId = route53.get("HostedZoneId")
             elif "HostedZoneName" in route53:
@@ -341,7 +341,7 @@ class HttpApiGenerator(object):
         basepath_resource_list = []
 
         if basepaths is None:
-            basepath_mapping = ApiGatewayV2ApiMapping(  # type: ignore[no-untyped-call]
+            basepath_mapping = ApiGatewayV2ApiMapping(
                 self.logical_id + "ApiMapping", attributes=self.passthrough_resource_attributes
             )
             basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
@@ -354,16 +354,16 @@ class HttpApiGenerator(object):
                 invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
 
                 if not isinstance(path, str):
-                    raise InvalidResourceException(self.logical_id, "Basepath must be a string.")  # type: ignore[no-untyped-call]
+                    raise InvalidResourceException(self.logical_id, "Basepath must be a string.")
 
                 if re.search(invalid_regex, path) is not None:
-                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")  # type: ignore[no-untyped-call]
+                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
 
                 # ignore leading and trailing `/` in the path name
                 path = path.strip("/")
 
                 logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-_/]+", "", path), "ApiMapping")
-                basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)  # type: ignore[no-untyped-call]
+                basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)
                 basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
                 basepath_mapping.ApiId = ref(http_api.logical_id)
                 basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
@@ -401,7 +401,7 @@ class HttpApiGenerator(object):
             alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")
             alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")
         else:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Only REGIONAL endpoint is supported on HTTP APIs.",
             )
@@ -415,16 +415,16 @@ class HttpApiGenerator(object):
             return
 
         if self.auth and not self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Auth works only with inline OpenApi specified in the 'DefinitionBody' property."
             )
 
         # Make sure keys in the dict are recognized
         if not all(key in AuthProperties._fields for key in self.auth.keys()):
-            raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
 
-        if not OpenApiEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+        if not OpenApiEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Auth configuration because 'DefinitionBody' does not contain a valid OpenApi definition.",
             )
@@ -444,19 +444,19 @@ class HttpApiGenerator(object):
         Adds tags to the Http Api, including a default SAM tag.
         """
         if self.tags and not self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Tags works only with inline OpenApi specified in the 'DefinitionBody' property."
             )
 
         if not self.definition_body:
             return
 
-        if self.tags and not OpenApiEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+        if self.tags and not OpenApiEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add `Tags` because 'DefinitionBody' does not contain a valid OpenApi definition.",
             )
-        if not OpenApiEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
+        if not OpenApiEditor.is_valid(self.definition_body):
             return
 
         if not self.tags:
@@ -484,13 +484,13 @@ class HttpApiGenerator(object):
             return
 
         if is_intrinsic(default_authorizer):
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to set DefaultAuthorizer because intrinsic functions are not supported for this field.",
             )
 
         if not authorizers.get(default_authorizer):
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to set DefaultAuthorizer because '"
                 + default_authorizer
@@ -518,16 +518,16 @@ class HttpApiGenerator(object):
             return authorizers
 
         if not isinstance(authorizers_config, dict):
-            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")
 
         for authorizer_name, authorizer in authorizers_config.items():
             if not isinstance(authorizer, dict):
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id, "Authorizer %s must be a dictionary." % (authorizer_name)
                 )
 
             if "OpenIdConnectUrl" in authorizer:
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id,
                     "'OpenIdConnectUrl' is no longer a supported property for authorizer '%s'. Please refer to the AWS SAM documentation."
                     % (authorizer_name),
@@ -555,7 +555,7 @@ class HttpApiGenerator(object):
         if isinstance(self.definition_uri, dict):
             if not self.definition_uri.get("Bucket", None) or not self.definition_uri.get("Key", None):
                 # DefinitionUri is a dictionary but does not contain Bucket or Key property
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id, "'DefinitionUri' requires Bucket and Key properties to be specified."
                 )
             s3_pointer = self.definition_uri
@@ -602,7 +602,7 @@ class HttpApiGenerator(object):
         else:
             generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)  # type: ignore[no-untyped-call]
             stage_logical_id = generator.gen()  # type: ignore[no-untyped-call]
-        stage = ApiGatewayV2Stage(stage_logical_id, attributes=self.passthrough_resource_attributes)  # type: ignore[no-untyped-call]
+        stage = ApiGatewayV2Stage(stage_logical_id, attributes=self.passthrough_resource_attributes)
         stage.ApiId = ref(self.logical_id)
         stage.StageName = self.stage_name
         stage.StageVariables = self.stage_variables
@@ -620,12 +620,12 @@ class HttpApiGenerator(object):
             return
 
         if not self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Description works only with inline OpenApi specified in the 'DefinitionBody' property.",
             )
         if self.definition_body.get("info", {}).get("description"):
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to set Description because it is already defined within inline OpenAPI specified in the "
                 "'DefinitionBody' property.",

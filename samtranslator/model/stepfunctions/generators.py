@@ -5,9 +5,9 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMRolePolicies
 from samtranslator.model.resource_policies import ResourcePolicies
-from samtranslator.model.role_utils import construct_role_for_resource  # type: ignore[attr-defined]
+from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
-from samtranslator.model.stepfunctions import StepFunctionsStateMachine  # type: ignore[attr-defined]
+from samtranslator.model.stepfunctions import StepFunctionsStateMachine
 from samtranslator.model.intrinsics import fnJoin
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
@@ -109,7 +109,7 @@ class StateMachineGenerator(object):
             self.state_machine.DefinitionSubstitutions = self.definition_substitutions
 
         if self.definition and self.definition_uri:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Specify either 'Definition' or 'DefinitionUri' property and not both."
             )
         if self.definition:
@@ -124,12 +124,12 @@ class StateMachineGenerator(object):
         elif self.definition_uri:
             self.state_machine.DefinitionS3Location = self._construct_definition_uri()  # type: ignore[no-untyped-call]
         else:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Either 'Definition' or 'DefinitionUri' property must be specified."
             )
 
         if self.role and self.policies:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Specify either 'Role' or 'Policies' property and not both."
             )
         if self.role:
@@ -142,7 +142,7 @@ class StateMachineGenerator(object):
             self.state_machine.RoleArn = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
         else:
-            raise InvalidResourceException(self.logical_id, "Either 'Role' or 'Policies' property must be specified.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, "Either 'Role' or 'Policies' property must be specified.")
 
         self.state_machine.StateMachineName = self.name
         self.state_machine.StateMachineType = self.type
@@ -165,7 +165,7 @@ class StateMachineGenerator(object):
         if isinstance(self.definition_uri, dict):
             if not self.definition_uri.get("Bucket", None) or not self.definition_uri.get("Key", None):
                 # DefinitionUri is a dictionary but does not contain Bucket or Key property
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id, "'DefinitionUri' requires Bucket and Key properties to be specified."
                 )
             s3_pointer = self.definition_uri
@@ -217,7 +217,7 @@ class StateMachineGenerator(object):
             policy_template_processor=None,
         )
 
-        execution_role = construct_role_for_resource(
+        execution_role = construct_role_for_resource(  # type: ignore[no-untyped-call]
             resource_logical_id=self.logical_id,
             attributes=self.passthrough_resource_attributes,
             managed_policy_map=self.managed_policy_map,
@@ -258,7 +258,7 @@ class StateMachineGenerator(object):
                     for name, resource in self.event_resources[logical_id].items():
                         kwargs[name] = resource
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, str(e))  # type: ignore[no-untyped-call]
+                    raise InvalidEventException(logical_id, str(e))
                 resources += eventsource.to_cloudformation(resource=self.state_machine, **kwargs)
 
         return resources

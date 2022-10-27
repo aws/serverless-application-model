@@ -1,7 +1,7 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
 import re
 import inspect
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List, Optional
 
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.types import Validator
@@ -67,7 +67,13 @@ class Resource(object):
     # }
     runtime_attrs: Dict[str, Callable[["Resource"], Any]] = {}  # TODO: replace Any with something more explicit
 
-    def __init__(self, logical_id, relative_id=None, depends_on=None, attributes=None):  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        logical_id: str,
+        relative_id: Optional[str] = None,
+        depends_on: Optional[List[str]] = None,
+        attributes: Optional[Dict[str, Any]] = None,
+    ) -> None:
         """Initializes a Resource object with the given logical id.
 
         :param str logical_id: The logical id of this Resource
@@ -84,7 +90,7 @@ class Resource(object):
         for name, _ in self.property_types.items():
             setattr(self, name, None)
 
-        self.resource_attributes = {}
+        self.resource_attributes: Dict[str, Any] = {}
         if attributes is not None:
             for attr, value in attributes.items():
                 self.set_resource_attribute(attr, value)  # type: ignore[no-untyped-call]
@@ -168,7 +174,7 @@ class Resource(object):
         pattern = re.compile(r"^[A-Za-z0-9]+$")
         if logical_id is not None and pattern.match(logical_id):
             return True
-        raise InvalidResourceException(logical_id, "Logical ids must be alphanumeric.")  # type: ignore[no-untyped-call]
+        raise InvalidResourceException(logical_id, "Logical ids must be alphanumeric.")
 
     @classmethod
     def _validate_resource_dict(cls, logical_id, resource_dict):  # type: ignore[no-untyped-def]
@@ -180,16 +186,16 @@ class Resource(object):
         :raises InvalidResourceException: if the resource dict has an invalid format
         """
         if "Type" not in resource_dict:
-            raise InvalidResourceException(logical_id, "Resource dict missing key 'Type'.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(logical_id, "Resource dict missing key 'Type'.")
         if resource_dict["Type"] != cls.resource_type:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 logical_id,
                 "Resource has incorrect Type; expected '{expected}', "
                 "got '{actual}'".format(expected=cls.resource_type, actual=resource_dict["Type"]),
             )
 
         if "Properties" in resource_dict and not isinstance(resource_dict["Properties"], dict):
-            raise InvalidResourceException(logical_id, "Properties of a resource must be an object.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(logical_id, "Properties of a resource must be an object.")
 
     def to_dict(self):  # type: ignore[no-untyped-def]
         """Validates that the required properties for this Resource have been provided, then returns a dict
@@ -225,9 +231,7 @@ class Resource(object):
         :returns: the resource dict for this Resource
         :rtype: dict
         """
-        resource_dict = {}
-
-        resource_dict["Type"] = self.resource_type
+        resource_dict: Dict[str, Any] = {"Type": self.resource_type}
 
         if self.depends_on:
             resource_dict["DependsOn"] = self.depends_on
@@ -240,7 +244,7 @@ class Resource(object):
             if value is not None:
                 properties_dict[name] = value
 
-        resource_dict["Properties"] = properties_dict  # type: ignore[assignment]
+        resource_dict["Properties"] = properties_dict
 
         return resource_dict
 
@@ -255,7 +259,7 @@ class Resource(object):
         if name in self._keywords or name in self.property_types.keys():
             return super(Resource, self).__setattr__(name, value)
 
-        raise InvalidResourceException(  # type: ignore[no-untyped-call]
+        raise InvalidResourceException(
             self.logical_id,
             "property {property_name} not defined for resource of type {resource_type}".format(
                 resource_type=self.resource_type, property_name=name
@@ -280,12 +284,12 @@ class Resource(object):
             # If the property value has not been set, verify that the property is not required.
             if value is None:
                 if property_type.required:
-                    raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                    raise InvalidResourceException(
                         self.logical_id, "Missing required property '{property_name}'.".format(property_name=name)
                     )
             # Otherwise, validate the value of the property.
             elif not property_type.validate(value, should_raise=False):
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id, "Type of property '{property_name}' is invalid.".format(property_name=name)
                 )
 
@@ -455,7 +459,7 @@ class SamResourceMacro(ResourceMacro):
 
     def _check_tag(self, reserved_tag_name, tags):  # type: ignore[no-untyped-def]
         if reserved_tag_name in tags:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 f"{reserved_tag_name} is a reserved Tag key name and "
                 "cannot be set on your resource. "
@@ -469,7 +473,7 @@ class SamResourceMacro(ResourceMacro):
         value = intrinsics_resolver.resolve_parameter_refs(parameter_value)
 
         if not isinstance(value, str) and not isinstance(value, dict):
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Could not resolve parameter for '{}' or parameter is not a String.".format(parameter_name),
             )

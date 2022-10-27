@@ -31,7 +31,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
     :rtype: model.iam.IAMRole
     """
     role_logical_id = resource_logical_id + "Role"
-    execution_role = IAMRole(logical_id=role_logical_id, attributes=attributes)  # type: ignore[no-untyped-call]
+    execution_role = IAMRole(logical_id=role_logical_id, attributes=attributes)
     execution_role.AssumeRolePolicyDocument = assume_role_policy_document
 
     if not managed_policy_arns:
@@ -94,7 +94,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
                 managed_policy_arns.append(policy_arn)
         else:
             # Policy Templates are not supported here in the "core"
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 resource_logical_id,
                 "Policy at index {} in the '{}' property is not valid".format(
                     index, resource_policies.POLICIES_PROPERTY_NAME

@@ -89,7 +89,7 @@ class FeatureToggle:
 class FeatureToggleConfigProvider:
     """Interface for all FeatureToggle config providers"""
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         pass
 
     @property
@@ -100,8 +100,8 @@ class FeatureToggleConfigProvider:
 class FeatureToggleDefaultConfigProvider(FeatureToggleConfigProvider):
     """Default config provider, always return False for every query."""
 
-    def __init__(self):  # type: ignore[no-untyped-def]
-        FeatureToggleConfigProvider.__init__(self)  # type: ignore[no-untyped-call]
+    def __init__(self) -> None:
+        FeatureToggleConfigProvider.__init__(self)
 
     @property
     def config(self):  # type: ignore[no-untyped-def]
@@ -112,7 +112,7 @@ class FeatureToggleLocalConfigProvider(FeatureToggleConfigProvider):
     """Feature toggle config provider which uses a local file. This is to facilitate local testing."""
 
     def __init__(self, local_config_path):  # type: ignore[no-untyped-def]
-        FeatureToggleConfigProvider.__init__(self)  # type: ignore[no-untyped-call]
+        FeatureToggleConfigProvider.__init__(self)
         with open(local_config_path, "r", encoding="utf-8") as f:
             config_json = f.read()
         self.feature_toggle_config = json.loads(config_json)
@@ -127,7 +127,7 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
 
     @cw_timer(prefix="External", name="AppConfig")  # type: ignore[no-untyped-call]
     def __init__(self, application_id, environment_id, configuration_profile_id, app_config_client=None):  # type: ignore[no-untyped-def]
-        FeatureToggleConfigProvider.__init__(self)  # type: ignore[no-untyped-call]
+        FeatureToggleConfigProvider.__init__(self)
         try:
             LOG.info("Loading feature toggle config from AppConfig...")
             # Lambda function has 120 seconds limit

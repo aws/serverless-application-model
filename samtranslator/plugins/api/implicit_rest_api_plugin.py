@@ -1,8 +1,8 @@
 from samtranslator.model.naming import GeneratedLogicalId
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
-from samtranslator.public.swagger import SwaggerEditor  # type: ignore[attr-defined]
-from samtranslator.public.exceptions import InvalidEventException  # type: ignore[attr-defined]
-from samtranslator.public.sdk.resource import SamResourceType, SamResource  # type: ignore[attr-defined, attr-defined]
+from samtranslator.public.swagger import SwaggerEditor
+from samtranslator.public.exceptions import InvalidEventException
+from samtranslator.public.sdk.resource import SamResourceType, SamResource
 
 
 class ImplicitRestApiPlugin(ImplicitApiPlugin):
@@ -27,11 +27,11 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
 
     """
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         """
         Initialize the plugin
         """
-        super(ImplicitRestApiPlugin, self).__init__(ImplicitRestApiPlugin.__name__)  # type: ignore[no-untyped-call]
+        super(ImplicitRestApiPlugin, self).__init__(ImplicitRestApiPlugin.__name__)
 
     def _setup_api_properties(self):  # type: ignore[no-untyped-def]
         """
@@ -136,13 +136,13 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
         return "AWS::Serverless::Api"
 
 
-class ImplicitApiResource(SamResource):  # type: ignore[misc]
+class ImplicitApiResource(SamResource):
     """
     Returns a AWS::Serverless::Api resource representing the Implicit APIs. The returned resource includes
     the empty swagger along with default values for other properties.
     """
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         swagger = SwaggerEditor.gen_skeleton()
 
         resource = {

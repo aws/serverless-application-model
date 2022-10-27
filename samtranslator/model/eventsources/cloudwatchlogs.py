@@ -46,7 +46,7 @@ class CloudWatchLogs(PushEventSource):
         )
 
     def get_subscription_filter(self, function, permission):  # type: ignore[no-untyped-def]
-        subscription_filter = SubscriptionFilter(  # type: ignore[no-untyped-call]
+        subscription_filter = SubscriptionFilter(
             self.logical_id,
             depends_on=[permission.logical_id],
             attributes=function.get_passthrough_resource_attributes(),

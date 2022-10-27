@@ -10,7 +10,7 @@ LOG = logging.getLogger(__name__)
 class MetricsPublisher:
     """Interface for all MetricPublishers"""
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         pass
 
     def publish(self, namespace, metrics):  # type: ignore[no-untyped-def]
@@ -26,7 +26,7 @@ class CWMetricsPublisher(MetricsPublisher):
 
         :param cloudwatch_client: cloudwatch client required to publish metrics to cloudwatch
         """
-        MetricsPublisher.__init__(self)  # type: ignore[no-untyped-call]
+        MetricsPublisher.__init__(self)
         self.cloudwatch_client = cloudwatch_client
 
     def publish(self, namespace, metrics):  # type: ignore[no-untyped-def]
@@ -58,8 +58,8 @@ class CWMetricsPublisher(MetricsPublisher):
 
 
 class DummyMetricsPublisher(MetricsPublisher):
-    def __init__(self):  # type: ignore[no-untyped-def]
-        MetricsPublisher.__init__(self)  # type: ignore[no-untyped-call]
+    def __init__(self) -> None:
+        MetricsPublisher.__init__(self)
 
     def publish(self, namespace, metrics):  # type: ignore[no-untyped-def]
         """Do not publish any metric, this is a dummy publisher used for offline use."""
@@ -119,7 +119,7 @@ class Metrics:
         :param namespace: namespace under which all metrics will be published
         :param metrics_publisher: publisher to publish all metrics
         """
-        self.metrics_publisher = metrics_publisher if metrics_publisher else DummyMetricsPublisher()  # type: ignore[no-untyped-call]
+        self.metrics_publisher = metrics_publisher if metrics_publisher else DummyMetricsPublisher()
         self.metrics_cache = {}
         self.namespace = namespace
 

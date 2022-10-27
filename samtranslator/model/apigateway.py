@@ -1,6 +1,8 @@
 import json
 from re import match
 from functools import reduce
+from typing import Any, Dict, Optional
+
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.types import is_type, one_of, is_str, list_of
@@ -117,18 +119,24 @@ class ApiGatewayDeployment(Resource):
 class ApiGatewayResponse(object):
     ResponseParameterProperties = ["Headers", "Paths", "QueryStrings"]
 
-    def __init__(self, api_logical_id=None, response_parameters=None, response_templates=None, status_code=None):  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        api_logical_id: str,
+        response_parameters: Optional[Dict[str, Any]] = None,
+        response_templates: Optional[Dict[str, Any]] = None,
+        status_code: Optional[str] = None,
+    ) -> None:
         if response_parameters:
             for response_parameter_key in response_parameters.keys():
                 if response_parameter_key not in ApiGatewayResponse.ResponseParameterProperties:
-                    raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                    raise InvalidResourceException(
                         api_logical_id, "Invalid gateway response parameter '{}'".format(response_parameter_key)
                     )
 
         status_code_str = self._status_code_string(status_code)  # type: ignore[no-untyped-call]
         # status_code must look like a status code, if present. Let's not be judgmental; just check 0-999.
         if status_code and not match(r"^[0-9]{1,3}$", status_code_str):
-            raise InvalidResourceException(api_logical_id, "Property 'StatusCode' must be numeric")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(api_logical_id, "Property 'StatusCode' must be numeric")
 
         self.api_logical_id = api_logical_id
         # Defaults to Py27Dict() as these will go into swagger
@@ -246,20 +254,20 @@ class ApiGatewayAuthorizer(object):
         if authorization_scopes is None:
             authorization_scopes = []
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 api_logical_id,
                 f"{name} Authorizer has invalid 'FunctionPayloadType': {function_payload_type}.",
             )
 
         if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):  # type: ignore[no-untyped-call]
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 api_logical_id,
                 f"{name} Authorizer must specify Identity with at least one "
                 "of Headers, QueryStrings, StageVariables, or Context.",
             )
 
         if authorization_scopes is not None and not isinstance(authorization_scopes, list):
-            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
 
         self.api_logical_id = api_logical_id
         self.name = name
@@ -407,7 +415,7 @@ class ApiGatewayAuthorizer(object):
 
     def _get_identity_header(self):  # type: ignore[no-untyped-def]
         if self.identity and not isinstance(self.identity, dict):
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id,
                 "Auth.Authorizers.<Authorizer>.Identity must be a dict (LambdaTokenAuthorizationIdentity, "
                 "LambdaRequestAuthorizationIdentity or CognitoAuthorizationIdentity).",
