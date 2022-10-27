@@ -2,9 +2,13 @@
 
 [![Tests](https://github.com/aws/serverless-application-model/actions/workflows/build.yml/badge.svg)](https://github.com/aws/serverless-application-model/actions/workflows/build.yml)
 [![PyPI](https://img.shields.io/pypi/v/aws-sam-translator?label=PyPI)](https://pypi.org/project/aws-sam-translator/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aws-sam-translator)](https://pypi.org/project/aws-sam-translator/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aws-sam-translator?label=Python)](https://pypi.org/project/aws-sam-translator/)
 
-The [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/) (AWS SAM) transform 
+The [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/) (AWS SAM) transform provides 
+
+
+- it's a [CloudFormation macro](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-macros.html)
+- it
 
 It allows you to write 
 
@@ -28,19 +32,9 @@ Resources:
         }
 ```
 
-## Getting help
+## Setting up development environment
 
-The best way to interact with the team is through GitHub. You can either [create an issue](https://github.com/aws/serverless-application-model/issues/new/choose) or [start a discussion](https://github.com/aws/serverless-application-model/discussions).
-
-Or join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack.
-
-## Learn more
-
-## Contributing
-
-### Setting up development environment
-
-The only prerequisite is to have Python 3.7+ installed.
+Make sure you have Python 3.7+ installed.
 
 Create a [virtual environment](https://docs.python.org/3/library/venv.html):
 
@@ -61,7 +55,16 @@ Run tests:
 make pr
  ```
 
-For more thorough instructions, see [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md).
+For further instructions, see [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md).
+
+## Getting help
+
+The best way to interact with the team is through GitHub. You can either [create an issue](https://github.com/aws/serverless-application-model/issues/new/choose) or [start a discussion](https://github.com/aws/serverless-application-model/discussions).
+
+You can also join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack.
+
+## Learn more
+
 
 ---
 
