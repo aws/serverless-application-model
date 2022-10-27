@@ -6,13 +6,11 @@
 
 The [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/) (AWS SAM) transform is a [AWS CloudFormation macro](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-macros.html) that transforms [SAM templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy.html) into [CloudFormation templates](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html).
 
-A SAM template has [`AWS::Serverless-2016-10-31`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-aws-serverless.html) in its `Transform` section.
-
 For the `sam` command-line tool, see the [AWS SAM CLI](https://github.com/aws/aws-sam-cli).
 
 ## Example
 
-The following example specifies a AWS Lambda function.
+The following SAM template defines a AWS Lambda function:
 
 ```yaml
 Transform: AWS::Serverless-2016-10-31
@@ -28,21 +26,70 @@ Resources:
         }
 ```
 
+A SAM template has [`AWS::Serverless-2016-10-31`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-aws-serverless.html) in its `Transform` section.
+
 <details>
   <summary>Transformed AWS CloudFormation template</summary>
-  
-  ### Heading
-  1. Foo
-  2. Bar
-     * Baz
-     * Qux
 
-  ### Some Code
-  ```js
-  function logSomething(something) {
-    console.log('Something', something);
+```json
+{
+  "Resources": {
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  console.log(event);\n}\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "MyFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    }
   }
-  ```
+}
+```
+
 </details>
 
 ## Setting up development environment
