@@ -65,6 +65,14 @@ For more thorough instructions, see [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.m
 
 ---
 
+1. what it is
+2. example
+3. contributing
+4. getting help
+5. learn more
+
+---
+
 - what it is (does it need the whys?)
 - example (link to other detailed docs etc)
 - getting help (slack etc)
