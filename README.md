@@ -10,7 +10,7 @@ For the `sam` command-line tool, see the [AWS SAM CLI](https://github.com/aws/aw
 
 ## Example
 
-The following SAM template defines a AWS Lambda function:
+Deploying the following template creates a [AWS Lambda](https://aws.amazon.com/lambda/) function that prints out any [events](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-concepts.html#gettingstarted-concepts-event) it receives:
 
 ```yaml
 Transform: AWS::Serverless-2016-10-31
@@ -123,6 +123,7 @@ You can also join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers
 
 ## Learn more
 
+- [Deploying a "Hello, World!" application](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-hello-world.html)
 - [SAM developer guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html)
 - [SAM template specification](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html)
 - [SAM connectors](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/managing-permissions-connectors.html)
