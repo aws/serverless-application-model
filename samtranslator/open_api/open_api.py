@@ -68,7 +68,7 @@ class OpenApiEditor(object):
         contents = [item]
         if isinstance(item, dict) and self._CONDITIONAL_IF in item:
             contents = item[self._CONDITIONAL_IF][1:]
-            contents = [content for content in contents if not is_intrinsic_no_value(content)]  # type: ignore[no-untyped-call]
+            contents = [content for content in contents if not is_intrinsic_no_value(content)]
         return contents
 
     def has_path(self, path, method=None):  # type: ignore[no-untyped-def]
@@ -214,7 +214,7 @@ class OpenApiEditor(object):
         # Wrap the integration_uri in a Condition if one exists on that function
         # This is necessary so CFN doesn't try to resolve the integration reference.
         if condition:
-            integration_uri = make_conditional(condition, integration_uri)  # type: ignore[no-untyped-call]
+            integration_uri = make_conditional(condition, integration_uri)
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             # create as Py27Dict and insert key one by one to preserve input order
@@ -234,7 +234,7 @@ class OpenApiEditor(object):
 
             # If a condition is present, wrap all method contents up into the condition
             if condition:
-                path_item[method] = make_conditional(condition, path_item[method])  # type: ignore[no-untyped-call]
+                path_item[method] = make_conditional(condition, path_item[method])
 
     def make_path_conditional(self, path, condition):  # type: ignore[no-untyped-def]
         """
@@ -242,7 +242,7 @@ class OpenApiEditor(object):
         :param path: path name
         :param condition: condition name
         """
-        self.paths[path] = make_conditional(condition, self.paths[path])  # type: ignore[no-untyped-call]
+        self.paths[path] = make_conditional(condition, self.paths[path])
 
     def iter_on_path(self):  # type: ignore[no-untyped-def]
         """
@@ -561,7 +561,7 @@ class OpenApiEditor(object):
         cors_configuration = self._doc.get(self._X_APIGW_CORS, {})
 
         # intrinsics will not work if cors configuration is defined in open api and as a property to the HttpApi
-        if allow_origins and is_intrinsic(allow_origins):  # type: ignore[no-untyped-call]
+        if allow_origins and is_intrinsic(allow_origins):
             cors_configuration_string = json.dumps(allow_origins)
             for header in cors_headers:
                 # example: allowOrigins to AllowOrigins
@@ -651,7 +651,7 @@ class OpenApiEditor(object):
         skeleton["openapi"] = "3.0.1"
         skeleton["info"] = Py27Dict()
         skeleton["info"]["version"] = "1.0"
-        skeleton["info"]["title"] = ref("AWS::StackName")  # type: ignore[no-untyped-call]
+        skeleton["info"]["title"] = ref("AWS::StackName")
         skeleton["paths"] = Py27Dict()
         return skeleton
 

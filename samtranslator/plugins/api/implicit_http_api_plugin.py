@@ -164,7 +164,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         api_route_settings = resource.properties.get("RouteSettings", {})
         event_route_settings = event_properties.get("RouteSettings", {})
         if condition:
-            event_route_settings = make_conditional(condition, event_properties.get("RouteSettings", {}))  # type: ignore[no-untyped-call]
+            event_route_settings = make_conditional(condition, event_properties.get("RouteSettings", {}))
 
         # Merge event-level and api-level RouteSettings properties
         api_route_settings.setdefault(route, {})

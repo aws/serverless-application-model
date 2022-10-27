@@ -344,7 +344,7 @@ class Api(EventSource):
         if swagger_body is None:
             return
 
-        integration_uri = fnSub("arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution")  # type: ignore[no-untyped-call]
+        integration_uri = fnSub("arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution")
 
         editor = SwaggerEditor(swagger_body)  # type: ignore[no-untyped-call]
 
@@ -448,7 +448,7 @@ class Api(EventSource):
         :rtype: dict
         """
         request_templates = {
-            "application/json": fnSub(  # type: ignore[no-untyped-call]
+            "application/json": fnSub(
                 json.dumps(
                     {
                         "input": "$util.escapeJavaScript($input.json('$'))",

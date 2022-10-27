@@ -139,7 +139,7 @@ class SharedApiUsagePlan(object):
 
             if self.conditions:
                 self.conditions.add(condition)
-                or_condition = make_or_condition(self.conditions)  # type: ignore[no-untyped-call]
+                or_condition = make_or_condition(self.conditions)
                 template_conditions[SharedApiUsagePlan.SHARED_USAGE_PLAN_CONDITION_NAME] = or_condition
             else:
                 self.conditions.add(condition)
@@ -396,7 +396,7 @@ class ApiGenerator(object):
             generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)  # type: ignore[no-untyped-call]
             stage_logical_id = generator.gen()  # type: ignore[no-untyped-call]
         stage = ApiGatewayStage(stage_logical_id, attributes=self.passthrough_resource_attributes)  # type: ignore[no-untyped-call]
-        stage.RestApiId = ref(self.logical_id)  # type: ignore[no-untyped-call]
+        stage.RestApiId = ref(self.logical_id)
         stage.update_deployment_ref(deployment.logical_id)  # type: ignore[no-untyped-call]
         stage.StageName = self.stage_name
         stage.CacheClusterEnabled = self.cache_cluster_enabled
@@ -503,9 +503,9 @@ class ApiGenerator(object):
             basepath_mapping = ApiGatewayBasePathMapping(  # type: ignore[no-untyped-call]
                 self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
             )
-            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))  # type: ignore[no-untyped-call]
-            basepath_mapping.RestApiId = ref(rest_api.logical_id)  # type: ignore[no-untyped-call]
-            basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")  # type: ignore[no-untyped-call]
+            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+            basepath_mapping.RestApiId = ref(rest_api.logical_id)
+            basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
             basepath_resource_list.extend([basepath_mapping])
         else:
             for path in basepaths:
@@ -514,9 +514,9 @@ class ApiGenerator(object):
                 basepath_mapping = ApiGatewayBasePathMapping(  # type: ignore[no-untyped-call]
                     logical_id, attributes=self.passthrough_resource_attributes
                 )
-                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))  # type: ignore[no-untyped-call]
-                basepath_mapping.RestApiId = ref(rest_api.logical_id)  # type: ignore[no-untyped-call]
-                basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")  # type: ignore[no-untyped-call]
+                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+                basepath_mapping.RestApiId = ref(rest_api.logical_id)
+                basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
                 basepath_mapping.BasePath = path
                 basepath_resource_list.extend([basepath_mapping])
 
@@ -583,11 +583,11 @@ class ApiGenerator(object):
         if target_health is not None:
             alias_target["EvaluateTargetHealth"] = target_health
         if domain.get("EndpointConfiguration") == "REGIONAL":
-            alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")  # type: ignore[no-untyped-call]
-            alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")  # type: ignore[no-untyped-call]
+            alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")
+            alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")
         else:
             if route53.get("DistributionDomainName") is None:
-                route53["DistributionDomainName"] = fnGetAtt(self.domain.get("ApiDomainName"), "DistributionDomainName")  # type: ignore[no-untyped-call]
+                route53["DistributionDomainName"] = fnGetAtt(self.domain.get("ApiDomainName"), "DistributionDomainName")
             alias_target["HostedZoneId"] = "Z2FDTNDATAQYW2"
             alias_target["DNSName"] = route53.get("DistributionDomainName")
         return alias_target
@@ -630,7 +630,7 @@ class ApiGenerator(object):
                 self.logical_id, "Cors works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
-        if isinstance(self.cors, str) or is_intrinsic(self.cors):  # type: ignore[no-untyped-call]
+        if isinstance(self.cors, str) or is_intrinsic(self.cors):
             # Just set Origin property. Others will be defaults
             properties = CorsProperties(AllowOrigin=self.cors)  # type: ignore[call-arg]
         elif isinstance(self.cors, dict):
@@ -793,8 +793,8 @@ class ApiGenerator(object):
             )
             api_stages = []
             api_stage = {}
-            api_stage["ApiId"] = ref(self.logical_id)  # type: ignore[no-untyped-call]
-            api_stage["Stage"] = ref(rest_api_stage.logical_id)  # type: ignore[no-untyped-call]
+            api_stage["ApiId"] = ref(self.logical_id)
+            api_stage["Stage"] = ref(rest_api_stage.logical_id)
             api_stages.append(api_stage)
             usage_plan.ApiStages = api_stages
 
@@ -815,8 +815,8 @@ class ApiGenerator(object):
                 ),
             )
             api_stage = {}
-            api_stage["ApiId"] = ref(self.logical_id)  # type: ignore[no-untyped-call]
-            api_stage["Stage"] = ref(rest_api_stage.logical_id)  # type: ignore[no-untyped-call]
+            api_stage["ApiId"] = ref(self.logical_id)
+            api_stage["Stage"] = ref(rest_api_stage.logical_id)
             if api_stage not in self.shared_api_usage_plan.api_stages_shared:
                 self.shared_api_usage_plan.api_stages_shared.append(api_stage)
             usage_plan.ApiStages = self.shared_api_usage_plan.api_stages_shared
@@ -856,8 +856,8 @@ class ApiGenerator(object):
             )
             api_key.Enabled = True
             stage_key = {}
-            stage_key["RestApiId"] = ref(self.logical_id)  # type: ignore[no-untyped-call]
-            stage_key["StageName"] = ref(rest_api_stage.logical_id)  # type: ignore[no-untyped-call]
+            stage_key["RestApiId"] = ref(self.logical_id)
+            stage_key["StageName"] = ref(rest_api_stage.logical_id)
             if stage_key not in self.shared_api_usage_plan.stage_keys_shared:
                 self.shared_api_usage_plan.stage_keys_shared.append(stage_key)
             api_key.StageKeys = self.shared_api_usage_plan.stage_keys_shared
@@ -873,8 +873,8 @@ class ApiGenerator(object):
             api_key.Enabled = True
             stage_keys = []
             stage_key = {}
-            stage_key["RestApiId"] = ref(self.logical_id)  # type: ignore[no-untyped-call]
-            stage_key["StageName"] = ref(rest_api_stage.logical_id)  # type: ignore[no-untyped-call]
+            stage_key["RestApiId"] = ref(self.logical_id)
+            stage_key["StageName"] = ref(rest_api_stage.logical_id)
             stage_keys.append(stage_key)
             api_key.StageKeys = stage_keys
         return api_key
@@ -903,9 +903,9 @@ class ApiGenerator(object):
             depends_on=[api_key.logical_id],
             attributes=resource_attributes,
         )
-        usage_plan_key.KeyId = ref(api_key.logical_id)  # type: ignore[no-untyped-call]
+        usage_plan_key.KeyId = ref(api_key.logical_id)
         usage_plan_key.KeyType = "API_KEY"
-        usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)  # type: ignore[no-untyped-call]
+        usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)
 
         return usage_plan_key
 
@@ -925,7 +925,7 @@ class ApiGenerator(object):
 
         # Make sure keys in the dict are recognized
         for responses_key, responses_value in self.gateway_responses.items():
-            if is_intrinsic(responses_value):  # type: ignore[no-untyped-call]
+            if is_intrinsic(responses_value):
                 # TODO: Add intrinsic support for this field.
                 raise InvalidResourceException(  # type: ignore[no-untyped-call]
                     self.logical_id,
@@ -1108,7 +1108,7 @@ class ApiGenerator(object):
 
         partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
         resource = "${__ApiId__}/authorizers/*"
-        source_arn = fnSub(  # type: ignore[no-untyped-call]
+        source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
             {"__ApiId__": api_id},
         )

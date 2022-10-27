@@ -280,7 +280,7 @@ class SamFunction(SamResourceMacro):
             if policy is not None:
                 policy_document.append(policy)
 
-        lambda_event_invoke_config.FunctionName = ref(function_name)  # type: ignore[no-untyped-call]
+        lambda_event_invoke_config.FunctionName = ref(function_name)
         if alias_name:
             lambda_event_invoke_config.Qualifier = alias_name
         else:
@@ -333,7 +333,7 @@ class SamFunction(SamResourceMacro):
                 if combined_condition:
                     resource.set_resource_attribute("Condition", combined_condition)  # type: ignore[union-attr]
                 if property_condition:
-                    destination["Destination"] = make_conditional(  # type: ignore[no-untyped-call]
+                    destination["Destination"] = make_conditional(
                         property_condition, resource.get_runtime_attr("arn"), dest_arn  # type: ignore[union-attr]
                     )
                 else:
@@ -359,8 +359,8 @@ class SamFunction(SamResourceMacro):
         if property_condition is None:
             return resource_condition
 
-        and_condition = make_and_condition([{"Condition": resource_condition}, {"Condition": property_condition}])  # type: ignore[no-untyped-call]
-        condition_name = self._make_gen_condition_name(resource_condition + "AND" + property_condition, self.logical_id)  # type: ignore[no-untyped-call]
+        and_condition = make_and_condition([{"Condition": resource_condition}, {"Condition": property_condition}])
+        condition_name = self._make_gen_condition_name(resource_condition + "AND" + property_condition, self.logical_id)
         conditions[condition_name] = and_condition
 
         return condition_name
@@ -381,23 +381,23 @@ class SamFunction(SamResourceMacro):
         """
         if destination is None:
             return None, None
-        if is_intrinsic_if(destination):  # type: ignore[no-untyped-call]
+        if is_intrinsic_if(destination):
             dest_list = destination.get("Fn::If")
-            if is_intrinsic_no_value(dest_list[1]) and is_intrinsic_no_value(dest_list[2]):  # type: ignore[no-untyped-call]
+            if is_intrinsic_no_value(dest_list[1]) and is_intrinsic_no_value(dest_list[2]):
                 return None, None
-            if is_intrinsic_no_value(dest_list[1]):  # type: ignore[no-untyped-call]
+            if is_intrinsic_no_value(dest_list[1]):
                 return dest_list[0], dest_list[2]
-            if is_intrinsic_no_value(dest_list[2]):  # type: ignore[no-untyped-call]
+            if is_intrinsic_no_value(dest_list[2]):
                 condition = dest_list[0]
-                not_condition = self._make_gen_condition_name("NOT" + condition, logical_id)  # type: ignore[no-untyped-call]
-                conditions[not_condition] = make_not_conditional(condition)  # type: ignore[no-untyped-call]
+                not_condition = self._make_gen_condition_name("NOT" + condition, logical_id)
+                conditions[not_condition] = make_not_conditional(condition)
                 return not_condition, dest_list[1]
         return None, None
 
-    def _make_gen_condition_name(self, name, hash_input):  # type: ignore[no-untyped-def]
+    def _make_gen_condition_name(self, name: str, hash_input: str) -> str:
         # Make sure the property name is not over 255 characters (CFN limit)
         hash_digest = logical_id_generator.LogicalIdGenerator("", hash_input).gen()  # type: ignore[no-untyped-call, no-untyped-call]
-        condition_name = name + hash_digest
+        condition_name: str = name + hash_digest
         if len(condition_name) > 255:
             return input(condition_name)[:255]
         return condition_name
@@ -599,13 +599,13 @@ class SamFunction(SamResourceMacro):
 
         architectures = [X86_64] if lambda_function.Architectures is None else lambda_function.Architectures
 
-        if is_intrinsic(architectures):  # type: ignore[no-untyped-call]
+        if is_intrinsic(architectures):
             return
 
         if (
             not isinstance(architectures, list)
             or len(architectures) != 1
-            or (not is_intrinsic(architectures[0]) and (architectures[0] not in [X86_64, ARM64]))  # type: ignore[no-untyped-call]
+            or (not is_intrinsic(architectures[0]) and (architectures[0] not in [X86_64, ARM64]))
         ):
             raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 lambda_function.logical_id,
@@ -928,7 +928,7 @@ class SamFunction(SamResourceMacro):
             return True
         if processed_property_value in [False, "false", "False"]:
             return False
-        if is_intrinsic(processed_property_value):  # type: ignore[no-untyped-call] # couldn't resolve intrinsic
+        if is_intrinsic(processed_property_value):  # couldn't resolve intrinsic
             raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.logical_id,
                 f"Unsupported intrinsic: the only intrinsic functions supported for "
@@ -975,11 +975,11 @@ class SamFunction(SamResourceMacro):
         self._validate_cors_config_parameter(lambda_function)  # type: ignore[no-untyped-call]
 
     def _validate_url_auth_type(self, lambda_function):  # type: ignore[no-untyped-def]
-        if is_intrinsic(self.FunctionUrlConfig):  # type: ignore[attr-defined, no-untyped-call]
+        if is_intrinsic(self.FunctionUrlConfig):  # type: ignore[attr-defined]
             return
 
         auth_type = self.FunctionUrlConfig.get("AuthType")  # type: ignore[attr-defined]
-        if auth_type and is_intrinsic(auth_type):  # type: ignore[no-untyped-call]
+        if auth_type and is_intrinsic(auth_type):
             return
 
         if not auth_type or auth_type not in ["AWS_IAM", "NONE"]:
@@ -989,7 +989,7 @@ class SamFunction(SamResourceMacro):
             )
 
     def _validate_cors_config_parameter(self, lambda_function):  # type: ignore[no-untyped-def]
-        if is_intrinsic(self.FunctionUrlConfig):  # type: ignore[attr-defined, no-untyped-call]
+        if is_intrinsic(self.FunctionUrlConfig):  # type: ignore[attr-defined]
             return
 
         cors_property_data_type = {
@@ -1003,7 +1003,7 @@ class SamFunction(SamResourceMacro):
 
         cors = self.FunctionUrlConfig.get("Cors")  # type: ignore[attr-defined]
 
-        if not cors or is_intrinsic(cors):  # type: ignore[no-untyped-call]
+        if not cors or is_intrinsic(cors):
             return
 
         for prop_name, prop_value in cors.items():
@@ -1013,7 +1013,7 @@ class SamFunction(SamResourceMacro):
                     "{} is not a valid property for configuring Cors.".format(prop_name),
                 )
             prop_type = cors_property_data_type.get(prop_name)
-            if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):  # type: ignore[arg-type, no-untyped-call]
+            if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):  # type: ignore[arg-type]
                 raise InvalidResourceException(  # type: ignore[no-untyped-call]
                     lambda_function.logical_id,
                     "{} must be of type {}.".format(prop_name, str(prop_type).split("'")[1]),
@@ -1039,7 +1039,7 @@ class SamFunction(SamResourceMacro):
         """
         auth_type = self.FunctionUrlConfig.get("AuthType")  # type: ignore[attr-defined]
 
-        if auth_type not in ["NONE"] or is_intrinsic(self.FunctionUrlConfig):  # type: ignore[attr-defined, no-untyped-call]
+        if auth_type not in ["NONE"] or is_intrinsic(self.FunctionUrlConfig):  # type: ignore[attr-defined]
             return None
 
         logical_id = f"{lambda_function.logical_id}UrlPublicPermissions"
@@ -1490,7 +1490,7 @@ class SamLayerVersion(SamResourceMacro):
         :return: value for the DeletionPolicy attribute.
         """
 
-        if is_intrinsic(self.RetentionPolicy):  # type: ignore[no-untyped-call]
+        if is_intrinsic(self.RetentionPolicy):
             # RetentionPolicy attribute of AWS::Serverless::LayerVersion does set the DeletionPolicy
             # attribute. And DeletionPolicy attribute does not support intrinsic values.
             raise InvalidResourceException(  # type: ignore[no-untyped-call]
@@ -1526,11 +1526,11 @@ class SamLayerVersion(SamResourceMacro):
         """
         architectures = lambda_layer.CompatibleArchitectures or [X86_64]
         # Intrinsics are not validated
-        if is_intrinsic(architectures):  # type: ignore[no-untyped-call]
+        if is_intrinsic(architectures):
             return
         for arq in architectures:
             # We validate the values only if we they're not intrinsics
-            if not is_intrinsic(arq) and not arq in [ARM64, X86_64]:  # type: ignore[no-untyped-call]
+            if not is_intrinsic(arq) and not arq in [ARM64, X86_64]:
                 raise InvalidResourceException(  # type: ignore[no-untyped-call]
                     lambda_layer.logical_id,
                     "CompatibleArchitectures needs to be a list of '{}' or '{}'".format(X86_64, ARM64),

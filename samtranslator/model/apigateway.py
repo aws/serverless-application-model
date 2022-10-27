@@ -27,7 +27,7 @@ class ApiGatewayRestApi(Resource):
         "ApiKeySourceType": PropertyType(False, is_str()),
     }
 
-    runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
 
 
 class ApiGatewayStage(Resource):
@@ -48,10 +48,10 @@ class ApiGatewayStage(Resource):
         "MethodSettings": PropertyType(False, is_type(list)),
     }
 
-    runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
 
     def update_deployment_ref(self, deployment_logical_id):  # type: ignore[no-untyped-def]
-        self.DeploymentId = ref(deployment_logical_id)  # type: ignore[no-untyped-call]
+        self.DeploymentId = ref(deployment_logical_id)
 
 
 class ApiGatewayAccount(Resource):
@@ -70,7 +70,7 @@ class ApiGatewayDeployment(Resource):
         "StageName": PropertyType(False, is_str()),
     }
 
-    runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}
 
     def make_auto_deployable(  # type: ignore[no-untyped-def]
         self, stage, openapi_version=None, swagger=None, domain=None, redeploy_restapi_parameters=None
@@ -201,7 +201,7 @@ class ApiGatewayUsagePlan(Resource):
         "Throttle": PropertyType(False, is_type(dict)),
         "UsagePlanName": PropertyType(False, is_str()),
     }
-    runtime_attrs = {"usage_plan_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"usage_plan_id": lambda self: ref(self.logical_id)}
 
 
 class ApiGatewayUsagePlanKey(Resource):
@@ -225,7 +225,7 @@ class ApiGatewayApiKey(Resource):
         "Value": PropertyType(False, is_str()),
     }
 
-    runtime_attrs = {"api_key_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"api_key_id": lambda self: ref(self.logical_id)}
 
 
 class ApiGatewayAuthorizer(object):
@@ -312,7 +312,7 @@ class ApiGatewayAuthorizer(object):
             swagger[APIGATEWAY_AUTHORIZER_KEY] = Py27Dict({"type": self._get_swagger_authorizer_type()})  # type: ignore[no-untyped-call, no-untyped-call]
             partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
-            authorizer_uri = fnSub(  # type: ignore[no-untyped-call]
+            authorizer_uri = fnSub(
                 ArnGenerator.generate_arn(  # type: ignore[no-untyped-call]
                     partition=partition, service="apigateway", resource=resource, include_account_id=False
                 ),

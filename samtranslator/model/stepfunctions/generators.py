@@ -197,7 +197,7 @@ class StateMachineGenerator(object):
         # Indenting and then splitting the JSON-encoded string for readability of the state machine definition in the CloudFormation translated resource.
         # Separators are passed explicitly to maintain trailing whitespace consistency across Py2 and Py3
         definition_lines = json.dumps(definition_dict, sort_keys=True, indent=4, separators=(",", ": ")).split("\n")
-        definition_string = fnJoin("\n", definition_lines)  # type: ignore[no-untyped-call]
+        definition_string = fnJoin("\n", definition_lines)
         return definition_string
 
     def _construct_role(self):  # type: ignore[no-untyped-def]

@@ -190,7 +190,7 @@ class PullEventSource(ResourceMacro):
                     role.Policies.append(destination_config_policy)
 
     def _validate_filter_criteria(self):  # type: ignore[no-untyped-def]
-        if not self.FilterCriteria or is_intrinsic(self.FilterCriteria):  # type: ignore[attr-defined, no-untyped-call]
+        if not self.FilterCriteria or is_intrinsic(self.FilterCriteria):  # type: ignore[attr-defined]
             return
         if self.resource_type not in self.RESOURCE_TYPES_WITH_EVENT_FILTERING:
             raise InvalidEventException(  # type: ignore[no-untyped-call]
@@ -446,7 +446,7 @@ class SelfManagedKafka(PullEventSource):
                 "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
             )
 
-        if not isinstance(config.get("URI"), str) and not is_intrinsic(config.get("URI")):  # type: ignore[no-untyped-call]
+        if not isinstance(config.get("URI"), str) and not is_intrinsic(config.get("URI")):
             raise InvalidEventException(  # type: ignore[no-untyped-call]
                 self.relative_id,
                 "Wrong Type for {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(
