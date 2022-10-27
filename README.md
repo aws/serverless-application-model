@@ -18,6 +18,8 @@ For the `sam` command-line tool, see the [AWS SAM CLI](https://github.com/aws/aw
 
 ## Example
 
+The following example specifies a AWS Lambda function.
+
 ```yaml
 Transform: AWS::Serverless-2016-10-31
 Resources:
