@@ -6,12 +6,12 @@ from samtranslator.model.intrinsics import ref, fnGetAtt
 class IAMRole(Resource):
     resource_type = "AWS::IAM::Role"
     property_types = {
-        "AssumeRolePolicyDocument": PropertyType(True, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ManagedPolicyArns": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Path": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Policies": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "PermissionsBoundary": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, list_of(is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
+        "AssumeRolePolicyDocument": PropertyType(True, is_type(dict)),
+        "ManagedPolicyArns": PropertyType(False, is_type(list)),
+        "Path": PropertyType(False, is_str()),
+        "Policies": PropertyType(False, is_type(list)),
+        "PermissionsBoundary": PropertyType(False, is_str()),
+        "Tags": PropertyType(False, list_of(is_type(dict))),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}  # type: ignore[no-untyped-call, no-untyped-call]
@@ -20,13 +20,13 @@ class IAMRole(Resource):
 class IAMManagedPolicy(Resource):
     resource_type = "AWS::IAM::ManagedPolicy"
     property_types = {
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Groups": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "PolicyDocument": PropertyType(True, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ManagedPolicyName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Path": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Roles": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Users": PropertyType(False, list_of(is_str())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
+        "Description": PropertyType(False, is_str()),
+        "Groups": PropertyType(False, is_str()),
+        "PolicyDocument": PropertyType(True, is_type(dict)),
+        "ManagedPolicyName": PropertyType(False, is_str()),
+        "Path": PropertyType(False, is_str()),
+        "Roles": PropertyType(False, is_type(list)),
+        "Users": PropertyType(False, list_of(is_str())),
     }
 
 

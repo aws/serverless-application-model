@@ -13,18 +13,18 @@ from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 class ApiGatewayRestApi(Resource):
     resource_type = "AWS::ApiGateway::RestApi"
     property_types = {
-        "Body": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "BodyS3Location": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CloneFrom": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FailOnWarnings": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Name": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Parameters": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "EndpointConfiguration": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "BinaryMediaTypes": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MinimumCompressionSize": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Mode": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ApiKeySourceType": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Body": PropertyType(False, is_type(dict)),
+        "BodyS3Location": PropertyType(False, is_type(dict)),
+        "CloneFrom": PropertyType(False, is_str()),
+        "Description": PropertyType(False, is_str()),
+        "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "Name": PropertyType(False, is_str()),
+        "Parameters": PropertyType(False, is_type(dict)),
+        "EndpointConfiguration": PropertyType(False, is_type(dict)),
+        "BinaryMediaTypes": PropertyType(False, is_type(list)),
+        "MinimumCompressionSize": PropertyType(False, is_type(int)),
+        "Mode": PropertyType(False, is_str()),
+        "ApiKeySourceType": PropertyType(False, is_str()),
     }
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
@@ -33,19 +33,19 @@ class ApiGatewayRestApi(Resource):
 class ApiGatewayStage(Resource):
     resource_type = "AWS::ApiGateway::Stage"
     property_types = {
-        "AccessLogSetting": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CacheClusterEnabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CacheClusterSize": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CanarySetting": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ClientCertificateId": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DeploymentId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RestApiId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "StageName": PropertyType(True, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, list_of(is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
-        "TracingEnabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Variables": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MethodSettings": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "AccessLogSetting": PropertyType(False, is_type(dict)),
+        "CacheClusterEnabled": PropertyType(False, is_type(bool)),
+        "CacheClusterSize": PropertyType(False, is_str()),
+        "CanarySetting": PropertyType(False, is_type(dict)),
+        "ClientCertificateId": PropertyType(False, is_str()),
+        "DeploymentId": PropertyType(True, is_str()),
+        "Description": PropertyType(False, is_str()),
+        "RestApiId": PropertyType(True, is_str()),
+        "StageName": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, list_of(is_type(dict))),
+        "TracingEnabled": PropertyType(False, is_type(bool)),
+        "Variables": PropertyType(False, is_type(dict)),
+        "MethodSettings": PropertyType(False, is_type(list)),
     }
 
     runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
@@ -56,7 +56,7 @@ class ApiGatewayStage(Resource):
 
 class ApiGatewayAccount(Resource):
     resource_type = "AWS::ApiGateway::Account"
-    property_types = {"CloudWatchRoleArn": PropertyType(False, one_of(is_str(), is_type(dict)))}  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
+    property_types = {"CloudWatchRoleArn": PropertyType(False, one_of(is_str(), is_type(dict)))}
 
 
 class ApiGatewayDeployment(Resource):
@@ -64,10 +64,10 @@ class ApiGatewayDeployment(Resource):
 
     resource_type = "AWS::ApiGateway::Deployment"
     property_types = {
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RestApiId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "StageDescription": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "StageName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Description": PropertyType(False, is_str()),
+        "RestApiId": PropertyType(True, is_str()),
+        "StageDescription": PropertyType(False, is_type(dict)),
+        "StageName": PropertyType(False, is_str()),
     }
 
     runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
@@ -171,35 +171,35 @@ class ApiGatewayResponse(object):
 class ApiGatewayDomainName(Resource):
     resource_type = "AWS::ApiGateway::DomainName"
     property_types = {
-        "RegionalCertificateArn": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DomainName": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "EndpointConfiguration": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "SecurityPolicy": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CertificateArn": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "OwnershipVerificationCertificateArn": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "RegionalCertificateArn": PropertyType(False, is_str()),
+        "DomainName": PropertyType(True, is_str()),
+        "EndpointConfiguration": PropertyType(False, is_type(dict)),
+        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
+        "SecurityPolicy": PropertyType(False, is_str()),
+        "CertificateArn": PropertyType(False, is_str()),
+        "OwnershipVerificationCertificateArn": PropertyType(False, is_str()),
     }
 
 
 class ApiGatewayBasePathMapping(Resource):
     resource_type = "AWS::ApiGateway::BasePathMapping"
     property_types = {
-        "BasePath": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DomainName": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RestApiId": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Stage": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "BasePath": PropertyType(False, is_str()),
+        "DomainName": PropertyType(True, is_str()),
+        "RestApiId": PropertyType(False, is_str()),
+        "Stage": PropertyType(False, is_str()),
     }
 
 
 class ApiGatewayUsagePlan(Resource):
     resource_type = "AWS::ApiGateway::UsagePlan"
     property_types = {
-        "ApiStages": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Quota": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, list_of(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Throttle": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "UsagePlanName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "ApiStages": PropertyType(False, is_type(list)),
+        "Description": PropertyType(False, is_str()),
+        "Quota": PropertyType(False, is_type(dict)),
+        "Tags": PropertyType(False, list_of(dict)),
+        "Throttle": PropertyType(False, is_type(dict)),
+        "UsagePlanName": PropertyType(False, is_str()),
     }
     runtime_attrs = {"usage_plan_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
 
@@ -207,22 +207,22 @@ class ApiGatewayUsagePlan(Resource):
 class ApiGatewayUsagePlanKey(Resource):
     resource_type = "AWS::ApiGateway::UsagePlanKey"
     property_types = {
-        "KeyId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "KeyType": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "UsagePlanId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "KeyId": PropertyType(True, is_str()),
+        "KeyType": PropertyType(True, is_str()),
+        "UsagePlanId": PropertyType(True, is_str()),
     }
 
 
 class ApiGatewayApiKey(Resource):
     resource_type = "AWS::ApiGateway::ApiKey"
     property_types = {
-        "CustomerId": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Enabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "GenerateDistinctId": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Name": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "StageKeys": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Value": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "CustomerId": PropertyType(False, is_str()),
+        "Description": PropertyType(False, is_str()),
+        "Enabled": PropertyType(False, is_type(bool)),
+        "GenerateDistinctId": PropertyType(False, is_type(bool)),
+        "Name": PropertyType(False, is_str()),
+        "StageKeys": PropertyType(False, is_type(list)),
+        "Value": PropertyType(False, is_str()),
     }
 
     runtime_attrs = {"api_key_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]

@@ -42,19 +42,19 @@ class SamResource(object):
 
         if self.condition:
 
-            if not is_str()(self.condition, should_raise=False):  # type: ignore[no-untyped-call]
+            if not is_str()(self.condition, should_raise=False):
                 raise InvalidDocumentException([InvalidTemplateException("Every Condition member must be a string.")])  # type: ignore[no-untyped-call, no-untyped-call]
 
         if self.deletion_policy:
 
-            if not is_str()(self.deletion_policy, should_raise=False):  # type: ignore[no-untyped-call]
+            if not is_str()(self.deletion_policy, should_raise=False):
                 raise InvalidDocumentException(  # type: ignore[no-untyped-call]
                     [InvalidTemplateException("Every DeletionPolicy member must be a string.")]  # type: ignore[no-untyped-call]
                 )
 
         if self.update_replace_policy:
 
-            if not is_str()(self.update_replace_policy, should_raise=False):  # type: ignore[no-untyped-call]
+            if not is_str()(self.update_replace_policy, should_raise=False):
                 raise InvalidDocumentException(  # type: ignore[no-untyped-call]
                     [InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")]  # type: ignore[no-untyped-call]
                 )

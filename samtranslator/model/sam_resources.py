@@ -76,42 +76,42 @@ class SamFunction(SamResourceMacro):
 
     resource_type = "AWS::Serverless::Function"
     property_types = {
-        "FunctionName": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Handler": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Runtime": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "ImageUri": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "PackageType": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "DeadLetterQueue": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MemorySize": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Timeout": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "VpcConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Role": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "PermissionsBoundary": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Tracing": PropertyType(False, one_of(is_type(dict), is_str())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "DeploymentPreference": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ReservedConcurrentExecutions": PropertyType(False, any_type()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "EventInvokeConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "EphemeralStorage": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "FunctionName": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Handler": PropertyType(False, is_str()),
+        "Runtime": PropertyType(False, is_str()),
+        "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "ImageUri": PropertyType(False, is_str()),
+        "PackageType": PropertyType(False, is_str()),
+        "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "DeadLetterQueue": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, is_str()),
+        "MemorySize": PropertyType(False, is_type(int)),
+        "Timeout": PropertyType(False, is_type(int)),
+        "VpcConfig": PropertyType(False, is_type(dict)),
+        "Role": PropertyType(False, is_str()),
+        "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
+        "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
+        "PermissionsBoundary": PropertyType(False, is_str()),
+        "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
+        "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "Tracing": PropertyType(False, one_of(is_type(dict), is_str())),
+        "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),
+        "DeploymentPreference": PropertyType(False, is_type(dict)),
+        "ReservedConcurrentExecutions": PropertyType(False, any_type()),
+        "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "EventInvokeConfig": PropertyType(False, is_type(dict)),
+        "EphemeralStorage": PropertyType(False, is_type(dict)),
         # Intrinsic functions in value of Alias property are not supported, yet
-        "AutoPublishAlias": PropertyType(False, one_of(is_str())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
-        "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
-        "VersionDescription": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
-        "ImageConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CodeSigningConfigArn": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "FunctionUrlConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "AutoPublishAlias": PropertyType(False, one_of(is_str())),
+        "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),
+        "VersionDescription": PropertyType(False, is_str()),
+        "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
+        "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
+        "ImageConfig": PropertyType(False, is_type(dict)),
+        "CodeSigningConfigArn": PropertyType(False, is_str()),
+        "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "FunctionUrlConfig": PropertyType(False, is_type(dict)),
     }
     event_resolver = ResourceTypeResolver(  # type: ignore[no-untyped-call]
         samtranslator.model.eventsources,
@@ -1064,33 +1064,33 @@ class SamApi(SamResourceMacro):
         # Implicit APIs. For Explicit APIs, customer is expected to set integration URI themselves.
         # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
         # Swagger.
-        "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Name": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "StageName": PropertyType(True, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DefinitionBody": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "CacheClusterEnabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CacheClusterSize": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Variables": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "EndpointConfiguration": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "MethodSettings": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "BinaryMediaTypes": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MinimumCompressionSize": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Cors": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Auth": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "GatewayResponses": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "AccessLogSetting": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CanarySetting": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "TracingEnabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "OpenApiVersion": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Models": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Domain": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FailOnWarnings": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Mode": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ApiKeySourceType": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
+        "Name": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "StageName": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "DefinitionBody": PropertyType(False, is_type(dict)),
+        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "CacheClusterEnabled": PropertyType(False, is_type(bool)),
+        "CacheClusterSize": PropertyType(False, is_str()),
+        "Variables": PropertyType(False, is_type(dict)),
+        "EndpointConfiguration": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "MethodSettings": PropertyType(False, is_type(list)),
+        "BinaryMediaTypes": PropertyType(False, is_type(list)),
+        "MinimumCompressionSize": PropertyType(False, is_type(int)),
+        "Cors": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Auth": PropertyType(False, is_type(dict)),
+        "GatewayResponses": PropertyType(False, is_type(dict)),
+        "AccessLogSetting": PropertyType(False, is_type(dict)),
+        "CanarySetting": PropertyType(False, is_type(dict)),
+        "TracingEnabled": PropertyType(False, is_type(bool)),
+        "OpenApiVersion": PropertyType(False, is_str()),
+        "Models": PropertyType(False, is_type(dict)),
+        "Domain": PropertyType(False, is_type(dict)),
+        "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "Description": PropertyType(False, is_str()),
+        "Mode": PropertyType(False, is_str()),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
+        "ApiKeySourceType": PropertyType(False, is_str()),
     }
 
     referable_properties = {
@@ -1192,21 +1192,21 @@ class SamHttpApi(SamResourceMacro):
         # Implicit APIs. For Explicit APIs, this is managed by the DefaultDefinitionBody Plugin.
         # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
         # Swagger.
-        "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DefinitionBody": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "StageVariables": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CorsConfiguration": PropertyType(False, one_of(is_type(bool), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
-        "AccessLogSettings": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DefaultRouteSettings": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Auth": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RouteSettings": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Domain": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FailOnWarnings": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
+        "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "DefinitionBody": PropertyType(False, is_type(dict)),
+        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "StageVariables": PropertyType(False, is_type(dict)),
+        "CorsConfiguration": PropertyType(False, one_of(is_type(bool), is_type(dict))),
+        "AccessLogSettings": PropertyType(False, is_type(dict)),
+        "DefaultRouteSettings": PropertyType(False, is_type(dict)),
+        "Auth": PropertyType(False, is_type(dict)),
+        "RouteSettings": PropertyType(False, is_type(dict)),
+        "Domain": PropertyType(False, is_type(dict)),
+        "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "Description": PropertyType(False, is_str()),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
     }
 
     referable_properties = {
@@ -1277,11 +1277,11 @@ class SamSimpleTable(SamResourceMacro):
 
     resource_type = "AWS::Serverless::SimpleTable"
     property_types = {
-        "PrimaryKey": PropertyType(False, dict_of(is_str(), is_str())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
-        "ProvisionedThroughput": PropertyType(False, dict_of(is_str(), one_of(is_type(int), is_type(dict)))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "TableName": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "SSESpecification": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "PrimaryKey": PropertyType(False, dict_of(is_str(), is_str())),
+        "ProvisionedThroughput": PropertyType(False, dict_of(is_str(), one_of(is_type(int), is_type(dict)))),
+        "TableName": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "SSESpecification": PropertyType(False, is_type(dict)),
     }
     attribute_type_conversions = {"String": "S", "Number": "N", "Binary": "B"}
 
@@ -1342,12 +1342,12 @@ class SamApplication(SamResourceMacro):
 
     # The plugin will always insert the TemplateUrl parameter
     property_types = {
-        "Location": PropertyType(True, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "TemplateUrl": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Parameters": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "NotificationARNs": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "TimeoutInMinutes": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Location": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "TemplateUrl": PropertyType(False, is_str()),
+        "Parameters": PropertyType(False, is_type(dict)),
+        "NotificationARNs": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "TimeoutInMinutes": PropertyType(False, is_type(int)),
     }
 
     @cw_timer
@@ -1389,13 +1389,13 @@ class SamLayerVersion(SamResourceMacro):
 
     resource_type = "AWS::Serverless::LayerVersion"
     property_types = {
-        "LayerName": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ContentUri": PropertyType(True, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "CompatibleArchitectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "LicenseInfo": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RetentionPolicy": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "LayerName": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Description": PropertyType(False, is_str()),
+        "ContentUri": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "CompatibleArchitectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "LicenseInfo": PropertyType(False, is_str()),
+        "RetentionPolicy": PropertyType(False, is_str()),
     }
 
     RETAIN = "Retain"
@@ -1542,18 +1542,18 @@ class SamStateMachine(SamResourceMacro):
 
     resource_type = "AWS::Serverless::StateMachine"
     property_types = {
-        "Definition": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Logging": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Role": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DefinitionSubstitutions": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Name": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Type": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Tracing": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "PermissionsBoundary": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Definition": PropertyType(False, is_type(dict)),
+        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Logging": PropertyType(False, is_type(dict)),
+        "Role": PropertyType(False, is_str()),
+        "DefinitionSubstitutions": PropertyType(False, is_type(dict)),
+        "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
+        "Name": PropertyType(False, is_str()),
+        "Type": PropertyType(False, is_str()),
+        "Tags": PropertyType(False, is_type(dict)),
+        "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        "Tracing": PropertyType(False, is_type(dict)),
+        "PermissionsBoundary": PropertyType(False, is_str()),
     }
     event_resolver = ResourceTypeResolver(  # type: ignore[no-untyped-call]
         samtranslator.model.stepfunctions.events,
@@ -1624,9 +1624,9 @@ class SamConnector(SamResourceMacro):
 
     resource_type = "AWS::Serverless::Connector"
     property_types = {
-        "Source": PropertyType(True, dict_of(is_str(), any_type())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Destination": PropertyType(True, dict_of(is_str(), any_type())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Permissions": PropertyType(True, list_of(is_str())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
+        "Source": PropertyType(True, dict_of(is_str(), any_type())),
+        "Destination": PropertyType(True, dict_of(is_str(), any_type())),
+        "Permissions": PropertyType(True, list_of(is_str())),
     }
 
     @cw_timer  # type: ignore[misc]

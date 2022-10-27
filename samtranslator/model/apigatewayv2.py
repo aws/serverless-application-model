@@ -10,13 +10,13 @@ APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
 class ApiGatewayV2HttpApi(Resource):
     resource_type = "AWS::ApiGatewayV2::Api"
     property_types = {
-        "Body": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "BodyS3Location": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FailOnWarnings": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "BasePath": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CorsConfiguration": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Body": PropertyType(False, is_type(dict)),
+        "BodyS3Location": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, is_str()),
+        "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
+        "BasePath": PropertyType(False, is_str()),
+        "CorsConfiguration": PropertyType(False, is_type(dict)),
     }
 
     runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
@@ -25,16 +25,16 @@ class ApiGatewayV2HttpApi(Resource):
 class ApiGatewayV2Stage(Resource):
     resource_type = "AWS::ApiGatewayV2::Stage"
     property_types = {
-        "AccessLogSettings": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DefaultRouteSettings": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RouteSettings": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ClientCertificateId": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ApiId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "StageVariables": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "AutoDeploy": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "AccessLogSettings": PropertyType(False, is_type(dict)),
+        "DefaultRouteSettings": PropertyType(False, is_type(dict)),
+        "RouteSettings": PropertyType(False, is_type(dict)),
+        "ClientCertificateId": PropertyType(False, is_str()),
+        "Description": PropertyType(False, is_str()),
+        "ApiId": PropertyType(True, is_str()),
+        "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "StageVariables": PropertyType(False, is_type(dict)),
+        "AutoDeploy": PropertyType(False, is_type(bool)),
     }
 
     runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
@@ -43,20 +43,20 @@ class ApiGatewayV2Stage(Resource):
 class ApiGatewayV2DomainName(Resource):
     resource_type = "AWS::ApiGatewayV2::DomainName"
     property_types = {
-        "DomainName": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DomainNameConfigurations": PropertyType(False, list_of(is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
-        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "DomainName": PropertyType(True, is_str()),
+        "DomainNameConfigurations": PropertyType(False, list_of(is_type(dict))),
+        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
+        "Tags": PropertyType(False, is_type(dict)),
     }
 
 
 class ApiGatewayV2ApiMapping(Resource):
     resource_type = "AWS::ApiGatewayV2::ApiMapping"
     property_types = {
-        "ApiId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ApiMappingKey": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DomainName": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Stage": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "ApiId": PropertyType(True, is_str()),
+        "ApiMappingKey": PropertyType(False, is_str()),
+        "DomainName": PropertyType(True, is_str()),
+        "Stage": PropertyType(True, is_str()),
     }
 
 

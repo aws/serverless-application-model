@@ -8,10 +8,20 @@ Validators should cover any validation logic that is *not* done by CloudFormatio
 the Permissions property is an ARN or list of ARNs. In this situation, we validate that the Permissions property is
 either a string or a list of strings, but do not validate whether the string(s) are valid IAM policy ARNs.
 """
+from typing import Any, Callable, Type, Union
+
 import samtranslator.model.exceptions
 
+# Validator always looks like def ...(value: Any, should_raise: bool = True) -> bool,
+# However, Python type hint doesn't support functions with optional keyword argument
+# > There is no syntax to indicate optional or keyword arguments; such function types
+# > are rarely used as callback types. Callable[..., ReturnType] (literal ellipsis)
+# > can be used to type hint a callable taking any number of arguments and returning ReturnType
+# > https://docs.python.org/3/library/typing.html#typing.Callable
+Validator = Callable[..., bool]
 
-def is_type(valid_type):  # type: ignore[no-untyped-def]
+
+def is_type(valid_type: Type[Any]) -> Validator:
     """Returns a validator function that succeeds only for inputs of the provided valid_type.
 
     :param type valid_type: the type that should be considered valid for the validator
@@ -19,7 +29,7 @@ def is_type(valid_type):  # type: ignore[no-untyped-def]
     :rtype: callable
     """
 
-    def validate(value, should_raise=True):  # type: ignore[no-untyped-def]
+    def validate(value: Any, should_raise: bool = True) -> bool:
         if not isinstance(value, valid_type):
             if should_raise:
                 raise TypeError(
@@ -33,17 +43,17 @@ def is_type(valid_type):  # type: ignore[no-untyped-def]
     return validate
 
 
-def list_of(validate_item):  # type: ignore[no-untyped-def]
+def list_of(validate_item: Union[Type[Any], Validator]) -> Validator:
     """Returns a validator function that succeeds only if the input is a list, and each item in the list passes as input
     to the provided validator validate_item.
 
-    :param callable validate_item: the validator function for items in the list
+    :param callable validate_item: the validator function or type casting function (e.g., str()) for items in the list
     :returns: a function which returns True its input is an list of valid items, and raises TypeError otherwise
     :rtype: callable
     """
 
-    def validate(value, should_raise=True):  # type: ignore[no-untyped-def]
-        validate_type = is_type(list)  # type: ignore[no-untyped-call]
+    def validate(value: Any, should_raise: bool = True) -> bool:
+        validate_type = is_type(list)
         if not validate_type(value, should_raise=should_raise):
             return False
 
@@ -60,7 +70,7 @@ def list_of(validate_item):  # type: ignore[no-untyped-def]
     return validate
 
 
-def dict_of(validate_key, validate_item):  # type: ignore[no-untyped-def]
+def dict_of(validate_key: Validator, validate_item: Validator) -> Validator:
     """Returns a validator function that succeeds only if the input is a dict, and each key and value in the dict passes
     as input to the provided validators validate_key and validate_item, respectively.
 
@@ -70,8 +80,8 @@ def dict_of(validate_key, validate_item):  # type: ignore[no-untyped-def]
     :rtype: callable
     """
 
-    def validate(value, should_raise=True):  # type: ignore[no-untyped-def]
-        validate_type = is_type(dict)  # type: ignore[no-untyped-call]
+    def validate(value: Any, should_raise: bool = True) -> bool:
+        validate_type = is_type(dict)
         if not validate_type(value, should_raise=should_raise):
             return False
 
@@ -96,7 +106,7 @@ def dict_of(validate_key, validate_item):  # type: ignore[no-untyped-def]
     return validate
 
 
-def one_of(*validators):  # type: ignore[no-untyped-def]
+def one_of(*validators: Validator) -> Validator:
     """Returns a validator function that succeeds only if the input passes at least one of the provided validators.
 
     :param callable validators: the validator functions
@@ -105,7 +115,7 @@ def one_of(*validators):  # type: ignore[no-untyped-def]
     :rtype: callable
     """
 
-    def validate(value, should_raise=True):  # type: ignore[no-untyped-def]
+    def validate(value: Any, should_raise: bool = True) -> bool:
         if any(validate(value, should_raise=False) for validate in validators):
             return True
 
@@ -116,17 +126,17 @@ def one_of(*validators):  # type: ignore[no-untyped-def]
     return validate
 
 
-def is_str():  # type: ignore[no-untyped-def]
+def is_str() -> Validator:
     """Returns a validator function that succeeds for input of type str or unicode.
 
     :returns: a string validator
     :rtype: callable
     """
-    return is_type(str)  # type: ignore[no-untyped-call]
+    return is_type(str)
 
 
-def any_type():  # type: ignore[no-untyped-def]
-    def validate(value, should_raise=False):  # type: ignore[no-untyped-def]
+def any_type() -> Validator:
+    def validate(value: Any, should_raise: bool = False) -> bool:
         return True
 
     return validate
