@@ -1,14 +1,16 @@
 {
   "Parameters": {
     "ArchitectureRef": {
-      "Type": "String",
-      "Default": "arm64"
+      "Default": "arm64",
+      "Type": "String"
     }
   },
   "Resources": {
     "FunctionWithArchitecturesIntrinsic": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
+        "Architectures": {
+          "Ref": "ArchitectureRef"
+        },
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
@@ -23,23 +25,19 @@
           ]
         },
         "Runtime": "nodejs12.x",
-        "Timeout": 3,
         "Tags": [
           {
             "Key": "lambda:createdBy",
             "Value": "SAM"
           }
         ],
-        "Architectures": {
-          "Ref": "ArchitectureRef"
-        }
-      }
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "FunctionWithArchitecturesIntrinsicRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -52,7 +50,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -63,7 +62,8 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

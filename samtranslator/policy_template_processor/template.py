@@ -10,7 +10,7 @@ class Template(object):
     Class representing a single policy template. It includes the name, parameters and template dictionary.
     """
 
-    def __init__(self, template_name, parameters, template_definition):
+    def __init__(self, template_name, parameters, template_definition):  # type: ignore[no-untyped-def]
         """
         Initialize a template. This performs the check to ensure all parameters are referenced in the template.
         For simplicity, this method assumes that inputs have already been validated against the JSON Schema. So no
@@ -21,13 +21,13 @@ class Template(object):
         :param template_definition: Template definition. Refer to JSON Schema for structure of this dict
         :raises ValueError: If one or more of the parameters are not referenced in the template definition
         """
-        Template.check_parameters_exist(parameters, template_definition)
+        Template.check_parameters_exist(parameters, template_definition)  # type: ignore[no-untyped-call]
 
         self.name = template_name
         self.parameters = parameters
         self.definition = template_definition
 
-    def to_statement(self, parameter_values):
+    def to_statement(self, parameter_values):  # type: ignore[no-untyped-def]
         """
         With the given values for each parameter, this method will return a policy statement that can be used
         directly with IAM.
@@ -39,10 +39,10 @@ class Template(object):
         :raises InsufficientParameterValues: If the parameter values don't have values for all required parameters
         """
 
-        missing = self.missing_parameter_values(parameter_values)
+        missing = self.missing_parameter_values(parameter_values)  # type: ignore[no-untyped-call]
         if len(missing) > 0:
             # str() of elements of list to prevent any `u` prefix from being displayed in user-facing error message
-            raise InsufficientParameterValues(
+            raise InsufficientParameterValues(  # type: ignore[no-untyped-call]
                 f"Following required parameters of template '{self.name}' don't have values: {[str(m) for m in missing]}"
             )
 
@@ -54,14 +54,14 @@ class Template(object):
         }
 
         # Only "Ref" is supported
-        supported_intrinsics = {RefAction.intrinsic_name: RefAction()}
+        supported_intrinsics = {RefAction.intrinsic_name: RefAction()}  # type: ignore[no-untyped-call]
 
-        resolver = IntrinsicsResolver(necessary_parameter_values, supported_intrinsics)
+        resolver = IntrinsicsResolver(necessary_parameter_values, supported_intrinsics)  # type: ignore[no-untyped-call]
         definition_copy = copy.deepcopy(self.definition)
 
-        return resolver.resolve_parameter_refs(definition_copy)
+        return resolver.resolve_parameter_refs(definition_copy)  # type: ignore[no-untyped-call]
 
-    def missing_parameter_values(self, parameter_values):
+    def missing_parameter_values(self, parameter_values):  # type: ignore[no-untyped-def]
         """
         Checks if the given input contains values for all parameters used by this template
 
@@ -70,13 +70,13 @@ class Template(object):
         :raises InvalidParameterValues: When parameter values is not a valid dictionary
         """
 
-        if not self._is_valid_parameter_values(parameter_values):
-            raise InvalidParameterValues("Parameter values are required to process a policy template")
+        if not self._is_valid_parameter_values(parameter_values):  # type: ignore[no-untyped-call]
+            raise InvalidParameterValues("Parameter values are required to process a policy template")  # type: ignore[no-untyped-call]
 
         return list(set(self.parameters.keys()) - set(parameter_values.keys()))
 
     @staticmethod
-    def _is_valid_parameter_values(parameter_values):
+    def _is_valid_parameter_values(parameter_values):  # type: ignore[no-untyped-def]
         """
         Checks if the given parameter values dictionary is valid
         :param dict parameter_values:
@@ -85,7 +85,7 @@ class Template(object):
         return parameter_values is not None and isinstance(parameter_values, dict)
 
     @staticmethod
-    def check_parameters_exist(parameters, template_definition):
+    def check_parameters_exist(parameters, template_definition):  # type: ignore[no-untyped-def]
         """
         Verify that every one of the parameters in the given list have been "Ref"ed in the template definition. This
         is a sanity check to prevent any mis-spelled properties etc. It also checks that parameters are used *only* with
@@ -99,7 +99,7 @@ class Template(object):
         pass
 
     @staticmethod
-    def from_dict(template_name, template_values_dict):
+    def from_dict(template_name, template_values_dict):  # type: ignore[no-untyped-def]
         """
         Parses the input and returns an instance of this class.
 
@@ -112,4 +112,4 @@ class Template(object):
         parameters = template_values_dict.get("Parameters", {})
         definition = template_values_dict.get("Definition", {})
 
-        return Template(template_name, parameters, definition)
+        return Template(template_name, parameters, definition)  # type: ignore[no-untyped-call]

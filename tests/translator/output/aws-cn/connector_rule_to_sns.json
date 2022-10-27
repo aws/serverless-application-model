@@ -21,7 +21,10 @@
               "Condition": {
                 "ArnEquals": {
                   "aws:SourceArn": {
-                    "Fn::GetAtt": ["MyNewEventsRule", "Arn"]
+                    "Fn::GetAtt": [
+                      "MyNewEventsRule",
+                      "Arn"
+                    ]
                   }
                 }
               },
@@ -47,18 +50,26 @@
     "MyNewEventsRule": {
       "Properties": {
         "EventPattern": {
-          "source": ["aws.ec2"]
+          "source": [
+            "aws.ec2"
+          ]
         },
         "Name": "mynewabc",
         "State": "ENABLED",
         "Targets": [
           {
             "Arn": {
-              "Fn::GetAtt": ["StateMachine", "Arn"]
+              "Fn::GetAtt": [
+                "StateMachine",
+                "Arn"
+              ]
             },
             "Id": "StateMachine",
             "RoleArn": {
-              "Fn::GetAtt": ["MyRuleRole", "Arn"]
+              "Fn::GetAtt": [
+                "MyRuleRole",
+                "Arn"
+              ]
             }
           }
         ]

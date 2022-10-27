@@ -1,10 +1,30 @@
 {
   "Resources": {
+    "HelloWorldFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "\"def lambda_handler():\n    pass\"\n"
+        },
+        "Handler": "index.lambda_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "HelloWorldFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
     "HelloWorldFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -17,40 +37,20 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    },
-    "HelloWorldFunction": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Handler": "index.lambda_handler",
-        "Code": {
-          "ZipFile": "\"def lambda_handler():\n    pass\"\n"
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "HelloWorldFunctionRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "python3.8",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

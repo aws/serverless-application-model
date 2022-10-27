@@ -1,81 +1,81 @@
 {
   "Resources": {
-    "MyLayera5167acaba": {
-      "DeletionPolicy": "Retain", 
-      "Type": "AWS::Lambda::LayerVersion", 
+    "ManyLayersFunc": {
       "Properties": {
-        "Content": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "layer.zip"
-        }, 
-        "LayerName": "MyLayer"
-      }
-    }, 
-    "ManyLayersFuncRole": {
-      "Type": "AWS::IAM::Role", 
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Layers": [
+          "arn:aws:lambda:us-east-1:123456789101:layer:z:1",
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Fn::Sub": "arn:aws:lambda:${AWS::Region}:123456789101:layer:a:1"
+          },
+          "arn:aws:lambda:us-east-1:123456789101:layer:d12345678:1",
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:123456789101:layer:c:1"
+          },
+          {
+            "Ref": "MyLayera5167acaba"
           }
         ],
+        "Role": {
+          "Fn::GetAtt": [
+            "ManyLayersFuncRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "ManyLayersFuncRole": {
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
-    }, 
-    "ManyLayersFunc": {
-      "Type": "AWS::Lambda::Function", 
-      "Properties": {
-        "Layers": [
-          "arn:aws:lambda:us-east-1:123456789101:layer:z:1", 
-          {
-            "Fn::Sub": "arn:aws:lambda:${AWS::Region}:123456789101:layer:a:1"
-          }, 
-          "arn:aws:lambda:us-east-1:123456789101:layer:d12345678:1", 
-          {
-            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:123456789101:layer:c:1"
-          }, 
-          {
-            "Ref": "MyLayera5167acaba"
-          }
-        ], 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "hello.zip"
-        }, 
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        ], 
-        "Handler": "hello.handler", 
-        "Role": {
-          "Fn::GetAtt": [
-            "ManyLayersFuncRole", 
-            "Arn"
-          ]
-        }, 
-        "Runtime": "python2.7"
-      }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyLayera5167acaba": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "MyLayer"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
     }
   }
 }

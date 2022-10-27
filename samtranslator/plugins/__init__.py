@@ -20,7 +20,7 @@ class BasePlugin(object):
     Base class for a NoOp plugin that implements all available hooks
     """
 
-    def __init__(self, name):
+    def __init__(self, name):  # type: ignore[no-untyped-def]
         """
         Initialize the plugin with given name. Name is always required to register a plugin
 
@@ -31,7 +31,7 @@ class BasePlugin(object):
 
         self.name = name
 
-    def on_before_transform_resource(self, logical_id, resource_type, resource_properties):
+    def on_before_transform_resource(self, logical_id, resource_type, resource_properties):  # type: ignore[no-untyped-def]
         """
         Hook method to execute on `before_transform_resource` life cycle event. Plugins are free to modify the
         whole template or properties of the resource.
@@ -56,7 +56,7 @@ class BasePlugin(object):
         # NoOp implementation
         pass
 
-    def on_before_transform_template(self, template_dict):
+    def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Hook method to execute on "before_transform_template" life cycle event. Plugins are free to modify the
         whole template, inject new resources, or modify certain sections of the template.
@@ -74,7 +74,7 @@ class BasePlugin(object):
         """
         pass
 
-    def on_after_transform_template(self, template):
+    def on_after_transform_template(self, template):  # type: ignore[no-untyped-def]
         """
         Hook method to execute on "after_transform_template" life cycle event. Plugins may further modify
         the template. Warning: any changes made in this lifecycle action by a plugin will not be

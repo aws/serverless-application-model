@@ -1,13 +1,49 @@
 {
   "Parameters": {
     "Vpc1": {
-      "Type": "String",
-      "Default": "vpc-1234"
+      "Default": "vpc-1234",
+      "Type": "String"
     }
   },
   "Resources": {
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {},
+          "swagger": "2.0"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiDeployment5332c373d4": {
+      "Properties": {
+        "Description": "RestApi deployment id: 5332c373d45c69e6c0f562b4a419aa8eb311adc7",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment5332c373d4"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
     "MyFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
@@ -26,61 +62,10 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "MyFunctionRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "MyFunctionFetchAnyMethodPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "MyFunction"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/any/fetch",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "MyFunctionApiAnyMethodPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
@@ -98,31 +83,10 @@
             }
           ]
         }
-      }
-    },
-    "MyFunctionFetchPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "MyFunction"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
     "MyFunctionApiPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
@@ -140,112 +104,147 @@
             }
           ]
         }
-      }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
-    "MyApi": {
-      "Type": "AWS::ApiGateway::RestApi",
+    "MyFunctionFetchAnyMethodPermissionProd": {
       "Properties": {
-        "Body": {
-          "swagger": "2.0",
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/any/fetch",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
             }
-          },
-          "paths": {}
+          ]
         }
-      }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
-    "MyApiDeployment5332c373d4": {
-      "Type": "AWS::ApiGateway::Deployment",
+    "MyFunctionFetchPermissionProd": {
       "Properties": {
-        "Description": "RestApi deployment id: 5332c373d45c69e6c0f562b4a419aa8eb311adc7",
-        "RestApiId": {
-          "Ref": "MyApi"
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction"
         },
-        "StageName": "Stage"
-      }
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
-    "MyApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
+    "MyFunctionRole": {
       "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiDeployment5332c373d4"
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
         },
-        "RestApiId": {
-          "Ref": "MyApi"
-        },
-        "StageName": "Prod"
-      }
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     },
     "ServerlessRestApi": {
-      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
-          "swagger": "2.0",
           "info": {
-            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
-            }
+            },
+            "version": "1.0"
           },
           "paths": {
-            "/get": {
-              "put": {
+            "/any/fetch": {
+              "x-amazon-apigateway-any-method": {
+                "responses": {},
                 "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
                   "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
-                },
-                "responses": {}
+                }
               }
             },
             "/any/get": {
               "x-amazon-apigateway-any-method": {
+                "responses": {},
                 "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
                   "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
-                },
-                "responses": {}
+                }
               }
             },
             "/fetch": {
               "post": {
+                "responses": {},
                 "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
                   "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
-                },
-                "responses": {}
+                }
               }
             },
-            "/any/fetch": {
-              "x-amazon-apigateway-any-method": {
+            "/get": {
+              "put": {
+                "responses": {},
                 "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
                   "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
-                },
-                "responses": {}
+                }
               }
             }
           },
+          "swagger": "2.0",
           "x-amazon-apigateway-policy": {
-            "Version": "2012-10-17",
             "Statement": [
               {
-                "Effect": "Allow",
                 "Action": "execute-api:Invoke",
+                "Effect": "Allow",
+                "Principal": "*",
                 "Resource": [
                   {
                     "Fn::Sub": [
@@ -255,12 +254,20 @@
                       }
                     ]
                   }
-                ],
-                "Principal": "*"
+                ]
               },
               {
-                "Effect": "Deny",
                 "Action": "execute-api:Invoke",
+                "Condition": {
+                  "StringNotEquals": {
+                    "aws:SourceVpc": [
+                      "vpc-1234",
+                      "vpc-5678"
+                    ]
+                  }
+                },
+                "Effect": "Deny",
+                "Principal": "*",
                 "Resource": [
                   {
                     "Fn::Sub": [
@@ -270,20 +277,12 @@
                       }
                     ]
                   }
-                ],
-                "Principal": "*",
-                "Condition": {
-                  "StringNotEquals": {
-                    "aws:SourceVpc": [
-                      "vpc-1234",
-                      "vpc-5678"
-                    ]
-                  }
-                }
+                ]
               },
               {
-                "Effect": "Allow",
                 "Action": "execute-api:Invoke",
+                "Effect": "Allow",
+                "Principal": "*",
                 "Resource": [
                   {
                     "Fn::Sub": [
@@ -293,12 +292,20 @@
                       }
                     ]
                   }
-                ],
-                "Principal": "*"
+                ]
               },
               {
-                "Effect": "Deny",
                 "Action": "execute-api:Invoke",
+                "Condition": {
+                  "StringNotEquals": {
+                    "aws:SourceVpc": [
+                      "vpc-1234",
+                      "vpc-5678"
+                    ]
+                  }
+                },
+                "Effect": "Deny",
+                "Principal": "*",
                 "Resource": [
                   {
                     "Fn::Sub": [
@@ -308,20 +315,12 @@
                       }
                     ]
                   }
-                ],
-                "Principal": "*",
-                "Condition": {
-                  "StringNotEquals": {
-                    "aws:SourceVpc": [
-                      "vpc-1234",
-                      "vpc-5678"
-                    ]
-                  }
-                }
+                ]
               },
               {
-                "Effect": "Allow",
                 "Action": "execute-api:Invoke",
+                "Effect": "Allow",
+                "Principal": "*",
                 "Resource": [
                   {
                     "Fn::Sub": [
@@ -331,12 +330,20 @@
                       }
                     ]
                   }
-                ],
-                "Principal": "*"
+                ]
               },
               {
-                "Effect": "Deny",
                 "Action": "execute-api:Invoke",
+                "Condition": {
+                  "StringNotEquals": {
+                    "aws:SourceVpc": [
+                      "vpc-1234",
+                      "vpc-5678"
+                    ]
+                  }
+                },
+                "Effect": "Deny",
+                "Principal": "*",
                 "Resource": [
                   {
                     "Fn::Sub": [
@@ -346,20 +353,12 @@
                       }
                     ]
                   }
-                ],
-                "Principal": "*",
-                "Condition": {
-                  "StringNotEquals": {
-                    "aws:SourceVpc": [
-                      "vpc-1234",
-                      "vpc-5678"
-                    ]
-                  }
-                }
+                ]
               },
               {
+                "Action": "execute-api:Invoke",
                 "Effect": "Allow",
-                "Action": "execute-api:Invoke",
+                "Principal": "*",
                 "Resource": [
                   {
                     "Fn::Sub": [
@@ -369,23 +368,10 @@
                       }
                     ]
                   }
-                ],
-                "Principal": "*"
+                ]
               },
               {
-                "Effect": "Deny",
                 "Action": "execute-api:Invoke",
-                "Resource": [
-                  {
-                    "Fn::Sub": [
-                      "execute-api:/${__Stage__}/*/any/fetch",
-                      {
-                        "__Stage__": "Prod"
-                      }
-                    ]
-                  }
-                ],
-                "Principal": "*",
                 "Condition": {
                   "StringNotEquals": {
                     "aws:SourceVpc": [
@@ -393,25 +379,38 @@
                       "vpc-5678"
                     ]
                   }
-                }
+                },
+                "Effect": "Deny",
+                "Principal": "*",
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "execute-api:/${__Stage__}/*/any/fetch",
+                      {
+                        "__Stage__": "Prod"
+                      }
+                    ]
+                  }
+                ]
               }
-            ]
+            ],
+            "Version": "2012-10-17"
           }
         }
-      }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
     },
     "ServerlessRestApiDeploymente76e291d74": {
-      "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "Description": "RestApi deployment id: e76e291d74b93709a6c6093ca05608700bb61fa6",
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Stage"
-      }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
     },
     "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeploymente76e291d74"
@@ -420,7 +419,8 @@
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Prod"
-      }
+      },
+      "Type": "AWS::ApiGateway::Stage"
     }
   }
 }

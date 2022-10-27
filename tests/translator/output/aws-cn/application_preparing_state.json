@@ -1,24 +1,24 @@
 {
   "Resources": {
     "PreparingApplication": {
-      "Type": "AWS::CloudFormation::Stack",
       "Properties": {
-        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           },
           {
-            "Value": "preparing",
-            "Key": "serverlessrepo:applicationId"
+            "Key": "serverlessrepo:applicationId",
+            "Value": "preparing"
           },
           {
-            "Value": "1.0.2",
-            "Key": "serverlessrepo:semanticVersion"
+            "Key": "serverlessrepo:semanticVersion",
+            "Value": "1.0.2"
           }
-        ]
-      }
+        ],
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url"
+      },
+      "Type": "AWS::CloudFormation::Stack"
     }
   }
 }

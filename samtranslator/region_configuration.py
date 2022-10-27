@@ -10,7 +10,7 @@ class RegionConfiguration(object):
     """
 
     @classmethod
-    def is_apigw_edge_configuration_supported(cls):
+    def is_apigw_edge_configuration_supported(cls):  # type: ignore[no-untyped-def]
         """
         # API Gateway defaults to EDGE endpoint configuration in all regions in AWS partition. But for other partitions,
         # such as GovCloud, they don't support Edge.
@@ -18,7 +18,7 @@ class RegionConfiguration(object):
         :return: True, if API Gateway does not support Edge configuration
         """
 
-        return ArnGenerator.get_partition_name() not in [
+        return ArnGenerator.get_partition_name() not in [  # type: ignore[no-untyped-call]
             "aws-us-gov",
             "aws-iso",
             "aws-iso-b",
@@ -26,7 +26,7 @@ class RegionConfiguration(object):
         ]
 
     @classmethod
-    def is_service_supported(cls, service, region=None):
+    def is_service_supported(cls, service, region=None):  # type: ignore[no-untyped-def]
         """
         Not all services are supported in all regions.  This method returns whether a given
         service is supported in a given region.  If no region is specified, the current region
@@ -47,7 +47,7 @@ class RegionConfiguration(object):
             # need to handle when region is None so that it won't break
             if region is None:
                 if ArnGenerator.BOTO_SESSION_REGION_NAME is not None:
-                    region = ArnGenerator.BOTO_SESSION_REGION_NAME
+                    region = ArnGenerator.BOTO_SESSION_REGION_NAME  # type: ignore[unreachable]
                 else:
                     raise NoRegionFound("AWS Region cannot be found")
 

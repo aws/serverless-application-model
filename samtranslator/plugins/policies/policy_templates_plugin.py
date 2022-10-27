@@ -17,7 +17,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
     _plugin_name = ""
     SUPPORTED_RESOURCE_TYPE = {"AWS::Serverless::Function", "AWS::Serverless::StateMachine"}
 
-    def __init__(self, policy_template_processor):
+    def __init__(self, policy_template_processor):  # type: ignore[no-untyped-def]
         """
         Initialize the plugin.
 
@@ -27,12 +27,12 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
 
         # Plugin name is the class name for easy disambiguation
         _plugin_name = PolicyTemplatesForResourcePlugin.__name__
-        super(PolicyTemplatesForResourcePlugin, self).__init__(_plugin_name)
+        super(PolicyTemplatesForResourcePlugin, self).__init__(_plugin_name)  # type: ignore[no-untyped-call]
 
         self._policy_template_processor = policy_template_processor
 
-    @cw_timer(prefix="Plugin-PolicyTemplates")
-    def on_before_transform_resource(self, logical_id, resource_type, resource_properties):
+    @cw_timer(prefix="Plugin-PolicyTemplates")  # type: ignore[no-untyped-call]
+    def on_before_transform_resource(self, logical_id, resource_type, resource_properties):  # type: ignore[no-untyped-def]
         """
         Hook method that gets called before "each" SAM resource gets processed
 
@@ -42,50 +42,50 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
         :return: Nothing
         """
 
-        if not self._is_supported(resource_type):
+        if not self._is_supported(resource_type):  # type: ignore[no-untyped-call]
             return
 
-        function_policies = ResourcePolicies(resource_properties, self._policy_template_processor)
+        function_policies = ResourcePolicies(resource_properties, self._policy_template_processor)  # type: ignore[no-untyped-call]
 
         if len(function_policies) == 0:
             # No policies to process
             return
 
         result = []
-        for policy_entry in function_policies.get():
+        for policy_entry in function_policies.get():  # type: ignore[no-untyped-call]
 
             if policy_entry.type is not PolicyTypes.POLICY_TEMPLATE:
                 # If we don't know the type, skip processing and pass to result as is.
                 result.append(policy_entry.data)
                 continue
 
-            if is_intrinsic_if(policy_entry.data):
+            if is_intrinsic_if(policy_entry.data):  # type: ignore[no-untyped-call]
                 # If policy is an intrinsic if, we need to process each sub-statement separately
-                processed_intrinsic_if = self._process_intrinsic_if_policy_template(logical_id, policy_entry)
+                processed_intrinsic_if = self._process_intrinsic_if_policy_template(logical_id, policy_entry)  # type: ignore[no-untyped-call]
                 result.append(processed_intrinsic_if)
                 continue
 
-            converted_policy = self._process_policy_template(logical_id, policy_entry.data)
+            converted_policy = self._process_policy_template(logical_id, policy_entry.data)  # type: ignore[no-untyped-call]
             result.append(converted_policy)
 
         # Save the modified policies list to the input
         resource_properties[ResourcePolicies.POLICIES_PROPERTY_NAME] = result
 
-    def _process_intrinsic_if_policy_template(self, logical_id, policy_entry):
+    def _process_intrinsic_if_policy_template(self, logical_id, policy_entry):  # type: ignore[no-untyped-def]
         intrinsic_if = policy_entry.data
         then_statement = intrinsic_if["Fn::If"][1]
         else_statement = intrinsic_if["Fn::If"][2]
 
         processed_then_statement = (
             then_statement
-            if is_intrinsic_no_value(then_statement)
-            else self._process_policy_template(logical_id, then_statement)
+            if is_intrinsic_no_value(then_statement)  # type: ignore[no-untyped-call]
+            else self._process_policy_template(logical_id, then_statement)  # type: ignore[no-untyped-call]
         )
 
         processed_else_statement = (
             else_statement
-            if is_intrinsic_no_value(else_statement)
-            else self._process_policy_template(logical_id, else_statement)
+            if is_intrinsic_no_value(else_statement)  # type: ignore[no-untyped-call]
+            else self._process_policy_template(logical_id, else_statement)  # type: ignore[no-untyped-call]
         )
 
         processed_intrinsic_if = {
@@ -94,7 +94,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
 
         return processed_intrinsic_if
 
-    def _process_policy_template(self, logical_id, template_data):
+    def _process_policy_template(self, logical_id, template_data):  # type: ignore[no-untyped-def]
 
         # We are processing policy templates. We know they have a particular structure:
         # {"templateName": { parameter_values_dict }}
@@ -107,13 +107,13 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
 
         except InsufficientParameterValues as ex:
             # Exception's message will give lot of specific details
-            raise InvalidResourceException(logical_id, str(ex))
+            raise InvalidResourceException(logical_id, str(ex))  # type: ignore[no-untyped-call]
         except InvalidParameterValues:
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 logical_id, "Must specify valid parameter values for policy template '{}'".format(template_name)
             )
 
-    def _is_supported(self, resource_type):
+    def _is_supported(self, resource_type):  # type: ignore[no-untyped-def]
         """
         Is this resource supported by this plugin?
 

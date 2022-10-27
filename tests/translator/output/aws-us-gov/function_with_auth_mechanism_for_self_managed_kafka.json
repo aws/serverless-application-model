@@ -3,7 +3,6 @@
   "Parameters": {},
   "Resources": {
     "KafkaFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -23,13 +22,37 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "KafkaFunctionMyKafkaCluster": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "KafkaFunction"
+        },
+        "SelfManagedEventSource": {
+          "Endpoints": {
+            "KafkaBootstrapServers": [
+              "abc.xyz.com:9092",
+              "123.45.67.89:9096"
+            ]
+          }
+        },
+        "SourceAccessConfigurations": [
+          {
+            "Type": "BASIC_AUTH",
+            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
+          }
+        ],
+        "Topics": [
+          "Topic1"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
     },
     "KafkaFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -42,7 +65,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -70,32 +94,8 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "KafkaFunctionMyKafkaCluster": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "KafkaFunction"
-        },
-        "Topics": [
-          "Topic1"
-        ],
-        "SourceAccessConfigurations": [
-          {
-            "Type": "BASIC_AUTH",
-            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
-          }
-        ],
-        "SelfManagedEventSource": {
-          "Endpoints": {
-            "KafkaBootstrapServers": [
-              "abc.xyz.com:9092",
-              "123.45.67.89:9096"
-            ]
-          }
-        }
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

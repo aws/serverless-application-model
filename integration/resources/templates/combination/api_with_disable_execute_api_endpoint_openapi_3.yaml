@@ -1,0 +1,40 @@
+Parameters:
+  DisableExecuteApiEndpointValue:
+    Description: Variable to define if client can access default API endpoint.
+    Type: String
+    AllowedValues: [true, false]
+
+Resources:
+  RestApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      OpenApiVersion: 3.0
+      DisableExecuteApiEndpoint:
+        Ref: DisableExecuteApiEndpointValue
+
+  RestApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs14.x
+      Events:
+        Iam:
+          Type: Api
+          Properties:
+            RestApiId: !Ref RestApiGateway
+            Method: GET
+            Path: /
+Outputs:
+  ApiUrl:
+    Description: "API endpoint URL for Prod environment"
+    Value:
+      Fn::Sub: 'https://${RestApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'

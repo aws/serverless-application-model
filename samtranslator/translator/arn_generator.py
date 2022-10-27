@@ -9,7 +9,7 @@ class ArnGenerator(object):
     BOTO_SESSION_REGION_NAME = None
 
     @classmethod
-    def generate_arn(cls, partition, service, resource, include_account_id=True):
+    def generate_arn(cls, partition, service, resource, include_account_id=True):  # type: ignore[no-untyped-def]
         if not service or not resource:
             raise RuntimeError("Could not construct ARN for resource.")
 
@@ -23,7 +23,7 @@ class ArnGenerator(object):
         return arn.format(partition, service, resource)
 
     @classmethod
-    def generate_aws_managed_policy_arn(cls, policy_name):
+    def generate_aws_managed_policy_arn(cls, policy_name):  # type: ignore[no-untyped-def]
         """
         Method to create an ARN of AWS Owned Managed Policy. This uses the right partition name to construct
         the ARN
@@ -31,10 +31,10 @@ class ArnGenerator(object):
         :param policy_name: Name of the policy
         :return: ARN Of the managed policy
         """
-        return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)
+        return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)  # type: ignore[no-untyped-call]
 
     @classmethod
-    def get_partition_name(cls, region=None):
+    def get_partition_name(cls, region=None):  # type: ignore[no-untyped-def]
         """
         Gets the name of the partition given the region name. If region name is not provided, this method will
         use Boto3 to get name of the region where this code is running.
@@ -53,7 +53,7 @@ class ArnGenerator(object):
             if ArnGenerator.BOTO_SESSION_REGION_NAME is None:
                 region = boto3.session.Session().region_name
             else:
-                region = ArnGenerator.BOTO_SESSION_REGION_NAME
+                region = ArnGenerator.BOTO_SESSION_REGION_NAME  # type: ignore[unreachable]
 
         # If region is still None, then we could not find the region. This will only happen
         # in the local context. When this is deployed, we will be able to find the region like

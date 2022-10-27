@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Function] is invalid. AutoPublishCodeSha256 must be a string",
   "errors": [
     {
       "errorMessage": "[Function] is invalid. AutoPublishCodeSha256 must be a string"
     }
-  ], 
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Function] is invalid. AutoPublishCodeSha256 must be a string"
+  ]
 }

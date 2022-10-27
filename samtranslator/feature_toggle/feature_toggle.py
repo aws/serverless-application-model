@@ -24,13 +24,13 @@ class FeatureToggle:
         "account-percentile": SimpleAccountPercentileDialup,
     }
 
-    def __init__(self, config_provider, stage, account_id, region):
+    def __init__(self, config_provider, stage, account_id, region):  # type: ignore[no-untyped-def]
         self.feature_config = config_provider.config
         self.stage = stage
         self.account_id = account_id
         self.region = region
 
-    def _get_dialup(self, region_config, feature_name):
+    def _get_dialup(self, region_config, feature_name):  # type: ignore[no-untyped-def]
         """
         get the right dialup instance
         if no dialup type is provided or the specified dialup is not supported,
@@ -46,9 +46,9 @@ class FeatureToggle:
                 region_config, account_id=self.account_id, feature_name=feature_name
             )
         LOG.warning("Dialup type '{}' is None or is not supported.".format(dialup_type))
-        return DisabledDialup(region_config)
+        return DisabledDialup(region_config)  # type: ignore[no-untyped-call]
 
-    def is_enabled(self, feature_name):
+    def is_enabled(self, feature_name):  # type: ignore[no-untyped-def]
         """
         To check if feature is available
 
@@ -78,7 +78,7 @@ class FeatureToggle:
         else:
             region_config = stage_config[region] if region in stage_config else stage_config.get("default", {})
 
-        dialup = self._get_dialup(region_config, feature_name=feature_name)
+        dialup = self._get_dialup(region_config, feature_name=feature_name)  # type: ignore[no-untyped-call]
         LOG.info("Using Dialip {}".format(dialup))
         is_enabled = dialup.is_enabled()
 
@@ -89,45 +89,45 @@ class FeatureToggle:
 class FeatureToggleConfigProvider:
     """Interface for all FeatureToggle config providers"""
 
-    def __init__(self):
+    def __init__(self):  # type: ignore[no-untyped-def]
         pass
 
     @property
-    def config(self):
+    def config(self):  # type: ignore[no-untyped-def]
         raise NotImplementedError
 
 
 class FeatureToggleDefaultConfigProvider(FeatureToggleConfigProvider):
     """Default config provider, always return False for every query."""
 
-    def __init__(self):
-        FeatureToggleConfigProvider.__init__(self)
+    def __init__(self):  # type: ignore[no-untyped-def]
+        FeatureToggleConfigProvider.__init__(self)  # type: ignore[no-untyped-call]
 
     @property
-    def config(self):
+    def config(self):  # type: ignore[no-untyped-def]
         return {}
 
 
 class FeatureToggleLocalConfigProvider(FeatureToggleConfigProvider):
     """Feature toggle config provider which uses a local file. This is to facilitate local testing."""
 
-    def __init__(self, local_config_path):
-        FeatureToggleConfigProvider.__init__(self)
+    def __init__(self, local_config_path):  # type: ignore[no-untyped-def]
+        FeatureToggleConfigProvider.__init__(self)  # type: ignore[no-untyped-call]
         with open(local_config_path, "r", encoding="utf-8") as f:
             config_json = f.read()
         self.feature_toggle_config = json.loads(config_json)
 
     @property
-    def config(self):
+    def config(self):  # type: ignore[no-untyped-def]
         return self.feature_toggle_config
 
 
 class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
     """Feature toggle config provider which loads config from AppConfig."""
 
-    @cw_timer(prefix="External", name="AppConfig")
-    def __init__(self, application_id, environment_id, configuration_profile_id, app_config_client=None):
-        FeatureToggleConfigProvider.__init__(self)
+    @cw_timer(prefix="External", name="AppConfig")  # type: ignore[no-untyped-call]
+    def __init__(self, application_id, environment_id, configuration_profile_id, app_config_client=None):  # type: ignore[no-untyped-def]
+        FeatureToggleConfigProvider.__init__(self)  # type: ignore[no-untyped-call]
         try:
             LOG.info("Loading feature toggle config from AppConfig...")
             # Lambda function has 120 seconds limit
@@ -152,5 +152,5 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
             self.feature_toggle_config = json.loads("{}")
 
     @property
-    def config(self):
+    def config(self):  # type: ignore[no-untyped-def]
         return self.feature_toggle_config
