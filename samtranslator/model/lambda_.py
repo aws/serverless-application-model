@@ -6,28 +6,28 @@ from samtranslator.model.intrinsics import fnGetAtt, ref
 class LambdaFunction(Resource):
     resource_type = "AWS::Lambda::Function"
     property_types = {
-        "Code": PropertyType(True, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "PackageType": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DeadLetterConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FunctionName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Handler": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MemorySize": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Role": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Runtime": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Timeout": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "VpcConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Environment": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Tags": PropertyType(False, list_of(is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
-        "TracingConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "ReservedConcurrentExecutions": PropertyType(False, any_type()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
-        "CodeSigningConfigArn": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ImageConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "EphemeralStorage": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Code": PropertyType(True, is_type(dict)),
+        "PackageType": PropertyType(False, is_str()),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, is_str()),
+        "FunctionName": PropertyType(False, is_str()),
+        "Handler": PropertyType(False, is_str()),
+        "MemorySize": PropertyType(False, is_type(int)),
+        "Role": PropertyType(False, is_str()),
+        "Runtime": PropertyType(False, is_str()),
+        "Timeout": PropertyType(False, is_type(int)),
+        "VpcConfig": PropertyType(False, is_type(dict)),
+        "Environment": PropertyType(False, is_type(dict)),
+        "Tags": PropertyType(False, list_of(is_type(dict))),
+        "TracingConfig": PropertyType(False, is_type(dict)),
+        "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),
+        "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "ReservedConcurrentExecutions": PropertyType(False, any_type()),
+        "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
+        "CodeSigningConfigArn": PropertyType(False, is_str()),
+        "ImageConfig": PropertyType(False, is_type(dict)),
+        "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "EphemeralStorage": PropertyType(False, is_type(dict)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}  # type: ignore[no-untyped-call, no-untyped-call]
@@ -36,9 +36,9 @@ class LambdaFunction(Resource):
 class LambdaVersion(Resource):
     resource_type = "AWS::Lambda::Version"
     property_types = {
-        "CodeSha256": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FunctionName": PropertyType(True, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
+        "CodeSha256": PropertyType(False, is_str()),
+        "Description": PropertyType(False, is_str()),
+        "FunctionName": PropertyType(True, one_of(is_str(), is_type(dict))),
     }
 
     runtime_attrs = {
@@ -50,11 +50,11 @@ class LambdaVersion(Resource):
 class LambdaAlias(Resource):
     resource_type = "AWS::Lambda::Alias"
     property_types = {
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Name": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FunctionName": PropertyType(True, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "FunctionVersion": PropertyType(True, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Description": PropertyType(False, is_str()),
+        "Name": PropertyType(False, is_str()),
+        "FunctionName": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "FunctionVersion": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
     }
 
     runtime_attrs = {"arn": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
@@ -63,26 +63,26 @@ class LambdaAlias(Resource):
 class LambdaEventSourceMapping(Resource):
     resource_type = "AWS::Lambda::EventSourceMapping"
     property_types = {
-        "BatchSize": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Enabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "EventSourceArn": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FunctionName": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MaximumRetryAttempts": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "BisectBatchOnFunctionError": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MaximumRecordAgeInSeconds": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DestinationConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ParallelizationFactor": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "StartingPosition": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Topics": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Queues": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "SourceAccessConfigurations": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "TumblingWindowInSeconds": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FunctionResponseTypes": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "SelfManagedEventSource": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FilterCriteria": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "AmazonManagedKafkaEventSourceConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "SelfManagedKafkaEventSourceConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "BatchSize": PropertyType(False, is_type(int)),
+        "Enabled": PropertyType(False, is_type(bool)),
+        "EventSourceArn": PropertyType(False, is_str()),
+        "FunctionName": PropertyType(True, is_str()),
+        "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
+        "MaximumRetryAttempts": PropertyType(False, is_type(int)),
+        "BisectBatchOnFunctionError": PropertyType(False, is_type(bool)),
+        "MaximumRecordAgeInSeconds": PropertyType(False, is_type(int)),
+        "DestinationConfig": PropertyType(False, is_type(dict)),
+        "ParallelizationFactor": PropertyType(False, is_type(int)),
+        "StartingPosition": PropertyType(False, is_str()),
+        "Topics": PropertyType(False, is_type(list)),
+        "Queues": PropertyType(False, is_type(list)),
+        "SourceAccessConfigurations": PropertyType(False, is_type(list)),
+        "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
+        "FunctionResponseTypes": PropertyType(False, is_type(list)),
+        "SelfManagedEventSource": PropertyType(False, is_type(dict)),
+        "FilterCriteria": PropertyType(False, is_type(dict)),
+        "AmazonManagedKafkaEventSourceConfig": PropertyType(False, is_type(dict)),
+        "SelfManagedKafkaEventSourceConfig": PropertyType(False, is_type(dict)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
@@ -91,24 +91,24 @@ class LambdaEventSourceMapping(Resource):
 class LambdaPermission(Resource):
     resource_type = "AWS::Lambda::Permission"
     property_types = {
-        "Action": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FunctionName": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Principal": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "SourceAccount": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "SourceArn": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "EventSourceToken": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FunctionUrlAuthType": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Action": PropertyType(True, is_str()),
+        "FunctionName": PropertyType(True, is_str()),
+        "Principal": PropertyType(True, is_str()),
+        "SourceAccount": PropertyType(False, is_str()),
+        "SourceArn": PropertyType(False, is_str()),
+        "EventSourceToken": PropertyType(False, is_str()),
+        "FunctionUrlAuthType": PropertyType(False, is_str()),
     }
 
 
 class LambdaEventInvokeConfig(Resource):
     resource_type = "AWS::Lambda::EventInvokeConfig"
     property_types = {
-        "DestinationConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FunctionName": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MaximumEventAgeInSeconds": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MaximumRetryAttempts": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Qualifier": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "DestinationConfig": PropertyType(False, is_type(dict)),
+        "FunctionName": PropertyType(True, is_str()),
+        "MaximumEventAgeInSeconds": PropertyType(False, is_type(int)),
+        "MaximumRetryAttempts": PropertyType(False, is_type(int)),
+        "Qualifier": PropertyType(True, is_str()),
     }
 
 
@@ -117,12 +117,12 @@ class LambdaLayerVersion(Resource):
 
     resource_type = "AWS::Lambda::LayerVersion"
     property_types = {
-        "Content": PropertyType(True, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "LayerName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "CompatibleArchitectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "LicenseInfo": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Content": PropertyType(True, is_type(dict)),
+        "Description": PropertyType(False, is_str()),
+        "LayerName": PropertyType(False, is_str()),
+        "CompatibleArchitectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "LicenseInfo": PropertyType(False, is_str()),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}  # type: ignore[no-untyped-call, no-untyped-call]
@@ -131,7 +131,7 @@ class LambdaLayerVersion(Resource):
 class LambdaUrl(Resource):
     resource_type = "AWS::Lambda::Url"
     property_types = {
-        "TargetFunctionArn": PropertyType(True, one_of(is_str(), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "AuthType": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Cors": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "TargetFunctionArn": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "AuthType": PropertyType(True, is_str()),
+        "Cors": PropertyType(False, is_type(dict)),
     }

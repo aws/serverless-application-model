@@ -16,7 +16,7 @@ class SQSQueue(Resource):
 
 class SQSQueuePolicy(Resource):
     resource_type = "AWS::SQS::QueuePolicy"
-    property_types = {"PolicyDocument": PropertyType(True, is_type(dict)), "Queues": PropertyType(True, list_of(str))}  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
+    property_types = {"PolicyDocument": PropertyType(True, is_type(dict)), "Queues": PropertyType(True, list_of(str))}
     runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "Arn")}  # type: ignore[no-untyped-call]
 
 

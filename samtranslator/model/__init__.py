@@ -4,6 +4,7 @@ import inspect
 from typing import Any, Callable, Dict
 
 from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.types import Validator
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
@@ -18,7 +19,12 @@ class PropertyType(object):
         raise an error when intrinsic function dictionary is supplied as value
     """
 
-    def __init__(self, required, validate=lambda value: True, supports_intrinsics=True):  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        required: bool,
+        validate: Validator = lambda value: True,
+        supports_intrinsics: bool = True,
+    ) -> None:
         self.required = required
         self.validate = validate
         self.supports_intrinsics = supports_intrinsics

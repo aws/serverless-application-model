@@ -13,7 +13,7 @@ class CloudWatchLogs(PushEventSource):
 
     resource_type = "CloudWatchLogs"
     principal = "logs.amazonaws.com"
-    property_types = {"LogGroupName": PropertyType(True, is_str()), "FilterPattern": PropertyType(True, is_str())}  # type: ignore[no-untyped-call, no-untyped-call]
+    property_types = {"LogGroupName": PropertyType(True, is_str()), "FilterPattern": PropertyType(True, is_str())}
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]

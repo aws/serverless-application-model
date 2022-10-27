@@ -80,14 +80,14 @@ class Schedule(EventSource):
     resource_type = "Schedule"
     principal = "events.amazonaws.com"
     property_types = {
-        "Schedule": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Input": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Enabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "State": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Name": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DeadLetterConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RetryPolicy": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Schedule": PropertyType(True, is_str()),
+        "Input": PropertyType(False, is_str()),
+        "Enabled": PropertyType(False, is_type(bool)),
+        "State": PropertyType(False, is_str()),
+        "Name": PropertyType(False, is_str()),
+        "Description": PropertyType(False, is_str()),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
@@ -164,14 +164,14 @@ class CloudWatchEvent(EventSource):
     resource_type = "CloudWatchEvent"
     principal = "events.amazonaws.com"
     property_types = {
-        "EventBusName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RuleName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Pattern": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Input": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "InputPath": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DeadLetterConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RetryPolicy": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "State": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "EventBusName": PropertyType(False, is_str()),
+        "RuleName": PropertyType(False, is_str()),
+        "Pattern": PropertyType(False, is_type(dict)),
+        "Input": PropertyType(False, is_str()),
+        "InputPath": PropertyType(False, is_str()),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
+        "State": PropertyType(False, is_str()),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
@@ -252,12 +252,12 @@ class Api(EventSource):
     resource_type = "Api"
     principal = "apigateway.amazonaws.com"
     property_types = {
-        "Path": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Method": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Path": PropertyType(True, is_str()),
+        "Method": PropertyType(True, is_str()),
         # Api Event sources must "always" be paired with a Serverless::Api
-        "RestApiId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Stage": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Auth": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "RestApiId": PropertyType(True, is_str()),
+        "Stage": PropertyType(False, is_str()),
+        "Auth": PropertyType(False, is_type(dict)),
     }
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]

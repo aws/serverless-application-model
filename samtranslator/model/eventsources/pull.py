@@ -29,27 +29,27 @@ class PullEventSource(ResourceMacro):
     resource_type: str = None  # type: ignore
     requires_stream_queue_broker = True
     property_types = {
-        "Stream": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Queue": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "BatchSize": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "StartingPosition": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Enabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MaximumRetryAttempts": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "BisectBatchOnFunctionError": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "MaximumRecordAgeInSeconds": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DestinationConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ParallelizationFactor": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Topics": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Broker": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Queues": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "SourceAccessConfigurations": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "SecretsManagerKmsKeyId": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "TumblingWindowInSeconds": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FunctionResponseTypes": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "KafkaBootstrapServers": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FilterCriteria": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ConsumerGroupId": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Stream": PropertyType(False, is_str()),
+        "Queue": PropertyType(False, is_str()),
+        "BatchSize": PropertyType(False, is_type(int)),
+        "StartingPosition": PropertyType(False, is_str()),
+        "Enabled": PropertyType(False, is_type(bool)),
+        "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
+        "MaximumRetryAttempts": PropertyType(False, is_type(int)),
+        "BisectBatchOnFunctionError": PropertyType(False, is_type(bool)),
+        "MaximumRecordAgeInSeconds": PropertyType(False, is_type(int)),
+        "DestinationConfig": PropertyType(False, is_type(dict)),
+        "ParallelizationFactor": PropertyType(False, is_type(int)),
+        "Topics": PropertyType(False, is_type(list)),
+        "Broker": PropertyType(False, is_str()),
+        "Queues": PropertyType(False, is_type(list)),
+        "SourceAccessConfigurations": PropertyType(False, is_type(list)),
+        "SecretsManagerKmsKeyId": PropertyType(False, is_str()),
+        "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
+        "FunctionResponseTypes": PropertyType(False, is_type(list)),
+        "KafkaBootstrapServers": PropertyType(False, is_type(list)),
+        "FilterCriteria": PropertyType(False, is_type(dict)),
+        "ConsumerGroupId": PropertyType(False, is_str()),
     }
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]

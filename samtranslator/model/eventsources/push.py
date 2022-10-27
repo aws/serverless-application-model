@@ -96,15 +96,15 @@ class Schedule(PushEventSource):
     resource_type = "Schedule"
     principal = "events.amazonaws.com"
     property_types = {
-        "Schedule": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RuleName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Input": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Enabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "State": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Name": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Description": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DeadLetterConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RetryPolicy": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Schedule": PropertyType(True, is_str()),
+        "RuleName": PropertyType(False, is_str()),
+        "Input": PropertyType(False, is_str()),
+        "Enabled": PropertyType(False, is_type(bool)),
+        "State": PropertyType(False, is_str()),
+        "Name": PropertyType(False, is_str()),
+        "Description": PropertyType(False, is_str()),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
@@ -180,16 +180,16 @@ class CloudWatchEvent(PushEventSource):
     resource_type = "CloudWatchEvent"
     principal = "events.amazonaws.com"
     property_types = {
-        "EventBusName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RuleName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Pattern": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "DeadLetterConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RetryPolicy": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Input": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "InputPath": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Target": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Enabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "State": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "EventBusName": PropertyType(False, is_str()),
+        "RuleName": PropertyType(False, is_str()),
+        "Pattern": PropertyType(False, is_type(dict)),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
+        "Input": PropertyType(False, is_str()),
+        "InputPath": PropertyType(False, is_str()),
+        "Target": PropertyType(False, is_type(dict)),
+        "Enabled": PropertyType(False, is_type(bool)),
+        "State": PropertyType(False, is_str()),
     }
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
@@ -274,9 +274,9 @@ class S3(PushEventSource):
     resource_type = "S3"
     principal = "s3.amazonaws.com"
     property_types = {
-        "Bucket": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Events": PropertyType(True, one_of(is_str(), list_of(is_str())), False),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "Filter": PropertyType(False, dict_of(is_str(), is_str())),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
+        "Bucket": PropertyType(True, is_str()),
+        "Events": PropertyType(True, one_of(is_str(), list_of(is_str())), False),
+        "Filter": PropertyType(False, dict_of(is_str(), is_str())),
     }
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
@@ -447,10 +447,10 @@ class SNS(PushEventSource):
     resource_type = "SNS"
     principal = "sns.amazonaws.com"
     property_types = {
-        "Topic": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Region": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "FilterPolicy": PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict))))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
-        "SqsSubscription": PropertyType(False, one_of(is_type(bool), is_type(dict))),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call]
+        "Topic": PropertyType(True, is_str()),
+        "Region": PropertyType(False, is_str()),
+        "FilterPolicy": PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict))))),
+        "SqsSubscription": PropertyType(False, one_of(is_type(bool), is_type(dict))),
     }
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
@@ -562,14 +562,14 @@ class Api(PushEventSource):
     resource_type = "Api"
     principal = "apigateway.amazonaws.com"
     property_types = {
-        "Path": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Method": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Path": PropertyType(True, is_str()),
+        "Method": PropertyType(True, is_str()),
         # Api Event sources must "always" be paired with a Serverless::Api
-        "RestApiId": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Stage": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Auth": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RequestModel": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RequestParameters": PropertyType(False, is_type(list)),  # type: ignore[no-untyped-call, no-untyped-call]
+        "RestApiId": PropertyType(True, is_str()),
+        "Stage": PropertyType(False, is_str()),
+        "Auth": PropertyType(False, is_type(dict)),
+        "RequestModel": PropertyType(False, is_type(dict)),
+        "RequestParameters": PropertyType(False, is_type(list)),
     }
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
@@ -932,7 +932,7 @@ class AlexaSkill(PushEventSource):
     resource_type = "AlexaSkill"
     principal = "alexa-appkit.amazon.com"
 
-    property_types = {"SkillId": PropertyType(False, is_str())}  # type: ignore[no-untyped-call, no-untyped-call]
+    property_types = {"SkillId": PropertyType(False, is_str())}
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -951,7 +951,7 @@ class IoTRule(PushEventSource):
     resource_type = "IoTRule"
     principal = "iot.amazonaws.com"
 
-    property_types = {"Sql": PropertyType(True, is_str()), "AwsIotSqlVersion": PropertyType(False, is_str())}  # type: ignore[no-untyped-call, no-untyped-call]
+    property_types = {"Sql": PropertyType(True, is_str()), "AwsIotSqlVersion": PropertyType(False, is_str())}
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -998,8 +998,8 @@ class Cognito(PushEventSource):
     principal = "cognito-idp.amazonaws.com"
 
     property_types = {
-        "UserPool": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str())), False),  # type: ignore[no-untyped-call, no-untyped-call, no-untyped-call, no-untyped-call]
+        "UserPool": PropertyType(True, is_str()),
+        "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str())), False),
     }
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
@@ -1078,14 +1078,14 @@ class HttpApi(PushEventSource):
     resource_type = "HttpApi"
     principal = "apigateway.amazonaws.com"
     property_types = {
-        "Path": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Method": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "ApiId": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Stage": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
-        "Auth": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "TimeoutInMillis": PropertyType(False, is_type(int)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "RouteSettings": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
-        "PayloadFormatVersion": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "Path": PropertyType(False, is_str()),
+        "Method": PropertyType(False, is_str()),
+        "ApiId": PropertyType(False, is_str()),
+        "Stage": PropertyType(False, is_str()),
+        "Auth": PropertyType(False, is_type(dict)),
+        "TimeoutInMillis": PropertyType(False, is_type(int)),
+        "RouteSettings": PropertyType(False, is_type(dict)),
+        "PayloadFormatVersion": PropertyType(False, is_str()),
     }
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
