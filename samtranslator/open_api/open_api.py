@@ -1,5 +1,6 @@
 import copy
 import re
+from typing import Any, Iterator, Optional
 
 from samtranslator.model.intrinsics import ref, make_conditional, is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
@@ -39,10 +40,10 @@ class OpenApiEditor(object):
         :param dict doc: OpenApi document as a dictionary
         :raises InvalidDocumentException: If the input OpenApi document does not meet the basic OpenApi requirements.
         """
-        if not OpenApiEditor.is_valid(doc):  # type: ignore[no-untyped-call]
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
+        if not OpenApiEditor.is_valid(doc):
+            raise InvalidDocumentException(
                 [
-                    InvalidTemplateException(  # type: ignore[no-untyped-call]
+                    InvalidTemplateException(
                         "Invalid OpenApi document. Invalid values or missing keys for 'openapi' or 'paths' in 'DefinitionBody'."
                     )
                 ]
@@ -172,7 +173,7 @@ class OpenApiEditor(object):
         # Integration present and non-empty
         return True
 
-    def add_path(self, path, method=None):  # type: ignore[no-untyped-def]
+    def add_path(self, path: str, method: Optional[str] = None) -> None:
         """
         Adds the path/method combination to the Swagger, if not already present
 
@@ -186,8 +187,8 @@ class OpenApiEditor(object):
 
         if not isinstance(path_dict, dict):
             # Either customers has provided us an invalid Swagger, or this class has messed it somehow
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
-                [InvalidTemplateException(f"Value of '{path}' path must be a dictionary according to Swagger spec.")]  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
+                [InvalidTemplateException(f"Value of '{path}' path must be a dictionary according to Swagger spec.")]
             )
 
         for path_item in self.get_conditional_contents(path_dict):  # type: ignore[no-untyped-call]
@@ -209,7 +210,7 @@ class OpenApiEditor(object):
             # Not throwing an error- we will add lambda integrations to existing swagger if not present
             return
 
-        self.add_path(path, method)  # type: ignore[no-untyped-call]
+        self.add_path(path, method)
 
         # Wrap the integration_uri in a Condition if one exists on that function
         # This is necessary so CFN doesn't try to resolve the integration reference.
@@ -236,7 +237,7 @@ class OpenApiEditor(object):
             if condition:
                 path_item[method] = make_conditional(condition, path_item[method])
 
-    def make_path_conditional(self, path, condition):  # type: ignore[no-untyped-def]
+    def make_path_conditional(self, path: str, condition: str) -> None:
         """
         Wrap entire API path definition in a CloudFormation if condition.
         :param path: path name
@@ -244,7 +245,7 @@ class OpenApiEditor(object):
         """
         self.paths[path] = make_conditional(condition, self.paths[path])
 
-    def iter_on_path(self):  # type: ignore[no-untyped-def]
+    def iter_on_path(self) -> Iterator[str]:
         """
         Yields all the paths available in the Swagger. As a caller, if you add new paths to Swagger while iterating,
         they will not show up in this iterator
@@ -384,9 +385,9 @@ class OpenApiEditor(object):
                     normalized_method_name = self._normalize_method_name(method_name)  # type: ignore[no-untyped-call]
                     # It is possible that the method could have two definitions in a Fn::If block.
                     if normalized_method_name not in path_item:
-                        raise InvalidDocumentException(  # type: ignore[no-untyped-call]
+                        raise InvalidDocumentException(
                             [
-                                InvalidTemplateException(  # type: ignore[no-untyped-call]
+                                InvalidTemplateException(
                                     f"Could not find {normalized_method_name} in {path} within DefinitionBody."
                                 )
                             ]
@@ -394,9 +395,9 @@ class OpenApiEditor(object):
                     for method_definition in self.get_conditional_contents(method):  # type: ignore[no-untyped-call]
                         # check if there is any method_definition given by customer
                         if not method_definition:
-                            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
+                            raise InvalidDocumentException(
                                 [
-                                    InvalidTemplateException(  # type: ignore[no-untyped-call]
+                                    InvalidTemplateException(
                                         f"Invalid method definition ({normalized_method_name}) for path: {path}"
                                     )
                                 ]
@@ -483,9 +484,9 @@ class OpenApiEditor(object):
         for name, value in tags.items():
             # verify the tags definition is in the right format
             if not isinstance(self.tags, list):
-                raise InvalidDocumentException(  # type: ignore[no-untyped-call]
+                raise InvalidDocumentException(
                     [
-                        InvalidTemplateException(  # type: ignore[no-untyped-call]
+                        InvalidTemplateException(
                             f"Tags in OpenApi DefinitionBody needs to be a list. {self.tags} is a {type(self.tags).__name__} not a list."
                         )
                     ]
@@ -624,7 +625,7 @@ class OpenApiEditor(object):
         return copy.deepcopy(self._doc)
 
     @staticmethod
-    def is_valid(data):  # type: ignore[no-untyped-def]
+    def is_valid(data: Any) -> bool:
         """
         Checks if the input data is a OpenApi document
 
@@ -634,13 +635,13 @@ class OpenApiEditor(object):
 
         if bool(data) and isinstance(data, dict) and isinstance(data.get("paths"), dict):
             if bool(data.get("openapi")):
-                return OpenApiEditor.safe_compare_regex_with_string(  # type: ignore[no-untyped-call]
-                    OpenApiEditor.get_openapi_version_3_regex(), data["openapi"]  # type: ignore[no-untyped-call]
+                return OpenApiEditor.safe_compare_regex_with_string(
+                    OpenApiEditor.get_openapi_version_3_regex(), data["openapi"]
                 )
         return False
 
     @staticmethod
-    def gen_skeleton():  # type: ignore[no-untyped-def]
+    def gen_skeleton() -> Py27Dict:
         """
         Method to make an empty swagger file, with just some basic structure. Just enough to pass validator.
 
@@ -690,12 +691,12 @@ class OpenApiEditor(object):
         return method
 
     @staticmethod
-    def get_openapi_version_3_regex():  # type: ignore[no-untyped-def]
+    def get_openapi_version_3_regex() -> str:
         openapi_version_3_regex = r"\A3(\.\d)(\.\d)?$"
         return openapi_version_3_regex
 
     @staticmethod
-    def safe_compare_regex_with_string(regex, data):  # type: ignore[no-untyped-def]
+    def safe_compare_regex_with_string(regex: str, data: Any) -> bool:
         return re.match(regex, str(data)) is not None
 
     @staticmethod

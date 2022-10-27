@@ -112,75 +112,75 @@ class ApiGatewayV2Authorizer(object):
         authorizer_type = self._get_auth_type()  # type: ignore[no-untyped-call]
 
         if self.authorization_scopes is not None and not isinstance(self.authorization_scopes, list):
-            raise InvalidResourceException(self.api_logical_id, "AuthorizationScopes must be a list.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.api_logical_id, "AuthorizationScopes must be a list.")
 
         if self.authorization_scopes is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, "AuthorizationScopes must be defined only for OAuth2 Authorizer."
             )
 
         if self.jwt_configuration is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, "JwtConfiguration must be defined only for OAuth2 Authorizer."
             )
 
         if self.id_source is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, "IdentitySource must be defined only for OAuth2 Authorizer."
             )
 
         if self.function_arn is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, "FunctionArn must be defined only for Lambda Authorizer."
             )
 
         if self.function_invoke_role is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, "FunctionInvokeRole must be defined only for Lambda Authorizer."
             )
 
         if self.identity is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(self.api_logical_id, "Identity must be defined only for Lambda Authorizer.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.api_logical_id, "Identity must be defined only for Lambda Authorizer.")
 
         if self.authorizer_payload_format_version is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, "AuthorizerPayloadFormatVersion must be defined only for Lambda Authorizer."
             )
 
         if self.enable_simple_responses is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, "EnableSimpleResponses must be defined only for Lambda Authorizer."
             )
 
     def _validate_jwt_authorizer(self):  # type: ignore[no-untyped-def]
         if not self.jwt_configuration:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, f"{self.name} OAuth2 Authorizer must define 'JwtConfiguration'."
             )
         if not self.id_source:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, f"{self.name} OAuth2 Authorizer must define 'IdentitySource'."
             )
 
     def _validate_lambda_authorizer(self):  # type: ignore[no-untyped-def]
         if not self.function_arn:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, f"{self.name} Lambda Authorizer must define 'FunctionArn'."
             )
         if not self.authorizer_payload_format_version:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.api_logical_id, f"{self.name} Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
             )
 
         if self.identity:
             if not isinstance(self.identity, dict):
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.api_logical_id, self.name + " Lambda Authorizer property 'identity' is of invalid type."
                 )
             headers = self.identity.get("Headers")
             if headers:
                 if not isinstance(headers, list) or any((not isinstance(header, str) for header in headers)):
-                    raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                    raise InvalidResourceException(
                         self.api_logical_id,
                         self.name + " Lambda Authorizer property identity's 'Headers' is of invalid type.",
                     )

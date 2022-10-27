@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
@@ -43,12 +45,12 @@ class DeploymentPreferenceCollection(object):
     resources.
     """
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         """
         This collection stores an internal dict of the deployment preferences for each function's
         deployment preference in the SAM Template.
         """
-        self._resource_preferences = {}
+        self._resource_preferences: Dict[str, Any] = {}
 
     def add(self, logical_id, deployment_preference_dict, condition=None):  # type: ignore[no-untyped-def]
         """
@@ -125,7 +127,7 @@ class DeploymentPreferenceCollection(object):
         return [logical_id for logical_id, preference in self._resource_preferences.items() if preference.enabled]
 
     def get_codedeploy_application(self):  # type: ignore[no-untyped-def]
-        codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)  # type: ignore[no-untyped-call]
+        codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         codedeploy_application_resource.ComputePlatform = "Lambda"
         if self.needs_resource_condition():  # type: ignore[no-untyped-call]
             conditions = self.get_all_deployment_conditions()  # type: ignore[no-untyped-call]
@@ -136,7 +138,7 @@ class DeploymentPreferenceCollection(object):
         return codedeploy_application_resource
 
     def get_codedeploy_iam_role(self):  # type: ignore[no-untyped-def]
-        iam_role = IAMRole(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID)  # type: ignore[no-untyped-call]
+        iam_role = IAMRole(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID)
         iam_role.AssumeRolePolicyDocument = {
             "Version": "2012-10-17",
             "Statement": [
@@ -180,7 +182,7 @@ class DeploymentPreferenceCollection(object):
         try:
             deployment_group.AlarmConfiguration = self._convert_alarms(deployment_preference.alarms)  # type: ignore[no-untyped-call]
         except ValueError as e:
-            raise InvalidResourceException(function_logical_id, str(e))  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(function_logical_id, str(e))
 
         deployment_group.ApplicationName = ref(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         deployment_group.AutoRollbackConfiguration = {

@@ -74,7 +74,7 @@ class PullEventSource(ResourceMacro):
 
         resources = []
 
-        lambda_eventsourcemapping = LambdaEventSourceMapping(  # type: ignore[no-untyped-call]
+        lambda_eventsourcemapping = LambdaEventSourceMapping(
             self.logical_id, attributes=function.get_passthrough_resource_attributes()
         )
         resources.append(lambda_eventsourcemapping)
@@ -86,13 +86,13 @@ class PullEventSource(ResourceMacro):
             function_name_or_arn = function.get_runtime_attr("arn")
 
         if self.requires_stream_queue_broker and not self.Stream and not self.Queue and not self.Broker:  # type: ignore[attr-defined, attr-defined, attr-defined]
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided.",
             )
 
         if self.Stream and not self.StartingPosition:  # type: ignore[attr-defined, attr-defined]
-            raise InvalidEventException(self.relative_id, "StartingPosition is required for Kinesis, DynamoDB and MSK.")  # type: ignore[no-untyped-call]
+            raise InvalidEventException(self.relative_id, "StartingPosition is required for Kinesis, DynamoDB and MSK.")
 
         lambda_eventsourcemapping.FunctionName = function_name_or_arn
         lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue or self.Broker  # type: ignore[attr-defined, attr-defined, attr-defined]
@@ -123,7 +123,7 @@ class PullEventSource(ResourceMacro):
             elif self.resource_type == "SelfManagedKafka":
                 lambda_eventsourcemapping.SelfManagedKafkaEventSourceConfig = consumer_group_id_structure
             else:
-                raise InvalidEventException(  # type: ignore[no-untyped-call]
+                raise InvalidEventException(
                     self.logical_id,
                     "Property ConsumerGroupId not defined for resource of type {}.".format(self.resource_type),
                 )
@@ -131,7 +131,7 @@ class PullEventSource(ResourceMacro):
         destination_config_policy = None
         if self.DestinationConfig:  # type: ignore[attr-defined]
             if self.DestinationConfig.get("OnFailure") is None:  # type: ignore[attr-defined]
-                raise InvalidEventException(self.logical_id, "'OnFailure' is a required field for 'DestinationConfig'")  # type: ignore[no-untyped-call]
+                raise InvalidEventException(self.logical_id, "'OnFailure' is a required field for 'DestinationConfig'")
 
             # `Type` property is for sam to attach the right policies
             destination_type = self.DestinationConfig.get("OnFailure").get("Type")  # type: ignore[attr-defined]
@@ -142,15 +142,15 @@ class PullEventSource(ResourceMacro):
                 del self.DestinationConfig["OnFailure"]["Type"]  # type: ignore[attr-defined]
                 # the values 'SQS' and 'SNS' are allowed. No intrinsics are allowed
                 if destination_type not in ["SQS", "SNS"]:
-                    raise InvalidEventException(self.logical_id, "The only valid values for 'Type' are 'SQS' and 'SNS'")  # type: ignore[no-untyped-call]
+                    raise InvalidEventException(self.logical_id, "The only valid values for 'Type' are 'SQS' and 'SNS'")
                 if destination_type == "SQS":
                     queue_arn = self.DestinationConfig.get("OnFailure").get("Destination")  # type: ignore[attr-defined]
-                    destination_config_policy = IAMRolePolicies().sqs_send_message_role_policy(  # type: ignore[no-untyped-call]
+                    destination_config_policy = IAMRolePolicies().sqs_send_message_role_policy(
                         queue_arn, self.logical_id
                     )
                 elif destination_type == "SNS":
                     sns_topic_arn = self.DestinationConfig.get("OnFailure").get("Destination")  # type: ignore[attr-defined]
-                    destination_config_policy = IAMRolePolicies().sns_publish_role_policy(  # type: ignore[no-untyped-call]
+                    destination_config_policy = IAMRolePolicies().sns_publish_role_policy(
                         sns_topic_arn, self.logical_id
                     )
 
@@ -193,7 +193,7 @@ class PullEventSource(ResourceMacro):
         if not self.FilterCriteria or is_intrinsic(self.FilterCriteria):  # type: ignore[attr-defined]
             return
         if self.resource_type not in self.RESOURCE_TYPES_WITH_EVENT_FILTERING:
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "FilterCriteria is only available for {} events.".format(
                     ", ".join(self.RESOURCE_TYPES_WITH_EVENT_FILTERING)
@@ -201,11 +201,11 @@ class PullEventSource(ResourceMacro):
             )
         # FilterCriteria is either empty or only has "Filters"
         if list(self.FilterCriteria.keys()) not in [[], ["Filters"]]:  # type: ignore[attr-defined]
-            raise InvalidEventException(self.relative_id, "FilterCriteria field has a wrong format")  # type: ignore[no-untyped-call]
+            raise InvalidEventException(self.relative_id, "FilterCriteria field has a wrong format")
 
     def validate_secrets_manager_kms_key_id(self):  # type: ignore[no-untyped-def]
         if self.SecretsManagerKmsKeyId and not isinstance(self.SecretsManagerKmsKeyId, str):  # type: ignore[attr-defined]
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "Provided SecretsManagerKmsKeyId should be of type str.",
             )
@@ -269,12 +269,12 @@ class MQ(PullEventSource):
 
     def get_policy_statements(self):  # type: ignore[no-untyped-def]
         if not self.SourceAccessConfigurations:  # type: ignore[attr-defined]
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "No SourceAccessConfigurations for Amazon MQ event provided.",
             )
         if not type(self.SourceAccessConfigurations) is list:  # type: ignore[attr-defined]
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "Provided SourceAccessConfigurations cannot be parsed into a list.",
             )
@@ -282,7 +282,7 @@ class MQ(PullEventSource):
         for conf in self.SourceAccessConfigurations:  # type: ignore[attr-defined]
             event_type = conf.get("Type")
             if event_type not in ("BASIC_AUTH", "VIRTUAL_HOST"):
-                raise InvalidEventException(  # type: ignore[no-untyped-call]
+                raise InvalidEventException(
                     self.relative_id,
                     "Invalid property specified in SourceAccessConfigurations for Amazon MQ event.",
                 )
@@ -294,13 +294,13 @@ class MQ(PullEventSource):
                     )
                 basic_auth_uri = conf.get("URI")
                 if not basic_auth_uri:
-                    raise InvalidEventException(  # type: ignore[no-untyped-call]
+                    raise InvalidEventException(
                         self.relative_id,
                         "No BASIC_AUTH URI property specified in SourceAccessConfigurations for Amazon MQ event.",
                     )
 
         if not basic_auth_uri:
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "No BASIC_AUTH property specified in SourceAccessConfigurations for Amazon MQ event.",
             )
@@ -353,25 +353,25 @@ class SelfManagedKafka(PullEventSource):
 
     def get_policy_statements(self):  # type: ignore[no-untyped-def]
         if not self.KafkaBootstrapServers:  # type: ignore[attr-defined]
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "No KafkaBootstrapServers provided for self managed kafka as an event source",
             )
 
         if not self.Topics:  # type: ignore[attr-defined]
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "No Topics provided for self managed kafka as an event source",
             )
 
         if len(self.Topics) != 1:  # type: ignore[attr-defined]
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "Topics for self managed kafka only supports single configuration entry.",
             )
 
         if not self.SourceAccessConfigurations:  # type: ignore[attr-defined]
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "No SourceAccessConfigurations for self managed kafka event provided.",
             )
@@ -427,13 +427,13 @@ class SelfManagedKafka(PullEventSource):
                 authentication_uri = config.get("URI")
 
             else:
-                raise InvalidEventException(  # type: ignore[no-untyped-call]
+                raise InvalidEventException(
                     self.relative_id,
                     "Invalid SourceAccessConfigurations Type provided for self managed kafka event.",
                 )
 
         if (not has_vpc_subnet and has_vpc_security_group) or (has_vpc_subnet and not has_vpc_security_group):
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "VPC_SUBNET and VPC_SECURITY_GROUP in SourceAccessConfigurations for SelfManagedKafka must be both provided.",
             )
@@ -441,13 +441,13 @@ class SelfManagedKafka(PullEventSource):
 
     def validate_uri(self, config, msg):  # type: ignore[no-untyped-def]
         if not config.get("URI"):
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
             )
 
         if not isinstance(config.get("URI"), str) and not is_intrinsic(config.get("URI")):
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 "Wrong Type for {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(
                     msg

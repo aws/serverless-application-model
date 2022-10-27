@@ -1,3 +1,3 @@
-# flake8: noqa
-# pylint: disable=W0611
+__all__ = ["SwaggerEditor"]
+
 from samtranslator.swagger.swagger import SwaggerEditor

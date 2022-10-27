@@ -9,8 +9,8 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins import BasePlugin
 from samtranslator.plugins.exceptions import InvalidPluginException
-from samtranslator.public.sdk.resource import SamResourceType  # type: ignore[attr-defined]
-from samtranslator.public.sdk.template import SamTemplate  # type: ignore[attr-defined]
+from samtranslator.public.sdk.resource import SamResourceType
+from samtranslator.public.sdk.template import SamTemplate
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.region_configuration import RegionConfiguration
@@ -54,7 +54,7 @@ class ServerlessAppPlugin(BasePlugin):
         :param bool wait_for_template_active_status: Flag to wait for all templates to become active
         :param bool validate_only: Flag to only validate application access (uses get_application API instead)
         """
-        super(ServerlessAppPlugin, self).__init__(ServerlessAppPlugin.__name__)  # type: ignore[no-untyped-call]
+        super(ServerlessAppPlugin, self).__init__(ServerlessAppPlugin.__name__)
         if parameters is None:
             parameters = {}
         self._applications = {}
@@ -113,7 +113,7 @@ class ServerlessAppPlugin(BasePlugin):
             if key not in self._applications:
                 try:
                     if not RegionConfiguration.is_service_supported("serverlessrepo"):  # type: ignore[no-untyped-call]
-                        raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                        raise InvalidResourceException(
                             logical_id, "Serverless Application Repository is not available in this region."
                         )
                     # Lazy initialization of the client- create it when it is needed
@@ -141,7 +141,7 @@ class ServerlessAppPlugin(BasePlugin):
             call_succeeded = True
             break
         if not call_succeeded:
-            raise InvalidResourceException(logical_id, "Failed to call SAR, timeout limit exceeded.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(logical_id, "Failed to call SAR, timeout limit exceeded.")
 
     def _replace_value(self, input_dict, key, intrinsic_resolvers):  # type: ignore[no-untyped-def]
         value = self._resolve_location_value(input_dict.get(key), intrinsic_resolvers)  # type: ignore[no-untyped-call]
@@ -262,10 +262,10 @@ class ServerlessAppPlugin(BasePlugin):
         app_id = resource_properties[self.LOCATION_KEY].get(self.APPLICATION_ID_KEY)
 
         if not app_id:
-            raise InvalidResourceException(logical_id, "Property 'ApplicationId' cannot be blank.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(logical_id, "Property 'ApplicationId' cannot be blank.")
 
         if isinstance(app_id, dict):
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 logical_id,
                 "Property 'ApplicationId' cannot be resolved. Only FindInMap "
                 "and Ref intrinsic functions are supported.",
@@ -274,10 +274,10 @@ class ServerlessAppPlugin(BasePlugin):
         semver = resource_properties[self.LOCATION_KEY].get(self.SEMANTIC_VERSION_KEY)
 
         if not semver:
-            raise InvalidResourceException(logical_id, "Property 'SemanticVersion' cannot be blank.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(logical_id, "Property 'SemanticVersion' cannot be blank.")
 
         if isinstance(semver, dict):
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 logical_id,
                 "Property 'SemanticVersion' cannot be resolved. Only FindInMap "
                 "and Ref intrinsic functions are supported.",
@@ -304,7 +304,7 @@ class ServerlessAppPlugin(BasePlugin):
         """
         for key in keys:
             if key not in dictionary:
-                raise InvalidResourceException(logical_id, f"Resource is missing the required [{key}] property.")  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(logical_id, f"Resource is missing the required [{key}] property.")
 
     @cw_timer(prefix=PLUGIN_METRICS_PREFIX)  # type: ignore[no-untyped-call]
     def on_after_transform_template(self, template):  # type: ignore[no-untyped-def]
@@ -356,7 +356,7 @@ class ServerlessAppPlugin(BasePlugin):
         # Not all templates reached active status
         if len(self._in_progress_templates) != 0:
             application_ids = [items[0] for items in self._in_progress_templates]
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 application_ids, "Timed out waiting for nested stack templates to reach ACTIVE status."
             )
 
@@ -376,7 +376,7 @@ class ServerlessAppPlugin(BasePlugin):
 
         if status == "EXPIRED":
             message = f"Template for {application_id} with id {template_id} returned status: {status}. Cannot access an expired template."
-            raise InvalidResourceException(application_id, message)  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(application_id, message)
 
         return status == "ACTIVE"
 
@@ -396,7 +396,7 @@ class ServerlessAppPlugin(BasePlugin):
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code in ("AccessDeniedException", "NotFoundException"):
-                raise InvalidResourceException(logical_id, e.response["Error"]["Message"])  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(logical_id, e.response["Error"]["Message"])
             raise e
 
     def _resource_is_supported(self, resource_type):  # type: ignore[no-untyped-def]

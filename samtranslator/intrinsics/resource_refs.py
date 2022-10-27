@@ -1,3 +1,6 @@
+from typing import Any, Dict
+
+
 class SupportedResourceReferences(object):
     """
     Class that contains information about the resource references supported in this SAM template, along with the
@@ -5,11 +8,11 @@ class SupportedResourceReferences(object):
     collection which is finally used to resolve all the references in output CFN template.
     """
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
 
         # This is a two level map like:
         # { "LogicalId": {"Property": "Value"} }
-        self._refs = {}
+        self._refs: Dict[str, Dict[str, Any]] = {}
 
     def add(self, logical_id, property, value):  # type: ignore[no-untyped-def]
         """

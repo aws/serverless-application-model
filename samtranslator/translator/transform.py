@@ -12,7 +12,7 @@ def transform(input_fragment, parameter_values, managed_policy_loader, feature_t
     :rtype: dict
     """
 
-    sam_parser = Parser()  # type: ignore[no-untyped-call]
+    sam_parser = Parser()
     to_py27_compatible_template(input_fragment, parameter_values)  # type: ignore[no-untyped-call]
     translator = Translator(managed_policy_loader.load(), sam_parser)  # type: ignore[no-untyped-call]
     transformed = translator.translate(  # type: ignore[no-untyped-call]

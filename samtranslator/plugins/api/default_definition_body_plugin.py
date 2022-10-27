@@ -2,8 +2,8 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.plugins import BasePlugin
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
-from samtranslator.public.sdk.resource import SamResourceType  # type: ignore[attr-defined]
-from samtranslator.public.sdk.template import SamTemplate  # type: ignore[attr-defined]
+from samtranslator.public.sdk.resource import SamResourceType
+from samtranslator.public.sdk.template import SamTemplate
 
 
 class DefaultDefinitionBodyPlugin(BasePlugin):
@@ -14,12 +14,12 @@ class DefaultDefinitionBodyPlugin(BasePlugin):
     to a minimum Swagger definition and sets `__MANAGE_SWAGGER: true`.
     """
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         """
         Initialize the plugin.
         """
 
-        super(DefaultDefinitionBodyPlugin, self).__init__(DefaultDefinitionBodyPlugin.__name__)  # type: ignore[no-untyped-call]
+        super(DefaultDefinitionBodyPlugin, self).__init__(DefaultDefinitionBodyPlugin.__name__)
 
     @cw_timer(prefix="Plugin-DefaultDefinitionBody")  # type: ignore[no-untyped-call]
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
@@ -41,9 +41,9 @@ class DefaultDefinitionBodyPlugin(BasePlugin):
                     # If "Properties" is not set in the template, set them here
                     if not api.properties:
                         template.set(logicalId, api)
-                    api.properties["DefinitionBody"] = OpenApiEditor.gen_skeleton()  # type: ignore[no-untyped-call]
+                    api.properties["DefinitionBody"] = OpenApiEditor.gen_skeleton()
 
                 if api_type is SamResourceType.Api.value:
-                    api.properties["DefinitionBody"] = SwaggerEditor.gen_skeleton()  # type: ignore[no-untyped-call]
+                    api.properties["DefinitionBody"] = SwaggerEditor.gen_skeleton()
 
                 api.properties["__MANAGE_SWAGGER"] = True

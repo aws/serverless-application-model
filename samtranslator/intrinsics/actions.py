@@ -19,7 +19,7 @@ class Action(object):
     # TODO: Make `Action` an abstract class and not giving `intrinsic_name` initial value.
     intrinsic_name: str = None  # type: ignore
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         if not self.intrinsic_name:
             raise TypeError("Subclass must provide a intrinsic_name")
 
@@ -542,9 +542,9 @@ class FindInMapAction(Action):
 
         # FindInMap expects an array with 3 values
         if not isinstance(value, list) or len(value) != 3:
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
                 [
-                    InvalidTemplateException(  # type: ignore[no-untyped-call]
+                    InvalidTemplateException(
                         f"Invalid FindInMap value {value}. FindInMap expects an array with 3 values."
                     )
                 ]

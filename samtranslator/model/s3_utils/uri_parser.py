@@ -54,7 +54,7 @@ def construct_image_code_object(image_uri, logical_id, property_name):  # type: 
     :rtype: dict
     """
     if not image_uri:
-        raise InvalidResourceException(  # type: ignore[no-untyped-call]
+        raise InvalidResourceException(
             logical_id, "'{}' requires that a image hosted at a registry be specified.".format(property_name)
         )
 
@@ -74,7 +74,7 @@ def construct_s3_location_object(location_uri, logical_id, property_name):  # ty
     if isinstance(location_uri, dict):
         if not location_uri.get("Bucket") or not location_uri.get("Key"):
             # location_uri is a dictionary but does not contain Bucket or Key property
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 logical_id, "'{}' requires Bucket and Key properties to be specified.".format(property_name)
             )
 

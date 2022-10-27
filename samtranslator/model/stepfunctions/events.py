@@ -59,7 +59,7 @@ class EventSource(ResourceMacro):
         :rtype: model.iam.IAMRole
         """
         role_logical_id = self._generate_logical_id(prefix=prefix, suffix=suffix, resource_type="Role")  # type: ignore[no-untyped-call]
-        event_role = IAMRole(role_logical_id, attributes=resource.get_passthrough_resource_attributes())  # type: ignore[no-untyped-call]
+        event_role = IAMRole(role_logical_id, attributes=resource.get_passthrough_resource_attributes())
         event_role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(  # type: ignore[no-untyped-call]
             self.principal
         )
@@ -103,13 +103,13 @@ class Schedule(EventSource):
         permissions_boundary = kwargs.get("permissions_boundary")
 
         passthrough_resource_attributes = resource.get_passthrough_resource_attributes()
-        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)  # type: ignore[no-untyped-call]
+        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         resources.append(events_rule)
 
         events_rule.ScheduleExpression = self.Schedule  # type: ignore[attr-defined]
 
         if self.State and self.Enabled is not None:  # type: ignore[attr-defined, attr-defined]
-            raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")  # type: ignore[no-untyped-call]
+            raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
 
         if self.State:  # type: ignore[attr-defined]
             events_rule.State = self.State  # type: ignore[attr-defined]
@@ -188,7 +188,7 @@ class CloudWatchEvent(EventSource):
         permissions_boundary = kwargs.get("permissions_boundary")
 
         passthrough_resource_attributes = resource.get_passthrough_resource_attributes()
-        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)  # type: ignore[no-untyped-call]
+        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         events_rule.EventBusName = self.EventBusName  # type: ignore[attr-defined]
         events_rule.EventPattern = self.Pattern  # type: ignore[attr-defined]
         events_rule.Name = self.RuleName  # type: ignore[attr-defined]
@@ -295,7 +295,7 @@ class Api(EventSource):
 
             else:
                 # RestApiId is a string, not an intrinsic, but we did not find a valid API resource for this ID
-                raise InvalidEventException(  # type: ignore[no-untyped-call]
+                raise InvalidEventException(
                     self.relative_id,
                     "RestApiId property of Api event must reference a valid resource in the same template.",
                 )
@@ -350,7 +350,7 @@ class Api(EventSource):
 
         if editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined, no-untyped-call]
             # Cannot add the integration, if it is already present
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 self.relative_id,
                 'API method "{method}" defined multiple times for path "{path}".'.format(
                     method=self.Method, path=self.Path  # type: ignore[attr-defined]
@@ -381,7 +381,7 @@ class Api(EventSource):
 
                 if method_authorizer != "AWS_IAM":
                     if method_authorizer != "NONE" and not api_authorizers:
-                        raise InvalidEventException(  # type: ignore[no-untyped-call]
+                        raise InvalidEventException(
                             self.relative_id,
                             "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
                             "because the related API does not define any Authorizers.".format(
@@ -390,7 +390,7 @@ class Api(EventSource):
                         )
 
                     if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
-                        raise InvalidEventException(  # type: ignore[no-untyped-call]
+                        raise InvalidEventException(
                             self.relative_id,
                             "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
                             "because it wasn't defined in the API's Authorizers.".format(
@@ -400,7 +400,7 @@ class Api(EventSource):
 
                     if method_authorizer == "NONE":
                         if not api_auth or not api_auth.get("DefaultAuthorizer"):
-                            raise InvalidEventException(  # type: ignore[no-untyped-call]
+                            raise InvalidEventException(
                                 self.relative_id,
                                 "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
                                 "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
@@ -409,7 +409,7 @@ class Api(EventSource):
                             )
 
             if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):  # type: ignore[attr-defined]
-                raise InvalidEventException(  # type: ignore[no-untyped-call]
+                raise InvalidEventException(
                     self.relative_id,
                     "Unable to set Authorizer on API method [{method}] for path [{path}] because "
                     "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),  # type: ignore[attr-defined]
@@ -418,7 +418,7 @@ class Api(EventSource):
             apikey_required_setting = self.Auth.get("ApiKeyRequired")  # type: ignore[attr-defined]
             apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
             if apikey_required_setting_is_false and (not api_auth or not api_auth.get("ApiKeyRequired")):
-                raise InvalidEventException(  # type: ignore[no-untyped-call]
+                raise InvalidEventException(
                     self.relative_id,
                     "Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] "
                     "because the related API does not specify any ApiKeyRequired.".format(

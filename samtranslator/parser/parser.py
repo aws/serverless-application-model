@@ -3,13 +3,13 @@ import logging
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceException
 from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.plugins import LifeCycleEvents
-from samtranslator.public.sdk.template import SamTemplate  # type: ignore[attr-defined]
+from samtranslator.public.sdk.template import SamTemplate
 
 LOG = logging.getLogger(__name__)
 
 
 class Parser:
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         pass
 
     def parse(self, sam_template, parameter_values, sam_plugins):  # type: ignore[no-untyped-def]
@@ -24,12 +24,12 @@ class Parser:
             or not isinstance(sam_template["Resources"], dict)
             or not sam_template["Resources"]
         ):
-            raise InvalidDocumentException([InvalidTemplateException("'Resources' section is required")])  # type: ignore[no-untyped-call, no-untyped-call]
+            raise InvalidDocumentException([InvalidTemplateException("'Resources' section is required")])
 
         if not all(isinstance(sam_resource, dict) for sam_resource in sam_template["Resources"].values()):
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
                 [
-                    InvalidTemplateException(  # type: ignore[no-untyped-call]
+                    InvalidTemplateException(
                         "All 'Resources' must be Objects. If you're using YAML, this may be an indentation issue."
                     )
                 ]
@@ -42,9 +42,9 @@ class Parser:
             # `not isinstance(sam_resources.get("Properties"), dict)` as this would be a breaking change.
             # sam_resource.properties defaults to {} in SamTemplate init
             if not isinstance(sam_resource.properties, dict):
-                raise InvalidDocumentException(  # type: ignore[no-untyped-call]
+                raise InvalidDocumentException(
                     [
-                        InvalidResourceException(  # type: ignore[no-untyped-call]
+                        InvalidResourceException(
                             resource_logical_id,
                             "All 'Resources' must be Objects and have a 'Properties' Object. If "
                             "you're using YAML, this may be an indentation issue.",

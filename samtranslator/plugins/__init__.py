@@ -20,7 +20,7 @@ class BasePlugin(object):
     Base class for a NoOp plugin that implements all available hooks
     """
 
-    def __init__(self, name):  # type: ignore[no-untyped-def]
+    def __init__(self, name: str) -> None:
         """
         Initialize the plugin with given name. Name is always required to register a plugin
 
