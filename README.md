@@ -40,7 +40,7 @@ Or join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_in
 
 ### Setting up development environment
 
-You'll need to have Python 3.7+ installed.
+The only prerequisite is to have Python 3.7+ installed.
 
 Create a [virtual environment](https://docs.python.org/3/library/venv.html):
 
