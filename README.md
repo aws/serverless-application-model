@@ -90,7 +90,11 @@ Resources:
 
 </details>
 
-## Setting up development environment
+The `Transform: AWS::Serverless-2016-10-31` line instructs CloudFormation to transform the template using the SAM transform before deployment.
+
+## Contributing
+
+### Setting up development environment
 
 Make sure you have Python 3.7+ installed.
 
