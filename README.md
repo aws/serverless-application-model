@@ -38,6 +38,8 @@ Or join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_in
 
 ## Contributing
 
+### Setting up development environment
+
 Create a [virtual environment](https://docs.python.org/3/library/venv.html):
 
 ```bash
