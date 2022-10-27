@@ -43,20 +43,20 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
     for index, policy_entry in enumerate(resource_policies.get()):
         if policy_entry.type is PolicyTypes.POLICY_STATEMENT:
 
-            if is_intrinsic_if(policy_entry.data):  # type: ignore[no-untyped-call]
+            if is_intrinsic_if(policy_entry.data):
 
                 intrinsic_if = policy_entry.data
                 then_statement = intrinsic_if["Fn::If"][1]
                 else_statement = intrinsic_if["Fn::If"][2]
 
-                if not is_intrinsic_no_value(then_statement):  # type: ignore[no-untyped-call]
+                if not is_intrinsic_no_value(then_statement):
                     then_statement = {
                         "PolicyName": execution_role.logical_id + "Policy" + str(index),
                         "PolicyDocument": then_statement,
                     }
                     intrinsic_if["Fn::If"][1] = then_statement
 
-                if not is_intrinsic_no_value(else_statement):  # type: ignore[no-untyped-call]
+                if not is_intrinsic_no_value(else_statement):
                     else_statement = {
                         "PolicyName": execution_role.logical_id + "Policy" + str(index),
                         "PolicyDocument": else_statement,

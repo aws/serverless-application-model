@@ -16,4 +16,4 @@ class EventsRule(Resource):
         "Targets": PropertyType(False, list_of(is_type(dict))),
     }
 
-    runtime_attrs = {"rule_id": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}  # type: ignore[no-untyped-call, no-untyped-call]
+    runtime_attrs = {"rule_id": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}

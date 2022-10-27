@@ -312,7 +312,7 @@ class S3(PushEventSource):
 
         resources = []
 
-        source_account = ref("AWS::AccountId")  # type: ignore[no-untyped-call]
+        source_account = ref("AWS::AccountId")
         permission = self._construct_permission(function, source_account=source_account)  # type: ignore[no-untyped-call]
         if CONDITION in permission.resource_attributes:
             self._depend_on_lambda_permissions_using_tag(bucket, permission)  # type: ignore[no-untyped-call]
@@ -389,7 +389,7 @@ class S3(PushEventSource):
         dep_tag = {
             "sam:ConditionalDependsOn:"
             + permission.logical_id: {
-                "Fn::If": [permission.resource_attributes[CONDITION], ref(permission.logical_id), "no dependency"]  # type: ignore[no-untyped-call]
+                "Fn::If": [permission.resource_attributes[CONDITION], ref(permission.logical_id), "no dependency"]
             }
         }
         properties["Tags"] = tags + get_tag_list(dep_tag)  # type: ignore[no-untyped-call]
@@ -411,7 +411,7 @@ class S3(PushEventSource):
             lambda_event = copy.deepcopy(base_event_mapping)
             lambda_event["Event"] = event_type
             if CONDITION in function.resource_attributes:
-                lambda_event = make_conditional(function.resource_attributes[CONDITION], lambda_event)  # type: ignore[no-untyped-call]
+                lambda_event = make_conditional(function.resource_attributes[CONDITION], lambda_event)
             event_mappings.append(lambda_event)
 
         properties = bucket.get("Properties", None)
@@ -679,7 +679,7 @@ class Api(PushEventSource):
         # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
         resource = "${__ApiId__}/" + "${__Stage__}/" + method + path
         partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
-        source_arn = fnSub(  # type: ignore[no-untyped-call]
+        source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
             {"__ApiId__": api_id, "__Stage__": stage},
         )
@@ -797,7 +797,7 @@ class Api(PushEventSource):
                             model=method_model, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                         ),
                     )
-                if not is_intrinsic(api_models) and not isinstance(api_models, dict):  # type: ignore[no-untyped-call]
+                if not is_intrinsic(api_models) and not isinstance(api_models, dict):
                     raise InvalidEventException(  # type: ignore[no-untyped-call]
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
@@ -965,11 +965,11 @@ class IoTRule(PushEventSource):
         resource = "rule/${RuleName}"
 
         partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
-        source_arn = fnSub(  # type: ignore[no-untyped-call]
+        source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="iot", resource=resource),  # type: ignore[no-untyped-call]
-            {"RuleName": ref(self.logical_id)},  # type: ignore[no-untyped-call]
+            {"RuleName": ref(self.logical_id)},
         )
-        source_account = fnSub("${AWS::AccountId}")  # type: ignore[no-untyped-call]
+        source_account = fnSub("${AWS::AccountId}")
 
         resources.append(self._construct_permission(function, source_arn=source_arn, source_account=source_account))  # type: ignore[no-untyped-call]
         resources.append(self._construct_iot_rule(function))  # type: ignore[no-untyped-call]
@@ -1033,7 +1033,7 @@ class Cognito(PushEventSource):
         userpool_id = kwargs["userpool_id"]
 
         resources = []
-        source_arn = fnGetAtt(userpool_id, "Arn")  # type: ignore[no-untyped-call]
+        source_arn = fnGetAtt(userpool_id, "Arn")
         lambda_permission = self._construct_permission(  # type: ignore[no-untyped-call]
             function, source_arn=source_arn, prefix=function.logical_id + "Cognito"
         )
@@ -1175,7 +1175,7 @@ class HttpApi(PushEventSource):
 
         # ApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
         resource = "${__ApiId__}/" + "${__Stage__}/" + method + path
-        source_arn = fnSub(  # type: ignore[no-untyped-call]
+        source_arn = fnSub(
             ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
             {"__ApiId__": api_id, "__Stage__": stage},
         )
@@ -1301,14 +1301,14 @@ def _build_apigw_integration_uri(function, partition):  # type: ignore[no-untype
         "arn:"
         + partition
         + ":apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/"
-        + make_shorthand(function_arn)  # type: ignore[no-untyped-call]
+        + make_shorthand(function_arn)
         + "/invocations"
     )
     # function_arn is always of the form {"Fn::GetAtt": ["<function_logical_id>", "Arn"]}.
     # We only want to check if the function logical id is a Py27UniStr instance.
     if function_arn.get("Fn::GetAtt") and isinstance(function_arn["Fn::GetAtt"][0], Py27UniStr):
         arn = Py27UniStr(arn)
-    return Py27Dict(fnSub(arn))  # type: ignore[no-untyped-call, no-untyped-call]
+    return Py27Dict(fnSub(arn))
 
 
 def _check_valid_authorizer_types(  # type: ignore[no-untyped-def]

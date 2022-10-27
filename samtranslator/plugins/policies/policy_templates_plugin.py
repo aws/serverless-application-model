@@ -59,7 +59,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
                 result.append(policy_entry.data)
                 continue
 
-            if is_intrinsic_if(policy_entry.data):  # type: ignore[no-untyped-call]
+            if is_intrinsic_if(policy_entry.data):
                 # If policy is an intrinsic if, we need to process each sub-statement separately
                 processed_intrinsic_if = self._process_intrinsic_if_policy_template(logical_id, policy_entry)  # type: ignore[no-untyped-call]
                 result.append(processed_intrinsic_if)
@@ -78,13 +78,13 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
 
         processed_then_statement = (
             then_statement
-            if is_intrinsic_no_value(then_statement)  # type: ignore[no-untyped-call]
+            if is_intrinsic_no_value(then_statement)
             else self._process_policy_template(logical_id, then_statement)  # type: ignore[no-untyped-call]
         )
 
         processed_else_statement = (
             else_statement
-            if is_intrinsic_no_value(else_statement)  # type: ignore[no-untyped-call]
+            if is_intrinsic_no_value(else_statement)
             else self._process_policy_template(logical_id, else_statement)  # type: ignore[no-untyped-call]
         )
 

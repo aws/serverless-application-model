@@ -19,7 +19,7 @@ class ApiGatewayV2HttpApi(Resource):
         "CorsConfiguration": PropertyType(False, is_type(dict)),
     }
 
-    runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}
 
 
 class ApiGatewayV2Stage(Resource):
@@ -37,7 +37,7 @@ class ApiGatewayV2Stage(Resource):
         "AutoDeploy": PropertyType(False, is_type(bool)),
     }
 
-    runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
 
 
 class ApiGatewayV2DomainName(Resource):
@@ -218,7 +218,7 @@ class ApiGatewayV2Authorizer(object):
             # Generate the lambda arn
             partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
-            authorizer_uri = fnSub(  # type: ignore[no-untyped-call]
+            authorizer_uri = fnSub(
                 ArnGenerator.generate_arn(  # type: ignore[no-untyped-call]
                     partition=partition, service="apigateway", resource=resource, include_account_id=False
                 ),

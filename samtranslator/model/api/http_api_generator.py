@@ -172,7 +172,7 @@ class HttpApiGenerator(object):
             # if cors config is true add Origins as "'*'"
             properties = CorsProperties(AllowOrigins=[_CORS_WILDCARD])  # type: ignore[call-arg]
 
-        elif is_intrinsic(self.cors_configuration):  # type: ignore[no-untyped-call]
+        elif is_intrinsic(self.cors_configuration):
             # Just set Origin property. Intrinsics will be handledOthers will be defaults
             properties = CorsProperties(AllowOrigins=self.cors_configuration)  # type: ignore[call-arg]
 
@@ -344,9 +344,9 @@ class HttpApiGenerator(object):
             basepath_mapping = ApiGatewayV2ApiMapping(  # type: ignore[no-untyped-call]
                 self.logical_id + "ApiMapping", attributes=self.passthrough_resource_attributes
             )
-            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))  # type: ignore[no-untyped-call]
-            basepath_mapping.ApiId = ref(http_api.logical_id)  # type: ignore[no-untyped-call]
-            basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")  # type: ignore[no-untyped-call]
+            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+            basepath_mapping.ApiId = ref(http_api.logical_id)
+            basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
             basepath_resource_list.extend([basepath_mapping])
         else:
             for path in basepaths:
@@ -364,9 +364,9 @@ class HttpApiGenerator(object):
 
                 logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-_/]+", "", path), "ApiMapping")
                 basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)  # type: ignore[no-untyped-call]
-                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))  # type: ignore[no-untyped-call]
-                basepath_mapping.ApiId = ref(http_api.logical_id)  # type: ignore[no-untyped-call]
-                basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")  # type: ignore[no-untyped-call]
+                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+                basepath_mapping.ApiId = ref(http_api.logical_id)
+                basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
                 basepath_mapping.ApiMappingKey = path
                 basepath_resource_list.extend([basepath_mapping])
         return basepath_resource_list
@@ -398,8 +398,8 @@ class HttpApiGenerator(object):
         if target_health is not None:
             alias_target["EvaluateTargetHealth"] = target_health
         if domain.get("EndpointConfiguration") == "REGIONAL":
-            alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")  # type: ignore[no-untyped-call]
-            alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")  # type: ignore[no-untyped-call]
+            alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")
+            alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")
         else:
             raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.logical_id,
@@ -480,10 +480,10 @@ class HttpApiGenerator(object):
         if not default_authorizer:
             return
 
-        if is_intrinsic_no_value(default_authorizer):  # type: ignore[no-untyped-call]
+        if is_intrinsic_no_value(default_authorizer):
             return
 
-        if is_intrinsic(default_authorizer):  # type: ignore[no-untyped-call]
+        if is_intrinsic(default_authorizer):
             raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 self.logical_id,
                 "Unable to set DefaultAuthorizer because intrinsic functions are not supported for this field.",
@@ -603,7 +603,7 @@ class HttpApiGenerator(object):
             generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)  # type: ignore[no-untyped-call]
             stage_logical_id = generator.gen()  # type: ignore[no-untyped-call]
         stage = ApiGatewayV2Stage(stage_logical_id, attributes=self.passthrough_resource_attributes)  # type: ignore[no-untyped-call]
-        stage.ApiId = ref(self.logical_id)  # type: ignore[no-untyped-call]
+        stage.ApiId = ref(self.logical_id)
         stage.StageName = self.stage_name
         stage.StageVariables = self.stage_variables
         stage.AccessLogSettings = self.access_log_settings

@@ -349,8 +349,11 @@ class ImplicitApiPlugin(BasePlugin):  # type: ignore[misc]
             raise ValueError("conditions_to_combine must have at least 2 conditions")
 
         template_conditions = template_dict.setdefault("Conditions", {})
-        new_template_conditions = make_combined_condition(sorted(list(conditions_to_combine)), condition_name)  # type: ignore[no-untyped-call]
-        for name, definition in new_template_conditions.items():
+        new_template_conditions = make_combined_condition(sorted(list(conditions_to_combine)), condition_name)
+        # make_combined_condition() won't return None if `conditions_to_combine` has at least 2 elements,
+        # which is checked above.
+        # TODO: refactor the code to make the length check in one place only.
+        for name, definition in new_template_conditions.items():  # type: ignore
             template_conditions[name] = definition
 
     def _maybe_add_conditions_to_implicit_api_paths(self, template):  # type: ignore[no-untyped-def]

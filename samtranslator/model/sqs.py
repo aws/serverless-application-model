@@ -9,15 +9,15 @@ class SQSQueue(Resource):
     resource_type = "AWS::SQS::Queue"
     property_types: Dict[str, PropertyType] = {}
     runtime_attrs = {
-        "queue_url": lambda self: ref(self.logical_id),  # type: ignore[no-untyped-call]
-        "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),  # type: ignore[no-untyped-call]
+        "queue_url": lambda self: ref(self.logical_id),
+        "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),
     }
 
 
 class SQSQueuePolicy(Resource):
     resource_type = "AWS::SQS::QueuePolicy"
     property_types = {"PolicyDocument": PropertyType(True, is_type(dict)), "Queues": PropertyType(True, list_of(str))}
-    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "Arn")}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
 
 class SQSQueuePolicies:

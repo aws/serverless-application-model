@@ -81,7 +81,7 @@ class SwaggerEditor(object):
         contents = [item]
         if isinstance(item, dict) and self._CONDITIONAL_IF in item:
             contents = item[self._CONDITIONAL_IF][1:]
-            contents = [content for content in contents if not is_intrinsic_no_value(content)]  # type: ignore[no-untyped-call]
+            contents = [content for content in contents if not is_intrinsic_no_value(content)]
         return contents
 
     def has_path(self, path, method=None):  # type: ignore[no-untyped-def]
@@ -215,7 +215,7 @@ class SwaggerEditor(object):
         # Wrap the integration_uri in a Condition if one exists on that function
         # This is necessary so CFN doesn't try to resolve the integration reference.
         if condition:
-            integration_uri = make_conditional(condition, integration_uri)  # type: ignore[no-untyped-call]
+            integration_uri = make_conditional(condition, integration_uri)
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
@@ -248,7 +248,7 @@ class SwaggerEditor(object):
 
             # If a condition is present, wrap all method contents up into the condition
             if condition:
-                path_item[method] = make_conditional(condition, path_item[method])  # type: ignore[no-untyped-call]
+                path_item[method] = make_conditional(condition, path_item[method])
 
     def add_state_machine_integration(  # type: ignore[no-untyped-def]
         self,
@@ -281,7 +281,7 @@ class SwaggerEditor(object):
         # Wrap the integration_uri in a Condition if one exists on that state machine
         # This is necessary so CFN doesn't try to resolve the integration reference.
         if condition:
-            integration_uri = make_conditional(condition, integration_uri)  # type: ignore[no-untyped-call]
+            integration_uri = make_conditional(condition, integration_uri)
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             # Responses
@@ -311,13 +311,13 @@ class SwaggerEditor(object):
 
             # If a condition is present, wrap all method contents up into the condition
             if condition:
-                path_item[method] = make_conditional(condition, path_item[method])  # type: ignore[no-untyped-call]
+                path_item[method] = make_conditional(condition, path_item[method])
 
     def make_path_conditional(self, path, condition):  # type: ignore[no-untyped-def]
         """
         Wrap entire API path definition in a CloudFormation if condition.
         """
-        self.paths[path] = make_conditional(condition, self.paths[path])  # type: ignore[no-untyped-call]
+        self.paths[path] = make_conditional(condition, self.paths[path])
 
     def _generate_integration_credentials(self, method_invoke_role=None, api_invoke_role=None):  # type: ignore[no-untyped-def]
         return self._get_invoke_role(method_invoke_role or api_invoke_role)  # type: ignore[no-untyped-call]
@@ -1106,7 +1106,7 @@ class SwaggerEditor(object):
             resource = (
                 Py27UniStr(resource) if isinstance(method, Py27UniStr) or isinstance(path, Py27UniStr) else resource
             )
-            resource = fnSub(resource, {"__Stage__": stage})  # type: ignore[no-untyped-call]
+            resource = fnSub(resource, {"__Stage__": stage})
             uri_list.extend([resource])
         return uri_list
 
@@ -1361,7 +1361,7 @@ class SwaggerEditor(object):
         skeleton["swagger"] = "2.0"
         skeleton["info"] = Py27Dict()
         skeleton["info"]["version"] = "1.0"
-        skeleton["info"]["title"] = ref("AWS::StackName")  # type: ignore[no-untyped-call]
+        skeleton["info"]["title"] = ref("AWS::StackName")
         skeleton["paths"] = Py27Dict()
         return skeleton
 

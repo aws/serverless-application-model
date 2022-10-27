@@ -32,8 +32,8 @@ class CognitoUserPool(Resource):
     }
 
     runtime_attrs = {
-        "name": lambda self: ref(self.logical_id),  # type: ignore[no-untyped-call]
-        "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),  # type: ignore[no-untyped-call]
-        "provider_name": lambda self: fnGetAtt(self.logical_id, "ProviderName"),  # type: ignore[no-untyped-call]
-        "provider_url": lambda self: fnGetAtt(self.logical_id, "ProviderURL"),  # type: ignore[no-untyped-call]
+        "name": lambda self: ref(self.logical_id),
+        "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),
+        "provider_name": lambda self: fnGetAtt(self.logical_id, "ProviderName"),
+        "provider_url": lambda self: fnGetAtt(self.logical_id, "ProviderURL"),
     }

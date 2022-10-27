@@ -19,6 +19,6 @@ class StepFunctionsStateMachine(Resource):
     }
 
     runtime_attrs = {
-        "arn": lambda self: ref(self.logical_id),  # type: ignore[no-untyped-call]
-        "name": lambda self: fnGetAtt(self.logical_id, "Name"),  # type: ignore[no-untyped-call]
+        "arn": lambda self: ref(self.logical_id),
+        "name": lambda self: fnGetAtt(self.logical_id, "Name"),
     }
