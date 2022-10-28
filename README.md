@@ -90,7 +90,9 @@ Run tests:
 make pr
  ```
 
-For further development instructions, see [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md). For contributing guidelines, see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+For further development instructions, see [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md).
+
+For contributing guidelines, see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Getting help
 
