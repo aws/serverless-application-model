@@ -54,7 +54,7 @@ class Template(object):
         }
 
         # Only "Ref" is supported
-        supported_intrinsics = {RefAction.intrinsic_name: RefAction()}  # type: ignore[no-untyped-call]
+        supported_intrinsics = {RefAction.intrinsic_name: RefAction()}
 
         resolver = IntrinsicsResolver(necessary_parameter_values, supported_intrinsics)  # type: ignore[no-untyped-call]
         definition_copy = copy.deepcopy(self.definition)

@@ -19,7 +19,7 @@ class DynamoDBTable(Resource):
     }
 
     runtime_attrs = {
-        "name": lambda self: ref(self.logical_id),  # type: ignore[no-untyped-call]
-        "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),  # type: ignore[no-untyped-call]
-        "stream_arn": lambda self: fnGetAtt(self.logical_id, "StreamArn"),  # type: ignore[no-untyped-call]
+        "name": lambda self: ref(self.logical_id),
+        "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),
+        "stream_arn": lambda self: fnGetAtt(self.logical_id, "StreamArn"),
     }

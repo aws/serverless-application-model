@@ -60,12 +60,12 @@ class DeploymentPreference(DeploymentPreferenceTuple):
             return DeploymentPreference(None, None, None, None, False, None, None, None)
 
         if "Type" not in deployment_preference_dict:
-            raise InvalidResourceException(logical_id, "'DeploymentPreference' is missing required Property 'Type'")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(logical_id, "'DeploymentPreference' is missing required Property 'Type'")
 
         deployment_type = deployment_preference_dict["Type"]
         hooks = deployment_preference_dict.get("Hooks", {})
         if not isinstance(hooks, dict):
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 logical_id, "'Hooks' property of 'DeploymentPreference' must be a dictionary"
             )
 

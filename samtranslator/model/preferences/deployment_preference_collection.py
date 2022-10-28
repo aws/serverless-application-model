@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
@@ -43,12 +45,12 @@ class DeploymentPreferenceCollection(object):
     resources.
     """
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         """
         This collection stores an internal dict of the deployment preferences for each function's
         deployment preference in the SAM Template.
         """
-        self._resource_preferences = {}
+        self._resource_preferences: Dict[str, Any] = {}
 
     def add(self, logical_id, deployment_preference_dict, condition=None):  # type: ignore[no-untyped-def]
         """
@@ -125,7 +127,7 @@ class DeploymentPreferenceCollection(object):
         return [logical_id for logical_id, preference in self._resource_preferences.items() if preference.enabled]
 
     def get_codedeploy_application(self):  # type: ignore[no-untyped-def]
-        codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)  # type: ignore[no-untyped-call]
+        codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         codedeploy_application_resource.ComputePlatform = "Lambda"
         if self.needs_resource_condition():  # type: ignore[no-untyped-call]
             conditions = self.get_all_deployment_conditions()  # type: ignore[no-untyped-call]
@@ -136,7 +138,7 @@ class DeploymentPreferenceCollection(object):
         return codedeploy_application_resource
 
     def get_codedeploy_iam_role(self):  # type: ignore[no-untyped-def]
-        iam_role = IAMRole(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID)  # type: ignore[no-untyped-call]
+        iam_role = IAMRole(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID)
         iam_role.AssumeRolePolicyDocument = {
             "Version": "2012-10-17",
             "Statement": [
@@ -180,9 +182,9 @@ class DeploymentPreferenceCollection(object):
         try:
             deployment_group.AlarmConfiguration = self._convert_alarms(deployment_preference.alarms)  # type: ignore[no-untyped-call]
         except ValueError as e:
-            raise InvalidResourceException(function_logical_id, str(e))  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(function_logical_id, str(e))
 
-        deployment_group.ApplicationName = ref(CODEDEPLOY_APPLICATION_LOGICAL_ID)  # type: ignore[no-untyped-call]
+        deployment_group.ApplicationName = ref(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         deployment_group.AutoRollbackConfiguration = {
             "Enabled": True,
             "Events": ["DEPLOYMENT_FAILURE", "DEPLOYMENT_STOP_ON_ALARM", "DEPLOYMENT_STOP_ON_REQUEST"],
@@ -194,7 +196,7 @@ class DeploymentPreferenceCollection(object):
 
         deployment_group.DeploymentStyle = {"DeploymentType": "BLUE_GREEN", "DeploymentOption": "WITH_TRAFFIC_CONTROL"}
 
-        deployment_group.ServiceRoleArn = fnGetAtt(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID, "Arn")  # type: ignore[no-untyped-call]
+        deployment_group.ServiceRoleArn = fnGetAtt(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID, "Arn")
         if deployment_preference.role:
             deployment_group.ServiceRoleArn = deployment_preference.role
 
@@ -225,13 +227,13 @@ class DeploymentPreferenceCollection(object):
         ValueError
             If Alarms is in the wrong format
         """
-        if not preference_alarms or is_intrinsic_no_value(preference_alarms):  # type: ignore[no-untyped-call]
+        if not preference_alarms or is_intrinsic_no_value(preference_alarms):
             return None
 
-        if is_intrinsic_if(preference_alarms):  # type: ignore[no-untyped-call]
+        if is_intrinsic_if(preference_alarms):
             processed_alarms = copy.deepcopy(preference_alarms)
             alarms_list = processed_alarms.get("Fn::If")
-            validate_intrinsic_if_items(alarms_list)  # type: ignore[no-untyped-call]
+            validate_intrinsic_if_items(alarms_list)
             alarms_list[1] = self._build_alarm_configuration(alarms_list[1])  # type: ignore[no-untyped-call]
             alarms_list[2] = self._build_alarm_configuration(alarms_list[2])  # type: ignore[no-untyped-call]
             return processed_alarms
@@ -260,7 +262,7 @@ class DeploymentPreferenceCollection(object):
         if not isinstance(alarms, list):
             raise ValueError("Alarms must be a list")
 
-        if len(alarms) == 0 or is_intrinsic_no_value(alarms[0]):  # type: ignore[no-untyped-call]
+        if len(alarms) == 0 or is_intrinsic_no_value(alarms[0]):
             return {}
 
         return {
@@ -273,21 +275,21 @@ class DeploymentPreferenceCollection(object):
             for i, v in enumerate(value):
                 value[i] = self._replace_deployment_types(v)  # type: ignore[no-untyped-call]
             return value
-        if is_intrinsic(value):  # type: ignore[no-untyped-call]
+        if is_intrinsic(value):
             for (k, v) in value.items():
                 value[k] = self._replace_deployment_types(v, k)  # type: ignore[no-untyped-call]
             return value
         if value in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
             if key == "Fn::Sub":  # Don't nest a "Sub" in a "Sub"
                 return ["CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value}]
-            return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value})  # type: ignore[no-untyped-call]
+            return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value})
         return value
 
     def update_policy(self, function_logical_id):  # type: ignore[no-untyped-def]
         deployment_preference = self.get(function_logical_id)  # type: ignore[no-untyped-call]
 
         return UpdatePolicy(
-            ref(CODEDEPLOY_APPLICATION_LOGICAL_ID),  # type: ignore[no-untyped-call]
+            ref(CODEDEPLOY_APPLICATION_LOGICAL_ID),
             self.deployment_group(function_logical_id).get_runtime_attr("name"),  # type: ignore[no-untyped-call]
             deployment_preference.pre_traffic_hook,
             deployment_preference.post_traffic_hook,

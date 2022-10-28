@@ -4,7 +4,7 @@ from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAt
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
 
 # All intrinsics are supported by default
-DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}  # type: ignore[no-untyped-call]
+DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}
 
 
 class IntrinsicsResolver(object):
@@ -20,8 +20,8 @@ class IntrinsicsResolver(object):
         if supported_intrinsics is None:
             supported_intrinsics = DEFAULT_SUPPORTED_INTRINSICS
         if parameters is None or not isinstance(parameters, dict):
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
-                [InvalidTemplateException("'Mappings' or 'Parameters' is either null or not a valid dictionary.")]  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
+                [InvalidTemplateException("'Mappings' or 'Parameters' is either null or not a valid dictionary.")]
             )
 
         if not isinstance(supported_intrinsics, dict) or not all(

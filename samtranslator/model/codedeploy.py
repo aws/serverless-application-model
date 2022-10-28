@@ -7,7 +7,7 @@ class CodeDeployApplication(Resource):
     resource_type = "AWS::CodeDeploy::Application"
     property_types = {"ComputePlatform": PropertyType(False, one_of(is_str(), is_type(dict)))}
 
-    runtime_attrs = {"name": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"name": lambda self: ref(self.logical_id)}
 
 
 class CodeDeployDeploymentGroup(Resource):
@@ -22,4 +22,4 @@ class CodeDeployDeploymentGroup(Resource):
         "TriggerConfigurations": PropertyType(False, is_type(list)),
     }
 
-    runtime_attrs = {"name": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"name": lambda self: ref(self.logical_id)}

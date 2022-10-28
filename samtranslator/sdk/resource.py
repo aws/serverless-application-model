@@ -15,7 +15,7 @@ class SamResource(object):
     type = None
     properties: Dict[str, Any] = {}  # TODO: Replace `Any` with something more specific
 
-    def __init__(self, resource_dict):  # type: ignore[no-untyped-def]
+    def __init__(self, resource_dict: Dict[str, Any]) -> None:
         """
         Initialize the object given the resource as a dictionary
 
@@ -43,20 +43,20 @@ class SamResource(object):
         if self.condition:
 
             if not is_str()(self.condition, should_raise=False):
-                raise InvalidDocumentException([InvalidTemplateException("Every Condition member must be a string.")])  # type: ignore[no-untyped-call, no-untyped-call]
+                raise InvalidDocumentException([InvalidTemplateException("Every Condition member must be a string.")])
 
         if self.deletion_policy:
 
             if not is_str()(self.deletion_policy, should_raise=False):
-                raise InvalidDocumentException(  # type: ignore[no-untyped-call]
-                    [InvalidTemplateException("Every DeletionPolicy member must be a string.")]  # type: ignore[no-untyped-call]
+                raise InvalidDocumentException(
+                    [InvalidTemplateException("Every DeletionPolicy member must be a string.")]
                 )
 
         if self.update_replace_policy:
 
             if not is_str()(self.update_replace_policy, should_raise=False):
-                raise InvalidDocumentException(  # type: ignore[no-untyped-call]
-                    [InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")]  # type: ignore[no-untyped-call]
+                raise InvalidDocumentException(
+                    [InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")]
                 )
 
         return SamResourceType.has_value(self.type)  # type: ignore[no-untyped-call]

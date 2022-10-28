@@ -7,12 +7,12 @@ class EventBridgeRuleUtils:
     def create_dead_letter_queue_with_policy(rule_logical_id, rule_arn, queue_logical_id=None, attributes=None):  # type: ignore[no-untyped-def]
         resources = []
 
-        queue = SQSQueue(queue_logical_id or rule_logical_id + "Queue", attributes=attributes)  # type: ignore[no-untyped-call]
+        queue = SQSQueue(queue_logical_id or rule_logical_id + "Queue", attributes=attributes)
         dlq_queue_arn = queue.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
         dlq_queue_url = queue.get_runtime_attr("queue_url")  # type: ignore[no-untyped-call]
 
         # grant necessary permission to Eventbridge Rule resource for sending messages to dead-letter queue
-        policy = SQSQueuePolicy(rule_logical_id + "QueuePolicy", attributes=attributes)  # type: ignore[no-untyped-call]
+        policy = SQSQueuePolicy(rule_logical_id + "QueuePolicy", attributes=attributes)
         policy.PolicyDocument = SQSQueuePolicies.eventbridge_dlq_send_message_resource_based_policy(  # type: ignore[no-untyped-call]
             rule_arn, dlq_queue_arn
         )
@@ -29,16 +29,16 @@ class EventBridgeRuleUtils:
         is_arn_defined = "Arn" in dead_letter_config
         is_type_defined = "Type" in dead_letter_config
         if is_arn_defined and is_type_defined:
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 source_logical_id, "You can either define 'Arn' or 'Type' property of DeadLetterConfig"
             )
         if is_type_defined and dead_letter_config.get("Type") not in supported_types:
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 source_logical_id,
                 "The only valid value for 'Type' property of DeadLetterConfig is 'SQS'",
             )
         if not is_arn_defined and not is_type_defined:
-            raise InvalidEventException(source_logical_id, "No 'Arn' or 'Type' property provided for DeadLetterConfig")  # type: ignore[no-untyped-call]
+            raise InvalidEventException(source_logical_id, "No 'Arn' or 'Type' property provided for DeadLetterConfig")
 
     @staticmethod
     def get_dlq_queue_arn_and_resources(cw_event_source, source_arn, attributes):  # type: ignore[no-untyped-def]
@@ -48,7 +48,7 @@ class EventBridgeRuleUtils:
             return dlq_queue_arn, []
         queue_logical_id = cw_event_source.DeadLetterConfig.get("QueueLogicalId")
         if queue_logical_id is not None and not isinstance(queue_logical_id, str):
-            raise InvalidEventException(  # type: ignore[no-untyped-call]
+            raise InvalidEventException(
                 cw_event_source.logical_id,
                 "QueueLogicalId must be a string",
             )

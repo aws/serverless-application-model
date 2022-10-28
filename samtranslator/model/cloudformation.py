@@ -14,4 +14,4 @@ class NestedStack(Resource):
         "TimeoutInMinutes": PropertyType(False, is_type(int)),
     }
 
-    runtime_attrs = {"stack_id": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"stack_id": lambda self: ref(self.logical_id)}

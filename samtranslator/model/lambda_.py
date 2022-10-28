@@ -30,7 +30,7 @@ class LambdaFunction(Resource):
         "EphemeralStorage": PropertyType(False, is_type(dict)),
     }
 
-    runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}  # type: ignore[no-untyped-call, no-untyped-call]
+    runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
 
 class LambdaVersion(Resource):
@@ -42,8 +42,8 @@ class LambdaVersion(Resource):
     }
 
     runtime_attrs = {
-        "arn": lambda self: ref(self.logical_id),  # type: ignore[no-untyped-call]
-        "version": lambda self: fnGetAtt(self.logical_id, "Version"),  # type: ignore[no-untyped-call]
+        "arn": lambda self: ref(self.logical_id),
+        "version": lambda self: fnGetAtt(self.logical_id, "Version"),
     }
 
 
@@ -57,7 +57,7 @@ class LambdaAlias(Resource):
         "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
     }
 
-    runtime_attrs = {"arn": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"arn": lambda self: ref(self.logical_id)}
 
 
 class LambdaEventSourceMapping(Resource):
@@ -85,7 +85,7 @@ class LambdaEventSourceMapping(Resource):
         "SelfManagedKafkaEventSourceConfig": PropertyType(False, is_type(dict)),
     }
 
-    runtime_attrs = {"name": lambda self: ref(self.logical_id)}  # type: ignore[no-untyped-call]
+    runtime_attrs = {"name": lambda self: ref(self.logical_id)}
 
 
 class LambdaPermission(Resource):
@@ -125,7 +125,7 @@ class LambdaLayerVersion(Resource):
         "LicenseInfo": PropertyType(False, is_str()),
     }
 
-    runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}  # type: ignore[no-untyped-call, no-untyped-call]
+    runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
 
 class LambdaUrl(Resource):
