@@ -13,12 +13,12 @@ To start using the SAM transform, add `AWS::Serverless-2016-10-31` to the [`Tran
 Benefits of using the SAM transform include:
 
 - Built-in best practices and sane defaults.
-- Extension of the CloudFormation template syntax.
 - Local testing and debugging with the [AWS SAM CLI](https://github.com/aws/aws-sam-cli).
+- Extension of the CloudFormation template syntax.
 
 ## Getting started
 
-To start building SAM-based applications, use the [AWS SAM CLI](https://github.com/aws/aws-sam-cli). It allows you to locally build, test, debug, and deploy applications defined by SAM templates.
+To start building SAM-based applications, use the [SAM CLI](https://github.com/aws/aws-sam-cli). It allows you to locally build, test, debug, and deploy applications defined by SAM templates.
 
 Save the following as `template.yaml`:
 
