@@ -8,11 +8,9 @@ The [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/) (
 
 The SAM transform is used in templates with `AWS::Serverless-2016-10-31` in their [`Transform` section](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html).
 
-For the `sam` command-line tool, see the [AWS SAM CLI](https://github.com/aws/aws-sam-cli).
-
 ## Getting started
 
-To start building SAM-based applications, use the [SAM CLI](https://github.com/aws/aws-sam-cli). It allows you to locally build, test, debug, and deploy applications defined by SAM templates.
+To start building SAM-based applications, use the [AWS SAM CLI](https://github.com/aws/aws-sam-cli). It allows you to locally build, test, debug, and deploy applications defined by SAM templates.
 
 Save the following as `template.yaml`:
 
