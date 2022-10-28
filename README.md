@@ -18,8 +18,6 @@ Benefits of using the SAM transform include:
 
 ## Getting started
 
-To start building SAM-based applications, use the [SAM CLI](https://github.com/aws/aws-sam-cli). It allows you to locally build, test, debug, and deploy applications defined by SAM templates.
-
 Save the following as `template.yaml`:
 
 ```yaml
@@ -36,7 +34,7 @@ Resources:
         }
 ```
 
-And deploy it:
+And deploy it with the [SAM CLI](https://github.com/aws/aws-sam-cli):
 
 ```bash
 sam deploy --guided
