@@ -36,7 +36,7 @@ And deploy it:
 sam deploy --guided
 ```
 
-At deployment, the template gets transformed into the following (prettified) CloudFormation template:
+Under the hood, the template gets transformed into the following (prettified) CloudFormation template:
 
 ```yaml
 Resources:
