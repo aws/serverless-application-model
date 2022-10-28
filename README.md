@@ -36,7 +36,7 @@ Resources:
 And deploy it with the [SAM CLI](https://github.com/aws/aws-sam-cli):
 
 ```bash
-sam deploy --guided
+sam sync --stack-name sam-app
 ```
 
 The [`AWS::Serverless::Function`](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html) resource will create a [AWS Lambda](https://aws.amazon.com/lambda/) function that logs [events](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-concepts.html#gettingstarted-concepts-event) it receives.
