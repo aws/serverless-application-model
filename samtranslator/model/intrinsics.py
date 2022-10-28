@@ -217,12 +217,12 @@ def get_logical_id_from_intrinsic(input: Any) -> Optional[str]:
     if isinstance(v, str):
         return v
 
-    # Fn::GetAtt [<logical-id>, <attribute>]
+    # Fn::GetAtt: [<logical-id>, <attribute>]
     v = input.get("Fn::GetAtt")
     if isinstance(v, list) and len(v) == 2 and isinstance(v[0], str):
         return v[0]
 
-    # Fn::GetAtt <logical-id>.<attribute>
+    # Fn::GetAtt: <logical-id>.<attribute>
     if isinstance(v, str):
         tokens = v.split(".")
         if len(tokens) == 2:
