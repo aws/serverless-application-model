@@ -10,9 +10,9 @@ The [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/) (
 
 To start using the SAM transform, add `AWS::Serverless-2016-10-31` to the [`Transform` section](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html) of your CloudFormation template.
 
-- Local testing and debugging with the [AWS SAM CLI](https://github.com/aws/aws-sam-cli).
 - Built-in best practices and sane defaults.
 - Extension of the CloudFormation template syntax.
+- Local testing and debugging with the [AWS SAM CLI](https://github.com/aws/aws-sam-cli).
 
 ## Getting started
 
