@@ -89,10 +89,8 @@ Run tests:
 ```bash
 make pr
  ```
-
-For further development instructions, see [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md).
-
-For contributing guidelines, see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+ 
+See [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md) for further instructions, and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contributing guidelines.
 
 ## Getting help
 
