@@ -10,9 +10,11 @@ The SAM transform is used in templates with `AWS::Serverless-2016-10-31` in thei
 
 For the `sam` command-line tool, see the [AWS SAM CLI](https://github.com/aws/aws-sam-cli).
 
-## Example
+## Getting started
 
-Consider the following SAM template:
+To start building SAM-based applications, use the [SAM CLI](https://github.com/aws/aws-sam-cli). It allows you to locally build, test, debug, and deploy applications defined by SAM templates.
+
+Save the following as `template.yaml`:
 
 ```yaml
 Transform: AWS::Serverless-2016-10-31
@@ -28,7 +30,13 @@ Resources:
         }
 ```
 
-Before deployment, it gets transformed into the following (prettified) CloudFormation template:
+Deploy it:
+
+```bash
+sam deploy --guided
+```
+
+At deployment, the template gets transformed into the following (prettified) CloudFormation template:
 
 ```yaml
 Resources:
