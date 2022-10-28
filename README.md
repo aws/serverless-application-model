@@ -10,7 +10,7 @@ The SAM transform is used in templates with `AWS::Serverless-2016-10-31` in thei
 
 ## Getting started
 
-For a thorough introduction, see the ["Hello, World!" tutorial](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-hello-world.html).
+For a thorough introduction, see the [this tutorial](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-hello-world.html).
 
 To start building SAM-based applications, use the [AWS SAM CLI](https://github.com/aws/aws-sam-cli). It allows you to locally build, test, debug, and deploy applications defined by SAM templates.
 
