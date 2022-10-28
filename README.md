@@ -105,7 +105,3 @@ You can also join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers
 - [SAM template specification](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html)
 - [SAM connectors](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/managing-permissions-connectors.html)
 - [SAM policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html)
-
-## License
-
-This project is licensed under the [Apache-2.0 License](LICENSE).
