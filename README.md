@@ -28,7 +28,7 @@ Resources:
         }
 ```
 
-It defines a [`AWS::Serverless::Function`](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html) resource which creates a [AWS Lambda](https://aws.amazon.com/lambda/) function that logs any [events](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-concepts.html#gettingstarted-concepts-event) it receives.
+It defines a [`AWS::Serverless::Function`](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html) resource which will create a [AWS Lambda](https://aws.amazon.com/lambda/) function that logs any [events](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-concepts.html#gettingstarted-concepts-event) it receives.
 
 And deploy it:
 
