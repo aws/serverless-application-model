@@ -8,7 +8,7 @@ Resources:
         States:
           TryDoSomething:
             Type: Task
-            Resource: arn:aws:states:::states:startExecution.sync:2
+            Resource: !Sub arn:${AWS::Partition}:states:::states:startExecution.sync:2
             Parameters:
               StateMachineArn: !Ref MyStateMachine
             End: True
@@ -39,3 +39,59 @@ Resources:
       Permissions:
         - Read
         - Write
+
+  StateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: [ 'sts:AssumeRole' ]
+            Effect: Allow
+            Principal:
+              Service: [ states.amazonaws.com ]
+
+  TriggerStateMachineWithoutRole:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: TriggerStateMachineWithoutRole
+      Role: !GetAtt StateMachineRole.Arn
+      Definition:
+        StartAt: Success
+        States:
+          Success:
+            Type: Succeed
+
+  TriggerStateMachineWithoutRole2:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: TriggerStateMachineWithoutRole
+      Role:
+        Fn::GetAtt: StateMachineRole.Arn
+      Definition:
+        StartAt: Success
+        States:
+          Success:
+            Type: Succeed
+
+  MyConnectorProvidingRole1:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerStateMachineWithoutRole
+      Destination:
+        Id: MyStateMachine
+      Permissions:
+        - Write
+        - Read
+
+  MyConnectorProvidingRole2:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerStateMachineWithoutRole2
+      Destination:
+        Id: MyStateMachine
+      Permissions:
+        - Write
+        - Read

@@ -86,6 +86,7 @@ class TestIntrinsics(TestCase):
     @parameterized.expand(
         [
             ({"Fn::GetAtt": ["Foo", "Bar"]}, "Foo"),
+            ({"Fn::GetAtt": "Foo.Bar"}, "Foo"),
             ({"Ref": "Foo"}, "Foo"),
         ]
     )
@@ -95,12 +96,13 @@ class TestIntrinsics(TestCase):
     @parameterized.expand(
         [
             (None,),
-            ("Foo"),
+            ("Foo",),
             ({"Ref": True}),
             ({"Fn::GetAtt": "Foo"}),
             ({"Fn::GetAtt": ["Foo"]}),
             ({"Fn::GetAtt": [42, "Arn"]}),
             ({"Fn::If": ["Foo", "Bar"]}),
+            ({"Fn::GetAtt": "Foo.Bar.WhatEverThisIs"},),
         ]
     )
     def test_get_logical_id_from_intrinsic_error(self, input):
