@@ -28,15 +28,15 @@ Resources:
         }
 ```
 
-It defines a [`AWS::Serverless::Function`](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html) resource which will create a [AWS Lambda](https://aws.amazon.com/lambda/) function that logs any [events](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-concepts.html#gettingstarted-concepts-event) it receives.
-
-Deploy the template:
+And deploy it:
 
 ```bash
 sam deploy --guided
 ```
 
-Under the hood, the template gets transformed into the following (prettified) CloudFormation template:
+The [`AWS::Serverless::Function`](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html) resource will create a basic [AWS Lambda](https://aws.amazon.com/lambda/) function.
+
+Under the hood, the template is transformed into the following (prettified) CloudFormation template:
 
 ```yaml
 Resources:
