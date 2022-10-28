@@ -12,7 +12,7 @@ For the `sam` command-line tool, see the [AWS SAM CLI](https://github.com/aws/aw
 
 ## Example
 
-Deploying the following template creates a [AWS Lambda](https://aws.amazon.com/lambda/) function that prints out any [events](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-concepts.html#gettingstarted-concepts-event) it receives:
+Consider the following SAM template:
 
 ```yaml
 Transform: AWS::Serverless-2016-10-31
@@ -28,69 +28,42 @@ Resources:
         }
 ```
 
-<details>
-  <summary>Transformed CloudFormation template</summary>
+Before deployment, it gets transformed into the following (prettified) CloudFormation template:
 
-```json
-{
-  "Resources": {
-    "MyFunction": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async (event) => {\n  console.log(event);\n}\n"
-        },
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "MyFunctionRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs16.x",
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
+```yaml
+Resources:
+  MyFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            console.log(event);
           }
-        ]
-      }
-    },
-    "MyFunctionRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    }
-  }
-}
+      Handler: index.handler
+      Role: !GetAtt MyFunctionRole.Arn
+      Runtime: nodejs16.x
+      Tags:
+        - Key: lambda:createdBy
+          Value: SAM
+  MyFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: lambda:createdBy
+          Value: SAM
 ```
-
-</details>
 
 ## Contributing
 
