@@ -1,5 +1,6 @@
 import logging
 from collections import namedtuple
+from typing import List, Optional, Set
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
@@ -65,17 +66,17 @@ class SharedApiUsagePlan(object):
 
     SHARED_USAGE_PLAN_CONDITION_NAME = "SharedUsagePlanCondition"
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         self.usage_plan_shared = False
-        self.stage_keys_shared = []
-        self.api_stages_shared = []
-        self.depends_on_shared = []
+        self.stage_keys_shared: List[str] = []
+        self.api_stages_shared: List[str] = []
+        self.depends_on_shared: List[str] = []
 
         # shared resource level attributes
-        self.conditions = set()
+        self.conditions: Set[str] = set()
         self.any_api_without_condition = False
-        self.deletion_policy = None
-        self.update_replace_policy = None
+        self.deletion_policy: Optional[str] = None
+        self.update_replace_policy: Optional[str] = None
 
     def get_combined_resource_attributes(self, resource_attributes, conditions):  # type: ignore[no-untyped-def]
         """
@@ -133,13 +134,13 @@ class SharedApiUsagePlan(object):
         if condition and condition not in self.conditions:
 
             if template_conditions is None:
-                raise InvalidTemplateException(  # type: ignore[no-untyped-call]
+                raise InvalidTemplateException(
                     "Can't have condition without having 'Conditions' section in the template"
                 )
 
             if self.conditions:
                 self.conditions.add(condition)
-                or_condition = make_or_condition(self.conditions)  # type: ignore[no-untyped-call]
+                or_condition = make_or_condition(self.conditions)
                 template_conditions[SharedApiUsagePlan.SHARED_USAGE_PLAN_CONDITION_NAME] = or_condition
             else:
                 self.conditions.add(condition)
@@ -246,7 +247,7 @@ class ApiGenerator(object):
         :returns: the RestApi to which this SAM Api corresponds
         :rtype: model.apigateway.ApiGatewayRestApi
         """
-        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)  # type: ignore[no-untyped-call]
+        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         # NOTE: For backwards compatibility we need to retain BinaryMediaTypes on the CloudFormation Property
         # Removing this and only setting x-amazon-apigateway-binary-media-types results in other issues.
         rest_api.BinaryMediaTypes = self.binary_media
@@ -261,7 +262,7 @@ class ApiGenerator(object):
             self._set_endpoint_configuration(rest_api, "REGIONAL")  # type: ignore[no-untyped-call]
 
         if self.definition_uri and self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
             )
 
@@ -269,7 +270,7 @@ class ApiGenerator(object):
             if not SwaggerEditor.safe_compare_regex_with_string(
                 SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
             ):
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'."
                 )
 
@@ -315,7 +316,7 @@ class ApiGenerator(object):
         For this reason, we always put DisableExecuteApiEndpoint into openapi object irrespective of origin of DefinitionBody.
         """
         if self.disable_execute_api_endpoint is not None and not self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
         editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
@@ -331,7 +332,7 @@ class ApiGenerator(object):
         if isinstance(self.definition_uri, dict):
             if not self.definition_uri.get("Bucket", None) or not self.definition_uri.get("Key", None):
                 # DefinitionUri is a dictionary but does not contain Bucket or Key property
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id, "'DefinitionUri' requires Bucket and Key properties to be specified."
                 )
             s3_pointer = self.definition_uri
@@ -370,7 +371,7 @@ class ApiGenerator(object):
         :returns: the Deployment to which this SAM Api corresponds
         :rtype: model.apigateway.ApiGatewayDeployment
         """
-        deployment = ApiGatewayDeployment(  # type: ignore[no-untyped-call]
+        deployment = ApiGatewayDeployment(
             self.logical_id + "Deployment", attributes=self.passthrough_resource_attributes
         )
         deployment.RestApiId = rest_api.get_runtime_attr("rest_api_id")
@@ -395,8 +396,8 @@ class ApiGenerator(object):
         else:
             generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)  # type: ignore[no-untyped-call]
             stage_logical_id = generator.gen()  # type: ignore[no-untyped-call]
-        stage = ApiGatewayStage(stage_logical_id, attributes=self.passthrough_resource_attributes)  # type: ignore[no-untyped-call]
-        stage.RestApiId = ref(self.logical_id)  # type: ignore[no-untyped-call]
+        stage = ApiGatewayStage(stage_logical_id, attributes=self.passthrough_resource_attributes)
+        stage.RestApiId = ref(self.logical_id)
         stage.update_deployment_ref(deployment.logical_id)  # type: ignore[no-untyped-call]
         stage.StageName = self.stage_name
         stage.CacheClusterEnabled = self.cache_cluster_enabled
@@ -426,7 +427,7 @@ class ApiGenerator(object):
             return None, None, None
 
         if self.domain.get("DomainName") is None or self.domain.get("CertificateArn") is None:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Custom Domains only works if both DomainName and CertificateArn are provided."
             )
 
@@ -434,7 +435,7 @@ class ApiGenerator(object):
             "ApiGatewayDomainName", LogicalIdGenerator("", self.domain.get("DomainName")).gen()  # type: ignore[no-untyped-call, no-untyped-call]
         )
 
-        domain = ApiGatewayDomainName(self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes)  # type: ignore[no-untyped-call]
+        domain = ApiGatewayDomainName(self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes)
         domain.DomainName = self.domain.get("DomainName")
         endpoint = self.domain.get("EndpointConfiguration")
 
@@ -442,7 +443,7 @@ class ApiGenerator(object):
             endpoint = "REGIONAL"
             self.domain["EndpointConfiguration"] = "REGIONAL"
         elif endpoint not in ["EDGE", "REGIONAL", "PRIVATE"]:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "EndpointConfiguration for Custom Domains must be"
                 " one of {}.".format(["EDGE", "REGIONAL", "PRIVATE"]),
@@ -464,7 +465,7 @@ class ApiGenerator(object):
                         if not key in {"TruststoreUri", "TruststoreVersion"}:
                             invalid_keys.append(key)
                     invalid_keys.sort()
-                    raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                    raise InvalidResourceException(
                         ",".join(invalid_keys),
                         "Available MutualTlsAuthentication fields are {}.".format(
                             ["TruststoreUri", "TruststoreVersion"]
@@ -476,7 +477,7 @@ class ApiGenerator(object):
                 if mutual_tls_auth.get("TruststoreVersion", None):
                     domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]  # type: ignore[attr-defined]
             else:
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     mutual_tls_auth,
                     "MutualTlsAuthentication must be a map with at least one of the following fields {}.".format(
                         ["TruststoreUri", "TruststoreVersion"]
@@ -500,23 +501,23 @@ class ApiGenerator(object):
         basepath_resource_list = []
 
         if basepaths is None:
-            basepath_mapping = ApiGatewayBasePathMapping(  # type: ignore[no-untyped-call]
+            basepath_mapping = ApiGatewayBasePathMapping(
                 self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
             )
-            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))  # type: ignore[no-untyped-call]
-            basepath_mapping.RestApiId = ref(rest_api.logical_id)  # type: ignore[no-untyped-call]
-            basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")  # type: ignore[no-untyped-call]
+            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+            basepath_mapping.RestApiId = ref(rest_api.logical_id)
+            basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
             basepath_resource_list.extend([basepath_mapping])
         else:
             for path in basepaths:
                 path = "".join(e for e in path if e.isalnum())
                 logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
-                basepath_mapping = ApiGatewayBasePathMapping(  # type: ignore[no-untyped-call]
+                basepath_mapping = ApiGatewayBasePathMapping(
                     logical_id, attributes=self.passthrough_resource_attributes
                 )
-                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))  # type: ignore[no-untyped-call]
-                basepath_mapping.RestApiId = ref(rest_api.logical_id)  # type: ignore[no-untyped-call]
-                basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")  # type: ignore[no-untyped-call]
+                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+                basepath_mapping.RestApiId = ref(rest_api.logical_id)
+                basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
                 basepath_mapping.BasePath = path
                 basepath_resource_list.extend([basepath_mapping])
 
@@ -525,13 +526,13 @@ class ApiGenerator(object):
         if self.domain.get("Route53") is not None:
             route53 = self.domain.get("Route53")
             if not isinstance(route53, dict):
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id,
                     "Invalid property type '{}' for Route53. "
                     "Expected a map defines an Amazon Route 53 configuration'.".format(type(route53).__name__),
                 )
             if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id,
                     "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
                 )
@@ -543,7 +544,7 @@ class ApiGenerator(object):
 
             record_set_group = route53_record_set_groups.get(logical_id)
             if not record_set_group:
-                record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)  # type: ignore[no-untyped-call]
+                record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
                 if "HostedZoneId" in route53:
                     record_set_group.HostedZoneId = route53.get("HostedZoneId")
                 if "HostedZoneName" in route53:
@@ -583,11 +584,11 @@ class ApiGenerator(object):
         if target_health is not None:
             alias_target["EvaluateTargetHealth"] = target_health
         if domain.get("EndpointConfiguration") == "REGIONAL":
-            alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")  # type: ignore[no-untyped-call]
-            alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")  # type: ignore[no-untyped-call]
+            alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")
+            alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")
         else:
             if route53.get("DistributionDomainName") is None:
-                route53["DistributionDomainName"] = fnGetAtt(self.domain.get("ApiDomainName"), "DistributionDomainName")  # type: ignore[no-untyped-call]
+                route53["DistributionDomainName"] = fnGetAtt(self.domain.get("ApiDomainName"), "DistributionDomainName")
             alias_target["HostedZoneId"] = "Z2FDTNDATAQYW2"
             alias_target["DNSName"] = route53.get("DistributionDomainName")
         return alias_target
@@ -626,33 +627,33 @@ class ApiGenerator(object):
             return
 
         if self.cors and not self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Cors works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
-        if isinstance(self.cors, str) or is_intrinsic(self.cors):  # type: ignore[no-untyped-call]
+        if isinstance(self.cors, str) or is_intrinsic(self.cors):
             # Just set Origin property. Others will be defaults
             properties = CorsProperties(AllowOrigin=self.cors)  # type: ignore[call-arg]
         elif isinstance(self.cors, dict):
 
             # Make sure keys in the dict are recognized
             if not all(key in CorsProperties._fields for key in self.cors.keys()):
-                raise InvalidResourceException(self.logical_id, INVALID_ERROR)  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(self.logical_id, INVALID_ERROR)
 
             properties = CorsProperties(**self.cors)
 
         else:
-            raise InvalidResourceException(self.logical_id, INVALID_ERROR)  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, INVALID_ERROR)
 
         if not SwaggerEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Cors configuration because "
                 "'DefinitionBody' does not contain a valid Swagger definition.",
             )
 
         if properties.AllowCredentials is True and properties.AllowOrigin == _CORS_WILDCARD:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Cors configuration because "
                 "'AllowCredentials' can not be true when "
@@ -671,7 +672,7 @@ class ApiGenerator(object):
                     allow_credentials=properties.AllowCredentials,
                 )
             except InvalidTemplateException as ex:
-                raise InvalidResourceException(self.logical_id, ex.message)  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(self.logical_id, ex.message)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
@@ -703,16 +704,16 @@ class ApiGenerator(object):
             return
 
         if self.auth and not self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Auth works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
         # Make sure keys in the dict are recognized
         if not all(key in AuthProperties._fields for key in self.auth.keys()):
-            raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
 
         if not SwaggerEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Auth configuration because "
                 "'DefinitionBody' does not contain a valid Swagger definition.",
@@ -763,10 +764,10 @@ class ApiGenerator(object):
         usage_plan_properties = auth_properties.UsagePlan
         # throws error if UsagePlan is not a dict
         if not isinstance(usage_plan_properties, dict):
-            raise InvalidResourceException(self.logical_id, "'UsagePlan' must be a dictionary")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, "'UsagePlan' must be a dictionary")
         # throws error if the property invalid/ unsupported for UsagePlan
         if not all(key in UsagePlanProperties._fields for key in usage_plan_properties.keys()):
-            raise InvalidResourceException(self.logical_id, "Invalid property for 'UsagePlan'")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, "Invalid property for 'UsagePlan'")
 
         create_usage_plan = usage_plan_properties.get("CreateUsagePlan")
         usage_plan = None
@@ -774,9 +775,9 @@ class ApiGenerator(object):
         usage_plan_key = None
 
         if create_usage_plan is None:
-            raise InvalidResourceException(self.logical_id, "'CreateUsagePlan' is a required field for UsagePlan.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, "'CreateUsagePlan' is a required field for UsagePlan.")
         if create_usage_plan not in create_usage_plans_accepted_values:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "'CreateUsagePlan' accepts one of {}.".format(create_usage_plans_accepted_values)
             )
 
@@ -786,15 +787,15 @@ class ApiGenerator(object):
         # create usage plan for this api only
         if usage_plan_properties.get("CreateUsagePlan") == "PER_API":
             usage_plan_logical_id = self.logical_id + "UsagePlan"
-            usage_plan = ApiGatewayUsagePlan(  # type: ignore[no-untyped-call]
+            usage_plan = ApiGatewayUsagePlan(
                 logical_id=usage_plan_logical_id,
                 depends_on=[self.logical_id],
                 attributes=self.passthrough_resource_attributes,
             )
             api_stages = []
             api_stage = {}
-            api_stage["ApiId"] = ref(self.logical_id)  # type: ignore[no-untyped-call]
-            api_stage["Stage"] = ref(rest_api_stage.logical_id)  # type: ignore[no-untyped-call]
+            api_stage["ApiId"] = ref(self.logical_id)
+            api_stage["Stage"] = ref(rest_api_stage.logical_id)
             api_stages.append(api_stage)
             usage_plan.ApiStages = api_stages
 
@@ -807,7 +808,7 @@ class ApiGenerator(object):
             usage_plan_logical_id = "ServerlessUsagePlan"
             if self.logical_id not in self.shared_api_usage_plan.depends_on_shared:
                 self.shared_api_usage_plan.depends_on_shared.append(self.logical_id)
-            usage_plan = ApiGatewayUsagePlan(  # type: ignore[no-untyped-call]
+            usage_plan = ApiGatewayUsagePlan(
                 logical_id=usage_plan_logical_id,
                 depends_on=self.shared_api_usage_plan.depends_on_shared,
                 attributes=self.shared_api_usage_plan.get_combined_resource_attributes(
@@ -815,8 +816,8 @@ class ApiGenerator(object):
                 ),
             )
             api_stage = {}
-            api_stage["ApiId"] = ref(self.logical_id)  # type: ignore[no-untyped-call]
-            api_stage["Stage"] = ref(rest_api_stage.logical_id)  # type: ignore[no-untyped-call]
+            api_stage["ApiId"] = ref(self.logical_id)
+            api_stage["Stage"] = ref(rest_api_stage.logical_id)
             if api_stage not in self.shared_api_usage_plan.api_stages_shared:
                 self.shared_api_usage_plan.api_stages_shared.append(api_stage)
             usage_plan.ApiStages = self.shared_api_usage_plan.api_stages_shared
@@ -847,7 +848,7 @@ class ApiGenerator(object):
             # create an api key resource for all the apis
             LOG.info("Creating api key resource for all the Apis from SHARED usage plan")
             api_key_logical_id = "ServerlessApiKey"
-            api_key = ApiGatewayApiKey(  # type: ignore[no-untyped-call]
+            api_key = ApiGatewayApiKey(
                 logical_id=api_key_logical_id,
                 depends_on=[usage_plan_logical_id],
                 attributes=self.shared_api_usage_plan.get_combined_resource_attributes(
@@ -856,8 +857,8 @@ class ApiGenerator(object):
             )
             api_key.Enabled = True
             stage_key = {}
-            stage_key["RestApiId"] = ref(self.logical_id)  # type: ignore[no-untyped-call]
-            stage_key["StageName"] = ref(rest_api_stage.logical_id)  # type: ignore[no-untyped-call]
+            stage_key["RestApiId"] = ref(self.logical_id)
+            stage_key["StageName"] = ref(rest_api_stage.logical_id)
             if stage_key not in self.shared_api_usage_plan.stage_keys_shared:
                 self.shared_api_usage_plan.stage_keys_shared.append(stage_key)
             api_key.StageKeys = self.shared_api_usage_plan.stage_keys_shared
@@ -865,7 +866,7 @@ class ApiGenerator(object):
         else:
             # create an api key resource for this api
             api_key_logical_id = self.logical_id + "ApiKey"
-            api_key = ApiGatewayApiKey(  # type: ignore[no-untyped-call]
+            api_key = ApiGatewayApiKey(
                 logical_id=api_key_logical_id,
                 depends_on=[usage_plan_logical_id],
                 attributes=self.passthrough_resource_attributes,
@@ -873,8 +874,8 @@ class ApiGenerator(object):
             api_key.Enabled = True
             stage_keys = []
             stage_key = {}
-            stage_key["RestApiId"] = ref(self.logical_id)  # type: ignore[no-untyped-call]
-            stage_key["StageName"] = ref(rest_api_stage.logical_id)  # type: ignore[no-untyped-call]
+            stage_key["RestApiId"] = ref(self.logical_id)
+            stage_key["StageName"] = ref(rest_api_stage.logical_id)
             stage_keys.append(stage_key)
             api_key.StageKeys = stage_keys
         return api_key
@@ -898,14 +899,14 @@ class ApiGenerator(object):
             usage_plan_key_logical_id = self.logical_id + "UsagePlanKey"
             resource_attributes = self.passthrough_resource_attributes
 
-        usage_plan_key = ApiGatewayUsagePlanKey(  # type: ignore[no-untyped-call]
+        usage_plan_key = ApiGatewayUsagePlanKey(
             logical_id=usage_plan_key_logical_id,
             depends_on=[api_key.logical_id],
             attributes=resource_attributes,
         )
-        usage_plan_key.KeyId = ref(api_key.logical_id)  # type: ignore[no-untyped-call]
+        usage_plan_key.KeyId = ref(api_key.logical_id)
         usage_plan_key.KeyType = "API_KEY"
-        usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)  # type: ignore[no-untyped-call]
+        usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)
 
         return usage_plan_key
 
@@ -918,29 +919,29 @@ class ApiGenerator(object):
             return
 
         if self.gateway_responses and not self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "GatewayResponses works only with inline Swagger specified in 'DefinitionBody' property.",
             )
 
         # Make sure keys in the dict are recognized
         for responses_key, responses_value in self.gateway_responses.items():
-            if is_intrinsic(responses_value):  # type: ignore[no-untyped-call]
+            if is_intrinsic(responses_value):
                 # TODO: Add intrinsic support for this field.
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id,
                     "Unable to set GatewayResponses attribute because "
                     "intrinsic functions are not supported for this field.",
                 )
             if not isinstance(responses_value, dict):
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id,
                     "Invalid property type '{}' for GatewayResponses. "
                     "Expected an object of type 'GatewayResponse'.".format(type(responses_value).__name__),
                 )
             for response_key in responses_value.keys():
                 if response_key not in GatewayResponseProperties:
-                    raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                    raise InvalidResourceException(
                         self.logical_id,
                         "Invalid property '{}' in 'GatewayResponses' property '{}'.".format(
                             response_key, responses_key
@@ -948,7 +949,7 @@ class ApiGenerator(object):
                     )
 
         if not SwaggerEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Auth configuration because "
                 "'DefinitionBody' does not contain a valid Swagger definition.",
@@ -959,7 +960,7 @@ class ApiGenerator(object):
         # The dicts below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
         gateway_responses = Py27Dict()
         for response_type, response in self.gateway_responses.items():
-            gateway_responses[response_type] = ApiGatewayResponse(  # type: ignore[no-untyped-call]
+            gateway_responses[response_type] = ApiGatewayResponse(
                 api_logical_id=self.logical_id,
                 response_parameters=response.get("ResponseParameters", Py27Dict()),
                 response_templates=response.get("ResponseTemplates", Py27Dict()),
@@ -982,19 +983,19 @@ class ApiGenerator(object):
             return
 
         if self.models and not self.definition_body:
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id, "Models works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
         if not SwaggerEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Models definitions because "
                 "'DefinitionBody' does not contain a valid Swagger definition.",
             )
 
         if not all(isinstance(model, dict) for model in self.models.values()):
-            raise InvalidResourceException(self.logical_id, "Invalid value for 'Models' property")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, "Invalid value for 'Models' property")
 
         swagger_editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
         swagger_editor.add_models(self.models)  # type: ignore[no-untyped-call]
@@ -1077,11 +1078,11 @@ class ApiGenerator(object):
             return None
 
         if not isinstance(authorizers_config, dict):
-            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")
 
         for authorizer_name, authorizer in authorizers_config.items():
             if not isinstance(authorizer, dict):
-                raise InvalidResourceException(  # type: ignore[no-untyped-call]
+                raise InvalidResourceException(
                     self.logical_id, "Authorizer %s must be a dictionary." % (authorizer_name)
                 )
 
@@ -1103,17 +1104,17 @@ class ApiGenerator(object):
         :returns: the permission resource
         :rtype: model.lambda_.LambdaPermission
         """
-        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)  # type: ignore[no-untyped-call]
+        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         api_id = rest_api.get_runtime_attr("rest_api_id")  # type: ignore[no-untyped-call]
 
         partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
         resource = "${__ApiId__}/authorizers/*"
-        source_arn = fnSub(  # type: ignore[no-untyped-call]
+        source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
             {"__ApiId__": api_id},
         )
 
-        lambda_permission = LambdaPermission(  # type: ignore[no-untyped-call]
+        lambda_permission = LambdaPermission(
             self.logical_id + authorizer_name + "AuthorizerPermission", attributes=self.passthrough_resource_attributes
         )
         lambda_permission.Action = "lambda:InvokeFunction"
@@ -1152,13 +1153,13 @@ class ApiGenerator(object):
             return
 
         if not isinstance(default_authorizer, str):
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "DefaultAuthorizer is not a string.",
             )
 
         if not authorizers.get(default_authorizer) and default_authorizer != "AWS_IAM":
-            raise InvalidResourceException(  # type: ignore[no-untyped-call]
+            raise InvalidResourceException(
                 self.logical_id,
                 "Unable to set DefaultAuthorizer because '"
                 + default_authorizer

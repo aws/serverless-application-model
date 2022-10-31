@@ -1,7 +1,8 @@
 ﻿from typing import Dict, List
 
-from samtranslator.public.sdk.resource import SamResourceType  # type: ignore[attr-defined]
-from samtranslator.public.intrinsics import is_intrinsics  # type: ignore[attr-defined]
+from samtranslator.model.exceptions import ExceptionWithMessage
+from samtranslator.public.sdk.resource import SamResourceType
+from samtranslator.public.intrinsics import is_intrinsics
 from samtranslator.swagger.swagger import SwaggerEditor
 
 
@@ -458,8 +459,8 @@ class GlobalProperties(object):
         LIST = "list"
 
 
-class InvalidGlobalsSectionException(Exception):
-    """Exception raised when a Globals section is is invalid.
+class InvalidGlobalsSectionException(ExceptionWithMessage):
+    """Exception raised when a Globals section is invalid.
 
     Attributes:
         message -- explanation of the error

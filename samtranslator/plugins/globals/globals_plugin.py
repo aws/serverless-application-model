@@ -1,19 +1,19 @@
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.public.sdk.template import SamTemplate  # type: ignore[attr-defined]
-from samtranslator.public.plugins import BasePlugin  # type: ignore[attr-defined]
-from samtranslator.public.exceptions import InvalidDocumentException  # type: ignore[attr-defined]
+from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.public.plugins import BasePlugin
+from samtranslator.public.exceptions import InvalidDocumentException
 
 from samtranslator.plugins.globals.globals import Globals, InvalidGlobalsSectionException
 
 _API_RESOURCE = "AWS::Serverless::Api"
 
 
-class GlobalsPlugin(BasePlugin):  # type: ignore[misc]
+class GlobalsPlugin(BasePlugin):
     """
     Plugin to process Globals section of a SAM template before the template is translated to CloudFormation.
     """
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         """
         Initialize the plugin
         """

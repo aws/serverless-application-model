@@ -123,11 +123,11 @@ class Translator:
         # can see the transformed resources.
         resource_resolver = ResourceResolver(template.get("Resources", {}))
         mappings_resolver = IntrinsicsResolver(  # type: ignore[no-untyped-call]
-            template.get("Mappings", {}), {FindInMapAction.intrinsic_name: FindInMapAction()}  # type: ignore[no-untyped-call]
+            template.get("Mappings", {}), {FindInMapAction.intrinsic_name: FindInMapAction()}
         )
-        deployment_preference_collection = DeploymentPreferenceCollection()  # type: ignore[no-untyped-call]
-        supported_resource_refs = SupportedResourceReferences()  # type: ignore[no-untyped-call]
-        shared_api_usage_plan = SharedApiUsagePlan()  # type: ignore[no-untyped-call]
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        supported_resource_refs = SupportedResourceReferences()
+        shared_api_usage_plan = SharedApiUsagePlan()
         document_errors = []
         changed_logical_ids = {}
         route53_record_set_groups = {}  # type: ignore[var-annotated]
@@ -208,7 +208,7 @@ class Translator:
             template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)  # type: ignore[no-untyped-call]
             template = intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)  # type: ignore[no-untyped-call]
             return template
-        raise InvalidDocumentException(document_errors)  # type: ignore[no-untyped-call]
+        raise InvalidDocumentException(document_errors)
 
     # private methods
     def _get_resources_to_iterate(self, sam_template, macro_resolver):  # type: ignore[no-untyped-def]
@@ -270,10 +270,10 @@ def prepare_plugins(plugins, parameters=None):  # type: ignore[no-untyped-def]
     if parameters is None:
         parameters = {}
     required_plugins = [
-        DefaultDefinitionBodyPlugin(),  # type: ignore[no-untyped-call]
+        DefaultDefinitionBodyPlugin(),
         make_implicit_rest_api_plugin(),  # type: ignore[no-untyped-call]
         make_implicit_http_api_plugin(),  # type: ignore[no-untyped-call]
-        GlobalsPlugin(),  # type: ignore[no-untyped-call]
+        GlobalsPlugin(),
         make_policy_template_for_function_plugin(),  # type: ignore[no-untyped-call]
     ]
 
@@ -292,14 +292,14 @@ def make_implicit_rest_api_plugin():  # type: ignore[no-untyped-def]
     # This is necessary to prevent a circular dependency on imports when loading package
     from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin
 
-    return ImplicitRestApiPlugin()  # type: ignore[no-untyped-call]
+    return ImplicitRestApiPlugin()
 
 
 def make_implicit_http_api_plugin():  # type: ignore[no-untyped-def]
     # This is necessary to prevent a circular dependency on imports when loading package
     from samtranslator.plugins.api.implicit_http_api_plugin import ImplicitHttpApiPlugin
 
-    return ImplicitHttpApiPlugin()  # type: ignore[no-untyped-call]
+    return ImplicitHttpApiPlugin()
 
 
 def make_policy_template_for_function_plugin():  # type: ignore[no-untyped-def]

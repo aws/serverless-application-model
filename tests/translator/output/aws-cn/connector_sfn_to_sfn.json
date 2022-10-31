@@ -103,6 +103,212 @@
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
+    "MyConnectorProvidingRole1Policy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnectorProvidingRole1": {
+            "Destination": {
+              "Type": "AWS::Serverless::StateMachine"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::StateMachine"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "states:DescribeExecution"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
+                    {
+                      "DestinationName": {
+                        "Fn::GetAtt": [
+                          "MyStateMachine",
+                          "Name"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "events:DescribeRule"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+                }
+              ]
+            },
+            {
+              "Action": [
+                "states:StartExecution"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Ref": "MyStateMachine"
+                }
+              ]
+            },
+            {
+              "Action": [
+                "states:StopExecution"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
+                    {
+                      "DestinationName": {
+                        "Fn::GetAtt": [
+                          "MyStateMachine",
+                          "Name"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "events:PutTargets",
+                "events:PutRule"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "StateMachineRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyConnectorProvidingRole2Policy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnectorProvidingRole2": {
+            "Destination": {
+              "Type": "AWS::Serverless::StateMachine"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::StateMachine"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "states:DescribeExecution"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
+                    {
+                      "DestinationName": {
+                        "Fn::GetAtt": [
+                          "MyStateMachine",
+                          "Name"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "events:DescribeRule"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+                }
+              ]
+            },
+            {
+              "Action": [
+                "states:StartExecution"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Ref": "MyStateMachine"
+                }
+              ]
+            },
+            {
+              "Action": [
+                "states:StopExecution"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
+                    {
+                      "DestinationName": {
+                        "Fn::GetAtt": [
+                          "MyStateMachine",
+                          "Name"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "events:PutTargets",
+                "events:PutRule"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "StateMachineRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
     "MyStateMachine": {
       "Properties": {
         "DefinitionString": {
@@ -187,6 +393,27 @@
       },
       "Type": "AWS::IAM::Role"
     },
+    "StateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
     "TriggerStateMachine": {
       "DependsOn": [
         "MyConnectorPolicy"
@@ -204,7 +431,7 @@
               "            \"Parameters\": {",
               "                \"StateMachineArn\": \"${definition_substitution_1}\"",
               "            },",
-              "            \"Resource\": \"arn:aws:states:::states:startExecution.sync:2\",",
+              "            \"Resource\": \"${definition_substitution_2}\",",
               "            \"Type\": \"Task\"",
               "        }",
               "    }",
@@ -215,6 +442,9 @@
         "DefinitionSubstitutions": {
           "definition_substitution_1": {
             "Ref": "MyStateMachine"
+          },
+          "definition_substitution_2": {
+            "Fn::Sub": "arn:${AWS::Partition}:states:::states:startExecution.sync:2"
           }
         },
         "RoleArn": {
@@ -283,6 +513,75 @@
         ]
       },
       "Type": "AWS::IAM::Role"
+    },
+    "TriggerStateMachineWithoutRole": {
+      "DependsOn": [
+        "MyConnectorProvidingRole1Policy"
+      ],
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"Success\",",
+              "    \"States\": {",
+              "        \"Success\": {",
+              "            \"Type\": \"Succeed\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StateMachineRole",
+            "Arn"
+          ]
+        },
+        "StateMachineName": "TriggerStateMachineWithoutRole",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "TriggerStateMachineWithoutRole2": {
+      "DependsOn": [
+        "MyConnectorProvidingRole2Policy"
+      ],
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"Success\",",
+              "    \"States\": {",
+              "        \"Success\": {",
+              "            \"Type\": \"Succeed\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": "StateMachineRole.Arn"
+        },
+        "StateMachineName": "TriggerStateMachineWithoutRole",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
     }
   }
 }

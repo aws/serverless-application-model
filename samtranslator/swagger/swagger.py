@@ -50,7 +50,7 @@ class SwaggerEditor(object):
         """
 
         if not SwaggerEditor.is_valid(doc):  # type: ignore[no-untyped-call]
-            raise InvalidDocumentException([InvalidTemplateException("Invalid Swagger document")])  # type: ignore[no-untyped-call, no-untyped-call]
+            raise InvalidDocumentException([InvalidTemplateException("Invalid Swagger document")])
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
@@ -81,7 +81,7 @@ class SwaggerEditor(object):
         contents = [item]
         if isinstance(item, dict) and self._CONDITIONAL_IF in item:
             contents = item[self._CONDITIONAL_IF][1:]
-            contents = [content for content in contents if not is_intrinsic_no_value(content)]  # type: ignore[no-untyped-call]
+            contents = [content for content in contents if not is_intrinsic_no_value(content)]
         return contents
 
     def has_path(self, path, method=None):  # type: ignore[no-untyped-def]
@@ -202,9 +202,9 @@ class SwaggerEditor(object):
 
         method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
         if self.has_integration(path, method):  # type: ignore[no-untyped-call]
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
                 [
-                    InvalidTemplateException(  # type: ignore[no-untyped-call]
+                    InvalidTemplateException(
                         "Lambda integration already exists on Path={}, Method={}".format(path, method)
                     )
                 ]
@@ -215,7 +215,7 @@ class SwaggerEditor(object):
         # Wrap the integration_uri in a Condition if one exists on that function
         # This is necessary so CFN doesn't try to resolve the integration reference.
         if condition:
-            integration_uri = make_conditional(condition, integration_uri)  # type: ignore[no-untyped-call]
+            integration_uri = make_conditional(condition, integration_uri)
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
@@ -248,7 +248,7 @@ class SwaggerEditor(object):
 
             # If a condition is present, wrap all method contents up into the condition
             if condition:
-                path_item[method] = make_conditional(condition, path_item[method])  # type: ignore[no-untyped-call]
+                path_item[method] = make_conditional(condition, path_item[method])
 
     def add_state_machine_integration(  # type: ignore[no-untyped-def]
         self,
@@ -272,8 +272,8 @@ class SwaggerEditor(object):
 
         method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
         if self.has_integration(path, method):  # type: ignore[no-untyped-call]
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
-                [InvalidTemplateException("Integration already exists on Path={}, Method={}".format(path, method))]  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Integration already exists on Path={}, Method={}".format(path, method))]
             )
 
         self.add_path(path, method)  # type: ignore[no-untyped-call]
@@ -281,7 +281,7 @@ class SwaggerEditor(object):
         # Wrap the integration_uri in a Condition if one exists on that state machine
         # This is necessary so CFN doesn't try to resolve the integration reference.
         if condition:
-            integration_uri = make_conditional(condition, integration_uri)  # type: ignore[no-untyped-call]
+            integration_uri = make_conditional(condition, integration_uri)
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             # Responses
@@ -311,13 +311,13 @@ class SwaggerEditor(object):
 
             # If a condition is present, wrap all method contents up into the condition
             if condition:
-                path_item[method] = make_conditional(condition, path_item[method])  # type: ignore[no-untyped-call]
+                path_item[method] = make_conditional(condition, path_item[method])
 
     def make_path_conditional(self, path, condition):  # type: ignore[no-untyped-def]
         """
         Wrap entire API path definition in a CloudFormation if condition.
         """
-        self.paths[path] = make_conditional(condition, self.paths[path])  # type: ignore[no-untyped-call]
+        self.paths[path] = make_conditional(condition, self.paths[path])
 
     def _generate_integration_credentials(self, method_invoke_role=None, api_invoke_role=None):  # type: ignore[no-untyped-def]
         return self._get_invoke_role(method_invoke_role or api_invoke_role)  # type: ignore[no-untyped-call]
@@ -417,7 +417,7 @@ class SwaggerEditor(object):
                 continue
 
             if not allowed_origins:
-                raise InvalidTemplateException("Invalid input. Value for AllowedOrigins is required")  # type: ignore[no-untyped-call]
+                raise InvalidTemplateException("Invalid input. Value for AllowedOrigins is required")
 
             if not allowed_methods:
                 # AllowMethods is not given. Let's try to generate the list from the given Swagger.
@@ -961,10 +961,10 @@ class SwaggerEditor(object):
             model_properties = schema.get("properties")
 
             if not model_type:
-                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'type'.")])  # type: ignore[no-untyped-call, no-untyped-call]
+                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'type'.")])
 
             if not model_properties:
-                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'properties'.")])  # type: ignore[no-untyped-call, no-untyped-call]
+                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'properties'.")])
 
             self.definitions[model_name.lower()] = schema
 
@@ -1009,9 +1009,9 @@ class SwaggerEditor(object):
             self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)  # type: ignore[no-untyped-call]
 
         if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_blacklist):  # type: ignore[no-untyped-call]
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
                 [
-                    InvalidTemplateException(  # type: ignore[no-untyped-call]
+                    InvalidTemplateException(
                         "SourceVpcBlacklist must be a list of strings. Use IntrinsicVpcBlacklist instead for values that use Intrinsic Functions"
                     )
                 ]
@@ -1027,9 +1027,9 @@ class SwaggerEditor(object):
         self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)  # type: ignore[no-untyped-call]
 
         if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_whitelist):  # type: ignore[no-untyped-call]
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
                 [
-                    InvalidTemplateException(  # type: ignore[no-untyped-call]
+                    InvalidTemplateException(
                         "SourceVpcWhitelist must be a list of strings. Use IntrinsicVpcWhitelist instead for values that use Intrinsic Functions"
                     )
                 ]
@@ -1059,13 +1059,13 @@ class SwaggerEditor(object):
             return
 
         if effect not in ["Allow", "Deny"]:
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
-                [InvalidTemplateException("Effect must be one of {}".format(["Allow", "Deny"]))]  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Effect must be one of {}".format(["Allow", "Deny"]))]
             )
 
         if not isinstance(policy_list, (dict, list)):
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
-                [InvalidTemplateException("Type of '{}' must be a list or dictionary".format(policy_list))]  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Type of '{}' must be a list or dictionary".format(policy_list))]
             )
 
         if not isinstance(policy_list, list):
@@ -1106,7 +1106,7 @@ class SwaggerEditor(object):
             resource = (
                 Py27UniStr(resource) if isinstance(method, Py27UniStr) or isinstance(path, Py27UniStr) else resource
             )
-            resource = fnSub(resource, {"__Stage__": stage})  # type: ignore[no-untyped-call]
+            resource = fnSub(resource, {"__Stage__": stage})
             uri_list.extend([resource])
         return uri_list
 
@@ -1123,8 +1123,8 @@ class SwaggerEditor(object):
             ip_list = [ip_list]
 
         if conditional not in ["IpAddress", "NotIpAddress"]:
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
-                [InvalidTemplateException("Conditional must be one of {}".format(["IpAddress", "NotIpAddress"]))]  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Conditional must be one of {}".format(["IpAddress", "NotIpAddress"]))]
             )
 
         self.resource_policy["Version"] = "2012-10-17"
@@ -1161,8 +1161,8 @@ class SwaggerEditor(object):
         """
 
         if conditional not in ["StringNotEquals", "StringEquals"]:
-            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
-                [InvalidTemplateException("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))]  # type: ignore[no-untyped-call]
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))]
             )
 
         condition = Py27Dict()
@@ -1335,7 +1335,7 @@ class SwaggerEditor(object):
         """
 
         if not isinstance(obj, dict):
-            raise InvalidDocumentException([InvalidTemplateException(exception_message)])  # type: ignore[no-untyped-call, no-untyped-call]
+            raise InvalidDocumentException([InvalidTemplateException(exception_message)])
 
     @staticmethod
     def validate_path_item_is_dict(path_item, path):  # type: ignore[no-untyped-def]
@@ -1351,7 +1351,7 @@ class SwaggerEditor(object):
         )
 
     @staticmethod
-    def gen_skeleton():  # type: ignore[no-untyped-def]
+    def gen_skeleton() -> Py27Dict:
         """
         Method to make an empty swagger file, with just some basic structure. Just enough to pass validator.
 
@@ -1361,7 +1361,7 @@ class SwaggerEditor(object):
         skeleton["swagger"] = "2.0"
         skeleton["info"] = Py27Dict()
         skeleton["info"]["version"] = "1.0"
-        skeleton["info"]["title"] = ref("AWS::StackName")  # type: ignore[no-untyped-call]
+        skeleton["info"]["title"] = ref("AWS::StackName")
         skeleton["paths"] = Py27Dict()
         return skeleton
 

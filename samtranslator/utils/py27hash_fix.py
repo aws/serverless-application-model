@@ -7,7 +7,7 @@ import json
 import sys
 import logging
 
-from typing import Any
+from typing import Any, Dict, List
 
 from samtranslator.parser.parser import Parser
 from samtranslator.third_party.py27hash.hash import Hash
@@ -173,10 +173,10 @@ class Py27Keys(object):
 
     DUMMY = ["dummy"]  # marker for deleted keys
 
-    def __init__(self):  # type: ignore[no-untyped-def]
+    def __init__(self) -> None:
         super(Py27Keys, self).__init__()
         self.debug = False
-        self.keyorder = {}
+        self.keyorder: Dict[int, List[str]] = {}
         self.size = 0  # current size of the keys, equivalent to ma_used in dictobject.c
         self.fill = 0  # increment count when a key is added, equivalent to ma_fill in dictobject.c
         self.mask = MINSIZE - 1  # Python2 default dict size
@@ -184,7 +184,7 @@ class Py27Keys(object):
     def __deepcopy__(self, memo):  # type: ignore[no-untyped-def]
         # add keys in the py2 order -- we can't do a straigh-up deep copy of keyorder because
         # in py2 copy.deepcopy of a dict may result in reordering of the keys
-        ret = Py27Keys()  # type: ignore[no-untyped-call]
+        ret = Py27Keys()
         for k in self.keys():  # type: ignore[no-untyped-call]
             if k is self.DUMMY:
                 continue
@@ -334,7 +334,7 @@ class Py27Keys(object):
         Makes a copy of self
         """
         # Copy creates a new object and merges keys in
-        new = Py27Keys()  # type: ignore[no-untyped-call]
+        new = Py27Keys()
         new.merge(self.keys())  # type: ignore[no-untyped-call, no-untyped-call]
         return new
 
@@ -361,7 +361,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         super(Py27Dict, self).__init__()
 
         # Initialize iteration key list
-        self.keylist = Py27Keys()  # type: ignore[no-untyped-call]
+        self.keylist = Py27Keys()
 
         # Initialize base arguments
         self.update(*args, **kwargs)  # type: ignore[no-untyped-call]
@@ -434,7 +434,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         Clears the dict along with its backing Python2.7 keylist.
         """
         super(Py27Dict, self).clear()
-        self.keylist = Py27Keys()  # type: ignore[no-untyped-call]
+        self.keylist = Py27Keys()
 
     def copy(self):  # type: ignore[no-untyped-def]
         """

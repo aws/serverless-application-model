@@ -125,11 +125,11 @@ class ResourcePolicies(object):
             return PolicyTypes.MANAGED_POLICY
 
         # Handle the special case for 'if' intrinsic function
-        if is_intrinsic_if(policy):  # type: ignore[no-untyped-call]
+        if is_intrinsic_if(policy):
             return self._get_type_from_intrinsic_if(policy)  # type: ignore[no-untyped-call]
 
         # Intrinsic functions are treated as managed policies by default
-        if is_intrinsic(policy):  # type: ignore[no-untyped-call]
+        if is_intrinsic(policy):
             return PolicyTypes.MANAGED_POLICY
 
         # Policy statement is a dictionary with the key "Statement" in it
@@ -169,9 +169,9 @@ class ResourcePolicies(object):
         intrinsic_if_value = policy["Fn::If"]
 
         try:
-            validate_intrinsic_if_items(intrinsic_if_value)  # type: ignore[no-untyped-call]
+            validate_intrinsic_if_items(intrinsic_if_value)
         except ValueError as e:
-            raise InvalidTemplateException(e)  # type: ignore[no-untyped-call]
+            raise InvalidTemplateException(str(e))
 
         if_data = intrinsic_if_value[1]
         else_data = intrinsic_if_value[2]
@@ -182,13 +182,13 @@ class ResourcePolicies(object):
         if if_data_type == else_data_type:
             return if_data_type
 
-        if is_intrinsic_no_value(if_data):  # type: ignore[no-untyped-call]
+        if is_intrinsic_no_value(if_data):
             return else_data_type
 
-        if is_intrinsic_no_value(else_data):  # type: ignore[no-untyped-call]
+        if is_intrinsic_no_value(else_data):
             return if_data_type
 
-        raise InvalidTemplateException(  # type: ignore[no-untyped-call]
+        raise InvalidTemplateException(
             "Different policy types within the same Fn::If statement is unsupported. "
             "Separate different policy types into different Fn::If statements"
         )

@@ -13,7 +13,7 @@ class CloudWatchLogs(PushEventSource):
 
     resource_type = "CloudWatchLogs"
     principal = "logs.amazonaws.com"
-    property_types = {"LogGroupName": PropertyType(True, is_str()), "FilterPattern": PropertyType(True, is_str())}  # type: ignore[no-untyped-call, no-untyped-call]
+    property_types = {"LogGroupName": PropertyType(True, is_str()), "FilterPattern": PropertyType(True, is_str())}
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -40,13 +40,13 @@ class CloudWatchLogs(PushEventSource):
         resource = "log-group:${__LogGroupName__}:*"
         partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
 
-        return fnSub(  # type: ignore[no-untyped-call]
+        return fnSub(
             ArnGenerator.generate_arn(partition=partition, service="logs", resource=resource),  # type: ignore[no-untyped-call]
             {"__LogGroupName__": self.LogGroupName},  # type: ignore[attr-defined]
         )
 
     def get_subscription_filter(self, function, permission):  # type: ignore[no-untyped-def]
-        subscription_filter = SubscriptionFilter(  # type: ignore[no-untyped-call]
+        subscription_filter = SubscriptionFilter(
             self.logical_id,
             depends_on=[permission.logical_id],
             attributes=function.get_passthrough_resource_attributes(),

@@ -33,7 +33,7 @@ from functools import reduce
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
 
-from samtranslator.public.translator import ManagedPolicyLoader  # type: ignore[attr-defined]
+from samtranslator.public.translator import ManagedPolicyLoader
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
 from samtranslator.model.exceptions import InvalidDocumentException
@@ -105,9 +105,9 @@ def transform_template(input_file_path, output_file_path):  # type: ignore[no-un
 
         print("Wrote transformed CloudFormation template to: " + output_file_path)
     except InvalidDocumentException as e:
-        errorMessage = reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
-        LOG.error(errorMessage)
-        errors = map(lambda cause: cause.message, e.causes)  # type: ignore[no-any-return]
+        error_message = reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
+        LOG.error(error_message)
+        errors = map(lambda cause: cause.message, e.causes)
         LOG.error(errors)
 
 
