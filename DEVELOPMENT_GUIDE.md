@@ -107,7 +107,7 @@ We will install a development version of SAM transform from source into the
 virtualenv.
 
 1.  Activate Virtualenv: `pyenv activate sam37`
-1.  Install dev version of SAM Translator: `make init`
+1.  Install dev version of SAM transform: `make init`
 
 Running tests
 -------------
