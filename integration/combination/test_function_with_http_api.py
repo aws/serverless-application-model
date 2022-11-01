@@ -27,6 +27,6 @@ class TestFunctionWithHttpApi(BaseTest):
 
         stack_outputs = self.get_stack_outputs()
         base_url = stack_outputs["ApiUrl"]
-        # # The $default route catches requests that don't explicitly match other routes
+        # The $default route catches requests that don't explicitly match other routes
         self.verify_get_request_response(base_url, 200)
         self.verify_get_request_response(base_url + "something", 200)
