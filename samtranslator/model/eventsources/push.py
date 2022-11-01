@@ -1173,8 +1173,16 @@ class HttpApi(PushEventSource):
 
         api_id = self.ApiId  # type: ignore[attr-defined]
 
+        # when the Method is "ANY" and the path is '/$default' it adds an extra "*" which causes a bug
+        # the generated ARN for permissions ends with /*/*/$default which causes the path to be invalid
+        # see this issue: https://github.com/aws/serverless-application-model/issues/1860
+        resource = "${__ApiId__}/${__Stage__}"
+        if self.Method.lower() == "any" and path == f"/{OpenApiEditor._DEFAULT_PATH}":
+            resource += path
+        else:
+            resource += f"/{method}{path}"
+
         # ApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
-        resource = "${__ApiId__}/" + "${__Stage__}/" + method + path
         source_arn = fnSub(
             ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
             {"__ApiId__": api_id, "__Stage__": stage},
