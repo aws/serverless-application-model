@@ -1,4 +1,4 @@
-DEVELOPMENT GUIDE
+Development Guide
 =================
 
 **Welcome hacker!**
@@ -11,20 +11,20 @@ inaccurate, update this guide and send a Pull Request.
 **Note**: `pyenv` currently only supports macOS and Linux. If you are a
 Windows users, consider using [pipenv](https://docs.pipenv.org/).
 
-1-Click Ready to Hack IDE
+1-click ready-to-hack IDE
 -------------------------
 For setting up a local development environment, we recommend using Gitpod - a service that allows you to spin up an in-browser Visual Studio Code-compatible editor, with everything set up and ready to go for development on this project. Just click the button below to create your private workspace:
 
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/aws/serverless-application-model.git)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/aws/serverless-application-model.git)
 
 This will start a new Gitpod workspace, and immediately kick off a build of the code. Once it's done, you can start working.
 
 Gitpod is free for 50 hours per month - make sure to stop your workspace when you're done (you can always resume it later, and it won't need to run the build again).
 
 
-Environment Setup
+Environment setup
 -----------------
-### 1. Install Python Versions
+### 1. Install Python versions
 
 Our officially supported Python versions are 3.6, 3.7 and 3.8. 
 Our CI/CD pipeline is setup to run unit tests against Python 3 versions. Make sure you test it before sending a Pull Request.
@@ -53,7 +53,7 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 ```
 
-### 2. Install Additional Tooling
+### 2. Install additional tooling
 #### Black
 We format our code using [Black](https://github.com/python/black) and verify the source code is black compliant
 during PR checks. Black will be installed automatically with `make init`.
@@ -61,7 +61,7 @@ during PR checks. Black will be installed automatically with `make init`.
 After installing, you can run our formatting through our Makefile by `make black` or integrating Black directly in your favorite IDE (instructions
 can be found [here](https://black.readthedocs.io/en/stable/editor_integration.html))
  
-##### (workaround) Integrating Black directly in your favorite IDE
+##### (Workaround) Integrating Black directly in your favorite IDE
 Since black is installed in virtualenv, when you follow [this instruction](https://black.readthedocs.io/en/stable/editor_integration.html), `which black` might give you this
 
 ```bash
@@ -88,7 +88,7 @@ If you don't wish to manually run black on each pr or install black manually, we
 After installing pre-commit, run `pre-commit install` in the root of the project. This will install black for you and run the black formatting on
 commit.
 
-### 3. Activate Virtualenv
+### 3. Activate virtualenv
 
 Virtualenv allows you to install required libraries outside of the
 Python installation. A good practice is to setup a different virtualenv
@@ -101,15 +101,15 @@ be the appropriate python version.
 1.  Create Virtualenv `sam37` for Python3.7: `pyenv virtualenv 3.7.9 sam37`
 1.  Activate Virtualenv: `pyenv activate sam37`
 
-### 4. Install dev version of SAM Translator
+### 4. Install dev version of SAM transform
 
-We will install a development version of SAM Translator from source into the
+We will install a development version of SAM transform from source into the
 virtualenv.
 
 1.  Activate Virtualenv: `pyenv activate sam37`
-1.  Install dev version of SAM Translator: `make init`
+1.  Install dev version of SAM transform: `make init`
 
-Running Tests
+Running tests
 -------------
 
 ### Unit testing with one Python version
