@@ -83,7 +83,7 @@ Here are some questions that you should answer in your plan:
     Example: Developers can write a simple AWS SAM resource which will handle
     generating the boilerplate for them.
 
-## Reporting Bugs/Feature Requests
+## Reporting bugs/feature requests
 
 We welcome you to use the GitHub issue tracker to report bugs or suggest features.
 
@@ -95,7 +95,7 @@ reported the issue. Please try to include as much information as you can. Detail
 - Any modifications you've made relevant to the bug
 - Anything unusual about your environment or deployment
 
-## Contributing via Pull Requests
+## Contributing via pull requests
 
 Contributions via pull requests are much appreciated. Before sending us a pull request, please ensure that:
 
