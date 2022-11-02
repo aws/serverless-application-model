@@ -8,9 +8,9 @@ Globals:
   Api:
     # Overriding this property for Implicit API
     EndpointConfiguration:
-      Type: { "Ref": "EndpointConfigType" }
+      Type: {Ref: EndpointConfigType}
       VPCEndpointIds:
-        - { "Ref": "VpcEndpointId" }
+      - {Ref: VpcEndpointId}
 Resources:
   ImplicitApiFunction:
     Type: AWS::Serverless::Function

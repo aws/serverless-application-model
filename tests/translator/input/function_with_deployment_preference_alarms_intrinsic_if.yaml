@@ -1,11 +1,11 @@
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 Resources:
   MinimalFunction:
-    Type: "AWS::Serverless::Function"
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -15,9 +15,9 @@ Resources:
         Type: Linear10PercentEvery3Minutes
         Alarms:
           Fn::If:
-            - MyCondition
-            - - Alarm1
-              - Alarm2
-              - Alarm3
-            - - Alarm1
-              - Alarm5
+          - MyCondition
+          - - Alarm1
+            - Alarm2
+            - Alarm3
+          - - Alarm1
+            - Alarm5

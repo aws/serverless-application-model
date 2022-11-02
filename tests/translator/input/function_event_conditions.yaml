@@ -1,8 +1,8 @@
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
 
 Resources:
 
@@ -23,7 +23,7 @@ Resources:
 
 # All Event Types
   MyAwesomeFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: MyCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -36,7 +36,7 @@ Resources:
         EBSchedule:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
 
         CWEvent:
           Type: CloudWatchEvent

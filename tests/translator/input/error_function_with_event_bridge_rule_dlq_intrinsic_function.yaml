@@ -1,14 +1,14 @@
 Parameters:
   Env:
     Type: String
-    Default: "prd"
+    Default: prd
 Resources:
   testEventBus:
-    Type: 'AWS::Events::EventBus'
+    Type: AWS::Events::EventBus
     Properties:
       Name: test-event-bus
   testLambdaFn:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: test-Lambda-prd
       InlineCode: |
@@ -27,14 +27,14 @@ Resources:
           Properties:
             Pattern:
               source:
-                - 'Fn::Sub': 'test-${Env}'
+              - Fn::Sub: test-${Env}
               detail:
                 values:
                   status:
-                    - PENDING_REVIEW
+                  - PENDING_REVIEW
               detail-type:
-                - 'UPDATED'
+              - UPDATED
             DeadLetterConfig:
               Type: SQS
               QueueLogicalId:
-                'Fn::Sub': 'testLambdaFunctionEBRuleDLQ${Env}'
+                Fn::Sub: testLambdaFunctionEBRuleDLQ${Env}

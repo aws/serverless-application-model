@@ -26,7 +26,7 @@ Resources:
           properties:
             username:
               type: string
-  
+
   UnderscoreFunction:
     Type: AWS::Serverless::Function
     Properties:

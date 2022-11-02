@@ -4,7 +4,7 @@ Resources:
   ApiMinimumCompressionSizeNotInt:
     Type: AWS::Serverless::Api
     Properties:
-      MinimumCompressionSize: "3"
+      MinimumCompressionSize: '3'
       StageName: Stage name
 
   # MinimumCompressionSize not string

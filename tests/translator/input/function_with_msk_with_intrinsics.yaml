@@ -32,4 +32,3 @@ Resources:
             Stream: !Ref StreamValue
             Topics: !Ref TopicsValue
             ConsumerGroupId: !Ref ConsumerGroupValue
-

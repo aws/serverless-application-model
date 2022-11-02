@@ -1,14 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
+Transform: AWS::Serverless-2016-10-31
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   ConditionFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition:
       Ref: MyCondition
     Properties:

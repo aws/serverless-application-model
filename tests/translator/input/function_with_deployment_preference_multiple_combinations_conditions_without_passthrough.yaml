@@ -1,26 +1,26 @@
 Conditions:
   Condition1:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
   Condition2:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
   Condition3:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Parameters:
   MyFalseParameter:
     Type: String
-    Default: False
+    Default: false
 
 Resources:
   MinimalFunction:
     Condition: Condition1
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -30,7 +30,7 @@ Resources:
         Type: Linear10PercentEvery2Minutes
 
   MinimalFunctionWithMinimalDeploymentPreference:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Condition2
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -41,7 +41,7 @@ Resources:
         Type: Canary10Percent5Minutes
 
   MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarms:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Condition2
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -54,20 +54,20 @@ Resources:
           PreTraffic: !Ref MySanityTestFunction
           PostTraffic: !Ref MyValidationTestFunction
         Alarms:
-          - !Ref MyCloudWatchAlarm
+        - !Ref MyCloudWatchAlarm
 
   MySanityTestFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Condition3
     Properties:
       Handler: hello.handler
       Runtime: python2.7
       CodeUri: s3://my-bucket/mySanityTestFunction.zip
       DeploymentPreference:
-        Enabled: False
+        Enabled: false
 
   MyValidationTestFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       Handler: hello.handler
       Runtime: python2.7

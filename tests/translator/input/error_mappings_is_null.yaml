@@ -3,17 +3,17 @@ Mappings:
 Parameters:
   Stage:
     Type: String
-    Default: 'beta'
+    Default: beta
   Deployment:
     Type: String
-    Default: 'AllAtOnce'
+    Default: AllAtOnce
   Custom:
     Type: String
-    Default: 'CustomDeployment'
+    Default: CustomDeployment
 
 Resources:
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

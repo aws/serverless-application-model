@@ -7,18 +7,18 @@ Resources:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Description: Created by SAM
       Handler: index.handler
-      Architectures: ["arm6"]
+      Architectures: [arm6]
       MemorySize: 1024
       Runtime: nodejs12.x
       Timeout: 3
-  
+
   TestFunc2:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Description: Created by SAM
       Handler: index.handler
-      Architectures: "arm6"
+      Architectures: arm6
       MemorySize: 1024
       Runtime: nodejs12.x
       Timeout: 3

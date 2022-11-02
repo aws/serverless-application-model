@@ -34,11 +34,11 @@ Resources:
         Authorizers:
           AWS_IAM:
             AuthorizationScopes:
-              - scope
+            - scope
             IdentitySource: $request.header.Authorization
             JwtConfiguration:
               audience:
-                - audience1
-                - audience2
-              issuer: "https://www.example.com/v1/connect/oidc"
+              - audience1
+              - audience2
+              issuer: https://www.example.com/v1/connect/oidc
         DefaultAuthorizer: AWS_IAM

@@ -36,7 +36,7 @@ Resources:
         CertificateArn: MyCertificateArn
         DomainName: MyDomainName
         BasePath:
-          - 3
+        - 3
       StageName: Stage name
 
   # CertificateArn
@@ -265,7 +265,7 @@ Resources:
         CertificateArn: MyCertificateArn
         DomainName: MyDomainName
         Route53:
-          EvaluateTargetHealth: "true"
+          EvaluateTargetHealth: 'true'
       StageName: Stage name
   ApiRoute53EvaluateTargetHealthNotIntrinsic:
     Type: AWS::Serverless::Api
@@ -367,5 +367,5 @@ Resources:
         CertificateArn: MyCertificateArn
         DomainName: MyDomainName
         Route53:
-          IpV6: "true"
+          IpV6: 'true'
       StageName: Stage name

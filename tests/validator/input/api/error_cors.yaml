@@ -20,7 +20,7 @@ Resources:
     Properties:
       Cors:
         AllowCredentials:
-        AllowOrigin: "*"
+        AllowOrigin: '*'
       StageName: Stage name
 
   # AllowCredentials is not boolean
@@ -29,7 +29,7 @@ Resources:
     Properties:
       Cors:
         AllowCredentials: 3
-        AllowOrigin: "*"
+        AllowOrigin: '*'
       StageName: Stage name
 
   # AllowHeaders is empty
@@ -38,7 +38,7 @@ Resources:
     Properties:
       Cors:
         AllowHeaders:
-        AllowOrigin: "*"
+        AllowOrigin: '*'
       StageName: Stage name
 
   # AllowHeaders is not a string
@@ -47,7 +47,7 @@ Resources:
     Properties:
       Cors:
         AllowHeaders: 3
-        AllowOrigin: "*"
+        AllowOrigin: '*'
       StageName: Stage name
 
   # AllowMethods is empty
@@ -56,7 +56,7 @@ Resources:
     Properties:
       Cors:
         AllowMethods:
-        AllowOrigin: "*"
+        AllowOrigin: '*'
       StageName: Stage name
 
   # AllowMethods not string
@@ -65,7 +65,7 @@ Resources:
     Properties:
       Cors:
         AllowMethods: 3
-        AllowOrigin: "*"
+        AllowOrigin: '*'
       StageName: Stage name
 
   # AllowOrigin missing
@@ -81,7 +81,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Cors:
-        AllowOrigin: "*"
+        AllowOrigin: '*'
         MaxAge:
       StageName: Stage name
 
@@ -90,6 +90,6 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Cors:
-        AllowOrigin: "*"
+        AllowOrigin: '*'
         MaxAge: 3
       StageName: Stage name

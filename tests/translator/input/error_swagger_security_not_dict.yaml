@@ -20,14 +20,14 @@ Resources:
         AddDefaultAuthorizerToCorsPreflight: false
       DefinitionBody:
         paths:
-          "/path":
+          /path:
             put:
               responses:
                 '201':
                   content:
                     application/json:
                       schema:
-                        "$ref": "abcd"
+                        $ref: abcd
               x-amazon-apigateway-integration:
                 contentHandling: CONVERT_TO_TEXT
                 responses:
@@ -64,7 +64,7 @@ Resources:
         PutReservation:
           Type: Api
           Properties:
-            Path: "/path"
+            Path: /path
             RestApiId:
               Ref: AccessingPartyAPI
             Method: put

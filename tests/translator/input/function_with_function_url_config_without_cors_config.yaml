@@ -12,4 +12,3 @@ Resources:
       Timeout: 3
       FunctionUrlConfig:
         AuthType: NONE
-

@@ -12,7 +12,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
-      BinaryMediaTypes: "My binary media type"
+      BinaryMediaTypes: My binary media type
 
   # BinaryMediaTypes item is not an intrinsic
   ApiBinaryMediaTypesNotIntrinsic:
@@ -28,4 +28,4 @@ Resources:
     Properties:
       StageName: Stage name
       BinaryMediaTypes:
-        - 3
+      - 3

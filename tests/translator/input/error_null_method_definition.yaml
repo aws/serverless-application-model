@@ -11,8 +11,8 @@ Resources:
       DefinitionBody:
         swagger: 2.0
         paths:
-          "/":
-            get: null
+          /:
+            get:
 
   MyUserPool:
     Type: AWS::Cognito::UserPool
@@ -22,8 +22,8 @@ Resources:
         PasswordPolicy:
           MinimumLength: 8
       UsernameAttributes:
-        - email
+      - email
       Schema:
-        - AttributeDataType: String
-          Name: email
-          Required: false
+      - AttributeDataType: String
+        Name: email
+        Required: false

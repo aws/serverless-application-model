@@ -11,10 +11,10 @@ Resources:
             Resource: !Sub arn:${AWS::Partition}:states:::states:startExecution.sync:2
             Parameters:
               StateMachineArn: !Ref MyStateMachine
-            End: True
+            End: true
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingDoesNotMatter"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingDoesNotMatter
 
   MyStateMachine:
     Type: AWS::Serverless::StateMachine
@@ -26,8 +26,8 @@ Resources:
           Success:
             Type: Succeed
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingDoesNotMatter"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingDoesNotMatter
 
   MyConnector:
     Type: AWS::Serverless::Connector
@@ -37,8 +37,8 @@ Resources:
       Destination:
         Id: MyStateMachine
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write
 
   StateMachineRole:
     Type: AWS::IAM::Role
@@ -46,10 +46,10 @@ Resources:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Action: [ 'sts:AssumeRole' ]
-            Effect: Allow
-            Principal:
-              Service: [ states.amazonaws.com ]
+        - Action: [sts:AssumeRole]
+          Effect: Allow
+          Principal:
+            Service: [states.amazonaws.com]
 
   TriggerStateMachineWithoutRole:
     Type: AWS::Serverless::StateMachine
@@ -82,8 +82,8 @@ Resources:
       Destination:
         Id: MyStateMachine
       Permissions:
-        - Write
-        - Read
+      - Write
+      - Read
 
   MyConnectorProvidingRole2:
     Type: AWS::Serverless::Connector
@@ -93,5 +93,5 @@ Resources:
       Destination:
         Id: MyStateMachine
       Permissions:
-        - Write
-        - Read
+      - Write
+      - Read

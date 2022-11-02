@@ -1,22 +1,22 @@
 Resources:
   MyApiWithCognitoAuth:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      OpenApiVersion: "3.0.1"
+      OpenApiVersion: 3.0.1
       Auth:
         DefaultAuthorizer: MyDefaultCognitoAuth
         Authorizers:
           MyDefaultCognitoAuth:
             UserPoolArn: arn:aws:1
             AuthorizationScopes:
-              - default.write
-              - default.read
+            - default.write
+            - default.read
           MyCognitoAuthWithDefaultScopes:
             UserPoolArn: arn:aws:2
             AuthorizationScopes:
-              - default.delete
-              - default.update
+            - default.delete
+            - default.update
 
   MyStateMachine:
     Type: AWS::Serverless::StateMachine
@@ -35,11 +35,11 @@ Resources:
             Result: World
             End: true
       Policies:
-        - Version: "2012-10-17"
-          Statement:
-            - Effect: Deny
-              Action: "*"
-              Resource: "*"
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
       Events:
         CognitoAuthorizerWithDefaultScopes:
           Type: Api
@@ -72,8 +72,8 @@ Resources:
             Auth:
               Authorizer: MyDefaultCognitoAuth
               AuthorizationScopes:
-                - overwritten.read
-                - overwritten.write
+              - overwritten.read
+              - overwritten.write
         CognitoAuthorizerScopesOverwritten:
           Type: Api
           Properties:
@@ -83,8 +83,8 @@ Resources:
             Auth:
               Authorizer: MyCognitoAuthWithDefaultScopes
               AuthorizationScopes:
-                - overwritten.read
-                - overwritten.write
+              - overwritten.read
+              - overwritten.write
         CognitoDefaultScopesNone:
           Type: Api
           Properties:

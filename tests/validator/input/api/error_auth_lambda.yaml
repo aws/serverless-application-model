@@ -12,7 +12,7 @@ Resources:
             FunctionArn: Function.arn
           LambdaAuthorizationScopesItemNotString:
             AuthorizationScopes:
-              - 3
+            - 3
             FunctionArn: Function.arn
           LambdaAuthorizationScopesNotList:
             AuthorizationScopes: scopes1

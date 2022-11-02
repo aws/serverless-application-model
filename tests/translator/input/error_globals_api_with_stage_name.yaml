@@ -5,10 +5,10 @@
 
 Globals:
   Api:
-    Name: "some api"
+    Name: some api
 
     # This stage name will *not* be reflected in Implicit API
-    StageName: "foo"
+    StageName: foo
 
 Resources:
   ImplicitApiFunction:
@@ -23,5 +23,3 @@ Resources:
           Properties:
             Path: /
             Method: get
-
-

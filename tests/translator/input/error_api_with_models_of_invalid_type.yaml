@@ -4,7 +4,7 @@ Resources:
     Properties:
       StageName: Prod
       Models:
-        - Invalid_value
+      - Invalid_value
 
   MyFunction:
     Type: AWS::Serverless::Function
@@ -32,6 +32,6 @@ Resources:
 
 Outputs:
   ApiUrl:
-    Description: "API endpoint URL for Prod environment"
+    Description: API endpoint URL for Prod environment
     Value:
-      Fn::Sub: 'https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+      Fn::Sub: https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/

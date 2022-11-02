@@ -32,7 +32,8 @@ Resources:
     Properties:
       StageName: Stage name
       Tags:
-        MyVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTag: MyValue
+        ? MyVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTag
+        : MyValue
   # Tags item value not string
   ApiTagsItemValueNotString:
     Type: AWS::Serverless::Api

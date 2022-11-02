@@ -1,6 +1,6 @@
 Resources:
   StateMachine:
-    Type: 'AWS::Serverless::StateMachine'
+    Type: AWS::Serverless::StateMachine
     Properties:
       DefinitionUri: s3://sam-demo-bucket/my_state_machine.asl.json
       Role: arn:aws:iam::123456123456:role/service-role/SampleRole
@@ -8,10 +8,10 @@ Resources:
         ScheduleEvent:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
             Name: TestSchedule
             Description: test schedule
-            Enabled: False
+            Enabled: false
             DeadLetterConfig:
               Arn: MyDlqArn
-              Type: SQS 
+              Type: SQS

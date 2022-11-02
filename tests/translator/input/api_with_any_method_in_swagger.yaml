@@ -23,13 +23,13 @@ Resources:
       StageName:
         Ref: Stage
       Auth:
-        DefaultAuthorizer: "LambdaAuthorizer"
+        DefaultAuthorizer: LambdaAuthorizer
         Authorizers:
           LambdaAuthorizer:
-            FunctionPayloadType: "REQUEST"
+            FunctionPayloadType: REQUEST
             Identity:
               Headers:
-                  - "Authorization"
+              - Authorization
       DefinitionBody:
         openapi: '3.0'
         info:

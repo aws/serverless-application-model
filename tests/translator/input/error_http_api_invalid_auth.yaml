@@ -51,7 +51,7 @@ Resources:
             ApiId: !Ref MyApi4
             Auth:
               Authorizer: OAuth2
-              AuthorizationScopes: "scope"
+              AuthorizationScopes: scope
 
   Function5:
     Type: AWS::Serverless::Function
@@ -103,12 +103,12 @@ Resources:
         Authorizers:
           OAuth2:
             AuthorizationScopes:
-              - scope4
+            - scope4
             JwtConfiguration:
-              issuer: "https://www.example.com/v1/connect/oidc"
+              issuer: https://www.example.com/v1/connect/oidc
               audience:
-                - MyApi
-            IdentitySource: "$request.querystring.param"
+              - MyApi
+            IdentitySource: $request.querystring.param
         DefaultAuthorizer: OAuth2
       DefinitionBody:
         info:
@@ -125,12 +125,12 @@ Resources:
         Authorizers:
           OAuth2:
             AuthorizationScopes:
-              - scope4
+            - scope4
             JwtConfiguration:
-              issuer: "https://www.example.com/v1/connect/oidc"
+              issuer: https://www.example.com/v1/connect/oidc
               audience:
-                - MyApi
-            IdentitySource: "$request.querystring.param"
+              - MyApi
+            IdentitySource: $request.querystring.param
       DefinitionBody:
         info:
           version: '1.0'
@@ -146,12 +146,12 @@ Resources:
         Authorizers:
           OAuth2:
             AuthorizationScopes:
-              - scope4
+            - scope4
             JwtConfiguration:
-              issuer: "https://www.example.com/v1/connect/oidc"
+              issuer: https://www.example.com/v1/connect/oidc
               audience:
-                - MyApi
-            IdentitySource: "$request.querystring.param"
+              - MyApi
+            IdentitySource: $request.querystring.param
       DefinitionBody:
         info:
           version: '1.0'
@@ -166,14 +166,14 @@ Resources:
       Auth:
         Authorizers:
           OIDC:
-            OpenIdConnectUrl: "https://example.com/url"
+            OpenIdConnectUrl: https://example.com/url
             AuthorizationScopes:
-              - scope4
+            - scope4
             JwtConfiguration:
-              issuer: "https://www.example.com/v1/connect/oidc"
+              issuer: https://www.example.com/v1/connect/oidc
               audience:
-                - MyApi
-            IdentitySource: "$request.querystring.param"
+              - MyApi
+            IdentitySource: $request.querystring.param
       DefinitionBody:
         info:
           version: '1.0'
@@ -191,4 +191,4 @@ Resources:
             JwtConfiguration:
               audience: https://test-sam.com
               issuer: https://test-sam.com
-            IdentitySource: "$request.header.Authorization"
+            IdentitySource: $request.header.Authorization

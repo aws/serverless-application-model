@@ -1,8 +1,8 @@
 Conditions:
   C1:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
 Resources:
   ExplicitApi:
     Type: AWS::Serverless::Api
@@ -10,17 +10,9 @@ Resources:
       StageName: Prod
       Auth:
         ResourcePolicy:
-          CustomStatements: 
-            Fn::If: [
-              C1,
-              {
-                Action: 'execute-api:Invoke', 
-                Resource: ['execute-api:/*/*/*']
-              },
-              {
-                Ref: 'AWS::NoValue'
-              },
-            ]
+          CustomStatements:
+            Fn::If: [C1, {Action: execute-api:Invoke, Resource: [execute-api:/*/*/*]},
+              Ref: AWS::NoValue]
 
   ExplicitApiFunction:
     Type: AWS::Serverless::Function
@@ -57,5 +49,3 @@ Resources:
               Ref: ExplicitApi
             Path: /any
             Method: any
-
-      

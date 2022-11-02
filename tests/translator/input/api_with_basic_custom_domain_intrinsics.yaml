@@ -1,14 +1,14 @@
 Conditions:
   C1:
     Fn::Equals:
-      - true
-      - true  
+    - true
+    - true
 Parameters:
-  MyDomainCert: 
+  MyDomainCert:
     Type: String
     Default: another-api-arn
 
-  EndpointConf: 
+  EndpointConf:
     Type: String
     Default: REGIONAL
 
@@ -58,9 +58,8 @@ Resources:
         DomainName: !Sub 'example-${AWS::Region}.com'
         CertificateArn: !Ref MyDomainCert
         EndpointConfiguration: !Ref EndpointConf
-        BasePath: [ "/get", "/fetch" ]
+        BasePath: [/get, /fetch]
         MutualTlsAuthentication:
           TruststoreUri: !Ref MyMTLSUri
           TruststoreVersion: !Ref MyMTLSVersion
         SecurityPolicy: TLS_1_2
-

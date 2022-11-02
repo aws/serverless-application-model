@@ -1,20 +1,20 @@
 Resources:
   MyApiWithAwsIamAuthAndDefaultInvokeRole:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
         DefaultAuthorizer: AWS_IAM
         InvokeRole: CALLER_CREDENTIALS
   MyApiWithAwsIamAuthAndCustomInvokeRole:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
         DefaultAuthorizer: AWS_IAM
         InvokeRole: rn:aws:iam::123:role/AUTH_AWS_IAM
   MyApiWithAwsIamAuth:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:

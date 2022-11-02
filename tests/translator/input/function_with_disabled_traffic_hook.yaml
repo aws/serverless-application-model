@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Template with preference that does not require a new CodeDeploy Service Role
+Description: Template with preference that does not require a new CodeDeploy Service
+  Role
 
 Resources:
 
@@ -35,7 +36,7 @@ Resources:
         Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:role/lambda-role
       Runtime: python3.7
       CodeUri: s3://bucket/key
-      FunctionName: 'CodeDeployHook_preTrafficHook'
+      FunctionName: CodeDeployHook_preTrafficHook
       AutoPublishAlias: live
       DeploymentPreference:
         Enabled: false

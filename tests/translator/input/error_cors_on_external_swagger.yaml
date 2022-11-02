@@ -3,5 +3,5 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       DefinitionUri: s3://sam-demo-bucket/swagger.json
-      StageName: "Prod"
+      StageName: Prod
       Cors: "'*'"

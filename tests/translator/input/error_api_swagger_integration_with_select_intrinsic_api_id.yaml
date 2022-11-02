@@ -9,7 +9,7 @@ Resources:
         GetHtml:
           Type: Api
           Properties:
-            RestApiId: !Select [ "1", [ "HtmlApi", "HtmlApi" ] ]
+            RestApiId: !Select ['1', [HtmlApi, HtmlApi]]
             Path: /
             Method: get
             Auth:

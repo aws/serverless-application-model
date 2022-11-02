@@ -52,5 +52,5 @@ Resources:
     Properties:
       EndpointConfiguration:
         VPCEndpointIds:
-          - 3
+        - 3
       StageName: Stage name

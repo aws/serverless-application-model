@@ -4,7 +4,7 @@ Resources:
     Properties:
       DefinitionBody: {}
       OpenApiVersion: 3
-      StageName: 'prod'
+      StageName: prod
   Function:
     Type: AWS::Serverless::Function
     Properties:
@@ -17,5 +17,5 @@ Resources:
           Properties:
             RestApiId:
               Ref: MyApi
-            Path: "/"
+            Path: /
             Method: ANY

@@ -9,7 +9,7 @@ Resources:
         Basic: # integration exists
           Type: HttpApi
           Properties:
-            PayloadFormatVersion: "2.0"
+            PayloadFormatVersion: '2.0'
             Path: /basic
             Method: post
             ApiId: !Ref MyApi

@@ -9,4 +9,4 @@ Resources:
         info:
           title: test invalid paths Api
         paths:
-          /foo: null
+          /foo:

@@ -1,5 +1,5 @@
 Resources:
-  RestApiFunction: 
+  RestApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
@@ -26,7 +26,7 @@ Resources:
             Method: post
             Auth:
               AuthorizationScopes:
-                - scope3
+              - scope3
         oauth2Path:
           Type: HttpApi
           Properties:
@@ -43,10 +43,10 @@ Globals:
       Authorizers:
         oauth2Auth:
           AuthorizationScopes:
-            - scope4
+          - scope4
           JwtConfiguration:
-            issuer: "https://www.example.com/v1/connect/oidc"
+            issuer: https://www.example.com/v1/connect/oidc
             audience:
-              - MyApi
-          IdentitySource: "$request.querystring.param"
+            - MyApi
+          IdentitySource: $request.querystring.param
       DefaultAuthorizer: oauth2Auth

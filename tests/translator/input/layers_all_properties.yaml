@@ -5,25 +5,25 @@ Parameters:
 
 Resources:
   MyLayer:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: s3://bucket/key
       RetentionPolicy: !Ref LayerDeleteParam
 
   MyLayerWithAName:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: s3://bucket/key
       LayerName: DifferentLayerName
 
   MyFunction:
-    Type: "AWS::Serverless::Function"
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://bucket/key
       Handler: app.handler
       Runtime: python3.6
       Layers:
-        - !Ref MyLayer
+      - !Ref MyLayer
 
 Outputs:
   LayerName:

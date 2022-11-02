@@ -11,8 +11,8 @@ Parameters:
 Conditions:
   CreateBodyValidator:
     Fn::Equals:
-      - false
-      - true
+    - false
+    - true
 
 
 Resources:
@@ -71,9 +71,9 @@ Resources:
               Required: true
               ValidateBody:
                 Fn::If:
-                  - CreateBodyValidator
-                  - !Ref ValidateParametersBody
-                  - false
+                - CreateBodyValidator
+                - !Ref ValidateParametersBody
+                - false
 
 
   HtmlApi:

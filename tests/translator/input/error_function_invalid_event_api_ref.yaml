@@ -1,6 +1,6 @@
 Resources:
   FunctionApiRestApiRefError:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -13,4 +13,4 @@ Resources:
             Path: /
             # RestApiId should not be a list
             RestApiId:
-              - Fn::Sub: ServerlessRestApi
+            - Fn::Sub: ServerlessRestApi

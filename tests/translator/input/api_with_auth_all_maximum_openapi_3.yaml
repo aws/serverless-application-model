@@ -1,9 +1,9 @@
 Resources:
   MyApi:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      OpenApiVersion: '3.0.1'
+      OpenApiVersion: 3.0.1
       Auth:
         DefaultAuthorizer: MyCognitoAuth
         ApiKeyRequired: true
@@ -16,8 +16,8 @@ Resources:
 
           MyCognitoAuthMultipleUserPools:
             UserPoolArn:
-              - arn:aws:2
-              - arn:aws:3
+            - arn:aws:2
+            - arn:aws:3
             Identity:
               Header: MyAuthorizationHeader2
               ValidationExpression: myauthvalidationexpression2
@@ -43,13 +43,13 @@ Resources:
             FunctionInvokeRole: arn:aws:iam::123456789012:role/S3Access
             Identity:
               Headers:
-                - Authorization1
+              - Authorization1
               QueryStrings:
-                - Authorization2
+              - Authorization2
               StageVariables:
-                - Authorization3
+              - Authorization3
               Context:
-                - Authorization4
+              - Authorization4
               ReauthorizeEvery: 0
 
   MyFunction:

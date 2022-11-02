@@ -20,25 +20,25 @@ Mappings:
 
 Resources:
   ApplicationRefParameter:
-    Type: 'AWS::Serverless::Application'
+    Type: AWS::Serverless::Application
     Properties:
       Location:
         ApplicationId: !Ref ApplicationIdParam
         SemanticVersion: !Ref VersionParam
 
   ApplicationFindInMap:
-    Type: 'AWS::Serverless::Application'
+    Type: AWS::Serverless::Application
     Properties:
       Location:
         ApplicationId: !FindInMap
-         - ApplicationLocations
-         - !Ref 'AWS::Region'
-         - ApplicationId
+        - ApplicationLocations
+        - !Ref 'AWS::Region'
+        - ApplicationId
         SemanticVersion: !FindInMap
         - ApplicationLocations
         - !Ref 'AWS::Region'
         - Version
       NotificationARNs:
-        - !Ref Sns
+      - !Ref Sns
   Sns:
     Type: AWS::SNS::Topic

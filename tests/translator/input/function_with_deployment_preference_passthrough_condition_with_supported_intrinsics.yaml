@@ -18,29 +18,30 @@ Parameters:
   EnableAliasProvisionedConcurrency:
     Type: String
     AllowedValues:
-      - true
-      - false
+    - true
+    - false
     Default: true
   DefaultTrueParam:
     Type: String
-    Default: "true"
+    Default: 'true'
   DefaultFalseParam:
     Type: String
-    Default: "false"
+    Default: 'false'
   HelloParam:
     Type: String
-    Default: "hello"
+    Default: hello
   WorldParam:
     Type: String
-    Default: "world"
+    Default: world
 
 Conditions:
-  AliasProvisionedConcurrencyEnabled: !Equals [!Ref EnableAliasProvisionedConcurrency, true]
+  AliasProvisionedConcurrencyEnabled: !Equals [!Ref EnableAliasProvisionedConcurrency,
+    true]
   FunctionCondition: !Equals [true, true]
 
 Resources:
   TrueRef:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: FunctionCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -51,12 +52,11 @@ Resources:
         Type: Linear10PercentEvery3Minutes
         PassthroughCondition: !Ref DefaultTrueParam
       ProvisionedConcurrencyConfig: !If
-        - AliasProvisionedConcurrencyEnabled
-        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
-        - !Ref 'AWS::NoValue'
-
+      - AliasProvisionedConcurrencyEnabled
+      - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+      - !Ref 'AWS::NoValue'
   FalseRef:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: FunctionCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -65,14 +65,13 @@ Resources:
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery3Minutes
-        PassthroughCondition: !Ref DefaultFalseParam 
+        PassthroughCondition: !Ref DefaultFalseParam
       ProvisionedConcurrencyConfig: !If
-        - AliasProvisionedConcurrencyEnabled
-        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
-        - !Ref 'AWS::NoValue'
-    
+      - AliasProvisionedConcurrencyEnabled
+      - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+      - !Ref 'AWS::NoValue'
   TrueFindInMap:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: FunctionCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -82,16 +81,15 @@ Resources:
       DeploymentPreference:
         Type: Linear10PercentEvery3Minutes
         PassthroughCondition: !FindInMap
-          - HelloWorldMap
-          - !Ref HelloParam
-          - key1
+        - HelloWorldMap
+        - !Ref HelloParam
+        - key1
       ProvisionedConcurrencyConfig: !If
-        - AliasProvisionedConcurrencyEnabled
-        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
-        - !Ref 'AWS::NoValue'
-
+      - AliasProvisionedConcurrencyEnabled
+      - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+      - !Ref 'AWS::NoValue'
   FalseFindInMap:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: FunctionCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -101,10 +99,10 @@ Resources:
       DeploymentPreference:
         Type: Linear10PercentEvery3Minutes
         PassthroughCondition: !FindInMap
-          - HelloWorldMap
-          - !Ref WorldParam 
-          - key1
+        - HelloWorldMap
+        - !Ref WorldParam
+        - key1
       ProvisionedConcurrencyConfig: !If
-        - AliasProvisionedConcurrencyEnabled
-        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
-        - !Ref 'AWS::NoValue'
+      - AliasProvisionedConcurrencyEnabled
+      - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+      - !Ref 'AWS::NoValue'

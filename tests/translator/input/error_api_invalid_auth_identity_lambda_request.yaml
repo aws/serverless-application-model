@@ -8,6 +8,6 @@ Resources:
           LambdaRequestAuthorizer:
             FunctionArn:
               Fn::GetAtt:
-                - MyAuthFunction
-                - Arn
+              - MyAuthFunction
+              - Arn
             Identity: LambdaRequestAuthorizationIdentity

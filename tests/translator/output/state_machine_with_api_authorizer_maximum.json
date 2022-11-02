@@ -101,6 +101,50 @@
                   }
                 }
               },
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "security": [
+                  {
+                    "MyLambdaTokenAuth": []
+                  },
+                  {
+                    "api_key": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "StateMachineWithLambdaTokenAuthorizerRole",
+                      "Arn"
+                    ]
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${StateMachine}\"}"
+                    }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
+                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
+                }
+              },
               "patch": {
                 "responses": {
                   "200": {
@@ -121,7 +165,7 @@
                 "x-amazon-apigateway-integration": {
                   "credentials": {
                     "Fn::GetAtt": [
-                      "StateMachineWithLambdaTokenAuthorizerRole",
+                      "StateMachineWithLambdaTokenAuthorizerNoneFunctionInvokeRoleRole",
                       "Arn"
                     ]
                   },
@@ -332,9 +376,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiDeploymentde088eafc3": {
+    "MyApiDeployment8689b9debb": {
       "Properties": {
-        "Description": "RestApi deployment id: de088eafc3dd099f3b79506a6e0542dadb9fcd23",
+        "Description": "RestApi deployment id: 8689b9debbe5cf20e2e8ebe9575f5779a4f88505",
         "RestApiId": {
           "Ref": "MyApi"
         },
@@ -399,7 +443,7 @@
     "MyApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentde088eafc3"
+          "Ref": "MyApiDeployment8689b9debb"
         },
         "RestApiId": {
           "Ref": "MyApi"
@@ -599,6 +643,43 @@
               ]
             },
             "PolicyName": "StateMachineWithLambdaRequestAuthorizerRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachineWithLambdaTokenAuthorizerNoneFunctionInvokeRoleRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineWithLambdaTokenAuthorizerNoneFunctionInvokeRoleRoleStartExecutionPolicy"
           }
         ]
       },

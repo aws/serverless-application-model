@@ -23,8 +23,8 @@ Resources:
       Destination:
         Id: SomeTable
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write
   TestIamRolePolicyConnector:
     DependsOn: IamRolePolicyConnector
     Type: AWS::Foo::Bar
@@ -41,7 +41,7 @@ Resources:
       Destination:
         Id: SomeTopic
       Permissions:
-        - Write
+      - Write
   TestSnsTopicPolicyConnector:
     DependsOn: SnsTopicPolicyConnector
     Type: AWS::Foo::Bar
@@ -58,7 +58,7 @@ Resources:
       Destination:
         Id: SomeFunction
       Permissions:
-        - Write
+      - Write
   TestLambdaPermissionConnector:
     DependsOn: LambdaPermissionConnector
     Type: AWS::Foo::Bar
@@ -75,7 +75,7 @@ Resources:
       Destination:
         Id: SomeQueue
       Permissions:
-        - Write
+      - Write
   TestSqsQueuePolicyConnector:
     DependsOn: SqsQueuePolicyConnector
     Type: AWS::Foo::Bar
