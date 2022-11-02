@@ -7,7 +7,7 @@ Parameters:
     Default: beta
 Resources:
   MyAwesomeFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -19,7 +19,7 @@ Resources:
         EBSchedule:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
 
         CWEvent:
           Type: CloudWatchEvent
@@ -107,4 +107,4 @@ Resources:
         Key: webpage_swagger.json
       Variables:
         LambdaFunction:
-          Ref: "MyAwesomeFunction"
+          Ref: MyAwesomeFunction

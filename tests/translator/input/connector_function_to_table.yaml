@@ -4,12 +4,12 @@ Resources:
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: lambda.amazonaws.com
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
       ManagedPolicyArns:
-        - arn:{AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - arn:{AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   MyFunction:
     Type: AWS::Lambda::Function
@@ -50,11 +50,11 @@ Resources:
     Properties:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: "Id"
-          AttributeType: "S"
+      - AttributeName: Id
+        AttributeType: S
       KeySchema:
-        - AttributeName: "Id"
-          KeyType: "HASH"
+      - AttributeName: Id
+        KeyType: HASH
 
   MyConnector:
     Type: AWS::Serverless::Connector
@@ -64,8 +64,8 @@ Resources:
       Destination:
         Id: MyTable
       Permissions:
-        - Read
-        - Read
+      - Read
+      - Read
 
   MyConnectorWithTableArn:
     Type: AWS::Serverless::Connector
@@ -76,7 +76,7 @@ Resources:
         Type: AWS::DynamoDB::Table
         Arn: !GetAtt MyTable.Arn
       Permissions:
-        - Read
+      - Read
 
   MyConnectorWith2ACs:
     Type: AWS::Serverless::Connector
@@ -87,8 +87,8 @@ Resources:
         Type: AWS::DynamoDB::Table
         Arn: !GetAtt MyTable.Arn
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write
 
   MyConnectorWithRoleName:
     Type: AWS::Serverless::Connector
@@ -101,4 +101,4 @@ Resources:
         Type: AWS::DynamoDB::Table
         Arn: !GetAtt MyTable.Arn
       Permissions:
-        - Read
+      - Read

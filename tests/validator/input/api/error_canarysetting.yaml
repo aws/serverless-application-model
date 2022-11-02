@@ -44,7 +44,7 @@ Resources:
     Properties:
       StageName: Stage name
       CanarySetting:
-        PercentTraffic: "3.5"
+        PercentTraffic: '3.5'
 
   # PercentTraffic value is too high
   ApiPercentTrafficTooHigh:
@@ -94,7 +94,7 @@ Resources:
     Properties:
       StageName: Stage name
       CanarySetting:
-        StageVariableOverrides: "My override"
+        StageVariableOverrides: My override
 
   # UseStageCache is empty
   ApiUseStageCacheEmpty:
@@ -110,4 +110,4 @@ Resources:
     Properties:
       StageName: Stage name
       CanarySetting:
-        UseStageCache: "true"
+        UseStageCache: 'true'

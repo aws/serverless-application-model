@@ -1,5 +1,5 @@
 # AWSTemplateFormatVersion has an unknown value
-AWSTemplateFormatVersion: "2021-01-26"
+AWSTemplateFormatVersion: '2021-01-26'
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:

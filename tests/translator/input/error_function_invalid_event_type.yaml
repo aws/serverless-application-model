@@ -1,6 +1,6 @@
 Resources:
   FunctionApiTypeError:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -13,7 +13,7 @@ Resources:
             Path: /
 
   FunctionNoEventType:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -33,4 +33,3 @@ Resources:
       Runtime: python3.6
       Events:
         FileUploaded:
-

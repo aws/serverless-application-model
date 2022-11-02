@@ -1,12 +1,12 @@
 Parameters:
   BMT:
     Type: String
-    Default: 'image~1jpg'
+    Default: image~1jpg
 Globals:
   Api:
     BinaryMediaTypes:
-      - image~1gif
-      - {"Fn::Join": ["~1", ["image", "png"]]}
+    - image~1gif
+    - {Fn::Join: [~1, [image, png]]}
 
 Resources:
   ImplicitApiFunction:
@@ -28,5 +28,5 @@ Resources:
       StageName: Prod
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
       BinaryMediaTypes:
-        - application~1octet-stream
-        - !Ref BMT
+      - application~1octet-stream
+      - !Ref BMT

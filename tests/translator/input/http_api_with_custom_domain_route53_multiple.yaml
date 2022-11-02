@@ -7,7 +7,7 @@ Resources:
         CertificateArn: arn::cert::abc
         EndpointConfiguration: REGIONAL
         Route53:
-          HostedZoneId: "abc123456"
+          HostedZoneId: abc123456
 
   MyApi2:
     Type: AWS::Serverless::HttpApi
@@ -17,7 +17,7 @@ Resources:
         CertificateArn: arn::cert::abc
         EndpointConfiguration: REGIONAL
         Route53:
-          HostedZoneId: "abc123456"
+          HostedZoneId: abc123456
 
   MyApi3:
     Type: AWS::Serverless::HttpApi
@@ -27,4 +27,4 @@ Resources:
         CertificateArn: arn::cert::abc
         EndpointConfiguration: REGIONAL
         Route53:
-          HostedZoneId: "abc123456"
+          HostedZoneId: abc123456

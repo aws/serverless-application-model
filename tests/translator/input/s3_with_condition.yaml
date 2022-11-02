@@ -1,8 +1,8 @@
 Conditions:
   MyCondition:
     Fn::Equals:
-      - yes
-      - no
+    - yes
+    - no
 Resources:
   ThumbnailFunction:
     Type: AWS::Serverless::Function

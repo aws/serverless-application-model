@@ -3,10 +3,10 @@ Resources:
     Type: AWS::Serverless::StateMachine
     Properties:
       Name: MyStateMachine
-      Definition: "{}"
+      Definition: '{}'
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-          - Effect: Deny
-            Action: "*"
-            Resource: "*"
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'

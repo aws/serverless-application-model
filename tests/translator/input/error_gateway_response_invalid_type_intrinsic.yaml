@@ -8,7 +8,7 @@ Resources:
           Fn::Select:
           - 0
           - - ResponseParameters:
-                  Headers:
-                    Access-Control-Allow-Origin: '''*'''
-                    Access-Control-Allow-Methods: '''GET,OPTIONS'''
-                    Access-Control-Allow-Headers: '''content-type'''
+                Headers:
+                  Access-Control-Allow-Origin: "'*'"
+                  Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                  Access-Control-Allow-Headers: "'content-type'"

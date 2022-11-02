@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion : '2010-09-09'
+AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   EnvType:
@@ -16,4 +16,5 @@ Resources:
       CodeUri: s3://bucket/key
       AutoPublishAlias: live
       DeploymentPreference:
-        Type: !If [IsDevEnv, !If [IsDevEnv2, AllAtOnce, TestCustomDeploymentConfig], Canary10Percent15Minutes]
+        Type: !If [IsDevEnv, !If [IsDevEnv2, AllAtOnce, TestCustomDeploymentConfig],
+          Canary10Percent15Minutes]

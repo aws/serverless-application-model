@@ -18,11 +18,11 @@ Resources:
               Enabled: true
             FilterPolicy:
               store:
-                - example_corp
+              - example_corp
               price_usd:
-                - numeric:
-                    - ">="
-                    - 100
+              - numeric:
+                - '>='
+                - 100
 
   Notifications:
     Type: AWS::SNS::Topic

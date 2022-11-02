@@ -89,7 +89,7 @@ Resources:
         UsagePlan:
           CreateUsagePlan: PER_API
           Quota:
-            Limit: "3"
+            Limit: '3'
   ApiQuotaLimitNotIntrinsic:
     Type: AWS::Serverless::Api
     Properties:
@@ -108,7 +108,7 @@ Resources:
         UsagePlan:
           CreateUsagePlan: PER_API
           Quota:
-            Offset: "3"
+            Offset: '3'
   ApiQuotaOffsetNotIntrinsic:
     Type: AWS::Serverless::Api
     Properties:
@@ -173,7 +173,7 @@ Resources:
         UsagePlan:
           CreateUsagePlan: PER_API
           Tags:
-            - 3
+          - 3
   ApiTagsItemMissingKey:
     Type: AWS::Serverless::Api
     Properties:
@@ -182,7 +182,7 @@ Resources:
         UsagePlan:
           CreateUsagePlan: PER_API
           Tags:
-            - Value: MyValue
+          - Value: MyValue
   ApiTagsItemMissingValue:
     Type: AWS::Serverless::Api
     Properties:
@@ -191,7 +191,7 @@ Resources:
         UsagePlan:
           CreateUsagePlan: PER_API
           Tags:
-            - Key: MyKey
+          - Key: MyKey
 
   # Throttle
   ApiThrottleEmpty:
@@ -227,7 +227,7 @@ Resources:
         UsagePlan:
           CreateUsagePlan: PER_API
           Throttle:
-            BurstLimit: "3"
+            BurstLimit: '3'
   ApiThrottleRateLimitEmpty:
     Type: AWS::Serverless::Api
     Properties:
@@ -245,7 +245,7 @@ Resources:
         UsagePlan:
           CreateUsagePlan: PER_API
           Throttle:
-            RateLimit: "3"
+            RateLimit: '3'
 
   # UsagePlanName
   ApiUsagePlanNameEmpty:

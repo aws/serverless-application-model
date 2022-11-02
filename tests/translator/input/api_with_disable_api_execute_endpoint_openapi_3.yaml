@@ -4,7 +4,7 @@ Resources:
     Properties:
       StageName: prod
       OpenApiVersion: 3.0
-      DisableExecuteApiEndpoint: True
+      DisableExecuteApiEndpoint: true
   ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -18,6 +18,6 @@ Resources:
               Ref: ApiGatewayApi
       Runtime: python3.7
       Handler: index.handler
-      InlineCode: |
+      InlineCode: |-
         def handler(event, context):
             return {'body': 'Hello World!', 'statusCode': 200}

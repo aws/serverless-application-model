@@ -1,20 +1,20 @@
 Parameters:
   PathA:
     Type: String
-    Default: "SomeInputPath"
+    Default: SomeInputPath
   PathB:
     Type: String
-    Default: "AnotherInputPath"
+    Default: AnotherInputPath
 
 Conditions:
   PathCondition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
 
 Resources:
   LambdaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -23,9 +23,9 @@ Resources:
         OnTerminate:
           Type: CloudWatchEvent
           Properties:
-            EventBusName: !Join [ "", [ "Event", "Bus", "Name" ] ]
-            Input: !Join [ ":", [ "{ Key", "Value }" ] ]
-            InputPath: !If [ PathCondition, !Ref PathA, !Ref PathB ]
+            EventBusName: !Join ['', [Event, Bus, Name]]
+            Input: !Join [':', ['{ Key', 'Value }']]
+            InputPath: !If [PathCondition, !Ref PathA, !Ref PathB]
             Pattern:
               detail:
-                state: !Split [ "," , "terminated,stopped" ]
+                state: !Split [',', 'terminated,stopped']

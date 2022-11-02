@@ -6,8 +6,8 @@ Parameters:
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   SaveNotificationFunction:
@@ -22,15 +22,15 @@ Resources:
           Properties:
             FilterPolicy:
               Fn::If:
-                - MyCondition
-                - price_usd:
-                    - numeric:
-                        - ">="
-                        - 100
-                - price_usd:
-                    - numeric:
-                        - "<"
-                        - 100
+              - MyCondition
+              - price_usd:
+                - numeric:
+                  - '>='
+                  - 100
+              - price_usd:
+                - numeric:
+                  - <
+                  - 100
             Region:
               Ref: SnsRegion
             SqsSubscription: true

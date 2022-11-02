@@ -12,12 +12,12 @@ Resources:
         OneTrigger:
           Type: Cognito
           Properties:
-            UserPool: 
+            UserPool:
               Ref: UserPool
             Trigger: PreSignUp
         TwoTrigger:
           Type: Cognito
           Properties:
-            UserPool: 
+            UserPool:
               Ref: UserPool
-            Trigger: PreSignUp            
+            Trigger: PreSignUp

@@ -16,22 +16,23 @@ Resources:
             Ref: AWS::StackName
         securityDefinitions: # 1 Add security definition
           CognitoAuthorizer:
-            type: "apiKey"
-            name: "Authorization"
-            in: "header"
-            x-amazon-apigateway-authtype: "cognito_user_pools"
+            type: apiKey
+            name: Authorization
+            in: header
+            x-amazon-apigateway-authtype: cognito_user_pools
             x-amazon-apigateway-authorizer:
               providerARNs:
-                - # userPool ARN
-              type: "cognito_user_pools"
+              - 
+                  # userPool ARN
+              type: cognito_user_pools
         paths:
-          "/{proxy+}":
+          /{proxy+}:
             x-amazon-apigateway-any-method:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetHtmlFunction.Arn}/invocations
-              responses: { }
+              responses: {}
         components:
-        openapi: '3.0.0'
+        openapi: 3.0.0

@@ -26,7 +26,7 @@ Resources:
       RestApiId: !Ref MyApiGateway
 
   MyApiGatewayV2:
-    Type: 'AWS::ApiGatewayV2::Api'
+    Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: MyApi
       ProtocolType: WEBSOCKET
@@ -47,12 +47,12 @@ Resources:
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: lambda.amazonaws.com
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
       ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   MyFunction:
     Type: AWS::Lambda::Function
@@ -70,39 +70,39 @@ Resources:
   MyConnectorServerlessApiToLambda:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: MyServerlessApi
-      Destination: 
+      Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write
 
   MyConnectorApigwToLambda:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: MyApiGateway
-      Destination: 
+      Destination:
         Id: MyServerlessFunction
       Permissions:
-        - Write
+      - Write
 
   MyConnectorApiV2ToLambda:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: MyApiGatewayV2
-      Destination: 
+      Destination:
         Id: MyServerlessFunction
       Permissions:
-        - Write
+      - Write
 
   MyConnectorServerlessHttpApiToLambda:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: MyHttpApi
-      Destination: 
+      Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write

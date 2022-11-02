@@ -1,6 +1,5 @@
 Conditions:
-  DummyCondition:
-    !Equals ["", ""]
+  DummyCondition: !Equals ['', '']
 
 Resources:
   FunctionWithConditionalPolicy:
@@ -11,9 +10,9 @@ Resources:
       Runtime: python2.7
       CodeUri: s3://sam-demo-bucket/hello.zip
       Policies:
-        - !If
-          - DummyCondition
-          - AWSSecretsManagerGetSecretValuePolicy:
-              SecretArn: "Dummy Secret Arn"
-          - AWSSecretsManagerRotationPolicy:
-              FunctionName: "Dummy Function Name"
+      - !If
+        - DummyCondition
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: Dummy Secret Arn
+        - AWSSecretsManagerRotationPolicy:
+            FunctionName: Dummy Function Name

@@ -13,5 +13,5 @@ Resources:
       FunctionUrlConfig:
         AuthType: NONE
         Cors:
-          AllowOrigin: 
-            - "https://example.com"
+          AllowOrigin:
+          - https://example.com

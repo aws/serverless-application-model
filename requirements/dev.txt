@@ -26,6 +26,7 @@ docopt~=0.6.2
 
 # formatter
 black==20.8b1
+ruamel.yaml==0.17.21  # It can parse yaml while perserving comments
 
 # type check
 mypy==0.971

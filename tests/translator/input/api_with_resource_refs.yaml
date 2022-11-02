@@ -2,15 +2,15 @@
 
 Resources:
   MyApi:
-    Type: 'AWS::Serverless::Api'
+    Type: AWS::Serverless::Api
     Properties:
       StageName: foo
       DefinitionBody:
-        "this": "is"
-        "a": "swagger"
+        this: is
+        a: swagger
 
   MyFunction:
-    Type: "AWS::Serverless::Function"
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -36,4 +36,3 @@ Outputs:
     Value: !Ref MyApi.Deployment
   ExplicitApiStage:
     Value: !Ref MyApi.Stage
-

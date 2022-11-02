@@ -72,7 +72,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      DefinitionBody: { invalid: true }
+      DefinitionBody: {invalid: true}
       Models:
         User:
           type: object
@@ -95,4 +95,4 @@ Resources:
             Method: get
             RequestModel:
               Model:
-                - NotString
+              - NotString

@@ -7,7 +7,7 @@ Resources:
       DefinitionUri: s3://bucket/key
       Tags:
         Tag: value
-      StageName: !Join ["", ["Stage", "Name"]]
+      StageName: !Join ['', [Stage, Name]]
 
   Function:
     Type: AWS::Serverless::Function

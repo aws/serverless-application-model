@@ -1,9 +1,9 @@
 Parameters:
-  MyDomainName: 
+  MyDomainName:
     Type: String
     Default: sam-example.com
 
-  MyDomainCert: 
+  MyDomainCert:
     Type: String
     Default: arn:aws:acm:us-east-1:123455353535:certificate/6c911401-620d-4d41-b89e-366c238bb2f3
 
@@ -14,16 +14,16 @@ Globals:
       CertificateArn: !Ref MyDomainCert
       EndpointConfiguration: REGIONAL
       MutualTlsAuthentication:
-        TruststoreUri: 'my-api-v2-truststore-uri'
-        TruststoreVersion: 'my-api-v2-truststore-version'
+        TruststoreUri: my-api-v2-truststore-uri
+        TruststoreVersion: my-api-v2-truststore-version
       SecurityPolicy: TLS_1_2
-      BasePath: ["/basic", "/begin-here"]
+      BasePath: [/basic, /begin-here]
       Route53:
         HostedZoneName: sam-example.com.
 
 
 Resources:
-  HttpApiFunction: 
+  HttpApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       InlineCode: |
@@ -47,7 +47,7 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref MyApi
-  
+
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:

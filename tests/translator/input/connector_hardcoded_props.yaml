@@ -25,7 +25,7 @@ Resources:
         Type: AWS::SNS::Topic
         Arn: !GetAtt Egg.Baz
       Permissions:
-        - Write
+      - Write
 
   TopicToQueue:
     Type: AWS::Serverless::Connector
@@ -37,7 +37,7 @@ Resources:
         Arn: !Ref MyQueue
         QueueUrl: !If [true, !Ref Foo, !Ref Bar]
       Permissions:
-        - Write
+      - Write
 
   LambdaToQueue:
     Type: AWS::Serverless::Connector
@@ -49,7 +49,7 @@ Resources:
       Destination:
         Id: MyQueue
       Permissions:
-        - Write
+      - Write
 
   ApiV1ToLambda:
     Type: AWS::Serverless::Connector
@@ -61,7 +61,7 @@ Resources:
       Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write
 
   ApiV2ToLambda:
     Type: AWS::Serverless::Connector
@@ -69,11 +69,11 @@ Resources:
       Source:
         Type: AWS::ApiGatewayV2::Api
         ResourceId: !Ref MyApiV2
-        Qualifier: "*"
+        Qualifier: '*'
       Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write
 
   SfnToSfn:
     Type: AWS::Serverless::Connector
@@ -88,5 +88,5 @@ Resources:
         Arn: some-other-arn
         Name: !GetAtt MySfn.Name
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write

@@ -1,6 +1,6 @@
 Resources:
   FunctionApiInvalidProperties:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -8,10 +8,10 @@ Resources:
       Events:
         ApiEvent:
           Type: Api
-          Properties: '/hello' # NOTE: Should be an object no a string
+          Properties: /hello   # NOTE: Should be an object no a string
 
   FunctionApiNoMethod:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -22,9 +22,9 @@ Resources:
           Properties:
             method: get # NOTE: lowercase 'm'
             Path: /
-  
+
   FunctionApiNoPath:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -35,9 +35,8 @@ Resources:
           Properties:
             Method: get
             path: / # NOTE: lowercase 'm'
-  
   FunctionApiPathArray:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -48,9 +47,8 @@ Resources:
           Properties:
             Method: get
             Path: [/, /users]
-  
   FunctionApiMethodArray:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

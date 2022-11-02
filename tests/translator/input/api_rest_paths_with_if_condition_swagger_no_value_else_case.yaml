@@ -7,19 +7,17 @@ Description: >
 
 Globals:
   Api:
-    Cors: {
-    "Fn::Join": [",", ["www.amazon.com", "www.google.com"]]
-    }
+    Cors: {Fn::Join: [',', [www.amazon.com, www.google.com]]}
 
 Conditions:
   TrueCondition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
   FalseCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   MyAuthFn:
@@ -37,17 +35,17 @@ Resources:
         ApiKeyRequired: true
         Authorizers:
           MyLambdaAuthUpdated:
-            FunctionArn: 
+            FunctionArn:
               Fn::GetAtt:
-                - MyAuthFn
-                - Arn
+              - MyAuthFn
+              - Arn
             FunctionInvokeRole:
               Fn::GetAtt:
-                - MyAuthFnRole
-                - Arn
+              - MyAuthFnRole
+              - Arn
             Identity:
               Headers:
-                - Authorization
+              - Authorization
               ReauthorizeEvery: 37
             EnableSimpleResponses: false
             AuthorizerPayloadFormatVersion: 1.0
@@ -59,12 +57,11 @@ Resources:
         paths:
           /post:
             Fn::If:
-                - FalseCondition
-                - 
-                  post:
-                    x-amazon-apigateway-integration:
-                      httpMethod: POST
-                      type: aws_proxy
-                      uri: https://www.otherURI.co/
-                      payloadFormatVersion: '1.0'
-                - Ref: "AWS::NoValue"
+            - FalseCondition
+            - post:
+                x-amazon-apigateway-integration:
+                  httpMethod: POST
+                  type: aws_proxy
+                  uri: https://www.otherURI.co/
+                  payloadFormatVersion: '1.0'
+            - Ref: AWS::NoValue

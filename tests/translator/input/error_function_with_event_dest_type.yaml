@@ -9,7 +9,7 @@ Globals:
       MaximumEventAgeInSeconds: 70
       MaximumRetryAttempts: 1
       DestinationConfig:
-        OnFailure: 
+        OnFailure:
           Type: blah
           Destination: !Ref SNSArn
 

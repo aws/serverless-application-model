@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Conditions:
@@ -7,7 +7,7 @@ Conditions:
 
 Resources:
   APIGateway:
-    Type: 'AWS::Serverless::Api'
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
@@ -18,5 +18,5 @@ Resources:
             FunctionArn: SomeArn
             Identity:
               Headers:
-                - Accept
+              - Accept
               ReauthorizeEvery: !If [isProd, 3600, 0]

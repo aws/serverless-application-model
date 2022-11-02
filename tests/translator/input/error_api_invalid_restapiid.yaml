@@ -58,4 +58,3 @@ Resources:
     Properties:
       StageName: MyStageName
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
-

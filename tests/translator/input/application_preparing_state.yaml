@@ -1,6 +1,6 @@
 Resources:
   PreparingApplication:
-    Type: 'AWS::Serverless::Application'
+    Type: AWS::Serverless::Application
     Properties:
       Location:
         ApplicationId: preparing

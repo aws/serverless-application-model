@@ -22,8 +22,8 @@ Resources:
         }
       Runtime: nodejs12.x
       Policies:
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt MySqsQueue.QueueName
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt MySqsQueue.QueueName
       Events:
         StreamEvent:
           Type: Kinesis

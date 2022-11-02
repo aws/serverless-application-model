@@ -1,8 +1,8 @@
 Globals:
   Api:
     AccessLogSetting:
-      DestinationArn: "arn:aws:logs:us-west-2:012345678901/API-Gateway-Execution-Logs_0123456789/prod:log-stream:12345678910"
-      Format: "$context.requestId"
+      DestinationArn: arn:aws:logs:us-west-2:012345678901/API-Gateway-Execution-Logs_0123456789/prod:log-stream:12345678910
+      Format: $context.requestId
 
 Resources:
   ImplicitApiFunction:

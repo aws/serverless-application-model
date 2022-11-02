@@ -4,7 +4,7 @@ Parameters:
 
 Resources:
   ConcurrentFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -12,11 +12,9 @@ Resources:
       ReservedConcurrentExecutions: 100
 
   AnotherFunction:
-    Type: "AWS::Serverless::Function"
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
       Runtime: python2.7
-      ReservedConcurrentExecutions: {
-        "Ref": "Concurrency"
-      }
+      ReservedConcurrentExecutions: {Ref: Concurrency}

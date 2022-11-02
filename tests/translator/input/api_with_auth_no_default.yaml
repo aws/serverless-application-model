@@ -1,6 +1,6 @@
 Resources:
   MyApiWithCognitoAuth:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
@@ -9,7 +9,7 @@ Resources:
             UserPoolArn: !GetAtt MyUserPool.Arn
 
   MyApiWithLambdaTokenAuth:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
@@ -18,7 +18,7 @@ Resources:
             FunctionArn: !GetAtt MyAuthFn.Arn
 
   MyApiWithLambdaRequestAuth:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
@@ -28,7 +28,7 @@ Resources:
             FunctionArn: !GetAtt MyAuthFn.Arn
             Identity:
               Headers:
-                - Authorization1
+              - Authorization1
   MyAuthFn:
     Type: AWS::Serverless::Function
     Properties:
@@ -86,8 +86,8 @@ Resources:
         PasswordPolicy:
           MinimumLength: 8
       UsernameAttributes:
-        - email
+      - email
       Schema:
-        - AttributeDataType: String
-          Name: email
-          Required: false
+      - AttributeDataType: String
+        Name: email
+        Required: false

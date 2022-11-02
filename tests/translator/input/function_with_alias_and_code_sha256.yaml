@@ -1,12 +1,12 @@
 Parameters:
   AutoPublishCodeSha256:
-    Type: "String"
-    Description: "Sha256 to uniquely identify creation of the lambda"
+    Type: String
+    Description: Sha256 to uniquely identify creation of the lambda
     Default: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
 
 Resources:
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -14,4 +14,3 @@ Resources:
       AutoPublishAlias: live
       AutoPublishCodeSha256: !Ref AutoPublishCodeSha256
       VersionDescription: sam-testing
-

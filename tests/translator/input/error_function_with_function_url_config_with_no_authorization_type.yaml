@@ -12,17 +12,16 @@ Resources:
       Timeout: 3
       FunctionUrlConfig:
         Cors:
-            AllowOrigins: 
-              - "https://example.com"
-              - "example1.com"
-              - "example2.com"
-              - "example2.com"
-            AllowMethods: 
-              - "GET"
-            AllowCredentials: true
-            AllowHeaders: 
-              - "x-Custom-Header"
-            ExposeHeaders: 
-              - "x-amzn-header"
-            MaxAge: 10
-
+          AllowOrigins:
+          - https://example.com
+          - example1.com
+          - example2.com
+          - example2.com
+          AllowMethods:
+          - GET
+          AllowCredentials: true
+          AllowHeaders:
+          - x-Custom-Header
+          ExposeHeaders:
+          - x-amzn-header
+          MaxAge: 10

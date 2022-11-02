@@ -5,7 +5,7 @@ Parameters:
 Globals:
   Api:
     # Overriding this property for Implicit API
-    EndpointConfiguration: { "Ref": "EndpointConfig" }
+    EndpointConfiguration: {Ref: EndpointConfig}
 
 Resources:
   ImplicitApiFunction:

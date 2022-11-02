@@ -1,13 +1,13 @@
 Resources:
   MyApiWithAwsIamAuthNoCallerCredentials:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
         DefaultAuthorizer: AWS_IAM
         InvokeRole: NONE
   MyApiWithAwsIamAuth:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
@@ -122,7 +122,7 @@ Resources:
             Path: /MyFunctionNullInvokeRole
             Auth:
               Authorizer: AWS_IAM
-              InvokeRole: null
+              InvokeRole:
   MyFunctionCallerCredentialsOverride:
     Type: AWS::Serverless::Function
     Properties:

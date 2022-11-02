@@ -1,8 +1,8 @@
-Globals: [1,2,3]
+Globals: [1, 2, 3]
 
 Resources:
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

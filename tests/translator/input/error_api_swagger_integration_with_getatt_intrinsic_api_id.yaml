@@ -9,7 +9,7 @@ Resources:
         GetHtml:
           Type: Api
           Properties:
-            RestApiId: !GetAtt HtmlApi.Name 
+            RestApiId: !GetAtt HtmlApi.Name
             Path: /
             Method: get
             Auth:

@@ -1,5 +1,5 @@
 Resources:
-  HttpApiFunction: 
+  HttpApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
@@ -15,7 +15,7 @@ Resources:
         SimpleCase:
           Type: HttpApi
 
-  HttpApiFunction2: 
+  HttpApiFunction2:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip

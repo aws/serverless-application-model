@@ -12,7 +12,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
-      CacheClusterEnabled: "true"
+      CacheClusterEnabled: 'true'
 
   # CacheClusterEnabled not intrinsic
   ApiCacheClusterEnabledNotIntrinsic:

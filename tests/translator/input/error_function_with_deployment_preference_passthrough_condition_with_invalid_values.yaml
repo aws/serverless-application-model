@@ -18,26 +18,27 @@ Parameters:
   EnableAliasProvisionedConcurrency:
     Type: String
     AllowedValues:
-      - true
-      - false
+    - true
+    - false
     Default: true
   DefaultTrueParam:
     Type: String
-    Default: "true"
+    Default: 'true'
   DefaultFalseParam:
     Type: String
-    Default: "false"
+    Default: 'false'
   HelloWorldParam:
     Type: String
-    Default: "hello"
+    Default: hello
 
 Conditions:
-  AliasProvisionedConcurrencyEnabled: !Equals [!Ref EnableAliasProvisionedConcurrency, true]
+  AliasProvisionedConcurrencyEnabled: !Equals [!Ref EnableAliasProvisionedConcurrency,
+    true]
   FunctionCondition: !Equals [true, true]
 
 Resources:
   InvalidType:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: FunctionCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -46,14 +47,13 @@ Resources:
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery3Minutes
-        PassthroughCondition: ["hello"]
+        PassthroughCondition: [hello]
       ProvisionedConcurrencyConfig: !If
-        - AliasProvisionedConcurrencyEnabled
-        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
-        - !Ref 'AWS::NoValue'
-
+      - AliasProvisionedConcurrencyEnabled
+      - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+      - !Ref 'AWS::NoValue'
   UnsupportedIntrinsic:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: FunctionCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -63,10 +63,10 @@ Resources:
       DeploymentPreference:
         Type: Linear10PercentEvery3Minutes
         PassthroughCondition: !If
-          - AliasProvisionedConcurrencyEnabled
-          - true
-          - false 
-      ProvisionedConcurrencyConfig: !If
         - AliasProvisionedConcurrencyEnabled
-        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
-        - !Ref 'AWS::NoValue'
+        - true
+        - false
+      ProvisionedConcurrencyConfig: !If
+      - AliasProvisionedConcurrencyEnabled
+      - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+      - !Ref 'AWS::NoValue'

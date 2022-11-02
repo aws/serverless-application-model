@@ -9,7 +9,7 @@ Resources:
         GetHtml:
           Type: Api
           Properties:
-            RestApiId: !Join [ "-", [ Html, Api ] ]
+            RestApiId: !Join ['-', [Html, Api]]
             Path: /
             Method: get
             Auth:

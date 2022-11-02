@@ -1,12 +1,12 @@
 Conditions:
   TestCondition:
     Fn::Equals:
-      - test
-      - test
+    - test
+    - test
 Resources:
   StateMachine:
     Type: AWS::Serverless::StateMachine
-    Condition: "TestCondition"
+    Condition: TestCondition
     Properties:
       Name: MyStateMachine
       DefinitionUri:
