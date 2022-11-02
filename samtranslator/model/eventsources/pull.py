@@ -273,7 +273,7 @@ class MQ(PullEventSource):
                 self.relative_id,
                 "No SourceAccessConfigurations for Amazon MQ event provided.",
             )
-        if not type(self.SourceAccessConfigurations) is list:  # type: ignore[attr-defined]
+        if not isinstance(self.SourceAccessConfigurations, list):  # type: ignore[attr-defined]
             raise InvalidEventException(
                 self.relative_id,
                 "Provided SourceAccessConfigurations cannot be parsed into a list.",
