@@ -10,7 +10,7 @@ Resources:
           Type: SQS
           Properties:
             Queue:
-              Fn::GetAtt: ["MySqsQueue", "Arn"]
+              Fn::GetAtt: [MySqsQueue, Arn]
             BatchSize: 2
 
   MySqsQueue:

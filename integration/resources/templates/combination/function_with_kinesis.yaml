@@ -19,7 +19,7 @@ Resources:
             StartingPosition: LATEST
             TumblingWindowInSeconds: 120
             FunctionResponseTypes:
-              - ReportBatchItemFailures
+            - ReportBatchItemFailures
 
   MyStream:
     Type: AWS::Kinesis::Stream

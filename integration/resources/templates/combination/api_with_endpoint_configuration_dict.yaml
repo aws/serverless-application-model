@@ -14,4 +14,3 @@ Resources:
       EndpointConfiguration:
         Type: REGIONAL
       DefinitionUri: ${definitionuri}
-

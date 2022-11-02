@@ -1,8 +1,26 @@
 [
-  { "LogicalResourceId":"MyStateMachine", "ResourceType":"AWS::StepFunctions::StateMachine" },
-  { "LogicalResourceId":"MyStateMachineRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyStateMachineCWEvent", "ResourceType":"AWS::Events::Rule" },
-  { "LogicalResourceId":"MyStateMachineCWEventRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyStateMachineCWEventQueue", "ResourceType":"AWS::SQS::Queue" },
-  { "LogicalResourceId":"MyStateMachineCWEventQueuePolicy", "ResourceType":"AWS::SQS::QueuePolicy" }
+  {
+    "LogicalResourceId": "MyStateMachine",
+    "ResourceType": "AWS::StepFunctions::StateMachine"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineCWEvent",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineCWEventRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineCWEventQueue",
+    "ResourceType": "AWS::SQS::Queue"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineCWEventQueuePolicy",
+    "ResourceType": "AWS::SQS::QueuePolicy"
+  }
 ]

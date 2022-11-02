@@ -1,5 +1,14 @@
 [
-  { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function"},
-  { "LogicalResourceId":"MyFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyQueue", "ResourceType":"AWS::SQS::Queue" }
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyQueue",
+    "ResourceType": "AWS::SQS::Queue"
+  }
 ]

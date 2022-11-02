@@ -1,13 +1,13 @@
 Globals:
   Api:
-    OpenApiVersion: '3.0.1'
+    OpenApiVersion: 3.0.1
     CacheClusterEnabled: true
     CacheClusterSize: '0.5'
     MethodSettings:
-      - ResourcePath: /one
-        HttpMethod: "GET"
-        CachingEnabled: true
-        CacheTtlInSeconds: 15
+    - ResourcePath: /one
+      HttpMethod: GET
+      CachingEnabled: true
+      CacheTtlInSeconds: 15
 Resources:
   ApiParameterFunction:
     Type: AWS::Serverless::Function
@@ -37,9 +37,9 @@ Resources:
             Path: /one
             Method: get
             RequestParameters:
-              - method.request.querystring.type:
-                  Required: true
-                  Caching: true
+            - method.request.querystring.type:
+                Required: true
+                Caching: true
         AnotherGetHtml:
           Type: Api
           Properties:

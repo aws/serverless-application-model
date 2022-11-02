@@ -1,16 +1,58 @@
 [
-  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyLambdaFunctionAliasLive", "ResourceType":"AWS::Lambda::Alias" },
-  { "LogicalResourceId":"MyLambdaFunctionVersion", "ResourceType":"AWS::Lambda::Version" },
-  { "LogicalResourceId":"PreTrafficFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"PreTrafficFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"PostTrafficFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"PostTrafficFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"ServerlessDeploymentApplication", "ResourceType":"AWS::CodeDeploy::Application" },
-  { "LogicalResourceId":"MyLambdaFunctionDeploymentGroup", "ResourceType":"AWS::CodeDeploy::DeploymentGroup" },
-  { "LogicalResourceId":"DeploymentRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"FunctionErrorsAlarm", "ResourceType":"AWS::CloudWatch::Alarm" },
-  { "LogicalResourceId":"AliasErrorsAlarm", "ResourceType":"AWS::CloudWatch::Alarm" },
-  { "LogicalResourceId":"NewVersionErrorsAlarm", "ResourceType":"AWS::CloudWatch::Alarm" }
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionAliasLive",
+    "ResourceType": "AWS::Lambda::Alias"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionVersion",
+    "ResourceType": "AWS::Lambda::Version"
+  },
+  {
+    "LogicalResourceId": "PreTrafficFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "PreTrafficFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "PostTrafficFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "PostTrafficFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "ServerlessDeploymentApplication",
+    "ResourceType": "AWS::CodeDeploy::Application"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionDeploymentGroup",
+    "ResourceType": "AWS::CodeDeploy::DeploymentGroup"
+  },
+  {
+    "LogicalResourceId": "DeploymentRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "FunctionErrorsAlarm",
+    "ResourceType": "AWS::CloudWatch::Alarm"
+  },
+  {
+    "LogicalResourceId": "AliasErrorsAlarm",
+    "ResourceType": "AWS::CloudWatch::Alarm"
+  },
+  {
+    "LogicalResourceId": "NewVersionErrorsAlarm",
+    "ResourceType": "AWS::CloudWatch::Alarm"
+  }
 ]
