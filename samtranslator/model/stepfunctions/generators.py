@@ -94,7 +94,7 @@ class StateMachineGenerator(object):
         )
         self.substitution_counter = 1
 
-    @cw_timer(prefix="Generator", name="StateMachine")  # type: ignore[no-untyped-call]
+    @cw_timer(prefix="Generator", name="StateMachine")
     def to_cloudformation(self):  # type: ignore[no-untyped-def]
         """
         Constructs and returns the State Machine resource and any additional resources associated with it.
@@ -171,13 +171,14 @@ class StateMachineGenerator(object):
             s3_pointer = self.definition_uri
         else:
             # DefinitionUri is a string
-            s3_pointer = parse_s3_uri(self.definition_uri)  # type: ignore[no-untyped-call]
-            if s3_pointer is None:
+            parsed_s3_pointer = parse_s3_uri(self.definition_uri)
+            if parsed_s3_pointer is None:
                 raise InvalidResourceException(
                     self.logical_id,
                     "'DefinitionUri' is not a valid S3 Uri of the form "
                     "'s3://bucket/key' with optional versionId query parameter.",
                 )
+            s3_pointer = parsed_s3_pointer
 
         definition_s3 = {"Bucket": s3_pointer["Bucket"], "Key": s3_pointer["Key"]}
         if "Version" in s3_pointer:
@@ -236,7 +237,7 @@ class StateMachineGenerator(object):
         :rtype: list
         """
         sam_tag = {self._SAM_KEY: self._SAM_VALUE}
-        return get_tag_list(sam_tag) + get_tag_list(self.tags)  # type: ignore[no-untyped-call]
+        return get_tag_list(sam_tag) + get_tag_list(self.tags)
 
     def _generate_event_resources(self):  # type: ignore[no-untyped-def]
         """Generates and returns the resources associated with this state machine's event sources.

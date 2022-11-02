@@ -125,7 +125,7 @@ class FeatureToggleLocalConfigProvider(FeatureToggleConfigProvider):
 class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
     """Feature toggle config provider which loads config from AppConfig."""
 
-    @cw_timer(prefix="External", name="AppConfig")  # type: ignore[no-untyped-call]
+    @cw_timer(prefix="External", name="AppConfig")  # type: ignore[misc]
     def __init__(self, application_id, environment_id, configuration_profile_id, app_config_client=None):  # type: ignore[no-untyped-def]
         FeatureToggleConfigProvider.__init__(self)
         try:

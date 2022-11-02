@@ -58,7 +58,7 @@ class PullEventSource(ResourceMacro):
     def get_policy_statements(self):  # type: ignore[no-untyped-def]
         raise NotImplementedError("Subclass must implement this method")
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the Lambda EventSourceMapping to which this pull event corresponds. Adds the appropriate managed
         policy to the function's execution role, if such a role is provided.
