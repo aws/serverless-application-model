@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # This test-case tests what happens when an AWS_IAM authorizer is defined on an HttpApi but not enabled anywhere else.
 # While the defined authorizer isn't really a true Iam authorizer (it's just a poorly-named OAuth authorizer) this shouldn't cause an error.
 Resources:

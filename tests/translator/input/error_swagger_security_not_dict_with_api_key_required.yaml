@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 transformId: AWS::Serverless-2016-10-31
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:

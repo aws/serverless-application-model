@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # When there are unknown policy templates, we will simply skip the entry
 
 Resources:

@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Conditions:
   C1:
     Fn::Equals:

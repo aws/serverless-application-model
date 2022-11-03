@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   StarterLambda:
     Type: AWS::Serverless::Function
