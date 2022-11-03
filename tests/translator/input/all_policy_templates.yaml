@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # "Kitchen Sink" test containing all supported policy templates. The idea is to know every one of them is
 # transformable and fail on any changes in the policy template definition without updating the test
 # Since this not about testing the transformation logic, we will keep the policy template parameter values as literal

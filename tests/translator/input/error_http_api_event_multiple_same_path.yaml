@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   HttpApiFunction2:
     Type: AWS::Serverless::Function

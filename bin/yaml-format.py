@@ -17,6 +17,9 @@ from ruamel.yaml.error import YAMLError
 from bin._file_formatter import FileFormatter
 
 yaml = YAML()
+# We have pyyaml (5.4) to parse our yamls in this repo,
+# and pyyaml uses Yaml 1.1
+yaml.version = (1, 1)  # type: ignore
 
 
 class YAMLFormatter(FileFormatter):

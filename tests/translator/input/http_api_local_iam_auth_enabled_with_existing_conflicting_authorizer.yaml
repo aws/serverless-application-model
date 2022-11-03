@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # This test-case tests what happens when an AWS_IAM authorizer is defined on an HttpApi and also enabled locally.
 # In this case the defined authorizer should NOT be overwritten.
 Resources:

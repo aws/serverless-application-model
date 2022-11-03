@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # SAM template using intrinsic function on every property that supports it.
 # Translator should handle it properly
 Parameters:

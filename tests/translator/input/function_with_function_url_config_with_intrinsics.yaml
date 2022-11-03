@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   AuthorizationTypeRef:
