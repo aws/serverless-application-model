@@ -7,13 +7,6 @@ transparent and open process for evolving AWS SAM.
 
 Please read through this document before submitting any issues or pull requests to ensure we have all the necessary information to effectively respond to your bug report or contribution.
 
-## Guidelines
-
-1. **Do not resolve [intrinsic functions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html).** Customers can use [`AWS::LanguageExtensions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-languageextension-transform.html) for that. See https://github.com/aws/serverless-application-model/issues/2533.
-2. **Do not break backward compatibility.** As rule of thumb, a specific SAM template should always transform into the same CloudFormation template. Add opt-in properties for breaking changes. There are some exceptions, such as changes that do not impact resources (e.g. [`Metadata`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)) or abstractions that can by design change over time.
-3. **Stick as closely as possible to the underlying CloudFormation properties.** This includes both property names and values. This ensures we can pass values to CloudFormation and let it handle any intrinsic functions. In some cases, it also allows us to pass all properties as-is to a resource, which means customers can always use the newest properties, and we don’t spend effort maintaining a duplicate set of properties.
-4. **Only validate what’s necessary.** Do not validate properties if they’re passed directly to the underlying CloudFormation resource.
-
 ## Integrating AWS SAM into your tool
 
 We encourage you to modify SAM to integrate it with other frameworks and deployment providers from the community for building serverless applications. If you're building a new tool that will use AWS SAM, let us know how we can help!
