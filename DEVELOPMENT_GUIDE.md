@@ -150,7 +150,14 @@ Note that please always check the generated output is as expected. This tool doe
 
 Integration tests are covered in detail in the [INTEGRATION_TESTS.md file](INTEGRATION_TESTS.md) of this repository.
 
-Code Conventions
+## Development guidelines
+
+1. **Do not resolve [intrinsic functions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html).** Adding [`AWS::LanguageExtensions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-languageextension-transform.html) before the `AWS::Serverless-2016-10-31` transform resolves most of them. See https://github.com/aws/serverless-application-model/issues/2533.
+2. **Do not break backward compatibility.** As rule of thumb, a specific SAM template should always transform into the same CloudFormation template. Do not change logical IDs. Add opt-in properties for breaking changes. There are some exceptions, such as changes that do not impact resources (e.g. [`Metadata`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)) or abstractions that can by design change over time.
+3. **Stick as close as possible to the underlying CloudFormation properties.** This includes both property names and values. This ensures we can pass values to CloudFormation and let it handle any intrinsic functions. In some cases, it also allows us to pass all properties as-is to a resource, which means customers can always use the newest properties, and we don’t spend effort maintaining a duplicate set of properties.
+4. **Only validate what’s necessary.** Do not validate properties if they’re passed directly to the underlying CloudFormation resource.
+
+Code conventions
 ----------------
 
 Please follow these code conventions when making your changes. This will
