@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   ThumbnailFunction:
     Type: AWS::Serverless::Function
@@ -18,8 +20,8 @@ Resources:
   Images:
     Type: AWS::S3::Bucket
     Properties:
-       BucketName: "BucketNameParameter"
-       BucketEncryption:
-         ServerSideEncryptionConfiguration:
-           - ServerSideEncryptionByDefault:
-               SSEAlgorithm: AES256
+      BucketName: BucketNameParameter
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256

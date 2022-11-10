@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Parameters:
   ReadCapacity:
     Type: Number
@@ -7,10 +9,10 @@ Parameters:
     Default: 15
   EnableSSE:
     Type: String # Boolean parameter types not allowed
-    Default: True
+    Default: true
 Resources:
   MinimalTableRefParamLongForm:
-    Type: 'AWS::Serverless::SimpleTable'
+    Type: AWS::Serverless::SimpleTable
     Properties:
       ProvisionedThroughput:
         ReadCapacityUnits:

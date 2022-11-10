@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Parameters:
   MyStageName:
     Type: String
@@ -45,5 +47,5 @@ Resources:
       StageName:
         Ref: MyStageName
       DefinitionBody:
-        "this": "is"
-        "a": "inline swagger"
+        this: is
+        a: inline swagger

@@ -1,7 +1,9 @@
+%YAML 1.1
+---
 Resources:
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
-      DisableExecuteApiEndpoint: False
+      DisableExecuteApiEndpoint: false
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json

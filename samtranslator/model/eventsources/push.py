@@ -55,7 +55,7 @@ class PushEventSource(ResourceMacro):
     # TODO: Make `PushEventSource` an abstract class and not giving `principal` initial value.
     principal: str = None  # type: ignore
 
-    def _construct_permission(
+    def _construct_permission(  # type: ignore[no-untyped-def]
         self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None
     ):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
@@ -69,8 +69,8 @@ class PushEventSource(ResourceMacro):
         if suffix.isalnum():
             permission_logical_id = prefix + "Permission" + suffix
         else:
-            generator = logical_id_generator.LogicalIdGenerator(prefix + "Permission", suffix)
-            permission_logical_id = generator.gen()
+            generator = logical_id_generator.LogicalIdGenerator(prefix + "Permission", suffix)  # type: ignore[no-untyped-call]
+            permission_logical_id = generator.gen()  # type: ignore[no-untyped-call]
         lambda_permission = LambdaPermission(
             permission_logical_id, attributes=function.get_passthrough_resource_attributes()
         )
@@ -97,6 +97,7 @@ class Schedule(PushEventSource):
     principal = "events.amazonaws.com"
     property_types = {
         "Schedule": PropertyType(True, is_str()),
+        "RuleName": PropertyType(False, is_str()),
         "Input": PropertyType(False, is_str()),
         "Enabled": PropertyType(False, is_type(bool)),
         "State": PropertyType(False, is_str()),
@@ -106,8 +107,8 @@ class Schedule(PushEventSource):
         "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the EventBridge Rule and Lambda Permission to which this Schedule event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
@@ -125,50 +126,50 @@ class Schedule(PushEventSource):
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         resources.append(events_rule)
 
-        events_rule.ScheduleExpression = self.Schedule
+        events_rule.ScheduleExpression = self.Schedule  # type: ignore[attr-defined]
 
-        if self.State and self.Enabled is not None:
+        if self.State and self.Enabled is not None:  # type: ignore[attr-defined, attr-defined]
             raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
 
-        if self.State:
-            events_rule.State = self.State
+        if self.State:  # type: ignore[attr-defined]
+            events_rule.State = self.State  # type: ignore[attr-defined]
 
-        if self.Enabled is not None:
-            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
+        if self.Enabled is not None:  # type: ignore[attr-defined]
+            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"  # type: ignore[attr-defined]
 
-        events_rule.Name = self.Name
-        events_rule.Description = self.Description
+        events_rule.Name = self.Name  # type: ignore[attr-defined]
+        events_rule.Description = self.Description  # type: ignore[attr-defined]
 
-        source_arn = events_rule.get_runtime_attr("arn")
+        source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
         dlq_queue_arn = None
-        if self.DeadLetterConfig is not None:
-            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
-            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(  # type: ignore[no-untyped-call]
                 self, source_arn, passthrough_resource_attributes
             )
             resources.extend(dlq_resources)
 
-        events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
+        events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]  # type: ignore[no-untyped-call]
 
-        resources.append(self._construct_permission(function, source_arn=source_arn))
+        resources.append(self._construct_permission(function, source_arn=source_arn))  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _construct_target(self, function, dead_letter_queue_arn=None):
+    def _construct_target(self, function, dead_letter_queue_arn=None):  # type: ignore[no-untyped-def]
         """Constructs the Target property for the EventBridge Rule.
 
         :returns: the Target property
         :rtype: dict
         """
         target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
-        if self.Input is not None:
-            target["Input"] = self.Input
+        if self.Input is not None:  # type: ignore[attr-defined]
+            target["Input"] = self.Input  # type: ignore[attr-defined]
 
-        if self.DeadLetterConfig is not None:
+        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
             target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
 
-        if self.RetryPolicy is not None:
-            target["RetryPolicy"] = self.RetryPolicy
+        if self.RetryPolicy is not None:  # type: ignore[attr-defined]
+            target["RetryPolicy"] = self.RetryPolicy  # type: ignore[attr-defined]
 
         return target
 
@@ -180,6 +181,7 @@ class CloudWatchEvent(PushEventSource):
     principal = "events.amazonaws.com"
     property_types = {
         "EventBusName": PropertyType(False, is_str()),
+        "RuleName": PropertyType(False, is_str()),
         "Pattern": PropertyType(False, is_type(dict)),
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "RetryPolicy": PropertyType(False, is_type(dict)),
@@ -190,8 +192,8 @@ class CloudWatchEvent(PushEventSource):
         "State": PropertyType(False, is_str()),
     }
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the CloudWatch Events/EventBridge Rule and Lambda Permission to which
         this CloudWatch Events/EventBridge event source corresponds.
 
@@ -208,53 +210,54 @@ class CloudWatchEvent(PushEventSource):
 
         passthrough_resource_attributes = function.get_passthrough_resource_attributes()
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
-        events_rule.EventBusName = self.EventBusName
-        events_rule.EventPattern = self.Pattern
-        source_arn = events_rule.get_runtime_attr("arn")
+        events_rule.EventBusName = self.EventBusName  # type: ignore[attr-defined]
+        events_rule.EventPattern = self.Pattern  # type: ignore[attr-defined]
+        events_rule.Name = self.RuleName  # type: ignore[attr-defined]
+        source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
 
         dlq_queue_arn = None
-        if self.DeadLetterConfig is not None:
-            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
-            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(  # type: ignore[no-untyped-call]
                 self, source_arn, passthrough_resource_attributes
             )
             resources.extend(dlq_resources)
 
-        if self.State and self.Enabled is not None:
+        if self.State and self.Enabled is not None:  # type: ignore[attr-defined, attr-defined]
             raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
 
-        if self.State:
-            events_rule.State = self.State
+        if self.State:  # type: ignore[attr-defined]
+            events_rule.State = self.State  # type: ignore[attr-defined]
 
-        if self.Enabled is not None:
-            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
+        if self.Enabled is not None:  # type: ignore[attr-defined]
+            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"  # type: ignore[attr-defined]
 
-        events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
+        events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]  # type: ignore[no-untyped-call]
 
         resources.append(events_rule)
-        resources.append(self._construct_permission(function, source_arn=source_arn))
+        resources.append(self._construct_permission(function, source_arn=source_arn))  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _construct_target(self, function, dead_letter_queue_arn=None):
+    def _construct_target(self, function, dead_letter_queue_arn=None):  # type: ignore[no-untyped-def]
         """Constructs the Target property for the CloudWatch Events/EventBridge Rule.
 
         :returns: the Target property
         :rtype: dict
         """
-        target_id = self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "LambdaTarget"
+        target_id = self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "LambdaTarget"  # type: ignore[attr-defined]
         target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
-        if self.Input is not None:
-            target["Input"] = self.Input
+        if self.Input is not None:  # type: ignore[attr-defined]
+            target["Input"] = self.Input  # type: ignore[attr-defined]
 
-        if self.InputPath is not None:
-            target["InputPath"] = self.InputPath
+        if self.InputPath is not None:  # type: ignore[attr-defined]
+            target["InputPath"] = self.InputPath  # type: ignore[attr-defined]
 
-        if self.DeadLetterConfig is not None:
+        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
             target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
 
-        if self.RetryPolicy is not None:
-            target["RetryPolicy"] = self.RetryPolicy
+        if self.RetryPolicy is not None:  # type: ignore[attr-defined]
+            target["RetryPolicy"] = self.RetryPolicy  # type: ignore[attr-defined]
 
         return target
 
@@ -276,17 +279,17 @@ class S3(PushEventSource):
         "Filter": PropertyType(False, dict_of(is_str(), is_str())),
     }
 
-    def resources_to_link(self, resources):
-        if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:
-            bucket_id = self.Bucket["Ref"]
+    def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
+        if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:  # type: ignore[attr-defined]
+            bucket_id = self.Bucket["Ref"]  # type: ignore[attr-defined]
             if not isinstance(bucket_id, str):
                 raise InvalidEventException(self.relative_id, "'Ref' value in S3 events is not a valid string.")
             if bucket_id in resources:
                 return {"bucket": resources[bucket_id], "bucket_id": bucket_id}
         raise InvalidEventException(self.relative_id, "S3 events must reference an S3 bucket in the same template.")
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the Lambda Permission resource allowing S3 to invoke the function this event source triggers.
 
         :param dict kwargs: S3 bucket resource
@@ -310,11 +313,11 @@ class S3(PushEventSource):
         resources = []
 
         source_account = ref("AWS::AccountId")
-        permission = self._construct_permission(function, source_account=source_account)
+        permission = self._construct_permission(function, source_account=source_account)  # type: ignore[no-untyped-call]
         if CONDITION in permission.resource_attributes:
-            self._depend_on_lambda_permissions_using_tag(bucket, permission)
+            self._depend_on_lambda_permissions_using_tag(bucket, permission)  # type: ignore[no-untyped-call]
         else:
-            self._depend_on_lambda_permissions(bucket, permission)
+            self._depend_on_lambda_permissions(bucket, permission)  # type: ignore[no-untyped-call]
         resources.append(permission)
 
         # NOTE: `bucket` here is a dictionary representing the S3 Bucket resource in your SAM template. If there are
@@ -327,12 +330,12 @@ class S3(PushEventSource):
         #   merging is literally "last one wins", which works fine because we linearly loop through the template once.
         #   The de-dupe happens inside `samtranslator.translator.Translator.translate` method when merging results of
         #   to_cloudformation() to output template.
-        self._inject_notification_configuration(function, bucket, bucket_id)
-        resources.append(S3Bucket.from_dict(bucket_id, bucket))
+        self._inject_notification_configuration(function, bucket, bucket_id)  # type: ignore[no-untyped-call]
+        resources.append(S3Bucket.from_dict(bucket_id, bucket))  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _depend_on_lambda_permissions(self, bucket, permission):
+    def _depend_on_lambda_permissions(self, bucket, permission):  # type: ignore[no-untyped-def]
         """
         Make the S3 bucket depends on Lambda Permissions resource because when S3 adds a Notification Configuration,
         it will check whether it has permissions to access Lambda. This will fail if the Lambda::Permissions is not
@@ -364,7 +367,7 @@ class S3(PushEventSource):
 
         return bucket
 
-    def _depend_on_lambda_permissions_using_tag(self, bucket, permission):
+    def _depend_on_lambda_permissions_using_tag(self, bucket, permission):  # type: ignore[no-untyped-def]
         """
         Since conditional DependsOn is not supported this undocumented way of
         implicitely  making dependency through tags is used.
@@ -389,18 +392,18 @@ class S3(PushEventSource):
                 "Fn::If": [permission.resource_attributes[CONDITION], ref(permission.logical_id), "no dependency"]
             }
         }
-        properties["Tags"] = tags + get_tag_list(dep_tag)
+        properties["Tags"] = tags + get_tag_list(dep_tag)  # type: ignore[no-untyped-call]
         return bucket
 
-    def _inject_notification_configuration(self, function, bucket, bucket_id):
+    def _inject_notification_configuration(self, function, bucket, bucket_id):  # type: ignore[no-untyped-def]
         base_event_mapping = {"Function": function.get_runtime_attr("arn")}
 
-        if self.Filter is not None:
-            base_event_mapping["Filter"] = self.Filter
+        if self.Filter is not None:  # type: ignore[attr-defined]
+            base_event_mapping["Filter"] = self.Filter  # type: ignore[attr-defined]
 
-        event_types = self.Events
-        if isinstance(self.Events, str):
-            event_types = [self.Events]
+        event_types = self.Events  # type: ignore[attr-defined]
+        if isinstance(self.Events, str):  # type: ignore[attr-defined]
+            event_types = [self.Events]  # type: ignore[attr-defined]
 
         event_mappings = []
         for event_type in event_types:
@@ -450,8 +453,8 @@ class SNS(PushEventSource):
         "SqsSubscription": PropertyType(False, one_of(is_type(bool), is_type(dict))),
     }
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the Lambda Permission resource allowing SNS to invoke the function this event source triggers.
 
         :param dict kwargs: no existing resources need to be modified
@@ -465,29 +468,29 @@ class SNS(PushEventSource):
             raise TypeError("Missing required keyword argument: function")
 
         # SNS -> Lambda
-        if not self.SqsSubscription:
-            subscription = self._inject_subscription(
+        if not self.SqsSubscription:  # type: ignore[attr-defined]
+            subscription = self._inject_subscription(  # type: ignore[no-untyped-call]
                 "lambda",
                 function.get_runtime_attr("arn"),
-                self.Topic,
-                self.Region,
-                self.FilterPolicy,
+                self.Topic,  # type: ignore[attr-defined]
+                self.Region,  # type: ignore[attr-defined]
+                self.FilterPolicy,  # type: ignore[attr-defined]
                 function,
             )
-            return [self._construct_permission(function, source_arn=self.Topic), subscription]
+            return [self._construct_permission(function, source_arn=self.Topic), subscription]  # type: ignore[attr-defined, no-untyped-call]
 
         # SNS -> SQS(Create New) -> Lambda
-        if isinstance(self.SqsSubscription, bool):
-            resources = []
-            queue = self._inject_sqs_queue(function)
+        if isinstance(self.SqsSubscription, bool):  # type: ignore[attr-defined]
+            resources = []  # type: ignore[var-annotated]
+            queue = self._inject_sqs_queue(function)  # type: ignore[no-untyped-call]
             queue_arn = queue.get_runtime_attr("arn")
             queue_url = queue.get_runtime_attr("queue_url")
 
-            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function)
-            subscription = self._inject_subscription(
-                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function
+            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function)  # type: ignore[attr-defined, no-untyped-call]
+            subscription = self._inject_subscription(  # type: ignore[no-untyped-call]
+                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function  # type: ignore[attr-defined, attr-defined, attr-defined]
             )
-            event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)
+            event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)  # type: ignore[no-untyped-call]
 
             resources = resources + event_source
             resources.append(queue)
@@ -497,27 +500,27 @@ class SNS(PushEventSource):
 
         # SNS -> SQS(Existing) -> Lambda
         resources = []
-        queue_arn = self.SqsSubscription.get("QueueArn", None)
-        queue_url = self.SqsSubscription.get("QueueUrl", None)
+        queue_arn = self.SqsSubscription.get("QueueArn", None)  # type: ignore[attr-defined]
+        queue_url = self.SqsSubscription.get("QueueUrl", None)  # type: ignore[attr-defined]
         if not queue_arn or not queue_url:
             raise InvalidEventException(self.relative_id, "No QueueARN or QueueURL provided.")
 
-        queue_policy_logical_id = self.SqsSubscription.get("QueuePolicyLogicalId", None)
-        batch_size = self.SqsSubscription.get("BatchSize", None)
-        enabled = self.SqsSubscription.get("Enabled", None)
+        queue_policy_logical_id = self.SqsSubscription.get("QueuePolicyLogicalId", None)  # type: ignore[attr-defined]
+        batch_size = self.SqsSubscription.get("BatchSize", None)  # type: ignore[attr-defined]
+        enabled = self.SqsSubscription.get("Enabled", None)  # type: ignore[attr-defined]
 
-        queue_policy = self._inject_sqs_queue_policy(
-            self.Topic, queue_arn, queue_url, function, queue_policy_logical_id
+        queue_policy = self._inject_sqs_queue_policy(  # type: ignore[no-untyped-call]
+            self.Topic, queue_arn, queue_url, function, queue_policy_logical_id  # type: ignore[attr-defined]
         )
-        subscription = self._inject_subscription("sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function)
-        event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)
+        subscription = self._inject_subscription("sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function)  # type: ignore[attr-defined, attr-defined, attr-defined, no-untyped-call]
+        event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)  # type: ignore[no-untyped-call]
 
         resources = resources + event_source
         resources.append(queue_policy)
         resources.append(subscription)
         return resources
 
-    def _inject_subscription(self, protocol, endpoint, topic, region, filterPolicy, function):
+    def _inject_subscription(self, protocol, endpoint, topic, region, filterPolicy, function):  # type: ignore[no-untyped-def]
         subscription = SNSSubscription(self.logical_id, attributes=function.get_passthrough_resource_attributes())
         subscription.Protocol = protocol
         subscription.Endpoint = endpoint
@@ -531,10 +534,10 @@ class SNS(PushEventSource):
 
         return subscription
 
-    def _inject_sqs_queue(self, function):
+    def _inject_sqs_queue(self, function):  # type: ignore[no-untyped-def]
         return SQSQueue(self.logical_id + "Queue", attributes=function.get_passthrough_resource_attributes())
 
-    def _inject_sqs_event_source_mapping(self, function, role, queue_arn, batch_size=None, enabled=None):
+    def _inject_sqs_event_source_mapping(self, function, role, queue_arn, batch_size=None, enabled=None):  # type: ignore[no-untyped-def]
         event_source = SQS(
             self.logical_id + "EventSourceMapping", attributes=function.get_passthrough_resource_attributes()
         )
@@ -543,12 +546,12 @@ class SNS(PushEventSource):
         event_source.Enabled = enabled or True
         return event_source.to_cloudformation(function=function, role=role)
 
-    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, function, logical_id=None):
+    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, function, logical_id=None):  # type: ignore[no-untyped-def]
         policy = SQSQueuePolicy(
             logical_id or self.logical_id + "QueuePolicy", attributes=function.get_passthrough_resource_attributes()
         )
 
-        policy.PolicyDocument = SQSQueuePolicies.sns_topic_send_message_role_policy(topic_arn, queue_arn)
+        policy.PolicyDocument = SQSQueuePolicies.sns_topic_send_message_role_policy(topic_arn, queue_arn)  # type: ignore[no-untyped-call]
         policy.Queues = [queue_url]
         return policy
 
@@ -569,7 +572,7 @@ class Api(PushEventSource):
         "RequestParameters": PropertyType(False, is_type(list)),
     }
 
-    def resources_to_link(self, resources):
+    def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
         """
         If this API Event Source refers to an explicit API resource, resolve the reference and grab
         necessary data from the explicit API
@@ -584,7 +587,7 @@ class Api(PushEventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        rest_api_id = self.get_rest_api_id_string(self.RestApiId)
+        rest_api_id = self.get_rest_api_id_string(self.RestApiId)  # type: ignore[attr-defined, no-untyped-call]
         if isinstance(rest_api_id, str):
 
             if (
@@ -602,19 +605,19 @@ class Api(PushEventSource):
                         raise InvalidResourceException(rest_api_id, "StageName cannot be empty.")
                     stage_suffix = permitted_stage
                 else:
-                    stage_suffix = "Stage"
+                    stage_suffix = "Stage"  # type: ignore[unreachable]
 
             else:
                 # RestApiId is a string, not an intrinsic, but we did not find a valid API resource for this ID
                 raise InvalidEventException(
                     self.relative_id,
-                    "RestApiId property of Api event must reference a valid " "resource in the same template.",
+                    "RestApiId property of Api event must reference a valid resource in the same template.",
                 )
 
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """If the Api event source has a RestApi property, then simply return the Lambda Permission resource allowing
         API Gateway to call the function. If no RestApi is provided, then additionally inject the path, method, and the
         x-amazon-apigateway-integration into the Swagger body for a provided implicit API.
@@ -632,19 +635,19 @@ class Api(PushEventSource):
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
-        if self.Method is not None:
+        if self.Method is not None:  # type: ignore[has-type]
             # Convert to lower case so that user can specify either GET or get
-            self.Method = self.Method.lower()
+            self.Method = self.Method.lower()  # type: ignore[has-type]
 
-        resources.extend(self._get_permissions(kwargs))
+        resources.extend(self._get_permissions(kwargs))  # type: ignore[no-untyped-call]
 
         explicit_api = kwargs["explicit_api"]
         if explicit_api.get("__MANAGE_SWAGGER"):
-            self._add_swagger_integration(explicit_api, function, intrinsics_resolver)
+            self._add_swagger_integration(explicit_api, function, intrinsics_resolver)  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _get_permissions(self, resources_to_link):
+    def _get_permissions(self, resources_to_link):  # type: ignore[no-untyped-def]
         permissions = []
 
         # By default, implicit APIs get a stage called Prod. If the API event refers to an
@@ -656,34 +659,35 @@ class Api(PushEventSource):
             suffix = resources_to_link["explicit_api_stage"]["suffix"]
         self.Stage = suffix
 
-        permissions.append(self._get_permission(resources_to_link, permitted_stage, suffix))
+        permissions.append(self._get_permission(resources_to_link, permitted_stage, suffix))  # type: ignore[no-untyped-call]
         return permissions
 
-    def _get_permission(self, resources_to_link, stage, suffix):
+    def _get_permission(self, resources_to_link, stage, suffix):  # type: ignore[no-untyped-def]
         # It turns out that APIGW doesn't like trailing slashes in paths (#665)
         # and removes as a part of their behaviour, but this isn't documented.
         # The regex removes the tailing slash to ensure the permission works as intended
-        path = re.sub(r"^(.+)/$", r"\1", self.Path)
+        path = re.sub(r"^(.+)/$", r"\1", self.Path)  # type: ignore[attr-defined]
 
         if not stage or not suffix:
             raise RuntimeError("Could not add permission to lambda function.")
 
-        path = SwaggerEditor.get_path_without_trailing_slash(path)
+        path = SwaggerEditor.get_path_without_trailing_slash(path)  # type: ignore[no-untyped-call]
         method = "*" if self.Method.lower() == "any" else self.Method.upper()
 
-        api_id = self.RestApiId
+        api_id = self.RestApiId  # type: ignore[attr-defined]
 
         # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
         resource = "${__ApiId__}/" + "${__Stage__}/" + method + path
-        partition = ArnGenerator.get_partition_name()
+        partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),
+            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
             {"__ApiId__": api_id, "__Stage__": stage},
         )
 
-        return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)
+        return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)  # type: ignore[no-untyped-call]
 
-    def _add_swagger_integration(self, api, function, intrinsics_resolver):
+    def _add_swagger_integration(self, api, function, intrinsics_resolver):  # type: ignore[no-untyped-def]
+        # pylint: disable=duplicate-code
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
@@ -692,17 +696,17 @@ class Api(PushEventSource):
         if swagger_body is None:
             return
 
-        partition = ArnGenerator.get_partition_name()
-        uri = _build_apigw_integration_uri(function, partition)
+        partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+        uri = _build_apigw_integration_uri(function, partition)  # type: ignore[no-untyped-call]
 
-        editor = SwaggerEditor(swagger_body)
+        editor = SwaggerEditor(swagger_body)  # type: ignore[no-untyped-call]
 
-        if editor.has_integration(self.Path, self.Method):
+        if editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined, no-untyped-call]
             # Cannot add the Lambda Integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
                 'API method "{method}" defined multiple times for path "{path}".'.format(
-                    method=self.Method, path=self.Path
+                    method=self.Method, path=self.Path  # type: ignore[attr-defined]
                 ),
             )
 
@@ -710,10 +714,10 @@ class Api(PushEventSource):
         if CONDITION in function.resource_attributes:
             condition = function.resource_attributes[CONDITION]
 
-        editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)
+        editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
 
-        if self.Auth:
-            method_authorizer = self.Auth.get("Authorizer")
+        if self.Auth:  # type: ignore[attr-defined]
+            method_authorizer = self.Auth.get("Authorizer")  # type: ignore[attr-defined]
             api_auth = api.get("Auth")
             api_auth = intrinsics_resolver.resolve_parameter_refs(api_auth)
 
@@ -726,12 +730,12 @@ class Api(PushEventSource):
                             self.relative_id,
                             "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
                             "because the related API does not define any Authorizers.".format(
-                                authorizer=method_authorizer, method=self.Method, path=self.Path
+                                authorizer=method_authorizer, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                             ),
                         )
 
-                    _check_valid_authorizer_types(
-                        self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers, False
+                    _check_valid_authorizer_types(  # type: ignore[no-untyped-call]
+                        self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers, False  # type: ignore[attr-defined]
                     )
 
                     if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
@@ -739,7 +743,7 @@ class Api(PushEventSource):
                             self.relative_id,
                             "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
                             "because it wasn't defined in the API's Authorizers.".format(
-                                authorizer=method_authorizer, method=self.Method, path=self.Path
+                                authorizer=method_authorizer, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                             ),
                         )
 
@@ -749,39 +753,39 @@ class Api(PushEventSource):
                                 self.relative_id,
                                 "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
                                 "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                                    method=self.Method, path=self.Path
+                                    method=self.Method, path=self.Path  # type: ignore[attr-defined]
                                 ),
                             )
 
-            if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):
+            if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):  # type: ignore[attr-defined]
                 raise InvalidEventException(
                     self.relative_id,
                     "Unable to set Authorizer on API method [{method}] for path [{path}] because "
-                    "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),
+                    "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),  # type: ignore[attr-defined]
                 )
 
-            apikey_required_setting = self.Auth.get("ApiKeyRequired")
+            apikey_required_setting = self.Auth.get("ApiKeyRequired")  # type: ignore[attr-defined]
             apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
             if apikey_required_setting_is_false and (not api_auth or not api_auth.get("ApiKeyRequired")):
                 raise InvalidEventException(
                     self.relative_id,
                     "Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] "
                     "because the related API does not specify any ApiKeyRequired.".format(
-                        method=self.Method, path=self.Path
+                        method=self.Method, path=self.Path  # type: ignore[attr-defined]
                     ),
                 )
 
             if method_authorizer or apikey_required_setting is not None:
-                editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+                editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
 
-            if self.Auth.get("ResourcePolicy"):
-                resource_policy = self.Auth.get("ResourcePolicy")
-                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)
+            if self.Auth.get("ResourcePolicy"):  # type: ignore[attr-defined]
+                resource_policy = self.Auth.get("ResourcePolicy")  # type: ignore[attr-defined]
+                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)  # type: ignore[attr-defined, no-untyped-call]
                 if resource_policy.get("CustomStatements"):
-                    editor.add_custom_statements(resource_policy.get("CustomStatements"))
+                    editor.add_custom_statements(resource_policy.get("CustomStatements"))  # type: ignore[no-untyped-call]
 
-        if self.RequestModel:
-            method_model = self.RequestModel.get("Model")
+        if self.RequestModel:  # type: ignore[attr-defined]
+            method_model = self.RequestModel.get("Model")  # type: ignore[attr-defined]
 
             if method_model:
                 api_models = api.get("Models")
@@ -790,7 +794,7 @@ class Api(PushEventSource):
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
                         "because the related API does not define any Models.".format(
-                            model=method_model, method=self.Method, path=self.Path
+                            model=method_model, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                         ),
                     )
                 if not is_intrinsic(api_models) and not isinstance(api_models, dict):
@@ -798,7 +802,7 @@ class Api(PushEventSource):
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
                         "because the related API Models defined is of invalid type.".format(
-                            model=method_model, method=self.Method, path=self.Path
+                            model=method_model, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                         ),
                     )
                 if not isinstance(method_model, str):
@@ -806,7 +810,7 @@ class Api(PushEventSource):
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
                         "because the related API does not contain valid Models.".format(
-                            model=method_model, method=self.Method, path=self.Path
+                            model=method_model, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                         ),
                     )
 
@@ -815,16 +819,16 @@ class Api(PushEventSource):
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
                         "because it wasn't defined in the API's Models.".format(
-                            model=method_model, method=self.Method, path=self.Path
+                            model=method_model, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                         ),
                     )
 
-                editor.add_request_model_to_method(
-                    path=self.Path, method_name=self.Method, request_model=self.RequestModel
+                editor.add_request_model_to_method(  # type: ignore[no-untyped-call]
+                    path=self.Path, method_name=self.Method, request_model=self.RequestModel  # type: ignore[attr-defined, attr-defined]
                 )
 
-                validate_body = self.RequestModel.get("ValidateBody")
-                validate_parameters = self.RequestModel.get("ValidateParameters")
+                validate_body = self.RequestModel.get("ValidateBody")  # type: ignore[attr-defined]
+                validate_parameters = self.RequestModel.get("ValidateParameters")  # type: ignore[attr-defined]
 
                 # Checking if any of the fields are defined as it can be false we are checking if the field are not None
                 if validate_body is not None or validate_parameters is not None:
@@ -841,23 +845,23 @@ class Api(PushEventSource):
                             self.relative_id,
                             "Unable to set Validator to RequestModel [{model}] on API method [{method}] for path [{path}] "
                             "ValidateBody and ValidateParameters must be a boolean type, strings or intrinsics are not supported.".format(
-                                model=method_model, method=self.Method, path=self.Path
+                                model=method_model, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                             ),
                         )
 
-                    editor.add_request_validator_to_method(
-                        path=self.Path,
+                    editor.add_request_validator_to_method(  # type: ignore[no-untyped-call]
+                        path=self.Path,  # type: ignore[attr-defined]
                         method_name=self.Method,
                         validate_body=validate_body,
                         validate_parameters=validate_parameters,
                     )
 
-        if self.RequestParameters:
+        if self.RequestParameters:  # type: ignore[attr-defined]
 
             default_value = {"Required": False, "Caching": False}
 
             parameters = []
-            for parameter in self.RequestParameters:
+            for parameter in self.RequestParameters:  # type: ignore[attr-defined]
 
                 if isinstance(parameter, dict):
 
@@ -896,7 +900,7 @@ class Api(PushEventSource):
                         )
 
                     settings = default_value.copy()
-                    settings.update({"Name": parameter})
+                    settings.update({"Name": parameter})  # type: ignore[dict-item]
 
                     parameters.append(settings)
 
@@ -906,14 +910,14 @@ class Api(PushEventSource):
                         "Invalid value for 'RequestParameters' property. Property must be either a string or an object",
                     )
 
-            editor.add_request_parameters_to_method(
-                path=self.Path, method_name=self.Method, request_parameters=parameters
+            editor.add_request_parameters_to_method(  # type: ignore[no-untyped-call]
+                path=self.Path, method_name=self.Method, request_parameters=parameters  # type: ignore[attr-defined]
             )
 
         api["DefinitionBody"] = editor.swagger
 
     @staticmethod
-    def get_rest_api_id_string(rest_api_id):
+    def get_rest_api_id_string(rest_api_id):  # type: ignore[no-untyped-def]
         """
         rest_api_id can be either a string or a dictionary where the actual api id is the value at key "Ref".
         If rest_api_id is a dictionary with key "Ref", returns value at key "Ref". Otherwise, return rest_api_id.
@@ -930,15 +934,15 @@ class AlexaSkill(PushEventSource):
 
     property_types = {"SkillId": PropertyType(False, is_str())}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         function = kwargs.get("function")
 
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
         resources = []
-        resources.append(self._construct_permission(function, event_source_token=self.SkillId))
+        resources.append(self._construct_permission(function, event_source_token=self.SkillId))  # type: ignore[attr-defined, no-untyped-call]
 
         return resources
 
@@ -949,8 +953,8 @@ class IoTRule(PushEventSource):
 
     property_types = {"Sql": PropertyType(True, is_str()), "AwsIotSqlVersion": PropertyType(False, is_str())}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         function = kwargs.get("function")
 
         if not function:
@@ -960,29 +964,29 @@ class IoTRule(PushEventSource):
 
         resource = "rule/${RuleName}"
 
-        partition = ArnGenerator.get_partition_name()
+        partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition=partition, service="iot", resource=resource),
+            ArnGenerator.generate_arn(partition=partition, service="iot", resource=resource),  # type: ignore[no-untyped-call]
             {"RuleName": ref(self.logical_id)},
         )
         source_account = fnSub("${AWS::AccountId}")
 
-        resources.append(self._construct_permission(function, source_arn=source_arn, source_account=source_account))
-        resources.append(self._construct_iot_rule(function))
+        resources.append(self._construct_permission(function, source_arn=source_arn, source_account=source_account))  # type: ignore[no-untyped-call]
+        resources.append(self._construct_iot_rule(function))  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _construct_iot_rule(self, function):
+    def _construct_iot_rule(self, function):  # type: ignore[no-untyped-def]
         rule = IotTopicRule(self.logical_id, attributes=function.get_passthrough_resource_attributes())
 
         payload = {
-            "Sql": self.Sql,
+            "Sql": self.Sql,  # type: ignore[attr-defined]
             "RuleDisabled": False,
             "Actions": [{"Lambda": {"FunctionArn": function.get_runtime_attr("arn")}}],
         }
 
-        if self.AwsIotSqlVersion:
-            payload["AwsIotSqlVersion"] = self.AwsIotSqlVersion
+        if self.AwsIotSqlVersion:  # type: ignore[attr-defined]
+            payload["AwsIotSqlVersion"] = self.AwsIotSqlVersion  # type: ignore[attr-defined]
 
         rule.TopicRulePayload = payload
 
@@ -998,9 +1002,9 @@ class Cognito(PushEventSource):
         "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str())), False),
     }
 
-    def resources_to_link(self, resources):
-        if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:
-            userpool_id = self.UserPool["Ref"]
+    def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
+        if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:  # type: ignore[attr-defined]
+            userpool_id = self.UserPool["Ref"]  # type: ignore[attr-defined]
             if not isinstance(userpool_id, str):
                 raise InvalidEventException(
                     self.logical_id,
@@ -1012,8 +1016,8 @@ class Cognito(PushEventSource):
             self.relative_id, "Cognito events must reference a Cognito UserPool in the same template."
         )
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         function = kwargs.get("function")
 
         if not function:
@@ -1030,21 +1034,21 @@ class Cognito(PushEventSource):
 
         resources = []
         source_arn = fnGetAtt(userpool_id, "Arn")
-        lambda_permission = self._construct_permission(
+        lambda_permission = self._construct_permission(  # type: ignore[no-untyped-call]
             function, source_arn=source_arn, prefix=function.logical_id + "Cognito"
         )
         for attribute, value in function.get_passthrough_resource_attributes().items():
             lambda_permission.set_resource_attribute(attribute, value)
         resources.append(lambda_permission)
 
-        self._inject_lambda_config(function, userpool)
-        resources.append(CognitoUserPool.from_dict(userpool_id, userpool))
+        self._inject_lambda_config(function, userpool)  # type: ignore[no-untyped-call]
+        resources.append(CognitoUserPool.from_dict(userpool_id, userpool))  # type: ignore[no-untyped-call]
         return resources
 
-    def _inject_lambda_config(self, function, userpool):
-        event_triggers = self.Trigger
-        if isinstance(self.Trigger, str):
-            event_triggers = [self.Trigger]
+    def _inject_lambda_config(self, function, userpool):  # type: ignore[no-untyped-def]
+        event_triggers = self.Trigger  # type: ignore[attr-defined]
+        if isinstance(self.Trigger, str):  # type: ignore[attr-defined]
+            event_triggers = [self.Trigger]  # type: ignore[attr-defined]
 
         # TODO can these be conditional?
 
@@ -1063,7 +1067,7 @@ class Cognito(PushEventSource):
                 lambda_config[event_trigger] = function.get_runtime_attr("arn")
             else:
                 raise InvalidEventException(
-                    self.relative_id, 'Cognito trigger "{trigger}" defined multiple times.'.format(trigger=self.Trigger)
+                    self.relative_id, 'Cognito trigger "{trigger}" defined multiple times.'.format(trigger=self.Trigger)  # type: ignore[attr-defined]
                 )
         return userpool
 
@@ -1084,13 +1088,13 @@ class HttpApi(PushEventSource):
         "PayloadFormatVersion": PropertyType(False, is_str()),
     }
 
-    def resources_to_link(self, resources):
+    def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
         """
         If this API Event Source refers to an explicit API resource, resolve the reference and grab
         necessary data from the explicit API
         """
 
-        api_id = self.ApiId
+        api_id = self.ApiId  # type: ignore[attr-defined]
         if isinstance(api_id, dict) and "Ref" in api_id:
             api_id = api_id["Ref"]
 
@@ -1098,8 +1102,8 @@ class HttpApi(PushEventSource):
 
         return {"explicit_api": explicit_api}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """If the Api event source has a RestApi property, then simply return the Lambda Permission resource allowing
         API Gateway to call the function. If no RestApi is provided, then additionally inject the path, method, and the
         x-amazon-apigateway-integration into the OpenApi body for a provided implicit API.
@@ -1113,53 +1117,53 @@ class HttpApi(PushEventSource):
 
         function = kwargs.get("function")
 
-        if self.Method is not None:
+        if self.Method is not None:  # type: ignore[has-type]
             # Convert to lower case so that user can specify either GET or get
-            self.Method = self.Method.lower()
+            self.Method = self.Method.lower()  # type: ignore[has-type]
 
-        resources.extend(self._get_permissions(kwargs))
+        resources.extend(self._get_permissions(kwargs))  # type: ignore[no-untyped-call]
 
         explicit_api = kwargs["explicit_api"]
-        self._add_openapi_integration(explicit_api, function, explicit_api.get("__MANAGE_SWAGGER"))
+        self._add_openapi_integration(explicit_api, function, explicit_api.get("__MANAGE_SWAGGER"))  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _get_permissions(self, resources_to_link):
+    def _get_permissions(self, resources_to_link):  # type: ignore[no-untyped-def]
         permissions = []
 
         # Give permission to all stages by default
         permitted_stage = "*"
 
-        permission = self._get_permission(resources_to_link, permitted_stage)
+        permission = self._get_permission(resources_to_link, permitted_stage)  # type: ignore[no-untyped-call]
         if permission:
             permissions.append(permission)
         return permissions
 
-    def _get_permission(self, resources_to_link, stage):
+    def _get_permission(self, resources_to_link, stage):  # type: ignore[no-untyped-def]
         # It turns out that APIGW doesn't like trailing slashes in paths (#665)
         # and removes as a part of their behaviour, but this isn't documented.
         # The regex removes the tailing slash to ensure the permission works as intended
-        path = re.sub(r"^(.+)/$", r"\1", self.Path)
+        path = re.sub(r"^(.+)/$", r"\1", self.Path)  # type: ignore[attr-defined]
 
         editor = None
         if resources_to_link["explicit_api"].get("DefinitionBody"):
             try:
-                editor = OpenApiEditor(resources_to_link["explicit_api"].get("DefinitionBody"))
+                editor = OpenApiEditor(resources_to_link["explicit_api"].get("DefinitionBody"))  # type: ignore[no-untyped-call]
             except InvalidDocumentException as e:
-                api_logical_id = self.ApiId.get("Ref") if isinstance(self.ApiId, dict) else self.ApiId
+                api_logical_id = self.ApiId.get("Ref") if isinstance(self.ApiId, dict) else self.ApiId  # type: ignore[attr-defined]
                 raise InvalidResourceException(api_logical_id, " ".join(ex.message for ex in e.causes))
 
         # If this is using the new $default path, keep path blank and add a * permission
         if path == OpenApiEditor._DEFAULT_PATH:
             path = ""
-        elif editor and editor.is_integration_function_logical_id_match(
+        elif editor and editor.is_integration_function_logical_id_match(  # type: ignore[no-untyped-call]
             OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD, resources_to_link.get("function").logical_id
         ):
             # Case where default exists for this function, and so the permissions for that will apply here as well
             # This can save us several CFN resources (not duplicating permissions)
             return
         else:
-            path = OpenApiEditor.get_path_without_trailing_slash(path)
+            path = OpenApiEditor.get_path_without_trailing_slash(path)  # type: ignore[no-untyped-call]
 
         # Handle case where Method is already the ANY ApiGateway extension
         if self.Method.lower() == "any" or self.Method.lower() == OpenApiEditor._X_ANY_METHOD:
@@ -1167,18 +1171,26 @@ class HttpApi(PushEventSource):
         else:
             method = self.Method.upper()
 
-        api_id = self.ApiId
+        api_id = self.ApiId  # type: ignore[attr-defined]
+
+        # when the Method is "ANY" and the path is '/$default' it adds an extra "*" which causes a bug
+        # the generated ARN for permissions ends with /*/*/$default which causes the path to be invalid
+        # see this issue: https://github.com/aws/serverless-application-model/issues/1860
+        resource = "${__ApiId__}/${__Stage__}"
+        if self.Method.lower() == "any" and path == f"/{OpenApiEditor._DEFAULT_PATH}":
+            resource += path
+        else:
+            resource += f"/{method}{path}"
 
         # ApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
-        resource = "${__ApiId__}/" + "${__Stage__}/" + method + path
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),
+            ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
             {"__ApiId__": api_id, "__Stage__": stage},
         )
 
-        return self._construct_permission(resources_to_link["function"], source_arn=source_arn)
+        return self._construct_permission(resources_to_link["function"], source_arn=source_arn)  # type: ignore[no-untyped-call]
 
-    def _add_openapi_integration(self, api, function, manage_swagger=False):
+    def _add_openapi_integration(self, api, function, manage_swagger=False):  # type: ignore[no-untyped-def]
         """Adds the path and method for this Api event source to the OpenApi body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
@@ -1187,16 +1199,16 @@ class HttpApi(PushEventSource):
         if open_api_body is None:
             return
 
-        uri = _build_apigw_integration_uri(function, "${AWS::Partition}")
+        uri = _build_apigw_integration_uri(function, "${AWS::Partition}")  # type: ignore[no-untyped-call]
 
-        editor = OpenApiEditor(open_api_body)
+        editor = OpenApiEditor(open_api_body)  # type: ignore[no-untyped-call]
 
-        if manage_swagger and editor.has_integration(self.Path, self.Method):
+        if manage_swagger and editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined, no-untyped-call]
             # Cannot add the Lambda Integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
                 "API method '{method}' defined multiple times for path '{path}'.".format(
-                    method=self.Method, path=self.Path
+                    method=self.Method, path=self.Path  # type: ignore[attr-defined]
                 ),
             )
 
@@ -1204,33 +1216,33 @@ class HttpApi(PushEventSource):
         if CONDITION in function.resource_attributes:
             condition = function.resource_attributes[CONDITION]
 
-        editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)
-        if self.Auth:
-            self._add_auth_to_openapi_integration(api, editor)
-        if self.TimeoutInMillis:
-            editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)
-        path_parameters = re.findall("{(.*?)}", self.Path)
+        editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
+        if self.Auth:  # type: ignore[attr-defined]
+            self._add_auth_to_openapi_integration(api, editor)  # type: ignore[no-untyped-call]
+        if self.TimeoutInMillis:  # type: ignore[attr-defined]
+            editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
+        path_parameters = re.findall("{(.*?)}", self.Path)  # type: ignore[attr-defined]
         if path_parameters:
-            editor.add_path_parameters_to_method(
-                api=api, path=self.Path, method_name=self.Method, path_parameters=path_parameters
+            editor.add_path_parameters_to_method(  # type: ignore[no-untyped-call]
+                api=api, path=self.Path, method_name=self.Method, path_parameters=path_parameters  # type: ignore[attr-defined]
             )
 
-        if self.PayloadFormatVersion:
-            editor.add_payload_format_version_to_method(
-                api=api, path=self.Path, method_name=self.Method, payload_format_version=self.PayloadFormatVersion
+        if self.PayloadFormatVersion:  # type: ignore[attr-defined]
+            editor.add_payload_format_version_to_method(  # type: ignore[no-untyped-call]
+                api=api, path=self.Path, method_name=self.Method, payload_format_version=self.PayloadFormatVersion  # type: ignore[attr-defined, attr-defined]
             )
         api["DefinitionBody"] = editor.openapi
 
-    def _add_auth_to_openapi_integration(self, api, editor):
+    def _add_auth_to_openapi_integration(self, api, editor):  # type: ignore[no-untyped-def]
         """Adds authorization to the lambda integration
         :param api: api object
         :param editor: OpenApiEditor object that contains the OpenApi definition
         """
-        method_authorizer = self.Auth.get("Authorizer")
+        method_authorizer = self.Auth.get("Authorizer")  # type: ignore[attr-defined]
         api_auth = api.get("Auth", {})
         if not method_authorizer:
             if api_auth.get("DefaultAuthorizer"):
-                self.Auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")
+                self.Auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")  # type: ignore[attr-defined]
             else:
                 # currently, we require either a default auth or auth in the method
                 raise InvalidEventException(
@@ -1246,8 +1258,8 @@ class HttpApi(PushEventSource):
         # The IAM authorizer is built-in and not defined as a regular Authorizer.
         iam_authorizer_enabled = api_auth and api_auth.get("EnableIamAuthorizer", False) is True
 
-        _check_valid_authorizer_types(
-            self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers, iam_authorizer_enabled
+        _check_valid_authorizer_types(  # type: ignore[no-untyped-call]
+            self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers, iam_authorizer_enabled  # type: ignore[attr-defined]
         )
 
         if method_authorizer == "NONE":
@@ -1256,7 +1268,7 @@ class HttpApi(PushEventSource):
                     self.relative_id,
                     "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
                     "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                        method=self.Method, path=self.Path
+                        method=self.Method, path=self.Path  # type: ignore[attr-defined]
                     ),
                 )
         # If the method authorizer is "AWS_IAM" but it's not enabled it's possible that's a custom authorizer, not the "official" one.
@@ -1268,7 +1280,7 @@ class HttpApi(PushEventSource):
                     self.relative_id,
                     "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
                     "because the related API does not define any Authorizers.".format(
-                        authorizer=method_authorizer, method=self.Method, path=self.Path
+                        authorizer=method_authorizer, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                     ),
                 )
 
@@ -1277,21 +1289,21 @@ class HttpApi(PushEventSource):
                     self.relative_id,
                     "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
                     "because it wasn't defined in the API's Authorizers.".format(
-                        authorizer=method_authorizer, method=self.Method, path=self.Path
+                        authorizer=method_authorizer, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                     ),
                 )
 
-        if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):
+        if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):  # type: ignore[attr-defined]
             raise InvalidEventException(
                 self.relative_id,
                 "Unable to set Authorizer on API method [{method}] for path [{path}] because "
-                "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),
+                "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),  # type: ignore[attr-defined]
             )
 
-        editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+        editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)  # type: ignore[attr-defined, attr-defined]
 
 
-def _build_apigw_integration_uri(function, partition):
+def _build_apigw_integration_uri(function, partition):  # type: ignore[no-untyped-def]
     function_arn = function.get_runtime_attr("arn")
     arn = (
         "arn:"
@@ -1307,7 +1319,7 @@ def _build_apigw_integration_uri(function, partition):
     return Py27Dict(fnSub(arn))
 
 
-def _check_valid_authorizer_types(
+def _check_valid_authorizer_types(  # type: ignore[no-untyped-def]
     relative_id, method, path, method_authorizer, api_authorizers, iam_authorizer_enabled
 ):
     if method_authorizer == "NONE":

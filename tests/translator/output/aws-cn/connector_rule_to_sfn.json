@@ -17,7 +17,9 @@
         "PolicyDocument": {
           "Statement": [
             {
-              "Action": ["states:StartExecution"],
+              "Action": [
+                "states:StartExecution"
+              ],
               "Effect": "Allow",
               "Resource": [
                 {
@@ -39,18 +41,26 @@
     "MyNewEventsRule": {
       "Properties": {
         "EventPattern": {
-          "source": ["aws.ec2"]
+          "source": [
+            "aws.ec2"
+          ]
         },
         "Name": "mynewabc",
         "State": "ENABLED",
         "Targets": [
           {
             "Arn": {
-              "Fn::GetAtt": ["StateMachine", "Arn"]
+              "Fn::GetAtt": [
+                "StateMachine",
+                "Arn"
+              ]
             },
             "Id": "StateMachine",
             "RoleArn": {
-              "Fn::GetAtt": ["MyRuleRole", "Arn"]
+              "Fn::GetAtt": [
+                "MyRuleRole",
+                "Arn"
+              ]
             }
           }
         ]
@@ -96,11 +106,17 @@
         },
         "DefinitionSubstitutions": {
           "definition_substitution_1": {
-            "Fn::GetAtt": ["StateMachineFunction", "Arn"]
+            "Fn::GetAtt": [
+              "StateMachineFunction",
+              "Arn"
+            ]
           }
         },
         "RoleArn": {
-          "Fn::GetAtt": ["StateMachineRole", "Arn"]
+          "Fn::GetAtt": [
+            "StateMachineRole",
+            "Arn"
+          ]
         },
         "StateMachineType": "EXPRESS",
         "Tags": [
@@ -117,10 +133,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["states.amazonaws.com"]
+                "Service": [
+                  "states.amazonaws.com"
+                ]
               }
             }
           ],
@@ -132,7 +152,9 @@
             "PolicyDocument": {
               "Statement": [
                 {
-                  "Action": ["lambda:InvokeFunction"],
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
                   "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [

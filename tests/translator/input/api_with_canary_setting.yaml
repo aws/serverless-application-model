@@ -1,10 +1,12 @@
+%YAML 1.1
+---
 Globals:
   Api:
     CanarySetting:
       PercentTraffic: 100
       StageVariablesOverrides:
-        sv1: "test"
-        sv2: "test2"
+        sv1: test
+        sv2: test2
       UseStageCache: false
 
 Resources:

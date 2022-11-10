@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   Function1:
     Type: AWS::Serverless::Function
@@ -24,4 +26,3 @@ Resources:
           Properties:
             Path: /add
             Method: post
-

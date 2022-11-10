@@ -1,4 +1,4 @@
-# flake8: noqa
+__all__ = ["IntrinsicsResolver", "is_intrinsics"]
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 

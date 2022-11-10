@@ -1,7 +1,9 @@
+%YAML 1.1
+---
 Globals:
   Api:
     Cors:
-      AllowMethods: "methods"
+      AllowMethods: methods
 
 Resources:
   ImplicitApiFunction:
@@ -21,4 +23,3 @@ Resources:
           Properties:
             Path: /any
             Method: any
-

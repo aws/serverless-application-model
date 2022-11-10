@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   AppFunction:
     Type: AWS::Serverless::Function
@@ -6,7 +8,7 @@ Resources:
       Handler: app.lambdaHandler
       Runtime: nodejs14.x
       Architectures:
-        - x86_64
+      - x86_64
       Events:
         S3Event:
           Type: S3
@@ -30,7 +32,7 @@ Resources:
       Handler: app.lambdaHandler
       Runtime: nodejs14.x
       Architectures:
-        - x86_64
+      - x86_64
       Events:
         S3Event:
           Type: S3
@@ -48,4 +50,3 @@ Resources:
           Fn::GetAtt:
           - AnotherFunction
           - Arn
-        

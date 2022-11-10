@@ -1,5 +1,7 @@
+%YAML 1.1
+---
 Resources:
-  RestApiFunction: 
+  RestApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
@@ -38,7 +40,7 @@ Resources:
             Method: any
 
   ServerlessRestApi:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

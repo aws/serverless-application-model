@@ -1,10 +1,12 @@
+%YAML 1.1
+---
 Resources:
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
       DefinitionBody: {}
       OpenApiVersion: '5.0'
-      StageName: 'prod'
+      StageName: prod
   Function:
     Type: AWS::Serverless::Function
     Properties:
@@ -17,5 +19,5 @@ Resources:
           Properties:
             RestApiId:
               Ref: MyApi
-            Path: "/"
+            Path: /
             Method: ANY

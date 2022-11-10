@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
@@ -12,12 +14,12 @@ Resources:
         OneTrigger:
           Type: Cognito
           Properties:
-            UserPool: 
+            UserPool:
               Ref: UserPool
             Trigger: PreSignUp
         TwoTrigger:
           Type: Cognito
           Properties:
-            UserPool: 
+            UserPool:
               Ref: UserPool
-            Trigger: PreSignUp            
+            Trigger: PreSignUp

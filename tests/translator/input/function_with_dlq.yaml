@@ -1,4 +1,6 @@
-Transform: "AWS::Serverless-2016-10-31"
+%YAML 1.1
+---
+Transform: AWS::Serverless-2016-10-31
 Resources:
   MySnsDlqLambdaFunction:
     Type: AWS::Serverless::Function

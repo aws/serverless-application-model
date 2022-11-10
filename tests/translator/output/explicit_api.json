@@ -1,163 +1,162 @@
 {
   "Parameters": {
-    "something": {
-      "Default": "something", 
-      "Type": "String"
-    }, 
     "MyStageName": {
-      "Default": "Production", 
+      "Default": "Production",
+      "Type": "String"
+    },
+    "something": {
+      "Default": "something",
       "Type": "String"
     }
-  }, 
+  },
   "Resources": {
-    "GetHtmlFunction": {
-      "Type": "AWS::Lambda::Function", 
+    "ApiWithInlineSwagger": {
       "Properties": {
-        "Handler": "index.gethtml", 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "webpage.zip"
-        }, 
-        "Role": {
-          "Fn::GetAtt": [
-            "GetHtmlFunctionRole", 
-            "Arn"
-          ]
-        }, 
-        "Runtime": "nodejs12.x",
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
-    }, 
+        "Body": {
+          "a": "inline swagger",
+          "this": "is"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ApiWithInlineSwaggerDeployment09cda3d97b": {
+      "Properties": {
+        "Description": "RestApi deployment id: 09cda3d97b008bed7bd4ebb1b5304ed622492941",
+        "RestApiId": {
+          "Ref": "ApiWithInlineSwagger"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
     "ApiWithInlineSwaggerStage": {
-      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
           "Ref": "ApiWithInlineSwaggerDeployment09cda3d97b"
-        }, 
+        },
         "RestApiId": {
           "Ref": "ApiWithInlineSwagger"
-        }, 
+        },
         "StageName": {
           "Ref": "MyStageName"
         }
-      }
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "GetHtmlApi": {
+      "Properties": {
+        "BodyS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "webpage_swagger.json"
+        },
+        "Name": "MyGetApi"
+      },
+      "Type": "AWS::ApiGateway::RestApi"
     },
     "GetHtmlApiDeploymentf117c932f7": {
-      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
+        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289",
         "RestApiId": {
           "Ref": "GetHtmlApi"
-        }, 
-        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
+        },
         "StageName": "Stage"
-      }
-    }, 
-    "GetHtmlFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "GetHtmlApiStage": {
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
-        ],
+        "DeploymentId": {
+          "Ref": "GetHtmlApiDeploymentf117c932f7"
+        },
+        "RestApiId": {
+          "Ref": "GetHtmlApi"
+        },
+        "StageName": {
+          "Ref": "MyStageName"
+        },
+        "Variables": {
+          "EndpointUri": {
+            "Ref": "something"
+          },
+          "EndpointUri2": "http://example.com"
+        }
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "GetHtmlFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "webpage.zip"
+        },
+        "Handler": "index.gethtml",
+        "Role": {
+          "Fn::GetAtt": [
+            "GetHtmlFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        ],
-
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "GetHtmlFunctionGetHtmlPermissionStage": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "GetHtmlFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            {
+              "__ApiId__": {
+                "Ref": "GetHtmlApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "GetHtmlFunctionRole": {
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
-    }, 
-    "ApiWithInlineSwagger": {
-      "Type": "AWS::ApiGateway::RestApi", 
-      "Properties": {
-        "Body": {
-          "this": "is", 
-          "a": "inline swagger"
-        }
-      }
-    }, 
-    "GetHtmlFunctionGetHtmlPermissionStage": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "GetHtmlFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "GetHtmlApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "GetHtmlApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
-      "Properties": {
-        "BodyS3Location": {
-          "Bucket": "sam-demo-bucket", 
-          "Key": "webpage_swagger.json"
-        }, 
-        "Name": "MyGetApi"
-      }
-    }, 
-    "GetHtmlApiStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "GetHtmlApiDeploymentf117c932f7"
-        }, 
-        "RestApiId": {
-          "Ref": "GetHtmlApi"
-        }, 
-        "Variables": {
-          "EndpointUri": {
-            "Ref": "something"
-          }, 
-          "EndpointUri2": "http://example.com"
-        }, 
-        "StageName": {
-          "Ref": "MyStageName"
-        }
-      }
-    }, 
-    "ApiWithInlineSwaggerDeployment09cda3d97b": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ApiWithInlineSwagger"
-        }, 
-        "Description": "RestApi deployment id: 09cda3d97b008bed7bd4ebb1b5304ed622492941", 
-        "StageName": "Stage"
-      }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

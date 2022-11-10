@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # File: sam.yml
 # Version: 0.9
 
@@ -10,7 +12,7 @@ Resources:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Description: Created by SAM
       Handler: index.handler
-      Architectures: ["arm64"]
+      Architectures: [arm64]
       MemorySize: 1024
       Runtime: nodejs12.x
       Timeout: 3

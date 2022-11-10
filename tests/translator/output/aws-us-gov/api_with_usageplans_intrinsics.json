@@ -1,24 +1,24 @@
 {
-  "Outputs": {
-    "ApiTwoUrl": {
-      "Description": "API endpoint URL for Prod environment",
-      "Value": {
-        "Fn::Sub": "https://${MyApiTwo}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
-      }
-    },
-    "ApiOneUrl": {
-      "Description": "API endpoint URL for Prod environment",
-      "Value": {
-        "Fn::Sub": "https://${MyApiOne}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
-      }
-    }
-  },
   "Conditions": {
     "C1": {
       "Fn::Equals": [
         true,
         true
       ]
+    }
+  },
+  "Outputs": {
+    "ApiOneUrl": {
+      "Description": "API endpoint URL for Prod environment",
+      "Value": {
+        "Fn::Sub": "https://${MyApiOne}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+      }
+    },
+    "ApiTwoUrl": {
+      "Description": "API endpoint URL for Prod environment",
+      "Value": {
+        "Fn::Sub": "https://${MyApiTwo}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+      }
     }
   },
   "Parameters": {
@@ -28,91 +28,89 @@
     }
   },
   "Resources": {
-    "MyApiTwoUsagePlanKey": {
-      "Type": "AWS::ApiGateway::UsagePlanKey",
+    "MyApiOne": {
+      "Condition": "C1",
       "Properties": {
-        "KeyType": "API_KEY",
-        "KeyId": {
-          "Ref": "MyApiTwoApiKey"
+        "Body": {
+          "components": {
+            "securitySchemes": {
+              "api_key": {
+                "in": "header",
+                "name": "x-api-key",
+                "type": "apiKey"
+              }
+            }
+          },
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.0",
+          "paths": {
+            "/path/one": {
+              "get": {
+                "responses": {},
+                "security": [
+                  {
+                    "api_key": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionOne.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          }
         },
-        "UsagePlanId": {
-          "Ref": "MyApiTwoUsagePlan"
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
       },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiOneApiKey": {
+      "Condition": "C1",
       "DependsOn": [
-        "MyApiTwoApiKey"
-      ]
-    },
-    "MyApiTwoDeployment802c3b471d": {
-      "Type": "AWS::ApiGateway::Deployment",
+        "MyApiOneUsagePlan"
+      ],
       "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiTwo"
-        },
-        "Description": "RestApi deployment id: 802c3b471de66f79d6d2cac656e6c9319fa0ba51"
-      }
-    },
-    "MyApiOneUsagePlan": {
-      "Type": "AWS::ApiGateway::UsagePlan",
-      "Properties": {
-        "ApiStages": [
+        "Enabled": true,
+        "StageKeys": [
           {
-            "ApiId": {
+            "RestApiId": {
               "Ref": "MyApiOne"
             },
-            "Stage": {
+            "StageName": {
               "Ref": "MyApiOneProdStage"
             }
           }
         ]
       },
-      "DependsOn": [
-        "MyApiOne"
-      ],
-      "Condition": "C1"
+      "Type": "AWS::ApiGateway::ApiKey"
     },
     "MyApiOneDeployment8b73115419": {
-      "Type": "AWS::ApiGateway::Deployment",
+      "Condition": "C1",
       "Properties": {
+        "Description": "RestApi deployment id: 8b731154198483502cc4b2bff739c404e88bfe41",
         "RestApiId": {
           "Ref": "MyApiOne"
-        },
-        "Description": "RestApi deployment id: 8b731154198483502cc4b2bff739c404e88bfe41"
+        }
       },
-      "Condition": "C1"
-    },
-    "MyApiTwoUsagePlan": {
-      "Type": "AWS::ApiGateway::UsagePlan",
-      "Properties": {
-        "ApiStages": [
-          {
-            "ApiId": {
-              "Ref": "MyApiTwo"
-            },
-            "Stage": {
-              "Ref": "MyApiTwoProdStage"
-            }
-          }
-        ]
-      },
-      "DependsOn": [
-        "MyApiTwo"
-      ]
-    },
-    "MyApiTwoProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiTwoDeployment802c3b471d"
-        },
-        "RestApiId": {
-          "Ref": "MyApiTwo"
-        },
-        "StageName": "Prod"
-      }
+      "Type": "AWS::ApiGateway::Deployment"
     },
     "MyApiOneProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
+      "Condition": "C1",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiOneDeployment8b73115419"
@@ -122,76 +120,97 @@
         },
         "StageName": "Prod"
       },
-      "Condition": "C1"
+      "Type": "AWS::ApiGateway::Stage"
     },
-    "MyApiOneApiKey": {
-      "Type": "AWS::ApiGateway::ApiKey",
+    "MyApiOneUsagePlan": {
+      "Condition": "C1",
+      "DependsOn": [
+        "MyApiOne"
+      ],
       "Properties": {
-        "Enabled": true,
-        "StageKeys": [
+        "ApiStages": [
           {
-            "RestApiId": {
+            "ApiId": {
               "Ref": "MyApiOne"
             },
-            "StageName": {
+            "Stage": {
               "Ref": "MyApiOneProdStage"
             }
           }
         ]
       },
-      "DependsOn": [
-        "MyApiOneUsagePlan"
-      ],
-      "Condition": "C1"
-    },
-    "MyFunctionTwoRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
+      "Type": "AWS::ApiGateway::UsagePlan"
     },
     "MyApiOneUsagePlanKey": {
-      "Type": "AWS::ApiGateway::UsagePlanKey",
+      "Condition": "C1",
+      "DependsOn": [
+        "MyApiOneApiKey"
+      ],
       "Properties": {
-        "KeyType": "API_KEY",
         "KeyId": {
           "Ref": "MyApiOneApiKey"
         },
+        "KeyType": "API_KEY",
         "UsagePlanId": {
           "Ref": "MyApiOneUsagePlan"
         }
       },
-      "DependsOn": [
-        "MyApiOneApiKey"
-      ],
-      "Condition": "C1"
+      "Type": "AWS::ApiGateway::UsagePlanKey"
+    },
+    "MyApiTwo": {
+      "Properties": {
+        "Body": {
+          "components": {
+            "securitySchemes": {
+              "api_key": {
+                "in": "header",
+                "name": "x-api-key",
+                "type": "apiKey"
+              }
+            }
+          },
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.0",
+          "paths": {
+            "/path/two": {
+              "get": {
+                "responses": {},
+                "security": [
+                  {
+                    "api_key": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionTwo.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
     },
     "MyApiTwoApiKey": {
-      "Type": "AWS::ApiGateway::ApiKey",
+      "DependsOn": [
+        "MyApiTwoUsagePlan"
+      ],
       "Properties": {
         "Enabled": true,
         "StageKeys": [
@@ -205,82 +224,108 @@
           }
         ]
       },
-      "DependsOn": [
-        "MyApiTwoUsagePlan"
-      ]
+      "Type": "AWS::ApiGateway::ApiKey"
     },
-    "MyFunctionOneApiKeyPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
+    "MyApiTwoDeployment802c3b471d": {
       "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunctionOne"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/path/one",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "MyApiOne"
-              }
-            }
-          ]
+        "Description": "RestApi deployment id: 802c3b471de66f79d6d2cac656e6c9319fa0ba51",
+        "RestApiId": {
+          "Ref": "MyApiTwo"
         }
-      }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
     },
-    "MyFunctionTwo": {
-      "Type": "AWS::Lambda::Function",
+    "MyApiTwoProdStage": {
       "Properties": {
-        "Handler": "index.handler",
+        "DeploymentId": {
+          "Ref": "MyApiTwoDeployment802c3b471d"
+        },
+        "RestApiId": {
+          "Ref": "MyApiTwo"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyApiTwoUsagePlan": {
+      "DependsOn": [
+        "MyApiTwo"
+      ],
+      "Properties": {
+        "ApiStages": [
+          {
+            "ApiId": {
+              "Ref": "MyApiTwo"
+            },
+            "Stage": {
+              "Ref": "MyApiTwoProdStage"
+            }
+          }
+        ]
+      },
+      "Type": "AWS::ApiGateway::UsagePlan"
+    },
+    "MyApiTwoUsagePlanKey": {
+      "DependsOn": [
+        "MyApiTwoApiKey"
+      ],
+      "Properties": {
+        "KeyId": {
+          "Ref": "MyApiTwoApiKey"
+        },
+        "KeyType": "API_KEY",
+        "UsagePlanId": {
+          "Ref": "MyApiTwoUsagePlan"
+        }
+      },
+      "Type": "AWS::ApiGateway::UsagePlanKey"
+    },
+    "MyFunctionOne": {
+      "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async (event) => {\n  return {\n  statusCode: 200,\n  body: JSON.stringify(event),\n  headers: {}\n  }\n}\n"
         },
+        "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
-            "MyFunctionTwoRole",
+            "MyFunctionOneRole",
             "Arn"
           ]
         },
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
-    "MyFunctionTwoApiKeyPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
+    "MyFunctionOneApiKeyPermissionProd": {
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
-          "Ref": "MyFunctionTwo"
+          "Ref": "MyFunctionOne"
         },
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/path/two",
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/path/one",
             {
-              "__Stage__": "*",
               "__ApiId__": {
-                "Ref": "MyApiTwo"
-              }
+                "Ref": "MyApiOne"
+              },
+              "__Stage__": "*"
             }
           ]
         }
-      }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
     "MyFunctionOneRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -293,138 +338,93 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    },
-    "MyApiTwo": {
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {
-            "/path/two": {
-              "get": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionTwo.Arn}/invocations"
-                  }
-                },
-                "security": [
-                  {
-                    "api_key": []
-                  }
-                ],
-                "responses": {}
-              }
-            }
-          },
-          "openapi": "3.0.0",
-          "components": {
-            "securitySchemes": {
-              "api_key": {
-                "type": "apiKey",
-                "name": "x-api-key",
-                "in": "header"
-              }
-            }
-          }
-        },
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        },
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        }
-      }
-    },
-    "MyApiOne": {
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {
-            "/path/one": {
-              "get": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionOne.Arn}/invocations"
-                  }
-                },
-                "security": [
-                  {
-                    "api_key": []
-                  }
-                ],
-                "responses": {}
-              }
-            }
-          },
-          "openapi": "3.0.0",
-          "components": {
-            "securitySchemes": {
-              "api_key": {
-                "type": "apiKey",
-                "name": "x-api-key",
-                "in": "header"
-              }
-            }
-          }
-        },
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        },
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        }
       },
-      "Condition": "C1"
+      "Type": "AWS::IAM::Role"
     },
-    "MyFunctionOne": {
-      "Type": "AWS::Lambda::Function",
+    "MyFunctionTwo": {
       "Properties": {
-        "Handler": "index.handler",
         "Code": {
           "ZipFile": "exports.handler = async (event) => {\n  return {\n  statusCode: 200,\n  body: JSON.stringify(event),\n  headers: {}\n  }\n}\n"
         },
+        "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
-            "MyFunctionOneRole",
+            "MyFunctionTwoRole",
             "Arn"
           ]
         },
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionTwoApiKeyPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunctionTwo"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/path/two",
+            {
+              "__ApiId__": {
+                "Ref": "MyApiTwo"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyFunctionTwoRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

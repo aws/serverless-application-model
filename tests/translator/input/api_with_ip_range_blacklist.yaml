@@ -1,8 +1,10 @@
+%YAML 1.1
+---
 Globals:
   Api:
     Auth:
       ResourcePolicy:
-        IpRangeBlacklist: ['1.2.3.4']
+        IpRangeBlacklist: [1.2.3.4]
         AwsAccountWhitelist: ['12345']
 Resources:
   MyFunction:

@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   MyTopic:
     Type: AWS::SNS::Topic
@@ -11,4 +13,4 @@ Resources:
         Type: AWS::Lambda::Function
         Arn: !GetAtt SomeLambda.Arn
       Permissions:
-        - Write
+      - Write

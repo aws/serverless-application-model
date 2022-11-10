@@ -1,3 +1,3 @@
-# flake8: noqa
+__all__ = ["SamTemplate"]
 
 from samtranslator.sdk.template import SamTemplate

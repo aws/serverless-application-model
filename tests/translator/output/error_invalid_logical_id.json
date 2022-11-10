@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Bad-Function-Name-@#$%^&] is invalid. Logical ids must be alphanumeric.",
   "errors": [
     {
       "errorMessage": "Resource with id [Bad-Function-Name-@#$%^&] is invalid. Logical ids must be alphanumeric."
     }
-  ], 
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Bad-Function-Name-@#$%^&] is invalid. Logical ids must be alphanumeric."
+  ]
 }

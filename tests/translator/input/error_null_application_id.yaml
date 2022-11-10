@@ -1,7 +1,9 @@
+%YAML 1.1
+---
 Resources:
   Application:
     Type: AWS::Serverless::Application
     Properties:
       Location:
-        ApplicationId: null
+        ApplicationId:
         SemanticVersion: 1.0.0

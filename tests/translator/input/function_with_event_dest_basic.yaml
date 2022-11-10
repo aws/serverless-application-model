@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Parameters:
   SNSArn:
     Type: String
@@ -11,7 +13,7 @@ Globals:
       DestinationConfig:
         OnSuccess:
           Type: SQS
-        OnFailure: 
+        OnFailure:
           Type: SNS
           Destination: !Ref SNSArn
 

@@ -1,7 +1,7 @@
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import is_type, is_str, list_of
+from samtranslator.model.types import is_type, is_str
 from samtranslator.model.intrinsics import is_intrinsic
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
@@ -52,14 +52,14 @@ class PullEventSource(ResourceMacro):
         "ConsumerGroupId": PropertyType(False, is_str()),
     }
 
-    def get_policy_arn(self):
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
         raise NotImplementedError("Subclass must implement this method")
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         raise NotImplementedError("Subclass must implement this method")
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the Lambda EventSourceMapping to which this pull event corresponds. Adds the appropriate managed
         policy to the function's execution role, if such a role is provided.
 
@@ -85,43 +85,43 @@ class PullEventSource(ResourceMacro):
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
-        if self.requires_stream_queue_broker and not self.Stream and not self.Queue and not self.Broker:
+        if self.requires_stream_queue_broker and not self.Stream and not self.Queue and not self.Broker:  # type: ignore[attr-defined, attr-defined, attr-defined]
             raise InvalidEventException(
                 self.relative_id,
                 "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided.",
             )
 
-        if self.Stream and not self.StartingPosition:
+        if self.Stream and not self.StartingPosition:  # type: ignore[attr-defined, attr-defined]
             raise InvalidEventException(self.relative_id, "StartingPosition is required for Kinesis, DynamoDB and MSK.")
 
         lambda_eventsourcemapping.FunctionName = function_name_or_arn
-        lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue or self.Broker
-        lambda_eventsourcemapping.StartingPosition = self.StartingPosition
-        lambda_eventsourcemapping.BatchSize = self.BatchSize
-        lambda_eventsourcemapping.Enabled = self.Enabled
-        lambda_eventsourcemapping.MaximumBatchingWindowInSeconds = self.MaximumBatchingWindowInSeconds
-        lambda_eventsourcemapping.MaximumRetryAttempts = self.MaximumRetryAttempts
-        lambda_eventsourcemapping.BisectBatchOnFunctionError = self.BisectBatchOnFunctionError
-        lambda_eventsourcemapping.MaximumRecordAgeInSeconds = self.MaximumRecordAgeInSeconds
-        lambda_eventsourcemapping.ParallelizationFactor = self.ParallelizationFactor
-        lambda_eventsourcemapping.Topics = self.Topics
-        lambda_eventsourcemapping.Queues = self.Queues
-        lambda_eventsourcemapping.SourceAccessConfigurations = self.SourceAccessConfigurations
-        lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds
-        lambda_eventsourcemapping.FunctionResponseTypes = self.FunctionResponseTypes
-        lambda_eventsourcemapping.FilterCriteria = self.FilterCriteria
-        self._validate_filter_criteria()
+        lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue or self.Broker  # type: ignore[attr-defined, attr-defined, attr-defined]
+        lambda_eventsourcemapping.StartingPosition = self.StartingPosition  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.BatchSize = self.BatchSize  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.Enabled = self.Enabled  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.MaximumBatchingWindowInSeconds = self.MaximumBatchingWindowInSeconds  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.MaximumRetryAttempts = self.MaximumRetryAttempts  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.BisectBatchOnFunctionError = self.BisectBatchOnFunctionError  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.MaximumRecordAgeInSeconds = self.MaximumRecordAgeInSeconds  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.ParallelizationFactor = self.ParallelizationFactor  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.Topics = self.Topics  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.Queues = self.Queues  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.SourceAccessConfigurations = self.SourceAccessConfigurations  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.FunctionResponseTypes = self.FunctionResponseTypes  # type: ignore[attr-defined]
+        lambda_eventsourcemapping.FilterCriteria = self.FilterCriteria  # type: ignore[attr-defined]
+        self._validate_filter_criteria()  # type: ignore[no-untyped-call]
 
-        if self.KafkaBootstrapServers:
+        if self.KafkaBootstrapServers:  # type: ignore[attr-defined]
             lambda_eventsourcemapping.SelfManagedEventSource = {
-                "Endpoints": {"KafkaBootstrapServers": self.KafkaBootstrapServers}
+                "Endpoints": {"KafkaBootstrapServers": self.KafkaBootstrapServers}  # type: ignore[attr-defined]
             }
-        if self.ConsumerGroupId:
-            consumer_group_id_structure = {"ConsumerGroupId": self.ConsumerGroupId}
+        if self.ConsumerGroupId:  # type: ignore[attr-defined]
+            consumer_group_id_structure = {"ConsumerGroupId": self.ConsumerGroupId}  # type: ignore[attr-defined]
             if self.resource_type == "MSK":
-                lambda_eventsourcemapping.AmazonManagedKafkaConfig = consumer_group_id_structure
+                lambda_eventsourcemapping.AmazonManagedKafkaEventSourceConfig = consumer_group_id_structure
             elif self.resource_type == "SelfManagedKafka":
-                lambda_eventsourcemapping.SelfManagedKafkaConfig = consumer_group_id_structure
+                lambda_eventsourcemapping.SelfManagedKafkaEventSourceConfig = consumer_group_id_structure
             else:
                 raise InvalidEventException(
                     self.logical_id,
@@ -129,46 +129,46 @@ class PullEventSource(ResourceMacro):
                 )
 
         destination_config_policy = None
-        if self.DestinationConfig:
-            if self.DestinationConfig.get("OnFailure") is None:
+        if self.DestinationConfig:  # type: ignore[attr-defined]
+            if self.DestinationConfig.get("OnFailure") is None:  # type: ignore[attr-defined]
                 raise InvalidEventException(self.logical_id, "'OnFailure' is a required field for 'DestinationConfig'")
 
             # `Type` property is for sam to attach the right policies
-            destination_type = self.DestinationConfig.get("OnFailure").get("Type")
+            destination_type = self.DestinationConfig.get("OnFailure").get("Type")  # type: ignore[attr-defined]
 
             # SAM attaches the policies for SQS or SNS only if 'Type' is given
             if destination_type:
                 # delete this field as its used internally for SAM to determine the policy
-                del self.DestinationConfig["OnFailure"]["Type"]
+                del self.DestinationConfig["OnFailure"]["Type"]  # type: ignore[attr-defined]
                 # the values 'SQS' and 'SNS' are allowed. No intrinsics are allowed
                 if destination_type not in ["SQS", "SNS"]:
                     raise InvalidEventException(self.logical_id, "The only valid values for 'Type' are 'SQS' and 'SNS'")
                 if destination_type == "SQS":
-                    queue_arn = self.DestinationConfig.get("OnFailure").get("Destination")
+                    queue_arn = self.DestinationConfig.get("OnFailure").get("Destination")  # type: ignore[attr-defined]
                     destination_config_policy = IAMRolePolicies().sqs_send_message_role_policy(
                         queue_arn, self.logical_id
                     )
                 elif destination_type == "SNS":
-                    sns_topic_arn = self.DestinationConfig.get("OnFailure").get("Destination")
+                    sns_topic_arn = self.DestinationConfig.get("OnFailure").get("Destination")  # type: ignore[attr-defined]
                     destination_config_policy = IAMRolePolicies().sns_publish_role_policy(
                         sns_topic_arn, self.logical_id
                     )
 
-            lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig
+            lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig  # type: ignore[attr-defined]
 
         if "role" in kwargs:
-            self._link_policy(kwargs["role"], destination_config_policy)
+            self._link_policy(kwargs["role"], destination_config_policy)  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _link_policy(self, role, destination_config_policy=None):
+    def _link_policy(self, role, destination_config_policy=None):  # type: ignore[no-untyped-def]
         """If this source triggers a Lambda function whose execution role is auto-generated by SAM, add the
         appropriate managed policy to this Role.
 
         :param model.iam.IAMRole role: the execution role generated for the function
         """
-        policy_arn = self.get_policy_arn()
-        policy_statements = self.get_policy_statements()
+        policy_arn = self.get_policy_arn()  # type: ignore[no-untyped-call]
+        policy_statements = self.get_policy_statements()  # type: ignore[no-untyped-call]
         if role is not None:
             if policy_arn is not None and policy_arn not in role.ManagedPolicyArns:
                 role.ManagedPolicyArns.append(policy_arn)
@@ -189,8 +189,8 @@ class PullEventSource(ResourceMacro):
                 if not destination_config_policy.get("PolicyDocument") in [d["PolicyDocument"] for d in role.Policies]:
                     role.Policies.append(destination_config_policy)
 
-    def _validate_filter_criteria(self):
-        if not self.FilterCriteria or is_intrinsic(self.FilterCriteria):
+    def _validate_filter_criteria(self):  # type: ignore[no-untyped-def]
+        if not self.FilterCriteria or is_intrinsic(self.FilterCriteria):  # type: ignore[attr-defined]
             return
         if self.resource_type not in self.RESOURCE_TYPES_WITH_EVENT_FILTERING:
             raise InvalidEventException(
@@ -200,11 +200,11 @@ class PullEventSource(ResourceMacro):
                 ),
             )
         # FilterCriteria is either empty or only has "Filters"
-        if list(self.FilterCriteria.keys()) not in [[], ["Filters"]]:
+        if list(self.FilterCriteria.keys()) not in [[], ["Filters"]]:  # type: ignore[attr-defined]
             raise InvalidEventException(self.relative_id, "FilterCriteria field has a wrong format")
 
-    def validate_secrets_manager_kms_key_id(self):
-        if self.SecretsManagerKmsKeyId and not isinstance(self.SecretsManagerKmsKeyId, str):
+    def validate_secrets_manager_kms_key_id(self):  # type: ignore[no-untyped-def]
+        if self.SecretsManagerKmsKeyId and not isinstance(self.SecretsManagerKmsKeyId, str):  # type: ignore[attr-defined]
             raise InvalidEventException(
                 self.relative_id,
                 "Provided SecretsManagerKmsKeyId should be of type str.",
@@ -216,10 +216,10 @@ class Kinesis(PullEventSource):
 
     resource_type = "Kinesis"
 
-    def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")  # type: ignore[no-untyped-call]
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
 
 
@@ -228,10 +228,10 @@ class DynamoDB(PullEventSource):
 
     resource_type = "DynamoDB"
 
-    def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")  # type: ignore[no-untyped-call]
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
 
 
@@ -240,10 +240,10 @@ class SQS(PullEventSource):
 
     resource_type = "SQS"
 
-    def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")  # type: ignore[no-untyped-call]
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
 
 
@@ -252,10 +252,10 @@ class MSK(PullEventSource):
 
     resource_type = "MSK"
 
-    def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")  # type: ignore[no-untyped-call]
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
 
 
@@ -264,22 +264,22 @@ class MQ(PullEventSource):
 
     resource_type = "MQ"
 
-    def get_policy_arn(self):
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
         return None
 
-    def get_policy_statements(self):
-        if not self.SourceAccessConfigurations:
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+        if not self.SourceAccessConfigurations:  # type: ignore[attr-defined]
             raise InvalidEventException(
                 self.relative_id,
                 "No SourceAccessConfigurations for Amazon MQ event provided.",
             )
-        if not type(self.SourceAccessConfigurations) is list:
+        if not isinstance(self.SourceAccessConfigurations, list):  # type: ignore[attr-defined]
             raise InvalidEventException(
                 self.relative_id,
                 "Provided SourceAccessConfigurations cannot be parsed into a list.",
             )
         basic_auth_uri = None
-        for conf in self.SourceAccessConfigurations:
+        for conf in self.SourceAccessConfigurations:  # type: ignore[attr-defined]
             event_type = conf.get("Type")
             if event_type not in ("BASIC_AUTH", "VIRTUAL_HOST"):
                 raise InvalidEventException(
@@ -320,22 +320,22 @@ class MQ(PullEventSource):
                             "mq:DescribeBroker",
                         ],
                         "Effect": "Allow",
-                        "Resource": self.Broker,
+                        "Resource": self.Broker,  # type: ignore[attr-defined]
                     },
                 ]
             },
         }
-        if self.SecretsManagerKmsKeyId:
-            self.validate_secrets_manager_kms_key_id()
+        if self.SecretsManagerKmsKeyId:  # type: ignore[attr-defined]
+            self.validate_secrets_manager_kms_key_id()  # type: ignore[no-untyped-call]
             kms_policy = {
                 "Action": "kms:Decrypt",
                 "Effect": "Allow",
                 "Resource": {
                     "Fn::Sub": "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/"
-                    + self.SecretsManagerKmsKeyId
+                    + self.SecretsManagerKmsKeyId  # type: ignore[attr-defined]
                 },
             }
-            document["PolicyDocument"]["Statement"].append(kms_policy)
+            document["PolicyDocument"]["Statement"].append(kms_policy)  # type: ignore[index]
         return [document]
 
 
@@ -348,50 +348,50 @@ class SelfManagedKafka(PullEventSource):
     requires_stream_queue_broker = False
     AUTH_MECHANISM = ["SASL_SCRAM_256_AUTH", "SASL_SCRAM_512_AUTH", "BASIC_AUTH"]
 
-    def get_policy_arn(self):
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
         return None
 
-    def get_policy_statements(self):
-        if not self.KafkaBootstrapServers:
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+        if not self.KafkaBootstrapServers:  # type: ignore[attr-defined]
             raise InvalidEventException(
                 self.relative_id,
                 "No KafkaBootstrapServers provided for self managed kafka as an event source",
             )
 
-        if not self.Topics:
+        if not self.Topics:  # type: ignore[attr-defined]
             raise InvalidEventException(
                 self.relative_id,
                 "No Topics provided for self managed kafka as an event source",
             )
 
-        if len(self.Topics) != 1:
+        if len(self.Topics) != 1:  # type: ignore[attr-defined]
             raise InvalidEventException(
                 self.relative_id,
                 "Topics for self managed kafka only supports single configuration entry.",
             )
 
-        if not self.SourceAccessConfigurations:
+        if not self.SourceAccessConfigurations:  # type: ignore[attr-defined]
             raise InvalidEventException(
                 self.relative_id,
                 "No SourceAccessConfigurations for self managed kafka event provided.",
             )
-        document = self.generate_policy_document()
+        document = self.generate_policy_document()  # type: ignore[no-untyped-call]
         return [document]
 
-    def generate_policy_document(self):
+    def generate_policy_document(self):  # type: ignore[no-untyped-def]
         statements = []
-        authentication_uri, has_vpc_config = self.get_secret_key()
+        authentication_uri, has_vpc_config = self.get_secret_key()  # type: ignore[no-untyped-call]
         if authentication_uri:
-            secret_manager = self.get_secret_manager_secret(authentication_uri)
+            secret_manager = self.get_secret_manager_secret(authentication_uri)  # type: ignore[no-untyped-call]
             statements.append(secret_manager)
 
         if has_vpc_config:
-            vpc_permissions = self.get_vpc_permission()
+            vpc_permissions = self.get_vpc_permission()  # type: ignore[no-untyped-call]
             statements.append(vpc_permissions)
 
-        if self.SecretsManagerKmsKeyId:
-            self.validate_secrets_manager_kms_key_id()
-            kms_policy = self.get_kms_policy()
+        if self.SecretsManagerKmsKeyId:  # type: ignore[attr-defined]
+            self.validate_secrets_manager_kms_key_id()  # type: ignore[no-untyped-call]
+            kms_policy = self.get_kms_policy()  # type: ignore[no-untyped-call]
             statements.append(kms_policy)
 
         document = {
@@ -404,17 +404,17 @@ class SelfManagedKafka(PullEventSource):
 
         return document
 
-    def get_secret_key(self):
+    def get_secret_key(self):  # type: ignore[no-untyped-def]
         authentication_uri = None
         has_vpc_subnet = False
         has_vpc_security_group = False
-        for config in self.SourceAccessConfigurations:
+        for config in self.SourceAccessConfigurations:  # type: ignore[attr-defined]
             if config.get("Type") == "VPC_SUBNET":
-                self.validate_uri(config, "VPC_SUBNET")
+                self.validate_uri(config, "VPC_SUBNET")  # type: ignore[no-untyped-call]
                 has_vpc_subnet = True
 
             elif config.get("Type") == "VPC_SECURITY_GROUP":
-                self.validate_uri(config, "VPC_SECURITY_GROUP")
+                self.validate_uri(config, "VPC_SECURITY_GROUP")  # type: ignore[no-untyped-call]
                 has_vpc_security_group = True
 
             elif config.get("Type") in self.AUTH_MECHANISM:
@@ -423,7 +423,7 @@ class SelfManagedKafka(PullEventSource):
                         self.relative_id,
                         "Multiple auth mechanism properties specified in SourceAccessConfigurations for self managed kafka event.",
                     )
-                self.validate_uri(config, "auth mechanism")
+                self.validate_uri(config, "auth mechanism")  # type: ignore[no-untyped-call]
                 authentication_uri = config.get("URI")
 
             else:
@@ -439,7 +439,7 @@ class SelfManagedKafka(PullEventSource):
             )
         return authentication_uri, (has_vpc_subnet and has_vpc_security_group)
 
-    def validate_uri(self, config, msg):
+    def validate_uri(self, config, msg):  # type: ignore[no-untyped-def]
         if not config.get("URI"):
             raise InvalidEventException(
                 self.relative_id,
@@ -454,14 +454,14 @@ class SelfManagedKafka(PullEventSource):
                 ),
             )
 
-    def get_secret_manager_secret(self, authentication_uri):
+    def get_secret_manager_secret(self, authentication_uri):  # type: ignore[no-untyped-def]
         return {
             "Action": ["secretsmanager:GetSecretValue"],
             "Effect": "Allow",
             "Resource": authentication_uri,
         }
 
-    def get_vpc_permission(self):
+    def get_vpc_permission(self):  # type: ignore[no-untyped-def]
         return {
             "Action": [
                 "ec2:CreateNetworkInterface",
@@ -475,12 +475,12 @@ class SelfManagedKafka(PullEventSource):
             "Resource": "*",
         }
 
-    def get_kms_policy(self):
+    def get_kms_policy(self):  # type: ignore[no-untyped-def]
         return {
             "Action": ["kms:Decrypt"],
             "Effect": "Allow",
             "Resource": {
                 "Fn::Sub": "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/"
-                + self.SecretsManagerKmsKeyId
+                + self.SecretsManagerKmsKeyId  # type: ignore[attr-defined]
             },
         }

@@ -1,12 +1,16 @@
 import copy
 
+from typing import Any, Dict, Optional, Type, Union
+
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import make_combined_condition
 from samtranslator.model.eventsources.push import Api
+from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.public.plugins import BasePlugin
 from samtranslator.public.exceptions import InvalidDocumentException, InvalidResourceException, InvalidEventException
-from samtranslator.public.sdk.resource import SamResourceType
+from samtranslator.public.sdk.resource import SamResource, SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.utils.py27hash_fix import Py27Dict
 
 
@@ -32,27 +36,34 @@ class ImplicitApiPlugin(BasePlugin):
 
     """
 
-    def __init__(self, name):
+    implicit_api_logical_id: str  # "ServerlessRestApi" or "ServerlessHttpApi"
+    implicit_api_condition: str  # "ServerlessHttpApiCondition" or "ServerlessRestApiCondition"
+    api_event_type: str  # "HttpApi" or "Api"
+    api_type: str  # SamResourceType
+    api_id_property: str  # "ApiId" or "RestApiId"
+    editor: Union[Type[OpenApiEditor], Type[SwaggerEditor]]
+
+    def __init__(self, name: str) -> None:
         """
         Initialize the plugin
         """
         super(ImplicitApiPlugin, self).__init__(name)
 
-        self.existing_implicit_api_resource = None
+        self.existing_implicit_api_resource: Optional[SamResource] = None
         # dict containing condition (or None) for each resource path+method for all APIs. dict format:
         # {api_id: {path: {method: condition_name_or_None}}}
-        self.api_conditions = {}
-        self.api_deletion_policies = {}
-        self.api_update_replace_policies = {}
+        self.api_conditions: Dict[str, Any] = {}
+        self.api_deletion_policies: Dict[str, Any] = {}
+        self.api_update_replace_policies: Dict[str, Any] = {}
         self._setup_api_properties()
 
-    def _setup_api_properties(self):
+    def _setup_api_properties(self) -> None:
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
-    @cw_timer(prefix="Plugin-ImplicitApi")
-    def on_before_transform_template(self, template_dict):
+    @cw_timer(prefix="Plugin-ImplicitApi")  # type: ignore[no-untyped-call]
+    def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Hook method that gets called before the SAM template is processed.
         The template has pass the validation and is guaranteed to contain a non-empty "Resources" section.
@@ -72,14 +83,14 @@ class ImplicitApiPlugin(BasePlugin):
         # removing the "ServerlessRestApi" resource, we just restore what the author defined.
         self.existing_implicit_api_resource = copy.deepcopy(template.get(self.implicit_api_logical_id))
 
-        template.set(self.implicit_api_logical_id, self._generate_implicit_api_resource())
+        template.set(self.implicit_api_logical_id, self._generate_implicit_api_resource())  # type: ignore[no-untyped-call]
 
         errors = []
         for logicalId, resource in template.iterate(
             {SamResourceType.Function.value, SamResourceType.StateMachine.value}
         ):
 
-            api_events = self._get_api_events(resource)
+            api_events = self._get_api_events(resource)  # type: ignore[no-untyped-call]
             condition = resource.condition
             deletion_policy = resource.deletion_policy
             update_replace_policy = resource.update_replace_policy
@@ -87,23 +98,23 @@ class ImplicitApiPlugin(BasePlugin):
                 continue
 
             try:
-                self._process_api_events(
+                self._process_api_events(  # type: ignore[no-untyped-call]
                     resource, api_events, template, condition, deletion_policy, update_replace_policy
                 )
 
             except InvalidEventException as ex:
                 errors.append(InvalidResourceException(logicalId, ex.message))
 
-        self._maybe_add_condition_to_implicit_api(template_dict)
-        self._maybe_add_deletion_policy_to_implicit_api(template_dict)
-        self._maybe_add_update_replace_policy_to_implicit_api(template_dict)
-        self._maybe_add_conditions_to_implicit_api_paths(template)
-        self._maybe_remove_implicit_api(template)
+        self._maybe_add_condition_to_implicit_api(template_dict)  # type: ignore[no-untyped-call]
+        self._maybe_add_deletion_policy_to_implicit_api(template_dict)  # type: ignore[no-untyped-call]
+        self._maybe_add_update_replace_policy_to_implicit_api(template_dict)  # type: ignore[no-untyped-call]
+        self._maybe_add_conditions_to_implicit_api_paths(template)  # type: ignore[no-untyped-call]
+        self._maybe_remove_implicit_api(template)  # type: ignore[no-untyped-call]
 
         if len(errors) > 0:
             raise InvalidDocumentException(errors)
 
-    def _get_api_events(self, resource):
+    def _get_api_events(self, resource):  # type: ignore[no-untyped-def]
         """
         Method to return a dictionary of API Events on the resource
 
@@ -133,23 +144,23 @@ class ImplicitApiPlugin(BasePlugin):
 
         return api_events
 
-    def _process_api_events(
-        self, resource, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
+    def _process_api_events(  # type: ignore[no-untyped-def]
+        self, function, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
     ):
         """
         Actually process given API events. Iteratively adds the APIs to Swagger JSON in the respective Serverless::Api
         resource from the template
 
-        :param SamResource resource: SAM Resource containing the API events to be processed
-        :param dict api_events: API Events extracted from the resource. These events will be processed
+        :param SamResource function: SAM function containing the API events to be processed
+        :param dict api_events: API Events extracted from the function. These events will be processed
         :param SamTemplate template: SAM Template where Serverless::Api resources can be found
         :param str condition: optional; this is the condition that is on the resource with the API event
         """
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
-    def _add_implicit_api_id_if_necessary(self, event_properties):
+    def _add_implicit_api_id_if_necessary(self, event_properties):  # type: ignore[no-untyped-def]
         """
         Events for implicit APIs will *not* have the RestApiId property. Absence of this property means this event
         is associated with the Serverless::Api ImplicitAPI resource. This method solifies this assumption by adding
@@ -158,10 +169,10 @@ class ImplicitApiPlugin(BasePlugin):
         :param dict event_properties: Dictionary of event properties
         """
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
-    def _add_api_to_swagger(self, event_id, event_properties, template):
+    def _add_api_to_swagger(self, event_id, event_properties, template):  # type: ignore[no-untyped-def]
         """
         Adds the API path/method from the given event to the Swagger JSON of Serverless::Api resource this event
         refers to.
@@ -172,7 +183,7 @@ class ImplicitApiPlugin(BasePlugin):
         """
 
         # Need to grab the AWS::Serverless::Api resource for this API event and update its Swagger definition
-        api_id = self._get_api_id(event_properties)
+        api_id = self._get_api_id(event_properties)  # type: ignore[no-untyped-call]
 
         # As of right now, this is for backwards compatability. SAM fails if you have an event type "Api" but that
         # references "AWS::Serverless::HttpApi". If you do the opposite, SAM still outputs a valid template. Example of that
@@ -189,7 +200,7 @@ class ImplicitApiPlugin(BasePlugin):
         if isinstance(api_id, dict) or is_referencing_http_from_api_event:
             raise InvalidEventException(
                 event_id,
-                f"{self.api_id_property} must be a valid reference to an '{self._get_api_resource_type_name()}'"
+                f"{self.api_id_property} must be a valid reference to an '{self._get_api_resource_type_name()}'"  # type: ignore[no-untyped-call]
                 " resource in same template.",
             )
 
@@ -221,19 +232,19 @@ class ImplicitApiPlugin(BasePlugin):
         editor = self.editor(swagger)
         editor.add_path(path, method)
 
-        resource.properties["DefinitionBody"] = self._get_api_definition_from_editor(editor)
+        resource.properties["DefinitionBody"] = self._get_api_definition_from_editor(editor)  # type: ignore[no-untyped-call]
         template.set(api_id, resource)
 
-    def _get_api_id(self, event_properties):
+    def _get_api_id(self, event_properties):  # type: ignore[no-untyped-def]
         """
         Get API logical id from API event properties.
 
         Handles case where API id is not specified or is a reference to a logical id.
         """
         api_id = event_properties.get(self.api_id_property)
-        return Api.get_rest_api_id_string(api_id)
+        return Api.get_rest_api_id_string(api_id)  # type: ignore[no-untyped-call]
 
-    def _maybe_add_condition_to_implicit_api(self, template_dict):
+    def _maybe_add_condition_to_implicit_api(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Decides whether to add a condition to the implicit api resource.
         :param dict template_dict: SAM template dictionary
@@ -245,13 +256,11 @@ class ImplicitApiPlugin(BasePlugin):
         # Add a condition to the API resource IFF all of its resource+methods are associated with serverless functions
         # containing conditions.
         implicit_api_conditions = self.api_conditions[self.implicit_api_logical_id]
-        all_resource_method_conditions = set(
-            [
-                condition
-                for path, method_conditions in implicit_api_conditions.items()
-                for method, condition in method_conditions.items()
-            ]
-        )
+        all_resource_method_conditions = {
+            condition
+            for _, method_conditions in implicit_api_conditions.items()
+            for _, condition in method_conditions.items()
+        }
         at_least_one_resource_method = len(all_resource_method_conditions) > 0
         all_resource_methods_contain_conditions = None not in all_resource_method_conditions
         if at_least_one_resource_method and all_resource_methods_contain_conditions:
@@ -264,21 +273,21 @@ class ImplicitApiPlugin(BasePlugin):
                 # aggregate those conditions in order to conditionally create the Implicit Api. See RFC:
                 # https://github.com/awslabs/serverless-application-model/issues/758
                 implicit_api_resource["Condition"] = self.implicit_api_condition
-                self._add_combined_condition_to_template(
+                self._add_combined_condition_to_template(  # type: ignore[no-untyped-call]
                     template_dict, self.implicit_api_condition, all_resource_method_conditions
                 )
 
-    def _maybe_add_deletion_policy_to_implicit_api(self, template_dict):
+    def _maybe_add_deletion_policy_to_implicit_api(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Decides whether to add a deletion policy to the implicit api resource.
         :param dict template_dict: SAM template dictionary
         """
         # Short-circuit if template doesn't have any functions with implicit API events
-        if not self.api_deletion_policies.get(self.implicit_api_logical_id, {}):
+        implicit_api_deletion_policies = self.api_deletion_policies.get(self.implicit_api_logical_id)
+        if not implicit_api_deletion_policies:
             return
 
         # Add a deletion policy to the API resource if its resources contains DeletionPolicy.
-        implicit_api_deletion_policies = self.api_deletion_policies.get(self.implicit_api_logical_id)
         at_least_one_resource_method = len(implicit_api_deletion_policies) > 0
         one_resource_method_contains_deletion_policy = False
         contains_retain = False
@@ -300,17 +309,17 @@ class ImplicitApiPlugin(BasePlugin):
             elif contains_delete:
                 implicit_api_resource["DeletionPolicy"] = "Delete"
 
-    def _maybe_add_update_replace_policy_to_implicit_api(self, template_dict):
+    def _maybe_add_update_replace_policy_to_implicit_api(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Decides whether to add an update replace policy to the implicit api resource.
         :param dict template_dict: SAM template dictionary
         """
         # Short-circuit if template doesn't have any functions with implicit API events
-        if not self.api_update_replace_policies.get(self.implicit_api_logical_id, {}):
+        implicit_api_update_replace_policies = self.api_update_replace_policies.get(self.implicit_api_logical_id)
+        if not implicit_api_update_replace_policies:
             return
 
         # Add a update replace policy to the API resource if its resources contains UpdateReplacePolicy.
-        implicit_api_update_replace_policies = self.api_update_replace_policies.get(self.implicit_api_logical_id)
         at_least_one_resource_method = len(implicit_api_update_replace_policies) > 0
         one_resource_method_contains_update_replace_policy = False
         contains_retain = False
@@ -337,7 +346,7 @@ class ImplicitApiPlugin(BasePlugin):
             elif contains_delete:
                 implicit_api_resource["UpdateReplacePolicy"] = "Delete"
 
-    def _add_combined_condition_to_template(self, template_dict, condition_name, conditions_to_combine):
+    def _add_combined_condition_to_template(self, template_dict, condition_name, conditions_to_combine):  # type: ignore[no-untyped-def]
         """
         Add top-level template condition that combines the given list of conditions.
 
@@ -352,10 +361,13 @@ class ImplicitApiPlugin(BasePlugin):
 
         template_conditions = template_dict.setdefault("Conditions", {})
         new_template_conditions = make_combined_condition(sorted(list(conditions_to_combine)), condition_name)
-        for name, definition in new_template_conditions.items():
+        # make_combined_condition() won't return None if `conditions_to_combine` has at least 2 elements,
+        # which is checked above.
+        # TODO: refactor the code to make the length check in one place only.
+        for name, definition in new_template_conditions.items():  # type: ignore
             template_conditions[name] = definition
 
-    def _maybe_add_conditions_to_implicit_api_paths(self, template):
+    def _maybe_add_conditions_to_implicit_api_paths(self, template):  # type: ignore[no-untyped-def]
         """
         Add conditions to implicit API paths if necessary.
 
@@ -375,33 +387,31 @@ class ImplicitApiPlugin(BasePlugin):
             editor = self.editor(swagger)
 
             for path in editor.iter_on_path():
-                all_method_conditions = set(
-                    [condition for method, condition in self.api_conditions[api_id][path].items()]
-                )
+                all_method_conditions = {condition for _, condition in self.api_conditions[api_id][path].items()}
                 at_least_one_method = len(all_method_conditions) > 0
                 all_methods_contain_conditions = None not in all_method_conditions
                 if at_least_one_method and all_methods_contain_conditions:
                     if len(all_method_conditions) == 1:
                         editor.make_path_conditional(path, all_method_conditions.pop())
                     else:
-                        path_condition_name = self._path_condition_name(api_id, path)
-                        self._add_combined_condition_to_template(
+                        path_condition_name = self._path_condition_name(api_id, path)  # type: ignore[no-untyped-call]
+                        self._add_combined_condition_to_template(  # type: ignore[no-untyped-call]
                             template.template_dict, path_condition_name, all_method_conditions
                         )
                         editor.make_path_conditional(path, path_condition_name)
 
-            api.properties["DefinitionBody"] = self._get_api_definition_from_editor(editor)  # TODO make static method
+            api.properties["DefinitionBody"] = self._get_api_definition_from_editor(editor)  # type: ignore[no-untyped-call] # TODO make static method
             template.set(api_id, api)
 
-    def _get_api_definition_from_editor(self, editor):
+    def _get_api_definition_from_editor(self, editor):  # type: ignore[no-untyped-def]
         """
         Required function that returns the api body from the respective editor
         """
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
-    def _path_condition_name(self, api_id, path):
+    def _path_condition_name(self, api_id, path):  # type: ignore[no-untyped-def]
         """
         Generate valid condition logical id from the given API logical id and swagger resource path.
         """
@@ -411,7 +421,7 @@ class ImplicitApiPlugin(BasePlugin):
         path_logical_id = path.replace("/", "SLASH").replace("{", "OB").replace("}", "CB")
         return "{}{}PathCondition".format(api_id, path_logical_id)
 
-    def _maybe_remove_implicit_api(self, template):
+    def _maybe_remove_implicit_api(self, template):  # type: ignore[no-untyped-def]
         """
         Implicit API resource are tentatively added to the template for uniform handling of both Implicit & Explicit
         APIs. They need to removed from the template, if there are *no* API events attached to this resource.
@@ -431,18 +441,18 @@ class ImplicitApiPlugin(BasePlugin):
             else:
                 template.delete(self.implicit_api_logical_id)
 
-    def _generate_implicit_api_resource(self):
+    def _generate_implicit_api_resource(self):  # type: ignore[no-untyped-def]
         """
         Helper function implemented by child classes that create a new implicit API resource
         """
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
-    def _get_api_resource_type_name(self):
+    def _get_api_resource_type_name(self):  # type: ignore[no-untyped-def]
         """
         Returns the type of API resource
         """
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )

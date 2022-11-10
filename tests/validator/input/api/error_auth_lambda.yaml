@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -12,7 +14,7 @@ Resources:
             FunctionArn: Function.arn
           LambdaAuthorizationScopesItemNotString:
             AuthorizationScopes:
-              - 3
+            - 3
             FunctionArn: Function.arn
           LambdaAuthorizationScopesNotList:
             AuthorizationScopes: scopes1

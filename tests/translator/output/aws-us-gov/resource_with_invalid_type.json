@@ -1,17 +1,16 @@
 {
   "Resources": {
     "FunctionInvalid": {
-      "Type": {
-        "AWS::Serverless::Function": "invalid_field"
-      },
       "Properties": {
         "CodeUri": "s3://sam-demo-bucket/member_portal.zip",
         "Handler": "index.gethtml",
         "Runtime": "nodejs12.x"
+      },
+      "Type": {
+        "AWS::Serverless::Function": "invalid_field"
       }
     },
     "FunctionValid": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -31,13 +30,12 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "FunctionValidRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -50,7 +48,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -61,7 +60,8 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

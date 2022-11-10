@@ -1,72 +1,72 @@
 {
-  "AWSTemplateFormatVersion": "2010-09-09", 
-  "Parameters": {}, 
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {},
   "Resources": {
-    "AlexaSkillFuncRole": {
-      "Type": "AWS::IAM::Role", 
+    "AlexaSkillFunc": {
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": "Created by SAM",
+        "Handler": "index.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "AlexaSkillFuncRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "AlexaSkillFuncAlexaSkillEventPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "AlexaSkillFunc"
+        },
+        "Principal": "alexa-appkit.amazon.com"
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "AlexaSkillFuncRole": {
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
-    }, 
-    "AlexaSkillFuncAlexaSkillEventPermission": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "FunctionName": {
-          "Ref": "AlexaSkillFunc"
-        }, 
-        "Principal": "alexa-appkit.amazon.com"
-      }
-    }, 
-    "AlexaSkillFunc": {
-      "Type": "AWS::Lambda::Function", 
-      "Properties": {
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "hello.zip"
-        }, 
-        "Description": "Created by SAM",
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        ], 
-        "MemorySize": 1024, 
-        "Handler": "index.handler", 
-        "Role": {
-          "Fn::GetAtt": [
-            "AlexaSkillFuncRole", 
-            "Arn"
-          ]
-        }, 
-        "Timeout": 3, 
-        "Runtime": "nodejs12.x"
-      }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

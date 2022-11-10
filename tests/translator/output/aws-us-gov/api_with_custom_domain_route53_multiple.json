@@ -2,28 +2,31 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "apigateway-2402\nSample SAM Template for apigateway-2402\n",
   "Resources": {
-    "ApiGatewayAdminTwoProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
+    "ApiGatewayAdminOne": {
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ApiGatewayAdminTwoDeployment61887a4eed"
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {},
+          "swagger": "2.0"
         },
-        "RestApiId": {
-          "Ref": "ApiGatewayAdminTwo"
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
         },
-        "StageName": "Prod",
-        "TracingEnabled": true,
-        "MethodSettings": [
-          {
-            "HttpMethod": "*",
-            "ResourcePath": "/*",
-            "LoggingLevel": "Info"
-          }
-        ]
-      }
+        "Name": "App-Prod-Web",
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
     },
     "ApiGatewayAdminOneBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping",
       "Properties": {
         "DomainName": {
           "Ref": "ApiGatewayDomainName5fe29fe649"
@@ -34,178 +37,64 @@
         "Stage": {
           "Ref": "ApiGatewayAdminOneProdStage"
         }
-      }
-    },
-    "ApiGatewayAdminOneProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ApiGatewayAdminOneDeploymentdd3f545183"
-        },
-        "RestApiId": {
-          "Ref": "ApiGatewayAdminOne"
-        },
-        "StageName": "Prod",
-        "TracingEnabled": true,
-        "MethodSettings": [
-          {
-            "HttpMethod": "*",
-            "ResourcePath": "/*",
-            "LoggingLevel": "Info"
-          }
-        ]
-      }
-    },
-    "ApiGatewayAdminThreeDeployment7541e97159": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "Description": "RestApi deployment id: 7541e971598cffe7cafab030d3fccc687d508f59",
-        "RestApiId": {
-          "Ref": "ApiGatewayAdminThree"
-        },
-        "StageName": "Stage"
-      }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
     },
     "ApiGatewayAdminOneDeploymentdd3f545183": {
-      "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "Description": "RestApi deployment id: dd3f545183668c401e771fd9a377cfeadcf88a35",
         "RestApiId": {
           "Ref": "ApiGatewayAdminOne"
         },
         "StageName": "Stage"
-      }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
     },
-    "ApiGatewayDomainName3fd2dbd8f8": {
-      "Type": "AWS::ApiGateway::DomainName",
-      "Properties": {
-        "RegionalCertificateArn": "arn::cert::abc",
-        "DomainName": "admin.two.amazon.com",
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }
-      }
-    },
-    "ApiGatewayAdminTwoDeployment61887a4eed": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "Description": "RestApi deployment id: 61887a4eed03102402cbaa575b5b1e398b0dc647",
-        "RestApiId": {
-          "Ref": "ApiGatewayAdminTwo"
-        },
-        "StageName": "Stage"
-      }
-    },
-    "ApiGatewayAdminThree": {
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {},
-          "swagger": "2.0"
-        },
-        "Name": "App-Prod-Web",
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        },
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }
-      }
-    },
-    "ApiGatewayDomainName5fe29fe649": {
-      "Type": "AWS::ApiGateway::DomainName",
-      "Properties": {
-        "RegionalCertificateArn": "arn::cert::abc",
-        "DomainName": "admin.one.amazon.com",
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }
-      }
-    },
-    "ApiGatewayAdminTwoBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping",
-      "Properties": {
-        "DomainName": {
-          "Ref": "ApiGatewayDomainName3fd2dbd8f8"
-        },
-        "RestApiId": {
-          "Ref": "ApiGatewayAdminTwo"
-        },
-        "Stage": {
-          "Ref": "ApiGatewayAdminTwoProdStage"
-        }
-      }
-    },
-    "ApiGatewayAdminTwo": {
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {},
-          "swagger": "2.0"
-        },
-        "Name": "App-Prod-Web",
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        },
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }
-      }
-    },
-    "ApiGatewayDomainName41bfc7f9c4": {
-      "Type": "AWS::ApiGateway::DomainName",
-      "Properties": {
-        "RegionalCertificateArn": "arn::cert::abc",
-        "DomainName": "admin.three.amazon.com",
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }
-      }
-    },
-    "ApiGatewayAdminThreeProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
+    "ApiGatewayAdminOneProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiGatewayAdminThreeDeployment7541e97159"
+          "Ref": "ApiGatewayAdminOneDeploymentdd3f545183"
         },
-        "RestApiId": {
-          "Ref": "ApiGatewayAdminThree"
-        },
-        "StageName": "Prod",
-        "TracingEnabled": true,
         "MethodSettings": [
           {
             "HttpMethod": "*",
-            "ResourcePath": "/*",
-            "LoggingLevel": "Info"
+            "LoggingLevel": "Info",
+            "ResourcePath": "/*"
           }
-        ]
-      }
+        ],
+        "RestApiId": {
+          "Ref": "ApiGatewayAdminOne"
+        },
+        "StageName": "Prod",
+        "TracingEnabled": true
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "ApiGatewayAdminThree": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {},
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Name": "App-Prod-Web",
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
     },
     "ApiGatewayAdminThreeBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping",
       "Properties": {
         "DomainName": {
           "Ref": "ApiGatewayDomainName41bfc7f9c4"
@@ -216,93 +105,204 @@
         "Stage": {
           "Ref": "ApiGatewayAdminThreeProdStage"
         }
-      }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
     },
-    "RecordSetGroup370194ff6e": {
-      "Type": "AWS::Route53::RecordSetGroup",
+    "ApiGatewayAdminThreeDeployment7541e97159": {
       "Properties": {
-        "HostedZoneId": "abc123456",
-        "RecordSets": [
-          {
-            "Name": "admin.two.amazon.com",
-            "Type": "A",
-            "AliasTarget": {
-              "HostedZoneId": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainName3fd2dbd8f8",
-                  "RegionalHostedZoneId"
-                ]
-              },
-              "DNSName": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainName3fd2dbd8f8",
-                  "RegionalDomainName"
-                ]
-              }
-            }
-          },
-          {
-            "Name": "admin.three.amazon.com",
-            "Type": "A",
-            "AliasTarget": {
-              "HostedZoneId": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainName41bfc7f9c4",
-                  "RegionalHostedZoneId"
-                ]
-              },
-              "DNSName": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainName41bfc7f9c4",
-                  "RegionalDomainName"
-                ]
-              }
-            }
-          },
-          {
-            "Name": "admin.one.amazon.com",
-            "Type": "A",
-            "AliasTarget": {
-              "HostedZoneId": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainName5fe29fe649",
-                  "RegionalHostedZoneId"
-                ]
-              },
-              "DNSName": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainName5fe29fe649",
-                  "RegionalDomainName"
-                ]
-              }
-            }
-          }
-        ]
-      }
+        "Description": "RestApi deployment id: 7541e971598cffe7cafab030d3fccc687d508f59",
+        "RestApiId": {
+          "Ref": "ApiGatewayAdminThree"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
     },
-    "ApiGatewayAdminOne": {
-      "Type": "AWS::ApiGateway::RestApi",
+    "ApiGatewayAdminThreeProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ApiGatewayAdminThreeDeployment7541e97159"
+        },
+        "MethodSettings": [
+          {
+            "HttpMethod": "*",
+            "LoggingLevel": "Info",
+            "ResourcePath": "/*"
+          }
+        ],
+        "RestApiId": {
+          "Ref": "ApiGatewayAdminThree"
+        },
+        "StageName": "Prod",
+        "TracingEnabled": true
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "ApiGatewayAdminTwo": {
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
-            }
+            },
+            "version": "1.0"
           },
           "paths": {},
           "swagger": "2.0"
-        },
-        "Name": "App-Prod-Web",
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
         },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
           ]
+        },
+        "Name": "App-Prod-Web",
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
-      }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ApiGatewayAdminTwoBasePathMapping": {
+      "Properties": {
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName3fd2dbd8f8"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayAdminTwo"
+        },
+        "Stage": {
+          "Ref": "ApiGatewayAdminTwoProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "ApiGatewayAdminTwoDeployment61887a4eed": {
+      "Properties": {
+        "Description": "RestApi deployment id: 61887a4eed03102402cbaa575b5b1e398b0dc647",
+        "RestApiId": {
+          "Ref": "ApiGatewayAdminTwo"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ApiGatewayAdminTwoProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ApiGatewayAdminTwoDeployment61887a4eed"
+        },
+        "MethodSettings": [
+          {
+            "HttpMethod": "*",
+            "LoggingLevel": "Info",
+            "ResourcePath": "/*"
+          }
+        ],
+        "RestApiId": {
+          "Ref": "ApiGatewayAdminTwo"
+        },
+        "StageName": "Prod",
+        "TracingEnabled": true
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "ApiGatewayDomainName3fd2dbd8f8": {
+      "Properties": {
+        "DomainName": "admin.two.amazon.com",
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "RegionalCertificateArn": "arn::cert::abc"
+      },
+      "Type": "AWS::ApiGateway::DomainName"
+    },
+    "ApiGatewayDomainName41bfc7f9c4": {
+      "Properties": {
+        "DomainName": "admin.three.amazon.com",
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "RegionalCertificateArn": "arn::cert::abc"
+      },
+      "Type": "AWS::ApiGateway::DomainName"
+    },
+    "ApiGatewayDomainName5fe29fe649": {
+      "Properties": {
+        "DomainName": "admin.one.amazon.com",
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "RegionalCertificateArn": "arn::cert::abc"
+      },
+      "Type": "AWS::ApiGateway::DomainName"
+    },
+    "RecordSetGroup370194ff6e": {
+      "Properties": {
+        "HostedZoneId": "abc123456",
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName3fd2dbd8f8",
+                  "RegionalDomainName"
+                ]
+              },
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName3fd2dbd8f8",
+                  "RegionalHostedZoneId"
+                ]
+              }
+            },
+            "Name": "admin.two.amazon.com",
+            "Type": "A"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName41bfc7f9c4",
+                  "RegionalDomainName"
+                ]
+              },
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName41bfc7f9c4",
+                  "RegionalHostedZoneId"
+                ]
+              }
+            },
+            "Name": "admin.three.amazon.com",
+            "Type": "A"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName5fe29fe649",
+                  "RegionalDomainName"
+                ]
+              },
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName5fe29fe649",
+                  "RegionalHostedZoneId"
+                ]
+              }
+            },
+            "Name": "admin.one.amazon.com",
+            "Type": "A"
+          }
+        ]
+      },
+      "Type": "AWS::Route53::RecordSetGroup"
     }
   }
 }

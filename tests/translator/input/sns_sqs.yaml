@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   SaveNotificationFunction:
     Type: AWS::Serverless::Function
@@ -13,11 +15,11 @@ Resources:
             SqsSubscription: true
             FilterPolicy:
               store:
-                - example_corp
+              - example_corp
               price_usd:
-                - numeric:
-                    - ">="
-                    - 100
+              - numeric:
+                - '>='
+                - 100
 
   Notifications:
     Type: AWS::SNS::Topic

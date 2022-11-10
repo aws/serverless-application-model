@@ -1,5 +1,6 @@
 import copy
 import re
+from typing import Any, Iterator, Optional
 
 from samtranslator.model.intrinsics import ref, make_conditional, is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
@@ -31,7 +32,7 @@ class OpenApiEditor(object):
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
     _DEFAULT_PATH = "$default"
 
-    def __init__(self, doc):
+    def __init__(self, doc):  # type: ignore[no-untyped-def]
         """
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
         modifications on this copy.
@@ -55,7 +56,7 @@ class OpenApiEditor(object):
         self.tags = self._doc.get("tags", [])
         self.info = self._doc.get("info", Py27Dict())
 
-    def get_conditional_contents(self, item):
+    def get_conditional_contents(self, item):  # type: ignore[no-untyped-def]
         """
         Returns the contents of the given item.
         If a conditional block has been used inside the item, returns a list of the content
@@ -71,7 +72,7 @@ class OpenApiEditor(object):
             contents = [content for content in contents if not is_intrinsic_no_value(content)]
         return contents
 
-    def has_path(self, path, method=None):
+    def has_path(self, path, method=None):  # type: ignore[no-untyped-def]
         """
         Returns True if this Swagger has the given path and optional method
         For paths with conditionals, only returns true if both items (true case, and false case) have the method.
@@ -83,14 +84,14 @@ class OpenApiEditor(object):
         if path not in self.paths:
             return False
 
-        method = self._normalize_method_name(method)
+        method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
         if method:
-            for path_item in self.get_conditional_contents(self.paths.get(path)):
+            for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
                 if not path_item or method not in path_item:
                     return False
         return True
 
-    def is_integration_function_logical_id_match(self, path_name, method_name, logical_id):
+    def is_integration_function_logical_id_match(self, path_name, method_name, logical_id):  # type: ignore[no-untyped-def]
         """
         Returns True if the function logical id in a lambda integration matches the passed
         in logical_id.
@@ -101,18 +102,18 @@ class OpenApiEditor(object):
         :param method_name: name of the method
         :param logical_id: logical id to compare against
         """
-        if not self.has_integration(path_name, method_name):
+        if not self.has_integration(path_name, method_name):  # type: ignore[no-untyped-call]
             return False
-        method_name = self._normalize_method_name(method_name)
+        method_name = self._normalize_method_name(method_name)  # type: ignore[no-untyped-call]
 
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path_name, method_name, False):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path_name, method_name, False):  # type: ignore[no-untyped-call]
             integration = method_definition.get(self._X_APIGW_INTEGRATION, Py27Dict())
 
             # Extract the integration uri out of a conditional if necessary
             uri = integration.get("uri")
             if not isinstance(uri, dict):
                 return False
-            for uri_content in self.get_conditional_contents(uri):
+            for uri_content in self.get_conditional_contents(uri):  # type: ignore[no-untyped-call]
                 arn = uri_content.get("Fn::Sub", "")
 
                 # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
@@ -127,7 +128,7 @@ class OpenApiEditor(object):
 
         return True
 
-    def method_has_integration(self, method):
+    def method_has_integration(self, method):  # type: ignore[no-untyped-def]
         """
         Returns true if the given method contains a valid method definition.
         This uses the get_conditional_contents function to handle conditionals.
@@ -135,12 +136,12 @@ class OpenApiEditor(object):
         :param dict method: method dictionary
         :return: true if method has one or multiple integrations
         """
-        for method_definition in self.get_conditional_contents(method):
-            if self.method_definition_has_integration(method_definition):
+        for method_definition in self.get_conditional_contents(method):  # type: ignore[no-untyped-call]
+            if self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                 return True
         return False
 
-    def method_definition_has_integration(self, method_definition):
+    def method_definition_has_integration(self, method_definition):  # type: ignore[no-untyped-def]
         """
         Checks a method definition to make sure it has an apigw integration
 
@@ -151,7 +152,7 @@ class OpenApiEditor(object):
             return True
         return False
 
-    def has_integration(self, path, method):
+    def has_integration(self, path, method):  # type: ignore[no-untyped-def]
         """
         Checks if an API Gateway integration is already present at the given path/method.
         For paths with conditionals, it only returns True if both items (true case, false case) have the integration
@@ -160,19 +161,19 @@ class OpenApiEditor(object):
         :param string method: HTTP method
         :return: True, if an API Gateway integration is already present
         """
-        method = self._normalize_method_name(method)
+        method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
 
-        if not self.has_path(path, method):
+        if not self.has_path(path, method):  # type: ignore[no-untyped-call]
             return False
 
-        for path_item in self.get_conditional_contents(self.paths.get(path)):
+        for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             method_definition = path_item.get(method)
-            if not (isinstance(method_definition, dict) and self.method_has_integration(method_definition)):
+            if not (isinstance(method_definition, dict) and self.method_has_integration(method_definition)):  # type: ignore[no-untyped-call]
                 return False
         # Integration present and non-empty
         return True
 
-    def add_path(self, path, method=None):
+    def add_path(self, path: str, method: Optional[str] = None) -> None:
         """
         Adds the path/method combination to the Swagger, if not already present
 
@@ -180,24 +181,20 @@ class OpenApiEditor(object):
         :param string method: HTTP method
         :raises InvalidDocumentException: If the value of `path` in Swagger is not a dictionary
         """
-        method = self._normalize_method_name(method)
+        method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
 
         path_dict = self.paths.setdefault(path, Py27Dict())
 
         if not isinstance(path_dict, dict):
             # Either customers has provided us an invalid Swagger, or this class has messed it somehow
             raise InvalidDocumentException(
-                [
-                    InvalidTemplateException(
-                        "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
-                    )
-                ]
+                [InvalidTemplateException(f"Value of '{path}' path must be a dictionary according to Swagger spec.")]
             )
 
-        for path_item in self.get_conditional_contents(path_dict):
+        for path_item in self.get_conditional_contents(path_dict):  # type: ignore[no-untyped-call]
             path_item.setdefault(method, Py27Dict())
 
-    def add_lambda_integration(
+    def add_lambda_integration(  # type: ignore[no-untyped-def]
         self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
     ):
         """
@@ -208,8 +205,8 @@ class OpenApiEditor(object):
         :param string integration_uri: URI for the integration.
         """
 
-        method = self._normalize_method_name(method)
-        if self.has_integration(path, method):
+        method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
+        if self.has_integration(path, method):  # type: ignore[no-untyped-call]
             # Not throwing an error- we will add lambda integrations to existing swagger if not present
             return
 
@@ -220,7 +217,7 @@ class OpenApiEditor(object):
         if condition:
             integration_uri = make_conditional(condition, integration_uri)
 
-        for path_item in self.get_conditional_contents(self.paths.get(path)):
+        for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             # create as Py27Dict and insert key one by one to preserve input order
             if path_item[method] is None:
                 path_item[method] = Py27Dict()
@@ -240,7 +237,7 @@ class OpenApiEditor(object):
             if condition:
                 path_item[method] = make_conditional(condition, path_item[method])
 
-    def make_path_conditional(self, path, condition):
+    def make_path_conditional(self, path: str, condition: str) -> None:
         """
         Wrap entire API path definition in a CloudFormation if condition.
         :param path: path name
@@ -248,7 +245,7 @@ class OpenApiEditor(object):
         """
         self.paths[path] = make_conditional(condition, self.paths[path])
 
-    def iter_on_path(self):
+    def iter_on_path(self) -> Iterator[str]:
         """
         Yields all the paths available in the Swagger. As a caller, if you add new paths to Swagger while iterating,
         they will not show up in this iterator
@@ -256,10 +253,10 @@ class OpenApiEditor(object):
         :yields string: Path name
         """
 
-        for path, value in self.paths.items():
+        for path, _ in self.paths.items():
             yield path
 
-    def iter_on_method_definitions_for_path_at_method(
+    def iter_on_method_definitions_for_path_at_method(  # type: ignore[no-untyped-def]
         self, path_name, method_name, skip_methods_without_apigw_integration=True
     ):
         """
@@ -271,17 +268,15 @@ class OpenApiEditor(object):
         :param skip_methods_without_apigw_integration: if True, skips method definitions without apigw integration
         :yields dict: method definition
         """
-        normalized_method_name = self._normalize_method_name(method_name)
+        normalized_method_name = self._normalize_method_name(method_name)  # type: ignore[no-untyped-call]
 
-        for path_item in self.get_conditional_contents(self.paths.get(path_name)):
-            for method_definition in self.get_conditional_contents(path_item.get(normalized_method_name)):
-                if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
-                    method_definition
-                ):
+        for path_item in self.get_conditional_contents(self.paths.get(path_name)):  # type: ignore[no-untyped-call]
+            for method_definition in self.get_conditional_contents(path_item.get(normalized_method_name)):  # type: ignore[no-untyped-call]
+                if skip_methods_without_apigw_integration and not self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                     continue
                 yield method_definition
 
-    def iter_on_all_methods_for_path(self, path_name, skip_methods_without_apigw_integration=True):
+    def iter_on_all_methods_for_path(self, path_name, skip_methods_without_apigw_integration=True):  # type: ignore[no-untyped-def]
         """
         Yields all the (method name, method definition) tuples for the path, including those inside conditionals.
 
@@ -289,17 +284,15 @@ class OpenApiEditor(object):
         :param skip_methods_without_apigw_integration: if True, skips method definitions without apigw integration
         :yields list of (method name, method definition) tuples
         """
-        for path_item in self.get_conditional_contents(self.paths.get(path_name)):
+        for path_item in self.get_conditional_contents(self.paths.get(path_name)):  # type: ignore[no-untyped-call]
             for method_name, method in path_item.items():
-                for method_definition in self.get_conditional_contents(method):
-                    if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
-                        method_definition
-                    ):
+                for method_definition in self.get_conditional_contents(method):  # type: ignore[no-untyped-call]
+                    if skip_methods_without_apigw_integration and not self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                         continue
-                    normalized_method_name = self._normalize_method_name(method_name)
+                    normalized_method_name = self._normalize_method_name(method_name)  # type: ignore[no-untyped-call]
                     yield normalized_method_name, method_definition
 
-    def add_timeout_to_method(self, api, path, method_name, timeout):
+    def add_timeout_to_method(self, api, path, method_name, timeout):  # type: ignore[no-untyped-def]
         """
         Adds a timeout to this path/method.
 
@@ -308,10 +301,10 @@ class OpenApiEditor(object):
         :param string method_name: Method name
         :param int timeout: Timeout amount, in milliseconds
         """
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             method_definition[self._X_APIGW_INTEGRATION]["timeoutInMillis"] = timeout
 
-    def add_path_parameters_to_method(self, api, path, method_name, path_parameters):
+    def add_path_parameters_to_method(self, api, path, method_name, path_parameters):  # type: ignore[no-untyped-def]
         """
         Adds path parameters to this path + method
 
@@ -320,7 +313,7 @@ class OpenApiEditor(object):
         :param string method_name: Method name
         :param list path_parameters: list of strings of path parameters
         """
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             # create path parameter list
             # add it here if it doesn't exist, merge with existing otherwise.
             method_definition.setdefault("parameters", [])
@@ -347,7 +340,7 @@ class OpenApiEditor(object):
                     parameter["required"] = True
                     method_definition.get("parameters").append(parameter)
 
-    def add_payload_format_version_to_method(self, api, path, method_name, payload_format_version="2.0"):
+    def add_payload_format_version_to_method(self, api, path, method_name, payload_format_version="2.0"):  # type: ignore[no-untyped-def]
         """
         Adds a payload format version to this path/method.
 
@@ -356,10 +349,10 @@ class OpenApiEditor(object):
         :param string method_name: Method name
         :param string payload_format_version: payload format version sent to the integration
         """
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             method_definition[self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = payload_format_version
 
-    def add_authorizers_security_definitions(self, authorizers):
+    def add_authorizers_security_definitions(self, authorizers):  # type: ignore[no-untyped-def]
         """
         Add Authorizer definitions to the securityDefinitions part of Swagger.
 
@@ -370,7 +363,7 @@ class OpenApiEditor(object):
         for authorizer_name, authorizer in authorizers.items():
             self.security_schemes[authorizer_name] = authorizer.generate_openapi()
 
-    def set_path_default_authorizer(self, path, default_authorizer, authorizers, api_authorizers):
+    def set_path_default_authorizer(self, path, default_authorizer, authorizers, api_authorizers):  # type: ignore[no-untyped-def]
         """
         Adds the default_authorizer to the security block for each method on this path unless an Authorizer
         was defined at the Function/Path/Method level. This is intended to be used to set the
@@ -382,26 +375,24 @@ class OpenApiEditor(object):
             authorizers param.
         :param list authorizers: List of Authorizer configurations defined on the related Api.
         """
-        for path_item in self.get_conditional_contents(self.paths.get(path)):
+        for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             for method_name, method in path_item.items():
-                normalized_method_name = self._normalize_method_name(method_name)
+                normalized_method_name = self._normalize_method_name(method_name)  # type: ignore[no-untyped-call]
                 # Excluding parameters section
                 if normalized_method_name == "parameters":
                     continue
                 if normalized_method_name != "options":
-                    normalized_method_name = self._normalize_method_name(method_name)
+                    normalized_method_name = self._normalize_method_name(method_name)  # type: ignore[no-untyped-call]
                     # It is possible that the method could have two definitions in a Fn::If block.
                     if normalized_method_name not in path_item:
                         raise InvalidDocumentException(
                             [
                                 InvalidTemplateException(
-                                    "Could not find {} in {} within DefinitionBody.".format(
-                                        normalized_method_name, path
-                                    )
+                                    f"Could not find {normalized_method_name} in {path} within DefinitionBody."
                                 )
                             ]
                         )
-                    for method_definition in self.get_conditional_contents(method):
+                    for method_definition in self.get_conditional_contents(method):  # type: ignore[no-untyped-call]
                         # check if there is any method_definition given by customer
                         if not method_definition:
                             raise InvalidDocumentException(
@@ -412,7 +403,7 @@ class OpenApiEditor(object):
                                 ]
                             )
                         # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
-                        if not self.method_definition_has_integration(method_definition):
+                        if not self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                             continue
                         existing_security = method_definition.get("security", [])
                         if existing_security:
@@ -420,8 +411,8 @@ class OpenApiEditor(object):
                         authorizer_list = []
                         if authorizers:
                             authorizer_list.extend(authorizers.keys())
-                        security_dict = dict()
-                        security_dict[default_authorizer] = self._get_authorization_scopes(
+                        security_dict = {}
+                        security_dict[default_authorizer] = self._get_authorization_scopes(  # type: ignore[no-untyped-call]
                             api_authorizers, default_authorizer
                         )
                         authorizer_security = [security_dict]
@@ -431,7 +422,7 @@ class OpenApiEditor(object):
                         if security:
                             method_definition["security"] = security
 
-    def add_auth_to_method(self, path, method_name, auth, api):
+    def add_auth_to_method(self, path, method_name, auth, api):  # type: ignore[no-untyped-def]
         """
         Adds auth settings for this path/method. Auth settings currently consist of Authorizers
         but this method will eventually include setting other auth settings such as Resource Policy, etc.
@@ -447,9 +438,9 @@ class OpenApiEditor(object):
         api_auth = api and api.get("Auth")
         authorizers = api_auth and api_auth.get("Authorizers")
         if method_authorizer:
-            self._set_method_authorizer(path, method_name, method_authorizer, authorizers, authorization_scopes)
+            self._set_method_authorizer(path, method_name, method_authorizer, authorizers, authorization_scopes)  # type: ignore[no-untyped-call]
 
-    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers, authorization_scopes=None):
+    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers, authorization_scopes=None):  # type: ignore[no-untyped-def]
         """
         Adds the authorizer_name to the security block for each method on this path.
         This is used to configure the authorizer for individual functions.
@@ -463,10 +454,10 @@ class OpenApiEditor(object):
         if authorization_scopes is None:
             authorization_scopes = []
 
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             existing_security = method_definition.get("security", [])
 
-            security_dict = dict()
+            security_dict = {}  # type: ignore[var-annotated]
             security_dict[authorizer_name] = []
 
             # Neither the NONE nor the AWS_IAM built-in authorizers support authorization scopes.
@@ -484,7 +475,7 @@ class OpenApiEditor(object):
             if security:
                 method_definition["security"] = security
 
-    def add_tags(self, tags):
+    def add_tags(self, tags):  # type: ignore[no-untyped-def]
         """
         Adds tags to the OpenApi definition using an ApiGateway extension for tag values.
 
@@ -496,9 +487,7 @@ class OpenApiEditor(object):
                 raise InvalidDocumentException(
                     [
                         InvalidTemplateException(
-                            "Tags in OpenApi DefinitionBody needs to be a list. {} is a {} not a list.".format(
-                                self.tags, type(self.tags).__name__
-                            )
+                            f"Tags in OpenApi DefinitionBody needs to be a list. {self.tags} is a {type(self.tags).__name__} not a list."
                         )
                     ]
                 )
@@ -514,7 +503,7 @@ class OpenApiEditor(object):
                 tag[self._X_APIGW_TAG_VALUE] = value
                 self.tags.append(tag)
 
-    def add_endpoint_config(self, disable_execute_api_endpoint):
+    def add_endpoint_config(self, disable_execute_api_endpoint):  # type: ignore[no-untyped-def]
         """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG header in open api definition
 
         Following this guide:
@@ -529,13 +518,13 @@ class OpenApiEditor(object):
 
         servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
         for config in servers_configurations:
-            endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, dict())
+            endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, {})
             endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint
             config[self._X_APIGW_ENDPOINT_CONFIG] = endpoint_configuration
 
         self._doc[self._SERVERS] = servers_configurations
 
-    def add_cors(
+    def add_cors(  # type: ignore[no-untyped-def]
         self,
         allow_origins,
         allow_headers=None,
@@ -570,7 +559,7 @@ class OpenApiEditor(object):
         MAX_AGE = "maxAge"
         ALLOW_CREDENTIALS = "allowCredentials"
         cors_headers = [ALLOW_ORIGINS, ALLOW_HEADERS, ALLOW_METHODS, EXPOSE_HEADERS, MAX_AGE, ALLOW_CREDENTIALS]
-        cors_configuration = self._doc.get(self._X_APIGW_CORS, dict())
+        cors_configuration = self._doc.get(self._X_APIGW_CORS, {})
 
         # intrinsics will not work if cors configuration is defined in open api and as a property to the HttpApi
         if allow_origins and is_intrinsic(allow_origins):
@@ -598,7 +587,7 @@ class OpenApiEditor(object):
 
         self._doc[self._X_APIGW_CORS] = cors_configuration
 
-    def add_description(self, description):
+    def add_description(self, description):  # type: ignore[no-untyped-def]
         """Add description in open api definition, if it is not already defined
 
         :param string description: Description of the API
@@ -607,13 +596,13 @@ class OpenApiEditor(object):
             return
         self.info["description"] = description
 
-    def has_api_gateway_cors(self):
+    def has_api_gateway_cors(self):  # type: ignore[no-untyped-def]
         if self._doc.get(self._X_APIGW_CORS):
             return True
         return False
 
     @property
-    def openapi(self):
+    def openapi(self):  # type: ignore[no-untyped-def]
         """
         Returns a **copy** of the OpenApi specification as a dictionary.
 
@@ -636,7 +625,7 @@ class OpenApiEditor(object):
         return copy.deepcopy(self._doc)
 
     @staticmethod
-    def is_valid(data):
+    def is_valid(data: Any) -> bool:
         """
         Checks if the input data is a OpenApi document
 
@@ -652,7 +641,7 @@ class OpenApiEditor(object):
         return False
 
     @staticmethod
-    def gen_skeleton():
+    def gen_skeleton() -> Py27Dict:
         """
         Method to make an empty swagger file, with just some basic structure. Just enough to pass validator.
 
@@ -668,7 +657,7 @@ class OpenApiEditor(object):
         return skeleton
 
     @staticmethod
-    def _get_authorization_scopes(authorizers, default_authorizer):
+    def _get_authorization_scopes(authorizers, default_authorizer):  # type: ignore[no-untyped-def]
         """
         Returns auth scopes for an authorizer if present
         :param authorizers: authorizer definitions
@@ -683,7 +672,7 @@ class OpenApiEditor(object):
         return []
 
     @staticmethod
-    def _normalize_method_name(method):
+    def _normalize_method_name(method):  # type: ignore[no-untyped-def]
         """
         Returns a lower case, normalized version of HTTP Method. It also know how to handle API Gateway specific methods
         like "ANY"
@@ -699,20 +688,19 @@ class OpenApiEditor(object):
         method = method.lower()
         if method == "any":
             return OpenApiEditor._X_ANY_METHOD
-        else:
-            return method
+        return method
 
     @staticmethod
-    def get_openapi_version_3_regex():
+    def get_openapi_version_3_regex() -> str:
         openapi_version_3_regex = r"\A3(\.\d)(\.\d)?$"
         return openapi_version_3_regex
 
     @staticmethod
-    def safe_compare_regex_with_string(regex, data):
+    def safe_compare_regex_with_string(regex: str, data: Any) -> bool:
         return re.match(regex, str(data)) is not None
 
     @staticmethod
-    def get_path_without_trailing_slash(path):
+    def get_path_without_trailing_slash(path):  # type: ignore[no-untyped-def]
         sub = re.sub(r"{([a-zA-Z0-9._-]+|proxy\+)}", "*", path)
         if isinstance(path, Py27UniStr):
             return Py27UniStr(sub)

@@ -1,9 +1,11 @@
+%YAML 1.1
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
 Parameters: {}
 Resources:
   MyFunction:
@@ -19,17 +21,16 @@ Resources:
       FunctionUrlConfig:
         AuthType: NONE
         Cors:
-            AllowOrigins: 
-              - "https://example.com"
-              - "example1.com"
-              - "example2.com"
-              - "example2.com"
-            AllowMethods: 
-              - "GET"
-            AllowCredentials: true
-            AllowHeaders: 
-              - "x-Custom-Header"
-            ExposeHeaders: 
-              - "x-amzn-header"
-            MaxAge: 10
-
+          AllowOrigins:
+          - https://example.com
+          - example1.com
+          - example2.com
+          - example2.com
+          AllowMethods:
+          - GET
+          AllowCredentials: true
+          AllowHeaders:
+          - x-Custom-Header
+          ExposeHeaders:
+          - x-amzn-header
+          MaxAge: 10

@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Transform: AWS::Serverless-2016-10-31
 Resources:
   # Auth
@@ -19,7 +21,7 @@ Resources:
     Properties:
       StageName: Stage name
       Auth:
-        AddDefaultAuthorizerToCorsPreflight: "true"
+        AddDefaultAuthorizerToCorsPreflight: 'true'
 
   # ApiKeyRequired
   ApiApiKeyRequiredEmpty:
@@ -33,7 +35,7 @@ Resources:
     Properties:
       StageName: Stage name
       Auth:
-        ApiKeyRequired: "true"
+        ApiKeyRequired: 'true'
 
   # Authorizers
   ApiAuthorizersEmpty:
@@ -63,8 +65,8 @@ Resources:
         Authorizers:
           Unknown:
             AuthorizationScopes:
-              - scope1
-              - scope2
+            - scope1
+            - scope2
 
   # DefaultAuthorizer
   ApiDefaultAuthorizerEmpty:

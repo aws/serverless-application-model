@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   HtmlFunction:
     Type: AWS::Serverless::Function
@@ -9,9 +11,9 @@ Resources:
         GetHtml:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Transform:
-                Name: 'AWS::Include'
+                Name: AWS::Include
                 Parameters: {Location: {Ref: HtmlApi}}
             Path: /
             Method: get

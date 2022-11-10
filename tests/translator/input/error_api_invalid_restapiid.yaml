@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
 
   ValidFunction:
@@ -58,4 +60,3 @@ Resources:
     Properties:
       StageName: MyStageName
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
-

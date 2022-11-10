@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
@@ -7,14 +9,14 @@ Resources:
         PasswordPolicy:
           MinimumLength: 8
       UsernameAttributes:
-        - email
+      - email
       Schema:
-        - AttributeDataType: String
-          Name: email
-          Required: false
+      - AttributeDataType: String
+        Name: email
+        Required: false
       UserAttributeUpdateSettings:
-        AttributesRequireVerificationBeforeUpdate: 
-          - email
+        AttributesRequireVerificationBeforeUpdate:
+        - email
   ImplicitApiFunction:
     Type: AWS::Serverless::Function
     Properties:

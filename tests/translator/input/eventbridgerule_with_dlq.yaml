@@ -1,6 +1,8 @@
+%YAML 1.1
+---
 Resources:
   ScheduledFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
       Handler: hello.handler
@@ -9,11 +11,21 @@ Resources:
         Schedule:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
+            State: ENABLED
             DeadLetterConfig:
               Type: SQS
+        ScheduleV2:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            DeadLetterConfig:
+              Arn: Arn
+            RetryPolicy:
+              MaximumRetryAttempts: 5
+              MaximumEventAgeInSeconds: 300
   TriggeredFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
       Handler: hello.handler
@@ -23,6 +35,8 @@ Resources:
           Type: EventBridgeRule
           Properties:
             EventBusName: ExternalEventBridge
+            RuleName: MyRule
+            State: ENABLED
             Pattern:
               detail:
                 state:

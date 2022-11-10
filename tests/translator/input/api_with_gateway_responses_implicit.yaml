@@ -1,6 +1,8 @@
+%YAML 1.1
+---
 Globals:
   Api:
-    Name: "some api"
+    Name: some api
     GatewayResponses:
       UNAUTHORIZED:
         StatusCode: 401

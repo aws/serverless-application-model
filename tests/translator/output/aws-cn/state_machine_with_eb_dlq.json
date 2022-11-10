@@ -1,7 +1,22 @@
 {
   "Resources": {
+    "StateMachine": {
+      "Properties": {
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "my_state_machine.asl.json"
+        },
+        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
     "StateMachineCWEvent": {
-      "Type": "AWS::Events::Rule", 
       "Properties": {
         "EventPattern": {
           "detail": {
@@ -9,78 +24,63 @@
               "terminated"
             ]
           }
-        }, 
+        },
         "Targets": [
           {
-            "RoleArn": {
-              "Fn::GetAtt": [
-                "StateMachineCWEventRole", 
-                "Arn"
-              ]
-            }, 
-            "DeadLetterConfig": {
-              "Arn": "TestDlqArn"
-            }, 
-            "Id": "StateMachineCWEventStepFunctionsTarget", 
             "Arn": {
               "Ref": "StateMachine"
-            }
-          }
-        ]
-      }
-    }, 
-    "StateMachine": {
-      "Type": "AWS::StepFunctions::StateMachine", 
-      "Properties": {
-        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
-        "DefinitionS3Location": {
-          "Bucket": "sam-demo-bucket", 
-          "Key": "my_state_machine.asl.json"
-        }, 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "stateMachine:createdBy"
-          }
-        ]
-      }
-    }, 
-    "StateMachineCWEventRole": {
-      "Type": "AWS::IAM::Role", 
-      "Properties": {
-        "Policies": [
-          {
-            "PolicyName": "StateMachineCWEventRoleStartExecutionPolicy", 
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": "states:StartExecution", 
-                  "Resource": {
-                    "Ref": "StateMachine"
-                  }, 
-                  "Effect": "Allow"
-                }
+            },
+            "DeadLetterConfig": {
+              "Arn": "TestDlqArn"
+            },
+            "Id": "StateMachineCWEventStepFunctionsTarget",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "StateMachineCWEventRole",
+                "Arn"
               ]
             }
           }
-        ], 
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "StateMachineCWEventRole": {
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "events.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineCWEventRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

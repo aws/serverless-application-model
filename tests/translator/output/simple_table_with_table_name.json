@@ -6,66 +6,66 @@
     }
   },
   "Resources": {
-    "MinimalTableWithTableName": {
-      "Type": "AWS::DynamoDB::Table",
+    "MinimalTableWithRefTableName": {
       "Properties": {
-        "TableName": "MySimpleTable",
-        "BillingMode": "PAY_PER_REQUEST",
         "AttributeDefinitions": [
           {
             "AttributeName": "id",
             "AttributeType": "S"
           }
         ],
+        "BillingMode": "PAY_PER_REQUEST",
         "KeySchema": [
           {
-            "KeyType": "HASH",
-            "AttributeName": "id"
+            "AttributeName": "id",
+            "KeyType": "HASH"
           }
-        ]
-      }
-    },
-    "MinimalTableWithRefTableName": {
-      "Type": "AWS::DynamoDB::Table",
-      "Properties": {
+        ],
         "TableName": {
           "Ref": "MySimpleTableParameter"
-        },
-        "BillingMode": "PAY_PER_REQUEST",
-        "AttributeDefinitions": [
-          {
-            "AttributeName": "id",
-            "AttributeType": "S"
-          }
-        ],
-        "KeySchema": [
-          {
-            "KeyType": "HASH",
-            "AttributeName": "id"
-          }
-        ]
-      }
+        }
+      },
+      "Type": "AWS::DynamoDB::Table"
     },
     "MinimalTableWithSubTableName": {
-      "Type": "AWS::DynamoDB::Table",
       "Properties": {
-        "TableName": {
-          "Fn::Sub": "${AWS::StackName}MySimpleTable"
-        },
-        "BillingMode": "PAY_PER_REQUEST",
         "AttributeDefinitions": [
           {
             "AttributeName": "id",
             "AttributeType": "S"
           }
         ],
+        "BillingMode": "PAY_PER_REQUEST",
         "KeySchema": [
           {
-            "KeyType": "HASH",
-            "AttributeName": "id"
+            "AttributeName": "id",
+            "KeyType": "HASH"
           }
-        ]
-      }
+        ],
+        "TableName": {
+          "Fn::Sub": "${AWS::StackName}MySimpleTable"
+        }
+      },
+      "Type": "AWS::DynamoDB::Table"
+    },
+    "MinimalTableWithTableName": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "TableName": "MySimpleTable"
+      },
+      "Type": "AWS::DynamoDB::Table"
     }
   }
 }

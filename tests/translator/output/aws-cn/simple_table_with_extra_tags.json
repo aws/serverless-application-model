@@ -7,42 +7,42 @@
   },
   "Resources": {
     "MinimalTableWithTags": {
-      "Type": "AWS::DynamoDB::Table",
       "Properties": {
-        "BillingMode": "PAY_PER_REQUEST",
         "AttributeDefinitions": [
           {
             "AttributeName": "id",
             "AttributeType": "S"
           }
         ],
+        "BillingMode": "PAY_PER_REQUEST",
         "KeySchema": [
           {
-            "KeyType": "HASH",
-            "AttributeName": "id"
+            "AttributeName": "id",
+            "KeyType": "HASH"
           }
         ],
         "Tags": [
           {
-            "Value": "TagValue1",
-            "Key": "TagKey1"
+            "Key": "TagKey1",
+            "Value": "TagValue1"
           },
           {
-            "Value": "",
-            "Key": "TagKey2"
+            "Key": "TagKey2",
+            "Value": ""
           },
           {
+            "Key": "TagKey3",
             "Value": {
               "Ref": "TagValueParam"
-            },
-            "Key": "TagKey3"
+            }
           },
           {
-            "Value": "123",
-            "Key": "TagKey4"
+            "Key": "TagKey4",
+            "Value": "123"
           }
         ]
-      }
+      },
+      "Type": "AWS::DynamoDB::Table"
     }
   }
 }

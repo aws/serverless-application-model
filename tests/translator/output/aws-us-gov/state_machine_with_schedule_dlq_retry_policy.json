@@ -1,87 +1,164 @@
 {
   "Resources": {
-    "StateMachineScheduleEvent": {
-      "Type": "AWS::Events::Rule", 
+    "StateMachine": {
       "Properties": {
-        "State": "DISABLED", 
-        "ScheduleExpression": "rate(1 minute)", 
-        "Name": "TestSchedule", 
-        "Description": "test schedule", 
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "my_state_machine.asl.json"
+        },
+        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "StateMachineScheduleEvent": {
+      "Properties": {
+        "Description": "test schedule",
+        "Name": "TestSchedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "State": "DISABLED",
         "Targets": [
           {
-            "RoleArn": {
-              "Fn::GetAtt": [
-                "StateMachineScheduleEventRole", 
-                "Arn"
-              ]
-            }, 
-            "DeadLetterConfig": {
-              "Arn": "Arn"
-            }, 
-            "Id": "StateMachineScheduleEventStepFunctionsTarget", 
             "Arn": {
               "Ref": "StateMachine"
-            }, 
+            },
+            "DeadLetterConfig": {
+              "Arn": "Arn"
+            },
+            "Id": "StateMachineScheduleEventStepFunctionsTarget",
             "RetryPolicy": {
-              "MaximumEventAgeInSeconds": 300, 
+              "MaximumEventAgeInSeconds": 300,
               "MaximumRetryAttempts": 5
+            },
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "StateMachineScheduleEventRole",
+                "Arn"
+              ]
             }
           }
         ]
-      }
-    }, 
+      },
+      "Type": "AWS::Events::Rule"
+    },
     "StateMachineScheduleEventRole": {
-      "Type": "AWS::IAM::Role", 
       "Properties": {
-        "Policies": [
-          {
-            "PolicyName": "StateMachineScheduleEventRoleStartExecutionPolicy", 
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": "states:StartExecution", 
-                  "Resource": {
-                    "Ref": "StateMachine"
-                  }, 
-                  "Effect": "Allow"
-                }
-              ]
-            }
-          }
-        ], 
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "events.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
-    }, 
-    "StateMachine": {
-      "Type": "AWS::StepFunctions::StateMachine", 
-      "Properties": {
-        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
-        "DefinitionS3Location": {
-          "Bucket": "sam-demo-bucket", 
-          "Key": "my_state_machine.asl.json"
-        }, 
-        "Tags": [
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
           {
-            "Value": "SAM", 
-            "Key": "stateMachine:createdBy"
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineScheduleEventRoleStartExecutionPolicy"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachineScheduleEventV2": {
+      "Properties": {
+        "FlexibleTimeWindow": {
+          "Mode": "OFF"
+        },
+        "Name": "StateMachineScheduleEventV2",
+        "ScheduleExpression": "rate(1 minute)",
+        "Target": {
+          "Arn": {
+            "Ref": "StateMachine"
+          },
+          "DeadLetterConfig": {
+            "Arn": "Arn"
+          },
+          "RetryPolicy": {
+            "MaximumEventAgeInSeconds": 300,
+            "MaximumRetryAttempts": 5
+          },
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "StateMachineScheduleEventV2Role",
+              "Arn"
+            ]
+          }
+        }
+      },
+      "Type": "AWS::Scheduler::Schedule"
+    },
+    "StateMachineScheduleEventV2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "scheduler.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineScheduleEventV2StartExecutionPolicy"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "sqs:SendMessage",
+                  "Effect": "Allow",
+                  "Resource": "Arn"
+                }
+              ]
+            },
+            "PolicyName": "StateMachineScheduleEventV2SQSPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

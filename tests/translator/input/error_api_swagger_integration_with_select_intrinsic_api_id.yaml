@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   HtmlFunction:
     Type: AWS::Serverless::Function
@@ -9,7 +11,7 @@ Resources:
         GetHtml:
           Type: Api
           Properties:
-            RestApiId: !Select [ "1", [ "HtmlApi", "HtmlApi" ] ]
+            RestApiId: !Select ['1', [HtmlApi, HtmlApi]]
             Path: /
             Method: get
             Auth:

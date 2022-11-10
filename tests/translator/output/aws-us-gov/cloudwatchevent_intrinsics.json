@@ -1,14 +1,4 @@
 {
-  "Parameters": {
-    "PathA": {
-      "Type": "String",
-      "Default": "SomeInputPath"
-    },
-    "PathB": {
-      "Type": "String",
-      "Default": "AnotherInputPath"
-    }
-  },
   "Conditions": {
     "PathCondition": {
       "Fn::Equals": [
@@ -17,9 +7,18 @@
       ]
     }
   },
+  "Parameters": {
+    "PathA": {
+      "Default": "SomeInputPath",
+      "Type": "String"
+    },
+    "PathB": {
+      "Default": "AnotherInputPath",
+      "Type": "String"
+    }
+  },
   "Resources": {
     "LambdaFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -39,40 +38,10 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "LambdaFunctionRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "LambdaFunctionOnTerminate": {
-      "Type": "AWS::Events::Rule",
       "Properties": {
         "EventBusName": {
           "Fn::Join": [
@@ -125,10 +94,10 @@
             }
           }
         ]
-      }
+      },
+      "Type": "AWS::Events::Rule"
     },
     "LambdaFunctionOnTerminatePermission": {
-      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
@@ -141,7 +110,38 @@
             "Arn"
           ]
         }
-      }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "LambdaFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

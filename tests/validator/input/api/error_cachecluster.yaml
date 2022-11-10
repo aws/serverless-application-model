@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Transform: AWS::Serverless-2016-10-31
 Resources:
   # CacheClusterEnabled empty
@@ -12,7 +14,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
-      CacheClusterEnabled: "true"
+      CacheClusterEnabled: 'true'
 
   # CacheClusterEnabled not intrinsic
   ApiCacheClusterEnabledNotIntrinsic:

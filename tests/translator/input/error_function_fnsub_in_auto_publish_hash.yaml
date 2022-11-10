@@ -1,9 +1,11 @@
+%YAML 1.1
+---
 Description: Dip Investigation
 Parameters:
-  GitCommitInfo: 
+  GitCommitInfo:
     Type: String
     Default: hashhash
-  GitDirtInfo: 
+  GitDirtInfo:
     Type: String
     Default: dirtyyy
 AWSTemplateFormatVersion: '2010-09-09'

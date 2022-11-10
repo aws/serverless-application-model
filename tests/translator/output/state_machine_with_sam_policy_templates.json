@@ -1,40 +1,7 @@
 {
   "Resources": {
-    "ResolverLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Handler": "resolver.handler",
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "resolver.zip"
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "ResolverLambdaRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "python3.8",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
-    },
     "NestedWorkflow": {
-      "Type": "AWS::StepFunctions::StateMachine",
       "Properties": {
-        "DefinitionSubstitutions": {
-          "definition_substitution_1": {
-            "Fn::GetAtt": [
-              "StarterLambda",
-              "Arn"
-            ]
-          }
-        },
-        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole",
         "DefinitionString": {
           "Fn::Join": [
             "\n",
@@ -60,54 +27,7 @@
             ]
           ]
         },
-        "StateMachineType": "STANDARD",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "stateMachine:createdBy"
-          }
-        ]
-      }
-    },
-    "StarterLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Handler": "starter.handler",
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "starter.zip"
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "StarterLambdaRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "python2.7",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
-    },
-    "ProcessingWorkflow": {
-      "Type": "AWS::StepFunctions::StateMachine",
-      "Properties": {
         "DefinitionSubstitutions": {
-          "definition_substitution_4": {
-            "Ref": "NestedWorkflow"
-          },
-          "definition_substitution_5": {
-            "Ref": "OutputStore"
-          },
-          "definition_substitution_2": {
-            "Ref": "ResolverLambda"
-          },
-          "definition_substitution_3": {
-            "Ref": "ProcessingQueue"
-          },
           "definition_substitution_1": {
             "Fn::GetAtt": [
               "StarterLambda",
@@ -115,12 +35,41 @@
             ]
           }
         },
-        "RoleArn": {
-          "Fn::GetAtt": [
-            "ProcessingWorkflowRole",
-            "Arn"
-          ]
-        },
+        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole",
+        "StateMachineType": "STANDARD",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "OutputStore": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "TableName": "MySimpleTable"
+      },
+      "Type": "AWS::DynamoDB::Table"
+    },
+    "ProcessingQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "ProcessingWorkflow": {
+      "Properties": {
         "DefinitionString": {
           "Fn::Join": [
             "\n",
@@ -231,50 +180,45 @@
             ]
           ]
         },
+        "DefinitionSubstitutions": {
+          "definition_substitution_1": {
+            "Fn::GetAtt": [
+              "StarterLambda",
+              "Arn"
+            ]
+          },
+          "definition_substitution_2": {
+            "Ref": "ResolverLambda"
+          },
+          "definition_substitution_3": {
+            "Ref": "ProcessingQueue"
+          },
+          "definition_substitution_4": {
+            "Ref": "NestedWorkflow"
+          },
+          "definition_substitution_5": {
+            "Ref": "OutputStore"
+          }
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "ProcessingWorkflowRole",
+            "Arn"
+          ]
+        },
         "StateMachineType": "STANDARD",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "stateMachine:createdBy"
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    },
-    "StarterLambdaRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
     },
     "ProcessingWorkflowRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -287,18 +231,19 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [],
         "Policies": [
           {
-            "PolicyName": "ProcessingWorkflowRolePolicy0",
             "PolicyDocument": {
               "Statement": [
                 {
                   "Action": [
                     "lambda:InvokeFunction"
                   ],
+                  "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [
                       "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*",
@@ -308,20 +253,20 @@
                         }
                       }
                     ]
-                  },
-                  "Effect": "Allow"
+                  }
                 }
               ]
-            }
+            },
+            "PolicyName": "ProcessingWorkflowRolePolicy0"
           },
           {
-            "PolicyName": "ProcessingWorkflowRolePolicy1",
             "PolicyDocument": {
               "Statement": [
                 {
                   "Action": [
                     "sqs:SendMessage*"
                   ],
+                  "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [
                       "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
@@ -334,20 +279,20 @@
                         }
                       }
                     ]
-                  },
-                  "Effect": "Allow"
+                  }
                 }
               ]
-            }
+            },
+            "PolicyName": "ProcessingWorkflowRolePolicy1"
           },
           {
-            "PolicyName": "ProcessingWorkflowRolePolicy2",
             "PolicyDocument": {
               "Statement": [
                 {
                   "Action": [
                     "lambda:InvokeFunction"
                   ],
+                  "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [
                       "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*",
@@ -357,20 +302,20 @@
                         }
                       }
                     ]
-                  },
-                  "Effect": "Allow"
+                  }
                 }
               ]
-            }
+            },
+            "PolicyName": "ProcessingWorkflowRolePolicy2"
           },
           {
-            "PolicyName": "ProcessingWorkflowRolePolicy3",
             "PolicyDocument": {
               "Statement": [
                 {
                   "Action": [
                     "states:StartExecution"
                   ],
+                  "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [
                       "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
@@ -383,14 +328,13 @@
                         }
                       }
                     ]
-                  },
-                  "Effect": "Allow"
+                  }
                 }
               ]
-            }
+            },
+            "PolicyName": "ProcessingWorkflowRolePolicy3"
           },
           {
-            "PolicyName": "ProcessingWorkflowRolePolicy4",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -399,6 +343,7 @@
                     "dynamodb:UpdateItem",
                     "dynamodb:BatchWriteItem"
                   ],
+                  "Effect": "Allow",
                   "Resource": [
                     {
                       "Fn::Sub": [
@@ -420,48 +365,48 @@
                         }
                       ]
                     }
-                  ],
-                  "Effect": "Allow"
+                  ]
                 }
               ]
-            }
+            },
+            "PolicyName": "ProcessingWorkflowRolePolicy4"
           }
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "stateMachine:createdBy"
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     },
-    "OutputStore": {
-      "Type": "AWS::DynamoDB::Table",
+    "ResolverLambda": {
       "Properties": {
-        "KeySchema": [
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "resolver.zip"
+        },
+        "Handler": "resolver.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "ResolverLambdaRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Tags": [
           {
-            "KeyType": "HASH",
-            "AttributeName": "id"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        ],
-        "TableName": "MySimpleTable",
-        "AttributeDefinitions": [
-          {
-            "AttributeName": "id",
-            "AttributeType": "S"
-          }
-        ],
-        "BillingMode": "PAY_PER_REQUEST"
-      }
-    },
-    "ProcessingQueue": {
-      "Type": "AWS::SQS::Queue"
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "ResolverLambdaRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -474,18 +419,73 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StarterLambda": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "starter.zip"
+        },
+        "Handler": "starter.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "StarterLambdaRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "StarterLambdaRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

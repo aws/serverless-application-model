@@ -1,4 +1,4 @@
-DEVELOPMENT GUIDE
+Development Guide
 =================
 
 **Welcome hacker!**
@@ -11,20 +11,20 @@ inaccurate, update this guide and send a Pull Request.
 **Note**: `pyenv` currently only supports macOS and Linux. If you are a
 Windows users, consider using [pipenv](https://docs.pipenv.org/).
 
-1-Click Ready to Hack IDE
+1-click ready-to-hack IDE
 -------------------------
 For setting up a local development environment, we recommend using Gitpod - a service that allows you to spin up an in-browser Visual Studio Code-compatible editor, with everything set up and ready to go for development on this project. Just click the button below to create your private workspace:
 
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/aws/serverless-application-model.git)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/aws/serverless-application-model.git)
 
 This will start a new Gitpod workspace, and immediately kick off a build of the code. Once it's done, you can start working.
 
 Gitpod is free for 50 hours per month - make sure to stop your workspace when you're done (you can always resume it later, and it won't need to run the build again).
 
 
-Environment Setup
+Environment setup
 -----------------
-### 1. Install Python Versions
+### 1. Install Python versions
 
 Our officially supported Python versions are 3.6, 3.7 and 3.8. 
 Our CI/CD pipeline is setup to run unit tests against Python 3 versions. Make sure you test it before sending a Pull Request.
@@ -53,7 +53,7 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 ```
 
-### 2. Install Additional Tooling
+### 2. Install additional tooling
 #### Black
 We format our code using [Black](https://github.com/python/black) and verify the source code is black compliant
 during PR checks. Black will be installed automatically with `make init`.
@@ -61,7 +61,7 @@ during PR checks. Black will be installed automatically with `make init`.
 After installing, you can run our formatting through our Makefile by `make black` or integrating Black directly in your favorite IDE (instructions
 can be found [here](https://black.readthedocs.io/en/stable/editor_integration.html))
  
-##### (workaround) Integrating Black directly in your favorite IDE
+##### (Workaround) Integrating Black directly in your favorite IDE
 Since black is installed in virtualenv, when you follow [this instruction](https://black.readthedocs.io/en/stable/editor_integration.html), `which black` might give you this
 
 ```bash
@@ -88,7 +88,7 @@ If you don't wish to manually run black on each pr or install black manually, we
 After installing pre-commit, run `pre-commit install` in the root of the project. This will install black for you and run the black formatting on
 commit.
 
-### 3. Activate Virtualenv
+### 3. Activate virtualenv
 
 Virtualenv allows you to install required libraries outside of the
 Python installation. A good practice is to setup a different virtualenv
@@ -101,15 +101,15 @@ be the appropriate python version.
 1.  Create Virtualenv `sam37` for Python3.7: `pyenv virtualenv 3.7.9 sam37`
 1.  Activate Virtualenv: `pyenv activate sam37`
 
-### 4. Install dev version of SAM Translator
+### 4. Install dev version of SAM transform
 
-We will install a development version of SAM Translator from source into the
+We will install a development version of SAM transform from source into the
 virtualenv.
 
 1.  Activate Virtualenv: `pyenv activate sam37`
-1.  Install dev version of SAM Translator: `make init`
+1.  Install dev version of SAM transform: `make init`
 
-Running Tests
+Running tests
 -------------
 
 ### Unit testing with one Python version
@@ -127,11 +127,38 @@ will not work in Python3.6). If you want to test in many versions, you can creat
 each version and flip between them (sourcing the activate script). Typically, we run all tests in
 one python version locally and then have our ci (appveyor) run all supported versions.
 
+### Transform tests
+When adding new transform tests, we have provided a script to help generate the transform test input 
+and output files in the correct directory given a template.yaml file.
+```bash
+python3 bin/add_transform_test.py --template-file template.yaml
+```
+
+This script will automatically generate the input and output files. It will guarantee that the output
+files have the correct AWS partition (e.g. aws-cn, aws-us-gov). 
+
+For `AWS::ApiGateway::RestApi`, the script will automatically append `REGIONAL` EndpointConfiguration.
+To disable this feature, run the following command instead.
+```bash
+python3 bin/add_transform_test.py --template-file template.yaml --disable-api-configuration
+```
+
+Note that please always check the generated output is as expected. This tool does not guarantee correct output.
+
+
 ### Integration tests
 
 Integration tests are covered in detail in the [INTEGRATION_TESTS.md file](INTEGRATION_TESTS.md) of this repository.
 
-Code Conventions
+## Development guidelines
+
+1. **Do not resolve [intrinsic functions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html).** Adding [`AWS::LanguageExtensions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-languageextension-transform.html) before the `AWS::Serverless-2016-10-31` transform resolves most of them. See https://github.com/aws/serverless-application-model/issues/2533.
+2. **Do not break backward compatibility.** As rule of thumb, a specific SAM template should always transform into the same CloudFormation template. Do not change logical IDs. Add opt-in properties for breaking changes. There are some exceptions, such as changes that do not impact resources (e.g. [`Metadata`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)) or abstractions that can by design change over time.
+3. **Stick as close as possible to the underlying CloudFormation properties.** This includes both property names and values. This ensures we can pass values to CloudFormation and let it handle any intrinsic functions. In some cases, it also allows us to pass all properties as-is to a resource, which means customers can always use the newest properties, and we don’t spend effort maintaining a duplicate set of properties.
+4. **Only validate what’s necessary.** Do not validate properties if they’re passed directly to the underlying CloudFormation resource.
+5. **Add [type hints](https://peps.python.org/pep-0484/) to new code.** Strict typing was enabled in https://github.com/aws/serverless-application-model/pull/2558 by sprinkling [`# type: ignore`](https://peps.python.org/pep-0484/#compatibility-with-other-uses-of-function-annotations) across the existing code. Don't do that for new code. Avoid `# type: ignore`s at all cost. Instead, add types to new functions, and ideally add types to existing code it uses as well.
+
+Code conventions
 ----------------
 
 Please follow these code conventions when making your changes. This will
@@ -184,4 +211,4 @@ bin/sam-translate.py --template-file=output-template.yaml
 # Deploy your transformed CloudFormation template
 # Replace MY_STACK_NAME with a unique name each time you deploy
 aws cloudformation deploy --template-file cfn-template.json --capabilities CAPABILITY_NAMED_IAM --stack-name MY_STACK_NAME
-   ```
+```

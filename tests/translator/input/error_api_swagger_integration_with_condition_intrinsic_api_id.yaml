@@ -1,5 +1,7 @@
+%YAML 1.1
+---
 Conditions:
-  TestCondition: !Equals ["a", "b"]
+  TestCondition: !Equals [a, b]
 
 Resources:
   HtmlFunction:

@@ -9,15 +9,15 @@ LOG = logging.getLogger(__name__)
 
 
 class Parser:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def parse(self, sam_template, parameter_values, sam_plugins):
-        self._validate(sam_template, parameter_values)
+    def parse(self, sam_template, parameter_values, sam_plugins):  # type: ignore[no-untyped-def]
+        self._validate(sam_template, parameter_values)  # type: ignore[no-untyped-call]
         sam_plugins.act(LifeCycleEvents.before_transform_template, sam_template)
 
     @staticmethod
-    def validate_datatypes(sam_template):
+    def validate_datatypes(sam_template):  # type: ignore[no-untyped-def]
         """Validates the datatype within the template"""
         if (
             "Resources" not in sam_template
@@ -30,7 +30,7 @@ class Parser:
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
-                        "All 'Resources' must be Objects. If you're using YAML, this may be an " "indentation issue."
+                        "All 'Resources' must be Objects. If you're using YAML, this may be an indentation issue."
                     )
                 ]
             )
@@ -53,7 +53,7 @@ class Parser:
                 )
 
     # private methods
-    def _validate(self, sam_template, parameter_values):
+    def _validate(self, sam_template, parameter_values):  # type: ignore[no-untyped-def]
         """Validates the template and parameter values and raises exceptions if there's an issue
 
         :param dict sam_template: SAM template
@@ -62,11 +62,11 @@ class Parser:
         if parameter_values is None:
             raise ValueError("`parameter_values` argument is required")
 
-        Parser.validate_datatypes(sam_template)
+        Parser.validate_datatypes(sam_template)  # type: ignore[no-untyped-call]
 
         try:
-            validator = SamTemplateValidator()
-            validation_errors = validator.validate(sam_template)
+            validator = SamTemplateValidator()  # type: ignore[no-untyped-call]
+            validation_errors = validator.validate(sam_template)  # type: ignore[no-untyped-call]
             if validation_errors:
                 LOG.warning("Template schema validation reported the following errors: %s", validation_errors)
         except Exception as e:

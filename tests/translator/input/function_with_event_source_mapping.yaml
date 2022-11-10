@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
@@ -22,8 +24,8 @@ Resources:
         }
       Runtime: nodejs12.x
       Policies:
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt MySqsQueue.QueueName
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt MySqsQueue.QueueName
       Events:
         Stream:
           Type: Kinesis
@@ -54,7 +56,7 @@ Resources:
             StartingPosition: TRIM_HORIZON
             TumblingWindowInSeconds: 60
             FunctionResponseTypes:
-              - ReportBatchItemFailures
+            - ReportBatchItemFailures
             DestinationConfig:
               OnFailure:
                 Type: SQS
@@ -89,11 +91,11 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
+      - AttributeName: id
+        AttributeType: S
       KeySchema:
-        - AttributeName: id
-          KeyType: HASH
+      - AttributeName: id
+        KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5

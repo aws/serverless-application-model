@@ -1,8 +1,10 @@
+%YAML 1.1
+---
 Globals:
   Api:
     Auth:
       ResourcePolicy:
-        SourceVpcWhitelist: [{"sub":"SomeParameter"}]
+        SourceVpcWhitelist: [sub: SomeParameter]
 
 Parameters:
   SomeParameter:

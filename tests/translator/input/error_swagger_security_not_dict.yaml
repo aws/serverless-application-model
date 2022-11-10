@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 transformId: AWS::Serverless-2016-10-31
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:
@@ -20,14 +22,14 @@ Resources:
         AddDefaultAuthorizerToCorsPreflight: false
       DefinitionBody:
         paths:
-          "/path":
+          /path:
             put:
               responses:
                 '201':
                   content:
                     application/json:
                       schema:
-                        "$ref": "abcd"
+                        $ref: abcd
               x-amazon-apigateway-integration:
                 contentHandling: CONVERT_TO_TEXT
                 responses:
@@ -64,7 +66,7 @@ Resources:
         PutReservation:
           Type: Api
           Properties:
-            Path: "/path"
+            Path: /path
             RestApiId:
               Ref: AccessingPartyAPI
             Method: put

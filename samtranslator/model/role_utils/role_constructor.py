@@ -1,10 +1,10 @@
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
+from samtranslator.model.resource_policies import PolicyTypes
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidResourceException
 
 
-def construct_role_for_resource(
+def construct_role_for_resource(  # type: ignore[no-untyped-def]
     resource_logical_id,
     attributes,
     managed_policy_map,
@@ -14,7 +14,7 @@ def construct_role_for_resource(
     policy_documents=None,
     permissions_boundary=None,
     tags=None,
-):
+) -> IAMRole:
     """
     Constructs an execution role for a resource.
     :param resource_logical_id: The logical_id of the SAM resource that the role will be associated with

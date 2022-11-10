@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # Auth Cognito authorizer tests
 Transform: AWS::Serverless-2016-10-31
 Resources:
@@ -13,7 +15,7 @@ Resources:
             UserPoolArn: User.pool.arn
           CognitoAuthorizationScopesItemNotString:
             AuthorizationScopes:
-              - 3
+            - 3
             UserPoolArn: User.pool.arn
           CognitoAuthorizationScopesNotList:
             AuthorizationScopes: scopes1
@@ -41,7 +43,7 @@ Resources:
             UserPoolArn: User.pool.arn
           CognitoIdentityReauthorizeEveryNotInt:
             Identity:
-              ReauthorizeEvery: "3"
+              ReauthorizeEvery: '3'
             UserPoolArn: User.pool.arn
           CognitoIdentityReauthorizeEveryValueError:
             Identity:

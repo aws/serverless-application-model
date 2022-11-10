@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
@@ -7,11 +9,11 @@ Resources:
         PasswordPolicy:
           MinimumLength: 8
       UsernameAttributes:
-        - email
+      - email
       Schema:
-        - AttributeDataType: String
-          Name: email
-          Required: false
+      - AttributeDataType: String
+        Name: email
+        Required: false
   ImplicitApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -25,4 +27,4 @@ Resources:
           Properties:
             UserPool:
               Ref: UserPool
-            Trigger: !Join [ "", [ "Pre", "Sign", "Up"] ]
+            Trigger: !Join ['', [Pre, Sign, Up]]

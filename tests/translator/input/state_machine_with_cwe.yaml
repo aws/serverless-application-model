@@ -1,6 +1,8 @@
+%YAML 1.1
+---
 Resources:
   StateMachine:
-    Type: 'AWS::Serverless::StateMachine'
+    Type: AWS::Serverless::StateMachine
     Properties:
       DefinitionUri: s3://sam-demo-bucket/my_state_machine.asl.json
       Role: arn:aws:iam::123456123456:role/service-role/SampleRole
@@ -8,6 +10,8 @@ Resources:
         CWEvent:
           Type: CloudWatchEvent
           Properties:
+            RuleName: MyRule
+            State: ENABLED
             Pattern:
               detail:
                 state:

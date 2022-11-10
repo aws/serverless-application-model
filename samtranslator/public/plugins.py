@@ -1,3 +1,3 @@
-# flake8: noqa
+__all__ = ["BasePlugin"]
 
 from samtranslator.plugins import BasePlugin

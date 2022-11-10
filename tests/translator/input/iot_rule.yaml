@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # File: sam.yml
 # Version: 0.9
 
@@ -23,4 +25,3 @@ Resources:
       MemorySize: 1024
       Runtime: nodejs12.x
       Timeout: 3
-

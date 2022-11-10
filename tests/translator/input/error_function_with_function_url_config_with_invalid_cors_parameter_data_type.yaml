@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Parameters: {}
 Resources:
@@ -13,4 +15,4 @@ Resources:
       FunctionUrlConfig:
         AuthType: NONE
         Cors:
-          MaxAge: "10"
+          MaxAge: '10'

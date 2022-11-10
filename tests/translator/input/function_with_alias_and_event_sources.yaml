@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # Testing Alias Invoke with ALL event sources supported by Lambda
 # We are looking to check if the event sources and their associated Lambda::Permission resources are
 # connect to the Alias and *not* the function
@@ -7,7 +9,7 @@ Parameters:
     Default: beta
 Resources:
   MyAwesomeFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -19,7 +21,7 @@ Resources:
         EBSchedule:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
 
         CWEvent:
           Type: CloudWatchEvent
@@ -107,4 +109,4 @@ Resources:
         Key: webpage_swagger.json
       Variables:
         LambdaFunction:
-          Ref: "MyAwesomeFunction"
+          Ref: MyAwesomeFunction

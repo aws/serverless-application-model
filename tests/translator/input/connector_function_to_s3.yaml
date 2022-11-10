@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
@@ -16,10 +18,10 @@ Resources:
   MyConnector:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: MyFunction
-      Destination: 
+      Destination:
         Id: MyBucket
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write

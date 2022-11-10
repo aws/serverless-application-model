@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
@@ -14,7 +16,7 @@ Resources:
         CertificateArn: arn::cert::abc
         EndpointConfiguration: REGIONAL
         Route53:
-          HostedZoneId: "abc123456"
+          HostedZoneId: abc123456
 
   MyRestApi:
     Type: AWS::Serverless::Api
@@ -23,14 +25,14 @@ Resources:
       StageName: Prod
       TracingEnabled: true
       MethodSettings:
-        - LoggingLevel: Info
-          ResourcePath: '/*'
-          HttpMethod: '*'
+      - LoggingLevel: Info
+        ResourcePath: /*
+        HttpMethod: '*'
       Domain:
         DomainName: admin.two.amazon.com
         CertificateArn: arn::cert::abc
         EndpointConfiguration: REGIONAL
         Route53:
-          HostedZoneId: "abc123456"
+          HostedZoneId: abc123456
       EndpointConfiguration:
         Type: REGIONAL

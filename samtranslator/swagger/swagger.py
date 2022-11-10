@@ -1,5 +1,6 @@
 ﻿import copy
 import re
+from typing import Dict, Any
 
 from samtranslator.model.intrinsics import ref, make_conditional, fnSub, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
@@ -13,7 +14,7 @@ class SwaggerEditor(object):
     pass the Swagger spec. But this is necessary for SAM because it iteratively builds the Swagger starting from an
     empty skeleton.
 
-    NOTE (hawflau): To ensure the same logical ID will be generate in Py3 as in Py2 for AWS::Serverless::Api resource,
+    NOTE (hawflau): To ensure the same logical ID will be generated in Py3 as in Py2 for AWS::Serverless::Api resource,
     we have to apply py27hash_fix. For any dictionary that is created within the swagger body, we need to initiate it
     with Py27Dict() instead of {}. We also need to add keys into the Py27Dict instance one by one, so that the input
     order could be preserved. This is a must for the purpose of preserving the dict key iteration order, which is
@@ -37,8 +38,9 @@ class SwaggerEditor(object):
     _POLICY_TYPE_IAM = "Iam"
     _POLICY_TYPE_IP = "Ip"
     _POLICY_TYPE_VPC = "Vpc"
+    _SERVERS = "servers"
 
-    def __init__(self, doc):
+    def __init__(self, doc):  # type: ignore[no-untyped-def]
         """
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
         modifications on this copy.
@@ -47,7 +49,7 @@ class SwaggerEditor(object):
         :raises InvalidDocumentException: If the input Swagger document does not meet the basic Swagger requirements.
         """
 
-        if not SwaggerEditor.is_valid(doc):
+        if not SwaggerEditor.is_valid(doc):  # type: ignore[no-untyped-call]
             raise InvalidDocumentException([InvalidTemplateException("Invalid Swagger document")])
 
         self._doc = copy.deepcopy(doc)
@@ -62,11 +64,11 @@ class SwaggerEditor(object):
         # each path item object must be a dict (even it is empty).
         # We can do an early path validation on path item objects,
         # so we don't need to validate wherever we use them.
-        for path in self.iter_on_path():
-            for path_item in self.get_conditional_contents(self.paths.get(path)):
-                SwaggerEditor.validate_path_item_is_dict(path_item, path)
+        for path in self.iter_on_path():  # type: ignore[no-untyped-call]
+            for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
+                SwaggerEditor.validate_path_item_is_dict(path_item, path)  # type: ignore[no-untyped-call]
 
-    def get_conditional_contents(self, item):
+    def get_conditional_contents(self, item):  # type: ignore[no-untyped-def]
         """
         Returns the contents of the given item.
         If a conditional block has been used inside the item, returns a list of the content
@@ -82,7 +84,7 @@ class SwaggerEditor(object):
             contents = [content for content in contents if not is_intrinsic_no_value(content)]
         return contents
 
-    def has_path(self, path, method=None):
+    def has_path(self, path, method=None):  # type: ignore[no-untyped-def]
         """
         Returns True if this Swagger has the given path and optional method
         For paths with conditionals, only returns true if both items (true case, and false case) have the method.
@@ -94,14 +96,14 @@ class SwaggerEditor(object):
         if path not in self.paths:
             return False
 
-        method = self._normalize_method_name(method)
+        method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
         if method:
-            for path_item in self.get_conditional_contents(self.paths.get(path)):
+            for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
                 if method not in path_item:
                     return False
         return True
 
-    def method_has_integration(self, method):
+    def method_has_integration(self, method):  # type: ignore[no-untyped-def]
         """
         Returns true if the given method contains a valid method definition.
         This uses the get_conditional_contents function to handle conditionals.
@@ -109,12 +111,12 @@ class SwaggerEditor(object):
         :param dict method: method dictionary
         :return: true if method has one or multiple integrations
         """
-        for method_definition in self.get_conditional_contents(method):
-            if self.method_definition_has_integration(method_definition):
+        for method_definition in self.get_conditional_contents(method):  # type: ignore[no-untyped-call]
+            if self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                 return True
         return False
 
-    def method_definition_has_integration(self, method_definition):
+    def method_definition_has_integration(self, method_definition):  # type: ignore[no-untyped-def]
         """
         Checks a method definition to make sure it has an apigw integration
 
@@ -125,20 +127,34 @@ class SwaggerEditor(object):
             return True
         return False
 
-    def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint):
+    @staticmethod
+    def _update_dict(obj: Dict[Any, Any], k: str, v: Dict[Any, Any]) -> None:
+        if not obj.get(k):
+            obj[k] = {}
+        obj[k].update(v)
+
+    def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint):  # type: ignore[no-untyped-def]
         """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG in open api definition as extension
         Following this guide:
         https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
         :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
         """
-        if not self._doc.get(self._X_ENDPOINT_CONFIG):
-            self._doc[self._X_ENDPOINT_CONFIG] = {}
-
         DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
         set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
-        self._doc[self._X_ENDPOINT_CONFIG].update(set_disable_api_endpoint)
 
-    def has_integration(self, path, method):
+        # Check if the OpenAPI version is 3.0, if it is then the extension needs to added to the Servers field,
+        # if not then it gets added to the top level (same level as "paths" and "info")
+        if self._doc.get("openapi") and self.validate_open_api_version_3(self._doc["openapi"]):
+            # Add the x-amazon-apigateway-endpoint-configuration extension to the Servers objects
+            servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
+            for config in servers_configurations:
+                SwaggerEditor._update_dict(config, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
+
+            self._doc[self._SERVERS] = servers_configurations
+        else:
+            SwaggerEditor._update_dict(self._doc, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
+
+    def has_integration(self, path, method):  # type: ignore[no-untyped-def]
         """
         Checks if an API Gateway integration is already present at the given path/method.
         For paths with conditionals, it only returns True if both items (true case, false case) have the integration
@@ -147,33 +163,33 @@ class SwaggerEditor(object):
         :param string method: HTTP method
         :return: True, if an API Gateway integration is already present
         """
-        method = self._normalize_method_name(method)
+        method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
 
-        if not self.has_path(path, method):
+        if not self.has_path(path, method):  # type: ignore[no-untyped-call]
             return False
 
-        for path_item in self.get_conditional_contents(self.paths.get(path)):
+        for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             method_definition = path_item.get(method)
-            if not (isinstance(method_definition, dict) and self.method_has_integration(method_definition)):
+            if not (isinstance(method_definition, dict) and self.method_has_integration(method_definition)):  # type: ignore[no-untyped-call]
                 return False
         # Integration present and non-empty
         return True
 
-    def add_path(self, path, method=None):
+    def add_path(self, path, method=None):  # type: ignore[no-untyped-def]
         """
         Adds the path/method combination to the Swagger, if not already present
 
         :param string path: Path name
         :param string method: HTTP method
         """
-        method = self._normalize_method_name(method)
+        method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
 
         self.paths.setdefault(path, Py27Dict())
 
-        for path_item in self.get_conditional_contents(self.paths.get(path)):
+        for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             path_item.setdefault(method, Py27Dict())
 
-    def add_lambda_integration(
+    def add_lambda_integration(  # type: ignore[no-untyped-def]
         self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
     ):
         """
@@ -184,8 +200,8 @@ class SwaggerEditor(object):
         :param string integration_uri: URI for the integration.
         """
 
-        method = self._normalize_method_name(method)
-        if self.has_integration(path, method):
+        method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
+        if self.has_integration(path, method):  # type: ignore[no-untyped-call]
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
@@ -194,14 +210,14 @@ class SwaggerEditor(object):
                 ]
             )
 
-        self.add_path(path, method)
+        self.add_path(path, method)  # type: ignore[no-untyped-call]
 
         # Wrap the integration_uri in a Condition if one exists on that function
         # This is necessary so CFN doesn't try to resolve the integration reference.
         if condition:
             integration_uri = make_conditional(condition, integration_uri)
 
-        for path_item in self.get_conditional_contents(self.paths.get(path)):
+        for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
             # insert key one by one to preserce input order
             path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
@@ -221,7 +237,7 @@ class SwaggerEditor(object):
                 api_invoke_role = api_auth_config.get("InvokeRole")
                 if not api_invoke_role and "InvokeRole" in api_auth_config:
                     api_invoke_role = "NONE"
-                credentials = self._generate_integration_credentials(
+                credentials = self._generate_integration_credentials(  # type: ignore[no-untyped-call]
                     method_invoke_role=method_invoke_role, api_invoke_role=api_invoke_role
                 )
                 if credentials and credentials != "NONE":
@@ -234,7 +250,7 @@ class SwaggerEditor(object):
             if condition:
                 path_item[method] = make_conditional(condition, path_item[method])
 
-    def add_state_machine_integration(
+    def add_state_machine_integration(  # type: ignore[no-untyped-def]
         self,
         path,
         method,
@@ -254,20 +270,20 @@ class SwaggerEditor(object):
         :param bool condition: Condition for the integration
         """
 
-        method = self._normalize_method_name(method)
-        if self.has_integration(path, method):
+        method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
+        if self.has_integration(path, method):  # type: ignore[no-untyped-call]
             raise InvalidDocumentException(
                 [InvalidTemplateException("Integration already exists on Path={}, Method={}".format(path, method))]
             )
 
-        self.add_path(path, method)
+        self.add_path(path, method)  # type: ignore[no-untyped-call]
 
         # Wrap the integration_uri in a Condition if one exists on that state machine
         # This is necessary so CFN doesn't try to resolve the integration reference.
         if condition:
             integration_uri = make_conditional(condition, integration_uri)
 
-        for path_item in self.get_conditional_contents(self.paths.get(path)):
+        for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             # Responses
             integration_responses = Py27Dict()
             # insert key one by one to preserce input order
@@ -297,20 +313,20 @@ class SwaggerEditor(object):
             if condition:
                 path_item[method] = make_conditional(condition, path_item[method])
 
-    def make_path_conditional(self, path, condition):
+    def make_path_conditional(self, path, condition):  # type: ignore[no-untyped-def]
         """
         Wrap entire API path definition in a CloudFormation if condition.
         """
         self.paths[path] = make_conditional(condition, self.paths[path])
 
-    def _generate_integration_credentials(self, method_invoke_role=None, api_invoke_role=None):
-        return self._get_invoke_role(method_invoke_role or api_invoke_role)
+    def _generate_integration_credentials(self, method_invoke_role=None, api_invoke_role=None):  # type: ignore[no-untyped-def]
+        return self._get_invoke_role(method_invoke_role or api_invoke_role)  # type: ignore[no-untyped-call]
 
-    def _get_invoke_role(self, invoke_role):
+    def _get_invoke_role(self, invoke_role):  # type: ignore[no-untyped-def]
         CALLER_CREDENTIALS_ARN = "arn:aws:iam::*:user/*"
         return invoke_role if invoke_role and invoke_role != "CALLER_CREDENTIALS" else CALLER_CREDENTIALS_ARN
 
-    def iter_on_path(self):
+    def iter_on_path(self):  # type: ignore[no-untyped-def]
         """
         Yields all the paths available in the Swagger. As a caller, if you add new paths to Swagger while iterating,
         they will not show up in this iterator
@@ -318,10 +334,10 @@ class SwaggerEditor(object):
         :yields string: Path name
         """
 
-        for path, value in self.paths.items():
+        for path, _ in self.paths.items():
             yield path
 
-    def iter_on_method_definitions_for_path_at_method(
+    def iter_on_method_definitions_for_path_at_method(  # type: ignore[no-untyped-def]
         self, path_name, method_name, skip_methods_without_apigw_integration=True
     ):
         """
@@ -333,17 +349,15 @@ class SwaggerEditor(object):
         :param skip_methods_without_apigw_integration: if True, skips method definitions without apigw integration
         :yields dict: method definition
         """
-        normalized_method_name = self._normalize_method_name(method_name)
+        normalized_method_name = self._normalize_method_name(method_name)  # type: ignore[no-untyped-call]
 
-        for path_item in self.get_conditional_contents(self.paths.get(path_name)):
-            for method_definition in self.get_conditional_contents(path_item.get(normalized_method_name)):
-                if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
-                    method_definition
-                ):
+        for path_item in self.get_conditional_contents(self.paths.get(path_name)):  # type: ignore[no-untyped-call]
+            for method_definition in self.get_conditional_contents(path_item.get(normalized_method_name)):  # type: ignore[no-untyped-call]
+                if skip_methods_without_apigw_integration and not self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                     continue
                 yield method_definition
 
-    def iter_on_all_methods_for_path(self, path_name, skip_methods_without_apigw_integration=True):
+    def iter_on_all_methods_for_path(self, path_name, skip_methods_without_apigw_integration=True):  # type: ignore[no-untyped-def]
         """
         Yields all the (method name, method definition) tuples for the path, including those inside conditionals.
 
@@ -351,27 +365,25 @@ class SwaggerEditor(object):
         :param skip_methods_without_apigw_integration: if True, skips method definitions without apigw integration
         :yields list of (method name, method definition) tuples
         """
-        for path_item in self.get_conditional_contents(self.paths.get(path_name)):
+        for path_item in self.get_conditional_contents(self.paths.get(path_name)):  # type: ignore[no-untyped-call]
             for method_name, method in path_item.items():
                 # Excluding non-method sections
                 if method_name in SwaggerEditor._EXCLUDED_PATHS_FIELDS:
                     continue
 
-                for method_definition in self.get_conditional_contents(method):
-                    SwaggerEditor.validate_is_dict(
+                for method_definition in self.get_conditional_contents(method):  # type: ignore[no-untyped-call]
+                    SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
                         method_definition,
                         'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(
                             method_name, method_definition, path_name
                         ),
                     )
-                    if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
-                        method_definition
-                    ):
+                    if skip_methods_without_apigw_integration and not self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                         continue
-                    normalized_method_name = self._normalize_method_name(method_name)
+                    normalized_method_name = self._normalize_method_name(method_name)  # type: ignore[no-untyped-call]
                     yield normalized_method_name, method_definition
 
-    def add_cors(
+    def add_cors(  # type: ignore[no-untyped-def]
         self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None, allow_credentials=None
     ):
         """
@@ -398,9 +410,9 @@ class SwaggerEditor(object):
         :raises InvalidTemplateException: When values for one of the allowed_* variables is empty
         """
 
-        for path_item in self.get_conditional_contents(self.paths.get(path)):
+        for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             # Skip if Options is already present
-            method = self._normalize_method_name(self._OPTIONS_METHOD)
+            method = self._normalize_method_name(self._OPTIONS_METHOD)  # type: ignore[no-untyped-call]
             if method in path_item:
                 continue
 
@@ -409,7 +421,7 @@ class SwaggerEditor(object):
 
             if not allowed_methods:
                 # AllowMethods is not given. Let's try to generate the list from the given Swagger.
-                allowed_methods = self._make_cors_allowed_methods_for_path_item(path_item)
+                allowed_methods = self._make_cors_allowed_methods_for_path_item(path_item)  # type: ignore[no-untyped-call]
 
                 # APIGW expects the value to be a "string expression". Hence wrap in another quote. Ex: "'GET,POST,DELETE'"
                 allowed_methods = "'{}'".format(allowed_methods)
@@ -418,33 +430,37 @@ class SwaggerEditor(object):
                 allow_credentials = False
 
             # Add the Options method and the CORS response
-            path_item[self._OPTIONS_METHOD] = self._options_method_response_for_cors(
+            path_item[self._OPTIONS_METHOD] = self._options_method_response_for_cors(  # type: ignore[no-untyped-call]
                 allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials
             )
 
-    def add_binary_media_types(self, binary_media_types):
+    def add_binary_media_types(self, binary_media_types):  # type: ignore[no-untyped-def]
         """
         Args:
             binary_media_types: list
         """
 
-        def replace_recursively(bmt):
+        def replace_recursively(bmt):  # type: ignore[no-untyped-def]
             """replaces "~1" with "/" for the input binary_media_types recursively"""
             if isinstance(bmt, dict):
                 to_return = Py27Dict()
                 for k, v in bmt.items():
-                    to_return[Py27UniStr(k.replace("~1", "/"))] = replace_recursively(v)
+                    to_return[Py27UniStr(k.replace("~1", "/"))] = replace_recursively(v)  # type: ignore[no-untyped-call]
                 return to_return
             if isinstance(bmt, list):
-                return [replace_recursively(item) for item in bmt]
-            if isinstance(bmt, str) or isinstance(bmt, Py27UniStr):
+                return [replace_recursively(item) for item in bmt]  # type: ignore[no-untyped-call]
+            if isinstance(bmt, (Py27UniStr, str)):
                 return Py27UniStr(bmt.replace("~1", "/"))
             return bmt
 
-        bmt = replace_recursively(binary_media_types)
+        bmt = replace_recursively(binary_media_types)  # type: ignore[no-untyped-call]
         self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = bmt
 
-    def _options_method_response_for_cors(
+    @staticmethod
+    def _make_response_header_key(original_header_key: str) -> str:
+        return "method.response.header." + original_header_key
+
+    def _options_method_response_for_cors(  # type: ignore[no-untyped-def]
         self, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None, allow_credentials=None
     ):
         """
@@ -471,12 +487,11 @@ class SwaggerEditor(object):
         ALLOW_METHODS = "Access-Control-Allow-Methods"
         MAX_AGE = "Access-Control-Max-Age"
         ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials"
-        HEADER_RESPONSE = lambda x: "method.response.header." + x
 
         response_parameters = Py27Dict(
             {
                 # AllowedOrigin is always required
-                HEADER_RESPONSE(ALLOW_ORIGIN): allowed_origins
+                self._make_response_header_key(ALLOW_ORIGIN): allowed_origins
             }
         )
 
@@ -494,19 +509,19 @@ class SwaggerEditor(object):
         #    https://fetch.spec.whatwg.org/#http-new-header-syntax
         #
         if allowed_headers:
-            response_parameters[HEADER_RESPONSE(ALLOW_HEADERS)] = allowed_headers
+            response_parameters[self._make_response_header_key(ALLOW_HEADERS)] = allowed_headers
             response_headers[ALLOW_HEADERS] = {"type": "string"}
         if allowed_methods:
-            response_parameters[HEADER_RESPONSE(ALLOW_METHODS)] = allowed_methods
+            response_parameters[self._make_response_header_key(ALLOW_METHODS)] = allowed_methods
             response_headers[ALLOW_METHODS] = {"type": "string"}
         if max_age is not None:
             # MaxAge can be set to 0, which is a valid value. So explicitly check against None
-            response_parameters[HEADER_RESPONSE(MAX_AGE)] = max_age
+            response_parameters[self._make_response_header_key(MAX_AGE)] = max_age
             response_headers[MAX_AGE] = {"type": "integer"}
         if allow_credentials is True:
             # Allow-Credentials only has a valid value of true, it should be omitted otherwise.
             # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
-            response_parameters[HEADER_RESPONSE(ALLOW_CREDENTIALS)] = "'true'"
+            response_parameters[self._make_response_header_key(ALLOW_CREDENTIALS)] = "'true'"
             response_headers[ALLOW_CREDENTIALS] = {"type": "string"}
 
         # construct snippet and insert key one by one to preserce input order
@@ -528,7 +543,7 @@ class SwaggerEditor(object):
         to_return["responses"]["200"]["headers"] = response_headers
         return to_return
 
-    def _make_cors_allowed_methods_for_path_item(self, path_item):
+    def _make_cors_allowed_methods_for_path_item(self, path_item):  # type: ignore[no-untyped-def]
         """
         Creates the value for Access-Control-Allow-Methods header for given path item. All HTTP methods defined for this
         path item will be included in the result. If the path item contains "ANY" method, then *all available* HTTP methods will
@@ -561,7 +576,7 @@ class SwaggerEditor(object):
         # Allow-Methods is comma separated string
         return ",".join(allow_methods)
 
-    def add_authorizers_security_definitions(self, authorizers):
+    def add_authorizers_security_definitions(self, authorizers):  # type: ignore[no-untyped-def]
         """
         Add Authorizer definitions to the securityDefinitions part of Swagger.
 
@@ -572,7 +587,7 @@ class SwaggerEditor(object):
         for authorizer_name, authorizer in authorizers.items():
             self.security_definitions[authorizer_name] = authorizer.generate_swagger()
 
-    def add_awsiam_security_definition(self):
+    def add_awsiam_security_definition(self):  # type: ignore[no-untyped-def]
         """
         Adds AWS_IAM definition to the securityDefinitions part of Swagger.
         Note: this method is idempotent
@@ -593,7 +608,7 @@ class SwaggerEditor(object):
         if "AWS_IAM" not in self.security_definitions:
             self.security_definitions.update(aws_iam_security_definition)
 
-    def add_apikey_security_definition(self):
+    def add_apikey_security_definition(self):  # type: ignore[no-untyped-def]
         """
         Adds api_key definition to the securityDefinitions part of Swagger.
         Note: this method is idempotent
@@ -614,7 +629,7 @@ class SwaggerEditor(object):
         if "api_key" not in self.security_definitions:
             self.security_definitions.update(api_key_security_definition)
 
-    def set_path_default_authorizer(
+    def set_path_default_authorizer(  # type: ignore[no-untyped-def]
         self, path, default_authorizer, authorizers, add_default_auth_to_preflight=True, api_authorizers=None
     ):
         """
@@ -631,7 +646,7 @@ class SwaggerEditor(object):
             authorizer to OPTIONS preflight requests.
         """
 
-        for method_name, method_definition in self.iter_on_all_methods_for_path(path):
+        for method_name, method_definition in self.iter_on_all_methods_for_path(path):  # type: ignore[no-untyped-call]
             if not (add_default_auth_to_preflight or method_name != "options"):
                 continue
             existing_security = method_definition.get("security", [])
@@ -646,7 +661,7 @@ class SwaggerEditor(object):
             # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
             # We want to ensure only a single Authorizer security entry exists while keeping everything else
             for security in existing_security:
-                SwaggerEditor.validate_is_dict(
+                SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
                     security,
                     "{} in Security for path {} method {} is not a valid dictionary.".format(
                         security, path, method_name
@@ -683,7 +698,7 @@ class SwaggerEditor(object):
             # No existing Authorizer found; use default
             else:
                 security_dict = Py27Dict()
-                security_dict[default_authorizer] = self._get_authorization_scopes(api_authorizers, default_authorizer)
+                security_dict[default_authorizer] = self._get_authorization_scopes(api_authorizers, default_authorizer)  # type: ignore[no-untyped-call]
                 authorizer_security = [security_dict]
 
             security = existing_non_authorizer_security + authorizer_security
@@ -694,9 +709,9 @@ class SwaggerEditor(object):
                 # The first element of the method_definition['security'] should be AWS_IAM
                 # because authorizer_list = ['AWS_IAM'] is hardcoded above
                 if "AWS_IAM" in method_definition["security"][0]:
-                    self.add_awsiam_security_definition()
+                    self.add_awsiam_security_definition()  # type: ignore[no-untyped-call]
 
-    def set_path_default_apikey_required(self, path):
+    def set_path_default_apikey_required(self, path):  # type: ignore[no-untyped-def]
         """
         Add the ApiKey security as required for each method on this path unless ApiKeyRequired
         was defined at the Function/Path/Method level. This is intended to be used to set the
@@ -706,7 +721,7 @@ class SwaggerEditor(object):
         :param string path: Path name
         """
 
-        for method_name, method_definition in self.iter_on_all_methods_for_path(path):
+        for method_name, method_definition in self.iter_on_all_methods_for_path(path):  # type: ignore[no-untyped-call]
             existing_security = method_definition.get("security", [])
             apikey_security_names = set(["api_key", "api_key_false"])
             existing_non_apikey_security = []
@@ -717,7 +732,7 @@ class SwaggerEditor(object):
             # (e.g. sigv4 (AWS_IAM), authorizers, NONE (marker for ignoring default authorizer))
             # We want to ensure only a single ApiKey security entry exists while keeping everything else
             for security in existing_security:
-                SwaggerEditor.validate_is_dict(
+                SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
                     security,
                     "{} in Security for path {} method {} is not a valid dictionary.".format(
                         security, path, method_name
@@ -756,7 +771,7 @@ class SwaggerEditor(object):
             if security != existing_security:
                 method_definition["security"] = security
 
-    def add_auth_to_method(self, path, method_name, auth, api):
+    def add_auth_to_method(self, path, method_name, auth, api):  # type: ignore[no-untyped-def]
         """
         Adds auth settings for this path/method. Auth settings currently consist of Authorizers and ApiKeyRequired
         but this method will eventually include setting other auth settings such as Resource Policy, etc.
@@ -772,13 +787,13 @@ class SwaggerEditor(object):
         api_auth = api and api.get("Auth")
         authorizers = api_auth and api_auth.get("Authorizers")
         if method_authorizer:
-            self._set_method_authorizer(path, method_name, method_authorizer, authorizers, method_scopes)
+            self._set_method_authorizer(path, method_name, method_authorizer, authorizers, method_scopes)  # type: ignore[no-untyped-call]
 
         method_apikey_required = auth and auth.get("ApiKeyRequired")
         if method_apikey_required is not None:
-            self._set_method_apikey_handling(path, method_name, method_apikey_required)
+            self._set_method_apikey_handling(path, method_name, method_apikey_required)  # type: ignore[no-untyped-call]
 
-    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers=None, method_scopes=None):
+    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers=None, method_scopes=None):  # type: ignore[no-untyped-def]
         """
         Adds the authorizer_name to the security block for each method on this path.
         This is used to configure the authorizer for individual functions.
@@ -791,7 +806,7 @@ class SwaggerEditor(object):
         if authorizers is None:
             authorizers = Py27Dict()
 
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             existing_security = method_definition.get("security", [])
 
             security_dict = Py27Dict()
@@ -814,9 +829,9 @@ class SwaggerEditor(object):
                 # The first element of the method_definition['security'] should be AWS_IAM
                 # because authorizer_list = ['AWS_IAM'] is hardcoded above
                 if "AWS_IAM" in method_definition["security"][0]:
-                    self.add_awsiam_security_definition()
+                    self.add_awsiam_security_definition()  # type: ignore[no-untyped-call]
 
-    def _set_method_apikey_handling(self, path, method_name, apikey_required):
+    def _set_method_apikey_handling(self, path, method_name, apikey_required):  # type: ignore[no-untyped-def]
         """
         Adds the apikey setting to the security block for each method on this path.
         This is used to configure the authorizer for individual functions.
@@ -825,7 +840,7 @@ class SwaggerEditor(object):
         :param string method_name: Method name
         :param bool apikey_required: Whether the apikey security is required
         """
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             existing_security = method_definition.get("security", [])
 
             if apikey_required:
@@ -833,7 +848,7 @@ class SwaggerEditor(object):
                 security_dict = Py27Dict()
                 security_dict["api_key"] = []
                 apikey_security = [security_dict]
-                self.add_apikey_security_definition()
+                self.add_apikey_security_definition()  # type: ignore[no-untyped-call]
             else:
                 # The method explicitly does NOT require apikey and there is an API default
                 # so let's add a marker 'api_key_false' so that we don't incorrectly override
@@ -848,7 +863,7 @@ class SwaggerEditor(object):
             if security != existing_security:
                 method_definition["security"] = security
 
-    def add_request_validator_to_method(self, path, method_name, validate_body=False, validate_parameters=False):
+    def add_request_validator_to_method(self, path, method_name, validate_body=False, validate_parameters=False):  # type: ignore[no-untyped-def]
         """
         Adds request model body parameter for this path/method.
 
@@ -858,7 +873,7 @@ class SwaggerEditor(object):
         :param bool validate_parameters: Validate request
         """
 
-        validator_name = SwaggerEditor.get_validator_name(validate_body, validate_parameters)
+        validator_name = SwaggerEditor.get_validator_name(validate_body, validate_parameters)  # type: ignore[no-untyped-call]
 
         # Creating validator as py27 dict
         # and insert keys one by one to preserve input order
@@ -874,12 +889,12 @@ class SwaggerEditor(object):
             # Adding only if the validator hasn't been defined already
             self._doc[self._X_APIGW_REQUEST_VALIDATORS].update(request_validator_definition)
 
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             set_validator_to_method = Py27Dict({self._X_APIGW_REQUEST_VALIDATOR: validator_name})
             # Setting validator to the given method
             method_definition.update(set_validator_to_method)
 
-    def add_request_model_to_method(self, path, method_name, request_model):
+    def add_request_model_to_method(self, path, method_name, request_model):  # type: ignore[no-untyped-def]
         """
         Adds request model body parameter for this path/method.
 
@@ -890,7 +905,7 @@ class SwaggerEditor(object):
         model_name = request_model and request_model.get("Model").lower()
         model_required = request_model and request_model.get("Required")
 
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             if self._doc.get("swagger") is not None:
 
                 existing_parameters = method_definition.get("parameters", [])
@@ -919,7 +934,7 @@ class SwaggerEditor(object):
                 if model_required is not None:
                     method_definition["requestBody"]["required"] = model_required
 
-    def add_gateway_responses(self, gateway_responses):
+    def add_gateway_responses(self, gateway_responses):  # type: ignore[no-untyped-def]
         """
         Add Gateway Response definitions to Swagger.
 
@@ -930,7 +945,7 @@ class SwaggerEditor(object):
         for response_type, response in gateway_responses.items():
             self.gateway_responses[response_type] = response.generate_swagger()
 
-    def add_models(self, models):
+    def add_models(self, models):  # type: ignore[no-untyped-def]
         """
         Add Model definitions to Swagger.
 
@@ -953,7 +968,7 @@ class SwaggerEditor(object):
 
             self.definitions[model_name.lower()] = schema
 
-    def add_resource_policy(self, resource_policy, path, stage):
+    def add_resource_policy(self, resource_policy, path, stage):  # type: ignore[no-untyped-def]
         """
         Add resource policy definition to Swagger.
 
@@ -962,7 +977,7 @@ class SwaggerEditor(object):
         """
         if resource_policy is None:
             return
-        SwaggerEditor.validate_is_dict(resource_policy, "Resource Policy is not a valid dictionary.")
+        SwaggerEditor.validate_is_dict(resource_policy, "Resource Policy is not a valid dictionary.")  # type: ignore[no-untyped-call]
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")
@@ -978,22 +993,22 @@ class SwaggerEditor(object):
         source_vpce_intrinsic_blacklist = resource_policy.get("IntrinsicVpceBlacklist")
 
         if aws_account_whitelist is not None:
-            resource_list = self._get_method_path_uri_list(path, stage)
-            self._add_iam_resource_policy_for_method(aws_account_whitelist, "Allow", resource_list)
+            resource_list = self._get_method_path_uri_list(path, stage)  # type: ignore[no-untyped-call]
+            self._add_iam_resource_policy_for_method(aws_account_whitelist, "Allow", resource_list)  # type: ignore[no-untyped-call]
 
         if aws_account_blacklist is not None:
-            resource_list = self._get_method_path_uri_list(path, stage)
-            self._add_iam_resource_policy_for_method(aws_account_blacklist, "Deny", resource_list)
+            resource_list = self._get_method_path_uri_list(path, stage)  # type: ignore[no-untyped-call]
+            self._add_iam_resource_policy_for_method(aws_account_blacklist, "Deny", resource_list)  # type: ignore[no-untyped-call]
 
         if ip_range_whitelist is not None:
-            resource_list = self._get_method_path_uri_list(path, stage)
-            self._add_ip_resource_policy_for_method(ip_range_whitelist, "NotIpAddress", resource_list)
+            resource_list = self._get_method_path_uri_list(path, stage)  # type: ignore[no-untyped-call]
+            self._add_ip_resource_policy_for_method(ip_range_whitelist, "NotIpAddress", resource_list)  # type: ignore[no-untyped-call]
 
         if ip_range_blacklist is not None:
-            resource_list = self._get_method_path_uri_list(path, stage)
-            self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
+            resource_list = self._get_method_path_uri_list(path, stage)  # type: ignore[no-untyped-call]
+            self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)  # type: ignore[no-untyped-call]
 
-        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_blacklist):
+        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_blacklist):  # type: ignore[no-untyped-call]
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
@@ -1008,10 +1023,10 @@ class SwaggerEditor(object):
             "IntrinsicVpcList": source_vpc_intrinsic_blacklist,
             "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
         }
-        resource_list = self._get_method_path_uri_list(path, stage)
-        self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
+        resource_list = self._get_method_path_uri_list(path, stage)  # type: ignore[no-untyped-call]
+        self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)  # type: ignore[no-untyped-call]
 
-        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_whitelist):
+        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_whitelist):  # type: ignore[no-untyped-call]
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
@@ -1025,16 +1040,16 @@ class SwaggerEditor(object):
             "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
             "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
         }
-        self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
+        self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)  # type: ignore[no-untyped-call]
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
-    def add_custom_statements(self, custom_statements):
-        self._add_custom_statement(custom_statements)
+    def add_custom_statements(self, custom_statements):  # type: ignore[no-untyped-def]
+        self._add_custom_statement(custom_statements)  # type: ignore[no-untyped-call]
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
-    def _add_iam_resource_policy_for_method(self, policy_list, effect, resource_list):
+    def _add_iam_resource_policy_for_method(self, policy_list, effect, resource_list):  # type: ignore[no-untyped-def]
         """
         This method generates a policy statement to grant/deny specific IAM users access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
@@ -1072,18 +1087,18 @@ class SwaggerEditor(object):
             statement.extend([policy_statement])
             self.resource_policy["Statement"] = statement
 
-    def _get_method_path_uri_list(self, path, stage):
+    def _get_method_path_uri_list(self, path, stage):  # type: ignore[no-untyped-def]
         """
         It turns out that APIGW doesn't like trailing slashes in paths (#665)
         and removes as a part of their behavior, but this isn't documented.
         The regex removes the trailing slash to ensure the permission works as intended
         """
         methods = []
-        for path_item in self.get_conditional_contents(self.paths.get(path)):
+        for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             methods += list(path_item.keys())
 
         uri_list = []
-        path = SwaggerEditor.get_path_without_trailing_slash(path)
+        path = SwaggerEditor.get_path_without_trailing_slash(path)  # type: ignore[no-untyped-call]
 
         for m in methods:
             method = "*" if (m.lower() == self._X_ANY_METHOD or m.lower() == "any") else m.upper()
@@ -1095,7 +1110,7 @@ class SwaggerEditor(object):
             uri_list.extend([resource])
         return uri_list
 
-    def _add_ip_resource_policy_for_method(self, ip_list, conditional, resource_list):
+    def _add_ip_resource_policy_for_method(self, ip_list, conditional, resource_list):  # type: ignore[no-untyped-def]
         """
         This method generates a policy statement to grant/deny specific IP address ranges access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
@@ -1138,7 +1153,7 @@ class SwaggerEditor(object):
                 statement.extend([deny_statement])
             self.resource_policy["Statement"] = statement
 
-    def _add_vpc_resource_policy_for_method(self, endpoint_dict, conditional, resource_list):
+    def _add_vpc_resource_policy_for_method(self, endpoint_dict, conditional, resource_list):  # type: ignore[no-untyped-def]
         """
         This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
@@ -1166,13 +1181,13 @@ class SwaggerEditor(object):
                 if re.match(vpc_regex, endpoint):
                     vpc_list.append(endpoint)
             if vpc_list:
-                condition.setdefault("aws:SourceVpc", []).extend(vpc_list)
+                condition.setdefault("aws:SourceVpc", []).extend(vpc_list)  # type: ignore[no-untyped-call]
             if vpce_list:
-                condition.setdefault("aws:SourceVpce", []).extend(vpce_list)
+                condition.setdefault("aws:SourceVpce", []).extend(vpce_list)  # type: ignore[no-untyped-call]
         if intrinsic_vpc_endpoint_list is not None:
-            condition.setdefault("aws:SourceVpc", []).extend(intrinsic_vpc_endpoint_list)
+            condition.setdefault("aws:SourceVpc", []).extend(intrinsic_vpc_endpoint_list)  # type: ignore[no-untyped-call]
         if intrinsic_vpce_endpoint_list is not None:
-            condition.setdefault("aws:SourceVpce", []).extend(intrinsic_vpce_endpoint_list)
+            condition.setdefault("aws:SourceVpce", []).extend(intrinsic_vpce_endpoint_list)  # type: ignore[no-untyped-call]
 
         # Skip writing to transformed template if both vpc and vpce endpoint lists are empty
         if (not condition.get("aws:SourceVpc", [])) and (not condition.get("aws:SourceVpce", [])):
@@ -1204,7 +1219,7 @@ class SwaggerEditor(object):
                 statement.extend([deny_statement])
             self.resource_policy["Statement"] = statement
 
-    def _add_custom_statement(self, custom_statements):
+    def _add_custom_statement(self, custom_statements):  # type: ignore[no-untyped-def]
         if custom_statements is None:
             return
 
@@ -1224,7 +1239,7 @@ class SwaggerEditor(object):
                     statement.append(s)
             self.resource_policy["Statement"] = statement
 
-    def add_request_parameters_to_method(self, path, method_name, request_parameters):
+    def add_request_parameters_to_method(self, path, method_name, request_parameters):  # type: ignore[no-untyped-def]
         """
         Add Parameters to Swagger.
 
@@ -1234,7 +1249,7 @@ class SwaggerEditor(object):
         :return:
         """
 
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             existing_parameters = method_definition.get("parameters", [])
 
             for request_parameter in request_parameters:
@@ -1258,7 +1273,6 @@ class SwaggerEditor(object):
                 existing_parameters.append(parameter)
 
                 if request_parameter["Caching"]:
-
                     integration = method_definition[self._X_APIGW_INTEGRATION]
                     cache_parameters = integration.get(self._CACHE_KEY_PARAMETERS, [])
                     cache_parameters.append(parameter_name)
@@ -1267,7 +1281,7 @@ class SwaggerEditor(object):
             method_definition["parameters"] = existing_parameters
 
     @property
-    def swagger(self):
+    def swagger(self):  # type: ignore[no-untyped-def]
         """
         Returns a **copy** of the Swagger document as a dictionary.
 
@@ -1290,7 +1304,7 @@ class SwaggerEditor(object):
         return copy.deepcopy(self._doc)
 
     @staticmethod
-    def is_valid(data):
+    def is_valid(data):  # type: ignore[no-untyped-def]
         """
         Checks if the input data is a Swagger document
 
@@ -1301,14 +1315,18 @@ class SwaggerEditor(object):
         if bool(data) and isinstance(data, dict) and isinstance(data.get("paths"), dict):
             if bool(data.get("swagger")):
                 return True
-            elif bool(data.get("openapi")):
+            if bool(data.get("openapi")):
                 return SwaggerEditor.safe_compare_regex_with_string(
                     SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]
                 )
         return False
 
     @staticmethod
-    def validate_is_dict(obj, exception_message):
+    def validate_open_api_version_3(api_version: str) -> bool:
+        return SwaggerEditor.safe_compare_regex_with_string(SwaggerEditor.get_openapi_version_3_regex(), api_version)
+
+    @staticmethod
+    def validate_is_dict(obj, exception_message):  # type: ignore[no-untyped-def]
         """
         Throws exception if obj is not a dict
 
@@ -1320,7 +1338,7 @@ class SwaggerEditor(object):
             raise InvalidDocumentException([InvalidTemplateException(exception_message)])
 
     @staticmethod
-    def validate_path_item_is_dict(path_item, path):
+    def validate_path_item_is_dict(path_item, path):  # type: ignore[no-untyped-def]
         """
         Throws exception if path_item is not a dict
 
@@ -1328,12 +1346,12 @@ class SwaggerEditor(object):
         :param path: path name
         """
 
-        SwaggerEditor.validate_is_dict(
+        SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
             path_item, "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
         )
 
     @staticmethod
-    def gen_skeleton():
+    def gen_skeleton() -> Py27Dict:
         """
         Method to make an empty swagger file, with just some basic structure. Just enough to pass validator.
 
@@ -1348,7 +1366,7 @@ class SwaggerEditor(object):
         return skeleton
 
     @staticmethod
-    def _get_authorization_scopes(authorizers, default_authorizer):
+    def _get_authorization_scopes(authorizers, default_authorizer):  # type: ignore[no-untyped-def]
         """
         Returns auth scopes for an authorizer if present
         :param authorizers: authorizer definitions
@@ -1363,7 +1381,7 @@ class SwaggerEditor(object):
         return []
 
     @staticmethod
-    def _normalize_method_name(method):
+    def _normalize_method_name(method):  # type: ignore[no-untyped-def]
         """
         Returns a lower case, normalized version of HTTP Method. It also know how to handle API Gateway specific methods
         like "ANY"
@@ -1379,25 +1397,24 @@ class SwaggerEditor(object):
         method = method.lower()
         if method == "any":
             return SwaggerEditor._X_ANY_METHOD
-        else:
-            return method
+        return method
 
     @staticmethod
-    def get_openapi_versions_supported_regex():
+    def get_openapi_versions_supported_regex() -> str:
         openapi_version_supported_regex = r"\A[2-3](\.\d)(\.\d)?$"
         return openapi_version_supported_regex
 
     @staticmethod
-    def get_openapi_version_3_regex():
+    def get_openapi_version_3_regex() -> str:
         openapi_version_3_regex = r"\A3(\.\d)(\.\d)?$"
         return openapi_version_3_regex
 
     @staticmethod
-    def safe_compare_regex_with_string(regex, data):
+    def safe_compare_regex_with_string(regex: str, data: str) -> bool:
         return re.match(regex, str(data)) is not None
 
     @staticmethod
-    def get_path_without_trailing_slash(path):
+    def get_path_without_trailing_slash(path):  # type: ignore[no-untyped-def]
         # convert greedy paths to such as {greedy+}, {proxy+} to "*"
         sub = re.sub(r"{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "*", path)
         if isinstance(path, Py27UniStr):
@@ -1405,7 +1422,7 @@ class SwaggerEditor(object):
         return sub
 
     @staticmethod
-    def get_validator_name(validate_body, validate_parameters):
+    def get_validator_name(validate_body, validate_parameters):  # type: ignore[no-untyped-def]
         """
         Get a readable path name to use as validator name
 
@@ -1425,7 +1442,7 @@ class SwaggerEditor(object):
         return "no-validation"
 
     @staticmethod
-    def _validate_list_property_is_resolved(property_list):
+    def _validate_list_property_is_resolved(property_list):  # type: ignore[no-untyped-def]
         """
         Validate if the values of a Property List are all of type string
 

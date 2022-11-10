@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   TriggerFunction:
     Type: AWS::Serverless::Function
@@ -30,8 +32,8 @@ Resources:
           TABLE_NAME: !Ref Table
           VERIFICATION_QUEUE_URL: !Ref VerificationQueue
       Policies:
-        - SQSPollerPolicy:
-            QueueName: !GetAtt VerificationQueue.QueueName
+      - SQSPollerPolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
 
   InvokedFunction:
     Type: AWS::Serverless::Function
@@ -51,8 +53,8 @@ Resources:
         Variables:
           VERIFICATION_QUEUE_URL: !Ref VerificationQueue
       Policies:
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt VerificationQueue.QueueName
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
 
   VerificationQueue:
     Type: AWS::SQS::Queue
@@ -62,11 +64,11 @@ Resources:
     Properties:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: "Id"
-          AttributeType: "S"
+      - AttributeName: Id
+        AttributeType: S
       KeySchema:
-        - AttributeName: "Id"
-          KeyType: "HASH"
+      - AttributeName: Id
+        KeyType: HASH
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
 
@@ -74,7 +76,7 @@ Resources:
     Type: AWS::Lambda::EventSourceMapping
     Properties:
       BatchSize: 1
-      Enabled: True
+      Enabled: true
       EventSourceArn: !GetAtt Table.StreamArn
       FunctionName: !GetAtt InvokedFunction.Arn
       StartingPosition: TRIM_HORIZON
@@ -82,19 +84,19 @@ Resources:
   Connector:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: Table
-      Destination: 
+      Destination:
         Id: InvokedFunction
       Permissions:
-        - Read
+      - Read
 
   ConnectorNotTested:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: TriggerFunction
-      Destination: 
+      Destination:
         Id: Table
       Permissions:
-        - Write
+      - Write

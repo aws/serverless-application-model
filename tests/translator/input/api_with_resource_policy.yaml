@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   ExplicitApi:
     Type: AWS::Serverless::Api
@@ -5,10 +7,7 @@ Resources:
       StageName: Prod
       Auth:
         ResourcePolicy:
-          CustomStatements: {
-              Action: 'execute-api:Invoke', 
-              Resource: ['execute-api:/*/*/*']
-            }
+          CustomStatements: {Action: execute-api:Invoke, Resource: [execute-api:/*/*/*]}
   ExplicitApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -44,5 +43,3 @@ Resources:
               Ref: ExplicitApi
             Path: /any
             Method: any
-
-      

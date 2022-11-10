@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # File: sam.yml
 # Version: 0.9
 
@@ -5,7 +7,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters: {}
 Resources:
   SQSFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/queues.zip
       Handler: queue.sqs_handler

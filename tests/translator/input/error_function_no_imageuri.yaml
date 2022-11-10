@@ -1,5 +1,7 @@
+%YAML 1.1
+---
 Resources:
   Function:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       PackageType: Image

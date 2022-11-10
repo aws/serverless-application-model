@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   NoAuthApi:
     Type: AWS::Serverless::Api
@@ -50,7 +52,7 @@ Resources:
       Auth:
         Authorizers:
           MyCognitoAuthorizer:
-            UserPoolArn: 'arn:aws'
+            UserPoolArn: arn:aws
 
   MissingAuthorizerFn:
     Type: AWS::Serverless::Function
@@ -75,7 +77,7 @@ Resources:
       Auth:
         Authorizers:
           MyCognitoAuthorizer:
-            UserPoolArn: 'arn:aws'
+            UserPoolArn: arn:aws
 
   NoDefaultAuthorizerWithNoneFn:
     Type: AWS::Serverless::Function
@@ -125,7 +127,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      DefinitionBody: { invalid: true }
+      DefinitionBody: {invalid: true}
       Auth:
         DefaultAuthorizer: Foo
 
@@ -137,7 +139,7 @@ Resources:
         DefaultAuthorizer: NotThere
         Authorizers:
           MyCognitoAuthorizer:
-            UserPoolArn: 'arn:aws'
+            UserPoolArn: arn:aws
 
   NoApiAuthorizerFn:
     Type: AWS::Serverless::Function
@@ -162,7 +164,7 @@ Resources:
       Auth:
         Authorizers:
           MyLambdaAuthorizer:
-            FunctionArn: 'arn:aws'
+            FunctionArn: arn:aws
             FunctionPayloadType: INVALID
 
   NoIdentityOnRequestAuthorizer:
@@ -172,7 +174,7 @@ Resources:
       Auth:
         Authorizers:
           MyLambdaRequestAuthorizer:
-            FunctionArn: 'arn:aws'
+            FunctionArn: arn:aws
             FunctionPayloadType: REQUEST
 
   NoIdentitySourceOnRequestAuthorizer:
@@ -182,7 +184,7 @@ Resources:
       Auth:
         Authorizers:
           MyLambdaRequestAuthorizer:
-            FunctionArn: 'arn:aws'
+            FunctionArn: arn:aws
             FunctionPayloadType: REQUEST
             Identity:
               ReauthorizeEvery: 10
@@ -218,6 +220,6 @@ Resources:
             JwtConfiguration:
               audience: https://test-sam.com
               issuer: https://test-sam.com
-            IdentitySource: "$request.header.Authorization"
+            IdentitySource: $request.header.Authorization
         # Correct usage: DefaultAuthorizer: MyAuth
         DefaultAuthorizer: !Ref MyAuth

@@ -1,6 +1,8 @@
-Mappings: 
-  TestMap: 
-    TopLevel: 
+%YAML 1.1
+---
+Mappings:
+  TestMap:
+    TopLevel:
       ApiName: HtmlApi
 
 Resources:
@@ -15,9 +17,9 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !FindInMap
-              - TestMap
-              - TopLevel
-              - ApiName
+            - TestMap
+            - TopLevel
+            - ApiName
             Path: /
             Method: get
             Auth:

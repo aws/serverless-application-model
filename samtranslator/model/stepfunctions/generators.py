@@ -1,17 +1,13 @@
 import json
-from uuid import uuid4
 from copy import deepcopy
 
-import samtranslator.model.eventsources.push
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import ResourceTypeResolver
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMRolePolicies
 from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.model.stepfunctions import StepFunctionsStateMachine
-from samtranslator.model.stepfunctions import events
 from samtranslator.model.intrinsics import fnJoin
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
@@ -26,7 +22,7 @@ class StateMachineGenerator(object):
     _SUBSTITUTION_NAME_TEMPLATE = "definition_substitution_%s"
     _SUBSTITUTION_KEY_TEMPLATE = "${definition_substitution_%s}"
 
-    def __init__(
+    def __init__(  # type: ignore[no-untyped-def]
         self,
         logical_id,
         depends_on,
@@ -98,8 +94,8 @@ class StateMachineGenerator(object):
         )
         self.substitution_counter = 1
 
-    @cw_timer(prefix="Generator", name="StateMachine")
-    def to_cloudformation(self):
+    @cw_timer(prefix="Generator", name="StateMachine")  # type: ignore[no-untyped-call]
+    def to_cloudformation(self):  # type: ignore[no-untyped-def]
         """
         Constructs and returns the State Machine resource and any additional resources associated with it.
 
@@ -116,17 +112,17 @@ class StateMachineGenerator(object):
             raise InvalidResourceException(
                 self.logical_id, "Specify either 'Definition' or 'DefinitionUri' property and not both."
             )
-        elif self.definition:
+        if self.definition:
             processed_definition = deepcopy(self.definition)
-            substitutions = self._replace_dynamic_values_with_substitutions(processed_definition)
+            substitutions = self._replace_dynamic_values_with_substitutions(processed_definition)  # type: ignore[no-untyped-call]
             if len(substitutions) > 0:
                 if self.state_machine.DefinitionSubstitutions:
                     self.state_machine.DefinitionSubstitutions.update(substitutions)
                 else:
                     self.state_machine.DefinitionSubstitutions = substitutions
-            self.state_machine.DefinitionString = self._build_definition_string(processed_definition)
+            self.state_machine.DefinitionString = self._build_definition_string(processed_definition)  # type: ignore[no-untyped-call]
         elif self.definition_uri:
-            self.state_machine.DefinitionS3Location = self._construct_definition_uri()
+            self.state_machine.DefinitionS3Location = self._construct_definition_uri()  # type: ignore[no-untyped-call]
         else:
             raise InvalidResourceException(
                 self.logical_id, "Either 'Definition' or 'DefinitionUri' property must be specified."
@@ -136,13 +132,13 @@ class StateMachineGenerator(object):
             raise InvalidResourceException(
                 self.logical_id, "Specify either 'Role' or 'Policies' property and not both."
             )
-        elif self.role:
+        if self.role:
             self.state_machine.RoleArn = self.role
         elif self.policies:
             if not self.managed_policy_map:
                 raise Exception("Managed policy map is empty, but should not be.")
 
-            execution_role = self._construct_role()
+            execution_role = self._construct_role()  # type: ignore[no-untyped-call]
             self.state_machine.RoleArn = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
         else:
@@ -152,14 +148,14 @@ class StateMachineGenerator(object):
         self.state_machine.StateMachineType = self.type
         self.state_machine.LoggingConfiguration = self.logging
         self.state_machine.TracingConfiguration = self.tracing
-        self.state_machine.Tags = self._construct_tag_list()
+        self.state_machine.Tags = self._construct_tag_list()  # type: ignore[no-untyped-call]
 
-        event_resources = self._generate_event_resources()
+        event_resources = self._generate_event_resources()  # type: ignore[no-untyped-call]
         resources.extend(event_resources)
 
         return resources
 
-    def _construct_definition_uri(self):
+    def _construct_definition_uri(self):  # type: ignore[no-untyped-def]
         """
         Constructs the State Machine's `DefinitionS3 property`_, from the SAM State Machines's DefinitionUri property.
 
@@ -175,7 +171,7 @@ class StateMachineGenerator(object):
             s3_pointer = self.definition_uri
         else:
             # DefinitionUri is a string
-            s3_pointer = parse_s3_uri(self.definition_uri)
+            s3_pointer = parse_s3_uri(self.definition_uri)  # type: ignore[no-untyped-call]
             if s3_pointer is None:
                 raise InvalidResourceException(
                     self.logical_id,
@@ -188,7 +184,7 @@ class StateMachineGenerator(object):
             definition_s3["Version"] = s3_pointer["Version"]
         return definition_s3
 
-    def _build_definition_string(self, definition_dict):
+    def _build_definition_string(self, definition_dict):  # type: ignore[no-untyped-def]
         """
         Builds a CloudFormation definition string from a definition dictionary. The definition string constructed is
         a Fn::Join intrinsic function to make it readable.
@@ -204,7 +200,7 @@ class StateMachineGenerator(object):
         definition_string = fnJoin("\n", definition_lines)
         return definition_string
 
-    def _construct_role(self):
+    def _construct_role(self):  # type: ignore[no-untyped-def]
         """
         Constructs a State Machine execution role based on this SAM State Machine's Policies property.
 
@@ -213,9 +209,9 @@ class StateMachineGenerator(object):
         """
         policies = self.policies[:]
         if self.tracing and self.tracing.get("Enabled") is True:
-            policies.append(get_xray_managed_policy_name())
+            policies.append(get_xray_managed_policy_name())  # type: ignore[no-untyped-call]
 
-        state_machine_policies = ResourcePolicies(
+        state_machine_policies = ResourcePolicies(  # type: ignore[no-untyped-call]
             {"Policies": policies},
             # No support for policy templates in the "core"
             policy_template_processor=None,
@@ -225,14 +221,14 @@ class StateMachineGenerator(object):
             resource_logical_id=self.logical_id,
             attributes=self.passthrough_resource_attributes,
             managed_policy_map=self.managed_policy_map,
-            assume_role_policy_document=IAMRolePolicies.stepfunctions_assume_role_policy(),
+            assume_role_policy_document=IAMRolePolicies.stepfunctions_assume_role_policy(),  # type: ignore[no-untyped-call]
             resource_policies=state_machine_policies,
-            tags=self._construct_tag_list(),
+            tags=self._construct_tag_list(),  # type: ignore[no-untyped-call]
             permissions_boundary=self.permissions_boundary,
         )
         return execution_role
 
-    def _construct_tag_list(self):
+    def _construct_tag_list(self):  # type: ignore[no-untyped-def]
         """
         Transforms the SAM defined Tags into the form CloudFormation is expecting.
 
@@ -240,9 +236,9 @@ class StateMachineGenerator(object):
         :rtype: list
         """
         sam_tag = {self._SAM_KEY: self._SAM_VALUE}
-        return get_tag_list(sam_tag) + get_tag_list(self.tags)
+        return get_tag_list(sam_tag) + get_tag_list(self.tags)  # type: ignore[no-untyped-call]
 
-    def _generate_event_resources(self):
+    def _generate_event_resources(self):  # type: ignore[no-untyped-def]
         """Generates and returns the resources associated with this state machine's event sources.
 
         :returns: a list containing the state machine's event resources
@@ -262,12 +258,12 @@ class StateMachineGenerator(object):
                     for name, resource in self.event_resources[logical_id].items():
                         kwargs[name] = resource
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, "{}".format(e))
+                    raise InvalidEventException(logical_id, str(e))
                 resources += eventsource.to_cloudformation(resource=self.state_machine, **kwargs)
 
         return resources
 
-    def _replace_dynamic_values_with_substitutions(self, input):
+    def _replace_dynamic_values_with_substitutions(self, input):  # type: ignore[no-untyped-def]
         """
         Replaces the CloudFormation instrinsic functions and dynamic references within the input with substitutions.
 
@@ -277,16 +273,16 @@ class StateMachineGenerator(object):
         :rtype: dict
         """
         substitution_map = {}
-        for path in self._get_paths_to_intrinsics(input):
+        for path in self._get_paths_to_intrinsics(input):  # type: ignore[no-untyped-call]
             location = input
             for step in path[:-1]:
                 location = location[step]
-            sub_name, sub_key = self._generate_substitution()
+            sub_name, sub_key = self._generate_substitution()  # type: ignore[no-untyped-call]
             substitution_map[sub_name] = location[path[-1]]
             location[path[-1]] = sub_key
         return substitution_map
 
-    def _get_paths_to_intrinsics(self, input, path=None):
+    def _get_paths_to_intrinsics(self, input, path=None):  # type: ignore[no-untyped-def]
         """
         Returns all paths to dynamic values within a dictionary
 
@@ -296,23 +292,23 @@ class StateMachineGenerator(object):
         """
         if path is None:
             path = []
-        dynamic_value_paths = []
+        dynamic_value_paths = []  # type: ignore[var-annotated]
         if isinstance(input, dict):
             iterator = input.items()
         elif isinstance(input, list):
-            iterator = enumerate(input)
+            iterator = enumerate(input)  # type: ignore[assignment]
         else:
             return dynamic_value_paths
 
-        for key, value in sorted(iterator, key=lambda item: item[0]):
-            if is_intrinsic(value) or is_dynamic_reference(value):
+        for key, value in sorted(iterator, key=lambda item: item[0]):  # type: ignore[no-any-return]
+            if is_intrinsic(value) or is_dynamic_reference(value):  # type: ignore[no-untyped-call, no-untyped-call]
                 dynamic_value_paths.append(path + [key])
             elif isinstance(value, (dict, list)):
-                dynamic_value_paths.extend(self._get_paths_to_intrinsics(value, path + [key]))
+                dynamic_value_paths.extend(self._get_paths_to_intrinsics(value, path + [key]))  # type: ignore[no-untyped-call]
 
         return dynamic_value_paths
 
-    def _generate_substitution(self):
+    def _generate_substitution(self):  # type: ignore[no-untyped-def]
         """
         Generates a name and key for a new substitution.
 

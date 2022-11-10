@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   ApiWithEmptyStageName:
     Type: AWS::Serverless::Api
@@ -16,5 +18,5 @@ Resources:
           Properties:
             RestApiId:
               Ref: ApiWithEmptyStageName
-            Path: "/"
+            Path: /
             Method: ANY

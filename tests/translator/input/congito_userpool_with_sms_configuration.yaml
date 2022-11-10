@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function
@@ -11,13 +13,12 @@ Resources:
           Properties:
             UserPool:
               Ref: MyCognitoUserPool
-            Trigger:
-              PreSignUp
+            Trigger: PreSignUp
 
   MyCognitoUserPool:
-      Type: AWS::Cognito::UserPool
-      Properties:
-        UserPoolName: PreSignup
-        SmsConfiguration:
-          SnsCallerArn: !GetAtt UserPoolRole.Arn
-          ExternalId: !Ref ExternalId
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: PreSignup
+      SmsConfiguration:
+        SnsCallerArn: !GetAtt UserPoolRole.Arn
+        ExternalId: !Ref ExternalId

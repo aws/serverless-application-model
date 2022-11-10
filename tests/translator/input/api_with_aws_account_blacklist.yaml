@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Globals:
   Api:
     Auth:
@@ -28,4 +30,3 @@ Resources:
           Properties:
             Method: any
             Path: /any
-

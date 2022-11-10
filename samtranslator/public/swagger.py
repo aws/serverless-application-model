@@ -1,3 +1,3 @@
-# flake8: noqa
+__all__ = ["SwaggerEditor"]
 
 from samtranslator.swagger.swagger import SwaggerEditor

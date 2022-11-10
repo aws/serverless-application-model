@@ -1,305 +1,305 @@
 {
-    "Conditions": {
-        "TestCondition": {
-            "Fn::Equals": [
-                "test", 
-                "test"
-            ]
-        }
-    }, 
-    "Resources": {
-        "StateMachineMyApiEventRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "StateMachineMyApiEventRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "StateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }, 
-            "Condition": "TestCondition"
-        }, 
-        "StateMachine": {
-            "Type": "AWS::StepFunctions::StateMachine", 
-            "Properties": {
-                "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
-                "StateMachineName": "MyStateMachine", 
-                "DefinitionS3Location": {
-                    "Version": 3, 
-                    "Bucket": "sam-demo-bucket", 
-                    "Key": "my-state-machine.asl.json"
-                }, 
-                "Tags": [
-                    {
-                        "Value": "SAM", 
-                        "Key": "stateMachine:createdBy"
-                    }
-                ]
-            }, 
-            "Condition": "TestCondition"
-        }, 
-        "StateMachineScheduleEventRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "StateMachineScheduleEventRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "StateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "events.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }, 
-            "Condition": "TestCondition"
-        }, 
-        "ServerlessRestApiProdStage": {
-            "Type": "AWS::ApiGateway::Stage", 
-            "Properties": {
-                "DeploymentId": {
-                    "Ref": "ServerlessRestApiDeploymentaeae651245"
-                }, 
-                "RestApiId": {
-                    "Ref": "ServerlessRestApi"
-                }, 
-                "StageName": "Prod"
-            }, 
-            "Condition": "TestCondition"
-        }, 
-        "StateMachineScheduleEvent": {
-            "Type": "AWS::Events::Rule", 
-            "Properties": {
-                "ScheduleExpression": "rate(1 minute)", 
-                "Targets": [
-                    {
-                        "RoleArn": {
-                            "Fn::GetAtt": [
-                                "StateMachineScheduleEventRole", 
-                                "Arn"
-                            ]
-                        }, 
-                        "Id": "StateMachineScheduleEventStepFunctionsTarget", 
-                        "Arn": {
-                            "Ref": "StateMachine"
-                        }
-                    }
-                ], 
-                "Name": "TestSchedule"
-            }, 
-            "Condition": "TestCondition"
-        }, 
-        "StateMachineCWEvent": {
-            "Type": "AWS::Events::Rule", 
-            "Properties": {
-                "EventPattern": {
-                    "detail": {
-                        "state": [
-                            "terminated"
-                        ]
-                    }
-                }, 
-                "Targets": [
-                    {
-                        "RoleArn": {
-                            "Fn::GetAtt": [
-                                "StateMachineCWEventRole", 
-                                "Arn"
-                            ]
-                        }, 
-                        "Id": "StateMachineCWEventStepFunctionsTarget", 
-                        "Arn": {
-                            "Ref": "StateMachine"
-                        }
-                    }
-                ]
-            }, 
-            "Condition": "TestCondition"
-        }, 
-        "ServerlessRestApi": {
-            "Type": "AWS::ApiGateway::RestApi", 
-            "Properties": {
-                "Body": {
-                    "info": {
-                        "version": "1.0", 
-                        "title": {
-                            "Ref": "AWS::StackName"
-                        }
-                    }, 
-                    "paths": {
-                        "/startMyExecution": {
-                            "Fn::If": [
-                                "TestCondition", 
-                                {
-                                    "post": {
-                                        "Fn::If": [
-                                            "TestCondition", 
-                                            {
-                                                "x-amazon-apigateway-integration": {
-                                                    "responses": {
-                                                        "200": {
-                                                            "statusCode": "200"
-                                                        }, 
-                                                        "400": {
-                                                            "statusCode": "400"
-                                                        }
-                                                    }, 
-                                                    "uri": {
-                                                        "Fn::If": [
-                                                            "TestCondition", 
-                                                            {
-                                                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                                            }, 
-                                                            {
-                                                                "Ref": "AWS::NoValue"
-                                                            }
-                                                        ]
-                                                    }, 
-                                                    "httpMethod": "POST", 
-                                                    "requestTemplates": {
-                                                        "application/json": {
-                                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${StateMachine}\"}"
-                                                        }
-                                                    }, 
-                                                    "credentials": {
-                                                        "Fn::GetAtt": [
-                                                            "StateMachineMyApiEventRole", 
-                                                            "Arn"
-                                                        ]
-                                                    }, 
-                                                    "type": "aws"
-                                                }, 
-                                                "responses": {
-                                                    "200": {
-                                                        "description": "OK"
-                                                    }, 
-                                                    "400": {
-                                                        "description": "Bad Request"
-                                                    }
-                                                }
-                                            }, 
-                                            {
-                                                "Ref": "AWS::NoValue"
-                                            }
-                                        ]
-                                    }
-                                }, 
-                                {
-                                    "Ref": "AWS::NoValue"
-                                }
-                            ]
-                        }
-                    }, 
-                    "swagger": "2.0"
-                }, 
-                "EndpointConfiguration": {
-                    "Types": [
-                        "REGIONAL"
-                    ]
-                }, 
-                "Parameters": {
-                    "endpointConfigurationTypes": "REGIONAL"
-                }
-            }, 
-            "Condition": "TestCondition"
-        }, 
-        "ServerlessRestApiDeploymentaeae651245": {
-            "Type": "AWS::ApiGateway::Deployment", 
-            "Properties": {
-                "RestApiId": {
-                    "Ref": "ServerlessRestApi"
-                }, 
-                "Description": "RestApi deployment id: aeae651245fe7d417a17f2bea50b255f2727e2b8", 
-                "StageName": "Stage"
-            }, 
-            "Condition": "TestCondition"
-        }, 
-        "StateMachineCWEventRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "StateMachineCWEventRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "StateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "events.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }, 
-            "Condition": "TestCondition"
-        }
+  "Conditions": {
+    "TestCondition": {
+      "Fn::Equals": [
+        "test",
+        "test"
+      ]
     }
+  },
+  "Resources": {
+    "ServerlessRestApi": {
+      "Condition": "TestCondition",
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/startMyExecution": {
+              "Fn::If": [
+                "TestCondition",
+                {
+                  "post": {
+                    "Fn::If": [
+                      "TestCondition",
+                      {
+                        "responses": {
+                          "200": {
+                            "description": "OK"
+                          },
+                          "400": {
+                            "description": "Bad Request"
+                          }
+                        },
+                        "x-amazon-apigateway-integration": {
+                          "credentials": {
+                            "Fn::GetAtt": [
+                              "StateMachineMyApiEventRole",
+                              "Arn"
+                            ]
+                          },
+                          "httpMethod": "POST",
+                          "requestTemplates": {
+                            "application/json": {
+                              "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${StateMachine}\"}"
+                            }
+                          },
+                          "responses": {
+                            "200": {
+                              "statusCode": "200"
+                            },
+                            "400": {
+                              "statusCode": "400"
+                            }
+                          },
+                          "type": "aws",
+                          "uri": {
+                            "Fn::If": [
+                              "TestCondition",
+                              {
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                              },
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ServerlessRestApiDeploymentaeae651245": {
+      "Condition": "TestCondition",
+      "Properties": {
+        "Description": "RestApi deployment id: aeae651245fe7d417a17f2bea50b255f2727e2b8",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ServerlessRestApiProdStage": {
+      "Condition": "TestCondition",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeploymentaeae651245"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "StateMachine": {
+      "Condition": "TestCondition",
+      "Properties": {
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "my-state-machine.asl.json",
+          "Version": 3
+        },
+        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole",
+        "StateMachineName": "MyStateMachine",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "StateMachineCWEvent": {
+      "Condition": "TestCondition",
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "state": [
+              "terminated"
+            ]
+          }
+        },
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "StateMachine"
+            },
+            "Id": "StateMachineCWEventStepFunctionsTarget",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "StateMachineCWEventRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "StateMachineCWEventRole": {
+      "Condition": "TestCondition",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineCWEventRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachineMyApiEventRole": {
+      "Condition": "TestCondition",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineMyApiEventRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachineScheduleEvent": {
+      "Condition": "TestCondition",
+      "Properties": {
+        "Name": "TestSchedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "StateMachine"
+            },
+            "Id": "StateMachineScheduleEventStepFunctionsTarget",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "StateMachineScheduleEventRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "StateMachineScheduleEventRole": {
+      "Condition": "TestCondition",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineScheduleEventRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
 }

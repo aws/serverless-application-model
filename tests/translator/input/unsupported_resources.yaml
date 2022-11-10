@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   # These resources are NOT errors from the eye of translator.
   # Translator will simply ignore resources with unknown type in order to accept non-SAM resources

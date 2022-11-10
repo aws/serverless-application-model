@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   WrongFilterName:
     Type: AWS::Serverless::Function
@@ -13,7 +15,7 @@ Resources:
             StartingPosition: TRIM_HORIZON
             FilterCriteria:
               FiltersToUse:
-                - Pattern: '{"name": "value"}'
+              - Pattern: '{"name": "value"}'
 
   NotSupportedPushEvent:
     Type: AWS::Serverless::Function
@@ -28,7 +30,7 @@ Resources:
             Topic: !GetAtt MySnsTopic.Arn
             FilterCriteria:
               Filters:
-                - Pattern: '{"name": "value"}'
+              - Pattern: '{"name": "value"}'
 
   DynamoDBTable:
     Type: AWS::DynamoDB::Table

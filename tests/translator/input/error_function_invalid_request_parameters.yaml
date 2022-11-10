@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
 
   InvalidNameStringParameterFunction:
@@ -13,7 +15,7 @@ Resources:
             Path: /
             Method: get
             RequestParameters:
-              - Authorization
+            - Authorization
 
   InvalidNameLocationStringParameterFunction:
     Type: AWS::Serverless::Function
@@ -28,7 +30,7 @@ Resources:
             Path: /
             Method: get
             RequestParameters:
-              - method.request.invalid.Authorization
+            - method.request.invalid.Authorization
 
   InvalidNameDictParameterFunction:
     Type: AWS::Serverless::Function
@@ -43,8 +45,8 @@ Resources:
             Path: /
             Method: get
             RequestParameters:
-              - Authorization:
-                  Required: true
+            - Authorization:
+                Required: true
 
     InvalidNameLocationDictParameterFunction:
       Type: AWS::Serverless::Function
@@ -59,8 +61,8 @@ Resources:
               Path: /
               Method: get
               RequestParameters:
-                - method.request.invalid.Authorization:
-                    Required: true
+              - method.request.invalid.Authorization:
+                  Required: true
 
   ParameterNotDictFunction:
     Type: AWS::Serverless::Function
@@ -75,7 +77,7 @@ Resources:
             Path: /
             Method: get
             RequestParameters:
-              - method.request.header.Authorization: notadict
+            - method.request.header.Authorization: notadict
 
   ParameterInvalidFieldFunction:
     Type: AWS::Serverless::Function
@@ -90,8 +92,8 @@ Resources:
             Path: /
             Method: get
             RequestParameters:
-              - method.request.header.Authorization:
-                  invalid: field
+            - method.request.header.Authorization:
+                invalid: field
 
   ParameterNotDictOrStringFunction:
     Type: AWS::Serverless::Function
@@ -106,4 +108,4 @@ Resources:
             Path: /
             Method: get
             RequestParameters:
-              - [Authorization]
+            - [Authorization]

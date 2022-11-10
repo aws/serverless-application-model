@@ -1,125 +1,125 @@
 {
-    "AWSTemplateFormatVersion": "2010-09-09",
-    "Parameters": {},
-    "Resources": {
-        "MyFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-                "Code": {
-                    "S3Bucket": "sam-demo-bucket",
-                    "S3Key": "hello.zip"
-                },
-                "Description": "Created by SAM",
-                "Handler": "index.handler",
-                "MemorySize": 1024,
-                "Role": {
-                    "Fn::GetAtt": [
-                        "MyFunctionRole",
-                        "Arn"
-                    ]
-                },
-                "Runtime": "nodejs12.x",
-                "Timeout": 3,
-                "Tags": [
-                    {
-                        "Key": "lambda:createdBy",
-                        "Value": "SAM"
-                    }
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {},
+  "Resources": {
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": "Created by SAM",
+        "Handler": "index.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "MyFunctionVersion7eab81fa22",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
                 ]
+              }
             }
+          ],
+          "Version": "2012-10-17"
         },
-        "MyFunctionVersion7eab81fa22": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-                "FunctionName": {
-                    "Ref": "MyFunction"
-                }
-            }
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyFunctionUrl": {
+      "Properties": {
+        "AuthType": "NONE",
+        "Cors": {
+          "AllowCredentials": true,
+          "AllowHeaders": [
+            "x-Custom-Header"
+          ],
+          "AllowMethods": [
+            "GET"
+          ],
+          "AllowOrigins": [
+            "https://example.com",
+            "example1.com",
+            "example2.com",
+            "example2.com"
+          ],
+          "ExposeHeaders": [
+            "x-amzn-header"
+          ],
+          "MaxAge": 10
         },
-        "MyFunctionAliaslive": {
-            "Type": "AWS::Lambda::Alias",
-            "Properties": {
-                "Name": "live",
-                "FunctionName": {
-                    "Ref": "MyFunction"
-                },
-                "FunctionVersion": {
-                    "Fn::GetAtt": [
-                        "MyFunctionVersion7eab81fa22",
-                        "Version"
-                    ]
-                }
-            }
-        },
-        "MyFunctionUrl": {
-            "Type": "AWS::Lambda::Url",
-            "Properties": {
-                "TargetFunctionArn": {
-                    "Ref": "MyFunctionAliaslive"
-                },
-                "AuthType": "NONE",
-                "Cors": {
-                    "AllowOrigins": [
-                        "https://example.com",
-                        "example1.com",
-                        "example2.com",
-                        "example2.com"
-                    ],
-                    "AllowMethods": [
-                        "GET"
-                    ],
-                    "AllowCredentials": true,
-                    "AllowHeaders": [
-                        "x-Custom-Header"
-                    ],
-                    "ExposeHeaders": [
-                        "x-amzn-header"
-                    ],
-                    "MaxAge": 10
-                }
-            }
-        },
-        "MyFunctionUrlPublicPermissions": {
-            "Type": "AWS::Lambda::Permission",
-            "Properties": {
-                "Action": "lambda:InvokeFunctionUrl",
-                "FunctionName": {
-                    "Ref": "MyFunctionAliaslive"
-                },
-                "Principal": "*",
-                "FunctionUrlAuthType": "NONE"
-            }
-        },
-        "MyFunctionRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ],
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    "lambda.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                },
-                "ManagedPolicyArns": [
-                    "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-                ],
-                "Tags": [
-                    {
-                        "Key": "lambda:createdBy",
-                        "Value": "SAM"
-                    }
-                ]
-            }
+        "TargetFunctionArn": {
+          "Ref": "MyFunctionAliaslive"
         }
+      },
+      "Type": "AWS::Lambda::Url"
+    },
+    "MyFunctionUrlPublicPermissions": {
+      "Properties": {
+        "Action": "lambda:InvokeFunctionUrl",
+        "FunctionName": {
+          "Ref": "MyFunctionAliaslive"
+        },
+        "FunctionUrlAuthType": "NONE",
+        "Principal": "*"
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyFunctionVersion7eab81fa22": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
     }
+  }
 }

@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 # This is specifically testing a invalid SAM template, that is currently accepted by SAM, and some customers rely on this behavior.
 # We will eventually change the behavior to error on this invalid template, but until then, this test will guard against
 # inadvertently changing this behavior.
@@ -26,26 +28,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      DefinitionBody: {
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {
-            "/foo": {
-              "x-amazon-apigateway-any-method": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
-                  }
-                },
-                "responses": {}
-              }
-            }
-          },
-          "swagger": "2.0"
-        }
+      DefinitionBody: {info: {version: '1.0', title: {Ref: AWS::StackName}}, paths: {
+          /foo: {x-amazon-apigateway-any-method: {x-amazon-apigateway-integration: {
+                httpMethod: POST, type: aws_proxy, uri: {Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations'}},
+              responses: {}}}}, swagger: '2.0'}

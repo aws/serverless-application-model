@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   ThumbnailFunction:
     Type: AWS::Serverless::Function
@@ -22,7 +24,7 @@ Resources:
           title:
             Ref: AWS::StackName
         paths:
-          "/add":
+          /add:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -30,7 +32,7 @@ Resources:
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RestApiFunction.Arn}/invocations
               responses: {}
-          "/{proxy+}":
+          /{proxy+}:
             x-amazon-apigateway-any-method:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -38,7 +40,7 @@ Resources:
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetHtmlFunction.Arn}/invocations
               responses: {}
-          "/getlist":
+          /getlist:
             get:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -46,7 +48,7 @@ Resources:
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RestApiFunction.Arn}/invocations
               responses: {}
-          "/complete":
+          /complete:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -60,14 +62,14 @@ Resources:
     Type: AWS::S3::Bucket
 
   RestApiFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
       Runtime: python3.6
 
   GetHtmlFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

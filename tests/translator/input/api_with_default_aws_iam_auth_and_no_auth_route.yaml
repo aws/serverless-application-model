@@ -1,6 +1,8 @@
+%YAML 1.1
+---
 Resources:
   MyApiWithAwsIamAuth:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
@@ -32,7 +34,7 @@ Resources:
             Path: /
             Method: get
             Auth:
-              Authorizer: 'NONE'
+              Authorizer: NONE
         MyApiWithNoAuthAnyMethod:
           Type: Api
           Properties:
@@ -40,4 +42,4 @@ Resources:
             Path: /any/none
             Method: any
             Auth:
-              Authorizer: 'NONE'
+              Authorizer: NONE

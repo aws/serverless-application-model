@@ -1,13 +1,15 @@
+%YAML 1.1
+---
 Resources:
   SomeHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       DefinitionBody:
         paths:
-          "/{domain}":
+          /{domain}:
             any:
               responses: {}
-          "/{domain/}{id}":
+          /{domain/}{id}:
             any:
               responses: {}
         openapi: 3.0.1
@@ -20,5 +22,5 @@ Resources:
               audience:
               - randomnumber
               issuer: https://some/issuer
-            IdentitySource: "$request.headers.Authorization"
+            IdentitySource: $request.headers.Authorization
         DefaultAuthorizer: OAuth2Authorizer

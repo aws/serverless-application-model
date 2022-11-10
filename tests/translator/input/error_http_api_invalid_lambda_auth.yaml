@@ -1,3 +1,5 @@
+%YAML 1.1
+---
 Resources:
   Function1:
     Type: AWS::Serverless::Function
@@ -46,13 +48,13 @@ Resources:
             FunctionInvokeRole: !GetAtt MyAuthFnRole.Arn
             Identity:
               Context:
-                - contextVar
+              - contextVar
               Headers:
-                - Authorization
+              - Authorization
               QueryStrings:
-                - petId
+              - petId
               StageVariables:
-                - stageVar
+              - stageVar
               ReauthorizeEvery: 60
             EnableSimpleResponses: true
         DefaultAuthorizer: LambdaAuth
@@ -66,13 +68,13 @@ Resources:
             FunctionInvokeRole: !GetAtt MyAuthFnRole.Arn
             Identity:
               Context:
-                - contextVar
+              - contextVar
               Headers:
-                - Authorization
+              - Authorization
               QueryStrings:
-                - petId
+              - petId
               StageVariables:
-                - stageVar
+              - stageVar
               ReauthorizeEvery: 60
             AuthorizerPayloadFormatVersion: 2.0
             EnableSimpleResponses: true
