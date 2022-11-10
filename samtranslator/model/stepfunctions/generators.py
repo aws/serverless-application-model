@@ -217,7 +217,7 @@ class StateMachineGenerator(object):
             policy_template_processor=None,
         )
 
-        execution_role = construct_role_for_resource(  # type: ignore[no-untyped-call]
+        execution_role = construct_role_for_resource(
             resource_logical_id=self.logical_id,
             attributes=self.passthrough_resource_attributes,
             managed_policy_map=self.managed_policy_map,

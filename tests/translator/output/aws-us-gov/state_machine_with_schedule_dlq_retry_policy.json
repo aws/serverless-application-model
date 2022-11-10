@@ -82,6 +82,83 @@
         ]
       },
       "Type": "AWS::IAM::Role"
+    },
+    "StateMachineScheduleEventV2": {
+      "Properties": {
+        "FlexibleTimeWindow": {
+          "Mode": "OFF"
+        },
+        "Name": "StateMachineScheduleEventV2",
+        "ScheduleExpression": "rate(1 minute)",
+        "Target": {
+          "Arn": {
+            "Ref": "StateMachine"
+          },
+          "DeadLetterConfig": {
+            "Arn": "Arn"
+          },
+          "RetryPolicy": {
+            "MaximumEventAgeInSeconds": 300,
+            "MaximumRetryAttempts": 5
+          },
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "StateMachineScheduleEventV2Role",
+              "Arn"
+            ]
+          }
+        }
+      },
+      "Type": "AWS::Scheduler::Schedule"
+    },
+    "StateMachineScheduleEventV2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "scheduler.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineScheduleEventV2StartExecutionPolicy"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "sqs:SendMessage",
+                  "Effect": "Allow",
+                  "Resource": "Arn"
+                }
+              ]
+            },
+            "PolicyName": "StateMachineScheduleEventV2SQSPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

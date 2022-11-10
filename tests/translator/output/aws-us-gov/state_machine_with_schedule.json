@@ -75,6 +75,153 @@
         ]
       },
       "Type": "AWS::IAM::Role"
+    },
+    "StateMachineScheduleV2": {
+      "Properties": {
+        "FlexibleTimeWindow": {
+          "Mode": "OFF"
+        },
+        "Name": "StateMachineScheduleV2",
+        "ScheduleExpression": "rate(1 minute)",
+        "Target": {
+          "Arn": {
+            "Ref": "StateMachine"
+          },
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "StateMachineScheduleV2Role",
+              "Arn"
+            ]
+          }
+        }
+      },
+      "Type": "AWS::Scheduler::Schedule"
+    },
+    "StateMachineScheduleV2MoreProperties": {
+      "Properties": {
+        "Description": "Test Schedule",
+        "EndDate": "2015-10-02T15:01:23",
+        "FlexibleTimeWindow": {
+          "MaximumWindowInMinutes": 5,
+          "Mode": "FLEXIBLE"
+        },
+        "GroupName": "group-name",
+        "KmsKeyArn": {
+          "Ref": "KMSKeyArn"
+        },
+        "Name": "test-scheduler",
+        "ScheduleExpression": "rate(1 minute)",
+        "ScheduleExpressionTimezone": "UTC",
+        "StartDate": "2014-10-02T15:01:23",
+        "State": {
+          "Ref": "ScheduleState"
+        },
+        "Target": {
+          "Arn": {
+            "Ref": "StateMachine"
+          },
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "StateMachineScheduleV2MorePropertiesRole",
+              "Arn"
+            ]
+          }
+        }
+      },
+      "Type": "AWS::Scheduler::Schedule"
+    },
+    "StateMachineScheduleV2MorePropertiesRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "scheduler.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundaryForSchedule",
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineScheduleV2MorePropertiesStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachineScheduleV2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "scheduler.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineScheduleV2StartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachineScheduleV2WithRole": {
+      "Properties": {
+        "FlexibleTimeWindow": {
+          "Mode": "OFF"
+        },
+        "Name": "StateMachineScheduleV2WithRole",
+        "ScheduleExpression": "rate(1 minute)",
+        "Target": {
+          "Arn": {
+            "Ref": "StateMachine"
+          },
+          "RoleArn": {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::role/yoyo"
+          }
+        }
+      },
+      "Type": "AWS::Scheduler::Schedule"
     }
   }
 }
