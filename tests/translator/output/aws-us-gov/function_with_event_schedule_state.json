@@ -1,5 +1,8 @@
 {
   "Parameters": {
+    "KMSKeyArn": {
+      "Type": "String"
+    },
     "ScheduleState": {
       "Default": "Disabled",
       "Type": "String"
@@ -171,6 +174,147 @@
         }
       },
       "Type": "AWS::Lambda::Permission"
+    },
+    "ScheduledFunctionScheduleV2": {
+      "Properties": {
+        "FlexibleTimeWindow": {
+          "Mode": "OFF"
+        },
+        "Name": "ScheduledFunctionScheduleV2",
+        "ScheduleExpression": "rate(1 minute)",
+        "Target": {
+          "Arn": {
+            "Fn::GetAtt": [
+              "ScheduledFunction",
+              "Arn"
+            ]
+          },
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "ScheduledFunctionScheduleV2Role",
+              "Arn"
+            ]
+          }
+        }
+      },
+      "Type": "AWS::Scheduler::Schedule"
+    },
+    "ScheduledFunctionScheduleV2MoreProperties": {
+      "Properties": {
+        "Description": "Test Schedule",
+        "EndDate": "2015-10-02T15:01:23",
+        "FlexibleTimeWindow": {
+          "MaximumWindowInMinutes": 5,
+          "Mode": "FLEXIBLE"
+        },
+        "GroupName": "group-name",
+        "KmsKeyArn": {
+          "Ref": "KMSKeyArn"
+        },
+        "Name": "test-scheduler",
+        "ScheduleExpression": "rate(1 minute)",
+        "ScheduleExpressionTimezone": "UTC",
+        "StartDate": "2014-10-02T15:01:23",
+        "State": {
+          "Ref": "ScheduleState"
+        },
+        "Target": {
+          "Arn": {
+            "Fn::GetAtt": [
+              "ScheduledFunction",
+              "Arn"
+            ]
+          },
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "ScheduledFunctionScheduleV2MorePropertiesRole",
+              "Arn"
+            ]
+          }
+        }
+      },
+      "Type": "AWS::Scheduler::Schedule"
+    },
+    "ScheduledFunctionScheduleV2MorePropertiesRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "scheduler.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundaryForSchedule",
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "lambda:InvokeFunction",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "ScheduledFunction",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "ScheduledFunctionScheduleV2MorePropertiesLambdaPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ScheduledFunctionScheduleV2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "scheduler.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "lambda:InvokeFunction",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "ScheduledFunction",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "ScheduledFunctionScheduleV2LambdaPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

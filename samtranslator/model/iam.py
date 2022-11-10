@@ -86,6 +86,16 @@ class IAMRolePolicies:
         return document
 
     @classmethod
+    def scheduler_assume_role_policy(cls) -> Dict[str, Any]:
+        document = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {"Action": ["sts:AssumeRole"], "Effect": "Allow", "Principal": {"Service": ["scheduler.amazonaws.com"]}}
+            ],
+        }
+        return document
+
+    @classmethod
     def lambda_assume_role_policy(cls):  # type: ignore[no-untyped-def]
         document = {
             "Version": "2012-10-17",

@@ -19,3 +19,14 @@ Resources:
             RetryPolicy:
               MaximumRetryAttempts: 5
               MaximumEventAgeInSeconds: 300
+        ScheduleEventV2:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            FlexibleTimeWindow:
+              Mode: 'OFF'
+            DeadLetterConfig:
+              Arn: Arn
+            RetryPolicy:
+              MaximumRetryAttempts: 5
+              MaximumEventAgeInSeconds: 300
