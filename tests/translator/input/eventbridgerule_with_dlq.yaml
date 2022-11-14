@@ -15,6 +15,15 @@ Resources:
             State: ENABLED
             DeadLetterConfig:
               Type: SQS
+        ScheduleV2:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            DeadLetterConfig:
+              Arn: Arn
+            RetryPolicy:
+              MaximumRetryAttempts: 5
+              MaximumEventAgeInSeconds: 300
   TriggeredFunction:
     Type: AWS::Serverless::Function
     Properties:
