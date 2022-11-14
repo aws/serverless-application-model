@@ -42,8 +42,8 @@ class EventSource(ResourceMacro):
         if suffix.isalnum():
             logical_id = prefix + resource_type + suffix
         else:
-            generator = logical_id_generator.LogicalIdGenerator(prefix + resource_type, suffix)  # type: ignore[no-untyped-call]
-            logical_id = generator.gen()  # type: ignore[no-untyped-call]
+            generator = logical_id_generator.LogicalIdGenerator(prefix + resource_type, suffix)
+            logical_id = generator.gen()
         return logical_id
 
     def _construct_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):  # type: ignore[no-untyped-def]
@@ -90,7 +90,7 @@ class Schedule(EventSource):
         "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
-    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the EventBridge Rule and IAM Role to which this Schedule event source corresponds.
 
@@ -174,7 +174,7 @@ class CloudWatchEvent(EventSource):
         "State": PropertyType(False, is_str()),
     }
 
-    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this
         CloudWatch Events/EventBridge event source corresponds.
@@ -302,7 +302,7 @@ class Api(EventSource):
 
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
 
-    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
         """If the Api event source has a RestApi property, then simply return the IAM role resource
         allowing API Gateway to start the state machine execution. If no RestApi is provided, then

@@ -1,10 +1,12 @@
 import copy
 import re
-from typing import Any, Iterator, Optional
+from typing import Any, Dict, Iterator, List, Optional
 
+from samtranslator.model.apigatewayv2 import ApiGatewayV2Authorizer
 from samtranslator.model.intrinsics import ref, make_conditional, is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.utils.types import Intrinsicable
 import json
 
 
@@ -32,7 +34,7 @@ class OpenApiEditor(object):
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
     _DEFAULT_PATH = "$default"
 
-    def __init__(self, doc):  # type: ignore[no-untyped-def]
+    def __init__(self, doc: Optional[Dict[str, Any]]) -> None:
         """
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
         modifications on this copy.
@@ -40,7 +42,7 @@ class OpenApiEditor(object):
         :param dict doc: OpenApi document as a dictionary
         :raises InvalidDocumentException: If the input OpenApi document does not meet the basic OpenApi requirements.
         """
-        if not OpenApiEditor.is_valid(doc):
+        if not doc or not OpenApiEditor.is_valid(doc):
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
@@ -352,7 +354,7 @@ class OpenApiEditor(object):
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             method_definition[self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = payload_format_version
 
-    def add_authorizers_security_definitions(self, authorizers):  # type: ignore[no-untyped-def]
+    def add_authorizers_security_definitions(self, authorizers: Dict[str, ApiGatewayV2Authorizer]) -> None:
         """
         Add Authorizer definitions to the securityDefinitions part of Swagger.
 
@@ -363,7 +365,13 @@ class OpenApiEditor(object):
         for authorizer_name, authorizer in authorizers.items():
             self.security_schemes[authorizer_name] = authorizer.generate_openapi()
 
-    def set_path_default_authorizer(self, path, default_authorizer, authorizers, api_authorizers):  # type: ignore[no-untyped-def]
+    def set_path_default_authorizer(
+        self,
+        path: str,
+        default_authorizer: str,
+        authorizers: Dict[str, ApiGatewayV2Authorizer],
+        api_authorizers: Dict[str, Any],
+    ) -> None:
         """
         Adds the default_authorizer to the security block for each method on this path unless an Authorizer
         was defined at the Function/Path/Method level. This is intended to be used to set the
@@ -373,7 +381,7 @@ class OpenApiEditor(object):
         :param string path: Path name
         :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the
             authorizers param.
-        :param list authorizers: List of Authorizer configurations defined on the related Api.
+        :param dict authorizers: Dict of Authorizer configurations defined on the related Api.
         """
         for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             for method_name, method in path_item.items():
@@ -408,7 +416,7 @@ class OpenApiEditor(object):
                         existing_security = method_definition.get("security", [])
                         if existing_security:
                             continue
-                        authorizer_list = []
+                        authorizer_list: List[str] = []
                         if authorizers:
                             authorizer_list.extend(authorizers.keys())
                         security_dict = {}
@@ -475,7 +483,7 @@ class OpenApiEditor(object):
             if security:
                 method_definition["security"] = security
 
-    def add_tags(self, tags):  # type: ignore[no-untyped-def]
+    def add_tags(self, tags: Dict[str, Intrinsicable[str]]) -> None:
         """
         Adds tags to the OpenApi definition using an ApiGateway extension for tag values.
 
@@ -503,7 +511,7 @@ class OpenApiEditor(object):
                 tag[self._X_APIGW_TAG_VALUE] = value
                 self.tags.append(tag)
 
-    def add_endpoint_config(self, disable_execute_api_endpoint):  # type: ignore[no-untyped-def]
+    def add_endpoint_config(self, disable_execute_api_endpoint: Optional[Intrinsicable[bool]]) -> None:
         """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG header in open api definition
 
         Following this guide:
@@ -587,7 +595,7 @@ class OpenApiEditor(object):
 
         self._doc[self._X_APIGW_CORS] = cors_configuration
 
-    def add_description(self, description):  # type: ignore[no-untyped-def]
+    def add_description(self, description: Intrinsicable[str]) -> None:
         """Add description in open api definition, if it is not already defined
 
         :param string description: Description of the API

@@ -1,8 +1,9 @@
+from typing import Any, Dict, Optional
 from urllib.parse import urlparse, parse_qs
 from samtranslator.model.exceptions import InvalidResourceException
 
 
-def parse_s3_uri(uri):  # type: ignore[no-untyped-def]
+def parse_s3_uri(uri: Any) -> Optional[Dict[str, Any]]:
     """Parses a S3 Uri into a dictionary of the Bucket, Key, and VersionId
 
     :return: a BodyS3Location dict or None if not an S3 Uri
@@ -82,15 +83,16 @@ def construct_s3_location_object(location_uri, logical_id, property_name):  # ty
 
     else:
         # location_uri is NOT a dictionary. Parse it as a string
-        s3_pointer = parse_s3_uri(location_uri)  # type: ignore[no-untyped-call]
+        _s3_pointer = parse_s3_uri(location_uri)
 
-        if s3_pointer is None:
+        if _s3_pointer is None:
             raise InvalidResourceException(
                 logical_id,
                 "'{}' is not a valid S3 Uri of the form "
                 "'s3://bucket/key' with optional versionId query "
                 "parameter.".format(property_name),
             )
+        s3_pointer = _s3_pointer
 
     code = {"S3Bucket": s3_pointer["Bucket"], "S3Key": s3_pointer["Key"]}
     if "Version" in s3_pointer:

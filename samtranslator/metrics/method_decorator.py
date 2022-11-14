@@ -6,6 +6,7 @@ from datetime import datetime
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 from samtranslator.model import Resource
 import logging
+from typing import Any, Callable, Optional, Union
 
 LOG = logging.getLogger(__name__)
 
@@ -74,7 +75,9 @@ def _send_cw_metric(prefix, name, execution_time_ms, func, args):  # type: ignor
         LOG.warning("Failed to add metrics", exc_info=e)
 
 
-def cw_timer(_func=None, name=None, prefix=None):  # type: ignore[no-untyped-def]
+def cw_timer(
+    _func: Optional[Callable[..., Any]] = None, name: Optional[str] = None, prefix: Optional[str] = None
+) -> Union[Callable[..., Any], Callable[[Callable[..., Any]], Callable[..., Any]]]:
     """
     A method decorator, that will calculate execution time of the decorated method, and store this information as a
     metric in CloudWatch by calling the metrics singleton instance.
@@ -87,7 +90,7 @@ def cw_timer(_func=None, name=None, prefix=None):  # type: ignore[no-untyped-def
     If prefix is defined, it will be added in the beginning of what is been generated above
     """
 
-    def cw_timer_decorator(func):  # type: ignore[no-untyped-def]
+    def cw_timer_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(func)
         def wrapper_cw_timer(*args, **kwargs):  # type: ignore[no-untyped-def]
             start_time = datetime.now()
@@ -102,4 +105,4 @@ def cw_timer(_func=None, name=None, prefix=None):  # type: ignore[no-untyped-def
 
         return wrapper_cw_timer
 
-    return cw_timer_decorator if _func is None else cw_timer_decorator(_func)  # type: ignore[no-untyped-call]
+    return cw_timer_decorator if _func is None else cw_timer_decorator(_func)

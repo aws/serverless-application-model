@@ -338,15 +338,15 @@ class ApiGenerator(object):
             s3_pointer = self.definition_uri
 
         else:
-
             # DefinitionUri is a string
-            s3_pointer = parse_s3_uri(self.definition_uri)  # type: ignore[no-untyped-call]
-            if s3_pointer is None:
+            _parsed_s3_pointer = parse_s3_uri(self.definition_uri)
+            if _parsed_s3_pointer is None:
                 raise InvalidResourceException(
                     self.logical_id,
                     "'DefinitionUri' is not a valid S3 Uri of the form "
                     "'s3://bucket/key' with optional versionId query parameter.",
                 )
+            s3_pointer = _parsed_s3_pointer
 
             if isinstance(self.definition_uri, Py27UniStr):
                 # self.defintion_uri is a Py27UniStr instance if it is defined in the template
@@ -394,8 +394,8 @@ class ApiGenerator(object):
         if stage_name_prefix.isalnum():
             stage_logical_id = self.logical_id + stage_name_prefix + "Stage"
         else:
-            generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)  # type: ignore[no-untyped-call]
-            stage_logical_id = generator.gen()  # type: ignore[no-untyped-call]
+            generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)
+            stage_logical_id = generator.gen()
         stage = ApiGatewayStage(stage_logical_id, attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
         stage.update_deployment_ref(deployment.logical_id)  # type: ignore[no-untyped-call]
@@ -414,7 +414,7 @@ class ApiGenerator(object):
             )
 
         if self.tags is not None:
-            stage.Tags = get_tag_list(self.tags)  # type: ignore[no-untyped-call]
+            stage.Tags = get_tag_list(self.tags)
 
         return stage
 
@@ -432,7 +432,7 @@ class ApiGenerator(object):
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(
-            "ApiGatewayDomainName", LogicalIdGenerator("", self.domain.get("DomainName")).gen()  # type: ignore[no-untyped-call, no-untyped-call]
+            "ApiGatewayDomainName", LogicalIdGenerator("", self.domain.get("DomainName")).gen()
         )
 
         domain = ApiGatewayDomainName(self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes)
@@ -537,7 +537,7 @@ class ApiGenerator(object):
                     "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
                 )
 
-            logical_id_suffix = LogicalIdGenerator(  # type: ignore[no-untyped-call, no-untyped-call]
+            logical_id_suffix = LogicalIdGenerator(
                 "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
             ).gen()
             logical_id = "RecordSetGroup" + logical_id_suffix
@@ -593,7 +593,7 @@ class ApiGenerator(object):
             alias_target["DNSName"] = route53.get("DistributionDomainName")
         return alias_target
 
-    @cw_timer(prefix="Generator", name="Api")  # type: ignore[no-untyped-call]
+    @cw_timer(prefix="Generator", name="Api")
     def to_cloudformation(self, redeploy_restapi_parameters, route53_record_set_groups):  # type: ignore[no-untyped-def]
         """Generates CloudFormation resources from a SAM API resource
 

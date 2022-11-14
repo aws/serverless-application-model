@@ -171,7 +171,7 @@ class SchedulerEventSource(ResourceMacro):
         else:
             raise RuntimeError(f"Unexpected target type {target_type.name}")
 
-        role_logical_id = LogicalIdGenerator(self.logical_id + "Role").gen()  # type: ignore[no-untyped-call, no-untyped-call]
+        role_logical_id = LogicalIdGenerator(self.logical_id + "Role").gen()
         execution_role = IAMRole(role_logical_id, attributes=passthrough_resource_attributes)
         execution_role.AssumeRolePolicyDocument = IAMRolePolicies.scheduler_assume_role_policy()
 

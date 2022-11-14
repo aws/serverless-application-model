@@ -376,7 +376,7 @@ class ResourceMacro(Resource):
         """
         return {}
 
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
+    def to_cloudformation(self, **kwargs: Any) -> List[Any]:
         """Returns a list of Resource instances, representing vanilla CloudFormation resources, to which this macro
         expands. The caller should be able to update their template with the expanded resources by calling
         :func:`to_dict` on each resource returned, then updating their "Resources" mapping with the results.
@@ -455,7 +455,7 @@ class SamResourceMacro(ResourceMacro):
         # tags list. Changing this ordering will trigger a update on Lambda Function resource. Even though this
         # does not change the actual content of the tags, we don't want to trigger update of a resource without
         # customer's knowledge.
-        return get_tag_list(sam_tag) + get_tag_list(additional_tags) + get_tag_list(tags)  # type: ignore[no-untyped-call]
+        return get_tag_list(sam_tag) + get_tag_list(additional_tags) + get_tag_list(tags)
 
     def _check_tag(self, reserved_tag_name, tags):  # type: ignore[no-untyped-def]
         if reserved_tag_name in tags:
