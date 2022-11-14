@@ -14,7 +14,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
     policy_documents=None,
     permissions_boundary=None,
     tags=None,
-):
+) -> IAMRole:
     """
     Constructs an execution role for a resource.
     :param resource_logical_id: The logical_id of the SAM resource that the role will be associated with

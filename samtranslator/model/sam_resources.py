@@ -21,6 +21,7 @@ import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.cloudwatchlogs
+import samtranslator.model.eventsources.scheduler
 from .api.api_generator import ApiGenerator
 from .api.http_api_generator import HttpApiGenerator
 from .packagetype import ZIP, IMAGE
@@ -118,6 +119,7 @@ class SamFunction(SamResourceMacro):
         samtranslator.model.eventsources.pull,
         samtranslator.model.eventsources.push,
         samtranslator.model.eventsources.cloudwatchlogs,
+        samtranslator.model.eventsources.scheduler,
     )
 
     # DeadLetterQueue
@@ -525,7 +527,7 @@ class SamFunction(SamResourceMacro):
             if event_invoke_policies is not None:
                 policy_documents.extend(event_invoke_policies)
 
-        execution_role = construct_role_for_resource(  # type: ignore[no-untyped-call]
+        execution_role = construct_role_for_resource(
             resource_logical_id=self.logical_id,
             attributes=role_attributes,
             managed_policy_map=managed_policy_map,
@@ -1557,6 +1559,7 @@ class SamStateMachine(SamResourceMacro):
     }
     event_resolver = ResourceTypeResolver(  # type: ignore[no-untyped-call]
         samtranslator.model.stepfunctions.events,
+        samtranslator.model.eventsources.scheduler,
     )
 
     @cw_timer

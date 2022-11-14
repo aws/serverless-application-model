@@ -5,6 +5,8 @@ Parameters:
   ScheduleState:
     Type: String
     Default: Disabled
+  KMSKeyArn:
+    Type: String
 
 Resources:
   ScheduledFunction:
@@ -35,3 +37,23 @@ Resources:
             Name: test-schedule
             Description: Test Schedule
             State: !Ref ScheduleState
+        ScheduleV2:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+        ScheduleV2MoreProperties:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            Name: test-scheduler
+            Description: Test Schedule
+            FlexibleTimeWindow:
+              Mode: FLEXIBLE
+              MaximumWindowInMinutes: 5
+            State: !Ref ScheduleState
+            StartDate: '2014-10-02T15:01:23'
+            EndDate: '2015-10-02T15:01:23'
+            ScheduleExpressionTimezone: UTC
+            GroupName: group-name
+            KmsKeyArn: !Ref KMSKeyArn
+            PermissionsBoundary: arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundaryForSchedule
