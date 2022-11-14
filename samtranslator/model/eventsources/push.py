@@ -1,5 +1,6 @@
 import copy
 import re
+from typing import Any, Dict, Optional
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
@@ -451,6 +452,7 @@ class SNS(PushEventSource):
         "Region": PropertyType(False, is_str()),
         "FilterPolicy": PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict))))),
         "SqsSubscription": PropertyType(False, one_of(is_type(bool), is_type(dict))),
+        "RedrivePolicy": PropertyType(False, is_type(dict)),
     }
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
@@ -469,12 +471,13 @@ class SNS(PushEventSource):
 
         # SNS -> Lambda
         if not self.SqsSubscription:  # type: ignore[attr-defined]
-            subscription = self._inject_subscription(  # type: ignore[no-untyped-call]
+            subscription = self._inject_subscription(
                 "lambda",
                 function.get_runtime_attr("arn"),
                 self.Topic,  # type: ignore[attr-defined]
                 self.Region,  # type: ignore[attr-defined]
                 self.FilterPolicy,  # type: ignore[attr-defined]
+                self.RedrivePolicy,  # type: ignore[attr-defined]
                 function,
             )
             return [self._construct_permission(function, source_arn=self.Topic), subscription]  # type: ignore[attr-defined, no-untyped-call]
@@ -487,8 +490,8 @@ class SNS(PushEventSource):
             queue_url = queue.get_runtime_attr("queue_url")
 
             queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function)  # type: ignore[attr-defined, no-untyped-call]
-            subscription = self._inject_subscription(  # type: ignore[no-untyped-call]
-                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function  # type: ignore[attr-defined, attr-defined, attr-defined]
+            subscription = self._inject_subscription(
+                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function  # type: ignore[attr-defined, attr-defined, attr-defined]
             )
             event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)  # type: ignore[no-untyped-call]
 
@@ -512,7 +515,9 @@ class SNS(PushEventSource):
         queue_policy = self._inject_sqs_queue_policy(  # type: ignore[no-untyped-call]
             self.Topic, queue_arn, queue_url, function, queue_policy_logical_id  # type: ignore[attr-defined]
         )
-        subscription = self._inject_subscription("sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function)  # type: ignore[attr-defined, attr-defined, attr-defined, no-untyped-call]
+        subscription = self._inject_subscription(
+            "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function  # type: ignore[attr-defined, attr-defined, attr-defined]
+        )
         event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)  # type: ignore[no-untyped-call]
 
         resources = resources + event_source
@@ -520,7 +525,16 @@ class SNS(PushEventSource):
         resources.append(subscription)
         return resources
 
-    def _inject_subscription(self, protocol, endpoint, topic, region, filterPolicy, function):  # type: ignore[no-untyped-def]
+    def _inject_subscription(
+        self,
+        protocol: str,
+        endpoint: str,
+        topic: str,
+        region: Optional[str],
+        filterPolicy: Optional[Dict[str, Any]],
+        redrivePolicy: Optional[Dict[str, Any]],
+        function: Any,
+    ) -> SNSSubscription:
         subscription = SNSSubscription(self.logical_id, attributes=function.get_passthrough_resource_attributes())
         subscription.Protocol = protocol
         subscription.Endpoint = endpoint
@@ -531,6 +545,9 @@ class SNS(PushEventSource):
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
+
+        if redrivePolicy is not None:
+            subscription.RedrivePolicy = redrivePolicy
 
         return subscription
 

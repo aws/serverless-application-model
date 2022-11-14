@@ -29,6 +29,7 @@ class SnsEventSource(TestCase):
         self.assertEqual(subscription.Endpoint, "arn:aws:lambda:mock")
         self.assertIsNone(subscription.Region)
         self.assertIsNone(subscription.FilterPolicy)
+        self.assertIsNone(subscription.RedrivePolicy)
 
     def test_to_cloudformation_passes_the_region(self):
         region = "us-west-2"
@@ -54,6 +55,16 @@ class SnsEventSource(TestCase):
         subscription = resources[1]
         self.assertEqual(subscription.FilterPolicy, filterPolicy)
 
+    def test_to_cloudformation_passes_the_redrive_policy(self):
+        redrive_policy = {"deadLetterTargetArn": "arn:aws:sqs:us-east-2:123456789012:MyDeadLetterQueue"}
+        self.sns_event_source.RedrivePolicy = redrive_policy
+
+        resources = self.sns_event_source.to_cloudformation(function=self.function)
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[1].resource_type, "AWS::SNS::Subscription")
+        subscription = resources[1]
+        self.assertEqual(subscription.RedrivePolicy, redrive_policy)
+
     def test_to_cloudformation_throws_when_no_function(self):
         self.assertRaises(TypeError, self.sns_event_source.to_cloudformation)
 
@@ -77,3 +88,4 @@ class SnsEventSource(TestCase):
         self.assertEqual(subscription.Endpoint, "arn:aws:lambda:mock")
         self.assertIsNone(subscription.Region)
         self.assertIsNone(subscription.FilterPolicy)
+        self.assertIsNone(subscription.RedrivePolicy)
