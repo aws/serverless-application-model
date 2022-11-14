@@ -134,15 +134,32 @@ class StateMachineGenerator(object):
             )
         if self.role:
             self.state_machine.RoleArn = self.role
-        elif self.policies:
-            if not self.managed_policy_map:
+        elif not self.role:
+            if self.policies and not self.managed_policy_map:
                 raise Exception("Managed policy map is empty, but should not be.")
-
+            if not self.policies:
+                self.policies = [{
+                    "Version": "2012-10-17",
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Action": ["iam:*", 
+                            "organizations:DescribeAccount", 
+                            "organizations:DescribeOrganization", 
+                            "organizations:DescribeOrganizationalUnit", 
+                            "organizations:DescribePolicy", 
+                            "organizations:ListChildren", 
+                            "organizations:ListParents", 
+                            "organizations:ListPoliciesForTarget", 
+                            "organizations:ListRoots", 
+                            "organizations:ListPolicies", 
+                            "organizations:ListTargetsForPolicy"],
+                        "Resource": "*"
+    }
+  ]
+}]
             execution_role = self._construct_role()  # type: ignore[no-untyped-call]
             self.state_machine.RoleArn = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
-        else:
-            raise InvalidResourceException(self.logical_id, "Either 'Role' or 'Policies' property must be specified.")
 
         self.state_machine.StateMachineName = self.name
         self.state_machine.StateMachineType = self.type
