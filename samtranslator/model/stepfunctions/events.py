@@ -1,7 +1,8 @@
 import json
+from typing import Any, Dict, Optional
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import PropertyType, ResourceMacro
+from samtranslator.model import Property, PropertyType, ResourceMacro, Resource
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.types import is_str, is_type
@@ -258,8 +259,10 @@ class Api(EventSource):
         "RestApiId": PropertyType(True, is_str()),
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
-        "UnescapeMappingTemplate": PropertyType(False, is_type(bool)),
+        "UnescapeMappingTemplate": Property(False, is_type(bool)),
     }
+
+    UnescapeMappingTemplate: Optional[bool]
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
         """
@@ -444,7 +447,7 @@ class Api(EventSource):
 
         api["DefinitionBody"] = editor.swagger
 
-    def _generate_request_template(self, resource):  # type: ignore[no-untyped-def]
+    def _generate_request_template(self, resource: Resource) -> Dict[str, Any]:
         """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
 
@@ -466,7 +469,7 @@ class Api(EventSource):
         }
         return request_templates
 
-    def _generate_request_template_unescaped(self, resource):
+    def _generate_request_template_unescaped(self, resource: Resource) -> Dict[str, Any]:
         """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
 

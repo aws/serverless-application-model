@@ -30,6 +30,13 @@ class PropertyType(object):
         self.supports_intrinsics = supports_intrinsics
 
 
+class Property(PropertyType):
+    """Like PropertyType, except doesn't support intrinsics."""
+
+    def __init__(self, required: bool, validate: Validator) -> None:
+        super().__init__(required, validate, False)
+
+
 class Resource(object):
     """A Resource object represents an abstract entity that contains a Type and a Properties object. They map well to
     CloudFormation resources as well sub-types like AWS::Lambda::Function or `Events` section of
