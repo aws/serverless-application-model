@@ -48,7 +48,7 @@ class FeatureToggle:
         LOG.warning("Dialup type '{}' is None or is not supported.".format(dialup_type))
         return DisabledDialup(region_config)  # type: ignore[no-untyped-call]
 
-    def is_enabled(self, feature_name):  # type: ignore[no-untyped-def]
+    def is_enabled(self, feature_name: str) -> bool:
         """
         To check if feature is available
 
@@ -80,7 +80,7 @@ class FeatureToggle:
 
         dialup = self._get_dialup(region_config, feature_name=feature_name)  # type: ignore[no-untyped-call]
         LOG.info("Using Dialip {}".format(dialup))
-        is_enabled = dialup.is_enabled()
+        is_enabled: bool = dialup.is_enabled()
 
         LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
         return is_enabled

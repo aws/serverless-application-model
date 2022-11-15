@@ -124,7 +124,7 @@ class Schedule(EventSource):
         role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
         resources.append(role)
 
-        source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
+        source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
@@ -202,7 +202,7 @@ class CloudWatchEvent(EventSource):
         role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
         resources.append(role)
 
-        source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
+        source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
