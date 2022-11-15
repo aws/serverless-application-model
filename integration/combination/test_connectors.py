@@ -132,7 +132,6 @@ class TestConnectors(BaseTest):
     @parameterized.expand(
         [
             ("combination/connector_bucket_to_function_write",),
-            ("combination/connector_bucket_to_function_write_without_policy",),
         ]
     )
     @retry_once
