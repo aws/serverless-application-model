@@ -12,6 +12,8 @@ from samtranslator.model.tags.resource_tagging import get_tag_list
 class PropertyType(object):
     """Stores validation information for a CloudFormation resource property.
 
+    DEPRECATED: Use `Property` instead.
+
     :ivar bool required: True if the property is required, False otherwise
     :ivar callable validate: A function that returns True if the provided value is valid for this property, and raises \
         TypeError if it isn't.
@@ -28,6 +30,18 @@ class PropertyType(object):
         self.required = required
         self.validate = validate
         self.supports_intrinsics = supports_intrinsics
+
+
+class Property(PropertyType):
+    """Like `PropertyType`, except without intrinsics support.
+
+    Intrinsics are already resolved by AWS::LanguageExtensions (see https://github.com/aws/serverless-application-model/issues/2533),
+    and supporting intrinsics in the transform is error-prone due to more relaxed types (e.g. a
+    boolean property will evaluate as truthy when an intrinsic is passed to it).
+    """
+
+    def __init__(self, required: bool, validate: Validator) -> None:
+        super().__init__(required, validate, False)
 
 
 class Resource(object):
