@@ -141,22 +141,10 @@ class StateMachineGenerator(object):
                 self.policies = [{
                     "Version": "2012-10-17",
                     "Statement": [{
-                        "Effect": "Allow",
-                        "Action": ["iam:*", 
-                            "organizations:DescribeAccount", 
-                            "organizations:DescribeOrganization", 
-                            "organizations:DescribeOrganizationalUnit", 
-                            "organizations:DescribePolicy", 
-                            "organizations:ListChildren", 
-                            "organizations:ListParents", 
-                            "organizations:ListPoliciesForTarget", 
-                            "organizations:ListRoots", 
-                            "organizations:ListPolicies", 
-                            "organizations:ListTargetsForPolicy"],
+                        "Effect": "Deny",
+                        "Action": "*",
                         "Resource": "*"
-    }
-  ]
-}]
+                        }]}]
             execution_role = self._construct_role()  # type: ignore[no-untyped-call]
             self.state_machine.RoleArn = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
