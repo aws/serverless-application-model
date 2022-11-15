@@ -560,6 +560,17 @@ class BaseTest(TestCase):
             )
         return response
 
+    def verify_post_request(self, url: str, body_obj, expected_status_code: int):
+        """Return response to POST request and verify matches expected status code."""
+        response = self.do_post_request(url, body_obj)
+        if response.status_code != expected_status_code:
+            raise StatusCodeError(
+                "Request to {} failed with status: {}, expected status: {}".format(
+                    url, response.status_code, expected_status_code
+                )
+            )
+        return response
+
     def get_default_test_template_parameters(self):
         """
         get the default template parameters
@@ -631,5 +642,15 @@ class BaseTest(TestCase):
             REQUEST_LOGGER.info(
                 "Request made to " + url,
                 extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
+            )
+        return response
+
+    def do_post_request(self, url: str, body_obj):
+        """Perform a POST request with dict body body_obj."""
+        response = requests.post(url, json=body_obj)
+        if self.internal:
+            REQUEST_LOGGER.info(
+                "POST request made to " + url,
+                extra={"test": self.testcase, "status": response.status_code},
             )
         return response

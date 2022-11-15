@@ -127,8 +127,7 @@ class TestBasicApi(BaseTest):
         api_endpoint = stack_output.get("ApiEndpoint")
 
         input_json = {"f'oo": {"hello": "'wor'l'd'''"}}
-        response = requests.post(api_endpoint, json=input_json)
-        self.assertEqual(response.status_code, 200)
+        response = self.verify_post_request(api_endpoint, input_json, 200)
 
         execution_arn = response.json()["executionArn"]
         execution = self.client_provider.sfn_client.describe_execution(executionArn=execution_arn)
