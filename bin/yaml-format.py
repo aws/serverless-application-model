@@ -33,7 +33,9 @@ class YAMLFormatter(FileFormatter):
         if self.args.add_test_metadata:
             # Since formatting integration test templates cause failure,
             # temporary workaround to add test metadata to integration test templates
-            return input_str + "\n\nMetadata:\n  SamTransformTest: true\n\n"
+            if "SamTransformTest" in input_str:
+                return input_str
+            return input_str + "\nMetadata:\n  SamTransformTest: true\n\n"
 
         obj = yaml.load(input_str)
         out_stream = StringIO()
