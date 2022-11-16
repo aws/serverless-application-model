@@ -17,8 +17,7 @@ class JSONFormatter(FileFormatter):
     def description() -> str:
         return "JSON file formatter"
 
-    @staticmethod
-    def format(input_str: str) -> str:
+    def format(self, input_str: str) -> str:
         """Opinionated format JSON file."""
         obj = json.loads(input_str)
         return json.dumps(obj, indent=2, sort_keys=True) + "\n"
