@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   MyApi1:
     Type: AWS::Serverless::HttpApi
