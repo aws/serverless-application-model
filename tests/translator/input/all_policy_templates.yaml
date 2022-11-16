@@ -5,172 +5,172 @@
 
 Resources:
   KitchenSinkFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
       Runtime: python2.7
       Policies:
 
-        - SQSPollerPolicy:
-            QueueName: name
+      - SQSPollerPolicy:
+          QueueName: name
 
-        - LambdaInvokePolicy:
-            FunctionName: name
+      - LambdaInvokePolicy:
+          FunctionName: name
 
-        - CloudWatchDescribeAlarmHistoryPolicy: {}
+      - CloudWatchDescribeAlarmHistoryPolicy: {}
 
-        - CloudWatchPutMetricPolicy: {}
+      - CloudWatchPutMetricPolicy: {}
 
-        - EC2DescribePolicy: {}
+      - EC2DescribePolicy: {}
 
-        - DynamoDBCrudPolicy:
-            TableName: name
+      - DynamoDBCrudPolicy:
+          TableName: name
 
-        - DynamoDBReadPolicy:
-            TableName: name
+      - DynamoDBReadPolicy:
+          TableName: name
 
-        - SESSendBouncePolicy:
-            IdentityName: name
+      - SESSendBouncePolicy:
+          IdentityName: name
 
-        - ElasticsearchHttpPostPolicy:
-            DomainName: name
+      - ElasticsearchHttpPostPolicy:
+          DomainName: name
 
-        - S3ReadPolicy:
-            BucketName: name
+      - S3ReadPolicy:
+          BucketName: name
 
-        - S3CrudPolicy:
-            BucketName: name
+      - S3CrudPolicy:
+          BucketName: name
 
-        - AMIDescribePolicy: {}
+      - AMIDescribePolicy: {}
 
-        - CloudFormationDescribeStacksPolicy: {}
+      - CloudFormationDescribeStacksPolicy: {}
 
-        - RekognitionNoDataAccessPolicy:
-            CollectionId: id
+      - RekognitionNoDataAccessPolicy:
+          CollectionId: id
 
-        - RekognitionReadPolicy:
-            CollectionId: id
+      - RekognitionReadPolicy:
+          CollectionId: id
 
-        - RekognitionWriteOnlyAccessPolicy:
-            CollectionId: id
+      - RekognitionWriteOnlyAccessPolicy:
+          CollectionId: id
 
-        - SQSSendMessagePolicy:
-            QueueName: name
+      - SQSSendMessagePolicy:
+          QueueName: name
 
-        - SNSPublishMessagePolicy:
-            TopicName: name
+      - SNSPublishMessagePolicy:
+          TopicName: name
 
-        - VPCAccessPolicy: {}
+      - VPCAccessPolicy: {}
 
-        - DynamoDBStreamReadPolicy:
-            TableName: name
-            StreamName: name
+      - DynamoDBStreamReadPolicy:
+          TableName: name
+          StreamName: name
 
-        - KinesisStreamReadPolicy:
-            StreamName: name
+      - KinesisStreamReadPolicy:
+          StreamName: name
 
-        - SESCrudPolicy:
-            IdentityName: name
+      - SESCrudPolicy:
+          IdentityName: name
 
-        - SNSCrudPolicy:
-            TopicName: name
+      - SNSCrudPolicy:
+          TopicName: name
 
-        - KinesisCrudPolicy:
-            StreamName: name
+      - KinesisCrudPolicy:
+          StreamName: name
 
-        - KMSDecryptPolicy:
-            KeyId: keyId
+      - KMSDecryptPolicy:
+          KeyId: keyId
 
-        - PollyFullAccessPolicy:
-            LexiconName: name
+      - PollyFullAccessPolicy:
+          LexiconName: name
 
-        - S3FullAccessPolicy:
-            BucketName: name
+      - S3FullAccessPolicy:
+          BucketName: name
 
-        - CodePipelineLambdaExecutionPolicy: {}
+      - CodePipelineLambdaExecutionPolicy: {}
 
-        - ServerlessRepoReadWriteAccessPolicy: {}
+      - ServerlessRepoReadWriteAccessPolicy: {}
 
-        - EC2CopyImagePolicy:
-            ImageId: id
+      - EC2CopyImagePolicy:
+          ImageId: id
 
-        - CodePipelineReadOnlyPolicy:
-            PipelineName: pipeline
+      - CodePipelineReadOnlyPolicy:
+          PipelineName: pipeline
 
-        - CloudWatchDashboardPolicy: {}
+      - CloudWatchDashboardPolicy: {}
 
-        - RekognitionFacesPolicy: {}
+      - RekognitionFacesPolicy: {}
 
-        - RekognitionLabelsPolicy: {}
+      - RekognitionLabelsPolicy: {}
 
-        - DynamoDBBackupFullAccessPolicy:
-            TableName: table
+      - DynamoDBBackupFullAccessPolicy:
+          TableName: table
 
-        - DynamoDBRestoreFromBackupPolicy:
-            TableName: table
+      - DynamoDBRestoreFromBackupPolicy:
+          TableName: table
 
-        - ComprehendBasicAccessPolicy: {}
+      - ComprehendBasicAccessPolicy: {}
 
-        - AWSSecretsManagerRotationPolicy:
-            FunctionName: function
+      - AWSSecretsManagerRotationPolicy:
+          FunctionName: function
 
-        - MobileAnalyticsWriteOnlyAccessPolicy: {}
+      - MobileAnalyticsWriteOnlyAccessPolicy: {}
 
-        - PinpointEndpointAccessPolicy:
-            PinpointApplicationId: id
+      - PinpointEndpointAccessPolicy:
+          PinpointApplicationId: id
 
-        - RekognitionDetectOnlyPolicy: {}
+      - RekognitionDetectOnlyPolicy: {}
 
-        - RekognitionFacesManagementPolicy:
-            CollectionId: collection
+      - RekognitionFacesManagementPolicy:
+          CollectionId: collection
 
-        - EKSDescribePolicy: {}
+      - EKSDescribePolicy: {}
 
-        - CostExplorerReadOnlyPolicy: {}
+      - CostExplorerReadOnlyPolicy: {}
 
-        - OrganizationsListAccountsPolicy: {}
+      - OrganizationsListAccountsPolicy: {}
 
-        - DynamoDBReconfigurePolicy:
-            TableName: name
+      - DynamoDBReconfigurePolicy:
+          TableName: name
 
-        - SESBulkTemplatedCrudPolicy:
-            IdentityName: name
+      - SESBulkTemplatedCrudPolicy:
+          IdentityName: name
 
-        - SESEmailTemplateCrudPolicy: {}
+      - SESEmailTemplateCrudPolicy: {}
 
-        - FilterLogEventsPolicy:
-            LogGroupName: name
+      - FilterLogEventsPolicy:
+          LogGroupName: name
 
-        - SSMParameterReadPolicy:
-            ParameterName: name
+      - SSMParameterReadPolicy:
+          ParameterName: name
 
-        - StepFunctionsExecutionPolicy:
-            StateMachineName: name
+      - StepFunctionsExecutionPolicy:
+          StateMachineName: name
 
-        - CodeCommitCrudPolicy:
-            RepositoryName: name
+      - CodeCommitCrudPolicy:
+          RepositoryName: name
 
-        - CodeCommitReadPolicy:
-            RepositoryName: name
+      - CodeCommitReadPolicy:
+          RepositoryName: name
 
-        - KMSEncryptPolicy:
-            KeyId: keyId
+      - KMSEncryptPolicy:
+          KeyId: keyId
 
-        - AthenaQueryPolicy:
-            WorkGroupName: name
+      - AthenaQueryPolicy:
+          WorkGroupName: name
 
-        - S3WritePolicy:
-            BucketName: name
+      - S3WritePolicy:
+          BucketName: name
 
-        - DynamoDBWritePolicy:
-            TableName: name
+      - DynamoDBWritePolicy:
+          TableName: name
 
-        - EventBridgePutEventsPolicy:
-            EventBusName: name
+      - EventBridgePutEventsPolicy:
+          EventBusName: name
 
-        - AcmGetCertificatePolicy:
-            CertificateArn: arn
+      - AcmGetCertificatePolicy:
+          CertificateArn: arn
 
-        - Route53ChangeResourceRecordSetsPolicy:
-            HostedZoneId: test
+      - Route53ChangeResourceRecordSetsPolicy:
+          HostedZoneId: test

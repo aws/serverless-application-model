@@ -2,99 +2,99 @@
   "Conditions": {
     "TestCondition": {
       "Fn::Equals": [
-        true, 
+        true,
         false
       ]
     }
-  }, 
+  },
   "Resources": {
+    "ApplicationWithCondition": {
+      "Condition": "TestCondition",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "serverlessrepo:applicationId",
+            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world"
+          },
+          {
+            "Key": "serverlessrepo:semanticVersion",
+            "Value": "1.0.2"
+          }
+        ],
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "ApplicationWithLocationUrl": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "TagName2",
+            "Value": "TagValue2"
+          }
+        ],
+        "TemplateURL": "https://s3-us-east-1.amazonaws.com/demo-bucket/template.yaml"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "BasicApplication": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "serverlessrepo:applicationId",
+            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world"
+          },
+          {
+            "Key": "serverlessrepo:semanticVersion",
+            "Value": "1.0.2"
+          }
+        ],
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
     "NormalApplication": {
-      "Type": "AWS::CloudFormation::Stack", 
       "Properties": {
         "NotificationARNs": [
           "arn:aws:sns:us-east-1:123456789012:sns-arn"
-        ], 
-        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url", 
-        "TimeoutInMinutes": 15, 
+        ],
         "Parameters": {
           "IdentityNameParameter": "IdentityName"
-        }, 
+        },
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }, 
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
           {
-            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world", 
-            "Key": "serverlessrepo:applicationId"
-          }, 
+            "Key": "serverlessrepo:applicationId",
+            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world"
+          },
           {
-            "Value": "1.0.2", 
-            "Key": "serverlessrepo:semanticVersion"
-          }, 
+            "Key": "serverlessrepo:semanticVersion",
+            "Value": "1.0.2"
+          },
           {
-            "Value": "TagValue", 
-            "Key": "TagName"
+            "Key": "TagName",
+            "Value": "TagValue"
           }
-        ]
-      }
-    }, 
-    "BasicApplication": {
-      "Type": "AWS::CloudFormation::Stack", 
-      "Properties": {
-        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }, 
-          {
-            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world", 
-            "Key": "serverlessrepo:applicationId"
-          }, 
-          {
-            "Value": "1.0.2", 
-            "Key": "serverlessrepo:semanticVersion"
-          }
-        ]
-      }
-    }, 
-    "ApplicationWithLocationUrl": {
-      "Type": "AWS::CloudFormation::Stack", 
-      "Properties": {
-        "TemplateURL": "https://s3-us-east-1.amazonaws.com/demo-bucket/template.yaml", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }, 
-          {
-            "Value": "TagValue2", 
-            "Key": "TagName2"
-          }
-        ]
-      }
-    }, 
-    "ApplicationWithCondition": {
-      "Type": "AWS::CloudFormation::Stack", 
-      "Properties": {
-        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }, 
-          {
-            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world", 
-            "Key": "serverlessrepo:applicationId"
-          }, 
-          {
-            "Value": "1.0.2", 
-            "Key": "serverlessrepo:semanticVersion"
-          }
-        ]
-      }, 
-      "Condition": "TestCondition"
+        ],
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
+        "TimeoutInMinutes": 15
+      },
+      "Type": "AWS::CloudFormation::Stack"
     }
   }
 }

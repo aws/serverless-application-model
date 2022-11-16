@@ -47,8 +47,8 @@ Resources:
       Destination:
         Id: MyFunction
       Permissions:
-        - Write
-        - Read
+      - Write
+      - Read
 
   MyConnector2:
     Type: AWS::Serverless::Connector
@@ -58,8 +58,8 @@ Resources:
       Destination:
         Id: MyFunction
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write
 
   MyConnector3:
     Type: AWS::Serverless::Connector
@@ -69,8 +69,8 @@ Resources:
       Destination:
         Id: MyFunction
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write
 
   MyConnector4:
     Type: AWS::Serverless::Connector
@@ -80,4 +80,4 @@ Resources:
       Destination:
         Id: MyFunction
       Permissions:
-        - Read
+      - Read

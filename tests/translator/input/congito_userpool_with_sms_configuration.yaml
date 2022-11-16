@@ -11,13 +11,12 @@ Resources:
           Properties:
             UserPool:
               Ref: MyCognitoUserPool
-            Trigger:
-              PreSignUp
+            Trigger: PreSignUp
 
   MyCognitoUserPool:
-      Type: AWS::Cognito::UserPool
-      Properties:
-        UserPoolName: PreSignup
-        SmsConfiguration:
-          SnsCallerArn: !GetAtt UserPoolRole.Arn
-          ExternalId: !Ref ExternalId
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: PreSignup
+      SmsConfiguration:
+        SnsCallerArn: !GetAtt UserPoolRole.Arn
+        ExternalId: !Ref ExternalId

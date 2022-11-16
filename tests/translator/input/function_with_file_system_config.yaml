@@ -49,5 +49,5 @@ Resources:
         SecurityGroupIds: !Ref SecurityGroupIds
         SubnetIds: !Ref VpcSubnetIds
       FileSystemConfigs:
-        - Arn: !GetAtt AccessPoint.Arn
-          LocalMountPath: /mnt/EFS
+      - Arn: !GetAtt AccessPoint.Arn
+        LocalMountPath: /mnt/EFS

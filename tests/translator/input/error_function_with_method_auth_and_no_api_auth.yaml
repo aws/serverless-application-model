@@ -9,7 +9,7 @@ Resources:
         HttpGetUserGroupIdUserId:
           Type: Api
           Properties:
-            Path: '/users/{groupId}/{userId}'
+            Path: /users/{groupId}/{userId}
             Method: GET
             Auth:
-              Authorizer: "NONE"
+              Authorizer: NONE

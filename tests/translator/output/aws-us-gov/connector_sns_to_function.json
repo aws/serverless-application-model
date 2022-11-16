@@ -16,7 +16,10 @@
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
-          "Fn::GetAtt": ["MyFunction", "Arn"]
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
         },
         "Principal": "sns.amazonaws.com",
         "SourceArn": {
@@ -39,7 +42,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["MyRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x"
       },

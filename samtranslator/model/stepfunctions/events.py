@@ -1,7 +1,8 @@
 import json
+from typing import Any, Dict, Optional
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import PropertyType, ResourceMacro
+from samtranslator.model import Property, PropertyType, ResourceMacro, Resource
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.types import is_str, is_type
@@ -27,7 +28,7 @@ class EventSource(ResourceMacro):
     # TODO: Make `EventSource` an abstract class and not giving `principal` initial value.
     principal: str = None  # type: ignore
 
-    def _generate_logical_id(self, prefix, suffix, resource_type):
+    def _generate_logical_id(self, prefix, suffix, resource_type):  # type: ignore[no-untyped-def]
         """Helper utility to generate a logicial ID for a new resource
 
         :param string prefix: Prefix to use for the logical ID of the resource
@@ -46,7 +47,7 @@ class EventSource(ResourceMacro):
             logical_id = generator.gen()
         return logical_id
 
-    def _construct_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):
+    def _construct_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):  # type: ignore[no-untyped-def]
         """Constructs the IAM Role resource allowing the event service to invoke
         the StartExecution API of the state machine resource it is associated with.
 
@@ -58,14 +59,14 @@ class EventSource(ResourceMacro):
         :returns: the IAM Role resource
         :rtype: model.iam.IAMRole
         """
-        role_logical_id = self._generate_logical_id(prefix=prefix, suffix=suffix, resource_type="Role")
+        role_logical_id = self._generate_logical_id(prefix=prefix, suffix=suffix, resource_type="Role")  # type: ignore[no-untyped-call]
         event_role = IAMRole(role_logical_id, attributes=resource.get_passthrough_resource_attributes())
-        event_role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+        event_role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(  # type: ignore[no-untyped-call]
             self.principal
         )
         state_machine_arn = resource.get_runtime_attr("arn")
         event_role.Policies = [
-            IAMRolePolicies.step_functions_start_execution_role_policy(state_machine_arn, role_logical_id)
+            IAMRolePolicies.step_functions_start_execution_role_policy(state_machine_arn, role_logical_id)  # type: ignore[no-untyped-call]
         ]
 
         if permissions_boundary:
@@ -91,7 +92,7 @@ class Schedule(EventSource):
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, resource, **kwargs):
+    def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the EventBridge Rule and IAM Role to which this Schedule event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
@@ -106,36 +107,36 @@ class Schedule(EventSource):
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         resources.append(events_rule)
 
-        events_rule.ScheduleExpression = self.Schedule
+        events_rule.ScheduleExpression = self.Schedule  # type: ignore[attr-defined]
 
-        if self.State and self.Enabled is not None:
+        if self.State and self.Enabled is not None:  # type: ignore[attr-defined, attr-defined]
             raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
 
-        if self.State:
-            events_rule.State = self.State
+        if self.State:  # type: ignore[attr-defined]
+            events_rule.State = self.State  # type: ignore[attr-defined]
 
-        if self.Enabled is not None:
-            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
+        if self.Enabled is not None:  # type: ignore[attr-defined]
+            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"  # type: ignore[attr-defined]
 
-        events_rule.Name = self.Name
-        events_rule.Description = self.Description
+        events_rule.Name = self.Name  # type: ignore[attr-defined]
+        events_rule.Description = self.Description  # type: ignore[attr-defined]
 
-        role = self._construct_role(resource, permissions_boundary)
+        role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
         resources.append(role)
 
         source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
-        if self.DeadLetterConfig is not None:
-            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
-            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(  # type: ignore[no-untyped-call]
                 self, source_arn, passthrough_resource_attributes
             )
             resources.extend(dlq_resources)
-        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]
+        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _construct_target(self, resource, role, dead_letter_queue_arn=None):
+    def _construct_target(self, resource, role, dead_letter_queue_arn=None):  # type: ignore[no-untyped-def]
         """Constructs the Target property for the EventBridge Rule.
 
         :returns: the Target property
@@ -146,14 +147,14 @@ class Schedule(EventSource):
             "Id": self.logical_id + "StepFunctionsTarget",
             "RoleArn": role.get_runtime_attr("arn"),
         }
-        if self.Input is not None:
-            target["Input"] = self.Input
+        if self.Input is not None:  # type: ignore[attr-defined]
+            target["Input"] = self.Input  # type: ignore[attr-defined]
 
-        if self.DeadLetterConfig is not None:
+        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
             target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
 
-        if self.RetryPolicy is not None:
-            target["RetryPolicy"] = self.RetryPolicy
+        if self.RetryPolicy is not None:  # type: ignore[attr-defined]
+            target["RetryPolicy"] = self.RetryPolicy  # type: ignore[attr-defined]
 
         return target
 
@@ -165,6 +166,7 @@ class CloudWatchEvent(EventSource):
     principal = "events.amazonaws.com"
     property_types = {
         "EventBusName": PropertyType(False, is_str()),
+        "RuleName": PropertyType(False, is_str()),
         "Pattern": PropertyType(False, is_type(dict)),
         "Input": PropertyType(False, is_str()),
         "InputPath": PropertyType(False, is_str()),
@@ -174,7 +176,7 @@ class CloudWatchEvent(EventSource):
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, resource, **kwargs):
+    def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this
         CloudWatch Events/EventBridge event source corresponds.
 
@@ -188,31 +190,32 @@ class CloudWatchEvent(EventSource):
 
         passthrough_resource_attributes = resource.get_passthrough_resource_attributes()
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
-        events_rule.EventBusName = self.EventBusName
-        events_rule.EventPattern = self.Pattern
+        events_rule.EventBusName = self.EventBusName  # type: ignore[attr-defined]
+        events_rule.EventPattern = self.Pattern  # type: ignore[attr-defined]
+        events_rule.Name = self.RuleName  # type: ignore[attr-defined]
 
-        if self.State:
-            events_rule.State = self.State
+        if self.State:  # type: ignore[attr-defined]
+            events_rule.State = self.State  # type: ignore[attr-defined]
 
         resources.append(events_rule)
 
-        role = self._construct_role(resource, permissions_boundary)
+        role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
         resources.append(role)
 
         source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
-        if self.DeadLetterConfig is not None:
-            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
-            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(  # type: ignore[no-untyped-call]
                 self, source_arn, passthrough_resource_attributes
             )
             resources.extend(dlq_resources)
 
-        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]
+        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _construct_target(self, resource, role, dead_letter_queue_arn=None):
+    def _construct_target(self, resource, role, dead_letter_queue_arn=None):  # type: ignore[no-untyped-def]
         """Constructs the Target property for the CloudWatch Events/EventBridge Rule.
 
         :returns: the Target property
@@ -223,17 +226,17 @@ class CloudWatchEvent(EventSource):
             "Id": self.logical_id + "StepFunctionsTarget",
             "RoleArn": role.get_runtime_attr("arn"),
         }
-        if self.Input is not None:
-            target["Input"] = self.Input
+        if self.Input is not None:  # type: ignore[attr-defined]
+            target["Input"] = self.Input  # type: ignore[attr-defined]
 
-        if self.InputPath is not None:
-            target["InputPath"] = self.InputPath
+        if self.InputPath is not None:  # type: ignore[attr-defined]
+            target["InputPath"] = self.InputPath  # type: ignore[attr-defined]
 
-        if self.DeadLetterConfig is not None:
+        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
             target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
 
-        if self.RetryPolicy is not None:
-            target["RetryPolicy"] = self.RetryPolicy
+        if self.RetryPolicy is not None:  # type: ignore[attr-defined]
+            target["RetryPolicy"] = self.RetryPolicy  # type: ignore[attr-defined]
 
         return target
 
@@ -256,9 +259,12 @@ class Api(EventSource):
         "RestApiId": PropertyType(True, is_str()),
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
+        "UnescapeMappingTemplate": Property(False, is_type(bool)),
     }
 
-    def resources_to_link(self, resources):
+    UnescapeMappingTemplate: Optional[bool]
+
+    def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
         """
         If this API Event Source refers to an explicit API resource, resolve the reference and grab
         necessary data from the explicit API
@@ -273,7 +279,7 @@ class Api(EventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)
+        rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)  # type: ignore[attr-defined, no-untyped-call]
         if isinstance(rest_api_id, str):
 
             if (
@@ -289,7 +295,7 @@ class Api(EventSource):
                 if isinstance(permitted_stage, str):
                     stage_suffix = permitted_stage
                 else:
-                    stage_suffix = "Stage"
+                    stage_suffix = "Stage"  # type: ignore[unreachable]
 
             else:
                 # RestApiId is a string, not an intrinsic, but we did not find a valid API resource for this ID
@@ -301,7 +307,7 @@ class Api(EventSource):
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, resource, **kwargs):
+    def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
         """If the Api event source has a RestApi property, then simply return the IAM role resource
         allowing API Gateway to start the state machine execution. If no RestApi is provided, then
         additionally inject the path, method, and the x-amazon-apigateway-integration into the
@@ -320,20 +326,20 @@ class Api(EventSource):
         intrinsics_resolver = kwargs.get("intrinsics_resolver")
         permissions_boundary = kwargs.get("permissions_boundary")
 
-        if self.Method is not None:
+        if self.Method is not None:  # type: ignore[has-type]
             # Convert to lower case so that user can specify either GET or get
-            self.Method = self.Method.lower()
+            self.Method = self.Method.lower()  # type: ignore[has-type]
 
-        role = self._construct_role(resource, permissions_boundary)
+        role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
         resources.append(role)
 
         explicit_api = kwargs["explicit_api"]
         if explicit_api.get("__MANAGE_SWAGGER"):
-            self._add_swagger_integration(explicit_api, resource, role, intrinsics_resolver)
+            self._add_swagger_integration(explicit_api, resource, role, intrinsics_resolver)  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _add_swagger_integration(self, api, resource, role, intrinsics_resolver):
+    def _add_swagger_integration(self, api, resource, role, intrinsics_resolver):  # type: ignore[no-untyped-def]
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
@@ -344,14 +350,14 @@ class Api(EventSource):
 
         integration_uri = fnSub("arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution")
 
-        editor = SwaggerEditor(swagger_body)
+        editor = SwaggerEditor(swagger_body)  # type: ignore[no-untyped-call]
 
-        if editor.has_integration(self.Path, self.Method):
+        if editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined, no-untyped-call]
             # Cannot add the integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
                 'API method "{method}" defined multiple times for path "{path}".'.format(
-                    method=self.Method, path=self.Path
+                    method=self.Method, path=self.Path  # type: ignore[attr-defined]
                 ),
             )
 
@@ -359,18 +365,24 @@ class Api(EventSource):
         if CONDITION in resource.resource_attributes:
             condition = resource.resource_attributes[CONDITION]
 
-        editor.add_state_machine_integration(
-            self.Path,
+        request_template = (
+            self._generate_request_template_unescaped(resource)
+            if self.UnescapeMappingTemplate
+            else self._generate_request_template(resource)
+        )
+
+        editor.add_state_machine_integration(  # type: ignore[no-untyped-call]
+            self.Path,  # type: ignore[attr-defined]
             self.Method,
             integration_uri,
             role.get_runtime_attr("arn"),
-            self._generate_request_template(resource),
+            request_template,
             condition=condition,
         )
 
         # Note: Refactor and combine the section below with the Api eventsource for functions
-        if self.Auth:
-            method_authorizer = self.Auth.get("Authorizer")
+        if self.Auth:  # type: ignore[attr-defined]
+            method_authorizer = self.Auth.get("Authorizer")  # type: ignore[attr-defined]
             api_auth = api.get("Auth")
             api_auth = intrinsics_resolver.resolve_parameter_refs(api_auth)
 
@@ -383,7 +395,7 @@ class Api(EventSource):
                             self.relative_id,
                             "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
                             "because the related API does not define any Authorizers.".format(
-                                authorizer=method_authorizer, method=self.Method, path=self.Path
+                                authorizer=method_authorizer, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                             ),
                         )
 
@@ -392,7 +404,7 @@ class Api(EventSource):
                             self.relative_id,
                             "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
                             "because it wasn't defined in the API's Authorizers.".format(
-                                authorizer=method_authorizer, method=self.Method, path=self.Path
+                                authorizer=method_authorizer, method=self.Method, path=self.Path  # type: ignore[attr-defined]
                             ),
                         )
 
@@ -402,40 +414,40 @@ class Api(EventSource):
                                 self.relative_id,
                                 "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
                                 "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                                    method=self.Method, path=self.Path
+                                    method=self.Method, path=self.Path  # type: ignore[attr-defined]
                                 ),
                             )
 
-            if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):
+            if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):  # type: ignore[attr-defined]
                 raise InvalidEventException(
                     self.relative_id,
                     "Unable to set Authorizer on API method [{method}] for path [{path}] because "
-                    "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),
+                    "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),  # type: ignore[attr-defined]
                 )
 
-            apikey_required_setting = self.Auth.get("ApiKeyRequired")
+            apikey_required_setting = self.Auth.get("ApiKeyRequired")  # type: ignore[attr-defined]
             apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
             if apikey_required_setting_is_false and (not api_auth or not api_auth.get("ApiKeyRequired")):
                 raise InvalidEventException(
                     self.relative_id,
                     "Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] "
                     "because the related API does not specify any ApiKeyRequired.".format(
-                        method=self.Method, path=self.Path
+                        method=self.Method, path=self.Path  # type: ignore[attr-defined]
                     ),
                 )
 
             if method_authorizer or apikey_required_setting is not None:
-                editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+                editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
 
-            if self.Auth.get("ResourcePolicy"):
-                resource_policy = self.Auth.get("ResourcePolicy")
-                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)
+            if self.Auth.get("ResourcePolicy"):  # type: ignore[attr-defined]
+                resource_policy = self.Auth.get("ResourcePolicy")  # type: ignore[attr-defined]
+                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
                 if resource_policy.get("CustomStatements"):
-                    editor.add_custom_statements(resource_policy.get("CustomStatements"))
+                    editor.add_custom_statements(resource_policy.get("CustomStatements"))  # type: ignore[no-untyped-call]
 
         api["DefinitionBody"] = editor.swagger
 
-    def _generate_request_template(self, resource):
+    def _generate_request_template(self, resource: Resource) -> Dict[str, Any]:
         """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
 
@@ -453,6 +465,30 @@ class Api(EventSource):
                         "stateMachineArn": "${" + resource.logical_id + "}",
                     }
                 )
+            )
+        }
+        return request_templates
+
+    def _generate_request_template_unescaped(self, resource: Resource) -> Dict[str, Any]:
+        """Generates the Body mapping request template for the Api. This allows for the input
+        request to the Api to be passed as the execution input to the associated state machine resource.
+
+        Unescapes single quotes such that it's valid JSON.
+
+        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine
+                resource to which the Api event source must be associated
+
+        :returns: a body mapping request which passes the Api input to the state machine execution
+        :rtype: dict
+        """
+        request_templates = {
+            "application/json": fnSub(
+                # Need to unescape single quotes escaped by escapeJavaScript.
+                # Also the mapping template isn't valid JSON, so can't use json.dumps().
+                # See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#util-template-reference
+                """{"input": "$util.escapeJavaScript($input.json('$')).replaceAll("\\\\'","'")", "stateMachineArn": "${"""
+                + resource.logical_id
+                + """}"}"""
             )
         }
         return request_templates

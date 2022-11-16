@@ -1,14 +1,14 @@
 Parameters:
   Env:
     Type: String
-    Default: "prd"
+    Default: prd
 Resources:
   testEventBus:
-    Type: 'AWS::Events::EventBus'
+    Type: AWS::Events::EventBus
     Properties:
       Name: test-event-bus
   testLambdaFn:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: test-Lambda-prd
       InlineCode: |
@@ -25,8 +25,8 @@ Resources:
         Schedule:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
             DeadLetterConfig:
               Type: SQS
               QueueLogicalId:
-                'Fn::Sub': 'testLambdaFunctionEBRuleDLQ${Env}'
+                Fn::Sub: testLambdaFunctionEBRuleDLQ${Env}

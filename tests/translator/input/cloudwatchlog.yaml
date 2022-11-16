@@ -1,6 +1,6 @@
 Resources:
   TriggeredFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
       Handler: hello.handler
@@ -11,4 +11,3 @@ Resources:
           Properties:
             LogGroupName: MyCWLogGroup
             FilterPattern: My filter pattern
-            

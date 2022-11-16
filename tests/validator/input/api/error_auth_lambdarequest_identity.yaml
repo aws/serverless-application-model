@@ -36,7 +36,7 @@ Resources:
             FunctionPayloadType: REQUEST
             Identity:
               Context:
-                - 3
+              - 3
 
           # Headers
           LambdaRequestIdentityHeadersEmpty:
@@ -54,7 +54,7 @@ Resources:
             FunctionPayloadType: REQUEST
             Identity:
               Headers:
-                - 3
+              - 3
 
           # QueryStrings
           LambdaRequestIdentityQueryStringsEmpty:
@@ -72,7 +72,7 @@ Resources:
             FunctionPayloadType: REQUEST
             Identity:
               QueryStrings:
-                - 3
+              - 3
 
           # ReauthorizeEvery
           LambdaRequestIdentityReauthorizeEveryEmpty:
@@ -84,7 +84,7 @@ Resources:
             FunctionArn: Function.Arn
             FunctionPayloadType: REQUEST
             Identity:
-              ReauthorizeEvery: "3"
+              ReauthorizeEvery: '3'
           LambdaRequestIdentityReauthorizeEveryTooLow:
             FunctionArn: Function.Arn
             FunctionPayloadType: REQUEST
@@ -112,4 +112,4 @@ Resources:
             FunctionPayloadType: REQUEST
             Identity:
               StageVariables:
-                - 3
+              - 3

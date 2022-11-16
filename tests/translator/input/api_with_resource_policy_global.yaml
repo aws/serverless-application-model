@@ -5,21 +5,21 @@ Parameters:
 Conditions:
   C1:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
 Globals:
   Api:
     Auth:
       ResourcePolicy:
-          CustomStatements: 
-            Fn::If:
-              - C1
-              - Action: execute-api:Invoke
-                Resource: 
-                  - execute-api:/*/*/*
-              - Action: execute-api:Blah
-                Resource: 
-                  - execute-api:/*/*/*
+        CustomStatements:
+          Fn::If:
+          - C1
+          - Action: execute-api:Invoke
+            Resource:
+            - execute-api:/*/*/*
+          - Action: execute-api:Blah
+            Resource:
+            - execute-api:/*/*/*
 Resources:
   ExplicitApiFunction:
     Type: AWS::Serverless::Function
@@ -46,7 +46,7 @@ Resources:
           version: '1.0'
           title: !Ref AWS::StackName
         paths:
-          "/":
+          /:
             get:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -56,22 +56,22 @@ Resources:
         x-amazon-apigateway-policy:
           Version: '2012-10-17'
           Statement:
-            Action: 'sts:AssumeRole'
+            Action: sts:AssumeRole
             Effect: Allow
-            Principal: 
-              Service: 'lambda.amazonaws.com'
+            Principal:
+              Service: lambda.amazonaws.com
   AnotherApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref StageName
       Auth:
         ResourcePolicy:
-          CustomStatements: 
+          CustomStatements:
             Fn::If:
-              - C1
-              - Action: execute-api:Invoke
-                Resource: 
-                  - execute-api:/*/*/*
-              - Action: execute-api:Another
-                Resource: 
-                  - execute-api:/*/*/*
+            - C1
+            - Action: execute-api:Invoke
+              Resource:
+              - execute-api:/*/*/*
+            - Action: execute-api:Another
+              Resource:
+              - execute-api:/*/*/*

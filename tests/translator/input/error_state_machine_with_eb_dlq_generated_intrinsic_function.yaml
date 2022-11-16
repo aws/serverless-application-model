@@ -1,10 +1,10 @@
 Parameters:
   Env:
     Type: String
-    Default: "prd"
+    Default: prd
 Resources:
   StateMachine:
-    Type: 'AWS::Serverless::StateMachine'
+    Type: AWS::Serverless::StateMachine
     Properties:
       DefinitionUri: s3://sam-demo-bucket/my_state_machine.asl.json
       Role: arn:aws:iam::123456123456:role/service-role/SampleRole
@@ -19,4 +19,4 @@ Resources:
             DeadLetterConfig:
               Type: SQS
               QueueLogicalId:
-                'Fn::Sub': 'TestDLQ${Env}'
+                Fn::Sub: TestDLQ${Env}

@@ -22,7 +22,7 @@ class SQSQueuePolicy(Resource):
 
 class SQSQueuePolicies:
     @staticmethod
-    def sns_topic_send_message_role_policy(topic_arn, queue_arn):
+    def sns_topic_send_message_role_policy(topic_arn, queue_arn):  # type: ignore[no-untyped-def]
         document = {
             "Version": "2012-10-17",
             "Statement": [
@@ -38,7 +38,7 @@ class SQSQueuePolicies:
         return document
 
     @staticmethod
-    def eventbridge_dlq_send_message_resource_based_policy(rule_arn, queue_arn):
+    def eventbridge_dlq_send_message_resource_based_policy(rule_arn, queue_arn):  # type: ignore[no-untyped-def]
         document = {
             "Version": "2012-10-17",
             "Statement": [

@@ -1,18 +1,18 @@
 Conditions:
   TestCondition:
     Fn::Equals:
-      - True
-      - False
+    - true
+    - false
 Resources:
   BasicApplication:
-    Type: 'AWS::Serverless::Application'
+    Type: AWS::Serverless::Application
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
         SemanticVersion: 1.0.2
 
   NormalApplication:
-    Type: 'AWS::Serverless::Application'
+    Type: AWS::Serverless::Application
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
@@ -22,20 +22,20 @@ Resources:
       Parameters:
         IdentityNameParameter: IdentityName
       NotificationARNs:
-        - arn:aws:sns:us-east-1:123456789012:sns-arn
+      - arn:aws:sns:us-east-1:123456789012:sns-arn
       TimeoutInMinutes: 15
 
   ApplicationWithLocationUrl:
-    Type: 'AWS::Serverless::Application'
+    Type: AWS::Serverless::Application
     Properties:
       Location: https://s3-us-east-1.amazonaws.com/demo-bucket/template.yaml
       Tags:
         TagName2: TagValue2
 
   ApplicationWithCondition:
-    Type: 'AWS::Serverless::Application'
-    Condition: TestCondition   
+    Type: AWS::Serverless::Application
+    Condition: TestCondition
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
-        SemanticVersion: 1.0.2        
+        SemanticVersion: 1.0.2

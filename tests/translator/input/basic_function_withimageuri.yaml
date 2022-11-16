@@ -7,23 +7,23 @@ Parameters:
     Default: otherparam
 Resources:
   MinimalImageFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
       PackageType: Image
 
   MinimalImageFunctionPackageTypeAndImageConfig:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
       PackageType: Image
       ImageConfig:
         WorkingDirectory: /var/task
         Command: /bin/sh
-        EntryPoint: "echo hello world!"
+        EntryPoint: echo hello world!
 
   CompleteImageFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: MyAwesomeFunction
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
@@ -42,60 +42,57 @@ Resources:
       ImageConfig:
         WorkingDirectory: /var/task
         Command: /bin/sh
-        EntryPoint: "echo hello world!"
+        EntryPoint: echo hello world!
       Environment:
         Variables:
           Name: Value
           Name2: Value2
 
   FunctionWithPolicies:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
       PackageType: Image
       Policies: AmazonDynamoDBFullAccess
 
   FunctionWithPolicyDocument:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
       PackageType: Image
       Policies:
         Statement:
-        - Action: [ 'dynamodb:*' ]
+        - Action: [dynamodb:*]
           Effect: Allow
           Resource: '*'
 
   FunctionWithRoleRef:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
       PackageType: Image
       Role:
-        Fn::GetAtt: ["MyFunctionRole", "Arn"]
+        Fn::GetAtt: [MyFunctionRole, Arn]
 
   MyFunctionRole:
     # This is just some role. Actual role definition might be wrong
-    Type: "AWS::IAM::Role"
+    Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
-          -
-            Effect: "Allow"
-            Principal:
-              Service:
-                - "ec2.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
       Policies:
-        -
-          PolicyName: "root"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Effect: "Allow"
-                Action: "*"
-                Resource: "*"
+      - PolicyName: root
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: '*'
+            Resource: '*'

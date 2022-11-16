@@ -10,8 +10,8 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Sub
-              - ${ApiName}
-              - { ApiName: !Ref HtmlApi }
+            - ${ApiName}
+            - {ApiName: !Ref HtmlApi}
             Path: /
             Method: get
             Auth:

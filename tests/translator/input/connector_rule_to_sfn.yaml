@@ -1,26 +1,26 @@
 Resources:
   MyNewEventsRule:
-    Type: 'AWS::Events::Rule'
+    Type: AWS::Events::Rule
     Properties:
       Name: mynewabc
       EventPattern:
         source:
-          - aws.ec2
+        - aws.ec2
       State: ENABLED
       Targets:
-        - RoleArn: !GetAtt MyRuleRole.Arn
-          Arn: !GetAtt 'StateMachine.Arn'
-          Id: StateMachine
+      - RoleArn: !GetAtt MyRuleRole.Arn
+        Arn: !GetAtt 'StateMachine.Arn'
+        Id: StateMachine
 
   MyRuleRole:
-    Type: 'AWS::IAM::Role'
+    Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-          - Effect: Allow
-            Principal:
-              Service: !Sub events.amazonaws.com
-            Action: 'sts:AssumeRole'
+        - Effect: Allow
+          Principal:
+            Service: !Sub events.amazonaws.com
+          Action: sts:AssumeRole
 
   StateMachine:
     Type: AWS::Serverless::StateMachine
@@ -36,15 +36,15 @@ Resources:
             Resource: !GetAtt StateMachineFunction.Arn
             End: true
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingIsNotStateMachineFunction"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingIsNotStateMachineFunction
 
   MyConnector:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: MyNewEventsRule
-      Destination: 
+      Destination:
         Id: StateMachine
       Permissions:
-        - Write
+      - Write

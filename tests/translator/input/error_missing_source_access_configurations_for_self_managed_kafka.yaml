@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters: {}
 Resources:
   KafkaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/kafka.zip
       Handler: index.kafka_handler
@@ -12,8 +12,7 @@ Resources:
           Type: SelfManagedKafka
           Properties:
             KafkaBootstrapServers:
-              - "abc.xyz.com:9092"
-              - "123.45.67.89:9096"
+            - abc.xyz.com:9092
+            - 123.45.67.89:9096
             Topics:
-              - "Topic1"
-
+            - Topic1

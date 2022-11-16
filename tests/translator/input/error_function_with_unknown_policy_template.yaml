@@ -2,20 +2,19 @@
 
 Resources:
   UnknownTemplate:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
       Runtime: python2.7
       Policies:
         # Known managed policy
-        - AWSLambdaRole
+      - AWSLambdaRole
 
         # Known policy template
-        - LambdaInvokePolicy:
-            FunctionName: "Some function"
+      - LambdaInvokePolicy:
+          FunctionName: Some function
 
         # This is an unknown policy template
-        - SomeUnknownPolicyTemplate:
-            Key: Value
-
+      - SomeUnknownPolicyTemplate:
+          Key: Value

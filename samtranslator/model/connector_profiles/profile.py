@@ -10,7 +10,7 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "profiles.jso
     PROFILE: ConnectorProfile = json.load(f)
 
 
-def get_profile(source_type: str, dest_type: str):
+def get_profile(source_type: str, dest_type: str):  # type: ignore[no-untyped-def]
     profile = PROFILE["Permissions"].get(source_type, {}).get(dest_type)
     # Ensure not passing a mutable shared variable
     return copy.deepcopy(profile)
@@ -26,7 +26,7 @@ def verify_profile_variables_replaced(obj: Any) -> None:
         raise ValueError(f"The following variables have not been replaced: {matches}")
 
 
-def profile_replace(obj: Any, replacements: Dict[str, Any]):
+def profile_replace(obj: Any, replacements: Dict[str, Any]):  # type: ignore[no-untyped-def]
     """
     This function is used to recursively replace all keys in 'replacements' found
     in 'obj' with matching values in 'replacement' dictionary.
@@ -37,7 +37,7 @@ def profile_replace(obj: Any, replacements: Dict[str, Any]):
     return _map_nested(obj, lambda v: _profile_replace_str(v, replacements))
 
 
-def _map_nested(obj: Any, fn):
+def _map_nested(obj: Any, fn):  # type: ignore[no-untyped-def, no-untyped-def]
     if isinstance(obj, dict):
         return {k: _map_nested(v, fn) for k, v in obj.items()}
     if isinstance(obj, list):
@@ -50,7 +50,7 @@ def _sanitize(s: str) -> str:
     return "".join(c for c in s if c.isalnum())
 
 
-def _profile_replace_str(s: Any, replacements: Dict[str, Any]):
+def _profile_replace_str(s: Any, replacements: Dict[str, Any]):  # type: ignore[no-untyped-def]
     if not isinstance(s, str):
         return s
     res = {}

@@ -7,7 +7,7 @@ Resources:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Description: Created by SAM
       Handler: index.handler
-      Architectures: ["arm64", "x86_64"]
+      Architectures: [arm64, x86_64]
       MemorySize: 1024
       Runtime: nodejs12.x
       Timeout: 3

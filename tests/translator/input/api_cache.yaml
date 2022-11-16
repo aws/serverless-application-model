@@ -19,4 +19,4 @@ Resources:
       StageName: Prod
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
       CacheClusterEnabled: true
-      CacheClusterSize: "1.6"
+      CacheClusterSize: '1.6'

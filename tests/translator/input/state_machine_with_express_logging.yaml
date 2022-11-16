@@ -1,6 +1,6 @@
 Resources:
   MyFunction:
-    Type: "AWS::Serverless::Function"
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -22,27 +22,27 @@ Resources:
         my_lambda_arn: !GetAtt MyFunction.Arn
       Logging:
         Level: FATAL
-        IncludeExecutionData: False
+        IncludeExecutionData: false
         Destinations:
-          - CloudWatchLogsLogGroup:
-              LogGroupArn: !GetAtt ExpressLogGroup.Arn
+        - CloudWatchLogsLogGroup:
+            LogGroupArn: !GetAtt ExpressLogGroup.Arn
       Policies:
-        - Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Action: lambda:InvokeFunction
-              Resource: !GetAtt MyFunction.Arn
-        - Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Action:
-                - "logs:CreateLogDelivery"
-                - "logs:GetLogDelivery"
-                - "logs:UpdateLogDelivery"
-                - "logs:DeleteLogDelivery"
-                - "logs:ListLogDeliveries"
-                - "logs:PutResourcePolicy"
-                - "logs:DescribeResourcePolicies"
-                - "logs:DescribeLogGroups"
-              Resource:
-                - "*"
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: lambda:InvokeFunction
+          Resource: !GetAtt MyFunction.Arn
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - logs:CreateLogDelivery
+          - logs:GetLogDelivery
+          - logs:UpdateLogDelivery
+          - logs:DeleteLogDelivery
+          - logs:ListLogDeliveries
+          - logs:PutResourcePolicy
+          - logs:DescribeResourcePolicies
+          - logs:DescribeLogGroups
+          Resource:
+          - '*'

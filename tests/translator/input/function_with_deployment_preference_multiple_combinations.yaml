@@ -1,6 +1,6 @@
 Resources:
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -8,7 +8,7 @@ Resources:
       AutoPublishAlias: live
 
   MinimalFunctionWithMinimalDeploymentPreference:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -18,7 +18,7 @@ Resources:
         Type: Canary10Percent5Minutes
 
   MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarms:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -30,32 +30,32 @@ Resources:
           PreTraffic: !Ref MySanityTestFunction
           PostTraffic: !Ref MyValidationTestFunction
         Alarms:
-          - !Ref MyCloudWatchAlarm
+        - !Ref MyCloudWatchAlarm
 
   MySanityTestFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       Handler: hello.handler
       Runtime: python2.7
       CodeUri: s3://my-bucket/mySanityTestFunction.zip
       DeploymentPreference:
-        Enabled: False
+        Enabled: false
 
   MyValidationTestFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       Handler: hello.handler
       Runtime: python2.7
       CodeUri: s3://my-bucket/myValidationTestFunction.zip
       DeploymentPreference:
-        Enabled: False
+        Enabled: false
 
   MyCloudWatchAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
-     ComparisonOperator: GreaterThanThreshold
-     EvaluationPeriods: 1
-     MetricName: MyMetric
-     Namespace: AWS/EC2
-     Period: 300
-     Threshold: 10
+      ComparisonOperator: GreaterThanThreshold
+      EvaluationPeriods: 1
+      MetricName: MyMetric
+      Namespace: AWS/EC2
+      Period: 300
+      Threshold: 10

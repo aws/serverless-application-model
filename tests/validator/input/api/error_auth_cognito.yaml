@@ -13,7 +13,7 @@ Resources:
             UserPoolArn: User.pool.arn
           CognitoAuthorizationScopesItemNotString:
             AuthorizationScopes:
-              - 3
+            - 3
             UserPoolArn: User.pool.arn
           CognitoAuthorizationScopesNotList:
             AuthorizationScopes: scopes1
@@ -41,7 +41,7 @@ Resources:
             UserPoolArn: User.pool.arn
           CognitoIdentityReauthorizeEveryNotInt:
             Identity:
-              ReauthorizeEvery: "3"
+              ReauthorizeEvery: '3'
             UserPoolArn: User.pool.arn
           CognitoIdentityReauthorizeEveryValueError:
             Identity:

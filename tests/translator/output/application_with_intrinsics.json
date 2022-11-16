@@ -1,76 +1,76 @@
 {
-  "Parameters": {
-    "ApplicationIdParam": {
-      "Default": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world", 
-      "Type": "String"
-    }, 
-    "VersionParam": {
-      "Default": "1.0.0", 
-      "Type": "String"
-    }
-  }, 
   "Mappings": {
     "ApplicationLocations": {
-      "cn-north-1": {
-        "Version": "1.0.2", 
-        "ApplicationId": "arn:aws-cn:serverlessrepo:cn-north-1:123456789012:applications/hello-world"
-      }, 
-      "us-gov-west-1": {
-        "Version": "1.0.3", 
-        "ApplicationId": "arn:aws-gov:serverlessrepo:us-gov-west-1:123456789012:applications/hello-world"
-      }, 
       "ap-southeast-1": {
-        "Version": "1.0.1", 
-        "ApplicationId": "arn:aws:serverlessrepo:ap-southeast-1:123456789012:applications/hello-world"
+        "ApplicationId": "arn:aws:serverlessrepo:ap-southeast-1:123456789012:applications/hello-world",
+        "Version": "1.0.1"
+      },
+      "cn-north-1": {
+        "ApplicationId": "arn:aws-cn:serverlessrepo:cn-north-1:123456789012:applications/hello-world",
+        "Version": "1.0.2"
+      },
+      "us-gov-west-1": {
+        "ApplicationId": "arn:aws-gov:serverlessrepo:us-gov-west-1:123456789012:applications/hello-world",
+        "Version": "1.0.3"
       }
     }
-  }, 
+  },
+  "Parameters": {
+    "ApplicationIdParam": {
+      "Default": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world",
+      "Type": "String"
+    },
+    "VersionParam": {
+      "Default": "1.0.0",
+      "Type": "String"
+    }
+  },
   "Resources": {
     "ApplicationFindInMap": {
-      "Type": "AWS::CloudFormation::Stack", 
       "Properties": {
         "NotificationARNs": [
           {
             "Ref": "Sns"
           }
-        ], 
-        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url", 
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }, 
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
           {
-            "Value": "arn:aws:serverlessrepo:ap-southeast-1:123456789012:applications/hello-world", 
-            "Key": "serverlessrepo:applicationId"
-          }, 
+            "Key": "serverlessrepo:applicationId",
+            "Value": "arn:aws:serverlessrepo:ap-southeast-1:123456789012:applications/hello-world"
+          },
           {
-            "Value": "1.0.1", 
-            "Key": "serverlessrepo:semanticVersion"
+            "Key": "serverlessrepo:semanticVersion",
+            "Value": "1.0.1"
           }
-        ]
-      }
-    }, 
+        ],
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
     "ApplicationRefParameter": {
-      "Type": "AWS::CloudFormation::Stack", 
       "Properties": {
-        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url", 
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }, 
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
           {
-            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world", 
-            "Key": "serverlessrepo:applicationId"
-          }, 
+            "Key": "serverlessrepo:applicationId",
+            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world"
+          },
           {
-            "Value": "1.0.0", 
-            "Key": "serverlessrepo:semanticVersion"
+            "Key": "serverlessrepo:semanticVersion",
+            "Value": "1.0.0"
           }
-        ]
-      }
-    }, 
+        ],
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
     "Sns": {
       "Type": "AWS::SNS::Topic"
     }

@@ -4,64 +4,64 @@ Parameters:
     Type: String
   DeleteList:
     Default:
-      - Retain
+    - Retain
     Type: List
   DeletePolicyIf:
-    Default: False
+    Default: false
     Type: Boolean
 
 Resources:
   LayerWithRuntimesString:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
-      CompatibleRuntimes: "strings are not allowed"
+      CompatibleRuntimes: strings are not allowed
 
   LayerWithLicenseInfoList:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       LicenseInfo:
-        - "lists also"
-        - "are not allowed"
+      - lists also
+      - are not allowed
 
   LayerWithNoContentUri:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       Description: No content uri
 
   LayerWithRetentionPolicy:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       RetentionPolicy: ErrorParam
 
   LayerWithRetentionPolicyParam:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       RetentionPolicy: !Ref DeletePolicy
 
   LayerWithRetentionPolicyListParam:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       RetentionPolicy: !Ref DeleteList
 
   LayerWithRetentionPolicyAsIntrinsic:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       RetentionPolicy: !If [DeletePolicyIf, Retain, Delete]
 
   LayerWithStringArchitecture:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
-      CompatibleArchitectures: "it must be a list"
+      CompatibleArchitectures: it must be a list
 
   LayerWithWrongArchitecture:
-    Type: 'AWS::Serverless::LayerVersion'
+    Type: AWS::Serverless::LayerVersion
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
-      CompatibleArchitectures: ['wrong']
+      CompatibleArchitectures: [wrong]

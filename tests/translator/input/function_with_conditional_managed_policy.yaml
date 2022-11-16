@@ -1,6 +1,5 @@
 Conditions:
-  DummyCondition:
-    !Equals ["", ""]
+  DummyCondition: !Equals ['', '']
 
 Resources:
   FunctionWithConditionalPolicy:
@@ -11,7 +10,7 @@ Resources:
       Runtime: python2.7
       CodeUri: s3://sam-demo-bucket/hello.zip
       Policies:
-        - !If
-          - DummyCondition
-          - !Sub arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess
-          - !Sub arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess
+      - !If
+        - DummyCondition
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess

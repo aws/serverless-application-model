@@ -1,180 +1,180 @@
 {
   "Resources": {
+    "ExpressLogGroup": {
+      "Type": "AWS::Logs::LogGroup"
+    },
     "MyFunction": {
-      "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "Handler": "hello.handler", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
-        }, 
+        },
+        "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
-            "MyFunctionRole", 
+            "MyFunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python2.7", 
+        },
+        "Runtime": "python2.7",
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    }, 
+      },
+      "Type": "AWS::Lambda::Function"
+    },
     "MyFunctionRole": {
-      "Type": "AWS::IAM::Role", 
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }, 
+          ],
+          "Version": "2012-10-17"
+        },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    }, 
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachine": {
+      "Properties": {
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "my-state-machine.asl.json",
+          "Version": 3
+        },
+        "DefinitionSubstitutions": {
+          "my_lambda_arn": {
+            "Fn::GetAtt": [
+              "MyFunction",
+              "Arn"
+            ]
+          }
+        },
+        "LoggingConfiguration": {
+          "Destinations": [
+            {
+              "CloudWatchLogsLogGroup": {
+                "LogGroupArn": {
+                  "Fn::GetAtt": [
+                    "ExpressLogGroup",
+                    "Arn"
+                  ]
+                }
+              }
+            }
+          ],
+          "IncludeExecutionData": false,
+          "Level": "FATAL"
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StateMachineRole",
+            "Arn"
+          ]
+        },
+        "StateMachineName": "MyStandardStateMachineWithLogging",
+        "StateMachineType": "EXPRESS",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
     "StateMachineRole": {
-      "Type": "AWS::IAM::Role", 
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "states.amazonaws.com"
                 ]
               }
             }
-          ]
-        }, 
-        "ManagedPolicyArns": [], 
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
         "Policies": [
           {
-            "PolicyName": "StateMachineRolePolicy0", 
             "PolicyDocument": {
-              "Version": "2012-10-17", 
               "Statement": [
                 {
-                  "Action": "lambda:InvokeFunction", 
+                  "Action": "lambda:InvokeFunction",
+                  "Effect": "Allow",
                   "Resource": {
                     "Fn::GetAtt": [
-                      "MyFunction", 
+                      "MyFunction",
                       "Arn"
                     ]
-                  }, 
-                  "Effect": "Allow"
+                  }
                 }
-              ]
-            }
-          }, 
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "StateMachineRolePolicy0"
+          },
           {
-            "PolicyName": "StateMachineRolePolicy1", 
             "PolicyDocument": {
-              "Version": "2012-10-17", 
               "Statement": [
                 {
                   "Action": [
-                    "logs:CreateLogDelivery", 
-                    "logs:GetLogDelivery", 
-                    "logs:UpdateLogDelivery", 
-                    "logs:DeleteLogDelivery", 
-                    "logs:ListLogDeliveries", 
-                    "logs:PutResourcePolicy", 
-                    "logs:DescribeResourcePolicies", 
+                    "logs:CreateLogDelivery",
+                    "logs:GetLogDelivery",
+                    "logs:UpdateLogDelivery",
+                    "logs:DeleteLogDelivery",
+                    "logs:ListLogDeliveries",
+                    "logs:PutResourcePolicy",
+                    "logs:DescribeResourcePolicies",
                     "logs:DescribeLogGroups"
-                  ], 
+                  ],
+                  "Effect": "Allow",
                   "Resource": [
                     "*"
-                  ], 
-                  "Effect": "Allow"
-                }
-              ]
-            }
-          }
-        ], 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "stateMachine:createdBy"
-          }
-        ]
-      }
-    }, 
-    "ExpressLogGroup": {
-      "Type": "AWS::Logs::LogGroup"
-    }, 
-    "StateMachine": {
-      "Type": "AWS::StepFunctions::StateMachine", 
-      "Properties": {
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "stateMachine:createdBy"
-          }
-        ], 
-        "RoleArn": {
-          "Fn::GetAtt": [
-            "StateMachineRole", 
-            "Arn"
-          ]
-        }, 
-        "StateMachineName": "MyStandardStateMachineWithLogging", 
-        "DefinitionSubstitutions": {
-          "my_lambda_arn": {
-            "Fn::GetAtt": [
-              "MyFunction", 
-              "Arn"
-            ]
-          }
-        }, 
-        "LoggingConfiguration": {
-          "IncludeExecutionData": false, 
-          "Level": "FATAL", 
-          "Destinations": [
-            {
-              "CloudWatchLogsLogGroup": {
-                "LogGroupArn": {
-                  "Fn::GetAtt": [
-                    "ExpressLogGroup", 
-                    "Arn"
                   ]
                 }
-              }
-            }
-          ]
-        }, 
-        "StateMachineType": "EXPRESS", 
-        "DefinitionS3Location": {
-          "Version": 3, 
-          "Bucket": "sam-demo-bucket", 
-          "Key": "my-state-machine.asl.json"
-        }
-      }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "StateMachineRolePolicy1"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

@@ -59,12 +59,12 @@ Resources:
             AuthorizerPayloadFormatVersion: 1.0
           MyOauth2Authorizer:
             AuthorizationScopes:
-              - scope
+            - scope
             IdentitySource: $request.header.Authorization
             JwtConfiguration:
               audience:
-                - audience1
-                - audience2
-              issuer: "https://www.example.com/v1/connect/oidc"
+              - audience1
+              - audience2
+              issuer: https://www.example.com/v1/connect/oidc
         DefaultAuthorizer: LambdaAuth
         EnableIamAuthorizer: true

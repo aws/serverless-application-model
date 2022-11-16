@@ -1,7 +1,7 @@
 Parameters:
   MyAlias:
     Type: String
-    Default: ""
+    Default: ''
 Resources:
   InvalidAutoPublishAliasFunction:
     Type: AWS::Serverless::Function
@@ -15,5 +15,5 @@ Resources:
         Get:
           Type: Api
           Properties:
-            Path: "/path"
+            Path: /path
             Method: GET

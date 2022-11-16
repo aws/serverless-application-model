@@ -1,0 +1,84 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # Stub resources
+  SomeFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !Ref SomeRole
+  SomeTable:
+    Type: AWS::DynamoDB::Table
+  SomeTopic:
+    Type: AWS::SNS::Topic
+  SomeQueue:
+    Type: AWS::SQS::Queue
+  SomeRule:
+    Type: AWS::Events::Rule
+
+  # Test AWS_IAM_ROLE_MANAGED_POLICY
+  IamRolePolicyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: SomeFunction
+      Destination:
+        Id: SomeTable
+      Permissions:
+      - Read
+      - Write
+  TestIamRolePolicyConnector:
+    DependsOn: IamRolePolicyConnector
+    Type: AWS::Foo::Bar
+  TestIamRolePolicyConnectorMulti:
+    DependsOn: [Foo, Egg, IamRolePolicyConnector]
+    Type: AWS::Foo::Bar
+
+  # Test AWS_SNS_TOPIC_POLICY
+  SnsTopicPolicyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: SomeRule
+      Destination:
+        Id: SomeTopic
+      Permissions:
+      - Write
+  TestSnsTopicPolicyConnector:
+    DependsOn: SnsTopicPolicyConnector
+    Type: AWS::Foo::Bar
+  TestSnsTopicPolicyConnectorMulti:
+    DependsOn: [Foo, SnsTopicPolicyConnector]
+    Type: AWS::Foo::Bar
+
+  # Test AWS_LAMBDA_PERMISSION
+  LambdaPermissionConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: SomeTopic
+      Destination:
+        Id: SomeFunction
+      Permissions:
+      - Write
+  TestLambdaPermissionConnector:
+    DependsOn: LambdaPermissionConnector
+    Type: AWS::Foo::Bar
+  TestLambdaPermissionConnectorMulti:
+    DependsOn: [Foo, LambdaPermissionConnector, Bar]
+    Type: AWS::Foo::Bar
+
+  # Test AWS_SQS_QUEUE_POLICY
+  SqsQueuePolicyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: SomeTopic
+      Destination:
+        Id: SomeQueue
+      Permissions:
+      - Write
+  TestSqsQueuePolicyConnector:
+    DependsOn: SqsQueuePolicyConnector
+    Type: AWS::Foo::Bar
+  TestSqsQueuePolicyConnectorMulti:
+    DependsOn: [SqsQueuePolicyConnector, Foo]
+    Type: AWS::Foo::Bar

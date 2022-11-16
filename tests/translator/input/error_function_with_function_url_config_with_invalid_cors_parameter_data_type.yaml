@@ -13,4 +13,4 @@ Resources:
       FunctionUrlConfig:
         AuthType: NONE
         Cors:
-          MaxAge: "10"
+          MaxAge: '10'

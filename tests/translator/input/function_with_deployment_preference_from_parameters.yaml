@@ -11,7 +11,7 @@ Parameters:
 
 Resources:
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -24,16 +24,16 @@ Resources:
           PreTraffic: !Ref MySanityTestFunction
           PostTraffic: !Ref MyValidationTestFunction
         Alarms:
-          - !Ref MyCloudWatchAlarm
+        - !Ref MyCloudWatchAlarm
         TriggerConfigurations:
-          - TriggerEvents:
-              - DeploymentSuccess
-              - DeploymentFailure
-            TriggerName: TestTrigger
-            TriggerTargetArn: !Ref MySNSTopic
+        - TriggerEvents:
+          - DeploymentSuccess
+          - DeploymentFailure
+          TriggerName: TestTrigger
+          TriggerTargetArn: !Ref MySNSTopic
 
   MySanityTestFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       Handler: hello.handler
       Runtime: python2.7
@@ -42,7 +42,7 @@ Resources:
         Enabled: !Ref MyLowerFalseParameter
 
   MyValidationTestFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       Handler: hello.handler
       Runtime: python2.7
@@ -53,12 +53,12 @@ Resources:
   MyCloudWatchAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
-     ComparisonOperator: GreaterThanThreshold
-     EvaluationPeriods: 1
-     MetricName: MyMetric
-     Namespace: AWS/EC2
-     Period: 300
-     Threshold: 10
+      ComparisonOperator: GreaterThanThreshold
+      EvaluationPeriods: 1
+      MetricName: MyMetric
+      Namespace: AWS/EC2
+      Period: 300
+      Threshold: 10
 
   MySNSTopic:
-      Type: AWS::SNS::Topic
+    Type: AWS::SNS::Topic

@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Event with id [StateMachineScheduleEvent] is invalid. QueueLogicalId must be a string",
   "errors": [
     {
       "errorMessage": "Event with id [StateMachineCWEvent] is invalid. QueueLogicalId must be a string"
     }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Event with id [StateMachineScheduleEvent] is invalid. QueueLogicalId must be a string"
+  ]
 }

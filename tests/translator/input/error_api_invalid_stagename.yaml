@@ -16,5 +16,5 @@ Resources:
           Properties:
             RestApiId:
               Ref: ApiWithEmptyStageName
-            Path: "/"
+            Path: /
             Method: ANY

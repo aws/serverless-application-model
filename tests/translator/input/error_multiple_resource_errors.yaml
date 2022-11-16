@@ -10,21 +10,21 @@ Resources:
     Properties:
       StageName: Prod
       DefinitionUri:
-        Bucket: "somebucket"
+        Bucket: somebucket
         # Key property is missing
 
   BadCodeUriFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: http://dropbox.com/my-object.zip
       Runtime: python2.7
       Handler: hello.handler
 
   BadCodeUriTypeFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri:
-        Key: "somebucket"
+        Key: somebucket
         # Buckiet property is missing
 
       Runtime: python2.7

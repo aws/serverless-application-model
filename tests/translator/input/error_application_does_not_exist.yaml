@@ -1,6 +1,6 @@
 Resources:
   MyApplication:
-    Type: 'AWS::Serverless::Application'
+    Type: AWS::Serverless::Application
     Properties:
       Location:
         ApplicationId: non-existent

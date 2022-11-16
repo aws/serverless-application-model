@@ -5,17 +5,17 @@ Resources:
       CodeUri: s3://sam-demo-bucket/starter.zip
       Handler: starter.handler
       Runtime: python2.7
-  
+
   ProcessingQueue:
     Type: AWS::SQS::Queue
-  
+
   ResolverLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/resolver.zip
       Handler: resolver.handler
       Runtime: python3.8
-  
+
   NestedWorkflow:
     Type: AWS::Serverless::StateMachine
     Properties:
@@ -32,7 +32,7 @@ Resources:
           NestedStateTwo:
             Type: Task
             Resource: !GetAtt StarterLambda.Arn
-            End: True
+            End: true
       Role: arn:aws:iam::123456123456:role/service-role/SampleRole
 
   OutputStore:
@@ -68,7 +68,7 @@ Resources:
                   Resource: arn:aws:states:::sqs:sendMessage.waitForTaskToken
                   Parameters:
                     QueueUrl: !Ref ProcessingQueue
-                    MessageBody.$: "$.input.message"
+                    MessageBody.$: $.input.message
                   Next: BranchOne_StateThree
                 BranchOne_StateThree:
                   Type: Task
@@ -79,10 +79,10 @@ Resources:
                 BranchOne_StateFour:
                   Type: Choice
                   Choices:
-                  - Variable: "$.value"
+                  - Variable: $.value
                     NumericEquals: 0
                     Next: ValueIsZero
-                  - Variable: "$.value"
+                  - Variable: $.value
                     NumericEquals: 1
                     Next: ValueIsOne
                 ValueIsZero:
@@ -107,20 +107,20 @@ Resources:
                     TableName: !Ref OutputStore
                     Item:
                       MessageId:
-                        S.$: "$.MessageDetails.MessageId"
+                        S.$: $.MessageDetails.MessageId
                       Body:
-                        S.$: "$.MessageDetails.Body"
+                        S.$: $.MessageDetails.Body
                   Next: BranchTwo_StateThree
                 BranchTwo_StateThree:
                   Type: Succeed
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: !Ref StarterLambda
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt ProcessingQueue.QueueName
-        - LambdaInvokePolicy:
-            FunctionName: !Ref ResolverLambda
-        - StepFunctionsExecutionPolicy:
-            StateMachineName: !GetAtt NestedWorkflow.Name
-        - DynamoDBWritePolicy:
-            TableName: !Ref OutputStore
+      - LambdaInvokePolicy:
+          FunctionName: !Ref StarterLambda
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt ProcessingQueue.QueueName
+      - LambdaInvokePolicy:
+          FunctionName: !Ref ResolverLambda
+      - StepFunctionsExecutionPolicy:
+          StateMachineName: !GetAtt NestedWorkflow.Name
+      - DynamoDBWritePolicy:
+          TableName: !Ref OutputStore

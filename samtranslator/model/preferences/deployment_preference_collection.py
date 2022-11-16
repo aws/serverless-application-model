@@ -1,3 +1,5 @@
+from typing import Any, Dict, Optional, cast
+
 from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
@@ -43,14 +45,14 @@ class DeploymentPreferenceCollection(object):
     resources.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         This collection stores an internal dict of the deployment preferences for each function's
         deployment preference in the SAM Template.
         """
-        self._resource_preferences = {}
+        self._resource_preferences: Dict[str, Any] = {}
 
-    def add(self, logical_id, deployment_preference_dict, condition=None):
+    def add(self, logical_id: str, deployment_preference_dict: Dict[str, Any], condition: Optional[str] = None) -> None:
         """
         Add this deployment preference to the collection
 
@@ -66,23 +68,25 @@ class DeploymentPreferenceCollection(object):
                 )
             )
 
-        self._resource_preferences[logical_id] = DeploymentPreference.from_dict(
+        self._resource_preferences[logical_id] = DeploymentPreference.from_dict(  # type: ignore[no-untyped-call]
             logical_id, deployment_preference_dict, condition
         )
 
-    def get(self, logical_id):
+    def get(self, logical_id: str) -> DeploymentPreference:
         """
         :rtype: DeploymentPreference object previously added for this given logical_id
         """
-        return self._resource_preferences.get(logical_id)
+        # Note: it never returns None
+        # TODO: find a way to deal with this implicit assumption
+        return cast(DeploymentPreference, self._resource_preferences.get(logical_id))
 
-    def any_enabled(self):
+    def any_enabled(self):  # type: ignore[no-untyped-def]
         """
         :return: boolean whether any deployment preferences in the collection are enabled
         """
         return any(preference.enabled for preference in self._resource_preferences.values())
 
-    def can_skip_service_role(self):
+    def can_skip_service_role(self):  # type: ignore[no-untyped-def]
         """
         If every one of the deployment preferences have a custom IAM role provided, we can skip creating the
         service role altogether.
@@ -90,7 +94,7 @@ class DeploymentPreferenceCollection(object):
         """
         return all(preference.role or not preference.enabled for preference in self._resource_preferences.values())
 
-    def needs_resource_condition(self):
+    def needs_resource_condition(self):  # type: ignore[no-untyped-def]
         """
         If all preferences have a condition, all code deploy resources need to be conditionally created
         :return: True, if a condition needs to be created
@@ -100,7 +104,7 @@ class DeploymentPreferenceCollection(object):
             not preference.condition and preference.enabled for preference in self._resource_preferences.values()
         )
 
-    def get_all_deployment_conditions(self):
+    def get_all_deployment_conditions(self):  # type: ignore[no-untyped-def]
         """
         Returns a list of all conditions associated with the deployment preference resources
         :return: List of condition names
@@ -111,31 +115,31 @@ class DeploymentPreferenceCollection(object):
             conditions_set.remove(None)
         return list(conditions_set)
 
-    def create_aggregate_deployment_condition(self):
+    def create_aggregate_deployment_condition(self):  # type: ignore[no-untyped-def]
         """
         Creates an aggregate deployment condition if necessary
         :return: None if <2 conditions are found, otherwise a dictionary of new conditions to add to template
         """
-        return make_combined_condition(self.get_all_deployment_conditions(), CODE_DEPLOY_CONDITION_NAME)
+        return make_combined_condition(self.get_all_deployment_conditions(), CODE_DEPLOY_CONDITION_NAME)  # type: ignore[no-untyped-call, no-untyped-call]
 
-    def enabled_logical_ids(self):
+    def enabled_logical_ids(self):  # type: ignore[no-untyped-def]
         """
         :return: only the logical id's for the deployment preferences in this collection which are enabled
         """
         return [logical_id for logical_id, preference in self._resource_preferences.items() if preference.enabled]
 
-    def get_codedeploy_application(self):
+    def get_codedeploy_application(self):  # type: ignore[no-untyped-def]
         codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         codedeploy_application_resource.ComputePlatform = "Lambda"
-        if self.needs_resource_condition():
-            conditions = self.get_all_deployment_conditions()
+        if self.needs_resource_condition():  # type: ignore[no-untyped-call]
+            conditions = self.get_all_deployment_conditions()  # type: ignore[no-untyped-call]
             condition_name = CODE_DEPLOY_CONDITION_NAME
             if len(conditions) <= 1:
                 condition_name = conditions.pop()
             codedeploy_application_resource.set_resource_attribute("Condition", condition_name)
         return codedeploy_application_resource
 
-    def get_codedeploy_iam_role(self):
+    def get_codedeploy_iam_role(self):  # type: ignore[no-untyped-def]
         iam_role = IAMRole(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID)
         iam_role.AssumeRolePolicyDocument = {
             "Version": "2012-10-17",
@@ -150,24 +154,24 @@ class DeploymentPreferenceCollection(object):
 
         # CodeDeploy has a new managed policy. We cannot update any existing partitions, without customer reach out
         # that support AWSCodeDeployRoleForLambda since this could regress stacks that are currently deployed.
-        if ArnGenerator.get_partition_name() in ["aws-iso", "aws-iso-b"]:
+        if ArnGenerator.get_partition_name() in ["aws-iso", "aws-iso-b"]:  # type: ignore[no-untyped-call]
             iam_role.ManagedPolicyArns = [
-                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambdaLimited")
+                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambdaLimited")  # type: ignore[no-untyped-call]
             ]
         else:
             iam_role.ManagedPolicyArns = [
-                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambda")
+                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambda")  # type: ignore[no-untyped-call]
             ]
 
-        if self.needs_resource_condition():
-            conditions = self.get_all_deployment_conditions()
+        if self.needs_resource_condition():  # type: ignore[no-untyped-call]
+            conditions = self.get_all_deployment_conditions()  # type: ignore[no-untyped-call]
             condition_name = CODE_DEPLOY_CONDITION_NAME
             if len(conditions) <= 1:
                 condition_name = conditions.pop()
             iam_role.set_resource_attribute("Condition", condition_name)
         return iam_role
 
-    def deployment_group(self, function_logical_id):
+    def deployment_group(self, function_logical_id: str) -> CodeDeployDeploymentGroup:
         """
         :param function_logical_id: logical_id of the function this deployment group belongs to
         :return: CodeDeployDeploymentGroup resource
@@ -175,10 +179,10 @@ class DeploymentPreferenceCollection(object):
 
         deployment_preference = self.get(function_logical_id)
 
-        deployment_group = CodeDeployDeploymentGroup(self.deployment_group_logical_id(function_logical_id))
+        deployment_group = CodeDeployDeploymentGroup(self.deployment_group_logical_id(function_logical_id))  # type: ignore[no-untyped-call, no-untyped-call]
 
         try:
-            deployment_group.AlarmConfiguration = self._convert_alarms(deployment_preference.alarms)
+            deployment_group.AlarmConfiguration = self._convert_alarms(deployment_preference.alarms)  # type: ignore[no-untyped-call]
         except ValueError as e:
             raise InvalidResourceException(function_logical_id, str(e))
 
@@ -188,7 +192,7 @@ class DeploymentPreferenceCollection(object):
             "Events": ["DEPLOYMENT_FAILURE", "DEPLOYMENT_STOP_ON_ALARM", "DEPLOYMENT_STOP_ON_REQUEST"],
         }
 
-        deployment_group.DeploymentConfigName = self._replace_deployment_types(
+        deployment_group.DeploymentConfigName = self._replace_deployment_types(  # type: ignore[no-untyped-call]
             copy.deepcopy(deployment_preference.deployment_type)
         )
 
@@ -206,7 +210,7 @@ class DeploymentPreferenceCollection(object):
 
         return deployment_group
 
-    def _convert_alarms(self, preference_alarms):
+    def _convert_alarms(self, preference_alarms):  # type: ignore[no-untyped-def]
         """
         Converts deployment preference alarms to an AlarmsConfiguration
 
@@ -232,13 +236,13 @@ class DeploymentPreferenceCollection(object):
             processed_alarms = copy.deepcopy(preference_alarms)
             alarms_list = processed_alarms.get("Fn::If")
             validate_intrinsic_if_items(alarms_list)
-            alarms_list[1] = self._build_alarm_configuration(alarms_list[1])
-            alarms_list[2] = self._build_alarm_configuration(alarms_list[2])
+            alarms_list[1] = self._build_alarm_configuration(alarms_list[1])  # type: ignore[no-untyped-call]
+            alarms_list[2] = self._build_alarm_configuration(alarms_list[2])  # type: ignore[no-untyped-call]
             return processed_alarms
 
-        return self._build_alarm_configuration(preference_alarms)
+        return self._build_alarm_configuration(preference_alarms)  # type: ignore[no-untyped-call]
 
-    def _build_alarm_configuration(self, alarms):
+    def _build_alarm_configuration(self, alarms):  # type: ignore[no-untyped-def]
         """
         Builds an AlarmConfiguration from a list of alarms
 
@@ -268,14 +272,14 @@ class DeploymentPreferenceCollection(object):
             "Alarms": [{"Name": alarm} for alarm in alarms],
         }
 
-    def _replace_deployment_types(self, value, key=None):
+    def _replace_deployment_types(self, value, key=None):  # type: ignore[no-untyped-def]
         if isinstance(value, list):
             for i, v in enumerate(value):
-                value[i] = self._replace_deployment_types(v)
+                value[i] = self._replace_deployment_types(v)  # type: ignore[no-untyped-call]
             return value
         if is_intrinsic(value):
             for (k, v) in value.items():
-                value[k] = self._replace_deployment_types(v, k)
+                value[k] = self._replace_deployment_types(v, k)  # type: ignore[no-untyped-call]
             return value
         if value in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
             if key == "Fn::Sub":  # Don't nest a "Sub" in a "Sub"
@@ -283,7 +287,7 @@ class DeploymentPreferenceCollection(object):
             return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value})
         return value
 
-    def update_policy(self, function_logical_id):
+    def update_policy(self, function_logical_id: str) -> UpdatePolicy:
         deployment_preference = self.get(function_logical_id)
 
         return UpdatePolicy(
@@ -293,18 +297,18 @@ class DeploymentPreferenceCollection(object):
             deployment_preference.post_traffic_hook,
         )
 
-    def deployment_group_logical_id(self, function_logical_id):
+    def deployment_group_logical_id(self, function_logical_id):  # type: ignore[no-untyped-def]
         return function_logical_id + "DeploymentGroup"
 
-    def __eq__(self, other):
+    def __eq__(self, other):  # type: ignore[no-untyped-def]
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
         return NotImplemented
 
-    def __ne__(self, other):
+    def __ne__(self, other):  # type: ignore[no-untyped-def]
         if isinstance(other, self.__class__):
-            return not self.__eq__(other)
+            return not self.__eq__(other)  # type: ignore[no-untyped-call]
         return NotImplemented
 
-    def __hash__(self):
+    def __hash__(self):  # type: ignore[no-untyped-def]
         return hash(tuple(sorted(self.__dict__.items())))

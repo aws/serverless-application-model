@@ -6,7 +6,6 @@ Description: >
   Sample SAM Template for apigateway-2402
 
 Resources:
-            
   ApiGatewayAdminOne:
     Type: AWS::Serverless::Api
     Properties:
@@ -14,19 +13,19 @@ Resources:
       StageName: Prod
       TracingEnabled: true
       MethodSettings:
-        - LoggingLevel: Info
-          ResourcePath: '/*'
-          HttpMethod: '*'
+      - LoggingLevel: Info
+        ResourcePath: /*
+        HttpMethod: '*'
       Domain:
         DomainName: admin.one.amazon.com
         CertificateArn: arn::cert::abc
         EndpointConfiguration: REGIONAL
         Route53:
-          HostedZoneId: "abc123456"
+          HostedZoneId: abc123456
       EndpointConfiguration:
         Type: REGIONAL
 
-            
+
   ApiGatewayAdminTwo:
     Type: AWS::Serverless::Api
     Properties:
@@ -34,19 +33,19 @@ Resources:
       StageName: Prod
       TracingEnabled: true
       MethodSettings:
-        - LoggingLevel: Info
-          ResourcePath: '/*'
-          HttpMethod: '*'
+      - LoggingLevel: Info
+        ResourcePath: /*
+        HttpMethod: '*'
       Domain:
         DomainName: admin.two.amazon.com
         CertificateArn: arn::cert::abc
         EndpointConfiguration: REGIONAL
         Route53:
-          HostedZoneId: "abc123456"
+          HostedZoneId: abc123456
       EndpointConfiguration:
         Type: REGIONAL
-        
-            
+
+
   ApiGatewayAdminThree:
     Type: AWS::Serverless::Api
     Properties:
@@ -54,14 +53,14 @@ Resources:
       StageName: Prod
       TracingEnabled: true
       MethodSettings:
-        - LoggingLevel: Info
-          ResourcePath: '/*'
-          HttpMethod: '*'
+      - LoggingLevel: Info
+        ResourcePath: /*
+        HttpMethod: '*'
       Domain:
         DomainName: admin.three.amazon.com
         CertificateArn: arn::cert::abc
         EndpointConfiguration: REGIONAL
         Route53:
-          HostedZoneId: "abc123456"
+          HostedZoneId: abc123456
       EndpointConfiguration:
         Type: REGIONAL

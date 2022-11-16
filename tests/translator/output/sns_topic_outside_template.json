@@ -3,88 +3,88 @@
     "SNSTopicArn": {
       "Type": "String"
     }
-  }, 
+  },
   "Resources": {
+    "SaveNotificationFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "notifications.zip"
+        },
+        "Handler": "index.save_notification",
+        "Role": {
+          "Fn::GetAtt": [
+            "SaveNotificationFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
     "SaveNotificationFunctionNotificationTopic": {
-      "Type": "AWS::SNS::Subscription", 
       "Properties": {
         "Endpoint": {
           "Fn::GetAtt": [
-            "SaveNotificationFunction", 
+            "SaveNotificationFunction",
             "Arn"
           ]
-        }, 
-        "Protocol": "lambda", 
+        },
+        "Protocol": "lambda",
         "TopicArn": {
           "Ref": "SNSTopicArn"
         }
-      }
-    }, 
-    "SaveNotificationFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      },
+      "Type": "AWS::SNS::Subscription"
+    },
+    "SaveNotificationFunctionNotificationTopicPermission": {
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "SaveNotificationFunction"
+        },
+        "Principal": "sns.amazonaws.com",
+        "SourceArn": {
+          "Ref": "SNSTopicArn"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "SaveNotificationFunctionRole": {
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
-    }, 
-    "SaveNotificationFunctionNotificationTopicPermission": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "sns.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "SaveNotificationFunction"
-        }, 
-        "SourceArn": {
-          "Ref": "SNSTopicArn"
-        }
-      }
-    }, 
-    "SaveNotificationFunction": {
-      "Type": "AWS::Lambda::Function", 
-      "Properties": {
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "notifications.zip"
-        }, 
-        "Handler": "index.save_notification", 
-        "Role": {
-          "Fn::GetAtt": [
-            "SaveNotificationFunctionRole", 
-            "Arn"
-          ]
-        }, 
-        "Runtime": "nodejs12.x",
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

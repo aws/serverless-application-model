@@ -11,7 +11,6 @@
   "Parameters": {},
   "Resources": {
     "MyFunction": {
-      "Type": "AWS::Lambda::Function",
       "Condition": "MyCondition",
       "Properties": {
         "Code": {
@@ -28,62 +27,20 @@
           ]
         },
         "Runtime": "nodejs12.x",
-        "Timeout": 3,
         "Tags": [
           {
             "Key": "lambda:createdBy",
             "Value": "SAM"
           }
-        ]
-      }
-    },
-    "MyFunctionUrl": {
-      "Type": "AWS::Lambda::Url",
-      "Condition": "MyCondition",
-      "Properties": {
-        "TargetFunctionArn": {
-          "Ref": "MyFunction"
-        },
-        "AuthType": "NONE",
-        "Cors": {
-          "AllowOrigins": [
-            "https://example.com",
-            "example1.com",
-            "example2.com",
-            "example2.com"
-          ],
-          "AllowMethods": [
-            "GET"
-          ],
-          "AllowCredentials": true,
-          "AllowHeaders": [
-            "x-Custom-Header"
-          ],
-          "ExposeHeaders": [
-            "x-amzn-header"
-          ],
-          "MaxAge": 10
-        }
-      }
-    },
-    "MyFunctionUrlPublicPermissions": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "MyCondition",
-      "Properties": {
-        "Action": "lambda:InvokeFunctionUrl",
-        "FunctionName": {
-          "Ref": "MyFunction"
-        },
-        "Principal": "*",
-        "FunctionUrlAuthType": "NONE"
-      }
+        ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "MyFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Condition": "MyCondition",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -96,7 +53,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -107,7 +65,49 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyFunctionUrl": {
+      "Condition": "MyCondition",
+      "Properties": {
+        "AuthType": "NONE",
+        "Cors": {
+          "AllowCredentials": true,
+          "AllowHeaders": [
+            "x-Custom-Header"
+          ],
+          "AllowMethods": [
+            "GET"
+          ],
+          "AllowOrigins": [
+            "https://example.com",
+            "example1.com",
+            "example2.com",
+            "example2.com"
+          ],
+          "ExposeHeaders": [
+            "x-amzn-header"
+          ],
+          "MaxAge": 10
+        },
+        "TargetFunctionArn": {
+          "Ref": "MyFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Url"
+    },
+    "MyFunctionUrlPublicPermissions": {
+      "Condition": "MyCondition",
+      "Properties": {
+        "Action": "lambda:InvokeFunctionUrl",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "FunctionUrlAuthType": "NONE",
+        "Principal": "*"
+      },
+      "Type": "AWS::Lambda::Permission"
     }
   }
 }

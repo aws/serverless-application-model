@@ -1,10 +1,10 @@
 Conditions:
   condition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
 Resources:
-  HttpApiFunction: 
+  HttpApiFunction:
     Condition: condition
     Type: AWS::Serverless::Function
     Properties:
@@ -15,7 +15,7 @@ Resources:
         Basic: # integration exists
           Type: HttpApi
           Properties:
-            PayloadFormatVersion: "2.0"
+            PayloadFormatVersion: '2.0'
             Path: /basic
             Method: post
             ApiId: !Ref MyApi
@@ -27,8 +27,8 @@ Resources:
             ApiId: !Ref MyApi
             Auth:
               Authorizer: OAuth2
-              AuthorizationScopes: 
-                - basic
+              AuthorizationScopes:
+              - basic
         SimpleCase: # path exists, integration doesn't
           Type: HttpApi
           Properties:
@@ -43,12 +43,12 @@ Resources:
         Authorizers:
           OAuth2:
             AuthorizationScopes:
-              - scope4
+            - scope4
             JwtConfiguration:
-              issuer: "https://www.example.com/v1/connect/oidc"
+              issuer: https://www.example.com/v1/connect/oidc
               audience:
-                - MyApi
-            IdentitySource: "$request.querystring.param"
+              - MyApi
+            IdentitySource: $request.querystring.param
         DefaultAuthorizer: OAuth2
       DefinitionBody:
         info:
@@ -56,7 +56,7 @@ Resources:
           title:
             Ref: AWS::StackName
         paths:
-          "/basic":
+          /basic:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -76,7 +76,7 @@ Resources:
                   Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations
                 payloadFormatVersion: '1.0'
               responses: {}
-          "/integration":
+          /integration:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -89,7 +89,7 @@ Resources:
                 - scope1
                 - scope2
               responses: {}
-          "$default":
+          $default:
             x-amazon-apigateway-any-method:
               isDefaultRoute: true
               security:
@@ -97,7 +97,7 @@ Resources:
                 - scope1
                 - scope2
               responses: {}
-          "/oauth2":
+          /oauth2:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -111,14 +111,14 @@ Resources:
               responses: {}
         openapi: 3.0.1
         tags:
-          - name: Tag1
-            description: this tag exists, but doesn't have an amazon extension value
+        - name: Tag1
+          description: this tag exists, but doesn't have an amazon extension value
         components:
           securitySchemes:
             oauth2Auth:
               type: oauth2
               x-amazon-apigateway-authorizer:
-                identitySource: "$request.querystring.param"
+                identitySource: $request.querystring.param
                 type: jwt
                 jwtConfiguration:
                   audience:
@@ -127,7 +127,7 @@ Resources:
             OpenIdAuth:
               type: openIdConnect
               x-amazon-apigateway-authorizer:
-                identitySource: "$request.querystring.param"
+                identitySource: $request.querystring.param
                 type: jwt
                 jwtConfiguration:
                   audience:

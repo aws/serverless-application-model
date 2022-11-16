@@ -14,12 +14,12 @@ Resources:
           Type: IoTRule
           Properties:
             Sql: SELECT * FROM 'topic/test'
-            AwsIotSqlVersion: beta 
+            AwsIotSqlVersion: beta
       Handler: index.handler
       MemorySize: 1024
       Runtime: nodejs12.x
       Timeout: 3
-  
+
   IoTRuleFuncMyIoTRule:
     Type: AWS::IoT::TopicRule
     Properties:

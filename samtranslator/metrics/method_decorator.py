@@ -6,6 +6,7 @@ from datetime import datetime
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 from samtranslator.model import Resource
 import logging
+from typing import Any, Callable, Optional, Union
 
 LOG = logging.getLogger(__name__)
 
@@ -16,22 +17,22 @@ class MetricsMethodWrapperSingleton:
     This singleton will be alive until lambda receives shutdown event
     """
 
-    _DUMMY_INSTANCE = Metrics("ServerlessTransform", DummyMetricsPublisher())
+    _DUMMY_INSTANCE = Metrics("ServerlessTransform", DummyMetricsPublisher())  # type: ignore[no-untyped-call, no-untyped-call]
     _METRICS_INSTANCE = _DUMMY_INSTANCE
 
     @staticmethod
-    def set_instance(metrics):
+    def set_instance(metrics):  # type: ignore[no-untyped-def]
         MetricsMethodWrapperSingleton._METRICS_INSTANCE = metrics
 
     @staticmethod
-    def get_instance():
+    def get_instance():  # type: ignore[no-untyped-def]
         """
         Return the instance, if nothing is set return a dummy one
         """
         return MetricsMethodWrapperSingleton._METRICS_INSTANCE
 
 
-def _get_metric_name(prefix, name, func, args):
+def _get_metric_name(prefix, name, func, args):  # type: ignore[no-untyped-def]
     """
     Returns the metric name depending on the parameters
 
@@ -61,20 +62,22 @@ def _get_metric_name(prefix, name, func, args):
     return metric_name
 
 
-def _send_cw_metric(prefix, name, execution_time_ms, func, args):
+def _send_cw_metric(prefix, name, execution_time_ms, func, args):  # type: ignore[no-untyped-def]
     """
     Gets metric name from 'prefix', 'name', 'func' and 'args' parameters, then calls metrics instance from its
     singleton object to record the latency.
     """
     try:
-        metric_name = _get_metric_name(prefix, name, func, args)
+        metric_name = _get_metric_name(prefix, name, func, args)  # type: ignore[no-untyped-call]
         LOG.debug("Execution took %sms for %s", execution_time_ms, metric_name)
-        MetricsMethodWrapperSingleton.get_instance().record_latency(metric_name, execution_time_ms)
+        MetricsMethodWrapperSingleton.get_instance().record_latency(metric_name, execution_time_ms)  # type: ignore[no-untyped-call]
     except Exception as e:
         LOG.warning("Failed to add metrics", exc_info=e)
 
 
-def cw_timer(_func=None, name=None, prefix=None):
+def cw_timer(
+    _func: Optional[Callable[..., Any]] = None, name: Optional[str] = None, prefix: Optional[str] = None
+) -> Union[Callable[..., Any], Callable[[Callable[..., Any]], Callable[..., Any]]]:
     """
     A method decorator, that will calculate execution time of the decorated method, and store this information as a
     metric in CloudWatch by calling the metrics singleton instance.
@@ -87,16 +90,16 @@ def cw_timer(_func=None, name=None, prefix=None):
     If prefix is defined, it will be added in the beginning of what is been generated above
     """
 
-    def cw_timer_decorator(func):
+    def cw_timer_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(func)
-        def wrapper_cw_timer(*args, **kwargs):
+        def wrapper_cw_timer(*args, **kwargs):  # type: ignore[no-untyped-def]
             start_time = datetime.now()
 
             exec_result = func(*args, **kwargs)
 
             execution_time = datetime.now() - start_time
             execution_time_ms = execution_time.total_seconds() * 1000
-            _send_cw_metric(prefix, name, execution_time_ms, func, args)
+            _send_cw_metric(prefix, name, execution_time_ms, func, args)  # type: ignore[no-untyped-call]
 
             return exec_result
 

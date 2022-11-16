@@ -13,14 +13,14 @@ Resources:
 
       DefinitionBody:
         paths:
-          "/path":
+          /path:
             put:
               responses:
                 '201':
                   content:
                     application/json:
                       schema:
-                        "$ref": "abcd"
+                        $ref: abcd
               x-amazon-apigateway-integration:
                 contentHandling: CONVERT_TO_TEXT
                 responses:
@@ -40,6 +40,6 @@ Resources:
                       - status
                       type: object
               security:
-                - []
+              - []
 
         openapi: 3.0.3

@@ -1,5 +1,5 @@
 Conditions:
-  TestCondition: !Equals ["a", "b"]
+  TestCondition: !Equals [a, b]
 
 Resources:
   HtmlFunction:

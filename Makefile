@@ -19,15 +19,19 @@ integ-test:
 
 black:
 	black setup.py samtranslator/* tests/* integration/* bin/*.py
+	bin/json-format.py --write tests
+	bin/yaml-format.py --write tests
 
 black-check:
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
+	bin/json-format.py --check tests
+	bin/yaml-format.py --check tests
 
 lint:
+	# mypy performs type check
+	mypy --strict samtranslator bin
 	# Linter performs static analysis to catch latent bugs
 	pylint --rcfile .pylintrc samtranslator
-	# mypy performs type check
-	mypy samtranslator
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup

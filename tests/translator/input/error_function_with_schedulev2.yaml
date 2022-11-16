@@ -1,0 +1,72 @@
+Parameters:
+  Env:
+    Type: String
+    Default: prd
+
+Resources:
+  ScheduledFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ScheduleMissingDLQProperty:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            FlexibleTimeWindow:
+              Mode: 'OFF'
+            DeadLetterConfig:
+              QueueLogicalId: MyDlqId
+
+  ScheduledFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ScheduleIntrinsics:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            FlexibleTimeWindow:
+              Mode: 'OFF'
+            DeadLetterConfig:
+              Type: SQS
+              QueueLogicalId:
+                Fn::Sub: testLambdaFunctionEBRuleDLQ${Env}
+
+  ScheduledFunction3:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ScheduleBothProvided:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            FlexibleTimeWindow:
+              Mode: 'OFF'
+            DeadLetterConfig:
+              Type: SQS
+              Arn: MyDlqArn
+
+  ScheduledFunction4:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ScheduleInvalidType:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            FlexibleTimeWindow:
+              Mode: 'OFF'
+            DeadLetterConfig:
+              Type: SNS

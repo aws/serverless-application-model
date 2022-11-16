@@ -1,10 +1,10 @@
 Resources:
   HttpApi:
-    Type: "AWS::Serverless::HttpApi"
+    Type: AWS::Serverless::HttpApi
     Properties:
       Domain:
         DomainName: domain-name
         CertificateArn:
-          "Ref": "CertificateArn"
+          Ref: CertificateArn
         BasePath:
-          - "Fn::Sub": "/${BasePathId}"
+        - Fn::Sub: /${BasePathId}

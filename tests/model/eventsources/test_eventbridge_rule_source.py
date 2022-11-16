@@ -32,6 +32,12 @@ class EventBridgeRuleSourceTests(TestCase):
         state = cfn[0].State
         self.assertEqual(state, "DISABLED")
 
+    def test_name_when_provided(self):
+        self.eb_event_source.RuleName = "MyRule"
+        cfn = self.eb_event_source.to_cloudformation(function=self.func)
+        name = cfn[0].Name
+        self.assertEqual(name, "MyRule")
+
     def test_to_cloudformation_with_retry_policy(self):
         retry_policy = {"MaximumRetryAttempts": "10", "MaximumEventAgeInSeconds": "300"}
         self.eb_event_source.RetryPolicy = retry_policy

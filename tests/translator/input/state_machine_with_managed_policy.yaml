@@ -6,4 +6,4 @@ Resources:
       Type: STANDARD
       DefinitionUri: s3://sam-demo-bucket/my-state-machine.asl.json
       Policies:
-        - AmazonDynamoDBFullAccess
+      - AmazonDynamoDBFullAccess

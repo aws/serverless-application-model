@@ -1,32 +1,30 @@
 Mappings:
   DeploymentPreferenceMap:
     prod:
-      DeploymentPreference:
-        AllAtOnce
+      DeploymentPreference: AllAtOnce
     beta:
-      DeploymentPreference:
-        CustomDeployment
+      DeploymentPreference: CustomDeployment
 
 Parameters:
   Stage:
     Type: String
-    Default: 'beta'
+    Default: beta
   Deployment:
     Type: String
-    Default: 'AllAtOnce'
+    Default: AllAtOnce
   Custom:
     Type: String
-    Default: 'CustomDeployment'
+    Default: CustomDeployment
 
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -36,7 +34,7 @@ Resources:
         Type: TestDeploymentConfiguration
 
   CustomWithFindInMap: # Doesn't work
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -46,7 +44,7 @@ Resources:
         Type: !FindInMap [DeploymentPreferenceMap, !Ref Stage, DeploymentPreference]
 
   CustomWithCondition: # Works
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -56,7 +54,7 @@ Resources:
         Type: !If [MyCondition, TestDeploymentConfiguration, AllAtOnce]
 
   CustomWithCondition2:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -66,7 +64,7 @@ Resources:
         Type: !If [MyCondition, !Sub "${Deployment}", !Ref Custom]
 
   NormalWithSub:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -76,7 +74,7 @@ Resources:
         Type: !Sub ${Deployment}
 
   CustomWithSub:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -86,7 +84,7 @@ Resources:
         Type: !Sub ${Custom}
 
   NormalWithRef:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

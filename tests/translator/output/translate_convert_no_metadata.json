@@ -1,90 +1,94 @@
 {
   "Resources": {
     "Images": {
-      "Type": "AWS::S3::Bucket",
-      "DependsOn": ["ThumbnailFunctionImageBucketPermission"],
+      "DependsOn": [
+        "ThumbnailFunctionImageBucketPermission"
+      ],
       "Properties": {
         "NotificationConfiguration": {
           "LambdaConfigurations": [
             {
+              "Event": "s3:ObjectCreated:*",
               "Function": {
                 "Fn::GetAtt": [
-                  "ThumbnailFunction", 
+                  "ThumbnailFunction",
                   "Arn"
                 ]
-              }, 
-              "Event": "s3:ObjectCreated:*"
+              }
             }
           ]
         }
-      }
-    }, 
-    "ThumbnailFunctionRole": {
-      "Type": "AWS::IAM::Role",
+      },
+      "Type": "AWS::S3::Bucket"
+    },
+    "ThumbnailFunction": {
+      "Metadata": {
+        "Foo": "Bar"
+      },
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "thumbnails.zip"
+        },
+        "Handler": "index.generate_thumbails",
+        "Role": {
+          "Fn::GetAtt": [
+            "ThumbnailFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        ],
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "ThumbnailFunctionImageBucketPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ThumbnailFunction"
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "ThumbnailFunctionRole": {
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
-    }, 
-    "ThumbnailFunctionImageBucketPermission": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "SourceAccount": {
-          "Ref": "AWS::AccountId"
-        }, 
-        "FunctionName": {
-          "Ref": "ThumbnailFunction"
-        }, 
-        "Principal": "s3.amazonaws.com"
-      }
-    }, 
-    "ThumbnailFunction": {
-      "Type": "AWS::Lambda::Function", 
-      "Metadata":{"Foo": "Bar"},
-      "Properties": {
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "thumbnails.zip"
-        }, 
-        "Handler": "index.generate_thumbails", 
-        "Role": {
-          "Fn::GetAtt": [
-            "ThumbnailFunctionRole", 
-            "Arn"
-          ]
-        }, 
-        "Runtime": "nodejs12.x",
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

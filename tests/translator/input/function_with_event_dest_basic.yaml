@@ -11,7 +11,7 @@ Globals:
       DestinationConfig:
         OnSuccess:
           Type: SQS
-        OnFailure: 
+        OnFailure:
           Type: SNS
           Destination: !Ref SNSArn
 

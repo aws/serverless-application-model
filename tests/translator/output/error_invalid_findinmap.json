@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Structure of the SAM template is invalid. Invalid FindInMap value ['ApplicationLocations', 'ap-southeast-1']. FindInMap expects an array with 3 values.",
   "errors": [
     {
       "errorMessage": "Structure of the SAM template is invalid. Invalid FindInMap value ['ApplicationLocations', 'ap-southeast-1']. FindInMap expects an array with 3 values."
     }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Structure of the SAM template is invalid. Invalid FindInMap value ['ApplicationLocations', 'ap-southeast-1']. FindInMap expects an array with 3 values."
+  ]
 }

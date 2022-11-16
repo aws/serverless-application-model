@@ -8,7 +8,7 @@ Resources:
           title:
             Ref: AWS::StackName
         paths:
-          "/basic":
+          /basic:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST

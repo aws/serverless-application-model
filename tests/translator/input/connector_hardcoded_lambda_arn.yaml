@@ -11,4 +11,4 @@ Resources:
         Type: AWS::Lambda::Function
         Arn: !GetAtt SomeLambda.Arn
       Permissions:
-        - Write
+      - Write

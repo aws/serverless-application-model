@@ -16,4 +16,3 @@ Resources:
       MemorySize: 1024
       Runtime: nodejs12.x
       Timeout: 3
-

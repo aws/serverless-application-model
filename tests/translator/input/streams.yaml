@@ -1,6 +1,6 @@
 Resources:
   KinesisFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/streams.zip
       Handler: stream.kinesis_handler
@@ -14,7 +14,7 @@ Resources:
             StartingPosition: TRIM_HORIZON
             Enabled: false
   DynamoDBFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/streams.zip
       Handler: stream.ddb_handler
@@ -27,7 +27,7 @@ Resources:
             BatchSize: 200
             StartingPosition: LATEST
   MSKFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/streams.zip
       Handler: stream.msk_handler
@@ -39,4 +39,4 @@ Resources:
             Stream: arn:aws:kafka:us-west-2:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
             StartingPosition: LATEST
             Topics:
-              - "Topic1"
+            - Topic1

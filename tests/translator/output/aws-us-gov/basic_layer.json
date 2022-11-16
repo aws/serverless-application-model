@@ -2,7 +2,7 @@
   "Conditions": {
     "TestCondition": {
       "Fn::Equals": [
-        "beta", 
+        "beta",
         "beta"
       ]
     }
@@ -14,94 +14,94 @@
     }
   },
   "Resources": {
-    "LayerWithCondition7c655e10ea": {
-      "DeletionPolicy": "Retain", 
-      "Type": "AWS::Lambda::LayerVersion", 
-      "Properties": {
-        "Content": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "layer.zip"
-        }, 
-        "LayerName": "LayerWithCondition"
-      }, 
-      "Condition": "TestCondition"
-    }, 
-    "MinimalLayer0c7f96cce7": {
-      "DeletionPolicy": "Retain", 
-      "Type": "AWS::Lambda::LayerVersion", 
-      "Properties": {
-        "Content": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "layer.zip"
-        }, 
-        "LayerName": "MinimalLayer"
-      }
-    }, 
     "CompleteLayer5d71a60e81": {
-      "DeletionPolicy": "Retain", 
-      "Type": "AWS::Lambda::LayerVersion", 
+      "DeletionPolicy": "Retain",
       "Properties": {
-        "Content": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "layer.zip"
-        }, 
-        "LayerName": "MyAwesomeLayer", 
-        "Description": "Starter Lambda Layer", 
-        "LicenseInfo": "License information", 
         "CompatibleRuntimes": [
-          "python3.6", 
+          "python3.6",
           "python2.7"
-        ]
-      }
-    },
-    "LayerWithContentUriObjectbdbf1b82ac": {
-      "DeletionPolicy": "Delete", 
-      "Type": "AWS::Lambda::LayerVersion", 
-      "Properties": {
+        ],
         "Content": {
-          "S3Bucket": "somebucket", 
-          "S3Key": "somekey", 
-          "S3ObjectVersion": "v1"
-        }, 
-        "LayerName": "LayerWithContentUriObject"
-      }
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "Description": "Starter Lambda Layer",
+        "LayerName": "MyAwesomeLayer",
+        "LicenseInfo": "License information"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    },
+    "LayerWithArchitecturesab56a78493": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "CompatibleArchitectures": [
+          "x86_64",
+          "arm64"
+        ],
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithArchitectures"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
     },
     "LayerWithCaseInsensitiveRetentionPolicyead52a491d": {
       "DeletionPolicy": "Delete",
-      "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "layer.zip"
         },
         "LayerName": "LayerWithCaseInsensitiveRetentionPolicy"
-      }
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    },
+    "LayerWithCondition7c655e10ea": {
+      "Condition": "TestCondition",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithCondition"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    },
+    "LayerWithContentUriObjectbdbf1b82ac": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "somebucket",
+          "S3Key": "somekey",
+          "S3ObjectVersion": "v1"
+        },
+        "LayerName": "LayerWithContentUriObject"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
     },
     "LayerWithRetentionPolicyParamcc64815342": {
       "DeletionPolicy": "Retain",
-      "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "layer.zip"
         },
         "LayerName": "LayerWithRetentionPolicyParam"
-      }
-    }, 
-    "LayerWithArchitecturesab56a78493": {
-      "DeletionPolicy": "Retain", 
-      "Type": "AWS::Lambda::LayerVersion", 
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    },
+    "MinimalLayer0c7f96cce7": {
+      "DeletionPolicy": "Retain",
       "Properties": {
         "Content": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "layer.zip"
-        }, 
-        "CompatibleArchitectures": [
-          "x86_64", 
-          "arm64"
-        ], 
-        "LayerName": "LayerWithArchitectures"
-      }
+        },
+        "LayerName": "MinimalLayer"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
     }
   }
 }

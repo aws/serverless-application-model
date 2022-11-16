@@ -1,6 +1,6 @@
 Resources:
   MyApiWithCognitoAuth:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
@@ -9,13 +9,13 @@ Resources:
           MyDefaultCognitoAuth:
             UserPoolArn: arn:aws:1
             AuthorizationScopes:
-              - default.write
-              - default.read
+            - default.write
+            - default.read
           MyCognitoAuthWithDefaultScopes:
             UserPoolArn: arn:aws:2
             AuthorizationScopes:
-              - default.delete
-              - default.update
+            - default.delete
+            - default.update
 
   MyFn:
     Type: AWS::Serverless::Function
@@ -54,9 +54,9 @@ Resources:
             Path: /cognitodefaultscopesoverwritten
             Auth:
               Authorizer: MyDefaultCognitoAuth
-              AuthorizationScopes: 
-                - overwritten.read
-                - overwritten.write
+              AuthorizationScopes:
+              - overwritten.read
+              - overwritten.write
         CognitoAuthorizerScopesOverwritten:
           Type: Api
           Properties:
@@ -65,9 +65,9 @@ Resources:
             Path: /cognitoauthorizercopesoverwritten
             Auth:
               Authorizer: MyCognitoAuthWithDefaultScopes
-              AuthorizationScopes: 
-                - overwritten.read
-                - overwritten.write
+              AuthorizationScopes:
+              - overwritten.read
+              - overwritten.write
         CognitoDefaultScopesNone:
           Type: Api
           Properties:
