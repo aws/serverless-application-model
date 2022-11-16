@@ -1,6 +1,8 @@
+import json
 import logging
 from unittest.case import skipIf
 
+import requests
 from tenacity import stop_after_attempt, wait_exponential, retry_if_exception_type, after_log, wait_random
 
 from integration.helpers.base_test import BaseTest
@@ -113,3 +115,21 @@ class TestBasicApi(BaseTest):
         self.assertIsNotNone(stage)
         self.assertEqual(stage["tags"]["TagKey1"], "TagValue1")
         self.assertEqual(stage["tags"]["TagKey2"], "")
+
+    def test_state_machine_with_api_single_quotes_input(self):
+        """
+        Pass single quotes in input JSON to a StateMachine
+        See https://github.com/aws/serverless-application-model/issues/1895
+        """
+        self.create_and_verify_stack("single/state_machine_with_api")
+
+        stack_output = self.get_stack_outputs()
+        api_endpoint = stack_output.get("ApiEndpoint")
+
+        input_json = {"f'oo": {"hello": "'wor'l'd'''"}}
+        response = self.verify_post_request(api_endpoint, input_json, 200)
+
+        execution_arn = response.json()["executionArn"]
+        execution = self.client_provider.sfn_client.describe_execution(executionArn=execution_arn)
+        execution_input = json.loads(execution["input"])
+        self.assertEqual(execution_input, input_json)
