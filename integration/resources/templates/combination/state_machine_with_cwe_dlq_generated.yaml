@@ -57,3 +57,7 @@ Outputs:
     Description: "Url of the dead-letter queue created for the CWE rule target"
     Value:
       Ref: MyStateMachineCWEventQueue
+
+Metadata:
+  SamTransformTest: true
+

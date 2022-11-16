@@ -20,3 +20,8 @@ Resources:
                 Ref: ScheduleName
               Description: test schedule
               Enabled: True
+
+
+Metadata:
+  SamTransformTest: true
+

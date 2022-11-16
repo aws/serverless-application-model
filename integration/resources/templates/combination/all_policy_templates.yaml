@@ -207,3 +207,8 @@ Resources:
             EndpointConfigName: name
         - EcsRunTaskPolicy:
             TaskDefinition: name
+
+
+Metadata:
+  SamTransformTest: true
+

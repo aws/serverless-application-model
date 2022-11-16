@@ -63,3 +63,8 @@ Resources:
       GroupDescription: "my test group"
       VpcId:
         Ref: PreCreatedVpc
+
+
+Metadata:
+  SamTransformTest: true
+

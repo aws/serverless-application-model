@@ -116,3 +116,8 @@ Resources:
         Var2:
           "Fn::Join": ["", ["1", "2"]]
 
+
+
+Metadata:
+  SamTransformTest: true
+

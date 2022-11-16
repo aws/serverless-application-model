@@ -93,3 +93,8 @@ Resources:
     DestinationSQS:
         Condition: QueueCreationDisabled
         Type: AWS::SQS::Queue
+
+
+Metadata:
+  SamTransformTest: true
+

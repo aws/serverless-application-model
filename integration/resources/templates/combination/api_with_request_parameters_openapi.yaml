@@ -45,3 +45,8 @@ Resources:
           Properties:
             Path: /two
             Method: get
+
+
+Metadata:
+  SamTransformTest: true
+

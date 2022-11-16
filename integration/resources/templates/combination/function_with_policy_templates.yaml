@@ -39,3 +39,8 @@ Resources:
 
   MyQueue:
     Type: AWS::SQS::Queue
+
+
+Metadata:
+  SamTransformTest: true
+

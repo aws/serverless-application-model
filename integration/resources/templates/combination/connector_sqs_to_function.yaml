@@ -80,3 +80,7 @@ Resources:
       Permissions:
         - Read
         - Write
+
+Metadata:
+  SamTransformTest: true
+

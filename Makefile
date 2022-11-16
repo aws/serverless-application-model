@@ -21,11 +21,13 @@ black:
 	black setup.py samtranslator/* tests/* integration/* bin/*.py
 	bin/json-format.py --write tests
 	bin/yaml-format.py --write tests
+	bin/yaml-format.py --write integration --add-test-metadata
 
 black-check:
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
 	bin/json-format.py --check tests
 	bin/yaml-format.py --check tests
+	bin/yaml-format.py --check integration --add-test-metadata
 
 lint:
 	# mypy performs type check

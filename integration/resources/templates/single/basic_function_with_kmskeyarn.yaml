@@ -30,3 +30,7 @@ Resources:
                Action:
                  - "kms:*"
                Resource: "*"
+
+Metadata:
+  SamTransformTest: true
+

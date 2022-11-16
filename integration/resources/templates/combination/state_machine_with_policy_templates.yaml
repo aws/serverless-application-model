@@ -34,3 +34,7 @@ Outputs:
     Description: "ARN of the role created for the State Machine"
     Value:
       Ref: MyStateMachineRole
+
+Metadata:
+  SamTransformTest: true
+

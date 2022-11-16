@@ -36,3 +36,7 @@ Outputs:
       Fn::GetAtt:
         - "MyDeadLetterQueue"
         - "Arn"
+
+Metadata:
+  SamTransformTest: true
+

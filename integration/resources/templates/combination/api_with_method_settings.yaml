@@ -11,3 +11,8 @@ Resources:
         "ResourcePath": "/*",
         "HttpMethod": "*"
     }]
+
+
+Metadata:
+  SamTransformTest: true
+

@@ -29,3 +29,8 @@ Resources:
         Id: MyTopic
       Permissions:
         - Write
+
+
+Metadata:
+  SamTransformTest: true
+

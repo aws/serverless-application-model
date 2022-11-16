@@ -38,3 +38,7 @@ Outputs:
     Description: "Url of the dead-letter queue created for the Schedule rule target"
     Value:
       Ref: MyLambdaFunctionRepeatQueue
+
+Metadata:
+  SamTransformTest: true
+

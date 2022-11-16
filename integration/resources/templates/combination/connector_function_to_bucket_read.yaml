@@ -44,3 +44,7 @@ Resources:
         Id: Bucket
       Permissions:
         - Read
+
+Metadata:
+  SamTransformTest: true
+

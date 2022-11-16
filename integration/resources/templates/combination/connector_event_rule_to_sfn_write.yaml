@@ -91,3 +91,8 @@ Resources:
         Id: StateMachine
       Permissions:
         - Write
+
+
+Metadata:
+  SamTransformTest: true
+

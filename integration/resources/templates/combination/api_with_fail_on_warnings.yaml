@@ -32,3 +32,8 @@ Resources:
               Ref: RestApiGateway
             Method: GET
             Path: /
+
+
+Metadata:
+  SamTransformTest: true
+

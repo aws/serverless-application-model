@@ -102,3 +102,8 @@ Resources:
         Id: VerificationQueue
       Permissions:
         - Write
+
+
+Metadata:
+  SamTransformTest: true
+

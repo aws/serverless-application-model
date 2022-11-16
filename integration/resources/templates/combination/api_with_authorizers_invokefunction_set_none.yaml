@@ -74,3 +74,7 @@ Outputs:
       Description: "API endpoint URL for Prod environment"
       Value:
         Fn::Sub: 'https://${MyApiWithAwsIamAuthNoCallerCredentials}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+
+Metadata:
+  SamTransformTest: true
+

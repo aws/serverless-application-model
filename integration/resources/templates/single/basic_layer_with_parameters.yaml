@@ -44,3 +44,7 @@ Outputs:
     LayerName:
         Value:
             Ref: LayerName
+
+Metadata:
+  SamTransformTest: true
+

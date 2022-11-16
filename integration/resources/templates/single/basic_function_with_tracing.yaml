@@ -34,3 +34,8 @@ Resources:
                 - AmazonS3ReadOnlyAccess
             Tracing:
               Ref: TracingParamPassThrough
+
+
+Metadata:
+  SamTransformTest: true
+

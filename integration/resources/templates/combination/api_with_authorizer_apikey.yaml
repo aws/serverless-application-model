@@ -114,3 +114,8 @@ Outputs:
       Description: "Authorizer Function Arn"
       Value:
         Fn::GetAtt: MyLambdaAuthFunction.Arn
+
+
+Metadata:
+  SamTransformTest: true
+

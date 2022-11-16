@@ -4,3 +4,8 @@ Resources:
         Properties:
             ContentUri: ${contenturi}
             RetentionPolicy: Delete
+
+
+Metadata:
+  SamTransformTest: true
+

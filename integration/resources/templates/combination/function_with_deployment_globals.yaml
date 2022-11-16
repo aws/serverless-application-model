@@ -48,3 +48,8 @@ Resources:
                   - "lambda:InvokeFunction"
                   - "s3:Get*"
                   - "sns:Publish"
+
+
+Metadata:
+  SamTransformTest: true
+

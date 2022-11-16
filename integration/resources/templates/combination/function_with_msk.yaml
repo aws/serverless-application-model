@@ -72,3 +72,8 @@ Resources:
             Topics:
               - "MyDummyTestTopic"
 
+
+
+Metadata:
+  SamTransformTest: true
+

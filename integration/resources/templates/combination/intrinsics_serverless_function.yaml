@@ -116,3 +116,8 @@ Resources:
         "Fn::Join": ["", ["nodejs", "12.x"]]
 
 
+
+
+Metadata:
+  SamTransformTest: true
+

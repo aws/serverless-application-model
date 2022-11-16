@@ -43,3 +43,8 @@ Outputs:
     Description: Api id of ServerlessHttpApi
     Value:
       Ref: ServerlessHttpApi      
+
+
+Metadata:
+  SamTransformTest: true
+

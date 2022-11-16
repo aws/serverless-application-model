@@ -173,3 +173,7 @@ Resources:
       SecretString:
         Fn::Sub: '{"username":"${MQBrokerUser}","password":"${MQBrokerPassword}"}'
       Description: SecretsManager Secret for broker user and password
+
+Metadata:
+  SamTransformTest: true
+

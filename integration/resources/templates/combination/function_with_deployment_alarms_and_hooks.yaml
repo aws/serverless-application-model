@@ -126,3 +126,7 @@ Resources:
      Handler: index.handler
      Runtime: nodejs14.x
      CodeUri: ${codeuri}
+
+Metadata:
+  SamTransformTest: true
+

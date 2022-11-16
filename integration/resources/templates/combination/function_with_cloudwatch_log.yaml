@@ -18,3 +18,7 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       RetentionInDays: 7
+
+Metadata:
+  SamTransformTest: true
+

@@ -43,3 +43,7 @@ Outputs:
     Description: "Name of the role created for the CWE rule"
     Value:
       Ref: MyStateMachineCWEventRole
+
+Metadata:
+  SamTransformTest: true
+

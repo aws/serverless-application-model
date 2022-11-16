@@ -15,3 +15,8 @@ Resources:
         Type: REGIONAL
       DefinitionUri: ${definitionuri}
 
+
+
+Metadata:
+  SamTransformTest: true
+

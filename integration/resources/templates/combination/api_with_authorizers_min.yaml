@@ -128,3 +128,7 @@ Outputs:
       Description: "Cognito User Pool Arn"
       Value:
         Fn::GetAtt: MyCognitoUserPool.Arn
+
+Metadata:
+  SamTransformTest: true
+

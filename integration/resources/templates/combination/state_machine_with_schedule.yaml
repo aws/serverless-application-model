@@ -43,3 +43,7 @@ Outputs:
     Description: "ARN of the role created for the Schedule rule"
     Value:
       Ref: MyStateMachineCWScheduleRole
+
+Metadata:
+  SamTransformTest: true
+

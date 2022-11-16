@@ -19,3 +19,8 @@ Resources:
       }
       DefinitionUri: ${definitionuri}
 
+
+
+Metadata:
+  SamTransformTest: true
+

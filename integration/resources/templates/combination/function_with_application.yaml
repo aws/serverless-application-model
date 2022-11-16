@@ -31,3 +31,7 @@ Resources:
     Condition: FalseCondition
     Properties:
       Location: ${templateurl}
+
+Metadata:
+  SamTransformTest: true
+

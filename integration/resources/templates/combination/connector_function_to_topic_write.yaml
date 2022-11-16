@@ -45,3 +45,7 @@ Resources:
         Id: Topic
       Permissions:
         - Write
+
+Metadata:
+  SamTransformTest: true
+

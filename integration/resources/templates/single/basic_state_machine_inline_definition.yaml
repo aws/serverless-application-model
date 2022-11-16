@@ -21,3 +21,8 @@ Resources:
           - Effect: Deny
             Action: "*"
             Resource: "*"
+
+
+Metadata:
+  SamTransformTest: true
+

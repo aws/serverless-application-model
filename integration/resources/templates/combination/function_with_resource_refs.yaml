@@ -42,3 +42,8 @@ Outputs:
   VersionNumber:
     Value:
       Fn::GetAtt: ["MyLambdaFunction.Version", "Version"]
+
+
+Metadata:
+  SamTransformTest: true
+

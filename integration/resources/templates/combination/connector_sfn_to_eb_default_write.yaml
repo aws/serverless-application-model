@@ -31,3 +31,8 @@ Resources:
         Arn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
       Permissions:
         - Write
+
+
+Metadata:
+  SamTransformTest: true
+

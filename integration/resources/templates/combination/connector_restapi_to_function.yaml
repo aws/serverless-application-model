@@ -143,3 +143,8 @@ Resources:
         Id: ConnectedFunction
       Permissions:
         - Write
+
+
+Metadata:
+  SamTransformTest: true
+

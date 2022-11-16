@@ -153,3 +153,7 @@ Outputs:
     Value:
       Ref: ServerlessApiKey
   
+
+Metadata:
+  SamTransformTest: true
+

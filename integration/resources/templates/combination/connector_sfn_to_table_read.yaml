@@ -39,3 +39,8 @@ Resources:
         Id: MyTable
       Permissions:
         - Read
+
+
+Metadata:
+  SamTransformTest: true
+

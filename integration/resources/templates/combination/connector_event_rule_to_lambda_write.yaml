@@ -83,3 +83,8 @@ Resources:
         Id: Function
       Permissions:
         - Write
+
+
+Metadata:
+  SamTransformTest: true
+

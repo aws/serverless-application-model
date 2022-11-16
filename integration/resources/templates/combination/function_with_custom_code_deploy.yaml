@@ -61,3 +61,7 @@ Resources:
         TimeBasedLinear:
           LinearInterval: 1
           LinearPercentage: 50
+
+Metadata:
+  SamTransformTest: true
+

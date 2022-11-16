@@ -58,3 +58,8 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: Prod
+
+
+Metadata:
+  SamTransformTest: true
+

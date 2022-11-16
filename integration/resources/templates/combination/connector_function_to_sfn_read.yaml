@@ -53,3 +53,7 @@ Resources:
         Id: StateMachine
       Permissions:
         - Read
+
+Metadata:
+  SamTransformTest: true
+

@@ -33,3 +33,8 @@ Resources:
         Key:
           Ref: SwaggerKey
 
+
+
+Metadata:
+  SamTransformTest: true
+

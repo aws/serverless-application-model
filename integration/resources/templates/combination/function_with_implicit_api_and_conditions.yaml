@@ -223,3 +223,7 @@ Resources:
           Properties:
             Path: /sub9
             Method: post
+
+Metadata:
+  SamTransformTest: true
+

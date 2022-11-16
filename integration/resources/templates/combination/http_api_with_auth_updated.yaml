@@ -51,3 +51,7 @@ Resources:
             EnableSimpleResponses: false
             AuthorizerPayloadFormatVersion: 1.0
         DefaultAuthorizer: MyLambdaAuthUpdated
+
+Metadata:
+  SamTransformTest: true
+

@@ -8,3 +8,8 @@ Resources:
       AutoPublishAlias: Live
       DeploymentPreference:
         Type: Canary10Percent5Minutes
+
+
+Metadata:
+  SamTransformTest: true
+

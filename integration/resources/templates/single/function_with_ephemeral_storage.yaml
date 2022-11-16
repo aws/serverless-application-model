@@ -15,3 +15,7 @@ Resources:
                 Variables:
                     Name: Value
                     Name2: Value2
+
+Metadata:
+  SamTransformTest: true
+

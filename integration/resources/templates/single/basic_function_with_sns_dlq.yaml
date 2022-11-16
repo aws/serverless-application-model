@@ -12,3 +12,8 @@ Resources:
 
   MyTopic:
     Type: AWS::SNS::Topic
+
+
+Metadata:
+  SamTransformTest: true
+

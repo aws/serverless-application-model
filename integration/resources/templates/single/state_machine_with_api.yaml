@@ -37,3 +37,8 @@ Resources:
 Outputs:
   ApiEndpoint:
     Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/echo"
+
+
+Metadata:
+  SamTransformTest: true
+

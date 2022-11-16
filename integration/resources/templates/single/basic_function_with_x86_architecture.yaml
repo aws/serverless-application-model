@@ -9,3 +9,8 @@ Resources:
             Architectures:
                 - x86_64
             
+
+
+Metadata:
+  SamTransformTest: true
+

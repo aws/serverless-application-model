@@ -80,3 +80,8 @@ Resources:
     Type: AWS::Kinesis::Stream
     Properties:
       ShardCount: 1
+
+
+Metadata:
+  SamTransformTest: true
+

@@ -243,3 +243,8 @@ Outputs:
       Description: "ID of the API Key"
       Value:
         Ref: MyFirstApiKey
+
+
+Metadata:
+  SamTransformTest: true
+

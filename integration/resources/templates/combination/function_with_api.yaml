@@ -31,3 +31,8 @@ Resources:
             Method: post
             RestApiId:
               Ref: ExistingRestApi
+
+
+Metadata:
+  SamTransformTest: true
+

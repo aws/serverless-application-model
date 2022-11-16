@@ -30,9 +30,12 @@ class YAMLFormatter(FileFormatter):
 
     def format(self, input_str: str) -> str:
         """Opinionated format YAML file."""
-        obj = yaml.load(input_str)
         if self.args.add_test_metadata:
-            self._add_test_metadata(obj)
+            # Since formatting integration test templates cause failure,
+            # temporary workaround to add test metadata to integration test templates
+            return input_str + "\n\nMetadata:\n  SamTransformTest: true\n\n"
+
+        obj = yaml.load(input_str)
         out_stream = StringIO()
         yaml.dump(
             obj,

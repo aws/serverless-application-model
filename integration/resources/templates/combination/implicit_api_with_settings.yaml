@@ -27,3 +27,8 @@ Resources:
           Properties:
             Path: /pathget
             Method: get
+
+
+Metadata:
+  SamTransformTest: true
+

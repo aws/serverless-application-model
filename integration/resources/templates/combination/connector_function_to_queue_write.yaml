@@ -44,3 +44,7 @@ Resources:
         Id: Queue
       Permissions:
         - Write
+
+Metadata:
+  SamTransformTest: true
+

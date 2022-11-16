@@ -37,3 +37,7 @@ Outputs:
   MyLambdaLayerArn:
     Value: 
       Ref: MyLambdaLayer
+
+Metadata:
+  SamTransformTest: true
+

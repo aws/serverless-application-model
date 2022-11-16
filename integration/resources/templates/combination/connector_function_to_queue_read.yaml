@@ -43,3 +43,7 @@ Resources:
         Id: Queue
       Permissions:
         - Read
+
+Metadata:
+  SamTransformTest: true
+

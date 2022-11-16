@@ -12,3 +12,8 @@ Resources:
             Tags:
                 TagKey1: TagValue1
                 TagKey2: ""
+
+
+Metadata:
+  SamTransformTest: true
+

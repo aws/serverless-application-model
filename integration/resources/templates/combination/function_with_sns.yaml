@@ -26,3 +26,8 @@ Resources:
   MySnsTopic:
     Type: AWS::SNS::Topic
 
+
+
+Metadata:
+  SamTransformTest: true
+

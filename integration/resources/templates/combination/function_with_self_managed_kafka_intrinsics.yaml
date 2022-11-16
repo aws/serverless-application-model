@@ -35,3 +35,8 @@ Resources:
       SecretString:
         Fn::Sub: '{"username":"testBrokerUserWithInstrinsic","password":"testBrokerPasswordWithInstrinsic"}'
 
+
+
+Metadata:
+  SamTransformTest: true
+

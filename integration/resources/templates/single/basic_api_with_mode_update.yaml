@@ -22,3 +22,8 @@ Resources:
             Method: put
             RestApiId: !Ref MyApi
 
+
+
+Metadata:
+  SamTransformTest: true
+

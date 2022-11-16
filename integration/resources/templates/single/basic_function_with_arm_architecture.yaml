@@ -8,3 +8,7 @@ Resources:
             MemorySize: 128
             Architectures: ["arm64"]
             
+
+Metadata:
+  SamTransformTest: true
+

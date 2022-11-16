@@ -31,3 +31,7 @@ Outputs:
     Description: "Partition"
     Value: 
       Ref: AWS::Partition
+
+Metadata:
+  SamTransformTest: true
+

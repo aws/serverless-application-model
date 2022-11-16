@@ -27,3 +27,8 @@ Resources:
       SecretString:
         Fn::Sub: '{"username":"testBrokerUser","password":"testBrokerPassword"}'
 
+
+
+Metadata:
+  SamTransformTest: true
+

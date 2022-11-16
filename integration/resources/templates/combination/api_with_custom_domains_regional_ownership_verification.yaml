@@ -54,3 +54,8 @@ Resources:
           Properties:
             Method: Post
             Path: /post
+
+
+Metadata:
+  SamTransformTest: true
+

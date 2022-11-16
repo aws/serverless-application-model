@@ -46,3 +46,7 @@ Resources:
           HostedZoneId:
             Ref: HostedZoneId
           IpV6: true
+
+Metadata:
+  SamTransformTest: true
+

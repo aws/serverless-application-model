@@ -104,3 +104,8 @@ Resources:
       - KeyType: HASH
         AttributeName: id
 
+
+
+Metadata:
+  SamTransformTest: true
+

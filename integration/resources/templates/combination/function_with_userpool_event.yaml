@@ -53,3 +53,7 @@ Outputs:
       Description: "Cognito User Pool Id"
       Value:
         Ref: MyCognitoUserPool
+
+Metadata:
+  SamTransformTest: true
+

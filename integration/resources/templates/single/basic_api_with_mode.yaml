@@ -32,3 +32,8 @@ Resources:
 Outputs:
   ApiEndpoint:
     Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/MyNewStageName"
+
+
+Metadata:
+  SamTransformTest: true
+

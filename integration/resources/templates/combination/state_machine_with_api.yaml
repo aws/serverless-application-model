@@ -72,3 +72,8 @@ Outputs:
     Description: "ARN of the role created for the explicit Api method"
     Value:
       Fn::GetAtt: MyStateMachineGetApiRole.Arn
+
+
+Metadata:
+  SamTransformTest: true
+

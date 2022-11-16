@@ -49,3 +49,8 @@ Resources:
         -
           Ref: "LambdaRole"
 
+
+
+Metadata:
+  SamTransformTest: true
+

@@ -44,3 +44,8 @@ Outputs:
     Value:
       Ref: MyDlq
 
+
+
+Metadata:
+  SamTransformTest: true
+

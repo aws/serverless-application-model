@@ -36,3 +36,8 @@ Resources:
         Arn: !GetAtt CustomEventBus.Arn
       Permissions:
         - Write
+
+
+Metadata:
+  SamTransformTest: true
+

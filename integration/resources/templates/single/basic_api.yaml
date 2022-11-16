@@ -4,3 +4,8 @@ Resources:
     Properties:
       StageName: MyNewStageName
       DefinitionUri: ${definitionuri}
+
+
+Metadata:
+  SamTransformTest: true
+

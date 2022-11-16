@@ -34,3 +34,8 @@ Resources:
 
   MyBucket:
     Type: AWS::S3::Bucket
+
+
+Metadata:
+  SamTransformTest: true
+

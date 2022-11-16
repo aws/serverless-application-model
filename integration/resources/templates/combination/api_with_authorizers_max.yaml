@@ -194,3 +194,7 @@ Outputs:
       Description: "Authorizer Function Arn"
       Value:
         Fn::GetAtt: LambdaAuthInvokeRole.Arn
+
+Metadata:
+  SamTransformTest: true
+

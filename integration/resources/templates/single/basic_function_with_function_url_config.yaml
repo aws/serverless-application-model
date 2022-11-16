@@ -19,3 +19,8 @@ Resources:
                     ExposeHeaders: 
                         - "x-amzn-header"
                     MaxAge: 10
+
+
+Metadata:
+  SamTransformTest: true
+

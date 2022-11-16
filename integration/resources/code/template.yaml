@@ -6,3 +6,7 @@ Resources:
 Outputs:
   TableName:
     Value: !Ref MyTable
+
+Metadata:
+  SamTransformTest: true
+

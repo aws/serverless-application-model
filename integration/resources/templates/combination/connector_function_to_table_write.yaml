@@ -41,3 +41,8 @@ Resources:
         Id: MyTable
       Permissions:
         - Write
+
+
+Metadata:
+  SamTransformTest: true
+

@@ -104,3 +104,7 @@ Resources:
         Id: Table
       Permissions:
         - Write
+
+Metadata:
+  SamTransformTest: true
+

@@ -79,3 +79,7 @@ Resources:
                 - MyApi
             IdentitySource: "$request.querystring.param"
         DefaultAuthorizer: MyOAuth2Auth
+
+Metadata:
+  SamTransformTest: true
+

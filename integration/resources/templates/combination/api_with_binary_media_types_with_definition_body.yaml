@@ -44,3 +44,8 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 requestParameters:
                   integration.request.path.proxy: "method.request.path.proxy"
+
+
+Metadata:
+  SamTransformTest: true
+

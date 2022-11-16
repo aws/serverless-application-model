@@ -21,3 +21,8 @@ Resources:
               - Alarm3
             - - Alarm1
               - Alarm5
+
+
+Metadata:
+  SamTransformTest: true
+

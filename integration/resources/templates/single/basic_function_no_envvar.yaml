@@ -9,3 +9,8 @@ Resources:
             Policies:
                 - AWSLambdaRole
                 - AmazonS3ReadOnlyAccess
+
+
+Metadata:
+  SamTransformTest: true
+

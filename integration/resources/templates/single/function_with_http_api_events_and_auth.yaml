@@ -94,3 +94,8 @@ Resources:
     Properties:
       Auth:
         EnableIamAuthorizer: true
+
+
+Metadata:
+  SamTransformTest: true
+

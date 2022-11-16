@@ -45,3 +45,7 @@ Outputs:
     Description: URL of your API endpoint
     Value:
       Fn::Sub: 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+
+Metadata:
+  SamTransformTest: true
+

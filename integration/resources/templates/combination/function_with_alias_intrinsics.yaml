@@ -27,3 +27,8 @@ Resources:
         Key:
           # Even though the entire Sub won't be resolved, translator will substitute ${Key} with value passed at runtime
           Fn::Sub: "${CodeKey}"
+
+
+Metadata:
+  SamTransformTest: true
+

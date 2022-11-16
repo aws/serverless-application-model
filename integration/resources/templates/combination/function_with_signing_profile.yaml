@@ -27,3 +27,8 @@ Resources:
      Type: AWS::Signer::SigningProfile
      Properties:
        PlatformId: AWSLambda-SHA384-ECDSA
+
+
+Metadata:
+  SamTransformTest: true
+

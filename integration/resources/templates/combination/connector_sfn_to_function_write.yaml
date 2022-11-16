@@ -35,3 +35,8 @@ Resources:
         Id: MyFunction
       Permissions:
         - Write
+
+
+Metadata:
+  SamTransformTest: true
+

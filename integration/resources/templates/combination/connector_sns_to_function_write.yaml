@@ -84,3 +84,8 @@ Resources:
       Permissions:
         - Write
 
+
+
+Metadata:
+  SamTransformTest: true
+

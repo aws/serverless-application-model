@@ -37,3 +37,7 @@ Outputs:
   ApiId:
     Value:
       Ref: MyApi  
+
+Metadata:
+  SamTransformTest: true
+

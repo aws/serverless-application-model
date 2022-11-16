@@ -29,3 +29,8 @@ Resources:
         Id: MyQueue
       Permissions:
         - Write
+
+
+Metadata:
+  SamTransformTest: true
+

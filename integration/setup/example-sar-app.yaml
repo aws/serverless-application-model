@@ -19,3 +19,7 @@ Resources:
       Environment:
         Variables:
           IdentityNameParameter: !Ref IdentityNameParameter
+
+Metadata:
+  SamTransformTest: true
+

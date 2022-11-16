@@ -57,3 +57,7 @@ Resources:
         Id: EventBus
       Permissions:
         - Write
+
+Metadata:
+  SamTransformTest: true
+

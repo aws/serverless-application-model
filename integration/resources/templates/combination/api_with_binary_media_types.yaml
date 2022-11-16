@@ -20,3 +20,8 @@ Resources:
         - {"Fn::Join": ["~1", ["image", "png"]]}
         - {"Ref": "ImageType"}
 
+
+
+Metadata:
+  SamTransformTest: true
+

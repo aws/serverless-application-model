@@ -31,3 +31,8 @@ Outputs:
     Description: ARN of the state machine
     Value:
       Ref: MyStateMachine
+
+
+Metadata:
+  SamTransformTest: true
+
