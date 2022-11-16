@@ -15,7 +15,7 @@ test-cov-report:
 	pytest --cov samtranslator --cov-report term-missing --cov-report html --cov-fail-under 95 tests/*
 
 integ-test:
-	pytest --no-cov integration/* -k test_state_machine_with_cwe_without_policy
+	pytest --no-cov integration/*
 
 black:
 	black setup.py samtranslator/* tests/* integration/* bin/*.py
