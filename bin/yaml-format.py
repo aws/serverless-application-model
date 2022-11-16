@@ -23,6 +23,9 @@ yaml = YAML()
 yaml.version = (1, 1)  # type: ignore
 
 
+YAML_VERSION_COMMENT_REGEX = r"^%YAML [0-9.]+\n-+\n"
+
+
 class YAMLFormatter(FileFormatter):
     @staticmethod
     def description() -> str:
@@ -39,7 +42,15 @@ class YAMLFormatter(FileFormatter):
             stream=out_stream,
         )
         # ruamel.yaml tends to add 2 empty lines at the bottom of the dump
-        return re.sub(r"\n+$", "\n", out_stream.getvalue())
+        formatted = re.sub(r"\n+$", "\n", out_stream.getvalue())
+
+        # ruamel adds yaml version at the beginning of the output file
+        # and we don't really want those, so if no yaml version
+        # is specified in the original file, remove it from the output file.
+        if not re.match(YAML_VERSION_COMMENT_REGEX, input_str):
+            formatted = re.sub(YAML_VERSION_COMMENT_REGEX, "", formatted)
+
+        return formatted
 
     @staticmethod
     def _add_test_metadata(obj: Dict[str, Any]) -> None:
