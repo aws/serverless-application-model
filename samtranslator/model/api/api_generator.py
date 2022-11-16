@@ -1105,7 +1105,7 @@ class ApiGenerator(object):
         :rtype: model.lambda_.LambdaPermission
         """
         rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
-        api_id = rest_api.get_runtime_attr("rest_api_id")  # type: ignore[no-untyped-call]
+        api_id = rest_api.get_runtime_attr("rest_api_id")
 
         partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
         resource = "${__ApiId__}/authorizers/*"

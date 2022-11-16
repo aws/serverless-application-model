@@ -141,7 +141,7 @@ class Schedule(PushEventSource):
         events_rule.Name = self.Name  # type: ignore[attr-defined]
         events_rule.Description = self.Description  # type: ignore[attr-defined]
 
-        source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
+        source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
@@ -214,7 +214,7 @@ class CloudWatchEvent(PushEventSource):
         events_rule.EventBusName = self.EventBusName  # type: ignore[attr-defined]
         events_rule.EventPattern = self.Pattern  # type: ignore[attr-defined]
         events_rule.Name = self.RuleName  # type: ignore[attr-defined]
-        source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
+        source_arn = events_rule.get_runtime_attr("arn")
 
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]

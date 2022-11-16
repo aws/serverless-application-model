@@ -25,7 +25,7 @@ class DisabledDialup(BaseDialup):
     def __init__(self, region_config, **kwargs):  # type: ignore[no-untyped-def]
         super(DisabledDialup, self).__init__(region_config)  # type: ignore[no-untyped-call]
 
-    def is_enabled(self):  # type: ignore[no-untyped-def]
+    def is_enabled(self) -> bool:
         return False
 
 
