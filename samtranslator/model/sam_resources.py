@@ -31,7 +31,7 @@ from .tags.resource_tagging import get_tag_list
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
     ResourceResolver,
-    Property,
+    PassThroughProperty,
     PropertyType,
     SamResourceMacro,
     Resource,
@@ -1283,7 +1283,7 @@ class SamHttpApi(SamResourceMacro):
         # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
         # Swagger.
         "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
-        "Name": Property(False, any_type()),
+        "Name": PassThroughProperty(False),
         "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
         "Tags": PropertyType(False, is_type(dict)),
         "DefinitionBody": PropertyType(False, is_type(dict)),

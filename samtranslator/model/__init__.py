@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.types import Validator
+from samtranslator.model.types import Validator, any_type
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
@@ -43,6 +43,17 @@ class Property(PropertyType):
 
     def __init__(self, required: bool, validate: Validator) -> None:
         super().__init__(required, validate, False)
+
+
+class PassThroughProperty(PropertyType):
+    """
+    Pass-through property.
+
+    SAM Translator should not try to read the value other than passing it to underlaying CFN resources.
+    """
+
+    def __init__(self, required: bool) -> None:
+        super().__init__(required, any_type(), False)
 
 
 class Resource(object):
