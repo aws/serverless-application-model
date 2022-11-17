@@ -129,24 +129,23 @@ class StateMachineGenerator(object):
             )
 
         if self.role and self.policies:
-            raise InvalidResourceException(
-                self.logical_id, "Specify either 'Role' or 'Policies' or neither property and not both."
-            )
+            raise InvalidResourceException(self.logical_id, "Specify 'Role' or 'Policies' or neither property.")
         if self.role:
             self.state_machine.RoleArn = self.role
-        elif not self.role:
+        else:
             if self.policies and not self.managed_policy_map:
                 raise Exception("Managed policy map is empty, but should not be.")
             if not self.policies:
                 self.policies = [
-                    { "Version": "2012-10-17", 
-                    "Statement": [ { 
-                        "Action": ["sts:AssumeRole"], 
-                        "Effect": "Allow", 
-                        "Principal": {
-                            "Service": ["states.amazonaws.com"]
-                        }, 
-                    }], 
+                    {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Action": ["Lambda:InvokeFunction"],
+                                "Effect": "Allow",
+                                "Resource": "arn:aws:lambda:us-west-2:534568764167:function:SomethingDoesNotMatter*",
+                            }
+                        ],
                     }
                 ]
             execution_role = self._construct_role()  # type: ignore[no-untyped-call]
