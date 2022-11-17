@@ -8,8 +8,8 @@ class EventBridgeRuleUtils:
         resources = []
 
         queue = SQSQueue(queue_logical_id or rule_logical_id + "Queue", attributes=attributes)
-        dlq_queue_arn = queue.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
-        dlq_queue_url = queue.get_runtime_attr("queue_url")  # type: ignore[no-untyped-call]
+        dlq_queue_arn = queue.get_runtime_attr("arn")
+        dlq_queue_url = queue.get_runtime_attr("queue_url")
 
         # grant necessary permission to Eventbridge Rule resource for sending messages to dead-letter queue
         policy = SQSQueuePolicy(rule_logical_id + "QueuePolicy", attributes=attributes)

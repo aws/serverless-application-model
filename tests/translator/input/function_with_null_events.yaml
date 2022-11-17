@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   FunctionWithNullEvents:
     Type: AWS::Serverless::Function

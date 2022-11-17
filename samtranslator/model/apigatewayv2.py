@@ -1,8 +1,11 @@
+from typing import Any, Dict, List, Optional
+
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import is_type, one_of, is_str, list_of
 from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.utils.types import Intrinsicable
 
 APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
 
@@ -48,6 +51,11 @@ class ApiGatewayV2DomainName(Resource):
         "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
         "Tags": PropertyType(False, is_type(dict)),
     }
+
+    DomainName: Intrinsicable[str]
+    DomainNameConfigurations: Optional[List[Dict[str, Any]]]
+    MutualTlsAuthentication: Optional[Dict[str, Any]]
+    Tags: Optional[Dict[str, Any]]
 
 
 class ApiGatewayV2ApiMapping(Resource):
@@ -96,7 +104,7 @@ class ApiGatewayV2Authorizer(object):
 
         # Validate necessary parameters exist
         if authorizer_type == "JWT":
-            self._validate_jwt_authorizer()  # type: ignore[no-untyped-call]
+            self._validate_jwt_authorizer()
 
         if authorizer_type == "REQUEST":
             self._validate_lambda_authorizer()  # type: ignore[no-untyped-call]
@@ -152,7 +160,7 @@ class ApiGatewayV2Authorizer(object):
                 self.api_logical_id, "EnableSimpleResponses must be defined only for Lambda Authorizer."
             )
 
-    def _validate_jwt_authorizer(self):  # type: ignore[no-untyped-def]
+    def _validate_jwt_authorizer(self) -> None:
         if not self.jwt_configuration:
             raise InvalidResourceException(
                 self.api_logical_id, f"{self.name} OAuth2 Authorizer must define 'JwtConfiguration'."
@@ -185,7 +193,7 @@ class ApiGatewayV2Authorizer(object):
                         self.name + " Lambda Authorizer property identity's 'Headers' is of invalid type.",
                     )
 
-    def generate_openapi(self):  # type: ignore[no-untyped-def]
+    def generate_openapi(self) -> Dict[str, Any]:
         """
         Generates OAS for the securitySchemes section
         """

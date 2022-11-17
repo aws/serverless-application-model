@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   NoAuthApi:
     Type: AWS::Serverless::Api
@@ -223,3 +221,10 @@ Resources:
             IdentitySource: $request.header.Authorization
         # Correct usage: DefaultAuthorizer: MyAuth
         DefaultAuthorizer: !Ref MyAuth
+
+  NonDictAuthorizerApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          MyAuth: AWS_IAM # It should be a dict

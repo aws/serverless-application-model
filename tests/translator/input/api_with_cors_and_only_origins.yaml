@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Globals:
   Api:
     # If we skip AllowMethods, then SAM will auto generate a list of methods scoped to each path

@@ -15,7 +15,7 @@ class CloudWatchLogs(PushEventSource):
     principal = "logs.amazonaws.com"
     property_types = {"LogGroupName": PropertyType(True, is_str()), "FilterPattern": PropertyType(True, is_str())}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the CloudWatch Logs Subscription Filter and Lambda Permission to which this CloudWatch Logs event source
         corresponds.

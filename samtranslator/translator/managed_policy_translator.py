@@ -11,7 +11,7 @@ class ManagedPolicyLoader(object):
         self._policy_map = None
         self.max_items = 1000
 
-    @cw_timer(prefix="External", name="IAM")  # type: ignore[no-untyped-call]
+    @cw_timer(prefix="External", name="IAM")
     def _load_policies_from_iam(self):  # type: ignore[no-untyped-def]
         LOG.info("Loading policies from IAM...")
 
