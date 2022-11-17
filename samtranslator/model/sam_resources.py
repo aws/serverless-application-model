@@ -1067,6 +1067,12 @@ class SamFunction(SamResourceMacro):
         if not cors or is_intrinsic(cors):
             return
 
+        if not isinstance(cors, dict):
+            raise InvalidResourceException(
+                lambda_function.logical_id,
+                "Invalid type for 'Cors'. It must be a dictionary.",
+            )
+
         for prop_name, prop_value in cors.items():
             if prop_name not in cors_property_data_type:
                 raise InvalidResourceException(
