@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Globals:
   Api:
     OpenApiVersion: 3.0.0

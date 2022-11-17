@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   MyNewEventsRule:
     Type: AWS::Events::Rule

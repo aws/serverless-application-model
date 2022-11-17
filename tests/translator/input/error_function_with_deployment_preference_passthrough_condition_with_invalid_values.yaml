@@ -1,5 +1,3 @@
-%YAML 1.1
----
 # Tests unsupported intrinsic and invalid type in the PassthroughCondition property
 
 Mappings:

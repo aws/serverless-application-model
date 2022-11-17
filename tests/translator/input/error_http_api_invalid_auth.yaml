@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   Function:
     Type: AWS::Serverless::Function

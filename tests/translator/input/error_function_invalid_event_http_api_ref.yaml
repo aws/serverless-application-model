@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   FunctionApiHttpApiRefError:
     Type: AWS::Serverless::Function

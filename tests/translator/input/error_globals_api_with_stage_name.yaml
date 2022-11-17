@@ -1,5 +1,3 @@
-%YAML 1.1
----
 # For Implicit APIs, StageName is automatically set by SAM. Due to a limitation of the current architecture,
 # StageName **cannot** be overridden for Implicit APIs.
 #
