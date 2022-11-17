@@ -382,6 +382,14 @@ class SubAction(Action):
         substituted = text
         for match in re.finditer(ref_pattern, text):
             sub_value = handler_method(match.group(0), match.group(1))
+            if not isinstance(sub_value, str):
+                raise InvalidDocumentException(
+                    [
+                        InvalidTemplateException(
+                            f"Invalid Fn::Sub variable value {sub_value}. Fn::Sub expects all variables to be strings."
+                        )
+                    ]
+                )
             substituted = substituted.replace(match.group(0), sub_value, 1)
         return substituted
 
