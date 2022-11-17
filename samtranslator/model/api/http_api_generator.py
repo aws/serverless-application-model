@@ -39,7 +39,7 @@ class HttpApiGenerator(object):
         depends_on: Optional[List[str]],
         definition_body: Optional[Dict[str, Any]],
         definition_uri: Optional[Intrinsicable[str]],
-        name: Optional[Intrinsicable[str]],
+        name: Optional[Any],
         stage_name: Optional[Intrinsicable[str]],
         tags: Optional[Dict[str, Intrinsicable[str]]] = None,
         auth: Optional[Dict[str, Intrinsicable[str]]] = None,
