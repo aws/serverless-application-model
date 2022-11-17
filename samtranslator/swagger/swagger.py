@@ -1,7 +1,8 @@
 ﻿import copy
 import re
-from typing import Dict, Any
+from typing import Dict, Any, Iterator
 
+from samtranslator.model.apigateway import ApiGatewayAuthorizer
 from samtranslator.model.intrinsics import ref, make_conditional, fnSub, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
@@ -64,7 +65,7 @@ class SwaggerEditor(object):
         # each path item object must be a dict (even it is empty).
         # We can do an early path validation on path item objects,
         # so we don't need to validate wherever we use them.
-        for path in self.iter_on_path():  # type: ignore[no-untyped-call]
+        for path in self.iter_on_path():
             for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
                 SwaggerEditor.validate_path_item_is_dict(path_item, path)  # type: ignore[no-untyped-call]
 
@@ -326,7 +327,7 @@ class SwaggerEditor(object):
         CALLER_CREDENTIALS_ARN = "arn:aws:iam::*:user/*"
         return invoke_role if invoke_role and invoke_role != "CALLER_CREDENTIALS" else CALLER_CREDENTIALS_ARN
 
-    def iter_on_path(self):  # type: ignore[no-untyped-def]
+    def iter_on_path(self) -> Iterator[str]:
         """
         Yields all the paths available in the Swagger. As a caller, if you add new paths to Swagger while iterating,
         they will not show up in this iterator
@@ -372,7 +373,7 @@ class SwaggerEditor(object):
                     continue
 
                 for method_definition in self.get_conditional_contents(method):  # type: ignore[no-untyped-call]
-                    SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+                    SwaggerEditor.validate_is_dict(
                         method_definition,
                         'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(
                             method_name, method_definition, path_name
@@ -623,15 +624,22 @@ class SwaggerEditor(object):
         api_key_security_definition["api_key"]["in"] = "header"
 
         self.security_definitions = self.security_definitions or Py27Dict()
+        if not isinstance(self.security_definitions, dict):
+            # https://swagger.io/docs/specification/2-0/authentication/
+            raise InvalidTemplateException("securityDefinitions must be a dictionary.")
 
         # Only add the security definition if it doesn't exist.  This helps ensure
         # that we minimize changes to the swagger in the case of user defined swagger
         if "api_key" not in self.security_definitions:
             self.security_definitions.update(api_key_security_definition)
 
-    def set_path_default_authorizer(  # type: ignore[no-untyped-def]
-        self, path, default_authorizer, authorizers, add_default_auth_to_preflight=True, api_authorizers=None
-    ):
+    def set_path_default_authorizer(
+        self,
+        path: str,
+        default_authorizer: str,
+        authorizers: Dict[str, ApiGatewayAuthorizer],
+        add_default_auth_to_preflight: bool = True,
+    ) -> None:
         """
         Adds the default_authorizer to the security block for each method on this path unless an Authorizer
         was defined at the Function/Path/Method level. This is intended to be used to set the
@@ -661,7 +669,7 @@ class SwaggerEditor(object):
             # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
             # We want to ensure only a single Authorizer security entry exists while keeping everything else
             for security in existing_security:
-                SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+                SwaggerEditor.validate_is_dict(
                     security,
                     "{} in Security for path {} method {} is not a valid dictionary.".format(
                         security, path, method_name
@@ -698,7 +706,7 @@ class SwaggerEditor(object):
             # No existing Authorizer found; use default
             else:
                 security_dict = Py27Dict()
-                security_dict[default_authorizer] = self._get_authorization_scopes(api_authorizers, default_authorizer)  # type: ignore[no-untyped-call]
+                security_dict[default_authorizer] = self._get_authorization_scopes(authorizers, default_authorizer)
                 authorizer_security = [security_dict]
 
             security = existing_non_authorizer_security + authorizer_security
@@ -732,7 +740,7 @@ class SwaggerEditor(object):
             # (e.g. sigv4 (AWS_IAM), authorizers, NONE (marker for ignoring default authorizer))
             # We want to ensure only a single ApiKey security entry exists while keeping everything else
             for security in existing_security:
-                SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+                SwaggerEditor.validate_is_dict(
                     security,
                     "{} in Security for path {} method {} is not a valid dictionary.".format(
                         security, path, method_name
@@ -817,7 +825,12 @@ class SwaggerEditor(object):
             security = existing_security + authorizer_security
 
             if authorizer_name != "NONE" and authorizers:
-                method_auth_scopes = authorizers.get(authorizer_name, Py27Dict()).get("AuthorizationScopes")
+                authorizer = authorizers.get(authorizer_name, Py27Dict())
+                if not isinstance(authorizer, dict):
+                    raise InvalidDocumentException(
+                        [InvalidTemplateException(f"Type of authorizer '{authorizer_name}' must be a dictionary")]
+                    )
+                method_auth_scopes = authorizer.get("AuthorizationScopes")
                 if method_scopes is not None:
                     method_auth_scopes = method_scopes
                 if authorizers.get(authorizer_name) is not None and method_auth_scopes is not None:
@@ -977,7 +990,7 @@ class SwaggerEditor(object):
         """
         if resource_policy is None:
             return
-        SwaggerEditor.validate_is_dict(resource_policy, "Resource Policy is not a valid dictionary.")  # type: ignore[no-untyped-call]
+        SwaggerEditor.validate_is_dict(resource_policy, "Resource Policy is not a valid dictionary.")
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")
@@ -1326,7 +1339,7 @@ class SwaggerEditor(object):
         return SwaggerEditor.safe_compare_regex_with_string(SwaggerEditor.get_openapi_version_3_regex(), api_version)
 
     @staticmethod
-    def validate_is_dict(obj, exception_message):  # type: ignore[no-untyped-def]
+    def validate_is_dict(obj: Any, exception_message: str) -> None:
         """
         Throws exception if obj is not a dict
 
@@ -1346,7 +1359,7 @@ class SwaggerEditor(object):
         :param path: path name
         """
 
-        SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+        SwaggerEditor.validate_is_dict(
             path_item, "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
         )
 
@@ -1366,18 +1379,15 @@ class SwaggerEditor(object):
         return skeleton
 
     @staticmethod
-    def _get_authorization_scopes(authorizers, default_authorizer):  # type: ignore[no-untyped-def]
+    def _get_authorization_scopes(authorizers: Dict[str, ApiGatewayAuthorizer], default_authorizer: str) -> Any:
         """
         Returns auth scopes for an authorizer if present
         :param authorizers: authorizer definitions
         :param default_authorizer: name of the default authorizer
         """
-        if authorizers is not None:
-            if (
-                authorizers.get(default_authorizer)
-                and authorizers[default_authorizer].get("AuthorizationScopes") is not None
-            ):
-                return authorizers[default_authorizer].get("AuthorizationScopes")
+        authorizer = authorizers.get(default_authorizer)
+        if authorizer and authorizer.authorization_scopes is not None:
+            return authorizer.authorization_scopes
         return []
 
     @staticmethod

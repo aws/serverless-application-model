@@ -221,3 +221,10 @@ Resources:
             IdentitySource: $request.header.Authorization
         # Correct usage: DefaultAuthorizer: MyAuth
         DefaultAuthorizer: !Ref MyAuth
+
+  NonDictAuthorizerApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          MyAuth: AWS_IAM # It should be a dict

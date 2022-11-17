@@ -1,6 +1,6 @@
 import logging
 from collections import namedtuple
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Dict
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
@@ -661,7 +661,7 @@ class ApiGenerator(object):
             )
 
         editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
-        for path in editor.iter_on_path():  # type: ignore[no-untyped-call]
+        for path in editor.iter_on_path():
             try:
                 editor.add_cors(  # type: ignore[no-untyped-call]
                     path,
@@ -724,12 +724,11 @@ class ApiGenerator(object):
 
         if authorizers:
             swagger_editor.add_authorizers_security_definitions(authorizers)  # type: ignore[no-untyped-call]
-            self._set_default_authorizer(  # type: ignore[no-untyped-call]
+            self._set_default_authorizer(
                 swagger_editor,
                 authorizers,
                 auth_properties.DefaultAuthorizer,
                 auth_properties.AddDefaultAuthorizerToCorsPreflight,
-                auth_properties.Authorizers,
             )
 
         if auth_properties.ApiKeyRequired:
@@ -737,10 +736,10 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)  # type: ignore[no-untyped-call]
 
         if auth_properties.ResourcePolicy:
-            SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+            SwaggerEditor.validate_is_dict(
                 auth_properties.ResourcePolicy, "ResourcePolicy must be a map (ResourcePolicyStatement)."
             )
-            for path in swagger_editor.iter_on_path():  # type: ignore[no-untyped-call]
+            for path in swagger_editor.iter_on_path():
                 swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)  # type: ignore[no-untyped-call]
             if auth_properties.ResourcePolicy.get("CustomStatements"):
                 swagger_editor.add_custom_statements(auth_properties.ResourcePolicy.get("CustomStatements"))  # type: ignore[no-untyped-call]
@@ -1048,13 +1047,18 @@ class ApiGenerator(object):
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
-                                SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+                                SwaggerEditor.validate_is_dict(
                                     field_val,
                                     "Value of responses in options method for path {} must be a "
                                     "dictionary according to Swagger spec.".format(path),
                                 )
                                 if field_val.get("200") and field_val.get("200").get("headers"):
                                     headers = field_val["200"]["headers"]
+                                    SwaggerEditor.validate_is_dict(
+                                        headers,
+                                        "Value of response's headers in options method for path {} must be a "
+                                        "dictionary according to Swagger spec.".format(path),
+                                    )
                                     for header, header_val in headers.items():
                                         new_header_val_with_schema = Py27Dict()
                                         new_header_val_with_schema["schema"] = header_val
@@ -1146,9 +1150,13 @@ class ApiGenerator(object):
 
         return permissions
 
-    def _set_default_authorizer(  # type: ignore[no-untyped-def]
-        self, swagger_editor, authorizers, default_authorizer, add_default_auth_to_preflight=True, api_authorizers=None
-    ):
+    def _set_default_authorizer(
+        self,
+        swagger_editor: SwaggerEditor,
+        authorizers: Dict[str, ApiGatewayAuthorizer],
+        default_authorizer: str,
+        add_default_auth_to_preflight: bool = True,
+    ) -> None:
         if not default_authorizer:
             return
 
@@ -1172,7 +1180,6 @@ class ApiGenerator(object):
                 default_authorizer,
                 authorizers=authorizers,
                 add_default_auth_to_preflight=add_default_auth_to_preflight,
-                api_authorizers=api_authorizers,
             )
 
     def _set_default_apikey_required(self, swagger_editor):  # type: ignore[no-untyped-def]

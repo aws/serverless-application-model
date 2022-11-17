@@ -1,6 +1,6 @@
 import copy
 import re
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Dict, Iterator, Optional
 
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Authorizer
 from samtranslator.model.intrinsics import ref, make_conditional, is_intrinsic, is_intrinsic_no_value
@@ -371,7 +371,6 @@ class OpenApiEditor(object):
         path: str,
         default_authorizer: str,
         authorizers: Dict[str, ApiGatewayV2Authorizer],
-        api_authorizers: Dict[str, Any],
     ) -> None:
         """
         Adds the default_authorizer to the security block for each method on this path unless an Authorizer
@@ -417,12 +416,10 @@ class OpenApiEditor(object):
                         existing_security = method_definition.get("security", [])
                         if existing_security:
                             continue
-                        authorizer_list: List[str] = []
-                        if authorizers:
-                            authorizer_list.extend(authorizers.keys())
+
                         security_dict = {}
-                        security_dict[default_authorizer] = self._get_authorization_scopes(  # type: ignore[no-untyped-call]
-                            api_authorizers, default_authorizer
+                        security_dict[default_authorizer] = self._get_authorization_scopes(
+                            authorizers, default_authorizer
                         )
                         authorizer_security = [security_dict]
 
@@ -675,18 +672,16 @@ class OpenApiEditor(object):
         return skeleton
 
     @staticmethod
-    def _get_authorization_scopes(authorizers, default_authorizer):  # type: ignore[no-untyped-def]
+    def _get_authorization_scopes(authorizers: Dict[str, ApiGatewayV2Authorizer], default_authorizer: str) -> Any:
         """
         Returns auth scopes for an authorizer if present
         :param authorizers: authorizer definitions
         :param default_authorizer: name of the default authorizer
         """
-        if authorizers is not None:
-            if (
-                authorizers[default_authorizer]
-                and authorizers[default_authorizer].get("AuthorizationScopes") is not None
-            ):
-                return authorizers[default_authorizer].get("AuthorizationScopes")
+        authorizer = authorizers[default_authorizer]
+        if authorizer and authorizer.authorization_scopes is not None:
+            return authorizer.authorization_scopes
+
         return []
 
     @staticmethod
