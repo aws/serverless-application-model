@@ -623,6 +623,9 @@ class SwaggerEditor(object):
         api_key_security_definition["api_key"]["in"] = "header"
 
         self.security_definitions = self.security_definitions or Py27Dict()
+        if not isinstance(self.security_definitions, dict):
+            # https://swagger.io/docs/specification/2-0/authentication/
+            raise InvalidTemplateException("securityDefinitions must be a dictionary.")
 
         # Only add the security definition if it doesn't exist.  This helps ensure
         # that we minimize changes to the swagger in the case of user defined swagger
