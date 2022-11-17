@@ -737,7 +737,7 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)  # type: ignore[no-untyped-call]
 
         if auth_properties.ResourcePolicy:
-            SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+            SwaggerEditor.validate_is_dict(
                 auth_properties.ResourcePolicy, "ResourcePolicy must be a map (ResourcePolicyStatement)."
             )
             for path in swagger_editor.iter_on_path():  # type: ignore[no-untyped-call]
@@ -1048,13 +1048,18 @@ class ApiGenerator(object):
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
-                                SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+                                SwaggerEditor.validate_is_dict(
                                     field_val,
                                     "Value of responses in options method for path {} must be a "
                                     "dictionary according to Swagger spec.".format(path),
                                 )
                                 if field_val.get("200") and field_val.get("200").get("headers"):
                                     headers = field_val["200"]["headers"]
+                                    SwaggerEditor.validate_is_dict(
+                                        headers,
+                                        "Value of response's headers in options method for path {} must be a "
+                                        "dictionary according to Swagger spec.".format(path),
+                                    )
                                     for header, header_val in headers.items():
                                         new_header_val_with_schema = Py27Dict()
                                         new_header_val_with_schema["schema"] = header_val
