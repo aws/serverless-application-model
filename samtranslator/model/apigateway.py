@@ -253,21 +253,6 @@ class ApiGatewayAuthorizer(object):
     ):
         if authorization_scopes is None:
             authorization_scopes = []
-        if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
-            raise InvalidResourceException(
-                api_logical_id,
-                f"{name} Authorizer has invalid 'FunctionPayloadType': {function_payload_type}.",
-            )
-
-        if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):  # type: ignore[no-untyped-call]
-            raise InvalidResourceException(
-                api_logical_id,
-                f"{name} Authorizer must specify Identity with at least one "
-                "of Headers, QueryStrings, StageVariables, or Context.",
-            )
-
-        if authorization_scopes is not None and not isinstance(authorization_scopes, list):
-            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
 
         self.api_logical_id = api_logical_id
         self.name = name
@@ -279,9 +264,32 @@ class ApiGatewayAuthorizer(object):
         self.is_aws_iam_authorizer = is_aws_iam_authorizer
         self.authorization_scopes = authorization_scopes
 
-    def _is_missing_identity_source(self, identity):  # type: ignore[no-untyped-def]
+        if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
+            raise InvalidResourceException(
+                api_logical_id,
+                f"{name} Authorizer has invalid 'FunctionPayloadType': {function_payload_type}.",
+            )
+
+        if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):
+            raise InvalidResourceException(
+                api_logical_id,
+                f"{name} Authorizer must specify Identity with at least one "
+                "of Headers, QueryStrings, StageVariables, or Context.",
+            )
+
+        if authorization_scopes is not None and not isinstance(authorization_scopes, list):
+            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
+
+    def _is_missing_identity_source(self, identity: Dict[str, Any]) -> bool:
         if not identity:
             return True
+
+        if not isinstance(identity, dict):
+            # TODO: we should have a more centralized validation approach.
+            raise InvalidResourceException(
+                self.api_logical_id,
+                f"Invalid type for {self.name} Authorizer's Identity. It must be a dictionary.",
+            )
 
         headers = identity.get("Headers")
         query_strings = identity.get("QueryStrings")
@@ -291,9 +299,11 @@ class ApiGatewayAuthorizer(object):
 
         required_properties_missing = not headers and not query_strings and not stage_variables and not context
 
+        if ttl is None:
+            return required_properties_missing
         try:
             ttl_int = int(ttl)
-        # this will catch if ttl is None and not convertable to an int
+        # this will catch if and not convertable to an int
         except (TypeError, ValueError):
             # previous behavior before trying to read ttl
             return required_properties_missing
