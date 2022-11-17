@@ -372,7 +372,7 @@ class SwaggerEditor(object):
                     continue
 
                 for method_definition in self.get_conditional_contents(method):  # type: ignore[no-untyped-call]
-                    SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+                    SwaggerEditor.validate_is_dict(
                         method_definition,
                         'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(
                             method_name, method_definition, path_name
@@ -661,7 +661,7 @@ class SwaggerEditor(object):
             # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
             # We want to ensure only a single Authorizer security entry exists while keeping everything else
             for security in existing_security:
-                SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+                SwaggerEditor.validate_is_dict(
                     security,
                     "{} in Security for path {} method {} is not a valid dictionary.".format(
                         security, path, method_name
@@ -732,7 +732,7 @@ class SwaggerEditor(object):
             # (e.g. sigv4 (AWS_IAM), authorizers, NONE (marker for ignoring default authorizer))
             # We want to ensure only a single ApiKey security entry exists while keeping everything else
             for security in existing_security:
-                SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+                SwaggerEditor.validate_is_dict(
                     security,
                     "{} in Security for path {} method {} is not a valid dictionary.".format(
                         security, path, method_name
@@ -977,7 +977,7 @@ class SwaggerEditor(object):
         """
         if resource_policy is None:
             return
-        SwaggerEditor.validate_is_dict(resource_policy, "Resource Policy is not a valid dictionary.")  # type: ignore[no-untyped-call]
+        SwaggerEditor.validate_is_dict(resource_policy, "Resource Policy is not a valid dictionary.")
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")
@@ -1326,7 +1326,7 @@ class SwaggerEditor(object):
         return SwaggerEditor.safe_compare_regex_with_string(SwaggerEditor.get_openapi_version_3_regex(), api_version)
 
     @staticmethod
-    def validate_is_dict(obj, exception_message):  # type: ignore[no-untyped-def]
+    def validate_is_dict(obj: Any, exception_message: str) -> None:
         """
         Throws exception if obj is not a dict
 
@@ -1346,7 +1346,7 @@ class SwaggerEditor(object):
         :param path: path name
         """
 
-        SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+        SwaggerEditor.validate_is_dict(
             path_item, "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
         )
 
