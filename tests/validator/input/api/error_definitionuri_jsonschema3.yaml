@@ -77,7 +77,7 @@ Resources:
       StageName: Stage name
 
   # DefinitionUri Key not intrinsic
-  ApiDefinitionUriKeyNotString:
+  ApiDefinitionUriKeyNotStringIntrinsic:
     Type: AWS::Serverless::Api
     Properties:
       DefinitionUri:
