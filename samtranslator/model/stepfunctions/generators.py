@@ -136,18 +136,7 @@ class StateMachineGenerator(object):
             if self.policies and not self.managed_policy_map:
                 raise Exception("Managed policy map is empty, but should not be.")
             if not self.policies:
-                self.policies = [
-                    {
-                        "Version": "2012-10-17",
-                        "Statement": [
-                            {
-                                "Action": ["Lambda:InvokeFunction"],
-                                "Effect": "Allow",
-                                "Resource": "arn:aws:lambda:us-west-2:534568764167:function:SomethingDoesNotMatter*",
-                            }
-                        ],
-                    }
-                ]
+                self.policies = []
             execution_role = self._construct_role()  # type: ignore[no-untyped-call]
             self.state_machine.RoleArn = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
@@ -216,7 +205,7 @@ class StateMachineGenerator(object):
         :rtype: model.iam.IAMRole
         """
         policies = self.policies[:]
-        if self.tracing and self.tracing.get("Enabled") is True:
+        if self.tracing and self.tracing.get("Enabled") is True and self.policies:
             policies.append(get_xray_managed_policy_name())  # type: ignore[no-untyped-call]
 
         state_machine_policies = ResourcePolicies(  # type: ignore[no-untyped-call]
