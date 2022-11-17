@@ -1,0 +1,101 @@
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Role:
+        Fn::GetAtt:
+        - HelloWorldFunctionRole
+        - Arn
+      Architectures:
+      - x86_64
+      Events:
+        HelloWorld:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: HttpApi
+            Path: /{proxy+}
+            Method: ANY
+        Preflight:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: HttpApi
+            Path: /{proxy+}
+            Method: OPTIONS
+  HelloWorldFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: HelloWorldFunctionPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - cognito-idp:List*
+            - cognito-idp:AdminListGroupsForUser
+            - sts:AssumeRole
+            Resource: '*'
+    Metadata:
+      SamResourceId: HelloWorldFunctionRole
+
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName:
+        Fn::Sub: ${StageName}
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title:
+            Ref: AWS::StackName
+        paths: {}
+      CorsConfiguration:
+        AllowOrigins:
+        - '*'
+        AllowCredentials: false
+        AllowHeaders:
+        - Content-Type
+        - X-CSRF-TOKEN
+        - X-Amz-Date
+        - Authorization
+        - X-Requested-With
+        - X-Requested-By
+        - X-Api-Key
+        - X-Forwarded-For
+        - X-Amz-Security-Token
+        AllowMethods:
+        - '*'
+      Auth:
+        EnableIamAuthorizer: true
+        DefaultAuthorizer: AWS_IAM
+        Authorizers:
+          MyAuthorizer:
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              audience:
+              - Ref: UserPoolClient
+              - Ref: UserPoolClientApp
+              issuer:
+                Fn::Join:
+                - ''
+                - - https://cognito-idp.
+                  - Fn::Sub: ${AWS::Region}
+                  - .amazonaws.com/
+                  - Ref: UserPool
+    Metadata:
+      SamResourceId: HttpApi
