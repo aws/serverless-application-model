@@ -820,7 +820,12 @@ class SwaggerEditor(object):
             security = existing_security + authorizer_security
 
             if authorizer_name != "NONE" and authorizers:
-                method_auth_scopes = authorizers.get(authorizer_name, Py27Dict()).get("AuthorizationScopes")
+                authorizer = authorizers.get(authorizer_name, Py27Dict())
+                if not isinstance(authorizer, dict):
+                    raise InvalidDocumentException(
+                        [InvalidTemplateException(f"Type of authorizer '{authorizer_name}' must be a dictionary")]
+                    )
+                method_auth_scopes = authorizer.get("AuthorizationScopes")
                 if method_scopes is not None:
                     method_auth_scopes = method_scopes
                 if authorizers.get(authorizer_name) is not None and method_auth_scopes is not None:
