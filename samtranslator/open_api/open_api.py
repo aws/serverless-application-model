@@ -33,6 +33,7 @@ class OpenApiEditor(object):
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
     _DEFAULT_PATH = "$default"
+    _DEFAULT_OPENAPI_TITLE = ref("AWS::StackName")
 
     def __init__(self, doc: Optional[Dict[str, Any]]) -> None:
         """
@@ -604,6 +605,15 @@ class OpenApiEditor(object):
             return
         self.info["description"] = description
 
+    def add_title(self, title: Intrinsicable[str]) -> None:
+        """Add title in open api definition, if it is not already defined
+
+        :param string description: Description of the API
+        """
+        if self.info.get("title") != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
+            return
+        self.info["title"] = title
+
     def has_api_gateway_cors(self):  # type: ignore[no-untyped-def]
         if self._doc.get(self._X_APIGW_CORS):
             return True
@@ -660,7 +670,7 @@ class OpenApiEditor(object):
         skeleton["openapi"] = "3.0.1"
         skeleton["info"] = Py27Dict()
         skeleton["info"]["version"] = "1.0"
-        skeleton["info"]["title"] = ref("AWS::StackName")
+        skeleton["info"]["title"] = OpenApiEditor._DEFAULT_OPENAPI_TITLE
         skeleton["paths"] = Py27Dict()
         return skeleton
 

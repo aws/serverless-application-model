@@ -29,7 +29,14 @@ from .packagetype import ZIP, IMAGE
 from .s3_utils.uri_parser import construct_s3_location_object, construct_image_code_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import ResourceResolver, PropertyType, SamResourceMacro, Resource, ResourceTypeResolver
+from samtranslator.model import (
+    ResourceResolver,
+    Property,
+    PropertyType,
+    SamResourceMacro,
+    Resource,
+    ResourceTypeResolver,
+)
 from samtranslator.model.apigateway import (
     ApiGatewayDeployment,
     ApiGatewayStage,
@@ -1276,6 +1283,7 @@ class SamHttpApi(SamResourceMacro):
         # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
         # Swagger.
         "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
+        "Name": Property(False, any_type()),
         "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
         "Tags": PropertyType(False, is_type(dict)),
         "DefinitionBody": PropertyType(False, is_type(dict)),
@@ -1292,6 +1300,7 @@ class SamHttpApi(SamResourceMacro):
         "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
     }
 
+    Name: Optional[Any]
     StageName: Optional[Intrinsicable[str]]
     Tags: Optional[Dict[str, Any]]
     DefinitionBody: Optional[Dict[str, Any]]
@@ -1332,6 +1341,7 @@ class SamHttpApi(SamResourceMacro):
             self.depends_on,
             self.DefinitionBody,
             self.DefinitionUri,
+            self.Name,
             self.StageName,
             tags=self.Tags,
             auth=self.Auth,
