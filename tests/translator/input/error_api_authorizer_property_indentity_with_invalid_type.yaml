@@ -47,3 +47,14 @@ Resources:
             Identity: LambdaAuthorizationIdentity
             AuthorizerPayloadFormatVersion: 1.0
         DefaultAuthorizer: MyLambdaAuthUpdated
+
+  MyRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          LambdaRequestIdentityNotObject:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity: This should not be a string
