@@ -1,0 +1,4141 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "AlexaSkillEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "SkillId": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "AlexaSkill"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Type"
+            ],
+            "type": "object"
+        },
+        "ApiEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "Auth": {
+                            "properties": {
+                                "ApiKeyRequired": {
+                                    "type": "boolean"
+                                },
+                                "AuthorizationScopes": {
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "type": "array"
+                                },
+                                "Authorizer": {
+                                    "type": "string"
+                                },
+                                "InvokeRole": {
+                                    "type": [
+                                        "null",
+                                        "string"
+                                    ]
+                                },
+                                "ResourcePolicy": {
+                                    "properties": {
+                                        "AwsAccountBlacklist": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "AwsAccountWhitelist": {
+                                            "$ref": "#/definitions/CfnStringList"
+                                        },
+                                        "CustomStatements": {
+                                            "items": {},
+                                            "type": "array"
+                                        },
+                                        "IntrinsicVpcBlacklist": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "IntrinsicVpcWhitelist": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "IntrinsicVpceBlacklist": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "IntrinsicVpceWhitelist": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "IpRangeBlacklist": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "IpRangeWhitelist": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "SourceVpcBlacklist": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "SourceVpcWhitelist": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "Method": {
+                            "type": "string"
+                        },
+                        "Path": {
+                            "type": "string"
+                        },
+                        "RequestModel": {
+                            "properties": {
+                                "Model": {
+                                    "type": "string"
+                                },
+                                "Required": {
+                                    "type": "boolean"
+                                },
+                                "ValidateBody": {
+                                    "type": "boolean"
+                                },
+                                "ValidateParameters": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "Model"
+                            ],
+                            "type": "object"
+                        },
+                        "RequestParameters": {
+                            "anyOf": [
+                                {
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "type": "array"
+                                },
+                                {
+                                    "items": {
+                                        "additionalProperties": {
+                                            "properties": {
+                                                "Caching": {
+                                                    "type": "boolean"
+                                                },
+                                                "Required": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "RestApiId": {
+                            "$ref": "#/definitions/CfnString"
+                        }
+                    },
+                    "required": [
+                        "Method",
+                        "Path"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "Api"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "AwsServerlessApi": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "AccessLogSetting": {
+                            "properties": {
+                                "DestinationArn": {
+                                    "$ref": "#/definitions/CfnString"
+                                },
+                                "Format": {
+                                    "$ref": "#/definitions/CfnString"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "ApiKeySourceType": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Auth": {
+                            "properties": {
+                                "AddDefaultAuthorizerToCorsPreflight": {
+                                    "type": "boolean"
+                                },
+                                "ApiKeyRequired": {
+                                    "type": "boolean"
+                                },
+                                "Authorizers": {
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/definitions/CognitoAuthorizer"
+                                            },
+                                            {
+                                                "$ref": "#/definitions/LambdaTokenAuthorizer"
+                                            },
+                                            {
+                                                "$ref": "#/definitions/LambdaRequestAuthorizer"
+                                            }
+                                        ]
+                                    },
+                                    "type": "object"
+                                },
+                                "DefaultAuthorizer": {
+                                    "$ref": "#/definitions/SamString"
+                                },
+                                "InvokeRole": {
+                                    "$ref": "#/definitions/SamString"
+                                },
+                                "ResourcePolicy": {
+                                    "properties": {
+                                        "AwsAccountBlacklist": {
+                                            "$ref": "#/definitions/SamStringList"
+                                        },
+                                        "AwsAccountWhitelist": {
+                                            "$ref": "#/definitions/SamStringList"
+                                        },
+                                        "CustomStatements": {},
+                                        "IntrinsicVpcBlacklist": {
+                                            "$ref": "#/definitions/SamStringList"
+                                        },
+                                        "IntrinsicVpcWhitelist": {
+                                            "$ref": "#/definitions/SamStringList"
+                                        },
+                                        "IntrinsicVpceBlacklist": {
+                                            "$ref": "#/definitions/SamStringList"
+                                        },
+                                        "IntrinsicVpceWhitelist": {
+                                            "$ref": "#/definitions/SamStringList"
+                                        },
+                                        "IpRangeBlacklist": {
+                                            "$ref": "#/definitions/SamStringList"
+                                        },
+                                        "IpRangeWhitelist": {
+                                            "$ref": "#/definitions/SamStringList"
+                                        },
+                                        "SourceVpcBlacklist": {
+                                            "$ref": "#/definitions/SamStringList"
+                                        },
+                                        "SourceVpcWhitelist": {
+                                            "$ref": "#/definitions/SamStringList"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "UsagePlan": {
+                                    "properties": {
+                                        "CreateUsagePlan": {
+                                            "$ref": "#/definitions/SamString_1"
+                                        },
+                                        "Description": {
+                                            "$ref": "#/definitions/CfnString"
+                                        },
+                                        "Quota": {
+                                            "properties": {
+                                                "Limit": {
+                                                    "$ref": "#/definitions/CfnInteger"
+                                                },
+                                                "Offset": {
+                                                    "$ref": "#/definitions/CfnInteger"
+                                                },
+                                                "Period": {
+                                                    "$ref": "#/definitions/CfnString"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "Tags": {
+                                            "items": {
+                                                "properties": {
+                                                    "Key": {
+                                                        "$ref": "#/definitions/CfnString_1"
+                                                    },
+                                                    "Value": {
+                                                        "$ref": "#/definitions/CfnString_1"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "Key",
+                                                    "Value"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "Throttle": {
+                                            "properties": {
+                                                "BurstLimit": {
+                                                    "$ref": "#/definitions/CfnInteger"
+                                                },
+                                                "RateLimit": {
+                                                    "$ref": "#/definitions/CfnDouble"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "UsagePlanName": {
+                                            "$ref": "#/definitions/CfnString"
+                                        }
+                                    },
+                                    "required": [
+                                        "CreateUsagePlan"
+                                    ],
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "BinaryMediaTypes": {
+                            "$ref": "#/definitions/CfnStringList"
+                        },
+                        "CacheClusterEnabled": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "CacheClusterSize": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "CanarySetting": {
+                            "properties": {
+                                "DeploymentId": {
+                                    "$ref": "#/definitions/CfnString"
+                                },
+                                "PercentTraffic": {
+                                    "$ref": "#/definitions/CfnDouble"
+                                },
+                                "StageVariableOverrides": {},
+                                "UseStageCache": {
+                                    "$ref": "#/definitions/CfnBoolean"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "Cors": {
+                            "anyOf": [
+                                {
+                                    "properties": {
+                                        "AllowCredentials": {
+                                            "$ref": "#/definitions/SamBoolean"
+                                        },
+                                        "AllowHeaders": {
+                                            "$ref": "#/definitions/SamString"
+                                        },
+                                        "AllowMethods": {
+                                            "$ref": "#/definitions/SamString"
+                                        },
+                                        "AllowOrigin": {
+                                            "$ref": "#/definitions/SamString_1"
+                                        },
+                                        "MaxAge": {
+                                            "$ref": "#/definitions/SamString"
+                                        }
+                                    },
+                                    "required": [
+                                        "AllowOrigin"
+                                    ],
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "DefinitionBody": {
+                            "$ref": "#/definitions/SamJson"
+                        },
+                        "DefinitionUri": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/Ref"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnJoin"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSub"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnGetAtt"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnIf"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnFindInMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSelect"
+                                },
+                                {
+                                    "properties": {
+                                        "Bucket": {
+                                            "$ref": "#/definitions/CfnString_1"
+                                        },
+                                        "Key": {
+                                            "$ref": "#/definitions/CfnString_1"
+                                        },
+                                        "Version": {
+                                            "anyOf": [
+                                                {
+                                                    "$ref": "#/definitions/Ref"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnJoin"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnSub"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnGetAtt"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnIf"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnFindInMap"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnSelect"
+                                                },
+                                                {
+                                                    "type": [
+                                                        "string",
+                                                        "number"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "Bucket",
+                                        "Key"
+                                    ],
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "Description": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "DisableExecuteApiEndpoint": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "Domain": {
+                            "properties": {
+                                "BasePath": {
+                                    "$ref": "#/definitions/SamStringList"
+                                },
+                                "CertificateArn": {
+                                    "$ref": "#/definitions/CfnString_1"
+                                },
+                                "DomainName": {
+                                    "$ref": "#/definitions/CfnString_1"
+                                },
+                                "EndpointConfiguration": {
+                                    "$ref": "#/definitions/SamString"
+                                },
+                                "MutualTlsAuthentication": {
+                                    "properties": {
+                                        "TruststoreUri": {
+                                            "$ref": "#/definitions/CfnString"
+                                        },
+                                        "TruststoreVersion": {
+                                            "$ref": "#/definitions/CfnString"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "OwnershipVerificationCertificateArn": {
+                                    "$ref": "#/definitions/CfnString"
+                                },
+                                "Route53": {
+                                    "properties": {
+                                        "DistributionDomainName": {
+                                            "$ref": "#/definitions/CfnString"
+                                        },
+                                        "EvaluateTargetHealth": {
+                                            "$ref": "#/definitions/CfnBoolean"
+                                        },
+                                        "HostedZoneId": {
+                                            "$ref": "#/definitions/CfnString"
+                                        },
+                                        "HostedZoneName": {
+                                            "$ref": "#/definitions/CfnString"
+                                        },
+                                        "IpV6": {
+                                            "$ref": "#/definitions/SamBoolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "SecurityPolicy": {
+                                    "$ref": "#/definitions/CfnString"
+                                }
+                            },
+                            "required": [
+                                "CertificateArn",
+                                "DomainName"
+                            ],
+                            "type": "object"
+                        },
+                        "EndpointConfiguration": {
+                            "properties": {
+                                "Type": {
+                                    "$ref": "#/definitions/CfnString"
+                                },
+                                "VPCEndpointIds": {
+                                    "$ref": "#/definitions/CfnStringList"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "FailOnWarnings": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "GatewayResponses": {
+                            "$ref": "#/definitions/SamJson"
+                        },
+                        "MethodSettings": {},
+                        "MinimumCompressionSize": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "Mode": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Models": {
+                            "$ref": "#/definitions/SamJson"
+                        },
+                        "Name": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "OpenApiVersion": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/Ref"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnJoin"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSub"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnGetAtt"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnIf"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnFindInMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSelect"
+                                },
+                                {
+                                    "type": [
+                                        "string",
+                                        "number"
+                                    ]
+                                }
+                            ]
+                        },
+                        "StageName": {
+                            "$ref": "#/definitions/SamString_1"
+                        },
+                        "Tags": {
+                            "additionalProperties": {
+                                "$ref": "#/definitions/SamString_1",
+                                "description": "A CloudFormation string with full intrinsics support."
+                            },
+                            "type": "object"
+                        },
+                        "TracingEnabled": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "Variables": {
+                            "additionalProperties": {
+                                "$ref": "#/definitions/SamString_1",
+                                "description": "A CloudFormation string with full intrinsics support."
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "required": [
+                        "StageName"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "AWS::Serverless::Api"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "AwsServerlessApplication": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "Location": {
+                            "anyOf": [
+                                {
+                                    "properties": {
+                                        "ApplicationId": {
+                                            "$ref": "#/definitions/SamString_1"
+                                        },
+                                        "SemanticVersion": {
+                                            "$ref": "#/definitions/SamString_1"
+                                        }
+                                    },
+                                    "required": [
+                                        "ApplicationId",
+                                        "SemanticVersion"
+                                    ],
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "NotificationARNs": {
+                            "$ref": "#/definitions/CfnStringList"
+                        },
+                        "Parameters": {
+                            "$ref": "#/definitions/CfnStringMap"
+                        },
+                        "Tags": {
+                            "additionalProperties": {
+                                "type": "string"
+                            },
+                            "type": "object"
+                        },
+                        "TimeoutInMinutes": {
+                            "$ref": "#/definitions/CfnInteger"
+                        }
+                    },
+                    "required": [
+                        "Location"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "AWS::Serverless::Application"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "AwsServerlessFunction": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "Architectures": {
+                            "$ref": "#/definitions/CfnStringList"
+                        },
+                        "AssumeRolePolicyDocument": {},
+                        "AutoPublishAlias": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/Ref"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnJoin"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSub"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnGetAtt"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnIf"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnFindInMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSelect"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "AutoPublishCodeSha256": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/Ref"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnJoin"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSub"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnGetAtt"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnIf"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnFindInMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSelect"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "CodeSigningConfigArn": {
+                            "$ref": "#/definitions/CfnStringList"
+                        },
+                        "CodeUri": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/FunctionCode"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "DeadLetterQueue": {
+                            "$ref": "#/definitions/DeadLetterQueue"
+                        },
+                        "DeploymentPreference": {
+                            "$ref": "#/definitions/DeploymentPreference"
+                        },
+                        "Description": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Environment": {
+                            "properties": {
+                                "Variables": {
+                                    "additionalProperties": {
+                                        "$ref": "#/definitions/CfnString_1",
+                                        "description": "A CloudFormation string with full intrinsics support."
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "required": [
+                                "Variables"
+                            ],
+                            "type": "object"
+                        },
+                        "EphemeralStorage": {},
+                        "EventInvokeConfig": {},
+                        "Events": {
+                            "additionalProperties": {
+                                "anyOf": [
+                                    {
+                                        "$ref": "#/definitions/ApiEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/S3Event"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/SnsEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/KinesisEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/DynamoDbEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/SqsEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/ScheduleEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/CloudWatchEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/EventBridgeRuleEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/CloudWatchLogsEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/IotRuleEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/AlexaSkillEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/CognitoEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/HttpApiEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/MskEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/MqEvent"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/SelfManagedKafkaEvent"
+                                    }
+                                ]
+                            },
+                            "type": "object"
+                        },
+                        "FileSystemConfigs": {
+                            "items": {
+                                "$ref": "#/definitions/FileSystemConfig"
+                            },
+                            "type": "array"
+                        },
+                        "FunctionName": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "FunctionUrlConfig": {
+                            "$ref": "#/definitions/FunctionUrlConfig"
+                        },
+                        "Handler": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "ImageConfig": {},
+                        "ImageUri": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "InlineCode": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "KmsKeyArn": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Layers": {
+                            "$ref": "#/definitions/CfnStringList"
+                        },
+                        "MemorySize": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "PackageType": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "PermissionsBoundary": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Policies": {},
+                        "ProvisionedConcurrencyConfig": {},
+                        "ReservedConcurrentExecutions": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "Role": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Runtime": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Tags": {
+                            "additionalProperties": {
+                                "$ref": "#/definitions/CfnString_1",
+                                "description": "A CloudFormation string with full intrinsics support."
+                            },
+                            "type": "object"
+                        },
+                        "Timeout": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "Tracing": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/Ref"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnJoin"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSub"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnGetAtt"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnIf"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnFindInMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSelect"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "VersionDescription": {
+                            "type": "string"
+                        },
+                        "VpcConfig": {
+                            "$ref": "#/definitions/VpcConfig"
+                        }
+                    },
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "AWS::Serverless::Function"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Type"
+            ],
+            "type": "object"
+        },
+        "AwsServerlessHttpApi": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "AccessLogSettings": {},
+                        "Auth": {},
+                        "CorsConfiguration": {},
+                        "DefaultRouteSettings": {},
+                        "DefinitionBody": {},
+                        "DefinitionUri": {},
+                        "Description": {},
+                        "DisableExecuteApiEndpoint": {},
+                        "Domain": {},
+                        "FailOnWarnings": {},
+                        "RouteSettings": {},
+                        "StageName": {},
+                        "StageVariables": {},
+                        "Tags": {}
+                    },
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "AWS::Serverless::HttpApi"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Type"
+            ],
+            "type": "object"
+        },
+        "AwsServerlessLayerVersion": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "CompatibleArchitectures": {
+                            "$ref": "#/definitions/CfnStringList"
+                        },
+                        "CompatibleRuntimes": {
+                            "$ref": "#/definitions/CfnStringList"
+                        },
+                        "ContentUri": {
+                            "anyOf": [
+                                {
+                                    "properties": {
+                                        "Bucket": {
+                                            "$ref": "#/definitions/CfnString_1"
+                                        },
+                                        "Key": {
+                                            "$ref": "#/definitions/CfnString_1"
+                                        },
+                                        "Version": {
+                                            "$ref": "#/definitions/CfnString"
+                                        }
+                                    },
+                                    "required": [
+                                        "Bucket",
+                                        "Key"
+                                    ],
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "Description": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "LayerName": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "LicenseInfo": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "RetentionPolicy": {
+                            "$ref": "#/definitions/CfnString"
+                        }
+                    },
+                    "required": [
+                        "ContentUri"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "AWS::Serverless::LayerVersion"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "AwsServerlessSimpleTable": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "PrimaryKey": {
+                            "properties": {
+                                "Name": {
+                                    "$ref": "#/definitions/CfnString_1"
+                                },
+                                "Type": {
+                                    "$ref": "#/definitions/CfnString_1"
+                                }
+                            },
+                            "required": [
+                                "Name",
+                                "Type"
+                            ],
+                            "type": "object"
+                        },
+                        "ProvisionedThroughput": {
+                            "properties": {
+                                "ReadCapacityUnits": {
+                                    "$ref": "#/definitions/CfnInteger_1"
+                                },
+                                "WriteCapacityUnits": {
+                                    "$ref": "#/definitions/CfnInteger_1"
+                                }
+                            },
+                            "required": [
+                                "ReadCapacityUnits",
+                                "WriteCapacityUnits"
+                            ],
+                            "type": "object"
+                        },
+                        "SSESpecification": {
+                            "properties": {
+                                "KMSMasterKeyId": {
+                                    "$ref": "#/definitions/CfnString"
+                                },
+                                "SSEEnabled": {
+                                    "$ref": "#/definitions/CfnBoolean_1"
+                                },
+                                "SSEType": {
+                                    "$ref": "#/definitions/CfnString"
+                                }
+                            },
+                            "required": [
+                                "SSEEnabled"
+                            ],
+                            "type": "object"
+                        },
+                        "TableName": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Tags": {
+                            "additionalProperties": {
+                                "$ref": "#/definitions/CfnString_1",
+                                "description": "A CloudFormation string with full intrinsics support."
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "AWS::Serverless::SimpleTable"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Type"
+            ],
+            "type": "object"
+        },
+        "AwsServerlessStateMachine": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "Definition": {
+                            "$ref": "#/definitions/SamJson"
+                        },
+                        "DefinitionSubstitutions": {
+                            "$ref": "#/definitions/SamJson"
+                        },
+                        "DefinitionUri": {
+                            "anyOf": [
+                                {
+                                    "properties": {
+                                        "Bucket": {
+                                            "$ref": "#/definitions/CfnString_1"
+                                        },
+                                        "Key": {
+                                            "$ref": "#/definitions/CfnString_1"
+                                        },
+                                        "Version": {
+                                            "anyOf": [
+                                                {
+                                                    "$ref": "#/definitions/Ref"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnJoin"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnSub"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnGetAtt"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnIf"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnFindInMap"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/FnSelect"
+                                                },
+                                                {
+                                                    "type": [
+                                                        "string",
+                                                        "number"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "Bucket",
+                                        "Key"
+                                    ],
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "Events": {},
+                        "Logging": {},
+                        "Name": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "PermissionsBoundary": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Policies": {},
+                        "Role": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Tags": {
+                            "$ref": "#/definitions/SamJson"
+                        },
+                        "Tracing": {
+                            "properties": {
+                                "Enabled": {
+                                    "$ref": "#/definitions/SamBoolean_1"
+                                }
+                            },
+                            "required": [
+                                "Enabled"
+                            ],
+                            "type": "object"
+                        },
+                        "Type": {
+                            "$ref": "#/definitions/CfnString"
+                        }
+                    },
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "AWS::Serverless::StateMachine"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Type"
+            ],
+            "type": "object"
+        },
+        "CfnBoolean": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "boolean"
+                }
+            ],
+            "description": "A CloudFormation boolean with full intrinsics support."
+        },
+        "CfnBoolean_1": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "boolean"
+                }
+            ],
+            "description": "A CloudFormation boolean with full intrinsics support."
+        },
+        "CfnDouble": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "number"
+                }
+            ],
+            "description": "A CloudFormation double with full intrinsics support."
+        },
+        "CfnInteger": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "number"
+                }
+            ],
+            "description": "A CloudFormation integer with full intrinsics support."
+        },
+        "CfnInteger_1": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "number"
+                }
+            ],
+            "description": "A CloudFormation integer with full intrinsics support."
+        },
+        "CfnJson": {},
+        "CfnResourceType": {
+            "enum": [
+                "AWS::ACMPCA::Certificate",
+                "AWS::ACMPCA::CertificateAuthority",
+                "AWS::ACMPCA::CertificateAuthorityActivation",
+                "AWS::ACMPCA::Permission",
+                "AWS::APS::RuleGroupsNamespace",
+                "AWS::APS::Workspace",
+                "AWS::AccessAnalyzer::Analyzer",
+                "AWS::AmazonMQ::Broker",
+                "AWS::AmazonMQ::Configuration",
+                "AWS::AmazonMQ::ConfigurationAssociation",
+                "AWS::Amplify::App",
+                "AWS::Amplify::Branch",
+                "AWS::Amplify::Domain",
+                "AWS::AmplifyUIBuilder::Component",
+                "AWS::AmplifyUIBuilder::Theme",
+                "AWS::ApiGateway::Account",
+                "AWS::ApiGateway::ApiKey",
+                "AWS::ApiGateway::Authorizer",
+                "AWS::ApiGateway::BasePathMapping",
+                "AWS::ApiGateway::ClientCertificate",
+                "AWS::ApiGateway::Deployment",
+                "AWS::ApiGateway::DocumentationPart",
+                "AWS::ApiGateway::DocumentationVersion",
+                "AWS::ApiGateway::DomainName",
+                "AWS::ApiGateway::GatewayResponse",
+                "AWS::ApiGateway::Method",
+                "AWS::ApiGateway::Model",
+                "AWS::ApiGateway::RequestValidator",
+                "AWS::ApiGateway::Resource",
+                "AWS::ApiGateway::RestApi",
+                "AWS::ApiGateway::Stage",
+                "AWS::ApiGateway::UsagePlan",
+                "AWS::ApiGateway::UsagePlanKey",
+                "AWS::ApiGateway::VpcLink",
+                "AWS::ApiGatewayV2::Api",
+                "AWS::ApiGatewayV2::ApiGatewayManagedOverrides",
+                "AWS::ApiGatewayV2::ApiMapping",
+                "AWS::ApiGatewayV2::Authorizer",
+                "AWS::ApiGatewayV2::Deployment",
+                "AWS::ApiGatewayV2::DomainName",
+                "AWS::ApiGatewayV2::Integration",
+                "AWS::ApiGatewayV2::IntegrationResponse",
+                "AWS::ApiGatewayV2::Model",
+                "AWS::ApiGatewayV2::Route",
+                "AWS::ApiGatewayV2::RouteResponse",
+                "AWS::ApiGatewayV2::Stage",
+                "AWS::ApiGatewayV2::VpcLink",
+                "AWS::AppConfig::Application",
+                "AWS::AppConfig::ConfigurationProfile",
+                "AWS::AppConfig::Deployment",
+                "AWS::AppConfig::DeploymentStrategy",
+                "AWS::AppConfig::Environment",
+                "AWS::AppConfig::HostedConfigurationVersion",
+                "AWS::AppFlow::ConnectorProfile",
+                "AWS::AppFlow::Flow",
+                "AWS::AppMesh::GatewayRoute",
+                "AWS::AppMesh::Mesh",
+                "AWS::AppMesh::Route",
+                "AWS::AppMesh::VirtualGateway",
+                "AWS::AppMesh::VirtualNode",
+                "AWS::AppMesh::VirtualRouter",
+                "AWS::AppMesh::VirtualService",
+                "AWS::AppRunner::ObservabilityConfiguration",
+                "AWS::AppRunner::Service",
+                "AWS::AppRunner::VpcConnector",
+                "AWS::AppStream::AppBlock",
+                "AWS::AppStream::Application",
+                "AWS::AppStream::ApplicationEntitlementAssociation",
+                "AWS::AppStream::ApplicationFleetAssociation",
+                "AWS::AppStream::DirectoryConfig",
+                "AWS::AppStream::Entitlement",
+                "AWS::AppStream::Fleet",
+                "AWS::AppStream::ImageBuilder",
+                "AWS::AppStream::Stack",
+                "AWS::AppStream::StackFleetAssociation",
+                "AWS::AppStream::StackUserAssociation",
+                "AWS::AppStream::User",
+                "AWS::AppSync::ApiCache",
+                "AWS::AppSync::ApiKey",
+                "AWS::AppSync::DataSource",
+                "AWS::AppSync::DomainName",
+                "AWS::AppSync::DomainNameApiAssociation",
+                "AWS::AppSync::FunctionConfiguration",
+                "AWS::AppSync::GraphQLApi",
+                "AWS::AppSync::GraphQLSchema",
+                "AWS::AppSync::Resolver",
+                "AWS::ApplicationAutoScaling::ScalableTarget",
+                "AWS::ApplicationAutoScaling::ScalingPolicy",
+                "AWS::ApplicationInsights::Application",
+                "AWS::Athena::DataCatalog",
+                "AWS::Athena::NamedQuery",
+                "AWS::Athena::PreparedStatement",
+                "AWS::Athena::WorkGroup",
+                "AWS::AuditManager::Assessment",
+                "AWS::AutoScaling::AutoScalingGroup",
+                "AWS::AutoScaling::LaunchConfiguration",
+                "AWS::AutoScaling::LifecycleHook",
+                "AWS::AutoScaling::ScalingPolicy",
+                "AWS::AutoScaling::ScheduledAction",
+                "AWS::AutoScaling::WarmPool",
+                "AWS::AutoScalingPlans::ScalingPlan",
+                "AWS::Backup::BackupPlan",
+                "AWS::Backup::BackupSelection",
+                "AWS::Backup::BackupVault",
+                "AWS::Backup::Framework",
+                "AWS::Backup::ReportPlan",
+                "AWS::Batch::ComputeEnvironment",
+                "AWS::Batch::JobDefinition",
+                "AWS::Batch::JobQueue",
+                "AWS::Batch::SchedulingPolicy",
+                "AWS::Budgets::Budget",
+                "AWS::Budgets::BudgetsAction",
+                "AWS::CE::CostCategory",
+                "AWS::Cassandra::Keyspace",
+                "AWS::Cassandra::Table",
+                "AWS::CertificateManager::Account",
+                "AWS::CertificateManager::Certificate",
+                "AWS::Chatbot::SlackChannelConfiguration",
+                "AWS::Cloud9::EnvironmentEC2",
+                "AWS::CloudFormation::CustomResource",
+                "AWS::CloudFormation::HookDefaultVersion",
+                "AWS::CloudFormation::HookTypeConfig",
+                "AWS::CloudFormation::HookVersion",
+                "AWS::CloudFormation::Macro",
+                "AWS::CloudFormation::ModuleDefaultVersion",
+                "AWS::CloudFormation::ModuleVersion",
+                "AWS::CloudFormation::PublicTypeVersion",
+                "AWS::CloudFormation::Publisher",
+                "AWS::CloudFormation::ResourceDefaultVersion",
+                "AWS::CloudFormation::ResourceVersion",
+                "AWS::CloudFormation::Stack",
+                "AWS::CloudFormation::StackSet",
+                "AWS::CloudFormation::TypeActivation",
+                "AWS::CloudFormation::WaitCondition",
+                "AWS::CloudFormation::WaitConditionHandle",
+                "AWS::CloudFront::CachePolicy",
+                "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+                "AWS::CloudFront::Distribution",
+                "AWS::CloudFront::Function",
+                "AWS::CloudFront::KeyGroup",
+                "AWS::CloudFront::OriginRequestPolicy",
+                "AWS::CloudFront::PublicKey",
+                "AWS::CloudFront::RealtimeLogConfig",
+                "AWS::CloudFront::ResponseHeadersPolicy",
+                "AWS::CloudFront::StreamingDistribution",
+                "AWS::CloudTrail::EventDataStore",
+                "AWS::CloudTrail::Trail",
+                "AWS::CloudWatch::Alarm",
+                "AWS::CloudWatch::AnomalyDetector",
+                "AWS::CloudWatch::CompositeAlarm",
+                "AWS::CloudWatch::Dashboard",
+                "AWS::CloudWatch::InsightRule",
+                "AWS::CloudWatch::MetricStream",
+                "AWS::CodeArtifact::Domain",
+                "AWS::CodeArtifact::Repository",
+                "AWS::CodeBuild::Project",
+                "AWS::CodeBuild::ReportGroup",
+                "AWS::CodeBuild::SourceCredential",
+                "AWS::CodeCommit::Repository",
+                "AWS::CodeDeploy::Application",
+                "AWS::CodeDeploy::DeploymentConfig",
+                "AWS::CodeDeploy::DeploymentGroup",
+                "AWS::CodeGuruProfiler::ProfilingGroup",
+                "AWS::CodeGuruReviewer::RepositoryAssociation",
+                "AWS::CodePipeline::CustomActionType",
+                "AWS::CodePipeline::Pipeline",
+                "AWS::CodePipeline::Webhook",
+                "AWS::CodeStar::GitHubRepository",
+                "AWS::CodeStarConnections::Connection",
+                "AWS::CodeStarNotifications::NotificationRule",
+                "AWS::Cognito::IdentityPool",
+                "AWS::Cognito::IdentityPoolRoleAttachment",
+                "AWS::Cognito::UserPool",
+                "AWS::Cognito::UserPoolClient",
+                "AWS::Cognito::UserPoolDomain",
+                "AWS::Cognito::UserPoolGroup",
+                "AWS::Cognito::UserPoolIdentityProvider",
+                "AWS::Cognito::UserPoolResourceServer",
+                "AWS::Cognito::UserPoolRiskConfigurationAttachment",
+                "AWS::Cognito::UserPoolUICustomizationAttachment",
+                "AWS::Cognito::UserPoolUser",
+                "AWS::Cognito::UserPoolUserToGroupAttachment",
+                "AWS::Config::AggregationAuthorization",
+                "AWS::Config::ConfigRule",
+                "AWS::Config::ConfigurationAggregator",
+                "AWS::Config::ConfigurationRecorder",
+                "AWS::Config::ConformancePack",
+                "AWS::Config::DeliveryChannel",
+                "AWS::Config::OrganizationConfigRule",
+                "AWS::Config::OrganizationConformancePack",
+                "AWS::Config::RemediationConfiguration",
+                "AWS::Config::StoredQuery",
+                "AWS::DAX::Cluster",
+                "AWS::DAX::ParameterGroup",
+                "AWS::DAX::SubnetGroup",
+                "AWS::DLM::LifecyclePolicy",
+                "AWS::DMS::Certificate",
+                "AWS::DMS::Endpoint",
+                "AWS::DMS::EventSubscription",
+                "AWS::DMS::ReplicationInstance",
+                "AWS::DMS::ReplicationSubnetGroup",
+                "AWS::DMS::ReplicationTask",
+                "AWS::DataBrew::Dataset",
+                "AWS::DataBrew::Job",
+                "AWS::DataBrew::Project",
+                "AWS::DataBrew::Recipe",
+                "AWS::DataBrew::Ruleset",
+                "AWS::DataBrew::Schedule",
+                "AWS::DataPipeline::Pipeline",
+                "AWS::DataSync::Agent",
+                "AWS::DataSync::LocationEFS",
+                "AWS::DataSync::LocationFSxLustre",
+                "AWS::DataSync::LocationFSxONTAP",
+                "AWS::DataSync::LocationFSxOpenZFS",
+                "AWS::DataSync::LocationFSxWindows",
+                "AWS::DataSync::LocationHDFS",
+                "AWS::DataSync::LocationNFS",
+                "AWS::DataSync::LocationObjectStorage",
+                "AWS::DataSync::LocationS3",
+                "AWS::DataSync::LocationSMB",
+                "AWS::DataSync::Task",
+                "AWS::Detective::Graph",
+                "AWS::Detective::MemberInvitation",
+                "AWS::DevOpsGuru::NotificationChannel",
+                "AWS::DevOpsGuru::ResourceCollection",
+                "AWS::DirectoryService::MicrosoftAD",
+                "AWS::DirectoryService::SimpleAD",
+                "AWS::DocDB::DBCluster",
+                "AWS::DocDB::DBClusterParameterGroup",
+                "AWS::DocDB::DBInstance",
+                "AWS::DocDB::DBSubnetGroup",
+                "AWS::DynamoDB::GlobalTable",
+                "AWS::DynamoDB::Table",
+                "AWS::EC2::CapacityReservation",
+                "AWS::EC2::CapacityReservationFleet",
+                "AWS::EC2::CarrierGateway",
+                "AWS::EC2::ClientVpnAuthorizationRule",
+                "AWS::EC2::ClientVpnEndpoint",
+                "AWS::EC2::ClientVpnRoute",
+                "AWS::EC2::ClientVpnTargetNetworkAssociation",
+                "AWS::EC2::CustomerGateway",
+                "AWS::EC2::DHCPOptions",
+                "AWS::EC2::EC2Fleet",
+                "AWS::EC2::EIP",
+                "AWS::EC2::EIPAssociation",
+                "AWS::EC2::EgressOnlyInternetGateway",
+                "AWS::EC2::EnclaveCertificateIamRoleAssociation",
+                "AWS::EC2::FlowLog",
+                "AWS::EC2::GatewayRouteTableAssociation",
+                "AWS::EC2::Host",
+                "AWS::EC2::IPAM",
+                "AWS::EC2::IPAMAllocation",
+                "AWS::EC2::IPAMPool",
+                "AWS::EC2::IPAMScope",
+                "AWS::EC2::Instance",
+                "AWS::EC2::InternetGateway",
+                "AWS::EC2::KeyPair",
+                "AWS::EC2::LaunchTemplate",
+                "AWS::EC2::LocalGatewayRoute",
+                "AWS::EC2::LocalGatewayRouteTableVPCAssociation",
+                "AWS::EC2::NatGateway",
+                "AWS::EC2::NetworkAcl",
+                "AWS::EC2::NetworkAclEntry",
+                "AWS::EC2::NetworkInsightsAccessScope",
+                "AWS::EC2::NetworkInsightsAccessScopeAnalysis",
+                "AWS::EC2::NetworkInsightsAnalysis",
+                "AWS::EC2::NetworkInsightsPath",
+                "AWS::EC2::NetworkInterface",
+                "AWS::EC2::NetworkInterfaceAttachment",
+                "AWS::EC2::NetworkInterfacePermission",
+                "AWS::EC2::PlacementGroup",
+                "AWS::EC2::PrefixList",
+                "AWS::EC2::Route",
+                "AWS::EC2::RouteTable",
+                "AWS::EC2::SecurityGroup",
+                "AWS::EC2::SecurityGroupEgress",
+                "AWS::EC2::SecurityGroupIngress",
+                "AWS::EC2::SpotFleet",
+                "AWS::EC2::Subnet",
+                "AWS::EC2::SubnetCidrBlock",
+                "AWS::EC2::SubnetNetworkAclAssociation",
+                "AWS::EC2::SubnetRouteTableAssociation",
+                "AWS::EC2::TrafficMirrorFilter",
+                "AWS::EC2::TrafficMirrorFilterRule",
+                "AWS::EC2::TrafficMirrorSession",
+                "AWS::EC2::TrafficMirrorTarget",
+                "AWS::EC2::TransitGateway",
+                "AWS::EC2::TransitGatewayAttachment",
+                "AWS::EC2::TransitGatewayConnect",
+                "AWS::EC2::TransitGatewayMulticastDomain",
+                "AWS::EC2::TransitGatewayMulticastDomainAssociation",
+                "AWS::EC2::TransitGatewayMulticastGroupMember",
+                "AWS::EC2::TransitGatewayMulticastGroupSource",
+                "AWS::EC2::TransitGatewayPeeringAttachment",
+                "AWS::EC2::TransitGatewayRoute",
+                "AWS::EC2::TransitGatewayRouteTable",
+                "AWS::EC2::TransitGatewayRouteTableAssociation",
+                "AWS::EC2::TransitGatewayRouteTablePropagation",
+                "AWS::EC2::TransitGatewayVpcAttachment",
+                "AWS::EC2::VPC",
+                "AWS::EC2::VPCCidrBlock",
+                "AWS::EC2::VPCDHCPOptionsAssociation",
+                "AWS::EC2::VPCEndpoint",
+                "AWS::EC2::VPCEndpointConnectionNotification",
+                "AWS::EC2::VPCEndpointService",
+                "AWS::EC2::VPCEndpointServicePermissions",
+                "AWS::EC2::VPCGatewayAttachment",
+                "AWS::EC2::VPCPeeringConnection",
+                "AWS::EC2::VPNConnection",
+                "AWS::EC2::VPNConnectionRoute",
+                "AWS::EC2::VPNGateway",
+                "AWS::EC2::VPNGatewayRoutePropagation",
+                "AWS::EC2::Volume",
+                "AWS::EC2::VolumeAttachment",
+                "AWS::ECR::PullThroughCacheRule",
+                "AWS::ECR::RegistryPolicy",
+                "AWS::ECR::ReplicationConfiguration",
+                "AWS::ECR::Repository",
+                "AWS::ECS::CapacityProvider",
+                "AWS::ECS::Cluster",
+                "AWS::ECS::ClusterCapacityProviderAssociations",
+                "AWS::ECS::PrimaryTaskSet",
+                "AWS::ECS::Service",
+                "AWS::ECS::TaskDefinition",
+                "AWS::ECS::TaskSet",
+                "AWS::EFS::AccessPoint",
+                "AWS::EFS::FileSystem",
+                "AWS::EFS::MountTarget",
+                "AWS::EKS::Addon",
+                "AWS::EKS::Cluster",
+                "AWS::EKS::FargateProfile",
+                "AWS::EKS::IdentityProviderConfig",
+                "AWS::EKS::Nodegroup",
+                "AWS::EMR::Cluster",
+                "AWS::EMR::InstanceFleetConfig",
+                "AWS::EMR::InstanceGroupConfig",
+                "AWS::EMR::SecurityConfiguration",
+                "AWS::EMR::Step",
+                "AWS::EMR::Studio",
+                "AWS::EMR::StudioSessionMapping",
+                "AWS::EMRContainers::VirtualCluster",
+                "AWS::ElastiCache::CacheCluster",
+                "AWS::ElastiCache::GlobalReplicationGroup",
+                "AWS::ElastiCache::ParameterGroup",
+                "AWS::ElastiCache::ReplicationGroup",
+                "AWS::ElastiCache::SecurityGroup",
+                "AWS::ElastiCache::SecurityGroupIngress",
+                "AWS::ElastiCache::SubnetGroup",
+                "AWS::ElastiCache::User",
+                "AWS::ElastiCache::UserGroup",
+                "AWS::ElasticBeanstalk::Application",
+                "AWS::ElasticBeanstalk::ApplicationVersion",
+                "AWS::ElasticBeanstalk::ConfigurationTemplate",
+                "AWS::ElasticBeanstalk::Environment",
+                "AWS::ElasticLoadBalancing::LoadBalancer",
+                "AWS::ElasticLoadBalancingV2::Listener",
+                "AWS::ElasticLoadBalancingV2::ListenerCertificate",
+                "AWS::ElasticLoadBalancingV2::ListenerRule",
+                "AWS::ElasticLoadBalancingV2::LoadBalancer",
+                "AWS::ElasticLoadBalancingV2::TargetGroup",
+                "AWS::Elasticsearch::Domain",
+                "AWS::EventSchemas::Discoverer",
+                "AWS::EventSchemas::Registry",
+                "AWS::EventSchemas::RegistryPolicy",
+                "AWS::EventSchemas::Schema",
+                "AWS::Events::ApiDestination",
+                "AWS::Events::Archive",
+                "AWS::Events::Connection",
+                "AWS::Events::Endpoint",
+                "AWS::Events::EventBus",
+                "AWS::Events::EventBusPolicy",
+                "AWS::Events::Rule",
+                "AWS::Evidently::Experiment",
+                "AWS::Evidently::Feature",
+                "AWS::Evidently::Launch",
+                "AWS::Evidently::Project",
+                "AWS::Evidently::Segment",
+                "AWS::FIS::ExperimentTemplate",
+                "AWS::FMS::NotificationChannel",
+                "AWS::FMS::Policy",
+                "AWS::FSx::FileSystem",
+                "AWS::FSx::Snapshot",
+                "AWS::FSx::StorageVirtualMachine",
+                "AWS::FSx::Volume",
+                "AWS::FinSpace::Environment",
+                "AWS::Forecast::Dataset",
+                "AWS::Forecast::DatasetGroup",
+                "AWS::FraudDetector::Detector",
+                "AWS::FraudDetector::EntityType",
+                "AWS::FraudDetector::EventType",
+                "AWS::FraudDetector::Label",
+                "AWS::FraudDetector::Outcome",
+                "AWS::FraudDetector::Variable",
+                "AWS::GameLift::Alias",
+                "AWS::GameLift::Build",
+                "AWS::GameLift::Fleet",
+                "AWS::GameLift::GameServerGroup",
+                "AWS::GameLift::GameSessionQueue",
+                "AWS::GameLift::MatchmakingConfiguration",
+                "AWS::GameLift::MatchmakingRuleSet",
+                "AWS::GameLift::Script",
+                "AWS::GlobalAccelerator::Accelerator",
+                "AWS::GlobalAccelerator::EndpointGroup",
+                "AWS::GlobalAccelerator::Listener",
+                "AWS::Glue::Classifier",
+                "AWS::Glue::Connection",
+                "AWS::Glue::Crawler",
+                "AWS::Glue::DataCatalogEncryptionSettings",
+                "AWS::Glue::Database",
+                "AWS::Glue::DevEndpoint",
+                "AWS::Glue::Job",
+                "AWS::Glue::MLTransform",
+                "AWS::Glue::Partition",
+                "AWS::Glue::Registry",
+                "AWS::Glue::Schema",
+                "AWS::Glue::SchemaVersion",
+                "AWS::Glue::SchemaVersionMetadata",
+                "AWS::Glue::SecurityConfiguration",
+                "AWS::Glue::Table",
+                "AWS::Glue::Trigger",
+                "AWS::Glue::Workflow",
+                "AWS::Greengrass::ConnectorDefinition",
+                "AWS::Greengrass::ConnectorDefinitionVersion",
+                "AWS::Greengrass::CoreDefinition",
+                "AWS::Greengrass::CoreDefinitionVersion",
+                "AWS::Greengrass::DeviceDefinition",
+                "AWS::Greengrass::DeviceDefinitionVersion",
+                "AWS::Greengrass::FunctionDefinition",
+                "AWS::Greengrass::FunctionDefinitionVersion",
+                "AWS::Greengrass::Group",
+                "AWS::Greengrass::GroupVersion",
+                "AWS::Greengrass::LoggerDefinition",
+                "AWS::Greengrass::LoggerDefinitionVersion",
+                "AWS::Greengrass::ResourceDefinition",
+                "AWS::Greengrass::ResourceDefinitionVersion",
+                "AWS::Greengrass::SubscriptionDefinition",
+                "AWS::Greengrass::SubscriptionDefinitionVersion",
+                "AWS::GreengrassV2::ComponentVersion",
+                "AWS::GroundStation::Config",
+                "AWS::GroundStation::DataflowEndpointGroup",
+                "AWS::GroundStation::MissionProfile",
+                "AWS::GuardDuty::Detector",
+                "AWS::GuardDuty::Filter",
+                "AWS::GuardDuty::IPSet",
+                "AWS::GuardDuty::Master",
+                "AWS::GuardDuty::Member",
+                "AWS::GuardDuty::ThreatIntelSet",
+                "AWS::HealthLake::FHIRDatastore",
+                "AWS::IAM::AccessKey",
+                "AWS::IAM::Group",
+                "AWS::IAM::InstanceProfile",
+                "AWS::IAM::ManagedPolicy",
+                "AWS::IAM::OIDCProvider",
+                "AWS::IAM::Policy",
+                "AWS::IAM::Role",
+                "AWS::IAM::SAMLProvider",
+                "AWS::IAM::ServerCertificate",
+                "AWS::IAM::ServiceLinkedRole",
+                "AWS::IAM::User",
+                "AWS::IAM::UserToGroupAddition",
+                "AWS::IAM::VirtualMFADevice",
+                "AWS::ImageBuilder::Component",
+                "AWS::ImageBuilder::ContainerRecipe",
+                "AWS::ImageBuilder::DistributionConfiguration",
+                "AWS::ImageBuilder::Image",
+                "AWS::ImageBuilder::ImagePipeline",
+                "AWS::ImageBuilder::ImageRecipe",
+                "AWS::ImageBuilder::InfrastructureConfiguration",
+                "AWS::Inspector::AssessmentTarget",
+                "AWS::Inspector::AssessmentTemplate",
+                "AWS::Inspector::ResourceGroup",
+                "AWS::InspectorV2::Filter",
+                "AWS::IoT1Click::Device",
+                "AWS::IoT1Click::Placement",
+                "AWS::IoT1Click::Project",
+                "AWS::IoT::AccountAuditConfiguration",
+                "AWS::IoT::Authorizer",
+                "AWS::IoT::CACertificate",
+                "AWS::IoT::Certificate",
+                "AWS::IoT::CustomMetric",
+                "AWS::IoT::Dimension",
+                "AWS::IoT::DomainConfiguration",
+                "AWS::IoT::FleetMetric",
+                "AWS::IoT::JobTemplate",
+                "AWS::IoT::Logging",
+                "AWS::IoT::MitigationAction",
+                "AWS::IoT::Policy",
+                "AWS::IoT::PolicyPrincipalAttachment",
+                "AWS::IoT::ProvisioningTemplate",
+                "AWS::IoT::ResourceSpecificLogging",
+                "AWS::IoT::RoleAlias",
+                "AWS::IoT::ScheduledAudit",
+                "AWS::IoT::SecurityProfile",
+                "AWS::IoT::Thing",
+                "AWS::IoT::ThingPrincipalAttachment",
+                "AWS::IoT::TopicRule",
+                "AWS::IoT::TopicRuleDestination",
+                "AWS::IoTAnalytics::Channel",
+                "AWS::IoTAnalytics::Dataset",
+                "AWS::IoTAnalytics::Datastore",
+                "AWS::IoTAnalytics::Pipeline",
+                "AWS::IoTEvents::AlarmModel",
+                "AWS::IoTEvents::DetectorModel",
+                "AWS::IoTEvents::Input",
+                "AWS::IoTFleetHub::Application",
+                "AWS::IoTSiteWise::AccessPolicy",
+                "AWS::IoTSiteWise::Asset",
+                "AWS::IoTSiteWise::AssetModel",
+                "AWS::IoTSiteWise::Dashboard",
+                "AWS::IoTSiteWise::Gateway",
+                "AWS::IoTSiteWise::Portal",
+                "AWS::IoTSiteWise::Project",
+                "AWS::KMS::Alias",
+                "AWS::KMS::Key",
+                "AWS::KMS::ReplicaKey",
+                "AWS::KafkaConnect::Connector",
+                "AWS::Kendra::DataSource",
+                "AWS::Kendra::Faq",
+                "AWS::Kendra::Index",
+                "AWS::Kinesis::Stream",
+                "AWS::Kinesis::StreamConsumer",
+                "AWS::KinesisAnalytics::Application",
+                "AWS::KinesisAnalytics::ApplicationOutput",
+                "AWS::KinesisAnalytics::ApplicationReferenceDataSource",
+                "AWS::KinesisAnalyticsV2::Application",
+                "AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption",
+                "AWS::KinesisAnalyticsV2::ApplicationOutput",
+                "AWS::KinesisAnalyticsV2::ApplicationReferenceDataSource",
+                "AWS::KinesisFirehose::DeliveryStream",
+                "AWS::KinesisVideo::SignalingChannel",
+                "AWS::KinesisVideo::Stream",
+                "AWS::LakeFormation::DataCellsFilter",
+                "AWS::LakeFormation::DataLakeSettings",
+                "AWS::LakeFormation::Permissions",
+                "AWS::LakeFormation::PrincipalPermissions",
+                "AWS::LakeFormation::Resource",
+                "AWS::LakeFormation::Tag",
+                "AWS::LakeFormation::TagAssociation",
+                "AWS::Lambda::Alias",
+                "AWS::Lambda::CodeSigningConfig",
+                "AWS::Lambda::EventInvokeConfig",
+                "AWS::Lambda::EventSourceMapping",
+                "AWS::Lambda::Function",
+                "AWS::Lambda::LayerVersion",
+                "AWS::Lambda::LayerVersionPermission",
+                "AWS::Lambda::Permission",
+                "AWS::Lambda::Url",
+                "AWS::Lambda::Version",
+                "AWS::LicenseManager::Grant",
+                "AWS::LicenseManager::License",
+                "AWS::Lightsail::Alarm",
+                "AWS::Lightsail::Bucket",
+                "AWS::Lightsail::Certificate",
+                "AWS::Lightsail::Container",
+                "AWS::Lightsail::Database",
+                "AWS::Lightsail::Disk",
+                "AWS::Lightsail::Instance",
+                "AWS::Lightsail::LoadBalancer",
+                "AWS::Lightsail::LoadBalancerTlsCertificate",
+                "AWS::Lightsail::StaticIp",
+                "AWS::Location::GeofenceCollection",
+                "AWS::Location::Map",
+                "AWS::Location::PlaceIndex",
+                "AWS::Location::RouteCalculator",
+                "AWS::Location::Tracker",
+                "AWS::Location::TrackerConsumer",
+                "AWS::Logs::Destination",
+                "AWS::Logs::LogGroup",
+                "AWS::Logs::LogStream",
+                "AWS::Logs::MetricFilter",
+                "AWS::Logs::QueryDefinition",
+                "AWS::Logs::ResourcePolicy",
+                "AWS::Logs::SubscriptionFilter",
+                "AWS::LookoutMetrics::Alert",
+                "AWS::LookoutMetrics::AnomalyDetector",
+                "AWS::LookoutVision::Project",
+                "AWS::MSK::BatchScramSecret",
+                "AWS::MSK::Cluster",
+                "AWS::MSK::Configuration",
+                "AWS::MSK::ServerlessCluster",
+                "AWS::MWAA::Environment",
+                "AWS::Macie::CustomDataIdentifier",
+                "AWS::Macie::FindingsFilter",
+                "AWS::Macie::Session",
+                "AWS::ManagedBlockchain::Member",
+                "AWS::ManagedBlockchain::Node",
+                "AWS::MediaConnect::Flow",
+                "AWS::MediaConnect::FlowEntitlement",
+                "AWS::MediaConnect::FlowOutput",
+                "AWS::MediaConnect::FlowSource",
+                "AWS::MediaConnect::FlowVpcInterface",
+                "AWS::MediaConvert::JobTemplate",
+                "AWS::MediaConvert::Preset",
+                "AWS::MediaConvert::Queue",
+                "AWS::MediaLive::Channel",
+                "AWS::MediaLive::InputSecurityGroup",
+                "AWS::MediaPackage::Asset",
+                "AWS::MediaPackage::Channel",
+                "AWS::MediaPackage::OriginEndpoint",
+                "AWS::MediaPackage::PackagingConfiguration",
+                "AWS::MediaPackage::PackagingGroup",
+                "AWS::MemoryDB::ACL",
+                "AWS::MemoryDB::Cluster",
+                "AWS::MemoryDB::ParameterGroup",
+                "AWS::MemoryDB::SubnetGroup",
+                "AWS::MemoryDB::User",
+                "AWS::Neptune::DBCluster",
+                "AWS::Neptune::DBClusterParameterGroup",
+                "AWS::Neptune::DBInstance",
+                "AWS::Neptune::DBParameterGroup",
+                "AWS::Neptune::DBSubnetGroup",
+                "AWS::NetworkFirewall::Firewall",
+                "AWS::NetworkFirewall::FirewallPolicy",
+                "AWS::NetworkFirewall::LoggingConfiguration",
+                "AWS::NetworkFirewall::RuleGroup",
+                "AWS::NetworkManager::ConnectAttachment",
+                "AWS::NetworkManager::ConnectPeer",
+                "AWS::NetworkManager::CoreNetwork",
+                "AWS::NetworkManager::CustomerGatewayAssociation",
+                "AWS::NetworkManager::Device",
+                "AWS::NetworkManager::GlobalNetwork",
+                "AWS::NetworkManager::Link",
+                "AWS::NetworkManager::LinkAssociation",
+                "AWS::NetworkManager::Site",
+                "AWS::NetworkManager::SiteToSiteVpnAttachment",
+                "AWS::NetworkManager::TransitGatewayRegistration",
+                "AWS::NetworkManager::VpcAttachment",
+                "AWS::OpenSearchService::Domain",
+                "AWS::OpsWorks::App",
+                "AWS::OpsWorks::ElasticLoadBalancerAttachment",
+                "AWS::OpsWorks::Instance",
+                "AWS::OpsWorks::Layer",
+                "AWS::OpsWorks::Stack",
+                "AWS::OpsWorks::UserProfile",
+                "AWS::OpsWorks::Volume",
+                "AWS::OpsWorksCM::Server",
+                "AWS::Personalize::Dataset",
+                "AWS::Personalize::DatasetGroup",
+                "AWS::Personalize::Schema",
+                "AWS::Personalize::Solution",
+                "AWS::QLDB::Ledger",
+                "AWS::QLDB::Stream",
+                "AWS::QuickSight::Analysis",
+                "AWS::QuickSight::Dashboard",
+                "AWS::QuickSight::DataSet",
+                "AWS::QuickSight::DataSource",
+                "AWS::QuickSight::Template",
+                "AWS::QuickSight::Theme",
+                "AWS::RAM::ResourceShare",
+                "AWS::RDS::DBCluster",
+                "AWS::RDS::DBClusterParameterGroup",
+                "AWS::RDS::DBInstance",
+                "AWS::RDS::DBParameterGroup",
+                "AWS::RDS::DBProxy",
+                "AWS::RDS::DBProxyEndpoint",
+                "AWS::RDS::DBProxyTargetGroup",
+                "AWS::RDS::DBSecurityGroup",
+                "AWS::RDS::DBSecurityGroupIngress",
+                "AWS::RDS::DBSubnetGroup",
+                "AWS::RDS::EventSubscription",
+                "AWS::RDS::GlobalCluster",
+                "AWS::RDS::OptionGroup",
+                "AWS::RUM::AppMonitor",
+                "AWS::Redshift::Cluster",
+                "AWS::Redshift::ClusterParameterGroup",
+                "AWS::Redshift::ClusterSecurityGroup",
+                "AWS::Redshift::ClusterSecurityGroupIngress",
+                "AWS::Redshift::ClusterSubnetGroup",
+                "AWS::Redshift::EndpointAccess",
+                "AWS::Redshift::EndpointAuthorization",
+                "AWS::Redshift::EventSubscription",
+                "AWS::Redshift::ScheduledAction",
+                "AWS::RedshiftServerless::Namespace",
+                "AWS::RedshiftServerless::Workgroup",
+                "AWS::RefactorSpaces::Application",
+                "AWS::RefactorSpaces::Environment",
+                "AWS::RefactorSpaces::Route",
+                "AWS::RefactorSpaces::Service",
+                "AWS::Rekognition::Collection",
+                "AWS::Rekognition::Project",
+                "AWS::Rekognition::StreamProcessor",
+                "AWS::ResilienceHub::App",
+                "AWS::ResilienceHub::ResiliencyPolicy",
+                "AWS::ResourceGroups::Group",
+                "AWS::RoboMaker::Fleet",
+                "AWS::RoboMaker::Robot",
+                "AWS::RoboMaker::RobotApplication",
+                "AWS::RoboMaker::RobotApplicationVersion",
+                "AWS::RoboMaker::SimulationApplication",
+                "AWS::RoboMaker::SimulationApplicationVersion",
+                "AWS::RolesAnywhere::CRL",
+                "AWS::RolesAnywhere::Profile",
+                "AWS::RolesAnywhere::TrustAnchor",
+                "AWS::Route53::CidrCollection",
+                "AWS::Route53::DNSSEC",
+                "AWS::Route53::HealthCheck",
+                "AWS::Route53::HostedZone",
+                "AWS::Route53::KeySigningKey",
+                "AWS::Route53::RecordSet",
+                "AWS::Route53::RecordSetGroup",
+                "AWS::Route53Resolver::FirewallDomainList",
+                "AWS::Route53Resolver::FirewallRuleGroup",
+                "AWS::Route53Resolver::FirewallRuleGroupAssociation",
+                "AWS::Route53Resolver::ResolverConfig",
+                "AWS::Route53Resolver::ResolverDNSSECConfig",
+                "AWS::Route53Resolver::ResolverEndpoint",
+                "AWS::Route53Resolver::ResolverQueryLoggingConfig",
+                "AWS::Route53Resolver::ResolverQueryLoggingConfigAssociation",
+                "AWS::Route53Resolver::ResolverRule",
+                "AWS::Route53Resolver::ResolverRuleAssociation",
+                "AWS::S3::AccessPoint",
+                "AWS::S3::Bucket",
+                "AWS::S3::BucketPolicy",
+                "AWS::S3::MultiRegionAccessPoint",
+                "AWS::S3::MultiRegionAccessPointPolicy",
+                "AWS::S3::StorageLens",
+                "AWS::S3ObjectLambda::AccessPoint",
+                "AWS::S3ObjectLambda::AccessPointPolicy",
+                "AWS::S3Outposts::AccessPoint",
+                "AWS::S3Outposts::Bucket",
+                "AWS::S3Outposts::BucketPolicy",
+                "AWS::S3Outposts::Endpoint",
+                "AWS::SDB::Domain",
+                "AWS::SES::ConfigurationSet",
+                "AWS::SES::ConfigurationSetEventDestination",
+                "AWS::SES::ContactList",
+                "AWS::SES::DedicatedIpPool",
+                "AWS::SES::EmailIdentity",
+                "AWS::SES::Template",
+                "AWS::SNS::Subscription",
+                "AWS::SNS::Topic",
+                "AWS::SNS::TopicPolicy",
+                "AWS::SQS::Queue",
+                "AWS::SQS::QueuePolicy",
+                "AWS::SSM::Association",
+                "AWS::SSM::Document",
+                "AWS::SSM::MaintenanceWindow",
+                "AWS::SSM::MaintenanceWindowTarget",
+                "AWS::SSM::MaintenanceWindowTask",
+                "AWS::SSM::Parameter",
+                "AWS::SSM::PatchBaseline",
+                "AWS::SSM::ResourceDataSync",
+                "AWS::SSMContacts::Contact",
+                "AWS::SSMContacts::ContactChannel",
+                "AWS::SSMIncidents::ReplicationSet",
+                "AWS::SSMIncidents::ResponsePlan",
+                "AWS::SSO::Assignment",
+                "AWS::SSO::InstanceAccessControlAttributeConfiguration",
+                "AWS::SSO::PermissionSet",
+                "AWS::SageMaker::App",
+                "AWS::SageMaker::AppImageConfig",
+                "AWS::SageMaker::CodeRepository",
+                "AWS::SageMaker::DataQualityJobDefinition",
+                "AWS::SageMaker::Device",
+                "AWS::SageMaker::DeviceFleet",
+                "AWS::SageMaker::Domain",
+                "AWS::SageMaker::Endpoint",
+                "AWS::SageMaker::EndpointConfig",
+                "AWS::SageMaker::FeatureGroup",
+                "AWS::SageMaker::Image",
+                "AWS::SageMaker::ImageVersion",
+                "AWS::SageMaker::Model",
+                "AWS::SageMaker::ModelBiasJobDefinition",
+                "AWS::SageMaker::ModelExplainabilityJobDefinition",
+                "AWS::SageMaker::ModelPackage",
+                "AWS::SageMaker::ModelPackageGroup",
+                "AWS::SageMaker::ModelQualityJobDefinition",
+                "AWS::SageMaker::MonitoringSchedule",
+                "AWS::SageMaker::NotebookInstance",
+                "AWS::SageMaker::NotebookInstanceLifecycleConfig",
+                "AWS::SageMaker::Pipeline",
+                "AWS::SageMaker::Project",
+                "AWS::SageMaker::UserProfile",
+                "AWS::SageMaker::Workteam",
+                "AWS::SecretsManager::ResourcePolicy",
+                "AWS::SecretsManager::RotationSchedule",
+                "AWS::SecretsManager::Secret",
+                "AWS::SecretsManager::SecretTargetAttachment",
+                "AWS::SecurityHub::Hub",
+                "AWS::ServiceCatalog::AcceptedPortfolioShare",
+                "AWS::ServiceCatalog::CloudFormationProduct",
+                "AWS::ServiceCatalog::CloudFormationProvisionedProduct",
+                "AWS::ServiceCatalog::LaunchNotificationConstraint",
+                "AWS::ServiceCatalog::LaunchRoleConstraint",
+                "AWS::ServiceCatalog::LaunchTemplateConstraint",
+                "AWS::ServiceCatalog::Portfolio",
+                "AWS::ServiceCatalog::PortfolioPrincipalAssociation",
+                "AWS::ServiceCatalog::PortfolioProductAssociation",
+                "AWS::ServiceCatalog::PortfolioShare",
+                "AWS::ServiceCatalog::ResourceUpdateConstraint",
+                "AWS::ServiceCatalog::ServiceAction",
+                "AWS::ServiceCatalog::ServiceActionAssociation",
+                "AWS::ServiceCatalog::StackSetConstraint",
+                "AWS::ServiceCatalog::TagOption",
+                "AWS::ServiceCatalog::TagOptionAssociation",
+                "AWS::ServiceCatalogAppRegistry::Application",
+                "AWS::ServiceCatalogAppRegistry::AttributeGroup",
+                "AWS::ServiceCatalogAppRegistry::AttributeGroupAssociation",
+                "AWS::ServiceCatalogAppRegistry::ResourceAssociation",
+                "AWS::ServiceDiscovery::HttpNamespace",
+                "AWS::ServiceDiscovery::Instance",
+                "AWS::ServiceDiscovery::PrivateDnsNamespace",
+                "AWS::ServiceDiscovery::PublicDnsNamespace",
+                "AWS::ServiceDiscovery::Service",
+                "AWS::Signer::ProfilePermission",
+                "AWS::Signer::SigningProfile",
+                "AWS::StepFunctions::Activity",
+                "AWS::StepFunctions::StateMachine",
+                "AWS::Synthetics::Canary",
+                "AWS::Synthetics::Group",
+                "AWS::Timestream::Database",
+                "AWS::Timestream::ScheduledQuery",
+                "AWS::Timestream::Table",
+                "AWS::Transfer::Server",
+                "AWS::Transfer::User",
+                "AWS::Transfer::Workflow",
+                "AWS::WAF::ByteMatchSet",
+                "AWS::WAF::IPSet",
+                "AWS::WAF::Rule",
+                "AWS::WAF::SizeConstraintSet",
+                "AWS::WAF::SqlInjectionMatchSet",
+                "AWS::WAF::WebACL",
+                "AWS::WAF::XssMatchSet",
+                "AWS::WAFRegional::ByteMatchSet",
+                "AWS::WAFRegional::GeoMatchSet",
+                "AWS::WAFRegional::IPSet",
+                "AWS::WAFRegional::RateBasedRule",
+                "AWS::WAFRegional::RegexPatternSet",
+                "AWS::WAFRegional::Rule",
+                "AWS::WAFRegional::SizeConstraintSet",
+                "AWS::WAFRegional::SqlInjectionMatchSet",
+                "AWS::WAFRegional::WebACL",
+                "AWS::WAFRegional::WebACLAssociation",
+                "AWS::WAFRegional::XssMatchSet",
+                "AWS::WAFv2::IPSet",
+                "AWS::WAFv2::LoggingConfiguration",
+                "AWS::WAFv2::RegexPatternSet",
+                "AWS::WAFv2::RuleGroup",
+                "AWS::WAFv2::WebACL",
+                "AWS::WAFv2::WebACLAssociation",
+                "AWS::WorkSpaces::Workspace",
+                "AWS::XRay::Group",
+                "AWS::XRay::SamplingRule",
+                "Alexa::ASK::Skill"
+            ],
+            "type": "string"
+        },
+        "CfnString": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "A CloudFormation string with full intrinsics support."
+        },
+        "CfnStringList": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "items": {
+                        "$ref": "#/definitions/CfnString_1",
+                        "description": "A CloudFormation string with full intrinsics support."
+                    },
+                    "type": "array"
+                }
+            ],
+            "description": "A CloudFormation list of strings with full intrinsics support."
+        },
+        "CfnStringList_1": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "items": {
+                        "$ref": "#/definitions/CfnString_1",
+                        "description": "A CloudFormation string with full intrinsics support."
+                    },
+                    "type": "array"
+                }
+            ],
+            "description": "A CloudFormation list of strings with full intrinsics support."
+        },
+        "CfnStringMap": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "additionalProperties": {
+                        "$ref": "#/definitions/SamString_1",
+                        "description": "A CloudFormation string with full intrinsics support."
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "CfnString_1": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "A CloudFormation string with full intrinsics support."
+        },
+        "CloudWatchEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "EventBusName": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Input": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "InputPath": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Pattern": {
+                            "$ref": "#/definitions/CfnJson"
+                        }
+                    },
+                    "required": [
+                        "Pattern"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "CloudWatchEvent"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "CloudWatchLogsEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "FilterPattern": {
+                            "$ref": "#/definitions/CfnString_1"
+                        },
+                        "LogGroupName": {
+                            "$ref": "#/definitions/CfnString_1"
+                        }
+                    },
+                    "required": [
+                        "FilterPattern",
+                        "LogGroupName"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "CloudWatchLogs"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "CognitoAuthorizer": {
+            "properties": {
+                "AuthorizationScopes": {
+                    "$ref": "#/definitions/SamStringList"
+                },
+                "Identity": {
+                    "properties": {
+                        "Header": {
+                            "$ref": "#/definitions/SamString"
+                        },
+                        "ReauthorizeEvery": {
+                            "$ref": "#/definitions/SamInteger"
+                        },
+                        "ValidationExpression": {
+                            "$ref": "#/definitions/SamString"
+                        }
+                    },
+                    "type": "object"
+                },
+                "UserPoolArn": {
+                    "$ref": "#/definitions/SamString_1"
+                }
+            },
+            "required": [
+                "UserPoolArn"
+            ],
+            "type": "object"
+        },
+        "CognitoEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "Trigger": {
+                            "$ref": "#/definitions/CognitoUserPoolLambdaConfig"
+                        },
+                        "UserPool": {
+                            "$ref": "#/definitions/CfnString_1"
+                        }
+                    },
+                    "required": [
+                        "Trigger",
+                        "UserPool"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "Cognito"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "CognitoUserPoolLambdaConfig": {},
+        "DeadLetterQueue": {
+            "$ref": "#/definitions/DeadLetterQueue_1"
+        },
+        "DeadLetterQueue_1": {
+            "properties": {
+                "TargetArn": {
+                    "$ref": "#/definitions/CfnString_1"
+                },
+                "Type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "TargetArn",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "DeploymentPreference": {
+            "$ref": "#/definitions/DeploymentPreference_1"
+        },
+        "DeploymentPreference_1": {
+            "properties": {
+                "Alarms": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/Ref"
+                        },
+                        {
+                            "$ref": "#/definitions/FnJoin"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSub"
+                        },
+                        {
+                            "$ref": "#/definitions/FnGetAtt"
+                        },
+                        {
+                            "$ref": "#/definitions/FnIf"
+                        },
+                        {
+                            "$ref": "#/definitions/FnFindInMap"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSelect"
+                        },
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "$ref": "#/definitions/Ref"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/FnJoin"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/FnSub"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/FnGetAtt"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/FnIf"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/FnFindInMap"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/FnSelect"
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        }
+                    ]
+                },
+                "Enabled": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/Ref"
+                        },
+                        {
+                            "$ref": "#/definitions/FnJoin"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSub"
+                        },
+                        {
+                            "$ref": "#/definitions/FnGetAtt"
+                        },
+                        {
+                            "$ref": "#/definitions/FnIf"
+                        },
+                        {
+                            "$ref": "#/definitions/FnFindInMap"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSelect"
+                        },
+                        {
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                "Hooks": {
+                    "properties": {
+                        "PostTraffic": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/Ref"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnJoin"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSub"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnGetAtt"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnIf"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnFindInMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSelect"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "PreTraffic": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/Ref"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnJoin"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSub"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnGetAtt"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnIf"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnFindInMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSelect"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "type": "object"
+                },
+                "PassthroughCondition": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/Ref"
+                        },
+                        {
+                            "$ref": "#/definitions/FnJoin"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSub"
+                        },
+                        {
+                            "$ref": "#/definitions/FnGetAtt"
+                        },
+                        {
+                            "$ref": "#/definitions/FnIf"
+                        },
+                        {
+                            "$ref": "#/definitions/FnFindInMap"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSelect"
+                        },
+                        {
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                "Role": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/Ref"
+                        },
+                        {
+                            "$ref": "#/definitions/FnJoin"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSub"
+                        },
+                        {
+                            "$ref": "#/definitions/FnGetAtt"
+                        },
+                        {
+                            "$ref": "#/definitions/FnIf"
+                        },
+                        {
+                            "$ref": "#/definitions/FnFindInMap"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSelect"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "TriggerConfigurations": {},
+                "Type": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/Ref"
+                        },
+                        {
+                            "$ref": "#/definitions/FnJoin"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSub"
+                        },
+                        {
+                            "$ref": "#/definitions/FnGetAtt"
+                        },
+                        {
+                            "$ref": "#/definitions/FnIf"
+                        },
+                        {
+                            "$ref": "#/definitions/FnFindInMap"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSelect"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "type": "object"
+        },
+        "DestinationConfig": {
+            "properties": {
+                "OnFailure": {
+                    "properties": {
+                        "Destination": {
+                            "$ref": "#/definitions/CfnString_1"
+                        },
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Destination"
+                    ],
+                    "type": "object"
+                }
+            },
+            "required": [
+                "OnFailure"
+            ],
+            "type": "object"
+        },
+        "DestinationConfig_1": {
+            "$ref": "#/definitions/DestinationConfig"
+        },
+        "DynamoDbEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "BatchSize": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "BisectBatchOnFunctionError": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "DestinationConfig": {
+                            "$ref": "#/definitions/DestinationConfig_1"
+                        },
+                        "Enabled": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "FilterCriteria": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/Ref"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnJoin"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSub"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnGetAtt"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnIf"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnFindInMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSelect"
+                                },
+                                {
+                                    "$ref": "#/definitions/FilterCriteria_1"
+                                }
+                            ]
+                        },
+                        "FunctionResponseTypes": {
+                            "$ref": "#/definitions/CfnStringList"
+                        },
+                        "MaximumBatchingWindowInSeconds": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "MaximumRecordAgeInSeconds": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "MaximumRetryAttempts": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "ParallelizationFactor": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "StartingPosition": {
+                            "$ref": "#/definitions/CfnString_1"
+                        },
+                        "Stream": {
+                            "$ref": "#/definitions/CfnString_1"
+                        },
+                        "TumblingWindowInSeconds": {
+                            "$ref": "#/definitions/CfnInteger"
+                        }
+                    },
+                    "required": [
+                        "StartingPosition",
+                        "Stream"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "DynamoDB"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "EventBridgeRuleEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "DeadLetterConfig": {},
+                        "EventBusName": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Input": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "InputPath": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Pattern": {
+                            "$ref": "#/definitions/CfnJson"
+                        },
+                        "RetryPolicy": {
+                            "$ref": "#/definitions/EventsRuleRetryPolicy"
+                        },
+                        "Target": {
+                            "properties": {
+                                "Id": {
+                                    "$ref": "#/definitions/CfnString_1"
+                                }
+                            },
+                            "required": [
+                                "Id"
+                            ],
+                            "type": "object"
+                        }
+                    },
+                    "required": [
+                        "Pattern"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "EventBridgeRule"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "EventsRuleRetryPolicy": {
+            "$ref": "#/definitions/EventsRuleRetryPolicy_1"
+        },
+        "EventsRuleRetryPolicy_1": {
+            "properties": {
+                "MaximumEventAgeInSeconds": {
+                    "$ref": "#/definitions/CfnInteger"
+                },
+                "MaximumRetryAttempts": {
+                    "$ref": "#/definitions/CfnInteger"
+                }
+            },
+            "type": "object"
+        },
+        "FileSystemConfig": {
+            "properties": {
+                "Arn": {
+                    "$ref": "#/definitions/CfnString_1"
+                },
+                "LocalMountPath": {
+                    "$ref": "#/definitions/CfnString_1"
+                }
+            },
+            "required": [
+                "Arn",
+                "LocalMountPath"
+            ],
+            "type": "object"
+        },
+        "FilterCriteria": {
+            "$ref": "#/definitions/FilterCriteria_1"
+        },
+        "FilterCriteria_1": {
+            "properties": {
+                "Filters": {
+                    "items": {
+                        "properties": {
+                            "Pattern": {
+                                "$ref": "#/definitions/CfnString_1"
+                            }
+                        },
+                        "required": [
+                            "Pattern"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "Filters"
+            ],
+            "type": "object"
+        },
+        "FnFindInMap": {
+            "properties": {
+                "Fn::FindInMap": {
+                    "items": [
+                        {},
+                        {},
+                        {}
+                    ],
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "type": "array"
+                }
+            },
+            "required": [
+                "Fn::FindInMap"
+            ],
+            "type": "object"
+        },
+        "FnGetAtt": {
+            "properties": {
+                "Fn::GetAtt": {
+                    "anyOf": [
+                        {
+                            "items": [
+                                {},
+                                {}
+                            ],
+                            "maxItems": 2,
+                            "minItems": 2,
+                            "type": "array"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "Fn::GetAtt"
+            ],
+            "type": "object"
+        },
+        "FnIf": {
+            "properties": {
+                "Fn::If": {
+                    "items": [
+                        {},
+                        {},
+                        {}
+                    ],
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "type": "array"
+                }
+            },
+            "required": [
+                "Fn::If"
+            ],
+            "type": "object"
+        },
+        "FnJoin": {
+            "properties": {
+                "Fn::Join": {
+                    "items": [
+                        {},
+                        {
+                            "items": {},
+                            "type": "array"
+                        }
+                    ],
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "type": "array"
+                }
+            },
+            "required": [
+                "Fn::Join"
+            ],
+            "type": "object"
+        },
+        "FnSelect": {
+            "properties": {
+                "Fn::Select": {
+                    "items": [
+                        {},
+                        {
+                            "items": {},
+                            "type": "array"
+                        }
+                    ],
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "type": "array"
+                }
+            },
+            "required": [
+                "Fn::Select"
+            ],
+            "type": "object"
+        },
+        "FnSub": {
+            "properties": {
+                "Fn::Sub": {
+                    "anyOf": [
+                        {
+                            "items": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "additionalProperties": {},
+                                    "type": "object"
+                                }
+                            ],
+                            "maxItems": 2,
+                            "minItems": 2,
+                            "type": "array"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "Fn::Sub"
+            ],
+            "type": "object"
+        },
+        "FunctionCode": {
+            "properties": {
+                "Bucket": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/Ref"
+                        },
+                        {
+                            "$ref": "#/definitions/FnJoin"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSub"
+                        },
+                        {
+                            "$ref": "#/definitions/FnGetAtt"
+                        },
+                        {
+                            "$ref": "#/definitions/FnIf"
+                        },
+                        {
+                            "$ref": "#/definitions/FnFindInMap"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSelect"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "Key": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/Ref"
+                        },
+                        {
+                            "$ref": "#/definitions/FnJoin"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSub"
+                        },
+                        {
+                            "$ref": "#/definitions/FnGetAtt"
+                        },
+                        {
+                            "$ref": "#/definitions/FnIf"
+                        },
+                        {
+                            "$ref": "#/definitions/FnFindInMap"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSelect"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "Version": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/Ref"
+                        },
+                        {
+                            "$ref": "#/definitions/FnJoin"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSub"
+                        },
+                        {
+                            "$ref": "#/definitions/FnGetAtt"
+                        },
+                        {
+                            "$ref": "#/definitions/FnIf"
+                        },
+                        {
+                            "$ref": "#/definitions/FnFindInMap"
+                        },
+                        {
+                            "$ref": "#/definitions/FnSelect"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "Bucket",
+                "Key"
+            ],
+            "type": "object"
+        },
+        "FunctionUrlConfig": {
+            "$ref": "#/definitions/FunctionUrlConfig_1"
+        },
+        "FunctionUrlConfig_1": {
+            "properties": {
+                "AuthType": {
+                    "$ref": "#/definitions/CfnString_1"
+                },
+                "Cors": {}
+            },
+            "required": [
+                "AuthType"
+            ],
+            "type": "object"
+        },
+        "HttpApiEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "ApiId": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Auth": {
+                            "properties": {
+                                "AuthorizationScopes": {
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "type": "array"
+                                },
+                                "Authorizer": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "Method": {
+                            "type": "string"
+                        },
+                        "Path": {
+                            "type": "string"
+                        },
+                        "PayloadFormatVersion": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "RouteSettings": {
+                            "$ref": "#/definitions/CfnJson"
+                        },
+                        "TimeoutInMillis": {
+                            "$ref": "#/definitions/CfnInteger"
+                        }
+                    },
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "HttpApi"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Type"
+            ],
+            "type": "object"
+        },
+        "IotRuleEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "AwsIotSqlVersion": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Sql": {
+                            "$ref": "#/definitions/CfnString_1"
+                        }
+                    },
+                    "required": [
+                        "Sql"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "IoTRule"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "KinesisEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "BatchSize": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "BisectBatchOnFunctionError": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "DestinationConfig": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/DestinationConfig"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "Enabled": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "FilterCriteria": {
+                            "$ref": "#/definitions/FilterCriteria"
+                        },
+                        "FunctionResponseTypes": {
+                            "$ref": "#/definitions/CfnStringList"
+                        },
+                        "MaximumBatchingWindowInSeconds": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "MaximumRecordAgeInSeconds": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "MaximumRetryAttempts": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "ParallelizationFactor": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "StartingPosition": {
+                            "$ref": "#/definitions/CfnString_1"
+                        },
+                        "Stream": {
+                            "$ref": "#/definitions/CfnString_1"
+                        },
+                        "TumblingWindowInSeconds": {
+                            "$ref": "#/definitions/CfnInteger"
+                        }
+                    },
+                    "required": [
+                        "StartingPosition",
+                        "Stream"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "Kinesis"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "LambdaRequestAuthorizer": {
+            "properties": {
+                "AuthorizationScopes": {
+                    "$ref": "#/definitions/SamStringList"
+                },
+                "FunctionArn": {
+                    "$ref": "#/definitions/SamString"
+                },
+                "FunctionInvokeRole": {
+                    "$ref": "#/definitions/SamString"
+                },
+                "FunctionPayloadType": {
+                    "$ref": "#/definitions/SamString"
+                },
+                "Identity": {
+                    "properties": {
+                        "Context": {
+                            "$ref": "#/definitions/SamStringList"
+                        },
+                        "Headers": {
+                            "$ref": "#/definitions/SamStringList"
+                        },
+                        "QueryStrings": {
+                            "$ref": "#/definitions/SamStringList"
+                        },
+                        "ReauthorizeEvery": {
+                            "$ref": "#/definitions/SamInteger"
+                        },
+                        "StageVariables": {
+                            "$ref": "#/definitions/SamStringList"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "LambdaTokenAuthorizer": {
+            "properties": {
+                "AuthorizationScopes": {
+                    "$ref": "#/definitions/SamStringList"
+                },
+                "FunctionArn": {
+                    "$ref": "#/definitions/SamString_1"
+                },
+                "FunctionInvokeRole": {
+                    "$ref": "#/definitions/SamString"
+                },
+                "FunctionPayloadType": {
+                    "$ref": "#/definitions/SamString"
+                },
+                "Identity": {
+                    "properties": {
+                        "ReauthorizeEvery": {
+                            "$ref": "#/definitions/SamInteger"
+                        },
+                        "ValidationExpression": {
+                            "$ref": "#/definitions/SamString"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "required": [
+                "FunctionArn"
+            ],
+            "type": "object"
+        },
+        "MqEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "BatchSize": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "Broker": {
+                            "$ref": "#/definitions/CfnString_1"
+                        },
+                        "Enabled": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "MaximumBatchingWindowInSeconds": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "Queues": {
+                            "$ref": "#/definitions/CfnStringList_1"
+                        },
+                        "SecretsManagerKmsKeyId": {
+                            "type": "string"
+                        },
+                        "SourceAccessConfigurations": {
+                            "items": {
+                                "$ref": "#/definitions/SourceAccessConfiguration"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": [
+                        "Broker",
+                        "Queues",
+                        "SourceAccessConfigurations"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "MQ"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "MskEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "ConsumerGroupId": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "MaximumBatchingWindowInSeconds": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "StartingPosition": {
+                            "$ref": "#/definitions/CfnString_1"
+                        },
+                        "Stream": {
+                            "$ref": "#/definitions/CfnString_1"
+                        },
+                        "Topics": {
+                            "$ref": "#/definitions/CfnStringList_1"
+                        }
+                    },
+                    "required": [
+                        "StartingPosition",
+                        "Stream",
+                        "Topics"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "MSK"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "Partial": {
+            "$ref": "#/definitions/__type"
+        },
+        "Ref": {
+            "properties": {
+                "Ref": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Ref"
+            ],
+            "type": "object"
+        },
+        "S3Event": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "Bucket": {
+                            "$ref": "#/definitions/CfnString_1"
+                        },
+                        "Events": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/Ref"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnJoin"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSub"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnGetAtt"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnIf"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnFindInMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSelect"
+                                },
+                                {
+                                    "items": {
+                                        "$ref": "#/definitions/CfnString_1",
+                                        "description": "A CloudFormation string with full intrinsics support."
+                                    },
+                                    "type": "array"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "Filter": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/definitions/Ref"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnJoin"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSub"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnGetAtt"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnIf"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnFindInMap"
+                                },
+                                {
+                                    "$ref": "#/definitions/FnSelect"
+                                },
+                                {
+                                    "properties": {
+                                        "S3Key": {
+                                            "properties": {
+                                                "Rules": {}
+                                            },
+                                            "required": [
+                                                "Rules"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "S3Key"
+                                    ],
+                                    "type": "object"
+                                }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "Bucket",
+                        "Events"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "S3"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "SamBoolean": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "boolean"
+                }
+            ],
+            "description": "Boolean with partial support for intrinsics."
+        },
+        "SamBoolean_1": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "boolean"
+                }
+            ],
+            "description": "A CloudFormation boolean with full intrinsics support."
+        },
+        "SamInteger": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "number"
+                }
+            ],
+            "description": "Integer with partial support for intrinsics."
+        },
+        "SamJson": {},
+        "SamString": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "String with partial support for intrinsics."
+        },
+        "SamStringList": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/definitions/Ref"
+                            },
+                            {
+                                "$ref": "#/definitions/FnJoin"
+                            },
+                            {
+                                "$ref": "#/definitions/FnSub"
+                            },
+                            {
+                                "$ref": "#/definitions/FnGetAtt"
+                            },
+                            {
+                                "$ref": "#/definitions/FnIf"
+                            },
+                            {
+                                "$ref": "#/definitions/FnFindInMap"
+                            },
+                            {
+                                "$ref": "#/definitions/FnSelect"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ],
+                        "description": "A CloudFormation string with full intrinsics support."
+                    },
+                    "type": "array"
+                }
+            ],
+            "description": "List of strings with partial support for intrinsics."
+        },
+        "SamString_1": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/Ref"
+                },
+                {
+                    "$ref": "#/definitions/FnJoin"
+                },
+                {
+                    "$ref": "#/definitions/FnSub"
+                },
+                {
+                    "$ref": "#/definitions/FnGetAtt"
+                },
+                {
+                    "$ref": "#/definitions/FnIf"
+                },
+                {
+                    "$ref": "#/definitions/FnFindInMap"
+                },
+                {
+                    "$ref": "#/definitions/FnSelect"
+                },
+                {
+                    "type": "string"
+                }
+            ],
+            "description": "A CloudFormation string with full intrinsics support."
+        },
+        "ScheduleEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "DeadLetterConfig": {},
+                        "Description": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Enabled": {
+                            "type": "boolean"
+                        },
+                        "Input": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Name": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "RetryPolicy": {
+                            "$ref": "#/definitions/EventsRuleRetryPolicy"
+                        },
+                        "Schedule": {
+                            "$ref": "#/definitions/CfnString_1"
+                        }
+                    },
+                    "required": [
+                        "Schedule"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "Schedule"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "SelfManagedKafkaEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "BatchSize": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "ConsumerGroupId": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "Enabled": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "KafkaBootstrapServers": {
+                            "$ref": "#/definitions/CfnStringList"
+                        },
+                        "SourceAccessConfigurations": {
+                            "items": {
+                                "$ref": "#/definitions/SourceAccessConfiguration"
+                            },
+                            "type": "array"
+                        },
+                        "Topics": {
+                            "$ref": "#/definitions/CfnStringList_1"
+                        }
+                    },
+                    "required": [
+                        "SourceAccessConfigurations",
+                        "Topics"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "SelfManagedKafka"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "SnsEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "FilterPolicy": {
+                            "$ref": "#/definitions/CfnJson"
+                        },
+                        "Region": {
+                            "$ref": "#/definitions/CfnString"
+                        },
+                        "SqsSubscription": {
+                            "anyOf": [
+                                {
+                                    "properties": {
+                                        "BatchSize": {
+                                            "type": [
+                                                "string",
+                                                "number"
+                                            ]
+                                        },
+                                        "Enabled": {
+                                            "type": "boolean"
+                                        },
+                                        "QueueArn": {
+                                            "$ref": "#/definitions/CfnString_1"
+                                        },
+                                        "QueuePolicyLogicalId": {
+                                            "type": "string"
+                                        },
+                                        "QueueUrl": {
+                                            "$ref": "#/definitions/CfnString_1"
+                                        }
+                                    },
+                                    "required": [
+                                        "QueueArn",
+                                        "QueueUrl"
+                                    ],
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "boolean"
+                                }
+                            ]
+                        },
+                        "Topic": {
+                            "$ref": "#/definitions/CfnString_1"
+                        }
+                    },
+                    "required": [
+                        "Topic"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "SNS"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "SourceAccessConfiguration": {
+            "properties": {
+                "Type": {
+                    "$ref": "#/definitions/CfnString"
+                },
+                "URI": {
+                    "$ref": "#/definitions/CfnString"
+                }
+            },
+            "type": "object"
+        },
+        "SqsEvent": {
+            "properties": {
+                "Properties": {
+                    "properties": {
+                        "BatchSize": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "Enabled": {
+                            "$ref": "#/definitions/CfnBoolean"
+                        },
+                        "FilterCriteria": {
+                            "$ref": "#/definitions/FilterCriteria"
+                        },
+                        "MaximumBatchingWindowInSeconds": {
+                            "$ref": "#/definitions/CfnInteger"
+                        },
+                        "Queue": {
+                            "$ref": "#/definitions/CfnString_1"
+                        }
+                    },
+                    "required": [
+                        "Queue"
+                    ],
+                    "type": "object"
+                },
+                "Type": {
+                    "enum": [
+                        "SQS"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Properties",
+                "Type"
+            ],
+            "type": "object"
+        },
+        "VpcConfig": {
+            "$ref": "#/definitions/VpcConfig_1"
+        },
+        "VpcConfig_1": {
+            "properties": {
+                "SecurityGroupIds": {
+                    "$ref": "#/definitions/CfnStringList"
+                },
+                "SubnetIds": {
+                    "$ref": "#/definitions/CfnStringList"
+                }
+            },
+            "type": "object"
+        },
+        "__type": {
+            "properties": {
+                "Type": {
+                    "$ref": "#/definitions/CfnResourceType"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "properties": {
+        "AWSTemplateFormatVersion": {
+            "type": "string"
+        },
+        "Conditions": {},
+        "Description": {
+            "type": "string"
+        },
+        "Globals": {},
+        "Mappings": {},
+        "Metadata": {},
+        "Outputs": {},
+        "Parameters": {},
+        "Resources": {
+            "additionalProperties": {
+                "anyOf": [
+                    {
+                        "$ref": "#/definitions/AwsServerlessApi"
+                    },
+                    {
+                        "$ref": "#/definitions/AwsServerlessApplication"
+                    },
+                    {
+                        "$ref": "#/definitions/AwsServerlessFunction"
+                    },
+                    {
+                        "$ref": "#/definitions/AwsServerlessHttpApi"
+                    },
+                    {
+                        "$ref": "#/definitions/AwsServerlessLayerVersion"
+                    },
+                    {
+                        "$ref": "#/definitions/AwsServerlessSimpleTable"
+                    },
+                    {
+                        "$ref": "#/definitions/AwsServerlessStateMachine"
+                    },
+                    {
+                        "$ref": "#/definitions/Partial"
+                    }
+                ]
+            },
+            "type": "object"
+        },
+        "Transform": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "Resources"
+    ],
+    "type": "object"
+}
