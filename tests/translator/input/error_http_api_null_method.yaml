@@ -15,4 +15,4 @@ Resources:
         openapi: 3.0.1
         paths:
           /test:
-            post: null
+            post:

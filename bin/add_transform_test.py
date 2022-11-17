@@ -95,7 +95,7 @@ def copy_input_file_to_transform_test_dir(input_file_path: str, transform_test_i
     print(f"Transform Test input file generated {transform_test_input_path}")
 
 
-def verify_input_template(input_file_path: str):
+def verify_input_template(input_file_path: str):  # type: ignore[no-untyped-def]
     if "arn:aws:" in Path(input_file_path).read_text(encoding="utf-8"):
         print("ERROR: hardcoded partition name detected. Consider replace it with pseudo parameter {AWS::Partition}")
         sys.exit(1)

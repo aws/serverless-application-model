@@ -1,3 +1,5 @@
+from typing import Any, Dict, List, Optional
+
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
@@ -8,6 +10,7 @@ from samtranslator.model.lambda_ import LambdaEventSourceMapping
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRolePolicies
+from samtranslator.utils.types import Intrinsicable
 
 
 class PullEventSource(ResourceMacro):
@@ -52,14 +55,36 @@ class PullEventSource(ResourceMacro):
         "ConsumerGroupId": PropertyType(False, is_str()),
     }
 
-    def get_policy_arn(self):
+    Stream: Optional[Intrinsicable[str]]
+    Queue: Optional[Intrinsicable[str]]
+    BatchSize: Optional[Intrinsicable[int]]
+    StartingPosition: Optional[Intrinsicable[str]]
+    Enabled: Optional[bool]
+    MaximumBatchingWindowInSeconds: Optional[Intrinsicable[int]]
+    MaximumRetryAttempts: Optional[Intrinsicable[int]]
+    BisectBatchOnFunctionError: Optional[Intrinsicable[bool]]
+    MaximumRecordAgeInSeconds: Optional[Intrinsicable[int]]
+    DestinationConfig: Optional[Dict[str, Any]]
+    ParallelizationFactor: Optional[Intrinsicable[int]]
+    Topics: Optional[List[Any]]
+    Broker: Optional[Intrinsicable[str]]
+    Queues: Optional[List[Any]]
+    SourceAccessConfigurations: Optional[List[Any]]
+    SecretsManagerKmsKeyId: Optional[str]
+    TumblingWindowInSeconds: Optional[Intrinsicable[int]]
+    FunctionResponseTypes: Optional[List[Any]]
+    KafkaBootstrapServers: Optional[List[Any]]
+    FilterCriteria: Optional[Dict[str, Any]]
+    ConsumerGroupId: Optional[Intrinsicable[str]]
+
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
         raise NotImplementedError("Subclass must implement this method")
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         raise NotImplementedError("Subclass must implement this method")
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the Lambda EventSourceMapping to which this pull event corresponds. Adds the appropriate managed
         policy to the function's execution role, if such a role is provided.
 
@@ -110,7 +135,7 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds
         lambda_eventsourcemapping.FunctionResponseTypes = self.FunctionResponseTypes
         lambda_eventsourcemapping.FilterCriteria = self.FilterCriteria
-        self._validate_filter_criteria()
+        self._validate_filter_criteria()  # type: ignore[no-untyped-call]
 
         if self.KafkaBootstrapServers:
             lambda_eventsourcemapping.SelfManagedEventSource = {
@@ -130,26 +155,27 @@ class PullEventSource(ResourceMacro):
 
         destination_config_policy = None
         if self.DestinationConfig:
-            if self.DestinationConfig.get("OnFailure") is None:
+            on_failure = self.DestinationConfig.get("OnFailure")
+            if on_failure is None:
                 raise InvalidEventException(self.logical_id, "'OnFailure' is a required field for 'DestinationConfig'")
 
             # `Type` property is for sam to attach the right policies
-            destination_type = self.DestinationConfig.get("OnFailure").get("Type")
+            destination_type = on_failure.get("Type")
 
             # SAM attaches the policies for SQS or SNS only if 'Type' is given
             if destination_type:
                 # delete this field as its used internally for SAM to determine the policy
-                del self.DestinationConfig["OnFailure"]["Type"]
+                del on_failure["Type"]
                 # the values 'SQS' and 'SNS' are allowed. No intrinsics are allowed
                 if destination_type not in ["SQS", "SNS"]:
                     raise InvalidEventException(self.logical_id, "The only valid values for 'Type' are 'SQS' and 'SNS'")
                 if destination_type == "SQS":
-                    queue_arn = self.DestinationConfig.get("OnFailure").get("Destination")
+                    queue_arn = on_failure.get("Destination")
                     destination_config_policy = IAMRolePolicies().sqs_send_message_role_policy(
                         queue_arn, self.logical_id
                     )
                 elif destination_type == "SNS":
-                    sns_topic_arn = self.DestinationConfig.get("OnFailure").get("Destination")
+                    sns_topic_arn = on_failure.get("Destination")
                     destination_config_policy = IAMRolePolicies().sns_publish_role_policy(
                         sns_topic_arn, self.logical_id
                     )
@@ -157,18 +183,18 @@ class PullEventSource(ResourceMacro):
             lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig
 
         if "role" in kwargs:
-            self._link_policy(kwargs["role"], destination_config_policy)
+            self._link_policy(kwargs["role"], destination_config_policy)  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _link_policy(self, role, destination_config_policy=None):
+    def _link_policy(self, role, destination_config_policy=None):  # type: ignore[no-untyped-def]
         """If this source triggers a Lambda function whose execution role is auto-generated by SAM, add the
         appropriate managed policy to this Role.
 
         :param model.iam.IAMRole role: the execution role generated for the function
         """
-        policy_arn = self.get_policy_arn()
-        policy_statements = self.get_policy_statements()
+        policy_arn = self.get_policy_arn()  # type: ignore[no-untyped-call]
+        policy_statements = self.get_policy_statements()  # type: ignore[no-untyped-call]
         if role is not None:
             if policy_arn is not None and policy_arn not in role.ManagedPolicyArns:
                 role.ManagedPolicyArns.append(policy_arn)
@@ -189,7 +215,7 @@ class PullEventSource(ResourceMacro):
                 if not destination_config_policy.get("PolicyDocument") in [d["PolicyDocument"] for d in role.Policies]:
                     role.Policies.append(destination_config_policy)
 
-    def _validate_filter_criteria(self):
+    def _validate_filter_criteria(self):  # type: ignore[no-untyped-def]
         if not self.FilterCriteria or is_intrinsic(self.FilterCriteria):
             return
         if self.resource_type not in self.RESOURCE_TYPES_WITH_EVENT_FILTERING:
@@ -203,7 +229,7 @@ class PullEventSource(ResourceMacro):
         if list(self.FilterCriteria.keys()) not in [[], ["Filters"]]:
             raise InvalidEventException(self.relative_id, "FilterCriteria field has a wrong format")
 
-    def validate_secrets_manager_kms_key_id(self):
+    def validate_secrets_manager_kms_key_id(self):  # type: ignore[no-untyped-def]
         if self.SecretsManagerKmsKeyId and not isinstance(self.SecretsManagerKmsKeyId, str):
             raise InvalidEventException(
                 self.relative_id,
@@ -216,10 +242,10 @@ class Kinesis(PullEventSource):
 
     resource_type = "Kinesis"
 
-    def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")  # type: ignore[no-untyped-call]
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
 
 
@@ -228,10 +254,10 @@ class DynamoDB(PullEventSource):
 
     resource_type = "DynamoDB"
 
-    def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")  # type: ignore[no-untyped-call]
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
 
 
@@ -240,10 +266,10 @@ class SQS(PullEventSource):
 
     resource_type = "SQS"
 
-    def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")  # type: ignore[no-untyped-call]
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
 
 
@@ -252,10 +278,10 @@ class MSK(PullEventSource):
 
     resource_type = "MSK"
 
-    def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")  # type: ignore[no-untyped-call]
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
 
 
@@ -264,16 +290,16 @@ class MQ(PullEventSource):
 
     resource_type = "MQ"
 
-    def get_policy_arn(self):
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
         return None
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         if not self.SourceAccessConfigurations:
             raise InvalidEventException(
                 self.relative_id,
                 "No SourceAccessConfigurations for Amazon MQ event provided.",
             )
-        if not type(self.SourceAccessConfigurations) is list:
+        if not isinstance(self.SourceAccessConfigurations, list):
             raise InvalidEventException(
                 self.relative_id,
                 "Provided SourceAccessConfigurations cannot be parsed into a list.",
@@ -326,7 +352,7 @@ class MQ(PullEventSource):
             },
         }
         if self.SecretsManagerKmsKeyId:
-            self.validate_secrets_manager_kms_key_id()
+            self.validate_secrets_manager_kms_key_id()  # type: ignore[no-untyped-call]
             kms_policy = {
                 "Action": "kms:Decrypt",
                 "Effect": "Allow",
@@ -335,7 +361,7 @@ class MQ(PullEventSource):
                     + self.SecretsManagerKmsKeyId
                 },
             }
-            document["PolicyDocument"]["Statement"].append(kms_policy)
+            document["PolicyDocument"]["Statement"].append(kms_policy)  # type: ignore[index]
         return [document]
 
 
@@ -348,10 +374,10 @@ class SelfManagedKafka(PullEventSource):
     requires_stream_queue_broker = False
     AUTH_MECHANISM = ["SASL_SCRAM_256_AUTH", "SASL_SCRAM_512_AUTH", "BASIC_AUTH"]
 
-    def get_policy_arn(self):
+    def get_policy_arn(self):  # type: ignore[no-untyped-def]
         return None
 
-    def get_policy_statements(self):
+    def get_policy_statements(self):  # type: ignore[no-untyped-def]
         if not self.KafkaBootstrapServers:
             raise InvalidEventException(
                 self.relative_id,
@@ -375,23 +401,23 @@ class SelfManagedKafka(PullEventSource):
                 self.relative_id,
                 "No SourceAccessConfigurations for self managed kafka event provided.",
             )
-        document = self.generate_policy_document()
+        document = self.generate_policy_document(self.SourceAccessConfigurations)
         return [document]
 
-    def generate_policy_document(self):
+    def generate_policy_document(self, source_access_configurations: List[Any]):  # type: ignore[no-untyped-def]
         statements = []
-        authentication_uri, has_vpc_config = self.get_secret_key()
+        authentication_uri, has_vpc_config = self.get_secret_key(source_access_configurations)
         if authentication_uri:
-            secret_manager = self.get_secret_manager_secret(authentication_uri)
+            secret_manager = self.get_secret_manager_secret(authentication_uri)  # type: ignore[no-untyped-call]
             statements.append(secret_manager)
 
         if has_vpc_config:
-            vpc_permissions = self.get_vpc_permission()
+            vpc_permissions = self.get_vpc_permission()  # type: ignore[no-untyped-call]
             statements.append(vpc_permissions)
 
         if self.SecretsManagerKmsKeyId:
-            self.validate_secrets_manager_kms_key_id()
-            kms_policy = self.get_kms_policy()
+            self.validate_secrets_manager_kms_key_id()  # type: ignore[no-untyped-call]
+            kms_policy = self.get_kms_policy(self.SecretsManagerKmsKeyId)
             statements.append(kms_policy)
 
         document = {
@@ -404,17 +430,17 @@ class SelfManagedKafka(PullEventSource):
 
         return document
 
-    def get_secret_key(self):
+    def get_secret_key(self, source_access_configurations: List[Any]):  # type: ignore[no-untyped-def]
         authentication_uri = None
         has_vpc_subnet = False
         has_vpc_security_group = False
-        for config in self.SourceAccessConfigurations:
+        for config in source_access_configurations:
             if config.get("Type") == "VPC_SUBNET":
-                self.validate_uri(config, "VPC_SUBNET")
+                self.validate_uri(config, "VPC_SUBNET")  # type: ignore[no-untyped-call]
                 has_vpc_subnet = True
 
             elif config.get("Type") == "VPC_SECURITY_GROUP":
-                self.validate_uri(config, "VPC_SECURITY_GROUP")
+                self.validate_uri(config, "VPC_SECURITY_GROUP")  # type: ignore[no-untyped-call]
                 has_vpc_security_group = True
 
             elif config.get("Type") in self.AUTH_MECHANISM:
@@ -423,7 +449,7 @@ class SelfManagedKafka(PullEventSource):
                         self.relative_id,
                         "Multiple auth mechanism properties specified in SourceAccessConfigurations for self managed kafka event.",
                     )
-                self.validate_uri(config, "auth mechanism")
+                self.validate_uri(config, "auth mechanism")  # type: ignore[no-untyped-call]
                 authentication_uri = config.get("URI")
 
             else:
@@ -439,7 +465,7 @@ class SelfManagedKafka(PullEventSource):
             )
         return authentication_uri, (has_vpc_subnet and has_vpc_security_group)
 
-    def validate_uri(self, config, msg):
+    def validate_uri(self, config, msg):  # type: ignore[no-untyped-def]
         if not config.get("URI"):
             raise InvalidEventException(
                 self.relative_id,
@@ -454,14 +480,14 @@ class SelfManagedKafka(PullEventSource):
                 ),
             )
 
-    def get_secret_manager_secret(self, authentication_uri):
+    def get_secret_manager_secret(self, authentication_uri):  # type: ignore[no-untyped-def]
         return {
             "Action": ["secretsmanager:GetSecretValue"],
             "Effect": "Allow",
             "Resource": authentication_uri,
         }
 
-    def get_vpc_permission(self):
+    def get_vpc_permission(self):  # type: ignore[no-untyped-def]
         return {
             "Action": [
                 "ec2:CreateNetworkInterface",
@@ -475,12 +501,13 @@ class SelfManagedKafka(PullEventSource):
             "Resource": "*",
         }
 
-    def get_kms_policy(self):
+    @staticmethod
+    def get_kms_policy(secrets_manager_kms_key_id: str) -> Dict[str, Any]:
         return {
             "Action": ["kms:Decrypt"],
             "Effect": "Allow",
             "Resource": {
                 "Fn::Sub": "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/"
-                + self.SecretsManagerKmsKeyId
+                + secrets_manager_kms_key_id
             },
         }

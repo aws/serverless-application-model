@@ -1,17 +1,17 @@
 Parameters:
   DomainName:
     Type: String
-    Default: 'example.com'
+    Default: example.com
   ACMCertificateArn:
     Type: String
-    Default: 'cert-arn-in-us-east-1'
+    Default: cert-arn-in-us-east-1
 Globals:
   HttpApi:
     Domain:
       DomainName: !Ref DomainName
       CertificateArn: !Ref ACMCertificateArn
       BasePath:
-        - /one
+      - /one
       Route53:
         HostedZoneName: www.my-domain.com.
         IpV6: false

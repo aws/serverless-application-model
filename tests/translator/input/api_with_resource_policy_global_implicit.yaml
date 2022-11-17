@@ -1,6 +1,6 @@
 Resources:
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -13,14 +13,8 @@ Resources:
             Method: post
             Auth:
               ResourcePolicy:
-                CustomStatements: [{
-                    Action: 'execute-api:Invoke', 
-                    Resource: ['execute-api:/*/*/*']
-                  },
-                  {
-                    Action: 'execute-api:blah', 
-                    Resource: ['execute-api:/*/*/*']
-                  }]
+                CustomStatements: [{Action: execute-api:Invoke, Resource: [execute-api:/*/*/*]},
+                  {Action: execute-api:blah, Resource: [execute-api:/*/*/*]}]
         AddItemAnyMethod:
           Type: Api
           Properties:
@@ -28,11 +22,5 @@ Resources:
             Method: any
             Auth:
               ResourcePolicy:
-                CustomStatements: [{
-                                     Action: 'execute-api:Invoke',
-                                     Resource: ['execute-api:/*/*/*']
-                                   },
-                                   {
-                                     Action: 'execute-api:blah',
-                                     Resource: ['execute-api:/*/*/*']
-                                   }]
+                CustomStatements: [{Action: execute-api:Invoke, Resource: [execute-api:/*/*/*]},
+                  {Action: execute-api:blah, Resource: [execute-api:/*/*/*]}]

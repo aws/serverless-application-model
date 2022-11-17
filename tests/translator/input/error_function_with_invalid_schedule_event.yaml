@@ -1,8 +1,8 @@
-Transform: "AWS::Serverless-2016-10-31"
+Transform: AWS::Serverless-2016-10-31
 
 Resources:
   ScheduledFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
       Handler: hello.handler
@@ -11,8 +11,8 @@ Resources:
         Schedule1:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
             Name: test-schedule
             Description: Test Schedule
-            State: "Enabled"
-            Enabled: True
+            State: Enabled
+            Enabled: true

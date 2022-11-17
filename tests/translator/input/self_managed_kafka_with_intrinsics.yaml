@@ -5,7 +5,7 @@ Parameters:
 
   EnableValue:
     Type: String
-    Default: True
+    Default: true
 
   TopicsValue:
     Type: CommaDelimitedList
@@ -22,7 +22,7 @@ Parameters:
 
 Resources:
   KafkaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/kafka.zip
       Handler: index.kafka_handler
@@ -40,13 +40,13 @@ Resources:
             BatchSize:
               Ref: BatchSizeValue
             SourceAccessConfigurations:
-              - Type: VPC_SUBNET
-                URI: subnet:subnet-12345
-              - Type: VPC_SECURITY_GROUP
-                URI: security_group:sg-67890
-              - Type: BASIC_AUTH
-                URI:
-                  Ref: KafkaUserSecret
+            - Type: VPC_SUBNET
+              URI: subnet:subnet-12345
+            - Type: VPC_SECURITY_GROUP
+              URI: security_group:sg-67890
+            - Type: BASIC_AUTH
+              URI:
+                Ref: KafkaUserSecret
             ConsumerGroupId:
               Ref: ConsumerGroupValue
 
@@ -56,4 +56,3 @@ Resources:
       Name: KafkaUserPassword
       SecretString:
         Fn::Sub: '{"username":"testBrokerUser","password":"testBrokerPassword"}'
-

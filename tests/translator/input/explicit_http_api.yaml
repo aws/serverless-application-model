@@ -19,17 +19,17 @@ Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      FailOnWarnings: True
+      FailOnWarnings: true
       Auth:
         Authorizers:
           OAuth2:
             AuthorizationScopes:
-              - scope4
+            - scope4
             JwtConfiguration:
-              issuer: "https://www.example.com/v1/connect/oidc"
+              issuer: https://www.example.com/v1/connect/oidc
               audience:
-                - MyApi
-            IdentitySource: "$request.querystring.param"
+              - MyApi
+            IdentitySource: $request.querystring.param
         DefaultAuthorizer: OAuth2
 
   MyApi2:
@@ -39,10 +39,10 @@ Resources:
         Authorizers:
           OAuth2:
             JwtConfiguration:
-              issuer: "https://www.example.com/v1/connect/oidc"
+              issuer: https://www.example.com/v1/connect/oidc
               audience:
-                - MyApi
-            IdentitySource: "$request.querystring.param"
+              - MyApi
+            IdentitySource: $request.querystring.param
         DefaultAuthorizer: OAuth2
       DefinitionBody:
         openapi: '3.0'

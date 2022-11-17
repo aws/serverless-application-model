@@ -32,7 +32,7 @@ def _is_nonblank_str(s: Any) -> bool:
     return s and isinstance(s, str)
 
 
-def add_depends_on(logical_id: str, depends_on: str, resource_resolver: ResourceResolver):
+def add_depends_on(logical_id: str, depends_on: str, resource_resolver: ResourceResolver):  # type: ignore[no-untyped-def]
     """
     Add DependsOn attribute to resource.
     """
@@ -57,7 +57,7 @@ def replace_depends_on_logical_id(logical_id: str, replacement: List[str], resou
             resource["DependsOn"] = insert_unique(depends_on, replacement)
 
 
-def get_event_source_mappings(event_source_id: str, function_id: str, resource_resolver: ResourceResolver):
+def get_event_source_mappings(event_source_id: str, function_id: str, resource_resolver: ResourceResolver):  # type: ignore[no-untyped-def]
     """
     Get logical IDs of `AWS::Lambda::EventSourceMapping`s between resource logical IDs.
     """

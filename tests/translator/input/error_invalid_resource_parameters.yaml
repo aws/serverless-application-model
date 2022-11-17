@@ -2,6 +2,6 @@ Resources:
   UnknownPropertyInResource:
     Type: AWS::Serverless::Api
     Properties:
-      SomeProperty: "Value"
+      SomeProperty: Value
       StageName: Prod
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json

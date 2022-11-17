@@ -1,7 +1,7 @@
 Globals:
   Api:
     # If we skip AllowMethods, then SAM will auto generate a list of methods scoped to each path
-    Cors: "origins"
+    Cors: origins
 
 Resources:
   ImplicitApiFunction:
@@ -28,41 +28,9 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      DefinitionBody:  {
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {
-            "/add": {
-              "post": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
-                  }
-                },
-                "responses": {}
-              }
-            },
-            "/{proxy+}": {
-              "x-amazon-apigateway-any-method": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
-                  }
-                },
-                "responses": {}
-              }
-            }
-          },
-          "swagger": "2.0"
-        }
-
-
-
+      DefinitionBody: {info: {version: '1.0', title: {Ref: AWS::StackName}}, paths: {
+          /add: {post: {x-amazon-apigateway-integration: {httpMethod: POST, type: aws_proxy,
+                uri: {Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations'}},
+              responses: {}}}, '/{proxy+}': {x-amazon-apigateway-any-method: {x-amazon-apigateway-integration: {
+                httpMethod: POST, type: aws_proxy, uri: {Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations'}},
+              responses: {}}}}, swagger: '2.0'}

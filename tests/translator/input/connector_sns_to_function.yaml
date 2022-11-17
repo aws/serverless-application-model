@@ -1,18 +1,18 @@
 Resources:
   MySNSTopic:
     Type: AWS::SNS::Topic
-  
+
   MyRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: lambda.amazonaws.com
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
       ManagedPolicyArns:
-        - arn:{AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - arn:{AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   MyFunction:
     Type: AWS::Lambda::Function
@@ -33,9 +33,9 @@ Resources:
   MyConnector:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: MySNSTopic
-      Destination: 
+      Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write

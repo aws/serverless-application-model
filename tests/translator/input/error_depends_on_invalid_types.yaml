@@ -7,7 +7,7 @@ Resources:
 
   Bucket2:
     Type: AWS::S3::Bucket
-    DependsOn: null
+    DependsOn:
 
   Bucket3:
     Type: AWS::S3::Bucket
@@ -41,7 +41,7 @@ Resources:
             Bucket:
               Ref: Bucket2
             Events:
-              - s3:ObjectCreated:*
+            - s3:ObjectCreated:*
 
   Function3:
     Type: AWS::Serverless::Function
@@ -56,4 +56,4 @@ Resources:
             Bucket:
               Ref: Bucket3
             Events:
-              - s3:ObjectCreated:*
+            - s3:ObjectCreated:*

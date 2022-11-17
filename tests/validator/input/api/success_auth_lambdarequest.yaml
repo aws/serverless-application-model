@@ -11,45 +11,45 @@ Resources:
 
           LambdaRequestComplete:
             AuthorizationScopes:
-              - Scope1
-              - Scope2
+            - Scope1
+            - Scope2
             FunctionArn: Function.Arn
             FunctionInvokeRole: My function invoke role
             FunctionPayloadType: REQUEST
             Identity:
               Context:
-                - Context1
-                - Context2
+              - Context1
+              - Context2
               Headers:
-                - Headers1
-                - Headers2
+              - Headers1
+              - Headers2
               QueryStrings:
-                - QueryString1
-                - QueryString2
+              - QueryString1
+              - QueryString2
               ReauthorizeEvery: 3
               StageVariables:
-                - Variable1
-                - Variable2
+              - Variable1
+              - Variable2
 
           LambdaRequestCompleteIntrinsics:
             AuthorizationScopes:
-              - Scope1
-              - Scope2
+            - Scope1
+            - Scope2
             FunctionArn: Function.Arn
             FunctionInvokeRole: My function invoke role
             FunctionPayloadType: REQUEST
             Identity:
               Context:
-                - Context1
-                - Context2
+              - Context1
+              - Context2
               Headers:
-                - Headers1
-                - Headers2
+              - Headers1
+              - Headers2
               QueryStrings:
-                - QueryString1
-                - QueryString2
+              - QueryString1
+              - QueryString2
               ReauthorizeEvery:
                 Ref: ParamReauthorizeEvery
               StageVariables:
-                - Variable1
-                - Variable2
+              - Variable1
+              - Variable2

@@ -17,13 +17,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - 3
+      - 3
       StageName: Stage name
   ApiMethodSettingsItemEmpty:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        -
+      - 
       StageName: Stage name
 
   # MethodSettings CacheDataEncrypted
@@ -31,13 +31,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - CacheDataEncrypted:
+      - CacheDataEncrypted:
       StageName: Stage name
   ApiMethodSettingsCacheDataEncryptedNotBoolean:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - CacheDataEncrypted: 3
+      - CacheDataEncrypted: 3
       StageName: Stage name
 
   # MethodSettings CacheTtlInSeconds
@@ -45,13 +45,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - CacheTtlInSeconds:
+      - CacheTtlInSeconds:
       StageName: Stage name
   ApiMethodSettingsCacheTtlInSecondsNotInteger:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - CacheTtlInSeconds: "3"
+      - CacheTtlInSeconds: '3'
       StageName: Stage name
 
   # MethodSettings CachingEnabled
@@ -59,13 +59,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - CachingEnabled:
+      - CachingEnabled:
       StageName: Stage name
   ApiMethodSettingsCachingEnabledNotBoolean:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - CachingEnabled: 3
+      - CachingEnabled: 3
       StageName: Stage name
 
   # MethodSettings DataTraceEnabled
@@ -73,13 +73,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - DataTraceEnabled:
+      - DataTraceEnabled:
       StageName: Stage name
   ApiMethodSettingsDataTraceEnabledNotBoolean:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - DataTraceEnabled: 3
+      - DataTraceEnabled: 3
       StageName: Stage name
 
   # MethodSettings HttpMethod
@@ -87,13 +87,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - HttpMethod:
+      - HttpMethod:
       StageName: Stage name
   ApiMethodSettingsHttpMethodNotString:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - HttpMethod: 3
+      - HttpMethod: 3
       StageName: Stage name
 
   # MethodSettings LoggingLevel
@@ -101,13 +101,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - LoggingLevel:
+      - LoggingLevel:
       StageName: Stage name
   ApiMethodSettingsLoggingLevelNotString:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - LoggingLevel: 3
+      - LoggingLevel: 3
       StageName: Stage name
 
   # MethodSettings MetricsEnabled
@@ -115,13 +115,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - MetricsEnabled:
+      - MetricsEnabled:
       StageName: Stage name
   ApiMethodSettingsMetricsEnabledNotBoolean:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - MetricsEnabled: 3
+      - MetricsEnabled: 3
       StageName: Stage name
 
   # MethodSettings ResourcePath
@@ -129,13 +129,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - ResourcePath:
+      - ResourcePath:
       StageName: Stage name
   ApiMethodSettingsResourcePathNotString:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - ResourcePath: 3
+      - ResourcePath: 3
       StageName: Stage name
 
   # MethodSettings ThrottlingBurstLimit
@@ -143,13 +143,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - ThrottlingBurstLimit:
+      - ThrottlingBurstLimit:
       StageName: Stage name
   ApiMethodSettingsThrottlingBurstLimitNotInteger:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - ThrottlingBurstLimit: "3"
+      - ThrottlingBurstLimit: '3'
       StageName: Stage name
 
   # MethodSettings ThrottlingRateLimit
@@ -157,11 +157,11 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - ThrottlingRateLimit:
+      - ThrottlingRateLimit:
       StageName: Stage name
   ApiMethodSettingsThrottlingRateLimitNotNumber:
     Type: AWS::Serverless::Api
     Properties:
       MethodSettings:
-        - ThrottlingRateLimit: "3"
+      - ThrottlingRateLimit: '3'
       StageName: Stage name

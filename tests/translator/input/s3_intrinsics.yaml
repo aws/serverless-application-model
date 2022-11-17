@@ -6,8 +6,8 @@ Parameters:
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   ThumbnailFunction:
@@ -23,18 +23,18 @@ Resources:
             Bucket:
               Ref: Images
             Events:
-              - s3:ObjectCreated:*
+            - s3:ObjectCreated:*
             Filter:
               Fn::If:
-                - MyCondition
-                - S3Key:
-                    Rules:
-                      - Name: Rule1Prefix
-                        Value: Rule1Value
-                - S3Key:
-                    Rules:
-                      - Name: Rule2Prefix
-                        Value: Rule2Value
+              - MyCondition
+              - S3Key:
+                  Rules:
+                  - Name: Rule1Prefix
+                    Value: Rule1Value
+              - S3Key:
+                  Rules:
+                  - Name: Rule2Prefix
+                    Value: Rule2Value
 
   Images:
     Type: AWS::S3::Bucket

@@ -1,8 +1,6 @@
 Globals:
   Api:
-    Cors: {
-    "Fn::Join": [",", ["www.amazon.com", "www.google.com"]]
-    }
+    Cors: {Fn::Join: [',', [www.amazon.com, www.google.com]]}
 
 Resources:
   ImplicitApiFunction:
@@ -38,43 +36,14 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      DefinitionBody:  {
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {
-            "/add": {
-              "post": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RestApiFunction.Arn}/invocations"
-                  }
-                },
-                "responses": {}
-              }
-            },
-            "/{proxy+}": {
-              "x-amazon-apigateway-any-method": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetHtmlFunction.Arn}/invocations"
-                  }
-                },
-                "responses": {}
-              }
-            }
-          },
-          "swagger": "2.0"
-        }
+      DefinitionBody: {info: {version: '1.0', title: {Ref: AWS::StackName}}, paths: {
+          /add: {post: {x-amazon-apigateway-integration: {httpMethod: POST, type: aws_proxy,
+                uri: {Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RestApiFunction.Arn}/invocations'}},
+              responses: {}}}, '/{proxy+}': {x-amazon-apigateway-any-method: {x-amazon-apigateway-integration: {
+                httpMethod: POST, type: aws_proxy, uri: {Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetHtmlFunction.Arn}/invocations'}},
+              responses: {}}}}, swagger: '2.0'}
       Cors:
-        AllowMethods: "methods"
-        AllowHeaders: "headers"
-        AllowOrigin: "origins"
+        AllowMethods: methods
+        AllowHeaders: headers
+        AllowOrigin: origins
         AllowCredentials: true

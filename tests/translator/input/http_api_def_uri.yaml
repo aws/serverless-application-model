@@ -8,7 +8,7 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       DefinitionUri: s3://bucket/key
-      StageName: !Join ["", ["Stage", "Name"]]
+      StageName: !Join ['', [Stage, Name]]
       DefaultRouteSettings:
         ThrottlingBurstLimit: 50
 

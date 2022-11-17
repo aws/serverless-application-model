@@ -5,8 +5,8 @@ Parameters:
   UseExistingQueue:
     Type: String
     AllowedValues:
-      - true
-      - false
+    - true
+    - false
     Default: true
 Conditions:
   QueueCreationDisabled: !Equals [!Ref UseExistingQueue, true]
@@ -24,9 +24,10 @@ Resources:
           OnSuccess:
             Type: SQS
             Destination: !If [QueueCreationDisabled, !Ref SQSArn, !Ref 'AWS::NoValue']
-          OnFailure: 
+          OnFailure:
             Type: Lambda
-            Destination: !If [FunctionInlineEnabled, !GetAtt DestinationLambda.Arn, 'some-function-arn']
+            Destination: !If [FunctionInlineEnabled, !GetAtt DestinationLambda.Arn,
+              some-function-arn]
       InlineCode: |
         exports.handler = function(event, context, callback) {
           var event_received_at = new Date().toISOString();

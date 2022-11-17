@@ -3,8 +3,8 @@ Transform: AWS::Serverless-2016-10-31
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
 Globals:
   Api:
     # If we skip AllowMethods, then SAM will auto generate a list of methods scoped to each path

@@ -1,6 +1,6 @@
 Resources:
   MyApi:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
@@ -34,11 +34,11 @@ Resources:
             Result: World
             End: true
       Policies:
-        - Version: "2012-10-17"
-          Statement:
-            - Effect: Deny
-              Action: "*"
-              Resource: "*"
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
       Events:
         WithNoAuthorizer:
           Type: Api

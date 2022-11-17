@@ -13,8 +13,8 @@ Resources:
             Resource: !GetAtt StateMachineFunction.Arn
             End: true
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingIsNotStateMachineFunction"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingIsNotStateMachineFunction
 
   MyFunction:
     Type: AWS::Serverless::Function
@@ -32,7 +32,7 @@ Resources:
     Properties:
       Source:
         Id: MyStateMachine
-      Destination: 
+      Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write

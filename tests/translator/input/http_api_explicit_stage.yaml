@@ -1,7 +1,7 @@
 Parameters:
   CorsParam:
     Type: String
-    Default: True
+    Default: true
   PayloadFormatVersion:
     Default: '1.0'
     Type: String
@@ -9,12 +9,12 @@ Parameters:
 Globals:
   HttpApi:
     RouteSettings:
-      "$default":
-        DataTraceEnabled: True
+      $default:
+        DataTraceEnabled: true
         ThrottlingBurstLimit: 100
     FailOnWarnings: true
 Resources:
-  HttpApiFunction: 
+  HttpApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
@@ -37,7 +37,7 @@ Resources:
       StageVariables:
         VarName: VarValue
       RouteSettings:
-        "$default":
+        $default:
           ThrottlingBurstLimit: 200
           ThrottlingRateLimit: 0.7
       AccessLogSettings:

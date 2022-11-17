@@ -13,8 +13,8 @@ Resources:
         Authorizers:
           MyCognitoAuthorizer:
             AuthorizationScopes:
-              - Scope1
-              - Scope2
+            - Scope1
+            - Scope2
             Identity:
               Header: My header
               ReauthorizeEvery: 5
@@ -22,8 +22,8 @@ Resources:
             UserPoolArn: My user pool ARN
           MyLambdaTokenAuthorizer:
             AuthorizationScopes:
-              - Scope3
-              - Scope4
+            - Scope3
+            - Scope4
             FunctionArn: My function ARN
             FunctionInvokeRole: My invoke role
             FunctionPayloadType: TOKEN
@@ -32,47 +32,47 @@ Resources:
               ValidationExpression: My other validation expression
           MyLambdaRequestAuthorizer:
             AuthorizationScopes:
-              - Scope5
+            - Scope5
             FunctionArn: My other function ARN
             FunctionInvokeRole: My other invoke role
             FunctionPayloadType: REQUEST
             Identity:
               Context:
-                - Context1
+              - Context1
               Headers:
-                - Header1
-                - Header2
+              - Header1
+              - Header2
               QueryStrings:
-                - QueryString1
+              - QueryString1
               ReauthorizeEvery: 7
               StageVariables:
-                - StageVariable1
+              - StageVariable1
         DefaultAuthorizer: MyDefaultAuthorizer
         InvokeRole: IAMRoleArn
         ResourcePolicy:
           AwsAccountBlacklist:
-            - Account1
+          - Account1
           AwsAccountWhitelist:
-            - Account2
+          - Account2
           CustomStatements:
-            - Effect: Allow
-              Principal: "*"
+          - Effect: Allow
+            Principal: '*'
           IntrinsicVpcBlacklist:
-            - Ref: Vpc1
+          - Ref: Vpc1
           IntrinsicVpcWhitelist:
-            - Ref: Vpc2
+          - Ref: Vpc2
           IntrinsicVpceBlacklist:
-            - Ref: Vpce1
+          - Ref: Vpce1
           IntrinsicVpceWhitelist:
-            - Ref: Vpce2
+          - Ref: Vpce2
           IpRangeBlacklist:
-            - 1.2.3.4
+          - 1.2.3.4
           IpRangeWhitelist:
-            - 2.3.4.5
+          - 2.3.4.5
           SourceVpcBlacklist:
-            - vpc-3
+          - vpc-3
           SourceVpcWhitelist:
-            - vpce-4
+          - vpce-4
         UsagePlan:
           CreateUsagePlan: SHARED
           Description: My usage plan description
@@ -81,18 +81,18 @@ Resources:
             Offset: 2
             Period: DAY
           Tags:
-            - Key: Tag1Key
-              Value: Tag1Value
-            - Key: Tag2Key
-              Value: Tag2Value
+          - Key: Tag1Key
+            Value: Tag1Value
+          - Key: Tag2Key
+            Value: Tag2Value
           Throttle:
             BurstLimit: 3
             RateLimit: 50.4
           UsagePlanName: My usage plan name
       BinaryMediaTypes:
-        - "image/png"
+      - image/png
       CacheClusterEnabled: true
-      CacheClusterSize: "32"
+      CacheClusterSize: '32'
       CanarySetting:
         DeploymentId: MyDeploymentId
         PercentTraffic: 10.1
@@ -101,13 +101,13 @@ Resources:
           MyKey2: MyValue2
         UseStageCache: false
       Cors: "'*'"
-      DefinitionBody: "{}"
+      DefinitionBody: '{}'
       DefinitionUri: MyDefinitionUri
       Description: My API description
       Domain:
         BasePath:
-          - BasePath1
-          - BasePath2
+        - BasePath1
+        - BasePath2
         CertificateArn: My certificate ARN
         DomainName: My domain name
         EndpointConfiguration: REGIONAL
@@ -124,38 +124,39 @@ Resources:
       EndpointConfiguration:
         Type: EDGE
         VPCEndpointIds:
-          - VpcId1
-          - VpcId2
-          - VpcId3
+        - VpcId1
+        - VpcId2
+        - VpcId3
       GatewayResponses:
         ACCESS_DENIED:
           ResponseParameters:
             Param1: Param1Value
           ResponseTemplates:
             Template1: Template1Value
-          StatusCode: "403"
+          StatusCode: '403'
       MethodSettings:
-        - CacheDataEncrypted: true
-          CacheTtlInSeconds: 3
-          CachingEnabled: true
-          DataTraceEnabled: false
-          HttpMethod: GET
-          LoggingLevel: INFO
-          MetricsEnabled: true
-          ResourcePath: "/"
-          ThrottlingBurstLimit: 45
-          ThrottlingRateLimit: 80.5
+      - CacheDataEncrypted: true
+        CacheTtlInSeconds: 3
+        CachingEnabled: true
+        DataTraceEnabled: false
+        HttpMethod: GET
+        LoggingLevel: INFO
+        MetricsEnabled: true
+        ResourcePath: /
+        ThrottlingBurstLimit: 45
+        ThrottlingRateLimit: 80.5
       MinimumCompressionSize: 30
       Models:
         MyModel:
           MyModelProp: Value
       Name: MyApi
-      OpenApiVersion: "3.0.1"
+      OpenApiVersion: 3.0.1
       StageName: Stage name
       Tags:
         ApiTag1: ApiTag1Value
-        "A:p-i.T/a=g+with_special_chars": ApiTag2Value
-        VeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLong: VeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTagValue
+        A:p-i.T/a=g+with_special_chars: ApiTag2Value
+        ? VeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLong
+        : VeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTagValue
         ApiTagWithIntrinsicValue:
           Ref: MyTagValue
       TracingEnabled: true

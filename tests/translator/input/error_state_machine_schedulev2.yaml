@@ -1,0 +1,68 @@
+Parameters:
+  Env:
+    Type: String
+    Default: prd
+
+Resources:
+  ScheduledStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: s3://sam-demo-bucket/my_state_machine.asl.json
+      Role: arn:aws:iam::123456123456:role/service-role/SampleRole
+      Events:
+        ScheduleMissingDLQProperty:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            FlexibleTimeWindow:
+              Mode: 'OFF'
+            DeadLetterConfig:
+              QueueLogicalId: MyDlqId
+
+  ScheduledStateMachine2:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: s3://sam-demo-bucket/my_state_machine.asl.json
+      Role: arn:aws:iam::123456123456:role/service-role/SampleRole
+      Events:
+        ScheduleIntrinsics:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            FlexibleTimeWindow:
+              Mode: 'OFF'
+            DeadLetterConfig:
+              Type: SQS
+              QueueLogicalId:
+                Fn::Sub: testLambdaFunctionEBRuleDLQ${Env}
+
+  ScheduledStateMachine3:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: s3://sam-demo-bucket/my_state_machine.asl.json
+      Role: arn:aws:iam::123456123456:role/service-role/SampleRole
+      Events:
+        ScheduleBothProvided:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            FlexibleTimeWindow:
+              Mode: 'OFF'
+            DeadLetterConfig:
+              Type: SQS
+              Arn: MyDlqArn
+
+  ScheduledStateMachine4:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: s3://sam-demo-bucket/my_state_machine.asl.json
+      Role: arn:aws:iam::123456123456:role/service-role/SampleRole
+      Events:
+        ScheduleInvalidType:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            FlexibleTimeWindow:
+              Mode: 'OFF'
+            DeadLetterConfig:
+              Type: SNS

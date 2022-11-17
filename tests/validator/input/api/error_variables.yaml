@@ -18,14 +18,14 @@ Resources:
     Properties:
       StageName: Stage name
       Variables:
-        My_Variable: "value"
+        My_Variable: value
   # Variable contains an invalid character
   ApiVariableInvalidCharacter:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
       Variables:
-        MyVariable: ">"
+        MyVariable: '>'
   # Variable is not a string
   ApiVariableNotString:
     Type: AWS::Serverless::Api

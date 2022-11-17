@@ -21,11 +21,11 @@ Resources:
             Result: World
             End: true
       Policies:
-        - Version: "2012-10-17"
-          Statement:
-            - Effect: Deny
-              Action: "*"
-              Resource: "*"
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
       Events:
         GetHtml:
           Type: Api
@@ -36,8 +36,8 @@ Resources:
             Method: get
             Auth:
               ResourcePolicy:
-                IpRangeWhitelist: ["1.2.3.4"]
-                IpRangeBlacklist: ["1.2.3.4"]
+                IpRangeWhitelist: [1.2.3.4]
+                IpRangeBlacklist: [1.2.3.4]
         PostHtml:
           Type: Api
           Properties:
@@ -47,8 +47,8 @@ Resources:
             Method: post
             Auth:
               ResourcePolicy:
-                IpRangeWhitelist: ["1.2.3.4"]
-                IpRangeBlacklist: ["1.2.3.4"]
+                IpRangeWhitelist: [1.2.3.4]
+                IpRangeBlacklist: [1.2.3.4]
         PutHtml:
           Type: Api
           Properties:

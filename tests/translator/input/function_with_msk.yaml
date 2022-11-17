@@ -15,6 +15,5 @@ Resources:
             StartingPosition: LATEST
             Stream: !Sub arn:aws:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
             Topics:
-              - "MyDummyTestTopic"
+            - MyDummyTestTopic
             ConsumerGroupId: consumergroup1
-

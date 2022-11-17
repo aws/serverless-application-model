@@ -11,7 +11,7 @@ Globals:
       DestinationConfig:
         OnSuccess:
           Type: Lambda
-        OnFailure: 
+        OnFailure:
           Type: blah
           Destination: !Ref SNSArn
 

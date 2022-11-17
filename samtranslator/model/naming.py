@@ -6,9 +6,9 @@ class GeneratedLogicalId(object):
     """
 
     @staticmethod
-    def implicit_api():
+    def implicit_api():  # type: ignore[no-untyped-def]
         return "ServerlessRestApi"
 
     @staticmethod
-    def implicit_http_api():
+    def implicit_http_api():  # type: ignore[no-untyped-def]
         return "ServerlessHttpApi"

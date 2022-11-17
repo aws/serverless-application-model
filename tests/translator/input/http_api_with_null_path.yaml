@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
-Description: A template to test for API condition handling with a mix of explicit and implicit api events.
+Transform: AWS::Serverless-2016-10-31
+Description: A template to test for API condition handling with a mix of explicit
+  and implicit api events.
 
 Resources:
   EXAMPLEPARTIALGateway:
@@ -10,7 +11,7 @@ Resources:
         openapi: 3.0.1
         paths:
           /my/route:
-            post: null
+            post:
   EXAMPLEPARTIALLambda:
     Type: AWS::Serverless::Function
     Properties:

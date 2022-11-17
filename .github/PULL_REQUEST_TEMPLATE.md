@@ -6,6 +6,7 @@
 
 ### Checklist
 
+- [ ] Adheres to the [development guidelines](https://github.com/aws/serverless-application-model/blob/develop/DEVELOPMENT_GUIDE.md#development-guidelines)
 - [ ] Add/update [unit tests](https://github.com/aws/serverless-application-model/blob/develop/DEVELOPMENT_GUIDE.md#unit-testing-with-multiple-python-versions) using:
     - [ ] Correct values
     - [ ] Bad/wrong values (None, empty, wrong type, length, etc.)

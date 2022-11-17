@@ -6,142 +6,139 @@ Globals:
         CreateUsagePlan: SHARED
 
 Resources:
-   MyApiOne:
-     Type: AWS::Serverless::Api
-     Properties:
-       StageName: Prod
-       Auth:
-         UsagePlan:
+  MyApiOne:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        UsagePlan:
           CreateUsagePlan: NONE
 
-   MyApiTwo:
-     Type: AWS::Serverless::Api
-     Properties:
-       StageName: Prod
-       Auth:
-         UsagePlan:
-           CreateUsagePlan: PER_API
-           UsagePlanName: SomeRandomName
-           Description: "Description for usage plan"
-           Throttle:
-             BurstLimit: 1000
-             RateLimit: 1000
-           Tags:
-             - Key: key1
-               Value: value1
-             - Key: key2
-               Value: value2
-           Quota:
-             Limit: 10
-             Offset: 10
-             Period: MONTH
+  MyApiTwo:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          UsagePlanName: SomeRandomName
+          Description: Description for usage plan
+          Throttle:
+            BurstLimit: 1000
+            RateLimit: 1000
+          Tags:
+          - Key: key1
+            Value: value1
+          - Key: key2
+            Value: value2
+          Quota:
+            Limit: 10
+            Offset: 10
+            Period: MONTH
 
 
-   MyApiThree:
-     Type: AWS::Serverless::Api
-     Properties:
-       StageName: Prod
+  MyApiThree:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
 
-   MyFunctionOne:
-     Type: AWS::Serverless::Function
-     Properties:
-       Handler: index.handler
-       Runtime: nodejs12.x
-       InlineCode: |
-         exports.handler = async (event) => {
-           return {
-           statusCode: 200,
-           body: JSON.stringify(event),
-           headers: {}
-           }
-         }
-       Events:
-         ApiKey:
-           Type: Api
-           Properties:
-             RestApiId:
-               Ref: MyApiOne
-             Method: get
-             Path: /path/one
-         ApiKeyAnyMethod:
-           Type: Api
-           Properties:
-             RestApiId:
-               Ref: MyApiOne
-             Method: any
-             Path: /any/path/one
+  MyFunctionOne:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event) => {
+          return {
+          statusCode: 200,
+          body: JSON.stringify(event),
+          headers: {}
+          }
+        }
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiOne
+            Method: get
+            Path: /path/one
+        ApiKeyAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiOne
+            Method: any
+            Path: /any/path/one
 
-   MyFunctionTwo:
-     Type: AWS::Serverless::Function
-     Properties:
-       Handler: index.handler
-       Runtime: nodejs12.x
-       InlineCode: |
-         exports.handler = async (event) => {
-           return {
-           statusCode: 200,
-           body: JSON.stringify(event),
-           headers: {}
-           }
-         }
-       Events:
-         ApiKey:
-           Type: Api
-           Properties:
-             RestApiId:
-               Ref: MyApiTwo
-             Method: get
-             Path: /path/two
-         ImplicitApiEvent:
-           Type: Api
-           Properties:
-             Method: get
-             Path: /path/event
+  MyFunctionTwo:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event) => {
+          return {
+          statusCode: 200,
+          body: JSON.stringify(event),
+          headers: {}
+          }
+        }
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiTwo
+            Method: get
+            Path: /path/two
+        ImplicitApiEvent:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /path/event
 
-   MyFunctionThree:
-     Type: AWS::Serverless::Function
-     Properties:
-       Handler: index.handler
-       Runtime: nodejs12.x
-       InlineCode: |
-         exports.handler = async (event) => {
-           return {
-           statusCode: 200,
-           body: JSON.stringify(event),
-           headers: {}
-           }
-         }
-       Events:
-         ApiKey:
-           Type: Api
-           Properties:
-             RestApiId:
-               Ref: MyApiThree
-             Method: get
-             Path: /path/three
+  MyFunctionThree:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event) => {
+          return {
+          statusCode: 200,
+          body: JSON.stringify(event),
+          headers: {}
+          }
+        }
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiThree
+            Method: get
+            Path: /path/three
 
 Outputs:
-    ApiOneUrl:
-      Description: "API endpoint URL for Prod environment"
-      Value:
-        Fn::Sub: 'https://${MyApiOne}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
-    ApiTwoUrl:
-      Description: "API endpoint URL for Prod environment"
-      Value:
-        Fn::Sub: 'https://${MyApiTwo}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
-    ApiThreeUrl:
-      Description: "API endpoint URL for Prod environment"
-      Value:
-        Fn::Sub: 'https://${MyApiThree}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
-    UsagePlan:
-      Description: "Usage Plan physical Id"
-      Value:
-        !Ref MyApiTwo.UsagePlan
-    UsagePlanKey:
-      Description: "Usage Plan Key"
-      Value:
-        !Ref MyApiTwo.UsagePlanKey
-    ApiKey:
-      Description: "Api Key"
-      Value:
-        !Ref MyApiThree.ApiKey
+  ApiOneUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApiOne}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  ApiTwoUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApiTwo}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  ApiThreeUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApiThree}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  UsagePlan:
+    Description: Usage Plan physical Id
+    Value: !Ref MyApiTwo.UsagePlan
+  UsagePlanKey:
+    Description: Usage Plan Key
+    Value: !Ref MyApiTwo.UsagePlanKey
+  ApiKey:
+    Description: Api Key
+    Value: !Ref MyApiThree.ApiKey

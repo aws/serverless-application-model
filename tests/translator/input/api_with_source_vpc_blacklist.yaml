@@ -2,7 +2,7 @@ Globals:
   Api:
     Auth:
       ResourcePolicy:
-        SourceVpcBlacklist: ['vpce-3456']
+        SourceVpcBlacklist: [vpce-3456]
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
@@ -28,4 +28,3 @@ Resources:
           Properties:
             Method: any
             Path: /any/get
-        

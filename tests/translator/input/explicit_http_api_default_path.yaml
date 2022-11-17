@@ -1,0 +1,45 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        HttpApiANYdefault:
+          Type: HttpApi
+          Properties:
+            Path: /$default
+            Method: ANY
+            ApiId: !Ref HttpApi
+  Function2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        HttpApiANYhello:
+          Type: HttpApi
+          Properties:
+            Path: /hello
+            Method: ANY
+            ApiId: !Ref HttpApi
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefinitionBody:
+        openapi: '3.0'
+        info:
+          title: !Sub ${AWS::StackName}-HttpApi
+          version: '1.0'
+        paths:
+          /$default:
+            x-amazon-apigateway-any-method:
+              responses: {}
+              isDefaultRoute: true
+          /hello:
+            x-amazon-apigateway-any-method:
+              responses: {}
+      FailOnWarnings: true

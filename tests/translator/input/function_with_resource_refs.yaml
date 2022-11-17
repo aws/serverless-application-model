@@ -6,7 +6,7 @@
 
 Resources:
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -14,7 +14,7 @@ Resources:
       AutoPublishAlias: live
 
   FunctionWithoutAlias:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -24,7 +24,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       Name:
-        Fn::GetAtt: ["MinimalFunction.Alias", "Name"]
+        Fn::GetAtt: [MinimalFunction.Alias, Name]
 
 Outputs:
   AliasArn:
@@ -39,13 +39,14 @@ Outputs:
 
   AliasInSub:
     Value:
-      Fn::Sub: ["Hello ${MinimalFunction.Alias} ${MinimalFunction.Alias.Name} ${SomeValue}", {"SomeValue": "World"}]
+      Fn::Sub: ['Hello ${MinimalFunction.Alias} ${MinimalFunction.Alias.Name} ${SomeValue}',
+        SomeValue: World]
 
   VersionArn:
     Value: !Ref MinimalFunction.Version
   VersionNumber:
     Value:
-      Fn::GetAtt: ["MinimalFunction.Version", "Version"]
+      Fn::GetAtt: [MinimalFunction.Version, Version]
 
   UnResolvedVersion:
     Value:

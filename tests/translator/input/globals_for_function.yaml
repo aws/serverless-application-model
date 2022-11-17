@@ -7,9 +7,9 @@ Globals:
     Timeout: 30
     VpcConfig:
       SecurityGroupIds:
-        - sg-edcd9784
+      - sg-edcd9784
       SubnetIds:
-        - sub-id-2
+      - sub-id-2
     Environment:
       Variables:
         Var1: value1
@@ -20,19 +20,19 @@ Globals:
     AutoPublishAlias: live
     PermissionsBoundary: arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary
     Layers:
-      - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1
+    - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1
     ReservedConcurrentExecutions: 50
     Architectures:
-      - x86_64
-    EphemeralStorage: 
+    - x86_64
+    EphemeralStorage:
       Size: 1024
 
 Resources:
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
 
   FunctionWithOverrides:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: index.handler
@@ -40,8 +40,8 @@ Resources:
       MemorySize: 512
       Timeout: 100
       VpcConfig:
-          SecurityGroupIds:
-          - sg-123
+        SecurityGroupIds:
+        - sg-123
       Environment:
         Variables:
           Var3: value3
@@ -51,6 +51,5 @@ Resources:
       AutoPublishAlias: prod
       PermissionsBoundary: arn:aws:1234:iam:boundary/OverridePermissionsBoundary
       Layers:
-        - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer2:2
+      - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer2:2
       ReservedConcurrentExecutions: 100
-

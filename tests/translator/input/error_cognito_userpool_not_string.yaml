@@ -12,7 +12,7 @@ Resources:
         OneTrigger:
           Type: Cognito
           Properties:
-            UserPool: 
+            UserPool:
               Ref:
-                - NotAString
+              - NotAString
             Trigger: PreSignUp

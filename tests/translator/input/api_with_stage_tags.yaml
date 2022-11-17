@@ -5,12 +5,12 @@ Parameters:
 
 Resources:
   MyApiWithStageTags:
-      Type: "AWS::Serverless::Api"
-      Properties:
-        StageName: Prod
-        Tags:
-          TagKey1: TagValue1
-          TagKey2: ""
-          TagKey3:
-            Ref: TagValueParam
-          TagKey4: "123"
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Tags:
+        TagKey1: TagValue1
+        TagKey2: ''
+        TagKey3:
+          Ref: TagValueParam
+        TagKey4: '123'

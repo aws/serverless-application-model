@@ -14,7 +14,7 @@ Resources:
           Properties:
             Auth:
               Authorizer: MyLambdaAuthUpdated
-            ApiId: 
+            ApiId:
               Ref: MyApi
             Method: POST
             Path: /post
@@ -36,16 +36,14 @@ Resources:
       Auth:
         Authorizers:
           MyLambdaAuthUpdated:
-            FunctionArn: 
+            FunctionArn:
               Fn::GetAtt:
-                - MyAuthFn
-                - Arn
+              - MyAuthFn
+              - Arn
             FunctionInvokeRole:
               Fn::GetAtt:
-                - MyAuthFnRole
-                - Arn
+              - MyAuthFnRole
+              - Arn
             Identity: LambdaAuthorizationIdentity
             AuthorizerPayloadFormatVersion: 1.0
         DefaultAuthorizer: MyLambdaAuthUpdated
-
-      

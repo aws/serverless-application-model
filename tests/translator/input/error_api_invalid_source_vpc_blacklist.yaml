@@ -2,7 +2,7 @@ Globals:
   Api:
     Auth:
       ResourcePolicy:
-        SourceVpcBlacklist: [{"sub":"SomeParameter"}]
+        SourceVpcBlacklist: [sub: SomeParameter]
 
 Parameters:
   SomeParameter:

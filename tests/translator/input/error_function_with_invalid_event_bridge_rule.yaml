@@ -1,4 +1,4 @@
-Transform: "AWS::Serverless-2016-10-31"
+Transform: AWS::Serverless-2016-10-31
 
 Resources:
   TestBucket:
@@ -6,7 +6,7 @@ Resources:
     Properties:
       BucketName: test-bucket
   TestFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: test-function
       InlineCode: |
@@ -23,13 +23,13 @@ Resources:
             Enabled: true
             Pattern:
               source:
-                - aws.s3
+              - aws.s3
               detail-type:
-                - Object Created
+              - Object Created
               detail:
                 bucket:
                   name:
-                    - "test-bucket"
+                  - test-bucket
                 object:
                   key:
-                    - prefix: "/"
+                  - prefix: /

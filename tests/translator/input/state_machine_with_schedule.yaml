@@ -1,6 +1,6 @@
 Resources:
   StateMachine:
-    Type: 'AWS::Serverless::StateMachine'
+    Type: AWS::Serverless::StateMachine
     Properties:
       DefinitionUri: s3://sam-demo-bucket/my_state_machine.asl.json
       Role: arn:aws:iam::123456123456:role/service-role/SampleRole
@@ -8,7 +8,32 @@ Resources:
         ScheduleEvent:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
             Name: TestSchedule
             Description: test schedule
-            Enabled: False
+            Enabled: false
+        ScheduleV2:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+        ScheduleV2MoreProperties:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            Name: test-scheduler
+            Description: Test Schedule
+            FlexibleTimeWindow:
+              Mode: FLEXIBLE
+              MaximumWindowInMinutes: 5
+            State: !Ref ScheduleState
+            StartDate: '2014-10-02T15:01:23'
+            EndDate: '2015-10-02T15:01:23'
+            ScheduleExpressionTimezone: UTC
+            GroupName: group-name
+            KmsKeyArn: !Ref KMSKeyArn
+            PermissionsBoundary: arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundaryForSchedule
+        ScheduleV2WithRole:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            RoleArn: !Sub 'arn:${AWS::Partition}:iam::role/yoyo'

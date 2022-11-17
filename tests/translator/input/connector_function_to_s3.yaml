@@ -16,10 +16,10 @@ Resources:
   MyConnector:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: MyFunction
-      Destination: 
+      Destination:
         Id: MyBucket
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write

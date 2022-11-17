@@ -15,7 +15,7 @@ class SamResource(object):
     type = None
     properties: Dict[str, Any] = {}  # TODO: Replace `Any` with something more specific
 
-    def __init__(self, resource_dict):
+    def __init__(self, resource_dict: Dict[str, Any]) -> None:
         """
         Initialize the object given the resource as a dictionary
 
@@ -31,7 +31,7 @@ class SamResource(object):
         # Properties is *not* required. Ex: SimpleTable resource has no required properties
         self.properties = resource_dict.get("Properties", {})
 
-    def valid(self):
+    def valid(self):  # type: ignore[no-untyped-def]
         """
         Checks if the resource data is valid
 
@@ -59,11 +59,11 @@ class SamResource(object):
                     [InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")]
                 )
 
-        return SamResourceType.has_value(self.type)
+        return SamResourceType.has_value(self.type)  # type: ignore[no-untyped-call]
 
-    def to_dict(self):
+    def to_dict(self):  # type: ignore[no-untyped-def]
 
-        if self.valid():
+        if self.valid():  # type: ignore[no-untyped-call]
             # Touch a resource dictionary ONLY if it is valid
             # Modify only Type & Properties section to preserve CloudFormation properties like DependsOn, Conditions etc
             self.resource_dict["Type"] = self.type
@@ -86,7 +86,7 @@ class SamResourceType(Enum):
     StateMachine = "AWS::Serverless::StateMachine"
 
     @classmethod
-    def has_value(cls, value):
+    def has_value(cls, value):  # type: ignore[no-untyped-def]
         """
         Checks if the given value belongs to the Enum
 

@@ -11,12 +11,12 @@ Resources:
   MySignedFunctionCodeSigningConfig:
     Type: AWS::Lambda::CodeSigningConfig
     Properties:
-      Description: "Code Signing for MySignedLambdaFunction"
+      Description: Code Signing for MySignedLambdaFunction
       AllowedPublishers:
         SigningProfileVersionArns:
-          - !GetAtt SigningProfile.ProfileVersionArn
+        - !GetAtt SigningProfile.ProfileVersionArn
       CodeSigningPolicies:
-        UntrustedArtifactOnDeployment: "Enforce"
+        UntrustedArtifactOnDeployment: Enforce
 
   SigningProfile:
     Type: AWS::Signer::SigningProfile

@@ -18,12 +18,12 @@ Parameters:
 Conditions:
   TrueCondition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
   FalseCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   MyLambdaFunction:
@@ -42,16 +42,16 @@ Resources:
               Ref: IntValue
             BisectBatchOnFunctionError:
               Fn::If:
-                - FalseCondition
-                - True
-                - False
+              - FalseCondition
+              - true
+              - false
             Enabled:
               Fn::If:
-                - TrueCondition
-                - True
-                - False
+              - TrueCondition
+              - true
+              - false
             FunctionResponseTypes:
-              - Ref: FunctionResponseTypesValue
+            - Ref: FunctionResponseTypesValue
             MaximumBatchingWindowInSeconds:
               Ref: IntValue
             MaximumRecordAgeInSeconds:
@@ -65,15 +65,15 @@ Resources:
             Stream:
               # Connect with the stream we have created in this template
               Fn::Join:
-                - ''
-                - - 'arn:'
-                  - Ref: AWS::Partition
-                  - ':kinesis:'
-                  - Ref: AWS::Region
-                  - ':'
-                  - Ref: AWS::AccountId
-                  - ':stream/'
-                  - Ref: MyStream
+              - ''
+              - - 'arn:'
+                - Ref: AWS::Partition
+                - ':kinesis:'
+                - Ref: AWS::Region
+                - ':'
+                - Ref: AWS::AccountId
+                - :stream/
+                - Ref: MyStream
             TumblingWindowInSeconds:
               Ref: IntValue
   MyStream:

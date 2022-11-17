@@ -1,10 +1,10 @@
 Parameters:
   DomainName:
     Type: String
-    Default: 'example.com'
+    Default: example.com
   ACMCertificateArn:
     Type: String
-    Default: 'cert-arn-in-us-east-1'
+    Default: cert-arn-in-us-east-1
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
@@ -35,7 +35,7 @@ Resources:
         DomainName: !Ref DomainName
         CertificateArn: !Ref ACMCertificateArn
         BasePath:
-          - /one
+        - /one
         Route53:
-         HostedZoneId: ZQ1UAL4EFZVME
-         IpV6: true
+          HostedZoneId: ZQ1UAL4EFZVME
+          IpV6: true

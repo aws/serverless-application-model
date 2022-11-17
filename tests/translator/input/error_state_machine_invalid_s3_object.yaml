@@ -6,8 +6,8 @@ Resources:
         Bucket: my-sam-demo-bucket
         Version: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-          - Effect: Deny
-            Action: "*"
-            Resource: "*"
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'

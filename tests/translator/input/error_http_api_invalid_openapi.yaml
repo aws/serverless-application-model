@@ -10,7 +10,7 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref Api
-  
+
   Api:
     Type: AWS::Serverless::HttpApi
     Properties:

@@ -10,7 +10,6 @@ Parameters:
     Type: String
 
 Resources:
-            
   ApiGatewayAdminOne:
     Type: AWS::Serverless::Api
     Properties:
@@ -18,9 +17,9 @@ Resources:
       StageName: Prod
       TracingEnabled: true
       MethodSettings:
-        - LoggingLevel: Info
-          ResourcePath: '/*'
-          HttpMethod: '*'
+      - LoggingLevel: Info
+        ResourcePath: /*
+        HttpMethod: '*'
       Domain:
         DomainName: admin.one.amazon.com
         CertificateArn: arn::cert::abc
@@ -30,7 +29,7 @@ Resources:
       EndpointConfiguration:
         Type: REGIONAL
 
-            
+
   ApiGatewayAdminTwo:
     Type: AWS::Serverless::Api
     Properties:
@@ -38,9 +37,9 @@ Resources:
       StageName: Prod
       TracingEnabled: true
       MethodSettings:
-        - LoggingLevel: Info
-          ResourcePath: '/*'
-          HttpMethod: '*'
+      - LoggingLevel: Info
+        ResourcePath: /*
+        HttpMethod: '*'
       Domain:
         DomainName: admin.two.amazon.com
         CertificateArn: arn::cert::abc
@@ -49,8 +48,8 @@ Resources:
           HostedZoneId: !Sub "{{MyHostedZoneId}}"
       EndpointConfiguration:
         Type: REGIONAL
-        
-            
+
+
   ApiGatewayAdminThree:
     Type: AWS::Serverless::Api
     Properties:
@@ -58,9 +57,9 @@ Resources:
       StageName: Prod
       TracingEnabled: true
       MethodSettings:
-        - LoggingLevel: Info
-          ResourcePath: '/*'
-          HttpMethod: '*'
+      - LoggingLevel: Info
+        ResourcePath: /*
+        HttpMethod: '*'
       Domain:
         DomainName: admin.three.amazon.com
         CertificateArn: arn::cert::abc

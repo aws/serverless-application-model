@@ -17,8 +17,8 @@ Resources:
       Runtime: nodejs12.x
       Timeout: 3
       Tags:
-        lambda:createdBy: "blah"
-        TagKey2: ""
+        lambda:createdBy: blah
+        TagKey2: ''
   SomeApplication:
     Type: AWS::Serverless::Application
     Properties:
@@ -26,4 +26,4 @@ Resources:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world
         SemanticVersion: 1.0.2
       Tags:
-        lambda:createdBy: "me"
+        lambda:createdBy: me

@@ -1,19 +1,19 @@
 Conditions:
   TestCondition:
     Fn::Equals:
-      - test
-      - test
+    - test
+    - test
 Resources:
   StateMachine:
     Type: AWS::Serverless::StateMachine
-    Condition: "TestCondition"
+    Condition: TestCondition
     Properties:
       Name: MyStateMachine
       Events:
         ScheduleEvent:
           Type: Schedule
           Properties:
-            Schedule: "rate(1 minute)"
+            Schedule: rate(1 minute)
             Name: TestSchedule
         CWEvent:
           Type: CloudWatchEvent
@@ -21,7 +21,7 @@ Resources:
             Pattern:
               detail:
                 state:
-                  - terminated
+                - terminated
         MyApiEvent:
           Type: Api
           Properties:

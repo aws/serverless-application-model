@@ -1,6 +1,6 @@
 Resources:
   SQSFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/queues.zip
       Handler: queue.sqs_handler

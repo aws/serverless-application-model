@@ -24,4 +24,3 @@ Resources:
           Properties:
             Path: /add
             Method: post
-

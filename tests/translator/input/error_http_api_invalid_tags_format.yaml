@@ -1,10 +1,10 @@
 Conditions:
   condition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
 Resources:
-  HttpApiFunction: 
+  HttpApiFunction:
     Condition: condition
     Type: AWS::Serverless::Function
     Properties:
@@ -25,7 +25,7 @@ Resources:
           title:
             Ref: AWS::StackName
         paths:
-          "/basic":
+          /basic:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -53,7 +53,7 @@ Resources:
             oauth2Auth:
               type: oauth2
               x-amazon-apigateway-authorizer:
-                identitySource: "$request.querystring.param"
+                identitySource: $request.querystring.param
                 type: jwt
                 jwtConfiguration:
                   audience:
@@ -62,7 +62,7 @@ Resources:
             OpenIdAuth:
               type: openIdConnect
               x-amazon-apigateway-authorizer:
-                identitySource: "$request.querystring.param"
+                identitySource: $request.querystring.param
                 type: jwt
                 jwtConfiguration:
                   audience:

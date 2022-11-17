@@ -1,8 +1,8 @@
 Conditions:
   Condition1:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
 
 Globals:
   Function:
@@ -14,7 +14,7 @@ Globals:
 Resources:
 
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -22,7 +22,7 @@ Resources:
 
   OtherFunction:
     Condition: Condition1
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -42,6 +42,3 @@ Resources:
           Principal:
             Service:
             - codedeploy.amazonaws.com
-
-
-

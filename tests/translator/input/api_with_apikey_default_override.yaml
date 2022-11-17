@@ -1,6 +1,6 @@
 Resources:
   MyApiWithAuth:
-    Type: "AWS::Serverless::Api"
+    Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:

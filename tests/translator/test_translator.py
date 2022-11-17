@@ -314,6 +314,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "http_api_explicit_stage",
                 "http_api_def_uri",
                 "explicit_http_api",
+                "explicit_http_api_with_name",
                 "http_api_custom_iam_auth",
                 "http_api_with_cors",
                 "http_api_description",

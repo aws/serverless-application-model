@@ -9,9 +9,9 @@ Resources:
         GetHtml:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Transform:
-                Name: 'AWS::Include'
+                Name: AWS::Include
                 Parameters: {Location: {Ref: HtmlApi}}
             Path: /
             Method: get

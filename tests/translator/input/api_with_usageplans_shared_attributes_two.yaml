@@ -8,12 +8,12 @@ Globals:
 Conditions:
   C1:
     Fn::Equals:
-      - test
-      - test
+    - test
+    - test
   C2:
     Fn::Equals:
-      - test
-      - test  
+    - test
+    - test
 
 Resources:
   MyApiOne:

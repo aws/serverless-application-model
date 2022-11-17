@@ -36,7 +36,7 @@ Resources:
       Auth:
         ResourcePolicy:
           AwsAccountBlacklist:
-            -
+          - 
   ApiResourcePolicyAwsAccountBlacklistItemNotString:
     Type: AWS::Serverless::Api
     Properties:
@@ -44,7 +44,7 @@ Resources:
       Auth:
         ResourcePolicy:
           AwsAccountBlacklist:
-            - 3
+          - 3
   ApiResourcePolicyAwsAccountBlacklistItemNotIntrinsic:
     Type: AWS::Serverless::Api
     Properties:
@@ -52,7 +52,7 @@ Resources:
       Auth:
         ResourcePolicy:
           AwsAccountBlacklist:
-            - Not: Intrinsic
+          - Not: Intrinsic
 
   # ResourcePolicy - AwsAccountWhitelist
   ApiResourcePolicyAwsAccountWhitelistEmpty:
@@ -76,7 +76,7 @@ Resources:
       Auth:
         ResourcePolicy:
           AwsAccountWhitelist:
-            -
+          - 
   ApiResourcePolicyAwsAccountWhitelistItemNotString:
     Type: AWS::Serverless::Api
     Properties:
@@ -84,7 +84,7 @@ Resources:
       Auth:
         ResourcePolicy:
           AwsAccountWhitelist:
-            - 3
+          - 3
   ApiResourcePolicyAwsAccountWhitelistItemNotIntrinsic:
     Type: AWS::Serverless::Api
     Properties:
@@ -92,7 +92,7 @@ Resources:
       Auth:
         ResourcePolicy:
           AwsAccountWhitelist:
-            - Not: Intrinsic
+          - Not: Intrinsic
 
   # ResourcePolicy - CustomStatements
   ApiResourcePolicyCustomStatementsEmpty:
@@ -116,7 +116,7 @@ Resources:
       Auth:
         ResourcePolicy:
           CustomStatements:
-            -
+          - 
   ApiResourcePolicyCustomStatementsItemNotObject:
     Type: AWS::Serverless::Api
     Properties:
@@ -124,7 +124,7 @@ Resources:
       Auth:
         ResourcePolicy:
           CustomStatements:
-            - 3
+          - 3
 
   # ResourcePolicy - IntrinsicVpcBlacklist
   ApiResourcePolicyIntrinsicVpcBlacklistEmpty:
@@ -148,7 +148,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpcBlacklist:
-            -
+          - 
   ApiResourcePolicyIntrinsicVpcBlacklistItemNotString:
     Type: AWS::Serverless::Api
     Properties:
@@ -156,7 +156,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpcBlacklist:
-            - 3
+          - 3
   ApiResourcePolicyIntrinsicVpcBlacklistItemNotIntrinsic:
     Type: AWS::Serverless::Api
     Properties:
@@ -164,7 +164,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpcBlacklist:
-            - Not: Intrinsic
+          - Not: Intrinsic
 
   # ResourcePolicy - IntrinsicVpcWhitelist
   ApiResourcePolicyIntrinsicVpcWhitelistEmpty:
@@ -188,7 +188,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpcWhitelist:
-            -
+          - 
   ApiResourcePolicyIntrinsicVpcWhitelistItemNotString:
     Type: AWS::Serverless::Api
     Properties:
@@ -196,7 +196,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpcWhitelist:
-            - 3
+          - 3
   ApiResourcePolicyIntrinsicVpcWhitelistItemNotIntrinsic:
     Type: AWS::Serverless::Api
     Properties:
@@ -204,7 +204,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpcWhitelist:
-            - Not: Intrinsic
+          - Not: Intrinsic
 
   # ResourcePolicy - IntrinsicVpceBlacklist
   ApiResourcePolicyIntrinsicVpceBlacklistEmpty:
@@ -228,7 +228,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpceBlacklist:
-            -
+          - 
   ApiResourcePolicyIntrinsicVpceBlacklistItemNotString:
     Type: AWS::Serverless::Api
     Properties:
@@ -236,7 +236,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpceBlacklist:
-            - 3
+          - 3
   ApiResourcePolicyIntrinsicVpceBlacklistItemNotIntrinsic:
     Type: AWS::Serverless::Api
     Properties:
@@ -244,7 +244,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpceBlacklist:
-            - Not: Intrinsic
+          - Not: Intrinsic
 
   # ResourcePolicy - IntrinsicVpceWhitelist
   ApiResourcePolicyIntrinsicVpceWhitelistEmpty:
@@ -268,7 +268,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpceWhitelist:
-            -
+          - 
   ApiResourcePolicyIntrinsicVpceWhitelistItemNotString:
     Type: AWS::Serverless::Api
     Properties:
@@ -276,7 +276,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpceWhitelist:
-            - 3
+          - 3
   ApiResourcePolicyIntrinsicVpceWhitelistItemNotIntrinsic:
     Type: AWS::Serverless::Api
     Properties:
@@ -284,7 +284,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IntrinsicVpceWhitelist:
-            - Not: Intrinsic
+          - Not: Intrinsic
 
   # ResourcePolicy - IpRangeBlacklist
   ApiResourcePolicyIpRangeBlacklistEmpty:
@@ -308,7 +308,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IpRangeBlacklist:
-            -
+          - 
   ApiResourcePolicyIpRangeBlacklistItemNotString:
     Type: AWS::Serverless::Api
     Properties:
@@ -316,7 +316,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IpRangeBlacklist:
-            - 3
+          - 3
 
   # ResourcePolicy - IpRangeWhitelist
   ApiResourcePolicyIpRangeWhitelistEmpty:
@@ -340,7 +340,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IpRangeWhitelist:
-            -
+          - 
   ApiResourcePolicyIpRangeWhitelistItemNotString:
     Type: AWS::Serverless::Api
     Properties:
@@ -348,7 +348,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IpRangeWhitelist:
-            - 3
+          - 3
 
   # ResourcePolicy - SourceVpcBlacklist
   ApiResourcePolicySourceVpcBlacklistEmpty:
@@ -372,7 +372,7 @@ Resources:
       Auth:
         ResourcePolicy:
           SourceVpcBlacklist:
-            -
+          - 
   ApiResourcePolicySourceVpcBlacklistItemNotString:
     Type: AWS::Serverless::Api
     Properties:
@@ -380,7 +380,7 @@ Resources:
       Auth:
         ResourcePolicy:
           SourceVpcBlacklist:
-            - 3
+          - 3
   ApiResourcePolicySourceVpcBlacklistItemWrongFormat:
     Type: AWS::Serverless::Api
     Properties:
@@ -388,7 +388,7 @@ Resources:
       Auth:
         ResourcePolicy:
           SourceVpcBlacklist:
-            - myvpc
+          - myvpc
 
   # ResourcePolicy - SourceVpcWhitelist
   ApiResourcePolicySourceVpcWhitelistEmpty:
@@ -412,7 +412,7 @@ Resources:
       Auth:
         ResourcePolicy:
           SourceVpcWhitelist:
-            -
+          - 
   ApiResourcePolicySourceVpcWhitelistItemNotString:
     Type: AWS::Serverless::Api
     Properties:
@@ -420,7 +420,7 @@ Resources:
       Auth:
         ResourcePolicy:
           SourceVpcWhitelist:
-            - 3
+          - 3
   ApiResourcePolicySourceVpcWhitelistItemWrongFormat:
     Type: AWS::Serverless::Api
     Properties:
@@ -428,4 +428,4 @@ Resources:
       Auth:
         ResourcePolicy:
           SourceVpcWhitelist:
-            - myvpc
+          - myvpc

@@ -3,11 +3,11 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       Subscription:
-        - Endpoint: !GetAtt 'MyQueue1.Arn'
-          Protocol: sqs
-        - Endpoint: !GetAtt 'MyQueue2.Arn'
-          Protocol: sqs
- 
+      - Endpoint: !GetAtt 'MyQueue1.Arn'
+        Protocol: sqs
+      - Endpoint: !GetAtt 'MyQueue2.Arn'
+        Protocol: sqs
+
   MyQueue1:
     Type: AWS::SQS::Queue
 
@@ -17,19 +17,19 @@ Resources:
   MyQueue1Connector:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: MySNSTopic
-      Destination: 
+      Destination:
         Id: MyQueue1
       Permissions:
-        - Write
+      - Write
 
   MyQueue2Connector:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: MySNSTopic
-      Destination: 
+      Destination:
         Id: MyQueue2
       Permissions:
-        - Write
+      - Write

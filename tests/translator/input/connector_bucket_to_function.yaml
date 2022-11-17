@@ -15,11 +15,11 @@ Resources:
     DependsOn: MyConnector
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: 'random-bucket-name'
+      BucketName: random-bucket-name
       NotificationConfiguration:
         LambdaConfigurations:
-          - Event: 's3:ObjectCreated:*'
-            Function: !GetAtt InvokedFunction.Arn
+        - Event: s3:ObjectCreated:*
+          Function: !GetAtt InvokedFunction.Arn
 
   MyConnector:
     Type: AWS::Serverless::Connector
@@ -30,4 +30,4 @@ Resources:
       Destination:
         Id: Function
       Permissions:
-        - Write
+      - Write

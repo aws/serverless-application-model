@@ -32,7 +32,7 @@ Resources:
       Destination:
         Arn: somearn
       Permissions:
-        - Write
+      - Write
 
   NonStrId:
     Type: AWS::Serverless::Connector
@@ -42,7 +42,7 @@ Resources:
       Destination:
         Id: 42
       Permissions:
-        - Write
+      - Write
 
   NonExistentLogicalId:
     Type: AWS::Serverless::Connector
@@ -52,7 +52,7 @@ Resources:
       Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write
 
   ResourceWithoutType:
     Type: AWS::Serverless::Connector
@@ -62,7 +62,7 @@ Resources:
       Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write
 
   UnsupportedType:
     Type: AWS::Serverless::Connector
@@ -72,7 +72,7 @@ Resources:
       Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write
 
   UnsupportedAccessCategory:
     Type: AWS::Serverless::Connector
@@ -82,7 +82,7 @@ Resources:
       Destination:
         Id: MyQueue
       Permissions:
-        - OKAY
+      - OKAY
 
   UnsupportedAccessCategoryCombination:
     Type: AWS::Serverless::Connector
@@ -92,7 +92,7 @@ Resources:
       Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write
 
   MissingRole:
     Type: AWS::Serverless::Connector
@@ -102,7 +102,7 @@ Resources:
       Destination:
         Id: MyQueue
       Permissions:
-        - Write
+      - Write
 
   MissingRoleDestination:
     Type: AWS::Serverless::Connector
@@ -112,8 +112,8 @@ Resources:
       Destination:
         Id: MyFunctionMissingRole
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write
 
   MissingSqsQueueUrl:
     Type: AWS::Serverless::Connector
@@ -123,7 +123,7 @@ Resources:
       Destination:
         Type: AWS::SQS::Queue
       Permissions:
-        - Write
+      - Write
 
   MissingLambdaFunctionArn:
     Type: AWS::Serverless::Connector
@@ -133,7 +133,7 @@ Resources:
       Destination:
         Type: AWS::Lambda::Function
       Permissions:
-        - Write
+      - Write
 
   MissingSnsTopicArn:
     Type: AWS::Serverless::Connector
@@ -143,7 +143,7 @@ Resources:
       Destination:
         Type: AWS::SNS::Topic
       Permissions:
-        - Write
+      - Write
 
   BothIdAndOtherProps:
     Type: AWS::Serverless::Connector
@@ -154,7 +154,7 @@ Resources:
         Id: SomeId
         Arn:
       Permissions:
-        - Write
+      - Write
 
   NoPermissionConnector:
     Type: AWS::Serverless::Connector

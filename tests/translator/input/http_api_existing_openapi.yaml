@@ -7,11 +7,11 @@ Globals:
   HttpApi:
     CorsConfiguration:
       AllowHeaders:
-        - x-apigateway-header
+      - x-apigateway-header
       AllowMethods:
-        - GET
+      - GET
       AllowOrigins:
-        - https://global.com
+      - https://global.com
       MaxAge: 6000
 
 Resources:
@@ -47,7 +47,7 @@ Resources:
     Properties:
       CorsConfiguration:
         AllowOrigins:
-          - "https://local.com"
+        - https://local.com
       DefinitionBody:
         info:
           version: '1.0'
@@ -55,12 +55,12 @@ Resources:
             Ref: AWS::StackName
         x-amazon-apigateway-cors:
           allowOrigins:
-            - "https://www.overriden.com"
+          - https://www.overriden.com
           allowMethods:
-            - "POST"
+          - POST
           maxAge: 3600
         paths:
-          "/basic":
+          /basic:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -72,14 +72,13 @@ Resources:
               - OpenIdAuth:
                 - scope3
               responses: {}
-          "/get/{something}/with/{params}":
+          /get/{something}/with/{params}:
             get:
               parameters:
-                - 
-                  name: something
-                  in: path
+              - name: something
+                in: path
               responses: {}
-          "/integration":
+          /integration:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -92,7 +91,7 @@ Resources:
                 - scope1
                 - scope2
               responses: {}
-          "$default":
+          $default:
             x-amazon-apigateway-any-method:
               isDefaultRoute: true
               security:
@@ -100,7 +99,7 @@ Resources:
                 - scope1
                 - scope2
               responses: {}
-          "/oauth2":
+          /oauth2:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -118,7 +117,7 @@ Resources:
             oauth2Auth:
               type: oauth2
               x-amazon-apigateway-authorizer:
-                identitySource: "$request.querystring.param"
+                identitySource: $request.querystring.param
                 type: jwt
                 jwtConfiguration:
                   audience:
@@ -127,7 +126,7 @@ Resources:
             OpenIdAuth:
               type: openIdConnect
               x-amazon-apigateway-authorizer:
-                identitySource: "$request.querystring.param"
+                identitySource: $request.querystring.param
                 type: jwt
                 jwtConfiguration:
                   audience:

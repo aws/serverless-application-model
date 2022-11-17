@@ -1,6 +1,6 @@
 Globals:
   Api:
-    Cors: "origins"
+    Cors: origins
 
 Resources:
   ApiFunction:
@@ -30,7 +30,7 @@ Resources:
     Properties:
       StageName: Prod
       Auth:
-        AddDefaultAuthorizerToCorsPreflight: False
+        AddDefaultAuthorizerToCorsPreflight: false
         DefaultAuthorizer: MyLambdaRequestAuth
         Authorizers:
           MyLambdaRequestAuth:
@@ -38,7 +38,7 @@ Resources:
             FunctionArn: !GetAtt MyAuthFn.Arn
             Identity:
               Headers:
-                - Authorization1
+              - Authorization1
 
   MyAuthFn:
     Type: AWS::Serverless::Function

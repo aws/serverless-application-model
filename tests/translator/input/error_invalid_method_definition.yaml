@@ -1,8 +1,8 @@
 Globals:
   Api:
-    Name: "some api"
-    CacheClusterEnabled: True
-    CacheClusterSize: "1.6"
+    Name: some api
+    CacheClusterEnabled: true
+    CacheClusterSize: '1.6'
     Auth:
       DefaultAuthorizer: MyCognitoAuth
       Authorizers:
@@ -35,15 +35,15 @@ Resources:
           version: '1.0'
           title: !Ref AWS::StackName
         paths:
-          "/":
+          /:
             parameters:
-              - name: domain
-                in: path
-                description: Application domain
-                type: string
-                required: true
+            - name: domain
+              in: path
+              description: Application domain
+              type: string
+              required: true
             tags:
-              - InvalidMethodDefinition
+            - InvalidMethodDefinition
             get:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -59,8 +59,8 @@ Resources:
         PasswordPolicy:
           MinimumLength: 8
       UsernameAttributes:
-        - email
+      - email
       Schema:
-        - AttributeDataType: String
-          Name: email
-          Required: false
+      - AttributeDataType: String
+        Name: email
+        Required: false

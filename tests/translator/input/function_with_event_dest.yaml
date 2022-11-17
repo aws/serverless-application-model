@@ -5,14 +5,14 @@ Parameters:
   UseExistingQueue:
     Type: String
     AllowedValues:
-      - true
-      - false
+    - true
+    - false
     Default: true
   CreateSNSTopic:
     Type: String
     AllowedValues:
-      - true
-      - false
+    - true
+    - false
     Default: true
 Conditions:
   QueueCreationDisabled: !Equals [!Ref UseExistingQueue, true]
@@ -28,9 +28,9 @@ Resources:
           OnSuccess:
             Type: SQS
             Destination: !If [QueueCreationDisabled, !Ref SQSArn, !Ref 'AWS::NoValue']
-          OnFailure: 
+          OnFailure:
             Type: SNS
-            Destination: !If [TopicCreationEnabled, !Ref 'AWS::NoValue', 'SOME-SNS-ARN']
+            Destination: !If [TopicCreationEnabled, !Ref 'AWS::NoValue', SOME-SNS-ARN]
       InlineCode: |
         exports.handler = function(event, context, callback) {
             var event_received_at = new Date().toISOString();
@@ -60,7 +60,7 @@ Resources:
           OnSuccess:
             Type: Lambda
             Destination: !GetAtt DestinationLambda.Arn
-          OnFailure: 
+          OnFailure:
             Type: EventBridge
             Destination: event-bus-arn
       InlineCode: |
@@ -100,7 +100,7 @@ Resources:
   SNSSubscription:
     Type: AWS::SNS::Subscription
     Condition: TopicCreationEnabled
-    Properties: 
+    Properties:
       Endpoint: example@example.com
       Protocol: email
-      TopicArn: !Ref MyTestFunction.DestinationTopic 
+      TopicArn: !Ref MyTestFunction.DestinationTopic

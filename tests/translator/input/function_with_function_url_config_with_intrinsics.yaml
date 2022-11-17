@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Parameters: 
+Parameters:
   AuthorizationTypeRef:
-      Type: String
-      Default: NONE
+    Type: String
+    Default: NONE
 
   AllowOriginsRef:
-      Type: CommaDelimitedList
-      Default: "https://example.com"
+    Type: CommaDelimitedList
+    Default: https://example.com
 
   AllowMethodsRef:
-      Type: CommaDelimitedList
-      Default: "GET"
+    Type: CommaDelimitedList
+    Default: GET
 
 Resources:
   MyFunction:
@@ -25,7 +25,5 @@ Resources:
       FunctionUrlConfig:
         AuthType: !Ref AuthorizationTypeRef
         Cors:
-            AllowOrigins: !Ref AllowOriginsRef
-            AllowMethods: !Ref AllowMethodsRef
-            
-
+          AllowOrigins: !Ref AllowOriginsRef
+          AllowMethods: !Ref AllowMethodsRef
