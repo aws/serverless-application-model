@@ -1,3 +1,3 @@
 {
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyFunction] is invalid. AllowOrigin is not a valid property for configuring Cors."
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [MyFunction] is invalid. AllowOrigin is not a valid property for configuring Cors. Resource with id [MyFunction2] is invalid. Invalid type for 'Cors'. It must be a dictionary."
 }
