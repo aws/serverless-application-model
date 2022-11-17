@@ -39,6 +39,7 @@ class HttpApiGenerator(object):
         depends_on: Optional[List[str]],
         definition_body: Optional[Dict[str, Any]],
         definition_uri: Optional[Intrinsicable[str]],
+        name: Optional[Any],
         stage_name: Optional[Intrinsicable[str]],
         tags: Optional[Dict[str, Intrinsicable[str]]] = None,
         auth: Optional[Dict[str, Intrinsicable[str]]] = None,
@@ -60,6 +61,7 @@ class HttpApiGenerator(object):
         :param depends_on: Any resources that need to be depended on
         :param definition_body: API definition
         :param definition_uri: URI to API definition
+        :param name: Name of the API Gateway resource
         :param stage_name: Name of the Stage
         :param tags: Stage and API Tags
         :param access_log_settings: Whether to send access logs and where for Stage
@@ -73,6 +75,7 @@ class HttpApiGenerator(object):
         self.definition_body = definition_body
         self.definition_uri = definition_uri
         self.stage_name = stage_name
+        self.name = name
         if not self.stage_name:
             self.stage_name = DefaultStageName
         self.auth = auth
@@ -113,6 +116,7 @@ class HttpApiGenerator(object):
         if self.disable_execute_api_endpoint is not None:
             self._add_endpoint_configuration()
 
+        self._add_title()
         self._add_description()
 
         if self.definition_uri:
@@ -672,6 +676,27 @@ class HttpApiGenerator(object):
 
         open_api_editor = OpenApiEditor(self.definition_body)
         open_api_editor.add_description(self.description)
+        self.definition_body = open_api_editor.openapi
+
+    def _add_title(self) -> None:
+        if not self.name:
+            return
+
+        if not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Name works only with inline OpenApi specified in the 'DefinitionBody' property.",
+            )
+
+        if self.definition_body.get("info", {}).get("title") != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to set Name because it is already defined within inline OpenAPI specified in the "
+                "'DefinitionBody' property.",
+            )
+
+        open_api_editor = OpenApiEditor(self.definition_body)
+        open_api_editor.add_title(self.name)
         self.definition_body = open_api_editor.openapi
 
     @cw_timer(prefix="Generator", name="HttpApi")  # type: ignore[misc]
