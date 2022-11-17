@@ -470,9 +470,7 @@ class HttpApiGenerator(object):
 
         # authorizers is guaranteed to return a value or raise an exception
         open_api_editor.add_authorizers_security_definitions(authorizers)
-        self._set_default_authorizer(
-            open_api_editor, authorizers, auth_properties.DefaultAuthorizer, auth_properties.Authorizers
-        )
+        self._set_default_authorizer(open_api_editor, authorizers, auth_properties.DefaultAuthorizer)
         self.definition_body = open_api_editor.openapi
 
     def _add_tags(self) -> None:
@@ -510,7 +508,6 @@ class HttpApiGenerator(object):
         open_api_editor: OpenApiEditor,
         authorizers: Dict[str, ApiGatewayV2Authorizer],
         default_authorizer: str,
-        api_authorizers: Dict[str, Any],
     ) -> None:
         """
         Sets the default authorizer if one is given in the template
@@ -540,7 +537,7 @@ class HttpApiGenerator(object):
             )
 
         for path in open_api_editor.iter_on_path():
-            open_api_editor.set_path_default_authorizer(path, default_authorizer, authorizers, api_authorizers)
+            open_api_editor.set_path_default_authorizer(path, default_authorizer, authorizers)
 
     def _get_authorizers(
         self, authorizers_config: Any, enable_iam_authorizer: bool = False

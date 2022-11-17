@@ -1,7 +1,8 @@
 ﻿import copy
 import re
-from typing import Dict, Any
+from typing import Dict, Any, Iterator
 
+from samtranslator.model.apigateway import ApiGatewayAuthorizer
 from samtranslator.model.intrinsics import ref, make_conditional, fnSub, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
@@ -64,7 +65,7 @@ class SwaggerEditor(object):
         # each path item object must be a dict (even it is empty).
         # We can do an early path validation on path item objects,
         # so we don't need to validate wherever we use them.
-        for path in self.iter_on_path():  # type: ignore[no-untyped-call]
+        for path in self.iter_on_path():
             for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
                 SwaggerEditor.validate_path_item_is_dict(path_item, path)  # type: ignore[no-untyped-call]
 
@@ -326,7 +327,7 @@ class SwaggerEditor(object):
         CALLER_CREDENTIALS_ARN = "arn:aws:iam::*:user/*"
         return invoke_role if invoke_role and invoke_role != "CALLER_CREDENTIALS" else CALLER_CREDENTIALS_ARN
 
-    def iter_on_path(self):  # type: ignore[no-untyped-def]
+    def iter_on_path(self) -> Iterator[str]:
         """
         Yields all the paths available in the Swagger. As a caller, if you add new paths to Swagger while iterating,
         they will not show up in this iterator
@@ -632,9 +633,13 @@ class SwaggerEditor(object):
         if "api_key" not in self.security_definitions:
             self.security_definitions.update(api_key_security_definition)
 
-    def set_path_default_authorizer(  # type: ignore[no-untyped-def]
-        self, path, default_authorizer, authorizers, add_default_auth_to_preflight=True, api_authorizers=None
-    ):
+    def set_path_default_authorizer(
+        self,
+        path: str,
+        default_authorizer: str,
+        authorizers: Dict[str, ApiGatewayAuthorizer],
+        add_default_auth_to_preflight: bool = True,
+    ) -> None:
         """
         Adds the default_authorizer to the security block for each method on this path unless an Authorizer
         was defined at the Function/Path/Method level. This is intended to be used to set the
@@ -701,7 +706,7 @@ class SwaggerEditor(object):
             # No existing Authorizer found; use default
             else:
                 security_dict = Py27Dict()
-                security_dict[default_authorizer] = self._get_authorization_scopes(api_authorizers, default_authorizer)  # type: ignore[no-untyped-call]
+                security_dict[default_authorizer] = self._get_authorization_scopes(authorizers, default_authorizer)
                 authorizer_security = [security_dict]
 
             security = existing_non_authorizer_security + authorizer_security
@@ -1374,18 +1379,15 @@ class SwaggerEditor(object):
         return skeleton
 
     @staticmethod
-    def _get_authorization_scopes(authorizers, default_authorizer):  # type: ignore[no-untyped-def]
+    def _get_authorization_scopes(authorizers: Dict[str, ApiGatewayAuthorizer], default_authorizer: str) -> Any:
         """
         Returns auth scopes for an authorizer if present
         :param authorizers: authorizer definitions
         :param default_authorizer: name of the default authorizer
         """
-        if authorizers is not None:
-            if (
-                authorizers.get(default_authorizer)
-                and authorizers[default_authorizer].get("AuthorizationScopes") is not None
-            ):
-                return authorizers[default_authorizer].get("AuthorizationScopes")
+        authorizer = authorizers.get(default_authorizer)
+        if authorizer and authorizer.authorization_scopes is not None:
+            return authorizer.authorization_scopes
         return []
 
     @staticmethod
