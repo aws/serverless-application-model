@@ -1,6 +1,18 @@
 [
-  { "LogicalResourceId":"MyCognitoUserPool", "ResourceType":"AWS::Cognito::UserPool" },
-  { "LogicalResourceId":"PreSignupLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"PreSignupLambdaFunctionCognitoPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"PreSignupLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" }
+  {
+    "LogicalResourceId": "MyCognitoUserPool",
+    "ResourceType": "AWS::Cognito::UserPool"
+  },
+  {
+    "LogicalResourceId": "PreSignupLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "PreSignupLambdaFunctionCognitoPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "PreSignupLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
 ]

@@ -1,4 +1,10 @@
 [
-  { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGatewayV2::Api"},
-  { "LogicalResourceId":"MyApiApiGatewayDefaultStage", "ResourceType":"AWS::ApiGatewayV2::Stage" }
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "MyApiApiGatewayDefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  }
 ]

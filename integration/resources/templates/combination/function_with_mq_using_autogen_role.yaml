@@ -37,7 +37,7 @@ Resources:
     Properties:
       RouteTableId:
         Ref: RouteTable
-      DestinationCidrBlock: '0.0.0.0/0'
+      DestinationCidrBlock: 0.0.0.0/0
       GatewayId:
         Ref: PreCreatedInternetGateway
 
@@ -57,26 +57,26 @@ Resources:
       VpcId:
         Ref: PreCreatedVpc
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 8162
-          ToPort: 8162
-          CidrIp: '0.0.0.0/0'
-        - IpProtocol: tcp
-          FromPort: 61617
-          ToPort: 61617
-          CidrIp: '0.0.0.0/0'
-        - IpProtocol: tcp
-          FromPort: 5671
-          ToPort: 5671
-          CidrIp: '0.0.0.0/0'
-        - IpProtocol: tcp
-          FromPort: 61614
-          ToPort: 61614
-          CidrIp: '0.0.0.0/0'
-        - IpProtocol: tcp
-          FromPort: 8883
-          ToPort: 8883
-          CidrIp: '0.0.0.0/0'
+      - IpProtocol: tcp
+        FromPort: 8162
+        ToPort: 8162
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 61617
+        ToPort: 61617
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 5671
+        ToPort: 5671
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 61614
+        ToPort: 61614
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8883
+        ToPort: 8883
+        CidrIp: 0.0.0.0/0
 
   MyMqBroker:
     Properties:
@@ -92,17 +92,17 @@ Resources:
       PubliclyAccessible: true
       AutoMinorVersionUpgrade: false
       SecurityGroups:
-        - Ref: MQSecurityGroup
+      - Ref: MQSecurityGroup
       SubnetIds:
-        - Ref: PreCreatedSubnetTwo
+      - Ref: PreCreatedSubnetTwo
       Users:
-        - ConsoleAccess: true
-          Groups:
-            - admin
-          Username:
-            Ref: MQBrokerUser
-          Password:
-            Ref: MQBrokerPassword
+      - ConsoleAccess: true
+        Groups:
+        - admin
+        Username:
+          Ref: MQBrokerUser
+        Password:
+          Ref: MQBrokerPassword
     Type: AWS::AmazonMQ::Broker
 
   MyLambdaFunction:
@@ -118,11 +118,11 @@ Resources:
             Broker:
               Fn::GetAtt: MyMqBroker.Arn
             Queues:
-              - "TestQueue"
+            - TestQueue
             SourceAccessConfigurations:
-              - Type: BASIC_AUTH
-                URI:
-                  Ref: MQBrokerUserSecret
+            - Type: BASIC_AUTH
+              URI:
+                Ref: MQBrokerUserSecret
 
   MQBrokerUserSecret:
     Type: AWS::SecretsManager::Secret
@@ -132,3 +132,5 @@ Resources:
       SecretString:
         Fn::Sub: '{"username":"${MQBrokerUser}","password":"${MQBrokerPassword}"}'
       Description: SecretsManager Secret for broker user and password
+Metadata:
+  SamTransformTest: true

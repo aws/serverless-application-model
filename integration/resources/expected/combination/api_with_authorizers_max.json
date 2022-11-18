@@ -1,21 +1,78 @@
 [
-  { "LogicalResourceId":"LambdaAuthInvokeRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"MyApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-  { "LogicalResourceId":"MyApiMyLambdaRequestAuthAuthorizerPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyApiMyLambdaTokenAuthAuthorizerPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
-  { "LogicalResourceId":"MyCognitoUserPool", "ResourceType":"AWS::Cognito::UserPool" },
-  { "LogicalResourceId":"MyCognitoUserPoolTwo", "ResourceType":"AWS::Cognito::UserPool" },
-  { "LogicalResourceId":"MyCognitoUserPoolClient", "ResourceType":"AWS::Cognito::UserPoolClient" },
-  { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyFunctionCognitoPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyFunctionNonePermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyFunctionLambdaRequestPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyFunctionLambdaTokenPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyFunctionIamPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyLambdaAuthFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaAuthFunctionApiPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyLambdaAuthFunctionRole", "ResourceType":"AWS::IAM::Role" }
+  {
+    "LogicalResourceId": "LambdaAuthInvokeRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "MyApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "MyApiMyLambdaRequestAuthAuthorizerPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApiMyLambdaTokenAuthAuthorizerPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApiProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "MyCognitoUserPool",
+    "ResourceType": "AWS::Cognito::UserPool"
+  },
+  {
+    "LogicalResourceId": "MyCognitoUserPoolTwo",
+    "ResourceType": "AWS::Cognito::UserPool"
+  },
+  {
+    "LogicalResourceId": "MyCognitoUserPoolClient",
+    "ResourceType": "AWS::Cognito::UserPoolClient"
+  },
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionCognitoPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionNonePermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionLambdaRequestPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionLambdaTokenPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionIamPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaAuthFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaAuthFunctionApiPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaAuthFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
 ]

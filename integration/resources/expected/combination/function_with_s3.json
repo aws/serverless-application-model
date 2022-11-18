@@ -1,6 +1,18 @@
 [
-  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyLambdaFunctionS3EventPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyBucket", "ResourceType":"AWS::S3::Bucket" }
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionS3EventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyBucket",
+    "ResourceType": "AWS::S3::Bucket"
+  }
 ]

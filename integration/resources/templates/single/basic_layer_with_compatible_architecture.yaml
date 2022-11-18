@@ -1,28 +1,30 @@
 Parameters:
-    Runtimes:
-        Type: CommaDelimitedList
-        Default: nodejs14.x
-    LayerName:
-        Type: String
-        Default: MyNamedLayerVersion
-    
+  Runtimes:
+    Type: CommaDelimitedList
+    Default: nodejs14.x
+  LayerName:
+    Type: String
+    Default: MyNamedLayerVersion
+
 
 Resources:
-    MyLayerVersion:
-        Type: AWS::Serverless::LayerVersion
-        Properties:
-            ContentUri: ${contenturi}
-            LayerName:
-                Ref: LayerName
-            CompatibleRuntimes:
-                Ref: Runtimes
-            CompatibleArchitectures: [x86_64, arm64]
+  MyLayerVersion:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: ${contenturi}
+      LayerName:
+        Ref: LayerName
+      CompatibleRuntimes:
+        Ref: Runtimes
+      CompatibleArchitectures: [x86_64, arm64]
 
 Outputs:
-    MyLayerArn:
-        Value:
-            Ref: MyLayerVersion
-    LayerName:
-        Value:
-            Ref: LayerName
-            
+  MyLayerArn:
+    Value:
+      Ref: MyLayerVersion
+  LayerName:
+    Value:
+      Ref: LayerName
+
+Metadata:
+  SamTransformTest: true

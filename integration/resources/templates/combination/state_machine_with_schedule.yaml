@@ -16,30 +16,32 @@ Resources:
             Result: World
             End: true
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Deny
-              Action: "*"
-              Resource: "*"
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
 
       Events:
         CWSchedule:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
             Description: test schedule
-            Enabled: False
+            Enabled: false
 
 Outputs:
   MyStateMachineArn:
-    Description: "ARN of the State Machine"
+    Description: ARN of the State Machine
     Value:
       Ref: MyStateMachine
   MyScheduleName:
-    Description: "Name of the Schedule rule created"
+    Description: Name of the Schedule rule created
     Value:
       Ref: MyStateMachineCWSchedule
   MyEventRole:
-    Description: "ARN of the role created for the Schedule rule"
+    Description: ARN of the role created for the Schedule rule
     Value:
       Ref: MyStateMachineCWScheduleRole
+Metadata:
+  SamTransformTest: true

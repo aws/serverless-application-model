@@ -12,10 +12,10 @@ Resources:
             Parameters:
               TopicArn: !Ref MyTopic
               Message: hello
-            End: True
+            End: true
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingIsNotStateMachineFunction"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingIsNotStateMachineFunction
 
   MyTopic:
     Type: AWS::SNS::Topic
@@ -28,4 +28,6 @@ Resources:
       Destination:
         Id: MyTopic
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true

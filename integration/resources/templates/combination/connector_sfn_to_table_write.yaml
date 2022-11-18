@@ -14,21 +14,21 @@ Resources:
               Item:
                 Id:
                   S: some-value
-            End: True
+            End: true
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingIsNotStateMachineFunction"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingIsNotStateMachineFunction
 
   MyTable:
     Type: AWS::DynamoDB::Table
     Properties:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: "Id"
-          AttributeType: "S"
+      - AttributeName: Id
+        AttributeType: S
       KeySchema:
-        - AttributeName: "Id"
-          KeyType: "HASH"
+      - AttributeName: Id
+        KeyType: HASH
 
   MyConnector:
     Type: AWS::Serverless::Connector
@@ -38,4 +38,6 @@ Resources:
       Destination:
         Id: MyTable
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true

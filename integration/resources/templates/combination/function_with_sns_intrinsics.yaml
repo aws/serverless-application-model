@@ -1,8 +1,8 @@
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   MyLambdaFunction:
@@ -21,18 +21,20 @@ Resources:
               Ref: MySnsTopic
             FilterPolicy:
               Fn::If:
-                - MyCondition
-                - price_usd:
-                    - numeric:
-                        - ">="
-                        - 100
-                - price_usd:
-                    - numeric:
-                        - "<"
-                        - 100
+              - MyCondition
+              - price_usd:
+                - numeric:
+                  - '>='
+                  - 100
+              - price_usd:
+                - numeric:
+                  - <
+                  - 100
             Region:
               Ref: AWS::Region
             SqsSubscription: true
 
   MySnsTopic:
     Type: AWS::SNS::Topic
+Metadata:
+  SamTransformTest: true

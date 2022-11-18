@@ -40,7 +40,7 @@ Resources:
             Auth:
               Authorizer: MyLambdaTokenAuth
               ApiKeyRequired: true
-  
+
   MyLambdaAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -70,26 +70,26 @@ Resources:
   MyFirstApiKey:
     Type: AWS::ApiGateway::ApiKey
     DependsOn:
-      - MyUsagePlan
+    - MyUsagePlan
     Properties:
       Enabled: true
       Value: at_least_20_characters
       StageKeys:
-        - RestApiId:
-            Ref: MyApi
-          StageName:
-            Ref: MyApi.Stage
+      - RestApiId:
+          Ref: MyApi
+        StageName:
+          Ref: MyApi.Stage
 
   MyUsagePlan:
     Type: AWS::ApiGateway::UsagePlan
     DependsOn:
-      - MyApi
+    - MyApi
     Properties:
       ApiStages:
-        - ApiId:
-            Ref: MyApi
-          Stage:
-            Ref: MyApi.Stage
+      - ApiId:
+          Ref: MyApi
+        Stage:
+          Ref: MyApi.Stage
 
   MyUsagePlanKey:
     Type: AWS::ApiGateway::UsagePlanKey
@@ -101,16 +101,18 @@ Resources:
       KeyType: API_KEY
 
 Outputs:
-    ApiKeyId:
-      Description: "API Key ID"
-      Value:
-        Fn::GetAtt: MyFirstApiKey.APIKeyId
-    ApiUrl:
-      Description: "API endpoint URL for Prod environment"
-      Value:
-        Fn::Sub: 'https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+  ApiKeyId:
+    Description: API Key ID
+    Value:
+      Fn::GetAtt: MyFirstApiKey.APIKeyId
+  ApiUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/
 
-    AuthorizerFunctionArn:
-      Description: "Authorizer Function Arn"
-      Value:
-        Fn::GetAtt: MyLambdaAuthFunction.Arn
+  AuthorizerFunctionArn:
+    Description: Authorizer Function Arn
+    Value:
+      Fn::GetAtt: MyLambdaAuthFunction.Arn
+Metadata:
+  SamTransformTest: true

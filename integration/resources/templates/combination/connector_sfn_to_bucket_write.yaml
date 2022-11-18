@@ -12,14 +12,14 @@ Resources:
           PutObject:
             Type: Task
             Parameters:
-              "Bucket": !Ref Bucket
-              "Body": {}
-              "Key": "MyData"
+              Bucket: !Ref Bucket
+              Body: {}
+              Key: MyData
             Resource: !Sub "arn:${AWS::Partition}:states:::aws-sdk:s3:putObject"
             End: true
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingIsNotStateMachineFunction"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingIsNotStateMachineFunction
 
   MyConnector:
     Type: AWS::Serverless::Connector
@@ -29,4 +29,6 @@ Resources:
       Destination:
         Id: Bucket
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true

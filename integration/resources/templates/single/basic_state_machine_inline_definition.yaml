@@ -16,8 +16,10 @@ Resources:
             Result: World
             End: true
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-          - Effect: Deny
-            Action: "*"
-            Resource: "*"
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
+Metadata:
+  SamTransformTest: true

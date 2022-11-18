@@ -19,8 +19,8 @@ Globals:
         TruststoreVersion: 0
       SecurityPolicy: TLS_1_2
       BasePath:
-        - /get
-        - /post
+      - /get
+      - /post
       Route53:
         HostedZoneId:
           Ref: HostedZoneId
@@ -45,16 +45,18 @@ Resources:
           Properties:
             Method: Get
             Path: /get
-            ApiId: 
+            ApiId:
               Ref: MyApi
         ImplicitPost:
           Type: HttpApi
           Properties:
             Method: Post
             Path: /post
-            ApiId: 
+            ApiId:
               Ref: MyApi
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: Prod
+Metadata:
+  SamTransformTest: true

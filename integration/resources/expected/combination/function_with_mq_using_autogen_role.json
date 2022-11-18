@@ -1,11 +1,38 @@
 [
-  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"PublicSubnetRouteTableAssociation", "ResourceType":"AWS::EC2::SubnetRouteTableAssociation" },
-  { "LogicalResourceId":"MQSecurityGroup", "ResourceType":"AWS::EC2::SecurityGroup" },
-  { "LogicalResourceId":"MyMqBroker", "ResourceType":"AWS::AmazonMQ::Broker" },
-  { "LogicalResourceId":"RouteTable", "ResourceType":"AWS::EC2::RouteTable" },
-  { "LogicalResourceId":"MQBrokerUserSecret", "ResourceType":"AWS::SecretsManager::Secret" },
-  { "LogicalResourceId":"MyLambdaFunctionMyMqEvent", "ResourceType":"AWS::Lambda::EventSourceMapping" },
-  { "LogicalResourceId":"Route", "ResourceType":"AWS::EC2::Route" }
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "PublicSubnetRouteTableAssociation",
+    "ResourceType": "AWS::EC2::SubnetRouteTableAssociation"
+  },
+  {
+    "LogicalResourceId": "MQSecurityGroup",
+    "ResourceType": "AWS::EC2::SecurityGroup"
+  },
+  {
+    "LogicalResourceId": "MyMqBroker",
+    "ResourceType": "AWS::AmazonMQ::Broker"
+  },
+  {
+    "LogicalResourceId": "RouteTable",
+    "ResourceType": "AWS::EC2::RouteTable"
+  },
+  {
+    "LogicalResourceId": "MQBrokerUserSecret",
+    "ResourceType": "AWS::SecretsManager::Secret"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionMyMqEvent",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  },
+  {
+    "LogicalResourceId": "Route",
+    "ResourceType": "AWS::EC2::Route"
+  }
 ]

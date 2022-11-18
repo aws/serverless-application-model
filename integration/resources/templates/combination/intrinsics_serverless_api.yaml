@@ -10,17 +10,17 @@ Parameters:
     Default: devstage
   CacheClusterEnabled:
     Type: String
-    Default: "true"
+    Default: 'true'
 
 Conditions:
   TrueCondition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
   FalseCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   MyLambdaFunction:
@@ -95,9 +95,9 @@ Resources:
           Ref: SwaggerKey
       Variables:
         Var1:
-          "Fn::Join": ["", ["a", "b"]]
+          Fn::Join: ['', [a, b]]
         Var2:
-          "Fn::Join": ["", ["1", "2"]]
+          Fn::Join: ['', ['1', '2']]
 
   MyApiFalseCondition:
     Type: AWS::Serverless::Api
@@ -112,7 +112,8 @@ Resources:
           Ref: SwaggerKey
       Variables:
         Var1:
-          "Fn::Join": ["", ["a", "b"]]
+          Fn::Join: ['', [a, b]]
         Var2:
-          "Fn::Join": ["", ["1", "2"]]
-
+          Fn::Join: ['', ['1', '2']]
+Metadata:
+  SamTransformTest: true

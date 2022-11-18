@@ -24,23 +24,25 @@ Resources:
             DeadLetterConfig:
               Arn:
                 Fn::GetAtt:
-                  - "MyDeadLetterQueue"
-                  - "Arn"
+                - MyDeadLetterQueue
+                - Arn
 
 Outputs:
   MyLambdaArn:
-    Description: "Arn of the Lambda target"
+    Description: Arn of the Lambda target
     Value:
       Fn::GetAtt:
-        - "MyLambdaFunction"
-        - "Arn"
+      - MyLambdaFunction
+      - Arn
   MyEventName:
-    Description: "Name of the CloudWatchEvent rule created"
+    Description: Name of the CloudWatchEvent rule created
     Value:
       Ref: MyLambdaFunctionCWEvent
   MyDLQArn:
-    Description: "Arn of the dead-letter queue provided for the CWE rule target"
+    Description: Arn of the dead-letter queue provided for the CWE rule target
     Value:
       Fn::GetAtt:
-        - "MyDeadLetterQueue"
-        - "Arn"
+      - MyDeadLetterQueue
+      - Arn
+Metadata:
+  SamTransformTest: true
