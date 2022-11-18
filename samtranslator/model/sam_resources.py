@@ -80,6 +80,7 @@ from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.utils.types import Intrinsicable
+from samtranslator.validator.value_validator import sam_expect
 
 
 class SamFunction(SamResourceMacro):
@@ -679,12 +680,7 @@ class SamFunction(SamResourceMacro):
                 self.logical_id,
                 "'DeadLetterQueue' requires Type and TargetArn properties to be specified.",
             )
-
-        if not isinstance(dlq_type, str):
-            raise InvalidResourceException(
-                self.logical_id,
-                "'DeadLetterQueue' property 'Type' should be of type str.",
-            )
+        sam_expect(dlq_type, self.logical_id, "DeadLetterQueue.Type").to_be_a_string()
 
         # Validate required Types
         if not dlq_type in self.dead_letter_queue_policy_actions:
@@ -1067,11 +1063,7 @@ class SamFunction(SamResourceMacro):
         if not cors or is_intrinsic(cors):
             return
 
-        if not isinstance(cors, dict):
-            raise InvalidResourceException(
-                lambda_function.logical_id,
-                "Invalid type for 'Cors'. It must be a dictionary.",
-            )
+        sam_expect(cors, lambda_function.logical_id, "FunctionUrlConfig.Cors").to_be_a_map()
 
         for prop_name, prop_value in cors.items():
             if prop_name not in cors_property_data_type:
@@ -1416,13 +1408,15 @@ class SamSimpleTable(SamResourceMacro):
         dynamodb_table = DynamoDBTable(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         if self.PrimaryKey:
-            if "Name" not in self.PrimaryKey or "Type" not in self.PrimaryKey:
-                raise InvalidResourceException(
-                    self.logical_id, "'PrimaryKey' is missing required Property 'Name' or 'Type'."
-                )
+            primary_key_name = sam_expect(
+                self.PrimaryKey.get("Name"), self.logical_id, "PrimaryKey.Name"
+            ).to_not_be_none()
+            primary_key_type = sam_expect(
+                self.PrimaryKey.get("Type"), self.logical_id, "PrimaryKey.Type"
+            ).to_not_be_none()
             primary_key = {
-                "AttributeName": self.PrimaryKey["Name"],
-                "AttributeType": self._convert_attribute_type(self.PrimaryKey["Type"]),
+                "AttributeName": primary_key_name,
+                "AttributeType": self._convert_attribute_type(primary_key_type),
             }
 
         else:

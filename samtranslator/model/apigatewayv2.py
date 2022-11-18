@@ -6,6 +6,7 @@ from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
+from samtranslator.validator.value_validator import sam_expect
 
 APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
 
@@ -181,17 +182,14 @@ class ApiGatewayV2Authorizer(object):
             )
 
         if self.identity:
-            if not isinstance(self.identity, dict):
-                raise InvalidResourceException(
-                    self.api_logical_id, self.name + " Lambda Authorizer property 'identity' is of invalid type."
-                )
+            sam_expect(self.identity, self.api_logical_id, f"Authorizer.{self.name}.Identity").to_be_a_map()
             headers = self.identity.get("Headers")
             if headers:
-                if not isinstance(headers, list) or any((not isinstance(header, str) for header in headers)):
-                    raise InvalidResourceException(
-                        self.api_logical_id,
-                        self.name + " Lambda Authorizer property identity's 'Headers' is of invalid type.",
-                    )
+                sam_expect(headers, self.api_logical_id, f"Authorizer.{self.name}.Identity.Headers").to_be_a_list()
+                for index, header in enumerate(headers):
+                    sam_expect(
+                        header, self.api_logical_id, f"Authorizer.{self.name}.Identity.Headers[{index}]"
+                    ).to_be_a_string()
 
     def generate_openapi(self) -> Dict[str, Any]:
         """
