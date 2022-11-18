@@ -266,7 +266,8 @@
           "title": "Rolename"
         },
         "Type": {
-          "title": "Type"
+          "title": "Type",
+          "type": "string"
         }
       },
       "additionalProperties": false
@@ -468,12 +469,25 @@
       ],
       "additionalProperties": false
     },
+    "SimpleTablePrimaryKey": {
+      "title": "SimpleTablePrimaryKey",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "title": "Name"
+        },
+        "Type": {
+          "title": "Type"
+        }
+      },
+      "additionalProperties": false
+    },
     "SimpleTableProperties": {
       "title": "SimpleTableProperties",
       "type": "object",
       "properties": {
         "PrimaryKey": {
-          "title": "Primarykey"
+          "$ref": "#/definitions/SimpleTablePrimaryKey"
         },
         "ProvisionedThroughput": {
           "title": "Provisionedthroughput"
@@ -485,7 +499,8 @@
           "title": "Tablename"
         },
         "Tags": {
-          "title": "Tags"
+          "title": "Tags",
+          "type": "object"
         }
       },
       "additionalProperties": false
