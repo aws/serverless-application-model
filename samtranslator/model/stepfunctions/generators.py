@@ -21,6 +21,8 @@ class StateMachineGenerator(object):
     _SAM_VALUE = "SAM"
     _SUBSTITUTION_NAME_TEMPLATE = "definition_substitution_%s"
     _SUBSTITUTION_KEY_TEMPLATE = "${definition_substitution_%s}"
+    SFN_INVALID_PROPERTY_BOTH_ROLE_POLICY = "Specify either 'Role' or 'Policies' (but not both at the same time) or neither of them"
+
 
     def __init__(  # type: ignore[no-untyped-def]
         self,
@@ -129,7 +131,7 @@ class StateMachineGenerator(object):
             )
 
         if self.role and self.policies:
-            raise InvalidResourceException(self.logical_id, "Specify 'Role' or 'Policies' or neither property.")
+            raise InvalidResourceException(self.logical_id, self.SFN_INVALID_PROPERTY_BOTH_ROLE_POLICY)
         if self.role:
             self.state_machine.RoleArn = self.role
         else:
@@ -205,7 +207,7 @@ class StateMachineGenerator(object):
         :rtype: model.iam.IAMRole
         """
         policies = self.policies[:]
-        if self.tracing and self.tracing.get("Enabled") is True and self.policies:
+        if self.tracing and self.tracing.get("Enabled") is True:
             policies.append(get_xray_managed_policy_name())  # type: ignore[no-untyped-call]
 
         state_machine_policies = ResourcePolicies(  # type: ignore[no-untyped-call]
