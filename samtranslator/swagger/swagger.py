@@ -657,7 +657,9 @@ class SwaggerEditor(object):
         for method_name, method_definition in self.iter_on_all_methods_for_path(path):  # type: ignore[no-untyped-call]
             if not (add_default_auth_to_preflight or method_name != "options"):
                 continue
-            existing_security = method_definition.get("security", [])
+            existing_security = method_definition.get("security")
+            if not existing_security:
+                existing_security = []
             authorizer_list = ["AWS_IAM"]
             if authorizers:
                 authorizer_list.extend(authorizers.keys())
@@ -730,7 +732,9 @@ class SwaggerEditor(object):
         """
 
         for method_name, method_definition in self.iter_on_all_methods_for_path(path):  # type: ignore[no-untyped-call]
-            existing_security = method_definition.get("security", [])
+            existing_security = method_definition.get("security")
+            if not existing_security:
+                existing_security = []
             apikey_security_names = set(["api_key", "api_key_false"])
             existing_non_apikey_security = []
             existing_apikey_security = []
@@ -815,7 +819,9 @@ class SwaggerEditor(object):
             authorizers = Py27Dict()
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
-            existing_security = method_definition.get("security", [])
+            existing_security = method_definition.get("security")
+            if not existing_security:
+                existing_security = []
 
             security_dict = Py27Dict()
             security_dict[authorizer_name] = []
@@ -854,7 +860,9 @@ class SwaggerEditor(object):
         :param bool apikey_required: Whether the apikey security is required
         """
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
-            existing_security = method_definition.get("security", [])
+            existing_security = method_definition.get("security")
+            if not existing_security:
+                existing_security = []
 
             if apikey_required:
                 # We want to enable apikey required security

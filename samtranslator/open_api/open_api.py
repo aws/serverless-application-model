@@ -413,7 +413,7 @@ class OpenApiEditor(object):
                         # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                         if not self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                             continue
-                        existing_security = method_definition.get("security", [])
+                        existing_security = method_definition.get("security")
                         if existing_security:
                             continue
 
@@ -461,7 +461,9 @@ class OpenApiEditor(object):
             authorization_scopes = []
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
-            existing_security = method_definition.get("security", [])
+            existing_security = method_definition.get("security")
+            if not existing_security:
+                existing_security = []
 
             security_dict = {}  # type: ignore[var-annotated]
             security_dict[authorizer_name] = []
