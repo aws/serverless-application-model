@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Literal
 
 from pydantic import BaseModel, Field
 
@@ -1876,6 +1876,19 @@ class AwsServerlessFunction(BaseModel):
     Type: Type4
 
 
+class ResourceReference(BaseModel):
+    Id: Optional[str]
+
+
+class ConnectorProperties(BaseModel):
+    Source: ResourceReference
+
+
+class AwsServerlessConnector(BaseModel):
+    Type: Literal["AWS::Serverless::Connector"]
+    Properties: ConnectorProperties
+
+
 class Model(BaseModel):
     AWSTemplateFormatVersion: Optional[str] = None
     Conditions: Optional[Any] = None
@@ -1890,6 +1903,7 @@ class Model(BaseModel):
         Union[
             AwsServerlessApi,
             AwsServerlessApplication,
+            AwsServerlessConnector,
             AwsServerlessFunction,
             AwsServerlessHttpApi,
             AwsServerlessLayerVersion,

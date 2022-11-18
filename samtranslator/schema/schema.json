@@ -40,6 +40,9 @@
             "$ref": "#/definitions/AwsServerlessApplication"
           },
           {
+            "$ref": "#/definitions/AwsServerlessConnector"
+          },
+          {
             "$ref": "#/definitions/AwsServerlessFunction"
           },
           {
@@ -1318,6 +1321,48 @@
       "required": [
         "Properties",
         "Type"
+      ]
+    },
+    "ResourceReference": {
+      "title": "ResourceReference",
+      "type": "object",
+      "properties": {
+        "Id": {
+          "title": "Id",
+          "type": "string"
+        }
+      }
+    },
+    "ConnectorProperties": {
+      "title": "ConnectorProperties",
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/ResourceReference"
+        }
+      },
+      "required": [
+        "Source"
+      ]
+    },
+    "AwsServerlessConnector": {
+      "title": "AwsServerlessConnector",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AWS::Serverless::Connector"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/ConnectorProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
       ]
     },
     "FunctionCode": {
