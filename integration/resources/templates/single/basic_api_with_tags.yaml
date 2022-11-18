@@ -5,5 +5,7 @@ Resources:
       StageName: my-new-stage-name
       DefinitionUri: ${definitionuri}
       Tags:
-       TagKey1: TagValue1
-       TagKey2: ""
+        TagKey1: TagValue1
+        TagKey2: ''
+Metadata:
+  SamTransformTest: true

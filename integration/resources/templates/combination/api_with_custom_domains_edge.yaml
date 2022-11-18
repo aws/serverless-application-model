@@ -41,8 +41,10 @@ Resources:
           Ref: MyEdgeDomainCert
         EndpointConfiguration: EDGE
         BasePath:
-          - /get
+        - /get
         Route53:
           HostedZoneId:
             Ref: HostedZoneId
           IpV6: true
+Metadata:
+  SamTransformTest: true

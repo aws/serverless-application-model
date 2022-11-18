@@ -1,46 +1,48 @@
 Parameters:
-    Retention:
-        Type: String
-        Default: Retain
-    License:
-        Type: String
-        Default: MIT-0
-    Runtimes:
-        Type: CommaDelimitedList
-        Default: nodejs14.x
-    LayerName:
-        Type: String
-        Default: MyNamedLayerVersion
-    Description:
-        Type: String
-        Default: Some description about this layer goes here
+  Retention:
+    Type: String
+    Default: Retain
+  License:
+    Type: String
+    Default: MIT-0
+  Runtimes:
+    Type: CommaDelimitedList
+    Default: nodejs14.x
+  LayerName:
+    Type: String
+    Default: MyNamedLayerVersion
+  Description:
+    Type: String
+    Default: Some description about this layer goes here
 
 Resources:
-    MyLayerVersion:
-        Type: AWS::Serverless::LayerVersion
-        Properties:
-            ContentUri: ${contenturi}
-            LayerName:
-                Ref: LayerName
-            RetentionPolicy:
-                Ref: Retention
-            CompatibleRuntimes:
-                Ref: Runtimes
-            LicenseInfo:
-                Ref: License
-            Description:
-                Ref: Description
+  MyLayerVersion:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: ${contenturi}
+      LayerName:
+        Ref: LayerName
+      RetentionPolicy:
+        Ref: Retention
+      CompatibleRuntimes:
+        Ref: Runtimes
+      LicenseInfo:
+        Ref: License
+      Description:
+        Ref: Description
 
 Outputs:
-    MyLayerArn:
-        Value:
-            Ref: MyLayerVersion
-    License:
-        Value:
-            Ref: License
-    Description:
-        Value:
-            Ref: Description
-    LayerName:
-        Value:
-            Ref: LayerName
+  MyLayerArn:
+    Value:
+      Ref: MyLayerVersion
+  License:
+    Value:
+      Ref: License
+  Description:
+    Value:
+      Ref: Description
+  LayerName:
+    Value:
+      Ref: LayerName
+Metadata:
+  SamTransformTest: true

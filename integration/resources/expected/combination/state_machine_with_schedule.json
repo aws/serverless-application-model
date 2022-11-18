@@ -1,6 +1,18 @@
 [
-  { "LogicalResourceId":"MyStateMachine", "ResourceType":"AWS::StepFunctions::StateMachine" },
-  { "LogicalResourceId":"MyStateMachineRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyStateMachineCWSchedule", "ResourceType":"AWS::Events::Rule" },
-  { "LogicalResourceId":"MyStateMachineCWScheduleRole", "ResourceType":"AWS::IAM::Role" }
+  {
+    "LogicalResourceId": "MyStateMachine",
+    "ResourceType": "AWS::StepFunctions::StateMachine"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineCWSchedule",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineCWScheduleRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
 ]

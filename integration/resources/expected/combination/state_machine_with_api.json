@@ -1,12 +1,42 @@
 [
-  { "LogicalResourceId":"MyStateMachine", "ResourceType":"AWS::StepFunctions::StateMachine" },
-  { "LogicalResourceId":"MyStateMachineRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"ExistingRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-  { "LogicalResourceId":"ExistingRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"ExistingRestApiDevStage", "ResourceType":"AWS::ApiGateway::Stage" },
-  { "LogicalResourceId":"ServerlessRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"ServerlessRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-  { "LogicalResourceId":"ServerlessRestApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
-  { "LogicalResourceId":"MyStateMachinePostApiRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyStateMachineGetApiRole", "ResourceType":"AWS::IAM::Role" }
+  {
+    "LogicalResourceId": "MyStateMachine",
+    "ResourceType": "AWS::StepFunctions::StateMachine"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "ExistingRestApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "ExistingRestApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "ExistingRestApiDevStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "MyStateMachinePostApiRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineGetApiRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
 ]

@@ -1,7 +1,7 @@
 Resources:
   Bucket:
     Type: AWS::S3::Bucket
-    
+
 
   TriggerStateMachine:
     Type: AWS::Serverless::StateMachine
@@ -12,13 +12,13 @@ Resources:
         States:
           ListBucket:
             Type: Task
-            Parameters: 
+            Parameters:
               Bucket: !Ref Bucket
             Resource: !Sub "arn:${AWS::Partition}:states:::aws-sdk:s3:listObjectsV2"
             End: true
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingIsNotStateMachineFunction"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingIsNotStateMachineFunction
 
   MyConnector:
     Type: AWS::Serverless::Connector
@@ -28,4 +28,6 @@ Resources:
       Destination:
         Id: Bucket
       Permissions:
-        - Read
+      - Read
+Metadata:
+  SamTransformTest: true

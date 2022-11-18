@@ -1,14 +1,50 @@
 [
-  { "LogicalResourceId":"helloworld4", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"helloworld4Role", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"helloworld4ApiEventPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"helloworld6", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"helloworld6Role", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"helloworld6ApiEventPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"helloworld8", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"helloworld8Role", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"helloworld8ApiEventPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"ServerlessRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"ServerlessRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-  { "LogicalResourceId":"ServerlessRestApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" }
+  {
+    "LogicalResourceId": "helloworld4",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "helloworld4Role",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "helloworld4ApiEventPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "helloworld6",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "helloworld6Role",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "helloworld6ApiEventPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "helloworld8",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "helloworld8Role",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "helloworld8ApiEventPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  }
 ]

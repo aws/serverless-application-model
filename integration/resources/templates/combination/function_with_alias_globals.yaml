@@ -19,3 +19,5 @@ Resources:
       Runtime: nodejs14.x
       CodeUri: ${codeuri}
       AutoPublishAlias: Live
+Metadata:
+  SamTransformTest: true

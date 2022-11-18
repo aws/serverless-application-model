@@ -14,9 +14,11 @@ Resources:
         Repeat:
           Type: Schedule
           Properties:
-              Schedule: 'rate(5 minutes)'
-              Input: '{"Hello": "world!"}'
-              Name:
-                Ref: ScheduleName
-              Description: test schedule
-              Enabled: True
+            Schedule: rate(5 minutes)
+            Input: '{"Hello": "world!"}'
+            Name:
+              Ref: ScheduleName
+            Description: test schedule
+            Enabled: true
+Metadata:
+  SamTransformTest: true

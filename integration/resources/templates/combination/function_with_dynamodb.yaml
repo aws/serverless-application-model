@@ -19,24 +19,26 @@ Resources:
             StartingPosition: TRIM_HORIZON
             TumblingWindowInSeconds: 120
             FunctionResponseTypes:
-              - ReportBatchItemFailures
+            - ReportBatchItemFailures
 
   MyTable:
     Type: AWS::DynamoDB::Table
     Properties:
 
       AttributeDefinitions:
-        - { AttributeName : id, AttributeType : S }
+      - {AttributeName: id, AttributeType: S}
 
       KeySchema:
-        - { "AttributeName" : "id", "KeyType" : "HASH"}
+      - {AttributeName: id, KeyType: HASH}
 
       ProvisionedThroughput:
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5"
+        ReadCapacityUnits: '5'
+        WriteCapacityUnits: '5'
 
       StreamSpecification:
-        StreamViewType: "NEW_IMAGE"
+        StreamViewType: NEW_IMAGE
 
 
 
+Metadata:
+  SamTransformTest: true

@@ -11,10 +11,10 @@ Resources:
             Resource: !Sub arn:${AWS::Partition}:states:::states:startExecution
             Parameters:
               StateMachineArn: !Ref MyStateMachine
-            End: True
+            End: true
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingDoesNotMatter"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingDoesNotMatter
 
   MyStateMachine:
     Type: AWS::Serverless::StateMachine
@@ -26,8 +26,8 @@ Resources:
           Success:
             Type: Succeed
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingDoesNotMatter"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingDoesNotMatter
 
   MyConnector:
     Type: AWS::Serverless::Connector
@@ -37,5 +37,7 @@ Resources:
       Destination:
         Id: MyStateMachine
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write
+Metadata:
+  SamTransformTest: true

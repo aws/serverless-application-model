@@ -1,29 +1,29 @@
 Resources:
- 
    # a function which has lambda signing configuration
    # due to the nature of the flow, we can't sign this package
    # and we are setting warning for signing config
-   MyUnsignedLambdaFunction:
-     Type: AWS::Serverless::Function
-     Properties:
-       Handler: index.handler
-       Runtime: nodejs14.x
-       CodeUri: ${codeuri}
-       MemorySize: 128
-       CodeSigningConfigArn: 
-         Ref: MySignedFunctionCodeSigningConfig
- 
-   MySignedFunctionCodeSigningConfig:
-     Type: AWS::Lambda::CodeSigningConfig
-     Properties:
-       Description: "Code Signing for MyUnsignedLambdaFunction"
-       AllowedPublishers:
-         SigningProfileVersionArns:
-           - Fn::GetAtt: MySigningProfile.ProfileVersionArn
-       CodeSigningPolicies:
-         UntrustedArtifactOnDeployment: "Warn"
- 
-   MySigningProfile:
-     Type: AWS::Signer::SigningProfile
-     Properties:
-       PlatformId: AWSLambda-SHA384-ECDSA
+  MyUnsignedLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+      CodeSigningConfigArn:
+        Ref: MySignedFunctionCodeSigningConfig
+
+  MySignedFunctionCodeSigningConfig:
+    Type: AWS::Lambda::CodeSigningConfig
+    Properties:
+      Description: Code Signing for MyUnsignedLambdaFunction
+      AllowedPublishers:
+        SigningProfileVersionArns:
+        - Fn::GetAtt: MySigningProfile.ProfileVersionArn
+      CodeSigningPolicies:
+        UntrustedArtifactOnDeployment: Warn
+  MySigningProfile:
+    Type: AWS::Signer::SigningProfile
+    Properties:
+      PlatformId: AWSLambda-SHA384-ECDSA
+Metadata:
+  SamTransformTest: true
