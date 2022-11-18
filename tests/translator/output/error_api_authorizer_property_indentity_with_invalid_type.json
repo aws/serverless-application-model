@@ -1,3 +1,3 @@
 {
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [MyApi] is invalid. MyLambdaAuthUpdated Lambda Authorizer property 'identity' is of invalid type. Resource with id [MyRestApi] is invalid. Invalid type for LambdaRequestIdentityNotObject Authorizer's Identity. It must be a dictionary."
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [MyApi] is invalid. Property 'Authorizer.MyLambdaAuthUpdated.Identity' should be a map. Resource with id [MyRestApi] is invalid. Property 'Authorizer.LambdaRequestIdentityNotObject.Identity' should be a map."
 }

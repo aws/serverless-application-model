@@ -27,6 +27,7 @@ from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)
 
@@ -525,12 +526,7 @@ class ApiGenerator(object):
         record_set_group = None
         if self.domain.get("Route53") is not None:
             route53 = self.domain.get("Route53")
-            if not isinstance(route53, dict):
-                raise InvalidResourceException(
-                    self.logical_id,
-                    "Invalid property type '{}' for Route53. "
-                    "Expected a map defines an Amazon Route 53 configuration'.".format(type(route53).__name__),
-                )
+            sam_expect(route53, self.logical_id, "Domain.Route53").to_be_a_map()
             if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
                 raise InvalidResourceException(
                     self.logical_id,

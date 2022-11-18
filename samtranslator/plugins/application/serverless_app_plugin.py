@@ -14,6 +14,7 @@ from samtranslator.public.sdk.template import SamTemplate
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.region_configuration import RegionConfiguration
+from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)
 
@@ -260,9 +261,7 @@ class ServerlessAppPlugin(BasePlugin):
         )
 
         app_id = resource_properties[self.LOCATION_KEY].get(self.APPLICATION_ID_KEY)
-
-        if not app_id:
-            raise InvalidResourceException(logical_id, "Property 'ApplicationId' cannot be blank.")
+        app_id = sam_expect(app_id, logical_id, "ApplicationId").to_not_be_none()
 
         if isinstance(app_id, dict):
             raise InvalidResourceException(
