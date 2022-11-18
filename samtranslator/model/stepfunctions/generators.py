@@ -21,8 +21,9 @@ class StateMachineGenerator(object):
     _SAM_VALUE = "SAM"
     _SUBSTITUTION_NAME_TEMPLATE = "definition_substitution_%s"
     _SUBSTITUTION_KEY_TEMPLATE = "${definition_substitution_%s}"
-    SFN_INVALID_PROPERTY_BOTH_ROLE_POLICY = "Specify either 'Role' or 'Policies' (but not both at the same time) or neither of them"
-
+    SFN_INVALID_PROPERTY_BOTH_ROLE_POLICY = (
+        "Specify either 'Role' or 'Policies' (but not both at the same time) or neither of them"
+    )
 
     def __init__(  # type: ignore[no-untyped-def]
         self,

@@ -69,8 +69,8 @@ class StepFunctionsStateMachine(TestCase):
             StateMachineGenerator(**self.kwargs).to_cloudformation()
         self.assertEqual(
             error.exception.message,
-            "Resource with id [StateMachineId] is invalid. " +
-            StateMachineGenerator.SFN_INVALID_PROPERTY_BOTH_ROLE_POLICY,
+            "Resource with id [StateMachineId] is invalid. "
+            + StateMachineGenerator.SFN_INVALID_PROPERTY_BOTH_ROLE_POLICY,
         )
 
     def test_state_machine_invalid_definition_uri_string(self):
