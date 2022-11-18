@@ -34,9 +34,14 @@ lint:
 	mypy --strict samtranslator bin
 	# Linter performs static analysis to catch latent bugs
 	pylint --rcfile .pylintrc samtranslator
+	# Ensure templates adhere to JSON schema
+	bin/validate.sh
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
+
+schema:
+	python samtranslator/schema/schema.py > samtranslator/schema/schema.json
 
 # Command to run everytime you make changes to verify everything works
 dev: test

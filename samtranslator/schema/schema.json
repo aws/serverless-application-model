@@ -1,0 +1,892 @@
+{
+  "title": "Model",
+  "type": "object",
+  "properties": {
+    "Globals": {
+      "$ref": "#/definitions/Globals"
+    },
+    "Resources": {
+      "title": "Resources",
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/AwsServerlessConnector"
+          },
+          {
+            "$ref": "#/definitions/AwsServerlessFunction"
+          },
+          {
+            "$ref": "#/definitions/AwsServerlessSimpleTable"
+          },
+          {
+            "$ref": "#/definitions/AwsServerlessStateMachine"
+          },
+          {
+            "$ref": "#/definitions/AwsServerlessLayerVersion"
+          },
+          {
+            "$ref": "#/definitions/AwsServerlessApi"
+          },
+          {
+            "$ref": "#/definitions/AwsServerlessHttpApi"
+          },
+          {
+            "$ref": "#/definitions/AwsServerlessApplication"
+          },
+          {
+            "$ref": "#/definitions/AnyNonServerlessResource"
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "Resources"
+  ],
+  "definitions": {
+    "GlobalsFunction": {
+      "title": "GlobalsFunction",
+      "type": "object",
+      "properties": {
+        "Handler": {
+          "title": "Handler"
+        },
+        "Runtime": {
+          "title": "Runtime"
+        },
+        "CodeUri": {
+          "title": "Codeuri"
+        },
+        "DeadLetterQueue": {
+          "title": "Deadletterqueue"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "MemorySize": {
+          "title": "Memorysize"
+        },
+        "Timeout": {
+          "title": "Timeout"
+        },
+        "VpcConfig": {
+          "title": "Vpcconfig"
+        },
+        "Environment": {
+          "title": "Environment"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "Tracing": {
+          "title": "Tracing"
+        },
+        "KmsKeyArn": {
+          "title": "Kmskeyarn"
+        },
+        "Layers": {
+          "title": "Layers"
+        },
+        "AutoPublishAlias": {
+          "title": "Autopublishalias"
+        },
+        "DeploymentPreference": {
+          "title": "Deploymentpreference"
+        },
+        "PermissionsBoundary": {
+          "title": "Permissionsboundary"
+        },
+        "ReservedConcurrentExecutions": {
+          "title": "Reservedconcurrentexecutions"
+        },
+        "ProvisionedConcurrencyConfig": {
+          "title": "Provisionedconcurrencyconfig"
+        },
+        "AssumeRolePolicyDocument": {
+          "title": "Assumerolepolicydocument"
+        },
+        "EventInvokeConfig": {
+          "title": "Eventinvokeconfig"
+        },
+        "Architectures": {
+          "title": "Architectures"
+        },
+        "EphemeralStorage": {
+          "title": "Ephemeralstorage"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GlobalsApi": {
+      "title": "GlobalsApi",
+      "type": "object",
+      "properties": {
+        "Auth": {
+          "title": "Auth"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "DefinitionUri": {
+          "title": "Definitionuri"
+        },
+        "CacheClusterEnabled": {
+          "title": "Cacheclusterenabled"
+        },
+        "CacheClusterSize": {
+          "title": "Cacheclustersize"
+        },
+        "Variables": {
+          "title": "Variables"
+        },
+        "EndpointConfiguration": {
+          "title": "Endpointconfiguration"
+        },
+        "MethodSettings": {
+          "title": "Methodsettings"
+        },
+        "BinaryMediaTypes": {
+          "title": "Binarymediatypes"
+        },
+        "MinimumCompressionSize": {
+          "title": "Minimumcompressionsize"
+        },
+        "Cors": {
+          "title": "Cors"
+        },
+        "GatewayResponses": {
+          "title": "Gatewayresponses"
+        },
+        "AccessLogSetting": {
+          "title": "Accesslogsetting"
+        },
+        "CanarySetting": {
+          "title": "Canarysetting"
+        },
+        "TracingEnabled": {
+          "title": "Tracingenabled"
+        },
+        "OpenApiVersion": {
+          "title": "Openapiversion"
+        },
+        "Domain": {
+          "title": "Domain"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GlobalsHttpApi": {
+      "title": "GlobalsHttpApi",
+      "type": "object",
+      "properties": {
+        "Auth": {
+          "title": "Auth"
+        },
+        "AccessLogSettings": {
+          "title": "Accesslogsettings"
+        },
+        "StageVariables": {
+          "title": "Stagevariables"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "RouteSettings": {
+          "title": "Routesettings"
+        },
+        "FailOnWarnings": {
+          "title": "Failonwarnings"
+        },
+        "Domain": {
+          "title": "Domain"
+        },
+        "CorsConfiguration": {
+          "title": "Corsconfiguration"
+        },
+        "DefaultRouteSettings": {
+          "title": "Defaultroutesettings"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GlobalsSimpleTable": {
+      "title": "GlobalsSimpleTable",
+      "type": "object",
+      "properties": {
+        "SSESpecification": {
+          "title": "Ssespecification"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Globals": {
+      "title": "Globals",
+      "type": "object",
+      "properties": {
+        "Function": {
+          "$ref": "#/definitions/GlobalsFunction"
+        },
+        "Api": {
+          "$ref": "#/definitions/GlobalsApi"
+        },
+        "HttpApi": {
+          "$ref": "#/definitions/GlobalsHttpApi"
+        },
+        "SimpleTable": {
+          "$ref": "#/definitions/GlobalsSimpleTable"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ResourceReference": {
+      "title": "ResourceReference",
+      "type": "object",
+      "properties": {
+        "Id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "Arn": {
+          "title": "Arn"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "Qualifier": {
+          "title": "Qualifier"
+        },
+        "QueueUrl": {
+          "title": "Queueurl"
+        },
+        "ResourceId": {
+          "title": "Resourceid"
+        },
+        "RoleName": {
+          "title": "Rolename"
+        },
+        "Type": {
+          "title": "Type"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ConnectorProperties": {
+      "title": "ConnectorProperties",
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/ResourceReference"
+        },
+        "Destination": {
+          "$ref": "#/definitions/ResourceReference"
+        },
+        "Permissions": {
+          "title": "Permissions",
+          "type": "array",
+          "items": {
+            "enum": [
+              "Read",
+              "Write"
+            ],
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "Source",
+        "Destination",
+        "Permissions"
+      ],
+      "additionalProperties": false
+    },
+    "AwsServerlessConnector": {
+      "title": "AwsServerlessConnector",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AWS::Serverless::Connector"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/ConnectorProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionProperties": {
+      "title": "FunctionProperties",
+      "type": "object",
+      "properties": {
+        "Architectures": {
+          "title": "Architectures"
+        },
+        "AssumeRolePolicyDocument": {
+          "title": "Assumerolepolicydocument"
+        },
+        "AutoPublishAlias": {
+          "title": "Autopublishalias"
+        },
+        "AutoPublishCodeSha256": {
+          "title": "Autopublishcodesha256"
+        },
+        "CodeSigningConfigArn": {
+          "title": "Codesigningconfigarn"
+        },
+        "CodeUri": {
+          "title": "Codeuri"
+        },
+        "DeadLetterQueue": {
+          "title": "Deadletterqueue"
+        },
+        "DeploymentPreference": {
+          "title": "Deploymentpreference"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "Environment": {
+          "title": "Environment"
+        },
+        "EphemeralStorage": {
+          "title": "Ephemeralstorage"
+        },
+        "EventInvokeConfig": {
+          "title": "Eventinvokeconfig"
+        },
+        "Events": {
+          "title": "Events"
+        },
+        "FileSystemConfigs": {
+          "title": "Filesystemconfigs"
+        },
+        "FunctionName": {
+          "title": "Functionname"
+        },
+        "FunctionUrlConfig": {
+          "title": "Functionurlconfig"
+        },
+        "Handler": {
+          "title": "Handler"
+        },
+        "ImageConfig": {
+          "title": "Imageconfig"
+        },
+        "ImageUri": {
+          "title": "Imageuri"
+        },
+        "InlineCode": {
+          "title": "Inlinecode"
+        },
+        "KmsKeyArn": {
+          "title": "Kmskeyarn"
+        },
+        "Layers": {
+          "title": "Layers"
+        },
+        "MemorySize": {
+          "title": "Memorysize"
+        },
+        "PackageType": {
+          "title": "Packagetype"
+        },
+        "PermissionsBoundary": {
+          "title": "Permissionsboundary"
+        },
+        "Policies": {
+          "title": "Policies"
+        },
+        "ProvisionedConcurrencyConfig": {
+          "title": "Provisionedconcurrencyconfig"
+        },
+        "ReservedConcurrentExecutions": {
+          "title": "Reservedconcurrentexecutions"
+        },
+        "Role": {
+          "title": "Role"
+        },
+        "Runtime": {
+          "title": "Runtime"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "Timeout": {
+          "title": "Timeout"
+        },
+        "Tracing": {
+          "title": "Tracing"
+        },
+        "VersionDescription": {
+          "title": "Versiondescription"
+        },
+        "VpcConfig": {
+          "title": "Vpcconfig"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AwsServerlessFunction": {
+      "title": "AwsServerlessFunction",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AWS::Serverless::Function"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionProperties"
+        },
+        "DeletionPolicy": {
+          "title": "Deletionpolicy"
+        },
+        "UpdateReplacePolicy": {
+          "title": "Updatereplacepolicy"
+        },
+        "Condition": {
+          "title": "Condition"
+        },
+        "DependsOn": {
+          "title": "Dependson"
+        },
+        "Metadata": {
+          "title": "Metadata"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "SimpleTableProperties": {
+      "title": "SimpleTableProperties",
+      "type": "object",
+      "properties": {
+        "PrimaryKey": {
+          "title": "Primarykey"
+        },
+        "ProvisionedThroughput": {
+          "title": "Provisionedthroughput"
+        },
+        "SSESpecification": {
+          "title": "Ssespecification"
+        },
+        "TableName": {
+          "title": "Tablename"
+        },
+        "Tags": {
+          "title": "Tags"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AwsServerlessSimpleTable": {
+      "title": "AwsServerlessSimpleTable",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AWS::Serverless::SimpleTable"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/SimpleTableProperties"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "StateMachineProperties": {
+      "title": "StateMachineProperties",
+      "type": "object",
+      "properties": {
+        "Definition": {
+          "title": "Definition"
+        },
+        "DefinitionSubstitutions": {
+          "title": "Definitionsubstitutions"
+        },
+        "DefinitionUri": {
+          "title": "Definitionuri"
+        },
+        "Events": {
+          "title": "Events"
+        },
+        "Logging": {
+          "title": "Logging"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "PermissionsBoundary": {
+          "title": "Permissionsboundary"
+        },
+        "Policies": {
+          "title": "Policies"
+        },
+        "Role": {
+          "title": "Role"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "Tracing": {
+          "title": "Tracing"
+        },
+        "Type": {
+          "title": "Type"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AwsServerlessStateMachine": {
+      "title": "AwsServerlessStateMachine",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AWS::Serverless::StateMachine"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/StateMachineProperties"
+        },
+        "Condition": {
+          "title": "Condition"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "LayerVersionProperties": {
+      "title": "LayerVersionProperties",
+      "type": "object",
+      "properties": {
+        "CompatibleArchitectures": {
+          "title": "Compatiblearchitectures"
+        },
+        "CompatibleRuntimes": {
+          "title": "Compatibleruntimes"
+        },
+        "ContentUri": {
+          "title": "Contenturi"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "LayerName": {
+          "title": "Layername"
+        },
+        "LicenseInfo": {
+          "title": "Licenseinfo"
+        },
+        "RetentionPolicy": {
+          "title": "Retentionpolicy"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AwsServerlessLayerVersion": {
+      "title": "AwsServerlessLayerVersion",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AWS::Serverless::LayerVersion"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/LayerVersionProperties"
+        },
+        "Condition": {
+          "title": "Condition"
+        },
+        "DeletionPolicy": {
+          "title": "Deletionpolicy"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "ApiProperties": {
+      "title": "ApiProperties",
+      "type": "object",
+      "properties": {
+        "AccessLogSetting": {
+          "title": "Accesslogsetting"
+        },
+        "ApiKeySourceType": {
+          "title": "Apikeysourcetype"
+        },
+        "Auth": {
+          "title": "Auth"
+        },
+        "BinaryMediaTypes": {
+          "title": "Binarymediatypes"
+        },
+        "CacheClusterEnabled": {
+          "title": "Cacheclusterenabled"
+        },
+        "CacheClusterSize": {
+          "title": "Cacheclustersize"
+        },
+        "CanarySetting": {
+          "title": "Canarysetting"
+        },
+        "Cors": {
+          "title": "Cors"
+        },
+        "DefinitionBody": {
+          "title": "Definitionbody"
+        },
+        "DefinitionUri": {
+          "title": "Definitionuri"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "DisableExecuteApiEndpoint": {
+          "title": "Disableexecuteapiendpoint"
+        },
+        "Domain": {
+          "title": "Domain"
+        },
+        "EndpointConfiguration": {
+          "title": "Endpointconfiguration"
+        },
+        "FailOnWarnings": {
+          "title": "Failonwarnings"
+        },
+        "GatewayResponses": {
+          "title": "Gatewayresponses"
+        },
+        "MethodSettings": {
+          "title": "Methodsettings"
+        },
+        "MinimumCompressionSize": {
+          "title": "Minimumcompressionsize"
+        },
+        "Mode": {
+          "title": "Mode"
+        },
+        "Models": {
+          "title": "Models"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "OpenApiVersion": {
+          "title": "Openapiversion"
+        },
+        "StageName": {
+          "title": "Stagename"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "TracingEnabled": {
+          "title": "Tracingenabled"
+        },
+        "Variables": {
+          "title": "Variables"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AwsServerlessApi": {
+      "title": "AwsServerlessApi",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AWS::Serverless::Api"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/ApiProperties"
+        },
+        "Condition": {
+          "title": "Condition"
+        },
+        "DeletionPolicy": {
+          "title": "Deletionpolicy"
+        },
+        "UpdateReplacePolicy": {
+          "title": "Updatereplacepolicy"
+        },
+        "DependsOn": {
+          "title": "Dependson"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "HttpApiProperties": {
+      "title": "HttpApiProperties",
+      "type": "object",
+      "properties": {
+        "AccessLogSettings": {
+          "title": "Accesslogsettings"
+        },
+        "Auth": {
+          "title": "Auth"
+        },
+        "CorsConfiguration": {
+          "title": "Corsconfiguration"
+        },
+        "DefaultRouteSettings": {
+          "title": "Defaultroutesettings"
+        },
+        "DefinitionBody": {
+          "title": "Definitionbody"
+        },
+        "DefinitionUri": {
+          "title": "Definitionuri"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "DisableExecuteApiEndpoint": {
+          "title": "Disableexecuteapiendpoint"
+        },
+        "Domain": {
+          "title": "Domain"
+        },
+        "FailOnWarnings": {
+          "title": "Failonwarnings"
+        },
+        "RouteSettings": {
+          "title": "Routesettings"
+        },
+        "StageName": {
+          "title": "Stagename"
+        },
+        "StageVariables": {
+          "title": "Stagevariables"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "Name": {
+          "title": "Name"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AwsServerlessHttpApi": {
+      "title": "AwsServerlessHttpApi",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AWS::Serverless::HttpApi"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/HttpApiProperties"
+        },
+        "Metadata": {
+          "title": "Metadata"
+        },
+        "Condition": {
+          "title": "Condition"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "ApplicationProperties": {
+      "title": "ApplicationProperties",
+      "type": "object",
+      "properties": {
+        "Location": {
+          "title": "Location"
+        },
+        "NotificationARNs": {
+          "title": "Notificationarns"
+        },
+        "Parameters": {
+          "title": "Parameters"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "TimeoutInMinutes": {
+          "title": "Timeoutinminutes"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AwsServerlessApplication": {
+      "title": "AwsServerlessApplication",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AWS::Serverless::Application"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/ApplicationProperties"
+        },
+        "Condition": {
+          "title": "Condition"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "AnyNonServerlessResource": {
+      "title": "AnyNonServerlessResource",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "pattern": "^((?!::Serverless::).)*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ]
+    }
+  }
+}
