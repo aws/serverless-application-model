@@ -11,7 +11,7 @@ Resources:
             Resource: !Sub arn:${AWS::Partition}:states:::lambda:invoke
             Parameters:
               FunctionName: !Ref MyFunction
-            End: True
+            End: true
 
   MyFunction:
     Type: AWS::Serverless::Function
@@ -31,4 +31,6 @@ Resources:
       Destination:
         Id: MyFunction
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true
