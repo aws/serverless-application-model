@@ -38,6 +38,9 @@ lint:
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
 
+schema:
+	python samtranslator/schema/schema.py > samtranslator/schema/schema.json
+
 # Command to run everytime you make changes to verify everything works
 dev: test
 
