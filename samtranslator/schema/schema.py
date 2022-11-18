@@ -10,6 +10,8 @@ from pydantic import Extra, Field, constr
 # TODO: Get rid of this in favor of proper types
 Unknown = Optional[Any]
 
+# Value passed directly to CloudFormation; not used by SAM
+PassThrough = Any
 
 # By default strict
 # https://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally
@@ -20,13 +22,13 @@ class BaseModel(LenientBaseModel):
 
 class ResourceReference(BaseModel):
     Id: Optional[str]
-    Arn: Unknown
-    Name: Unknown
-    Qualifier: Unknown
-    QueueUrl: Unknown
-    ResourceId: Unknown
-    RoleName: Unknown
-    Type: Unknown
+    Arn: Optional[PassThrough]
+    Name: Optional[PassThrough]
+    Qualifier: Optional[PassThrough]
+    QueueUrl: Optional[PassThrough]
+    ResourceId: Optional[PassThrough]
+    RoleName: Optional[PassThrough]
+    Type: Optional[str]
 
 
 class ConnectorProperties(BaseModel):
@@ -88,12 +90,17 @@ class AwsServerlessFunction(BaseModel):
     Metadata: Unknown
 
 
+class SimpleTablePrimaryKey(BaseModel):
+    Name: PassThrough
+    Type: PassThrough
+
+
 class SimpleTableProperties(BaseModel):
-    PrimaryKey: Unknown
-    ProvisionedThroughput: Unknown
-    SSESpecification: Unknown
-    TableName: Unknown
-    Tags: Unknown
+    PrimaryKey: Optional[SimpleTablePrimaryKey]
+    ProvisionedThroughput: Optional[PassThrough]
+    SSESpecification: Optional[PassThrough]
+    TableName: Optional[PassThrough]
+    Tags: Optional[Dict[str, Any]]
 
 
 class AwsServerlessSimpleTable(BaseModel):
