@@ -13,6 +13,9 @@ Unknown = Optional[Any]
 # Value passed directly to CloudFormation; not used by SAM
 PassThrough = Any
 
+# Intrinsic resolvable by the SAM transform
+SamIntrinsic = Dict[str, Any]
+
 # By default strict
 # https://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally
 class BaseModel(LenientBaseModel):
@@ -209,12 +212,17 @@ class AwsServerlessHttpApi(BaseModel):
     Condition: Unknown
 
 
+class ApplicationLocation(BaseModel):
+    ApplicationId: Union[str, SamIntrinsic]
+    SemanticVersion: Union[str, SamIntrinsic]
+
+
 class ApplicationProperties(BaseModel):
-    Location: Unknown
-    NotificationARNs: Unknown
-    Parameters: Unknown
-    Tags: Unknown
-    TimeoutInMinutes: Unknown
+    Location: Union[str, ApplicationLocation]
+    NotificationARNs: Optional[PassThrough]
+    Parameters: Optional[PassThrough]
+    Tags: Optional[Dict[str, Any]]
+    TimeoutInMinutes: Optional[PassThrough]
 
 
 class AwsServerlessApplication(BaseModel):
