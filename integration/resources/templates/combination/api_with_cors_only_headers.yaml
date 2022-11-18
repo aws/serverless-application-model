@@ -1,23 +1,23 @@
 Conditions:
   IsChina:
     Fn::Or:
-      - Fn::Equals:
-        - Ref: "AWS::Region"
-        - "cn-north-1"
-      - Fn::Equals:
-        - Ref: "AWS::Region"
-        - "cn-northwest-1"
+    - Fn::Equals:
+      - Ref: AWS::Region
+      - cn-north-1
+    - Fn::Equals:
+      - Ref: AWS::Region
+      - cn-northwest-1
 
 Parameters:
   CorsParam:
     Type: String
-    Default: "headers"
+    Default: headers
 
 Globals:
   Api:
     EndpointConfiguration: REGIONAL
     Cors:
-      AllowHeaders: {"Fn::Sub": "'${CorsParam}'"}
+      AllowHeaders: {Fn::Sub: "'${CorsParam}'"}
 
 Resources:
   MyLambdaFunction:
@@ -45,4 +45,6 @@ Outputs:
   ApiUrl:
     Description: URL of your API endpoint
     Value:
-      Fn::Sub: 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/
+Metadata:
+  SamTransformTest: true

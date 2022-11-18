@@ -24,23 +24,25 @@ Resources:
 
 Outputs:
   MyLambdaArn:
-    Description: "Arn of the Lambda target"
+    Description: Arn of the Lambda target
     Value:
       Fn::GetAtt:
-        - "MyLambdaFunction"
-        - "Arn"
+      - MyLambdaFunction
+      - Arn
   MyEventName:
-    Description: "Name of the CWE rule created"
+    Description: Name of the CWE rule created
     Value:
       Ref: MyLambdaFunctionCWEvent
   MyDLQArn:
-    Description: "Arn of the dead-letter queue provided for the CWE rule target"
+    Description: Arn of the dead-letter queue provided for the CWE rule target
     Value:
       Fn::GetAtt:
-        - "MyDlq"
-        - "Arn"
+      - MyDlq
+      - Arn
   MyDLQUrl:
-    Description: "Url of the dead-letter queue provided for the CWE rule target"
+    Description: Url of the dead-letter queue provided for the CWE rule target
     Value:
       Ref: MyDlq
 
+Metadata:
+  SamTransformTest: true

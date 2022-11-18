@@ -1,5 +1,14 @@
 [
-  { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyNewRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MySecurityGroup", "ResourceType":"AWS::EC2::SecurityGroup" }
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyNewRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MySecurityGroup",
+    "ResourceType": "AWS::EC2::SecurityGroup"
+  }
 ]

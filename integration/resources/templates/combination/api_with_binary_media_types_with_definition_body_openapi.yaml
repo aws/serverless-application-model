@@ -15,10 +15,10 @@ Globals:
     # Send/receive binary data through the APIs
     BinaryMediaTypes:
       # These are equivalent to image/gif and image/png when deployed
-      - image~1jpg
-      - image~1gif
-      - image~1png
-      - application~1octet-stream
+    - image~1jpg
+    - image~1gif
+    - image~1png
+    - application~1octet-stream
     OpenApiVersion: 3.0.1
 
 Resources:
@@ -28,15 +28,15 @@ Resources:
       StageName: Prod
       DefinitionBody:
         # Simple HTTP Proxy API
-        openapi: "3.0.1"
+        openapi: 3.0.1
         info:
-          version: "2016-09-23T22:23:23Z"
-          title: "Simple Api"
-        basePath: "/none"
+          version: '2016-09-23T22:23:23Z'
+          title: Simple Api
+        basePath: /none
         schemes:
-          - "https"
+        - https
         paths:
-          "/none":
+          /none:
             get:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -68,10 +68,12 @@ Resources:
 
 Outputs:
   ApiUrl:
-    Description: "API endpoint URL for Prod environment"
+    Description: API endpoint URL for Prod environment
     Value:
-      Fn::Sub: 'https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+      Fn::Sub: https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/
   MyLambda:
     Description: MyLambda Function ARN
     Value:
       Fn::GetAtt: MyLambda.Arn
+Metadata:
+  SamTransformTest: true

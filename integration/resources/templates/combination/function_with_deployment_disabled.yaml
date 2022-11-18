@@ -8,7 +8,7 @@ Parameters:
     Type: String
   Enabled:
     Type: String
-    Default: False
+    Default: false
 
 Resources:
   MyLambdaFunction:
@@ -23,7 +23,7 @@ Resources:
       DeploymentPreference:
         Type: AllAtOnce
         Role:
-          Fn::GetAtt: [ DeploymentRole, Arn ]
+          Fn::GetAtt: [DeploymentRole, Arn]
 
         Enabled:
           Ref: Enabled
@@ -42,18 +42,18 @@ Resources:
             - codedeploy.amazonaws.com
 
       Policies:
-        -
-          PolicyName: "root"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Effect: "Allow"
-                Resource: "*"
-                Action:
-                  - "cloudwatch:DescribeAlarms"
-                  - "lambda:UpdateAlias"
-                  - "lambda:GetAlias"
-                  - "lambda:InvokeFunction"
-                  - "s3:Get*"
-                  - "sns:Publish"
+      - PolicyName: root
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Resource: '*'
+            Action:
+            - cloudwatch:DescribeAlarms
+            - lambda:UpdateAlias
+            - lambda:GetAlias
+            - lambda:InvokeFunction
+            - s3:Get*
+            - sns:Publish
+Metadata:
+  SamTransformTest: true

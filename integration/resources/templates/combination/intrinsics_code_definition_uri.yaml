@@ -1,12 +1,12 @@
 # Must support explicit bucket, key and version in CodeUri and DefinitionUri parameters
 
 Parameters:
- Bucket:
-  Type: String
- CodeKey:
-  Type: String
- SwaggerKey:
-  Type: String
+  Bucket:
+    Type: String
+  CodeKey:
+    Type: String
+  SwaggerKey:
+    Type: String
 
 Resources:
 
@@ -33,3 +33,5 @@ Resources:
         Key:
           Ref: SwaggerKey
 
+Metadata:
+  SamTransformTest: true

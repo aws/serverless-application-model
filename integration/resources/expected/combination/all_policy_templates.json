@@ -1,8 +1,26 @@
 [
-  { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyFunction2", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyFunction2Role", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyFunction3", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyFunction3Role", "ResourceType":"AWS::IAM::Role" }
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyFunction2",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunction2Role",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyFunction3",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunction3Role",
+    "ResourceType": "AWS::IAM::Role"
+  }
 ]

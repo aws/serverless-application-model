@@ -1,11 +1,13 @@
 Resources:
-    MyLambdaFunction:
-        Type: AWS::Serverless::Function
-        Properties:
-            Handler: index.handler
-            Runtime: nodejs14.x
-            CodeUri: ${codeuri}
-            MemorySize: 128
-            Policies:
-                - AWSLambdaRole
-                - AmazonS3ReadOnlyAccess
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+Metadata:
+  SamTransformTest: true

@@ -1,31 +1,118 @@
 [
-  { "LogicalResourceId":"FunctionOne", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"FunctionOneRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"FunctionOneImageBucketPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"Images", "ResourceType":"AWS::S3::Bucket" },
-  { "LogicalResourceId":"Notifications", "ResourceType":"AWS::SNS::Topic" },
-  { "LogicalResourceId":"CloudWatchLambdaLogsGroup", "ResourceType":"AWS::Logs::LogGroup" },
-  { "LogicalResourceId":"MyStream", "ResourceType":"AWS::Kinesis::Stream" },
-  { "LogicalResourceId":"MyDynamoDB", "ResourceType":"AWS::DynamoDB::Table" },
-  { "LogicalResourceId":"MyAwesomeFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyAwesomeFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyAwesomeFunctionVersion", "ResourceType":"AWS::Lambda::Version" },
-  { "LogicalResourceId":"MyAwesomeFunctionAliasLive", "ResourceType":"AWS::Lambda::Alias" },
-  { "LogicalResourceId":"MyAwesomeFunctionCWSchedule", "ResourceType":"AWS::Events::Rule" },
-  { "LogicalResourceId":"MyAwesomeFunctionCWSchedulePermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyAwesomeFunctionIoTRule", "ResourceType":"AWS::IoT::TopicRule" },
-  { "LogicalResourceId":"MyAwesomeFunctionIoTRulePermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyAwesomeFunctionCWEvent", "ResourceType":"AWS::Events::Rule" },
-  { "LogicalResourceId":"MyAwesomeFunctionCWEventPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyAwesomeFunctionS3TriggerPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyAwesomeFunctionNotificationTopic", "ResourceType":"AWS::SNS::Subscription" },
-  { "LogicalResourceId":"MyAwesomeFunctionNotificationTopicPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyAwesomeFunctionApiEventPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyAwesomeFunctionCWLog", "ResourceType":"AWS::Logs::SubscriptionFilter" },
-  { "LogicalResourceId":"MyAwesomeFunctionCWLogPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"ServerlessRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"ServerlessRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-  { "LogicalResourceId":"ServerlessRestApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
-  { "LogicalResourceId":"MyAwesomeFunctionKinesisStream", "ResourceType":"AWS::Lambda::EventSourceMapping" },
-  { "LogicalResourceId":"MyAwesomeFunctionDDBStream", "ResourceType":"AWS::Lambda::EventSourceMapping" }
+  {
+    "LogicalResourceId": "FunctionOne",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "FunctionOneRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "FunctionOneImageBucketPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "Images",
+    "ResourceType": "AWS::S3::Bucket"
+  },
+  {
+    "LogicalResourceId": "Notifications",
+    "ResourceType": "AWS::SNS::Topic"
+  },
+  {
+    "LogicalResourceId": "CloudWatchLambdaLogsGroup",
+    "ResourceType": "AWS::Logs::LogGroup"
+  },
+  {
+    "LogicalResourceId": "MyStream",
+    "ResourceType": "AWS::Kinesis::Stream"
+  },
+  {
+    "LogicalResourceId": "MyDynamoDB",
+    "ResourceType": "AWS::DynamoDB::Table"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionVersion",
+    "ResourceType": "AWS::Lambda::Version"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionAliasLive",
+    "ResourceType": "AWS::Lambda::Alias"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionCWSchedule",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionCWSchedulePermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionIoTRule",
+    "ResourceType": "AWS::IoT::TopicRule"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionIoTRulePermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionCWEvent",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionCWEventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionS3TriggerPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionNotificationTopic",
+    "ResourceType": "AWS::SNS::Subscription"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionNotificationTopicPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionApiEventPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionCWLog",
+    "ResourceType": "AWS::Logs::SubscriptionFilter"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionCWLogPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionKinesisStream",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionDDBStream",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  }
 ]

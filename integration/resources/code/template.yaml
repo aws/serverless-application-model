@@ -1,8 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
+Transform: AWS::Serverless-2016-10-31
 Resources:
   MyTable:
-    Type: 'AWS::Serverless::SimpleTable'
+    Type: AWS::Serverless::SimpleTable
 Outputs:
   TableName:
     Value: !Ref MyTable
+Metadata:
+  SamTransformTest: true

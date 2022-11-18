@@ -3,3 +3,5 @@ Resources:
     Type: AWS::Serverless::Application
     Properties:
       Location: ${templateurl}
+Metadata:
+  SamTransformTest: true
