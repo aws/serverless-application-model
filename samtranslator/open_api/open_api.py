@@ -468,7 +468,12 @@ class OpenApiEditor(object):
 
             # Neither the NONE nor the AWS_IAM built-in authorizers support authorization scopes.
             if authorizer_name not in ["NONE", "AWS_IAM"]:
-                method_authorization_scopes = authorizers[authorizer_name].get("AuthorizationScopes")
+                authorizer = authorizers.get(authorizer_name, Py27Dict())
+                if not isinstance(authorizer, dict):
+                    raise InvalidDocumentException(
+                        [InvalidTemplateException(f"Type of authorizer '{authorizer_name}' must be a dictionary")]
+                    )
+                method_authorization_scopes = authorizer.get("AuthorizationScopes")
                 if authorization_scopes:
                     method_authorization_scopes = authorization_scopes
                 if authorizers[authorizer_name] and method_authorization_scopes:
