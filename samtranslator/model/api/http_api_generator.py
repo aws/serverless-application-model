@@ -18,6 +18,7 @@ from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.utils.types import Intrinsicable
+from samtranslator.validator.value_validator import sam_expect
 
 _CORS_WILDCARD = "*"
 CorsProperties = namedtuple(
@@ -331,12 +332,7 @@ class HttpApiGenerator(object):
         route53_config = custom_domain_config.get("Route53")
         if route53_config is None:
             return None
-        if not isinstance(route53_config, dict):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Invalid property type '{}' for Route53. "
-                "Expected a map defines an Amazon Route 53 configuration'.".format(type(route53_config).__name__),
-            )
+        sam_expect(route53_config, self.logical_id, "Domain.Route53").to_be_a_map()
         if route53_config.get("HostedZoneId") is None and route53_config.get("HostedZoneName") is None:
             raise InvalidResourceException(
                 self.logical_id,
