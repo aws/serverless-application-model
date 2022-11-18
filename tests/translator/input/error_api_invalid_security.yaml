@@ -1,0 +1,42 @@
+Resources:
+  API:
+    Type: AWS::Serverless::Api
+    Metadata:
+      SamResourceId: API
+    Properties:
+      StageName: Prod
+      OpenApiVersion: 3.0.3
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+      DefinitionBody:
+        openapi: 3.0.3
+        paths:
+          /test:
+            get:
+              responses:
+                '200':
+                  description: Success
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APILambda.Arn}:live/invocations
+                httpMethod: GET
+                type: aws_proxy
+                passthroughBehaviour: never
+              # the security value should be a list:
+              security:
+        security:
+        - ApiKeyAuth: []
+
+  APILambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://abc/def
+      Handler: api
+      Events:
+        ApiCall:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: API
+            Path: /*
+            Method: '*'

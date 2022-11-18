@@ -657,7 +657,7 @@ class SwaggerEditor(object):
         for method_name, method_definition in self.iter_on_all_methods_for_path(path):  # type: ignore[no-untyped-call]
             if not (add_default_auth_to_preflight or method_name != "options"):
                 continue
-            existing_security = method_definition.get("security", [])
+
             authorizer_list = ["AWS_IAM"]
             if authorizers:
                 authorizer_list.extend(authorizers.keys())
@@ -668,6 +668,11 @@ class SwaggerEditor(object):
             # Split existing security into Authorizers and everything else
             # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
             # We want to ensure only a single Authorizer security entry exists while keeping everything else
+            existing_security = method_definition.get("security", [])
+            if not isinstance(existing_security, list):
+                raise InvalidDocumentException(
+                    [InvalidTemplateException(f"Type of security for path {path} method {method_name} must be a list")]
+                )
             for security in existing_security:
                 SwaggerEditor.validate_is_dict(
                     security,
@@ -730,7 +735,6 @@ class SwaggerEditor(object):
         """
 
         for method_name, method_definition in self.iter_on_all_methods_for_path(path):  # type: ignore[no-untyped-call]
-            existing_security = method_definition.get("security", [])
             apikey_security_names = set(["api_key", "api_key_false"])
             existing_non_apikey_security = []
             existing_apikey_security = []
@@ -739,6 +743,11 @@ class SwaggerEditor(object):
             # Split existing security into ApiKey and everything else
             # (e.g. sigv4 (AWS_IAM), authorizers, NONE (marker for ignoring default authorizer))
             # We want to ensure only a single ApiKey security entry exists while keeping everything else
+            existing_security = method_definition.get("security", [])
+            if not isinstance(existing_security, list):
+                raise InvalidDocumentException(
+                    [InvalidTemplateException(f"Type of security for path {path} method {method_name} must be a list")]
+                )
             for security in existing_security:
                 SwaggerEditor.validate_is_dict(
                     security,
@@ -815,12 +824,16 @@ class SwaggerEditor(object):
             authorizers = Py27Dict()
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
-            existing_security = method_definition.get("security", [])
 
             security_dict = Py27Dict()
             security_dict[authorizer_name] = []
             authorizer_security = [security_dict]
 
+            existing_security = method_definition.get("security", [])
+            if not isinstance(existing_security, list):
+                raise InvalidDocumentException(
+                    [InvalidTemplateException(f"Type of security for path {path} method {method_name} must be a list")]
+                )
             # This assumes there are no autorizers already configured in the existing security block
             security = existing_security + authorizer_security
 
@@ -854,7 +867,6 @@ class SwaggerEditor(object):
         :param bool apikey_required: Whether the apikey security is required
         """
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
-            existing_security = method_definition.get("security", [])
 
             if apikey_required:
                 # We want to enable apikey required security
@@ -870,6 +882,11 @@ class SwaggerEditor(object):
                 security_dict["api_key_false"] = []
                 apikey_security = [security_dict]
 
+            existing_security = method_definition.get("security", [])
+            if not isinstance(existing_security, list):
+                raise InvalidDocumentException(
+                    [InvalidTemplateException(f"Type of security for path {path} method {method_name} must be a list")]
+                )
             # This assumes there are no autorizers already configured in the existing security block
             security = existing_security + apikey_security
 
