@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing_extensions import Literal
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel as LenientBaseModel
 from pydantic import Extra, Field, constr
