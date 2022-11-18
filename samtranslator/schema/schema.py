@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel as LenientBaseModel
 from pydantic import Extra, Field, constr
 
+# TODO: Get rid of this in favor of proper types
 Unknown = Optional[Any]
 
 
@@ -79,9 +80,12 @@ class FunctionProperties(BaseModel):
 
 class AwsServerlessFunction(BaseModel):
     Type: Literal["AWS::Serverless::Function"]
-    Properties: FunctionProperties
+    Properties: Optional[FunctionProperties]
+    DeletionPolicy: Unknown
+    UpdateReplacePolicy: Unknown
     Condition: Unknown
     DependsOn: Unknown
+    Metadata: Unknown
 
 
 class SimpleTableProperties(BaseModel):
@@ -115,6 +119,7 @@ class StateMachineProperties(BaseModel):
 class AwsServerlessStateMachine(BaseModel):
     Type: Literal["AWS::Serverless::StateMachine"]
     Properties: StateMachineProperties
+    Condition: Unknown
 
 
 class LayerVersionProperties(BaseModel):
@@ -131,6 +136,7 @@ class AwsServerlessLayerVersion(BaseModel):
     Type: Literal["AWS::Serverless::LayerVersion"]
     Properties: LayerVersionProperties
     Condition: Unknown
+    DeletionPolicy: Unknown
 
 
 class ApiProperties(BaseModel):
@@ -166,6 +172,9 @@ class AwsServerlessApi(BaseModel):
     Type: Literal["AWS::Serverless::Api"]
     Properties: ApiProperties
     Condition: Unknown
+    DeletionPolicy: Unknown
+    UpdateReplacePolicy: Unknown
+    DependsOn: Unknown
 
 
 class HttpApiProperties(BaseModel):
@@ -183,11 +192,14 @@ class HttpApiProperties(BaseModel):
     StageName: Unknown
     StageVariables: Unknown
     Tags: Unknown
+    Name: Unknown
 
 
 class AwsServerlessHttpApi(BaseModel):
     Type: Literal["AWS::Serverless::HttpApi"]
     Properties: Optional[HttpApiProperties]
+    Metadata: Unknown
+    Condition: Unknown
 
 
 class ApplicationProperties(BaseModel):
@@ -205,11 +217,80 @@ class AwsServerlessApplication(BaseModel):
 
 
 # Match anything not containing Serverless
-class AnyCfnResource(LenientBaseModel):
+class AnyNonServerlessResource(LenientBaseModel):
     Type: constr(regex=r"^((?!::Serverless::).)*$")  # type: ignore
 
 
+class GlobalsFunction(BaseModel):
+    Handler: Unknown
+    Runtime: Unknown
+    CodeUri: Unknown
+    DeadLetterQueue: Unknown
+    Description: Unknown
+    MemorySize: Unknown
+    Timeout: Unknown
+    VpcConfig: Unknown
+    Environment: Unknown
+    Tags: Unknown
+    Tracing: Unknown
+    KmsKeyArn: Unknown
+    Layers: Unknown
+    AutoPublishAlias: Unknown
+    DeploymentPreference: Unknown
+    PermissionsBoundary: Unknown
+    ReservedConcurrentExecutions: Unknown
+    ProvisionedConcurrencyConfig: Unknown
+    AssumeRolePolicyDocument: Unknown
+    EventInvokeConfig: Unknown
+    Architectures: Unknown
+    EphemeralStorage: Unknown
+
+
+class GlobalsApi(BaseModel):
+    Auth: Unknown
+    Name: Unknown
+    DefinitionUri: Unknown
+    CacheClusterEnabled: Unknown
+    CacheClusterSize: Unknown
+    Variables: Unknown
+    EndpointConfiguration: Unknown
+    MethodSettings: Unknown
+    BinaryMediaTypes: Unknown
+    MinimumCompressionSize: Unknown
+    Cors: Unknown
+    GatewayResponses: Unknown
+    AccessLogSetting: Unknown
+    CanarySetting: Unknown
+    TracingEnabled: Unknown
+    OpenApiVersion: Unknown
+    Domain: Unknown
+
+
+class GlobalsHttpApi(BaseModel):
+    Auth: Unknown
+    AccessLogSettings: Unknown
+    StageVariables: Unknown
+    Tags: Unknown
+    RouteSettings: Unknown
+    FailOnWarnings: Unknown
+    Domain: Unknown
+    CorsConfiguration: Unknown
+    DefaultRouteSettings: Unknown
+
+
+class GlobalsSimpleTable(BaseModel):
+    SSESpecification: Unknown
+
+
+class Globals(BaseModel):
+    Function: Optional[GlobalsFunction]
+    Api: Optional[GlobalsApi]
+    HttpApi: Optional[GlobalsHttpApi]
+    SimpleTable: Optional[GlobalsSimpleTable]
+
+
 class Model(LenientBaseModel):
+    Globals: Optional[Globals]
     Resources: Dict[
         str,
         Union[
@@ -220,8 +301,8 @@ class Model(LenientBaseModel):
             AwsServerlessLayerVersion,
             AwsServerlessApi,
             AwsServerlessHttpApi,
-            AnyCfnResource,
             AwsServerlessApplication,
+            AnyNonServerlessResource,
         ],
     ]
 

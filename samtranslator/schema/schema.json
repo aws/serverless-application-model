@@ -2,6 +2,9 @@
   "title": "Model",
   "type": "object",
   "properties": {
+    "Globals": {
+      "$ref": "#/definitions/Globals"
+    },
     "Resources": {
       "title": "Resources",
       "type": "object",
@@ -29,10 +32,10 @@
             "$ref": "#/definitions/AwsServerlessHttpApi"
           },
           {
-            "$ref": "#/definitions/AnyCfnResource"
+            "$ref": "#/definitions/AwsServerlessApplication"
           },
           {
-            "$ref": "#/definitions/AwsServerlessApplication"
+            "$ref": "#/definitions/AnyNonServerlessResource"
           }
         ]
       }
@@ -42,6 +45,200 @@
     "Resources"
   ],
   "definitions": {
+    "GlobalsFunction": {
+      "title": "GlobalsFunction",
+      "type": "object",
+      "properties": {
+        "Handler": {
+          "title": "Handler"
+        },
+        "Runtime": {
+          "title": "Runtime"
+        },
+        "CodeUri": {
+          "title": "Codeuri"
+        },
+        "DeadLetterQueue": {
+          "title": "Deadletterqueue"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "MemorySize": {
+          "title": "Memorysize"
+        },
+        "Timeout": {
+          "title": "Timeout"
+        },
+        "VpcConfig": {
+          "title": "Vpcconfig"
+        },
+        "Environment": {
+          "title": "Environment"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "Tracing": {
+          "title": "Tracing"
+        },
+        "KmsKeyArn": {
+          "title": "Kmskeyarn"
+        },
+        "Layers": {
+          "title": "Layers"
+        },
+        "AutoPublishAlias": {
+          "title": "Autopublishalias"
+        },
+        "DeploymentPreference": {
+          "title": "Deploymentpreference"
+        },
+        "PermissionsBoundary": {
+          "title": "Permissionsboundary"
+        },
+        "ReservedConcurrentExecutions": {
+          "title": "Reservedconcurrentexecutions"
+        },
+        "ProvisionedConcurrencyConfig": {
+          "title": "Provisionedconcurrencyconfig"
+        },
+        "AssumeRolePolicyDocument": {
+          "title": "Assumerolepolicydocument"
+        },
+        "EventInvokeConfig": {
+          "title": "Eventinvokeconfig"
+        },
+        "Architectures": {
+          "title": "Architectures"
+        },
+        "EphemeralStorage": {
+          "title": "Ephemeralstorage"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GlobalsApi": {
+      "title": "GlobalsApi",
+      "type": "object",
+      "properties": {
+        "Auth": {
+          "title": "Auth"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "DefinitionUri": {
+          "title": "Definitionuri"
+        },
+        "CacheClusterEnabled": {
+          "title": "Cacheclusterenabled"
+        },
+        "CacheClusterSize": {
+          "title": "Cacheclustersize"
+        },
+        "Variables": {
+          "title": "Variables"
+        },
+        "EndpointConfiguration": {
+          "title": "Endpointconfiguration"
+        },
+        "MethodSettings": {
+          "title": "Methodsettings"
+        },
+        "BinaryMediaTypes": {
+          "title": "Binarymediatypes"
+        },
+        "MinimumCompressionSize": {
+          "title": "Minimumcompressionsize"
+        },
+        "Cors": {
+          "title": "Cors"
+        },
+        "GatewayResponses": {
+          "title": "Gatewayresponses"
+        },
+        "AccessLogSetting": {
+          "title": "Accesslogsetting"
+        },
+        "CanarySetting": {
+          "title": "Canarysetting"
+        },
+        "TracingEnabled": {
+          "title": "Tracingenabled"
+        },
+        "OpenApiVersion": {
+          "title": "Openapiversion"
+        },
+        "Domain": {
+          "title": "Domain"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GlobalsHttpApi": {
+      "title": "GlobalsHttpApi",
+      "type": "object",
+      "properties": {
+        "Auth": {
+          "title": "Auth"
+        },
+        "AccessLogSettings": {
+          "title": "Accesslogsettings"
+        },
+        "StageVariables": {
+          "title": "Stagevariables"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "RouteSettings": {
+          "title": "Routesettings"
+        },
+        "FailOnWarnings": {
+          "title": "Failonwarnings"
+        },
+        "Domain": {
+          "title": "Domain"
+        },
+        "CorsConfiguration": {
+          "title": "Corsconfiguration"
+        },
+        "DefaultRouteSettings": {
+          "title": "Defaultroutesettings"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GlobalsSimpleTable": {
+      "title": "GlobalsSimpleTable",
+      "type": "object",
+      "properties": {
+        "SSESpecification": {
+          "title": "Ssespecification"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Globals": {
+      "title": "Globals",
+      "type": "object",
+      "properties": {
+        "Function": {
+          "$ref": "#/definitions/GlobalsFunction"
+        },
+        "Api": {
+          "$ref": "#/definitions/GlobalsApi"
+        },
+        "HttpApi": {
+          "$ref": "#/definitions/GlobalsHttpApi"
+        },
+        "SimpleTable": {
+          "$ref": "#/definitions/GlobalsSimpleTable"
+        }
+      },
+      "additionalProperties": false
+    },
     "ResourceReference": {
       "title": "ResourceReference",
       "type": "object",
@@ -250,16 +447,24 @@
         "Properties": {
           "$ref": "#/definitions/FunctionProperties"
         },
+        "DeletionPolicy": {
+          "title": "Deletionpolicy"
+        },
+        "UpdateReplacePolicy": {
+          "title": "Updatereplacepolicy"
+        },
         "Condition": {
           "title": "Condition"
         },
         "DependsOn": {
           "title": "Dependson"
+        },
+        "Metadata": {
+          "title": "Metadata"
         }
       },
       "required": [
-        "Type",
-        "Properties"
+        "Type"
       ],
       "additionalProperties": false
     },
@@ -361,6 +566,9 @@
         },
         "Properties": {
           "$ref": "#/definitions/StateMachineProperties"
+        },
+        "Condition": {
+          "title": "Condition"
         }
       },
       "required": [
@@ -413,6 +621,9 @@
         },
         "Condition": {
           "title": "Condition"
+        },
+        "DeletionPolicy": {
+          "title": "Deletionpolicy"
         }
       },
       "required": [
@@ -522,6 +733,15 @@
         },
         "Condition": {
           "title": "Condition"
+        },
+        "DeletionPolicy": {
+          "title": "Deletionpolicy"
+        },
+        "UpdateReplacePolicy": {
+          "title": "Updatereplacepolicy"
+        },
+        "DependsOn": {
+          "title": "Dependson"
         }
       },
       "required": [
@@ -575,6 +795,9 @@
         },
         "Tags": {
           "title": "Tags"
+        },
+        "Name": {
+          "title": "Name"
         }
       },
       "additionalProperties": false
@@ -592,26 +815,18 @@
         },
         "Properties": {
           "$ref": "#/definitions/HttpApiProperties"
+        },
+        "Metadata": {
+          "title": "Metadata"
+        },
+        "Condition": {
+          "title": "Condition"
         }
       },
       "required": [
         "Type"
       ],
       "additionalProperties": false
-    },
-    "AnyCfnResource": {
-      "title": "AnyCfnResource",
-      "type": "object",
-      "properties": {
-        "Type": {
-          "title": "Type",
-          "pattern": "^((?!::Serverless::).)*$",
-          "type": "string"
-        }
-      },
-      "required": [
-        "Type"
-      ]
     },
     "ApplicationProperties": {
       "title": "ApplicationProperties",
@@ -658,6 +873,20 @@
         "Properties"
       ],
       "additionalProperties": false
+    },
+    "AnyNonServerlessResource": {
+      "title": "AnyNonServerlessResource",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "pattern": "^((?!::Serverless::).)*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ]
     }
   }
 }
