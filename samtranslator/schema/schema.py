@@ -11,7 +11,7 @@ from pydantic import Extra, Field, constr
 Unknown = Optional[Any]
 
 # Value passed directly to CloudFormation; not used by SAM
-PassThrough = Any
+PassThrough = Any  # TODO: Make it behave like typescript's unknown
 
 # Intrinsic resolvable by the SAM transform
 SamIntrinsic = Dict[str, Any]
