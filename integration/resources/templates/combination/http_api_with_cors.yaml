@@ -1,28 +1,27 @@
-
 Globals:
   HttpApi:
     CorsConfiguration:
       AllowHeaders:
-        - x-apigateway-header
+      - x-apigateway-header
       AllowMethods:
-        - GET
+      - GET
       AllowOrigins:
-        - https://foo.com
+      - https://foo.com
       ExposeHeaders:
-        - x-amzn-header
+      - x-amzn-header
 
 Resources:
   HttpApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       InlineCode: |
-         exports.handler = async (event) => {
-           return {
-           statusCode: 200,
-           body: JSON.stringify(event),
-           headers: {}
-           }
-         }
+        exports.handler = async (event) => {
+          return {
+          statusCode: 200,
+          body: JSON.stringify(event),
+          headers: {}
+          }
+        }
       Handler: index.handler
       Runtime: nodejs14.x
       Events:
@@ -32,14 +31,16 @@ Resources:
             Method: GET
             Path: /path
             TimeoutInMillis: 15000
-            PayloadFormatVersion: "1.0"
+            PayloadFormatVersion: '1.0'
 
 Outputs:
   ApiUrl:
     Description: URL of your API endpoint
     Value:
-      Fn::Sub: 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+      Fn::Sub: https://${ServerlessHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/
   ApiId:
     Description: Api id of ServerlessHttpApi
     Value:
-      Ref: ServerlessHttpApi      
+      Ref: ServerlessHttpApi
+Metadata:
+  SamTransformTest: true

@@ -1,12 +1,12 @@
 Conditions:
   TrueCondition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
   FalseCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   MyLambdaFunctionWithApplication:
@@ -18,7 +18,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME:
-            Fn::GetAtt: ["MyNestedApp", "Outputs.TableName"]
+            Fn::GetAtt: [MyNestedApp, Outputs.TableName]
 
   MyNestedApp:
     Type: AWS::Serverless::Application
@@ -31,3 +31,5 @@ Resources:
     Condition: FalseCondition
     Properties:
       Location: ${templateurl}
+Metadata:
+  SamTransformTest: true

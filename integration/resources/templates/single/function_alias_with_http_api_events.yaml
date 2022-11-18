@@ -21,3 +21,5 @@ Resources:
               Ref: MyHttpApi
             Path: /bar
             Method: POST
+Metadata:
+  SamTransformTest: true

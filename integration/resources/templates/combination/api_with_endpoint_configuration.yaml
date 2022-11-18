@@ -14,8 +14,8 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      EndpointConfiguration: {
-        "Ref": "Config"
-      }
+      EndpointConfiguration: {Ref: Config}
       DefinitionUri: ${definitionuri}
 
+Metadata:
+  SamTransformTest: true

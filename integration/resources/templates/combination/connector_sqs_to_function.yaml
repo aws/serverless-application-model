@@ -31,10 +31,10 @@ Resources:
           QUEUE_URL: !Ref Queue
           VERIFICATION_QUEUE_URL: !Ref VerificationQueue
       Policies:
-        - SQSPollerPolicy:
-            QueueName: !GetAtt VerificationQueue.QueueName
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt Queue.QueueName
+      - SQSPollerPolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt Queue.QueueName
 
   InvokedFunction:
     Type: AWS::Serverless::Function
@@ -54,17 +54,17 @@ Resources:
         Variables:
           VERIFICATION_QUEUE_URL: !Ref VerificationQueue
       Policies:
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt VerificationQueue.QueueName
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
 
   SQSEventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping
     Properties:
       FunctionName: !Ref InvokedFunction
-      EventSourceArn: 
+      EventSourceArn:
         Fn::GetAtt:
-          - "Queue"
-          - "Arn"
+        - Queue
+        - Arn
       BatchSize: 10
 
   VerificationQueue:
@@ -73,10 +73,12 @@ Resources:
   Connector:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: Queue
-      Destination: 
+      Destination:
         Id: InvokedFunction
       Permissions:
-        - Read
-        - Write
+      - Read
+      - Write
+Metadata:
+  SamTransformTest: true

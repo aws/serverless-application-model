@@ -1,9 +1,30 @@
 [
-  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyLambdaFunctionPostApiPermissionStage", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyLambdaFunctionGetApiPermissionStage", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-  { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"MyApiStage", "ResourceType":"AWS::ApiGateway::Stage" }
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionPostApiPermissionStage",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionGetApiPermissionStage",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "MyApiStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  }
 ]

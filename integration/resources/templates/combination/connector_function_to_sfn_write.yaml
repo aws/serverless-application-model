@@ -21,8 +21,8 @@ Resources:
             Resource: !GetAtt StateMachineFunction.Arn
             End: true
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: !Ref StateMachineFunction
+      - LambdaInvokePolicy:
+          FunctionName: !Ref StateMachineFunction
 
   TriggerFunction:
     Type: AWS::Serverless::Function
@@ -46,9 +46,11 @@ Resources:
   MyConnector:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: TriggerFunction
-      Destination: 
+      Destination:
         Id: StateMachine
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true

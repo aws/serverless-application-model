@@ -26,18 +26,20 @@ Resources:
     Properties:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: "Id"
-          AttributeType: "S"
+      - AttributeName: Id
+        AttributeType: S
       KeySchema:
-        - AttributeName: "Id"
-          KeyType: "HASH"
+      - AttributeName: Id
+        KeyType: HASH
 
   MyWriteConnector:
     Type: AWS::Serverless::Connector
     Properties:
-      Source: 
+      Source:
         Id: TriggerFunction
-      Destination: 
+      Destination:
         Id: MyTable
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true

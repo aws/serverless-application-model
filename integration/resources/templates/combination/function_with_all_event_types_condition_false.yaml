@@ -2,8 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
 
@@ -25,7 +25,7 @@ Resources:
 
 # All Event Types
   MyAwesomeFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: MyCondition
     Properties:
       InlineCode: |
@@ -37,7 +37,7 @@ Resources:
         CWSchedule:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
 
         CWEvent:
           Type: CloudWatchEvent
@@ -115,17 +115,19 @@ Resources:
       ShardCount: 1
 
   MyDynamoDB:
-    Type: 'AWS::DynamoDB::Table'
+    Type: AWS::DynamoDB::Table
     Condition: MyCondition
     Properties:
       AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
+      - AttributeName: id
+        AttributeType: S
       KeySchema:
-        - AttributeName: id
-          KeyType: HASH
+      - AttributeName: id
+        KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       StreamSpecification:
         StreamViewType: NEW_IMAGE
+Metadata:
+  SamTransformTest: true
