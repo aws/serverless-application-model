@@ -592,6 +592,22 @@
       ],
       "additionalProperties": false
     },
+    "LayerVersionContentUri": {
+      "title": "LayerVersionContentUri",
+      "type": "object",
+      "properties": {
+        "Bucket": {
+          "title": "Bucket"
+        },
+        "Key": {
+          "title": "Key"
+        },
+        "Version": {
+          "title": "Version"
+        }
+      },
+      "additionalProperties": false
+    },
     "LayerVersionProperties": {
       "title": "LayerVersionProperties",
       "type": "object",
@@ -603,7 +619,15 @@
           "title": "Compatibleruntimes"
         },
         "ContentUri": {
-          "title": "Contenturi"
+          "title": "Contenturi",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/LayerVersionContentUri"
+            }
+          ]
         },
         "Description": {
           "title": "Description"
@@ -615,9 +639,20 @@
           "title": "Licenseinfo"
         },
         "RetentionPolicy": {
-          "title": "Retentionpolicy"
+          "title": "Retentionpolicy",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         }
       },
+      "required": [
+        "ContentUri"
+      ],
       "additionalProperties": false
     },
     "AwsServerlessLayerVersion": {
@@ -843,12 +878,53 @@
       ],
       "additionalProperties": false
     },
+    "ApplicationLocation": {
+      "title": "ApplicationLocation",
+      "type": "object",
+      "properties": {
+        "ApplicationId": {
+          "title": "Applicationid",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "SemanticVersion": {
+          "title": "Semanticversion",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "ApplicationId",
+        "SemanticVersion"
+      ],
+      "additionalProperties": false
+    },
     "ApplicationProperties": {
       "title": "ApplicationProperties",
       "type": "object",
       "properties": {
         "Location": {
-          "title": "Location"
+          "title": "Location",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/ApplicationLocation"
+            }
+          ]
         },
         "NotificationARNs": {
           "title": "Notificationarns"
@@ -857,12 +933,16 @@
           "title": "Parameters"
         },
         "Tags": {
-          "title": "Tags"
+          "title": "Tags",
+          "type": "object"
         },
         "TimeoutInMinutes": {
           "title": "Timeoutinminutes"
         }
       },
+      "required": [
+        "Location"
+      ],
       "additionalProperties": false
     },
     "AwsServerlessApplication": {

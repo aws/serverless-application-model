@@ -13,6 +13,9 @@ Unknown = Optional[Any]
 # Value passed directly to CloudFormation; not used by SAM
 PassThrough = Any
 
+# Intrinsic resolvable by the SAM transform
+SamIntrinsic = Dict[str, Any]
+
 # By default strict
 # https://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally
 class BaseModel(LenientBaseModel):
@@ -129,21 +132,27 @@ class AwsServerlessStateMachine(BaseModel):
     Condition: Unknown
 
 
+class LayerVersionContentUri(BaseModel):
+    Bucket: PassThrough
+    Key: PassThrough
+    Version: Optional[PassThrough]
+
+
 class LayerVersionProperties(BaseModel):
-    CompatibleArchitectures: Unknown
-    CompatibleRuntimes: Unknown
-    ContentUri: Unknown
-    Description: Unknown
-    LayerName: Unknown
-    LicenseInfo: Unknown
-    RetentionPolicy: Unknown
+    CompatibleArchitectures: Optional[PassThrough]
+    CompatibleRuntimes: Optional[PassThrough]
+    ContentUri: Union[str, LayerVersionContentUri]
+    Description: Optional[PassThrough]
+    LayerName: Optional[PassThrough]
+    LicenseInfo: Optional[PassThrough]
+    RetentionPolicy: Optional[Union[str, SamIntrinsic]]
 
 
 class AwsServerlessLayerVersion(BaseModel):
     Type: Literal["AWS::Serverless::LayerVersion"]
     Properties: LayerVersionProperties
-    Condition: Unknown
-    DeletionPolicy: Unknown
+    Condition: Optional[PassThrough]
+    DeletionPolicy: Optional[PassThrough]
 
 
 class ApiProperties(BaseModel):
@@ -209,18 +218,23 @@ class AwsServerlessHttpApi(BaseModel):
     Condition: Unknown
 
 
+class ApplicationLocation(BaseModel):
+    ApplicationId: Union[str, SamIntrinsic]
+    SemanticVersion: Union[str, SamIntrinsic]
+
+
 class ApplicationProperties(BaseModel):
-    Location: Unknown
-    NotificationARNs: Unknown
-    Parameters: Unknown
-    Tags: Unknown
-    TimeoutInMinutes: Unknown
+    Location: Union[str, ApplicationLocation]
+    NotificationARNs: Optional[PassThrough]
+    Parameters: Optional[PassThrough]
+    Tags: Optional[Dict[str, Any]]
+    TimeoutInMinutes: Optional[PassThrough]
 
 
 class AwsServerlessApplication(BaseModel):
     Type: Literal["AWS::Serverless::Application"]
     Properties: ApplicationProperties
-    Condition: Unknown
+    Condition: Optional[PassThrough]
 
 
 # Match anything not containing Serverless
