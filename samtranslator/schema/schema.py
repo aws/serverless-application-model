@@ -53,7 +53,7 @@ class AwsServerlessFunction(BaseModel):
 
 # Match anything not containing Serverless
 class AnyCfnResource(LenientBaseModel):
-    Type: constr(regex=r"^((?!Serverless).)*$")
+    Type: constr(regex=r"^((?!::Serverless::).)*$")
 
 
 class Model(LenientBaseModel):

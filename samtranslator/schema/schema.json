@@ -162,7 +162,7 @@
       "properties": {
         "Type": {
           "title": "Type",
-          "pattern": "^((?!Serverless).)*$",
+          "pattern": "^((?!::Serverless::).)*$",
           "type": "string"
         }
       },
