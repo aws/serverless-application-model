@@ -28,7 +28,9 @@ Resources:
         Iam:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: RestApiGateway
             Method: GET
             Path: /
+Metadata:
+  SamTransformTest: true

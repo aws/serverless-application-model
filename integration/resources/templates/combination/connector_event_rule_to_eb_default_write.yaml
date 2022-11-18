@@ -35,10 +35,10 @@ Resources:
           EVENT_SOURCE: !Sub '${AWS::StackName}-test-event'
           EVENT_BUS_NAME: !Ref CustomEventBus
       Policies:
-        - EventBridgePutEventsPolicy:
-            EventBusName: !Ref CustomEventBus
-        - SQSPollerPolicy:
-            QueueName: !GetAtt VerificationQueue.QueueName
+      - EventBridgePutEventsPolicy:
+          EventBusName: !Ref CustomEventBus
+      - SQSPollerPolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
 
   CustomEventBus:
     Type: AWS::Events::EventBus
@@ -52,11 +52,11 @@ Resources:
       EventBusName: !Ref CustomEventBus
       EventPattern:
         source:
-          - !Sub '${AWS::StackName}-test-event'
+        - !Sub '${AWS::StackName}-test-event'
       Targets:
-        - Arn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
-          Id: "EBBus"
-          RoleArn: !GetAtt EBRole.Arn
+      - Arn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
+        Id: EBBus
+        RoleArn: !GetAtt EBRole.Arn
 
   EBRole:
     Type: AWS::IAM::Role
@@ -64,10 +64,10 @@ Resources:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Effect: Allow
-            Principal:
-              Service: events.amazonaws.com
-            Action: sts:AssumeRole
+        - Effect: Allow
+          Principal:
+            Service: events.amazonaws.com
+          Action: sts:AssumeRole
 
   MyConnector:
     Type: AWS::Serverless::Connector
@@ -78,7 +78,7 @@ Resources:
         Type: AWS::Events::EventBus
         Arn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
       Permissions:
-        - Write
+      - Write
 
   VerificationEventRule:
     Type: AWS::Events::Rule
@@ -86,10 +86,10 @@ Resources:
       Description: !Sub 'EventRule-${AWS::StackName}-verification'
       EventPattern:
         source:
-          - !Sub '${AWS::StackName}-test-event'
+        - !Sub '${AWS::StackName}-test-event'
       Targets:
-        - Arn: !GetAtt VerificationQueue.Arn
-          Id: "SQSqueue"
+      - Arn: !GetAtt VerificationQueue.Arn
+        Id: SQSqueue
 
   VerificationQueue:
     Type: AWS::SQS::Queue
@@ -102,4 +102,6 @@ Resources:
       Destination:
         Id: VerificationQueue
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true

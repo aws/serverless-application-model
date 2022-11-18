@@ -1,8 +1,26 @@
 [
-  { "LogicalResourceId":"MyFunctionImplicitGetPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyFunctionImplicitPostPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGatewayV2::Api" },
-  { "LogicalResourceId":"MyApiProdStage", "ResourceType":"AWS::ApiGatewayV2::Stage" },
-  { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyFunctionRole", "ResourceType":"AWS::IAM::Role" }
+  {
+    "LogicalResourceId": "MyFunctionImplicitGetPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionImplicitPostPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "MyApiProdStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  },
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
 ]

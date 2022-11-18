@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   MyApiWithAwsIamAuth:
     Type: AWS::Serverless::Api

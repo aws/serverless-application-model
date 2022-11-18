@@ -17,7 +17,7 @@ Resources:
               Fn::GetAtt: MyLambdaAuthFunction.Arn
             Identity:
               QueryStrings:
-                - authorization
+              - authorization
 
   MyFunction:
     Type: AWS::Serverless::Function
@@ -75,7 +75,7 @@ Resources:
             Path: /iam
             Auth:
               Authorizer: AWS_IAM
-  
+
   MyLambdaAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -104,7 +104,7 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: MyCognitoUserPool
-  
+
   MyCognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -114,17 +114,19 @@ Resources:
       GenerateSecret: false
 
 Outputs:
-    ApiUrl:
-      Description: "API endpoint URL for Prod environment"
-      Value:
-        Fn::Sub: 'https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+  ApiUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/
 
-    AuthorizerFunctionArn:
-      Description: "Authorizer Function Arn"
-      Value:
-        Fn::GetAtt: MyLambdaAuthFunction.Arn
+  AuthorizerFunctionArn:
+    Description: Authorizer Function Arn
+    Value:
+      Fn::GetAtt: MyLambdaAuthFunction.Arn
 
-    CognitoUserPoolArn:
-      Description: "Cognito User Pool Arn"
-      Value:
-        Fn::GetAtt: MyCognitoUserPool.Arn
+  CognitoUserPoolArn:
+    Description: Cognito User Pool Arn
+    Value:
+      Fn::GetAtt: MyCognitoUserPool.Arn
+Metadata:
+  SamTransformTest: true

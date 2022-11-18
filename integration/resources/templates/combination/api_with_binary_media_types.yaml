@@ -16,7 +16,9 @@ Resources:
       StageName: Prod
       DefinitionUri: ${definitionuri}
       BinaryMediaTypes:
-        - image~1jpg
-        - {"Fn::Join": ["~1", ["image", "png"]]}
-        - {"Ref": "ImageType"}
+      - image~1jpg
+      - {Fn::Join: [~1, [image, png]]}
+      - {Ref: ImageType}
 
+Metadata:
+  SamTransformTest: true

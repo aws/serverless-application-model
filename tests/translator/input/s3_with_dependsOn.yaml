@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   Topic:
     Type: AWS::SNS::Topic

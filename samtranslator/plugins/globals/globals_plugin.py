@@ -19,7 +19,7 @@ class GlobalsPlugin(BasePlugin):
         """
         super(GlobalsPlugin, self).__init__(GlobalsPlugin.__name__)
 
-    @cw_timer(prefix="Plugin-Globals")  # type: ignore[no-untyped-call]
+    @cw_timer(prefix="Plugin-Globals")
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Hook method that runs before a template gets transformed. In this method, we parse and process Globals section

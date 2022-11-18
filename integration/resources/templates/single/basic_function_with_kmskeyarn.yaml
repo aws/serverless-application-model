@@ -1,32 +1,33 @@
 Resources:
-    BasicFunctionWithKmsKeyArn:
-      Type: AWS::Serverless::Function
-      Properties:
-        Handler: index.handler
-        Runtime: nodejs14.x
-        CodeUri: ${codeuri}
-        MemorySize: 128
-        Environment:
-          Variables:
-            Key: Value
-        KmsKeyArn:
-          Fn::GetAtt: [MyKey, Arn]
+  BasicFunctionWithKmsKeyArn:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+      Environment:
+        Variables:
+          Key: Value
+      KmsKeyArn:
+        Fn::GetAtt: [MyKey, Arn]
 
 
-    MyKey:
-       Type: "AWS::KMS::Key"
-       Properties:
-         Description: "A sample key"
-         KeyPolicy:
-           Version: "2012-10-17"
-           Id: "key-default-1"
-           Statement:
-             -
-               Sid: "Allow administration of the key"
-               Effect: "Allow"
-               Principal:
-                 AWS:
-                   Fn::Sub: "arn:${AWS::Partition}:iam::${AWS::AccountId}:root"
-               Action:
-                 - "kms:*"
-               Resource: "*"
+  MyKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: A sample key
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: key-default-1
+        Statement:
+        - Sid: Allow administration of the key
+          Effect: Allow
+          Principal:
+            AWS:
+              Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:root
+          Action:
+          - kms:*
+          Resource: '*'
+Metadata:
+  SamTransformTest: true

@@ -20,3 +20,5 @@ Outputs:
     Value:
       Ref: MyApi.Deployment
 
+Metadata:
+  SamTransformTest: true

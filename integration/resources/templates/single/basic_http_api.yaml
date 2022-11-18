@@ -9,3 +9,5 @@ Resources:
             Ref: AWS::StackName
         openapi: 3.0.1
         paths: {}
+Metadata:
+  SamTransformTest: true

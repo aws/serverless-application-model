@@ -4,7 +4,7 @@
 
 Resources:
   MyAwesomeFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ${codeuri}
       Handler: index.handler
@@ -16,7 +16,7 @@ Resources:
         CWSchedule:
           Type: Schedule
           Properties:
-            Schedule: 'rate(1 minute)'
+            Schedule: rate(1 minute)
 
         CWEvent:
           Type: CloudWatchEvent
@@ -57,7 +57,7 @@ Resources:
           Type: Kinesis
           Properties:
             Stream:
-              Fn::GetAtt: ["Stream", "Arn"]
+              Fn::GetAtt: [Stream, Arn]
             BatchSize: 100
             StartingPosition: TRIM_HORIZON
 
@@ -65,7 +65,7 @@ Resources:
           Type: DynamoDB
           Properties:
             Stream:
-              Fn::GetAtt: ["MyTable", "StreamArn"]
+              Fn::GetAtt: [MyTable, StreamArn]
             BatchSize: 200
             StartingPosition: LATEST
 
@@ -78,7 +78,7 @@ Resources:
   ExistingRestApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: "Dev"
+      StageName: Dev
       DefinitionUri: ${definitionuri}
 
   Stream:
@@ -104,3 +104,5 @@ Resources:
       - KeyType: HASH
         AttributeName: id
 
+Metadata:
+  SamTransformTest: true

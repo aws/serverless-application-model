@@ -13,11 +13,11 @@ Resources:
         PasswordPolicy:
           MinimumLength: 8
       UsernameAttributes:
-        - email
+      - email
       Schema:
-        - AttributeDataType: String
-          Name: email
-          Required: false
+      - AttributeDataType: String
+        Name: email
+        Required: false
 
   PreSignupLambdaFunction:
     Type: AWS::Serverless::Function
@@ -40,16 +40,18 @@ Resources:
             Trigger: PreSignUp
 
 Outputs:
-    Region:
-      Description: "Region"
-      Value:
-        Ref: AWS::Region
-    
-    PreSignupLambdaFunctionArn:
-      Description: "lambda Function Arn"
-      Value:
-        Fn::GetAtt: [PreSignupLambdaFunction, Arn]
-    CognitoUserPoolId:
-      Description: "Cognito User Pool Id"
-      Value:
-        Ref: MyCognitoUserPool
+  Region:
+    Description: Region
+    Value:
+      Ref: AWS::Region
+
+  PreSignupLambdaFunctionArn:
+    Description: lambda Function Arn
+    Value:
+      Fn::GetAtt: [PreSignupLambdaFunction, Arn]
+  CognitoUserPoolId:
+    Description: Cognito User Pool Id
+    Value:
+      Ref: MyCognitoUserPool
+Metadata:
+  SamTransformTest: true

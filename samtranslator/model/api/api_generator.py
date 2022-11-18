@@ -1,6 +1,6 @@
 import logging
 from collections import namedtuple
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Dict
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
@@ -338,15 +338,15 @@ class ApiGenerator(object):
             s3_pointer = self.definition_uri
 
         else:
-
             # DefinitionUri is a string
-            s3_pointer = parse_s3_uri(self.definition_uri)  # type: ignore[no-untyped-call]
-            if s3_pointer is None:
+            _parsed_s3_pointer = parse_s3_uri(self.definition_uri)
+            if _parsed_s3_pointer is None:
                 raise InvalidResourceException(
                     self.logical_id,
                     "'DefinitionUri' is not a valid S3 Uri of the form "
                     "'s3://bucket/key' with optional versionId query parameter.",
                 )
+            s3_pointer = _parsed_s3_pointer
 
             if isinstance(self.definition_uri, Py27UniStr):
                 # self.defintion_uri is a Py27UniStr instance if it is defined in the template
@@ -394,8 +394,8 @@ class ApiGenerator(object):
         if stage_name_prefix.isalnum():
             stage_logical_id = self.logical_id + stage_name_prefix + "Stage"
         else:
-            generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)  # type: ignore[no-untyped-call]
-            stage_logical_id = generator.gen()  # type: ignore[no-untyped-call]
+            generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)
+            stage_logical_id = generator.gen()
         stage = ApiGatewayStage(stage_logical_id, attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
         stage.update_deployment_ref(deployment.logical_id)  # type: ignore[no-untyped-call]
@@ -414,7 +414,7 @@ class ApiGenerator(object):
             )
 
         if self.tags is not None:
-            stage.Tags = get_tag_list(self.tags)  # type: ignore[no-untyped-call]
+            stage.Tags = get_tag_list(self.tags)
 
         return stage
 
@@ -432,7 +432,7 @@ class ApiGenerator(object):
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(
-            "ApiGatewayDomainName", LogicalIdGenerator("", self.domain.get("DomainName")).gen()  # type: ignore[no-untyped-call, no-untyped-call]
+            "ApiGatewayDomainName", LogicalIdGenerator("", self.domain.get("DomainName")).gen()
         )
 
         domain = ApiGatewayDomainName(self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes)
@@ -537,7 +537,7 @@ class ApiGenerator(object):
                     "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
                 )
 
-            logical_id_suffix = LogicalIdGenerator(  # type: ignore[no-untyped-call, no-untyped-call]
+            logical_id_suffix = LogicalIdGenerator(
                 "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
             ).gen()
             logical_id = "RecordSetGroup" + logical_id_suffix
@@ -593,7 +593,7 @@ class ApiGenerator(object):
             alias_target["DNSName"] = route53.get("DistributionDomainName")
         return alias_target
 
-    @cw_timer(prefix="Generator", name="Api")  # type: ignore[no-untyped-call]
+    @cw_timer(prefix="Generator", name="Api")
     def to_cloudformation(self, redeploy_restapi_parameters, route53_record_set_groups):  # type: ignore[no-untyped-def]
         """Generates CloudFormation resources from a SAM API resource
 
@@ -661,7 +661,7 @@ class ApiGenerator(object):
             )
 
         editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
-        for path in editor.iter_on_path():  # type: ignore[no-untyped-call]
+        for path in editor.iter_on_path():
             try:
                 editor.add_cors(  # type: ignore[no-untyped-call]
                     path,
@@ -724,12 +724,11 @@ class ApiGenerator(object):
 
         if authorizers:
             swagger_editor.add_authorizers_security_definitions(authorizers)  # type: ignore[no-untyped-call]
-            self._set_default_authorizer(  # type: ignore[no-untyped-call]
+            self._set_default_authorizer(
                 swagger_editor,
                 authorizers,
                 auth_properties.DefaultAuthorizer,
                 auth_properties.AddDefaultAuthorizerToCorsPreflight,
-                auth_properties.Authorizers,
             )
 
         if auth_properties.ApiKeyRequired:
@@ -737,10 +736,10 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)  # type: ignore[no-untyped-call]
 
         if auth_properties.ResourcePolicy:
-            SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+            SwaggerEditor.validate_is_dict(
                 auth_properties.ResourcePolicy, "ResourcePolicy must be a map (ResourcePolicyStatement)."
             )
-            for path in swagger_editor.iter_on_path():  # type: ignore[no-untyped-call]
+            for path in swagger_editor.iter_on_path():
                 swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)  # type: ignore[no-untyped-call]
             if auth_properties.ResourcePolicy.get("CustomStatements"):
                 swagger_editor.add_custom_statements(auth_properties.ResourcePolicy.get("CustomStatements"))  # type: ignore[no-untyped-call]
@@ -1048,13 +1047,18 @@ class ApiGenerator(object):
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
-                                SwaggerEditor.validate_is_dict(  # type: ignore[no-untyped-call]
+                                SwaggerEditor.validate_is_dict(
                                     field_val,
                                     "Value of responses in options method for path {} must be a "
                                     "dictionary according to Swagger spec.".format(path),
                                 )
                                 if field_val.get("200") and field_val.get("200").get("headers"):
                                     headers = field_val["200"]["headers"]
+                                    SwaggerEditor.validate_is_dict(
+                                        headers,
+                                        "Value of response's headers in options method for path {} must be a "
+                                        "dictionary according to Swagger spec.".format(path),
+                                    )
                                     for header, header_val in headers.items():
                                         new_header_val_with_schema = Py27Dict()
                                         new_header_val_with_schema["schema"] = header_val
@@ -1105,7 +1109,7 @@ class ApiGenerator(object):
         :rtype: model.lambda_.LambdaPermission
         """
         rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
-        api_id = rest_api.get_runtime_attr("rest_api_id")  # type: ignore[no-untyped-call]
+        api_id = rest_api.get_runtime_attr("rest_api_id")
 
         partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
         resource = "${__ApiId__}/authorizers/*"
@@ -1146,9 +1150,13 @@ class ApiGenerator(object):
 
         return permissions
 
-    def _set_default_authorizer(  # type: ignore[no-untyped-def]
-        self, swagger_editor, authorizers, default_authorizer, add_default_auth_to_preflight=True, api_authorizers=None
-    ):
+    def _set_default_authorizer(
+        self,
+        swagger_editor: SwaggerEditor,
+        authorizers: Dict[str, ApiGatewayAuthorizer],
+        default_authorizer: str,
+        add_default_auth_to_preflight: bool = True,
+    ) -> None:
         if not default_authorizer:
             return
 
@@ -1172,7 +1180,6 @@ class ApiGenerator(object):
                 default_authorizer,
                 authorizers=authorizers,
                 add_default_auth_to_preflight=add_default_auth_to_preflight,
-                api_authorizers=api_authorizers,
             )
 
     def _set_default_apikey_required(self, swagger_editor):  # type: ignore[no-untyped-def]

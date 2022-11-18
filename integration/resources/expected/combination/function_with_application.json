@@ -1,5 +1,14 @@
 [
-  { "LogicalResourceId":"MyNestedApp", "ResourceType":"AWS::CloudFormation::Stack" },
-  { "LogicalResourceId":"MyLambdaFunctionWithApplication", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionWithApplicationRole", "ResourceType":"AWS::IAM::Role" }
+  {
+    "LogicalResourceId": "MyNestedApp",
+    "ResourceType": "AWS::CloudFormation::Stack"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionWithApplication",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionWithApplicationRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
 ]

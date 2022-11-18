@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional, cast
 
 from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
@@ -52,7 +52,7 @@ class DeploymentPreferenceCollection(object):
         """
         self._resource_preferences: Dict[str, Any] = {}
 
-    def add(self, logical_id, deployment_preference_dict, condition=None):  # type: ignore[no-untyped-def]
+    def add(self, logical_id: str, deployment_preference_dict: Dict[str, Any], condition: Optional[str] = None) -> None:
         """
         Add this deployment preference to the collection
 
@@ -72,11 +72,13 @@ class DeploymentPreferenceCollection(object):
             logical_id, deployment_preference_dict, condition
         )
 
-    def get(self, logical_id):  # type: ignore[no-untyped-def]
+    def get(self, logical_id: str) -> DeploymentPreference:
         """
         :rtype: DeploymentPreference object previously added for this given logical_id
         """
-        return self._resource_preferences.get(logical_id)
+        # Note: it never returns None
+        # TODO: find a way to deal with this implicit assumption
+        return cast(DeploymentPreference, self._resource_preferences.get(logical_id))
 
     def any_enabled(self):  # type: ignore[no-untyped-def]
         """
@@ -134,7 +136,7 @@ class DeploymentPreferenceCollection(object):
             condition_name = CODE_DEPLOY_CONDITION_NAME
             if len(conditions) <= 1:
                 condition_name = conditions.pop()
-            codedeploy_application_resource.set_resource_attribute("Condition", condition_name)  # type: ignore[no-untyped-call]
+            codedeploy_application_resource.set_resource_attribute("Condition", condition_name)
         return codedeploy_application_resource
 
     def get_codedeploy_iam_role(self):  # type: ignore[no-untyped-def]
@@ -166,16 +168,16 @@ class DeploymentPreferenceCollection(object):
             condition_name = CODE_DEPLOY_CONDITION_NAME
             if len(conditions) <= 1:
                 condition_name = conditions.pop()
-            iam_role.set_resource_attribute("Condition", condition_name)  # type: ignore[no-untyped-call]
+            iam_role.set_resource_attribute("Condition", condition_name)
         return iam_role
 
-    def deployment_group(self, function_logical_id):  # type: ignore[no-untyped-def]
+    def deployment_group(self, function_logical_id: str) -> CodeDeployDeploymentGroup:
         """
         :param function_logical_id: logical_id of the function this deployment group belongs to
         :return: CodeDeployDeploymentGroup resource
         """
 
-        deployment_preference = self.get(function_logical_id)  # type: ignore[no-untyped-call]
+        deployment_preference = self.get(function_logical_id)
 
         deployment_group = CodeDeployDeploymentGroup(self.deployment_group_logical_id(function_logical_id))  # type: ignore[no-untyped-call, no-untyped-call]
 
@@ -204,7 +206,7 @@ class DeploymentPreferenceCollection(object):
             deployment_group.TriggerConfigurations = deployment_preference.trigger_configurations
 
         if deployment_preference.condition:
-            deployment_group.set_resource_attribute("Condition", deployment_preference.condition)  # type: ignore[no-untyped-call]
+            deployment_group.set_resource_attribute("Condition", deployment_preference.condition)
 
         return deployment_group
 
@@ -285,12 +287,12 @@ class DeploymentPreferenceCollection(object):
             return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value})
         return value
 
-    def update_policy(self, function_logical_id):  # type: ignore[no-untyped-def]
-        deployment_preference = self.get(function_logical_id)  # type: ignore[no-untyped-call]
+    def update_policy(self, function_logical_id: str) -> UpdatePolicy:
+        deployment_preference = self.get(function_logical_id)
 
         return UpdatePolicy(
             ref(CODEDEPLOY_APPLICATION_LOGICAL_ID),
-            self.deployment_group(function_logical_id).get_runtime_attr("name"),  # type: ignore[no-untyped-call]
+            self.deployment_group(function_logical_id).get_runtime_attr("name"),
             deployment_preference.pre_traffic_hook,
             deployment_preference.post_traffic_hook,
         )

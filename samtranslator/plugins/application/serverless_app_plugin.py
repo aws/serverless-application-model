@@ -70,7 +70,7 @@ class ServerlessAppPlugin(BasePlugin):
             message = "Cannot set both validate_only and wait_for_template_active_status flags to True."
             raise InvalidPluginException(ServerlessAppPlugin.__name__, message)  # type: ignore[no-untyped-call]
 
-    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Hook method that gets called before the SAM template is processed.
@@ -230,7 +230,7 @@ class ServerlessAppPlugin(BasePlugin):
             return None
         return str(param)
 
-    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
     def on_before_transform_resource(self, logical_id, resource_type, resource_properties):  # type: ignore[no-untyped-def]
         """
         Hook method that gets called before "each" SAM resource gets processed
@@ -306,7 +306,7 @@ class ServerlessAppPlugin(BasePlugin):
             if key not in dictionary:
                 raise InvalidResourceException(logical_id, f"Resource is missing the required [{key}] property.")
 
-    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
     def on_after_transform_template(self, template):  # type: ignore[no-untyped-def]
         """
         Hook method that gets called after the template is processed
@@ -380,7 +380,7 @@ class ServerlessAppPlugin(BasePlugin):
 
         return status == "ACTIVE"
 
-    @cw_timer(prefix="External", name="SAR")  # type: ignore[no-untyped-call]
+    @cw_timer(prefix="External", name="SAR")
     def _sar_service_call(self, service_call_lambda, logical_id, *args):  # type: ignore[no-untyped-def]
         """
         Handles service calls and exception management for service calls

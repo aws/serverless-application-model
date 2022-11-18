@@ -1,0 +1,39 @@
+Parameters:
+  Parameter1:
+    Type: AWS::SSM::Parameter::Value<List<String>>
+    Default:
+    # This is invalid CFN template:
+    # "Template format error: Every Default member must be a string."
+    - a
+    - b
+
+  Parameter2:
+    Type: AWS::SSM::Parameter::Value<List<String>>
+    Default:
+    - a
+    - b
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+          - Principal: '*'
+            Effect: Allow
+            Action: execute-api:Invoke
+            Resource: execute-api:/*/*/*
+          - Principal: '*'
+            Effect: Deny
+            Action: execute-api:Invoke
+            Resource: execute-api:/*/*/*
+            Condition:
+              NotIpAddress:
+                aws:SourceIp:
+                  Fn::Join:
+                  - ','
+                  - - ''
+                    - Fn::Sub: ${Parameter1}
+                    - Fn::Sub: ${Parameter2}

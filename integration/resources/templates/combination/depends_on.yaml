@@ -6,46 +6,45 @@ Resources:
   # https://github.com/awslabs/serverless-application-model/issues/68#issuecomment-276495326
 
   MyLambdaFunction:
-    Type: "AWS::Serverless::Function"
+    Type: AWS::Serverless::Function
     DependsOn: LambdaRolePolicy
     Properties:
       Role:
-        "Fn::GetAtt": LambdaRole.Arn
+        Fn::GetAtt: LambdaRole.Arn
       Handler: lambda_function.lambda_handler
       Runtime: python3.8
       Timeout: 15
       CodeUri: ${codeuri}
 
   LambdaRole:
-    Type: "AWS::IAM::Role"
+    Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
-          -
-            Effect: "Allow"
-            Action:
-              - "sts:AssumeRole"
-            Principal:
-              Service:
-                - "lambda.amazonaws.com"
+        - Effect: Allow
+          Action:
+          - sts:AssumeRole
+          Principal:
+            Service:
+            - lambda.amazonaws.com
 
   LambdaRolePolicy:
-    Type: "AWS::IAM::Policy"
+    Type: AWS::IAM::Policy
     Properties:
-      PolicyName: "LambdaRolePolicy"
+      PolicyName: LambdaRolePolicy
       PolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
-          -
-            Effect: "Allow"
-            Action:
-              - "logs:CreateLogGroup"
-              - "logs:CreateLogStream"
-              - "logs:PutLogEvents"
-            Resource:
-              - "*"
+        - Effect: Allow
+          Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          Resource:
+          - '*'
       Roles:
-        -
-          Ref: "LambdaRole"
+      - Ref: LambdaRole
 
+Metadata:
+  SamTransformTest: true

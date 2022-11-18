@@ -16,11 +16,11 @@ Resources:
             Result: World
             End: true
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Deny
-              Action: "*"
-              Resource: "*"
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
       Events:
         CWEvent:
           Type: EventBridgeRule
@@ -28,7 +28,7 @@ Resources:
             Pattern:
               detail:
                 state:
-                  - terminated
+                - terminated
             DeadLetterConfig:
               Type: SQS
             RetryPolicy:
@@ -36,24 +36,26 @@ Resources:
 
 Outputs:
   MyStateMachineArn:
-    Description: "ARN of the State Machine"
+    Description: ARN of the State Machine
     Value:
       Ref: MyStateMachine
   MyEventName:
-    Description: "Name of the CloudWatchEvent rule created"
+    Description: Name of the CloudWatchEvent rule created
     Value:
       Ref: MyStateMachineCWEvent
   MyEventRole:
-    Description: "Name of the role created for the CWE rule"
+    Description: Name of the role created for the CWE rule
     Value:
       Ref: MyStateMachineCWEventRole
   MyDLQArn:
-    Description: "Arn of the dead-letter queue created for the CWE rule target"
+    Description: Arn of the dead-letter queue created for the CWE rule target
     Value:
       Fn::GetAtt:
-        - "MyStateMachineCWEventQueue"
-        - "Arn"
+      - MyStateMachineCWEventQueue
+      - Arn
   MyDLQUrl:
-    Description: "Url of the dead-letter queue created for the CWE rule target"
+    Description: Url of the dead-letter queue created for the CWE rule target
     Value:
       Ref: MyStateMachineCWEventQueue
+Metadata:
+  SamTransformTest: true

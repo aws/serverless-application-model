@@ -1,0 +1,34 @@
+[
+  {
+    "LogicalResourceId": "HelloWorldFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "HelloWorldFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "MyApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "MyApiProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "Post",
+    "ResourceType": "AWS::StepFunctions::StateMachine"
+  },
+  {
+    "LogicalResourceId": "PostPostEchoRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "PostRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
+]
