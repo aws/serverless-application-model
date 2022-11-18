@@ -33,7 +33,7 @@ lint:
 	# Linter performs static analysis to catch latent bugs
 	pylint --rcfile .pylintrc samtranslator
 	# Ensure templates adhere to JSON schema
-	./validate.sh
+	bin/validate.sh
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
