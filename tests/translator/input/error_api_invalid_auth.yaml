@@ -222,6 +222,14 @@ Resources:
         # Correct usage: DefaultAuthorizer: MyAuth
         DefaultAuthorizer: !Ref MyAuth
 
+  NonDictAuthorizerRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyAuth: AWS_IAM # It should be a dict
+
   NonDictAuthorizerApi:
     Type: AWS::Serverless::HttpApi
     Properties:
