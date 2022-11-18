@@ -1,30 +1,30 @@
 Resources:
   PreCreatedVpc:
-    Type: "AWS::EC2::VPC"
+    Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: "10.0.0.0/16"
+      CidrBlock: 10.0.0.0/16
 
   PreCreatedSubnetOne:
-    Type: "AWS::EC2::Subnet"
+    Type: AWS::EC2::Subnet
     Properties:
       VpcId:
         Ref: PreCreatedVpc
-      CidrBlock: "10.0.0.0/24"
+      CidrBlock: 10.0.0.0/24
       AvailabilityZone:
         Fn::Select:
-          - 0
-          - Fn::GetAZs: ""
+        - 0
+        - Fn::GetAZs: ''
 
   PreCreatedSubnetTwo:
-    Type: "AWS::EC2::Subnet"
+    Type: AWS::EC2::Subnet
     Properties:
       VpcId:
         Ref: PreCreatedVpc
-      CidrBlock: "10.0.1.0/24"
+      CidrBlock: 10.0.1.0/24
       AvailabilityZone:
         Fn::Select:
-          - 1
-          - Fn::GetAZs: ""
+        - 1
+        - Fn::GetAZs: ''
 
   PreCreatedInternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -43,26 +43,28 @@ Resources:
 
 Outputs:
   PreCreatedVpc:
-    Description: "Pre-created VPC that can be used inside other tests"
+    Description: Pre-created VPC that can be used inside other tests
     Value:
       Ref: PreCreatedVpc
   PreCreatedSubnetTwo:
-    Description: "Pre-created #2 subnet that can be used inside other tests"
+    Description: 'Pre-created #2 subnet that can be used inside other tests'
     Value:
       Ref: PreCreatedSubnetTwo
   PreCreatedSubnetOne:
-    Description: "Pre-created #1 subnet that can be used inside other tests"
+    Description: 'Pre-created #1 subnet that can be used inside other tests'
     Value:
       Ref: PreCreatedSubnetOne
   PreCreatedInternetGateway:
-    Description: "Pre-created Internet Gateway that can be used inside other tests"
+    Description: Pre-created Internet Gateway that can be used inside other tests
     Value:
       Ref: PreCreatedInternetGateway
   PreCreatedAttachGateway:
-    Description: "Pre-created Attach Gateway that can be used inside other tests"
+    Description: Pre-created Attach Gateway that can be used inside other tests
     Value:
       Ref: PreCreatedAttachGateway
   PreCreatedS3Bucket:
-    Description: "Pre-created S3 Bucket that can be used inside other tests"
-    Value: 
+    Description: Pre-created S3 Bucket that can be used inside other tests
+    Value:
       Ref: PreCreatedS3Bucket
+Metadata:
+  SamTransformTest: true

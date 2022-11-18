@@ -1,6 +1,18 @@
 [
-  { "LogicalResourceId":"ActiveTracingFunction", "ResourceType":"AWS::Lambda::Function"},
-  { "LogicalResourceId":"ActiveTracingFunctionRole", "ResourceType":"AWS::IAM::Role"},
-  { "LogicalResourceId":"PassThroughTracingFunction", "ResourceType":"AWS::Lambda::Function"},
-  { "LogicalResourceId":"PassThroughTracingFunctionRole", "ResourceType":"AWS::IAM::Role" }
+  {
+    "LogicalResourceId": "ActiveTracingFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "ActiveTracingFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "PassThroughTracingFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "PassThroughTracingFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
 ]

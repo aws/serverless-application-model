@@ -1,10 +1,11 @@
 Resources:
-    MyLambdaFunction:
-        Type: AWS::Serverless::Function
-        Properties:
-            Handler: index.handler
-            Runtime: nodejs14.x
-            CodeUri: ${codeuri}
-            MemorySize: 128
-            Architectures: ["arm64"]
-            
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+      Architectures: [arm64]
+Metadata:
+  SamTransformTest: true

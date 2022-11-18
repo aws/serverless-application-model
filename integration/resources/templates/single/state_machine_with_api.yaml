@@ -17,7 +17,7 @@ Resources:
     Type: AWS::Serverless::StateMachine
     Properties:
       Policies:
-        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+      - arn:aws:iam::aws:policy/AWSLambda_FullAccess
       Definition:
         StartAt: One
         States:
@@ -37,3 +37,5 @@ Resources:
 Outputs:
   ApiEndpoint:
     Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/echo"
+Metadata:
+  SamTransformTest: true

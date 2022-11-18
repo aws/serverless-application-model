@@ -18,8 +18,7 @@ Resources:
       SubnetId:
         Ref: PreCreatedSubnetOne
       SecurityGroups:
-        -
-          Fn::GetAtt: MySecurityGroup.GroupId
+      - Fn::GetAtt: MySecurityGroup.GroupId
 
   AccessPoint:
     Type: AWS::EFS::AccessPoint
@@ -47,19 +46,19 @@ Resources:
       Timeout: 3
       VpcConfig:
         SecurityGroupIds:
-          -
-            Fn::GetAtt: MySecurityGroup.GroupId
+        - Fn::GetAtt: MySecurityGroup.GroupId
         SubnetIds:
-          -
-            Ref: PreCreatedSubnetOne
+        - Ref: PreCreatedSubnetOne
       FileSystemConfigs:
-        - Arn:
-            Fn::GetAtt: AccessPoint.Arn
-          LocalMountPath: /mnt/EFS
+      - Arn:
+          Fn::GetAtt: AccessPoint.Arn
+        LocalMountPath: /mnt/EFS
 
   MySecurityGroup:
-    Type: "AWS::EC2::SecurityGroup"
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: "my test group"
+      GroupDescription: my test group
       VpcId:
         Ref: PreCreatedVpc
+Metadata:
+  SamTransformTest: true

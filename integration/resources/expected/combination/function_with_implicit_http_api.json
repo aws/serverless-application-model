@@ -1,7 +1,22 @@
 [
-  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyLambdaFunctionGetApiPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"ServerlessHttpApi", "ResourceType":"AWS::ApiGatewayV2::Api" },
-  { "LogicalResourceId":"ServerlessHttpApiApiGatewayDefaultStage", "ResourceType":"AWS::ApiGatewayV2::Stage" }
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionGetApiPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "ServerlessHttpApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "ServerlessHttpApiApiGatewayDefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  }
 ]

@@ -45,12 +45,14 @@ Resources:
         SemanticVersion:
           Fn::FindInMap:
           - SARApplication
-          - { Ref: 'AWS::Region' }
+          - {Ref: AWS::Region}
           - SemanticVersion
       Parameters:
         IdentityNameParameter: test
       NotificationARNs:
-        - Ref: MySns
+      - Ref: MySns
 
   MySns:
     Type: AWS::SNS::Topic
+Metadata:
+  SamTransformTest: true

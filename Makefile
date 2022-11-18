@@ -19,22 +19,29 @@ integ-test:
 
 black:
 	black setup.py samtranslator/* tests/* integration/* bin/*.py
-	bin/json-format.py --write tests
+	bin/json-format.py --write tests integration
 	bin/yaml-format.py --write tests
+	bin/yaml-format.py --write integration --add-test-metadata
 
 black-check:
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
-	bin/json-format.py --check tests
+	bin/json-format.py --check tests integration
 	bin/yaml-format.py --check tests
+	bin/yaml-format.py --check integration --add-test-metadata
 
 lint:
 	# mypy performs type check
 	mypy --strict samtranslator bin
 	# Linter performs static analysis to catch latent bugs
 	pylint --rcfile .pylintrc samtranslator
+	# Ensure templates adhere to JSON schema
+	bin/validate.sh
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
+
+schema:
+	python samtranslator/schema/schema.py > samtranslator/schema/schema.json
 
 # Command to run everytime you make changes to verify everything works
 dev: test

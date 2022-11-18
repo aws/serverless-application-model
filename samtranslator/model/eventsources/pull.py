@@ -434,6 +434,12 @@ class SelfManagedKafka(PullEventSource):
         authentication_uri = None
         has_vpc_subnet = False
         has_vpc_security_group = False
+
+        if not isinstance(source_access_configurations, list):
+            raise InvalidEventException(
+                self.relative_id,
+                "SourceAccessConfigurations for self managed kafka event should be a list.",
+            )
         for config in source_access_configurations:
             if config.get("Type") == "VPC_SUBNET":
                 self.validate_uri(config, "VPC_SUBNET")  # type: ignore[no-untyped-call]

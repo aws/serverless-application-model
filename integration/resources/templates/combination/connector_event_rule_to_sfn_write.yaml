@@ -7,7 +7,7 @@ Resources:
       Timeout: 10  # in case eb has delay
       InlineCode: |
         const AWS = require('aws-sdk');
-        
+
         exports.handler = async (event) => {
           const eb = new AWS.EventBridge();
           const response = await eb.putEvents({
@@ -33,10 +33,10 @@ Resources:
           QUEUE_URL: !Ref VerificationQueue
           EVENT_SOURCE: !Sub '${AWS::StackName}-test-event'
       Policies:
-        - EventBridgePutEventsPolicy:
-            EventBusName: default
-        - SQSPollerPolicy:
-            QueueName: !GetAtt VerificationQueue.QueueName
+      - EventBridgePutEventsPolicy:
+          EventBusName: default
+      - SQSPollerPolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
 
   EventRule:
     Type: AWS::Events::Rule
@@ -44,11 +44,11 @@ Resources:
       Description: !Sub 'EventRule-${AWS::StackName}'
       EventPattern:
         source:
-          - !Sub '${AWS::StackName}-test-event'
+        - !Sub '${AWS::StackName}-test-event'
       Targets:
-        - Arn: !GetAtt StateMachine.Arn
-          Id: "Target"
-          RoleArn: !GetAtt EBRole.Arn
+      - Arn: !GetAtt StateMachine.Arn
+        Id: Target
+        RoleArn: !GetAtt EBRole.Arn
 
   EBRole:
     Type: AWS::IAM::Role
@@ -56,10 +56,10 @@ Resources:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Effect: Allow
-            Principal:
-              Service: events.amazonaws.com
-            Action: sts:AssumeRole
+        - Effect: Allow
+          Principal:
+            Service: events.amazonaws.com
+          Action: sts:AssumeRole
 
   StateMachine:
     Type: AWS::Serverless::StateMachine
@@ -74,10 +74,10 @@ Resources:
             Parameters:
               QueueUrl: !Ref VerificationQueue
               MessageBody: hello
-            End: True
+            End: true
       Policies:
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt VerificationQueue.QueueName
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
 
   VerificationQueue:
     Type: AWS::SQS::Queue
@@ -90,4 +90,6 @@ Resources:
       Destination:
         Id: StateMachine
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true

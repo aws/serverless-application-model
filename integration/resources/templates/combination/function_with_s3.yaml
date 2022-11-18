@@ -16,3 +16,5 @@ Resources:
             Events: s3:ObjectCreated:*
   MyBucket:
     Type: AWS::S3::Bucket
+Metadata:
+  SamTransformTest: true

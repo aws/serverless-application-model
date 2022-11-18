@@ -6,7 +6,7 @@
 
 Resources:
   MyLambdaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ${codeuri}
       Handler: hello.handler
@@ -14,7 +14,7 @@ Resources:
       AutoPublishAlias: Live
 
   MyOtherFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ${codeuri}
       Runtime: python3.8
@@ -33,7 +33,7 @@ Outputs:
 
   AliasInSub:
     Value:
-      Fn::Sub: ["${MyLambdaFunction.Alias} ${SomeValue}", {"SomeValue": "Alias"}]
+      Fn::Sub: ['${MyLambdaFunction.Alias} ${SomeValue}', SomeValue: Alias]
 
   VersionArn:
     Value:
@@ -41,4 +41,6 @@ Outputs:
 
   VersionNumber:
     Value:
-      Fn::GetAtt: ["MyLambdaFunction.Version", "Version"]
+      Fn::GetAtt: [MyLambdaFunction.Version, Version]
+Metadata:
+  SamTransformTest: true

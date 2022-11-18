@@ -4,206 +4,208 @@
 
 Resources:
   MyFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ${codeuri}
       Handler: hello.handler
       Runtime: python3.8
       Policies:
 
-        - SQSPollerPolicy:
-            QueueName: name
+      - SQSPollerPolicy:
+          QueueName: name
 
-        - LambdaInvokePolicy:
-            FunctionName: name
+      - LambdaInvokePolicy:
+          FunctionName: name
 
-        - CloudWatchPutMetricPolicy: {}
+      - CloudWatchPutMetricPolicy: {}
 
-        - EC2DescribePolicy: {}
+      - EC2DescribePolicy: {}
 
-        - DynamoDBCrudPolicy:
-            TableName: name
+      - DynamoDBCrudPolicy:
+          TableName: name
 
-        - DynamoDBReadPolicy:
-            TableName: name
+      - DynamoDBReadPolicy:
+          TableName: name
 
-        - SESSendBouncePolicy:
-            IdentityName: name
+      - SESSendBouncePolicy:
+          IdentityName: name
 
-        - ElasticsearchHttpPostPolicy:
-            DomainName: name
+      - ElasticsearchHttpPostPolicy:
+          DomainName: name
 
-        - S3ReadPolicy:
-            BucketName: name
+      - S3ReadPolicy:
+          BucketName: name
 
-        - S3CrudPolicy:
-            BucketName: name
+      - S3CrudPolicy:
+          BucketName: name
 
-        - AMIDescribePolicy: {}
+      - AMIDescribePolicy: {}
 
-        - CloudFormationDescribeStacksPolicy: {}
+      - CloudFormationDescribeStacksPolicy: {}
 
-        - RekognitionDetectOnlyPolicy: {}
+      - RekognitionDetectOnlyPolicy: {}
 
-        - RekognitionNoDataAccessPolicy:
-            CollectionId: id
+      - RekognitionNoDataAccessPolicy:
+          CollectionId: id
 
-        - RekognitionReadPolicy:
-            CollectionId: id
+      - RekognitionReadPolicy:
+          CollectionId: id
 
-        - RekognitionWriteOnlyAccessPolicy:
-            CollectionId: id
+      - RekognitionWriteOnlyAccessPolicy:
+          CollectionId: id
 
-        - SQSSendMessagePolicy:
-            QueueName: name
+      - SQSSendMessagePolicy:
+          QueueName: name
 
-        - SNSPublishMessagePolicy:
-            TopicName: name
+      - SNSPublishMessagePolicy:
+          TopicName: name
 
-        - VPCAccessPolicy: {}
+      - VPCAccessPolicy: {}
 
-        - DynamoDBStreamReadPolicy:
-            TableName: name
-            StreamName: name
+      - DynamoDBStreamReadPolicy:
+          TableName: name
+          StreamName: name
 
-        - KinesisStreamReadPolicy:
-            StreamName: name
+      - KinesisStreamReadPolicy:
+          StreamName: name
 
-        - SESCrudPolicy:
-            IdentityName: name
+      - SESCrudPolicy:
+          IdentityName: name
 
-        - SNSCrudPolicy:
-            TopicName: name
+      - SNSCrudPolicy:
+          TopicName: name
 
-        - KinesisCrudPolicy:
-            StreamName: name
+      - KinesisCrudPolicy:
+          StreamName: name
 
-        - KMSDecryptPolicy:
-            KeyId: keyId
+      - KMSDecryptPolicy:
+          KeyId: keyId
 
-        - PollyFullAccessPolicy:
-            LexiconName: name
+      - PollyFullAccessPolicy:
+          LexiconName: name
 
-        - S3FullAccessPolicy:
-            BucketName: name
+      - S3FullAccessPolicy:
+          BucketName: name
 
-        - CodePipelineLambdaExecutionPolicy: {}
+      - CodePipelineLambdaExecutionPolicy: {}
 
-        - ServerlessRepoReadWriteAccessPolicy: {}
+      - ServerlessRepoReadWriteAccessPolicy: {}
 
-        - EC2CopyImagePolicy:
-            ImageId: id
+      - EC2CopyImagePolicy:
+          ImageId: id
 
-        - CodePipelineReadOnlyPolicy:
-            PipelineName: pipeline
+      - CodePipelineReadOnlyPolicy:
+          PipelineName: pipeline
 
-        - CloudWatchDashboardPolicy: {}
+      - CloudWatchDashboardPolicy: {}
 
-        - RekognitionFacesPolicy: {}
+      - RekognitionFacesPolicy: {}
 
-        - RekognitionLabelsPolicy: {}
+      - RekognitionLabelsPolicy: {}
 
-        - DynamoDBBackupFullAccessPolicy:
-            TableName: table
+      - DynamoDBBackupFullAccessPolicy:
+          TableName: table
 
-        - DynamoDBRestoreFromBackupPolicy:
-            TableName: table
+      - DynamoDBRestoreFromBackupPolicy:
+          TableName: table
 
-        - ComprehendBasicAccessPolicy: {}
+      - ComprehendBasicAccessPolicy: {}
 
-        - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn:
-                Fn::Sub: arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:MyTestDatabaseSecret-a1b2c3
+      - AWSSecretsManagerGetSecretValuePolicy:
+          SecretArn:
+            Fn::Sub: arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:MyTestDatabaseSecret-a1b2c3
 
-        - AWSSecretsManagerRotationPolicy:
-            FunctionName: function
+      - AWSSecretsManagerRotationPolicy:
+          FunctionName: function
 
   MyFunction2:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ${codeuri}
       Handler: hello.handler
       Runtime: python3.8
       Policies:
 
-        - SESEmailTemplateCrudPolicy: {}
+      - SESEmailTemplateCrudPolicy: {}
 
-        - SSMParameterReadPolicy:
-            ParameterName: name
+      - SSMParameterReadPolicy:
+          ParameterName: name
 
-        - MobileAnalyticsWriteOnlyAccessPolicy: {}
+      - MobileAnalyticsWriteOnlyAccessPolicy: {}
 
-        - PinpointEndpointAccessPolicy:
-            PinpointApplicationId: id
+      - PinpointEndpointAccessPolicy:
+          PinpointApplicationId: id
 
-        - FirehoseWritePolicy:
-            DeliveryStreamName: deliveryStream
+      - FirehoseWritePolicy:
+          DeliveryStreamName: deliveryStream
 
-        - FirehoseCrudPolicy:
-            DeliveryStreamName: deliveryStream
+      - FirehoseCrudPolicy:
+          DeliveryStreamName: deliveryStream
 
-        - EKSDescribePolicy: {}
+      - EKSDescribePolicy: {}
 
-        - CostExplorerReadOnlyPolicy: {}
+      - CostExplorerReadOnlyPolicy: {}
 
-        - OrganizationsListAccountsPolicy: {}
+      - OrganizationsListAccountsPolicy: {}
 
-        - DynamoDBReconfigurePolicy:
-            TableName: table
+      - DynamoDBReconfigurePolicy:
+          TableName: table
 
-        - SESBulkTemplatedCrudPolicy:
-            IdentityName: name
+      - SESBulkTemplatedCrudPolicy:
+          IdentityName: name
 
-        - FilterLogEventsPolicy:
-            LogGroupName: name
+      - FilterLogEventsPolicy:
+          LogGroupName: name
 
-        - StepFunctionsExecutionPolicy:
-            StateMachineName: name
+      - StepFunctionsExecutionPolicy:
+          StateMachineName: name
 
-        - CodeCommitCrudPolicy:
-            RepositoryName: name
+      - CodeCommitCrudPolicy:
+          RepositoryName: name
 
-        - CodeCommitReadPolicy:
-            RepositoryName: name
-        
-        - TextractPolicy: {}
+      - CodeCommitReadPolicy:
+          RepositoryName: name
 
-        - TextractDetectAnalyzePolicy: {}
+      - TextractPolicy: {}
 
-        - TextractGetResultPolicy: {}
+      - TextractDetectAnalyzePolicy: {}
 
-        - DynamoDBWritePolicy:
-            TableName: name
+      - TextractGetResultPolicy: {}
 
-        - S3WritePolicy:
-            BucketName: name
+      - DynamoDBWritePolicy:
+          TableName: name
 
-        - EFSWriteAccessPolicy:
-            AccessPoint: name
-            FileSystem: name
+      - S3WritePolicy:
+          BucketName: name
+
+      - EFSWriteAccessPolicy:
+          AccessPoint: name
+          FileSystem: name
 
   MyFunction3:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ${codeuri}
       Handler: hello.handler
       Runtime: python3.8
       Policies:
-        - ElasticMapReduceModifyInstanceFleetPolicy:
-            ClusterId: name
-        - ElasticMapReduceSetTerminationProtectionPolicy:
-            ClusterId: name
-        - ElasticMapReduceModifyInstanceGroupsPolicy:
-            ClusterId: name
-        - ElasticMapReduceCancelStepsPolicy:
-            ClusterId: name
-        - ElasticMapReduceTerminateJobFlowsPolicy:
-            ClusterId: name
-        - ElasticMapReduceAddJobFlowStepsPolicy:
-            ClusterId: name
-        - SageMakerCreateEndpointPolicy:
-            EndpointName: name
-        - SageMakerCreateEndpointConfigPolicy:
-            EndpointConfigName: name
-        - EcsRunTaskPolicy:
-            TaskDefinition: name
+      - ElasticMapReduceModifyInstanceFleetPolicy:
+          ClusterId: name
+      - ElasticMapReduceSetTerminationProtectionPolicy:
+          ClusterId: name
+      - ElasticMapReduceModifyInstanceGroupsPolicy:
+          ClusterId: name
+      - ElasticMapReduceCancelStepsPolicy:
+          ClusterId: name
+      - ElasticMapReduceTerminateJobFlowsPolicy:
+          ClusterId: name
+      - ElasticMapReduceAddJobFlowStepsPolicy:
+          ClusterId: name
+      - SageMakerCreateEndpointPolicy:
+          EndpointName: name
+      - SageMakerCreateEndpointConfigPolicy:
+          EndpointConfigName: name
+      - EcsRunTaskPolicy:
+          TaskDefinition: name
+Metadata:
+  SamTransformTest: true

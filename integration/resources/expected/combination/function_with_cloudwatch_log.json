@@ -1,7 +1,22 @@
 [
-  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyLambdaFunctionLogProcessorPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"CloudWatchLambdaLogsGroup", "ResourceType":"AWS::Logs::LogGroup" },
-  { "LogicalResourceId":"MyLambdaFunctionLogProcessor", "ResourceType":"AWS::Logs::SubscriptionFilter" }
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionLogProcessorPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "CloudWatchLambdaLogsGroup",
+    "ResourceType": "AWS::Logs::LogGroup"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionLogProcessor",
+    "ResourceType": "AWS::Logs::SubscriptionFilter"
+  }
 ]

@@ -5,23 +5,25 @@ Resources:
       StageName: MyNewStageName
       DefinitionBody:
         # Simple HTTP Proxy API
-        openapi: "3.0"
+        openapi: '3.0'
         info:
-          version: "2016-09-23T22:23:23Z"
-          title: "Simple Api"
-        basePath: "/demo"
+          version: '2016-09-23T22:23:23Z'
+          title: Simple Api
+        basePath: /demo
         schemes:
-        - "https"
+        - https
         paths:
           /http/{proxy+}:
             x-amazon-apigateway-any-method:
               parameters:
-              - name: "proxy"
-                in: "path"
+              - name: proxy
+                in: path
               x-amazon-apigateway-integration:
-                type: "http_proxy"
-                uri: "http://httpbin.org/{proxy}"
-                httpMethod: "ANY"
-                passthroughBehavior: "when_no_match"
+                type: http_proxy
+                uri: http://httpbin.org/{proxy}
+                httpMethod: ANY
+                passthroughBehavior: when_no_match
                 requestParameters:
-                  integration.request.path.proxy: "method.request.path.proxy"
+                  integration.request.path.proxy: method.request.path.proxy
+Metadata:
+  SamTransformTest: true
