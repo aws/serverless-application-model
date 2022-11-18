@@ -51,6 +51,7 @@ Resources:
                       - status
                       type: object
               security:
+              # each item should be a dict
               - CustomAuthorizer
 
         openapi: 3.0.3
