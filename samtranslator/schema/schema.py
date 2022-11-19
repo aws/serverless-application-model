@@ -1,24 +1,31 @@
 from __future__ import annotations
 
-from enum import Enum
 from typing_extensions import Literal
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel as LenientBaseModel
-from pydantic import Extra, Field, constr
+import pydantic
+from pydantic import Extra
+
 
 # TODO: Get rid of this in favor of proper types
 Unknown = Optional[Any]
 
 # Value passed directly to CloudFormation; not used by SAM
-PassThrough = Any
+PassThrough = Any  # TODO: Make it behave like typescript's unknown
 
 # Intrinsic resolvable by the SAM transform
 SamIntrinsic = Dict[str, Any]
 
-# By default strict
-# https://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally
-class BaseModel(LenientBaseModel):
+_LenientBaseModel = pydantic.BaseModel
+constr = pydantic.constr
+
+
+class BaseModel(_LenientBaseModel):
+    """
+    By default strict
+    https://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally
+    """
+
     class Config:
         extra = Extra.forbid
 
@@ -238,7 +245,7 @@ class AwsServerlessApplication(BaseModel):
 
 
 # Match anything not containing Serverless
-class AnyNonServerlessResource(LenientBaseModel):
+class AnyNonServerlessResource(_LenientBaseModel):
     Type: constr(regex=r"^((?!::Serverless::).)*$")  # type: ignore
 
 
@@ -310,7 +317,7 @@ class Globals(BaseModel):
     SimpleTable: Optional[GlobalsSimpleTable]
 
 
-class Model(LenientBaseModel):
+class Model(_LenientBaseModel):
     Globals: Optional[Globals]
     Resources: Dict[
         str,

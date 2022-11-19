@@ -20,6 +20,7 @@ from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
+from samtranslator.schema.schema import PassThrough
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.intrinsics import is_intrinsic, fnSub
 from samtranslator.model.lambda_ import LambdaPermission
@@ -427,17 +428,18 @@ class ApiGenerator(object):
         if self.domain is None:
             return None, None, None
 
-        if self.domain.get("DomainName") is None or self.domain.get("CertificateArn") is None:
-            raise InvalidResourceException(
-                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn are provided."
-            )
+        sam_expect(self.domain, self.logical_id, "Domain").to_be_a_map()
+        domain_name: PassThrough = sam_expect(
+            self.domain.get("DomainName"), self.logical_id, "Domain.DomainName"
+        ).to_not_be_none()
+        certificate_arn: PassThrough = sam_expect(
+            self.domain.get("CertificateArn"), self.logical_id, "Domain.CertificateArn"
+        ).to_not_be_none()
 
-        self.domain["ApiDomainName"] = "{}{}".format(
-            "ApiGatewayDomainName", LogicalIdGenerator("", self.domain.get("DomainName")).gen()
-        )
+        self.domain["ApiDomainName"] = "{}{}".format("ApiGatewayDomainName", LogicalIdGenerator("", domain_name).gen())
 
         domain = ApiGatewayDomainName(self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes)
-        domain.DomainName = self.domain.get("DomainName")
+        domain.DomainName = domain_name
         endpoint = self.domain.get("EndpointConfiguration")
 
         if endpoint is None:
@@ -451,9 +453,9 @@ class ApiGenerator(object):
             )
 
         if endpoint == "REGIONAL":
-            domain.RegionalCertificateArn = self.domain.get("CertificateArn")
+            domain.RegionalCertificateArn = certificate_arn
         else:
-            domain.CertificateArn = self.domain.get("CertificateArn")
+            domain.CertificateArn = certificate_arn
 
         domain.EndpointConfiguration = {"Types": [endpoint]}
 
