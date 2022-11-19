@@ -69,7 +69,9 @@ class FunctionDeploymentPreference(BaseModel):
     PassthroughCondition: Optional[Union[bool, SamIntrinsic]]
     Role: Optional[Union[str, SamIntrinsic]]
     TriggerConfigurations: Optional[PassThrough]
-    Type: Optional[Union[str, SamIntrinsic]] # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field. 
+    Type: Optional[
+        Union[str, SamIntrinsic]
+    ]  # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field.
 
 
 class FunctionDeadLetterQueue(BaseModel):
