@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing_extensions import Literal
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import Extra, constr
+import pydantic
+from pydantic import Extra
 
 # TODO: Get rid of this in favor of proper types
 Unknown = Optional[Any]
