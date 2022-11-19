@@ -1,6 +1,6 @@
 import logging
 from collections import namedtuple
-from typing import Any, List, Optional, Set, Dict
+from typing import List, Optional, Set, Dict
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
