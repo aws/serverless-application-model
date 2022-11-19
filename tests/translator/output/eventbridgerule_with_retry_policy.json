@@ -65,7 +65,10 @@
                 "Arn"
               ]
             },
-            "Id": "ScheduledFunctionScheduleLambdaTarget"
+            "Id": "ScheduledFunctionScheduleLambdaTarget",
+            "RetryPolicy": {
+              "MaximumRetryAttempts": 3
+            }
           }
         ]
       },

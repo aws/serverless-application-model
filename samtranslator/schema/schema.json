@@ -330,6 +330,232 @@
       ],
       "additionalProperties": false
     },
+    "FunctionCodeUri": {
+      "title": "FunctionCodeUri",
+      "type": "object",
+      "properties": {
+        "Bucket": {
+          "title": "Bucket",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Key": {
+          "title": "Key",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Version": {
+          "title": "Version",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "Bucket",
+        "Key"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionDeadLetterQueue": {
+      "title": "FunctionDeadLetterQueue",
+      "type": "object",
+      "properties": {
+        "TargetArn": {
+          "title": "Targetarn",
+          "type": "string"
+        },
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SNS",
+            "SQS"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "TargetArn",
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionDeploymentPreferenceHooks": {
+      "title": "FunctionDeploymentPreferenceHooks",
+      "type": "object",
+      "properties": {
+        "PostTraffic": {
+          "title": "Posttraffic",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "PreTraffic": {
+          "title": "Pretraffic",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionDeploymentPreference": {
+      "title": "FunctionDeploymentPreference",
+      "type": "object",
+      "properties": {
+        "Alarms": {
+          "title": "Alarms",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Enabled": {
+          "title": "Enabled",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Hooks": {
+          "$ref": "#/definitions/FunctionDeploymentPreferenceHooks"
+        },
+        "PassthroughCondition": {
+          "title": "Passthroughcondition",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Role": {
+          "title": "Role",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "TriggerConfigurations": {
+          "title": "Triggerconfigurations"
+        },
+        "Type": {
+          "title": "Type",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionEventInvokeConfiguration": {
+      "title": "FunctionEventInvokeConfiguration",
+      "type": "object",
+      "properties": {
+        "DestinationConfig": {
+          "title": "Destinationconfig"
+        },
+        "MaximumEventAgeInSeconds": {
+          "title": "Maximumeventageinseconds",
+          "type": "integer"
+        },
+        "MaximumRetryAttempts": {
+          "title": "Maximumretryattempts",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionEvent": {
+      "title": "FunctionEvent",
+      "type": "object",
+      "properties": {
+        "Properties": {
+          "title": "Properties"
+        },
+        "Type": {
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionUrlConfig": {
+      "title": "FunctionUrlConfig",
+      "type": "object",
+      "properties": {
+        "AuthType": {
+          "title": "Authtype",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Cors": {
+          "title": "Cors"
+        }
+      },
+      "required": [
+        "AuthType"
+      ],
+      "additionalProperties": false
+    },
     "FunctionProperties": {
       "title": "FunctionProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
@@ -339,25 +565,66 @@
           "title": "Architectures"
         },
         "AssumeRolePolicyDocument": {
-          "title": "Assumerolepolicydocument"
+          "title": "Assumerolepolicydocument",
+          "type": "object"
         },
         "AutoPublishAlias": {
-          "title": "Autopublishalias"
+          "title": "Autopublishalias",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         },
         "AutoPublishCodeSha256": {
-          "title": "Autopublishcodesha256"
+          "title": "Autopublishcodesha256",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         },
         "CodeSigningConfigArn": {
-          "title": "Codesigningconfigarn"
+          "title": "Codesigningconfigarn",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         },
         "CodeUri": {
-          "title": "Codeuri"
+          "title": "Codeuri",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/FunctionCodeUri"
+            }
+          ]
         },
         "DeadLetterQueue": {
-          "title": "Deadletterqueue"
+          "title": "Deadletterqueue",
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "#/definitions/FunctionDeadLetterQueue"
+            }
+          ]
         },
         "DeploymentPreference": {
-          "title": "Deploymentpreference"
+          "$ref": "#/definitions/FunctionDeploymentPreference"
         },
         "Description": {
           "title": "Description"
@@ -369,10 +636,14 @@
           "title": "Ephemeralstorage"
         },
         "EventInvokeConfig": {
-          "title": "Eventinvokeconfig"
+          "$ref": "#/definitions/FunctionEventInvokeConfiguration"
         },
         "Events": {
-          "title": "Events"
+          "title": "Events",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FunctionEvent"
+          }
         },
         "FileSystemConfigs": {
           "title": "Filesystemconfigs"
@@ -381,7 +652,7 @@
           "title": "Functionname"
         },
         "FunctionUrlConfig": {
-          "title": "Functionurlconfig"
+          "$ref": "#/definitions/FunctionUrlConfig"
         },
         "Handler": {
           "title": "Handler"
@@ -411,7 +682,28 @@
           "title": "Permissionsboundary"
         },
         "Policies": {
-          "title": "Policies"
+          "title": "Policies",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "object"
+            }
+          ]
         },
         "ProvisionedConcurrencyConfig": {
           "title": "Provisionedconcurrencyconfig"
@@ -420,19 +712,36 @@
           "title": "Reservedconcurrentexecutions"
         },
         "Role": {
-          "title": "Role"
+          "title": "Role",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         },
         "Runtime": {
           "title": "Runtime"
         },
         "Tags": {
-          "title": "Tags"
+          "title": "Tags",
+          "type": "object"
         },
         "Timeout": {
           "title": "Timeout"
         },
         "Tracing": {
-          "title": "Tracing"
+          "title": "Tracing",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         },
         "VersionDescription": {
           "title": "Versiondescription"
