@@ -110,8 +110,6 @@ class ResourcePolicy(BaseModel):
     SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
 
 
-
-
 class FunctionCodeUri(BaseModel):
     Bucket: Union[str, SamIntrinsic]
     Key: Union[str, SamIntrinsic]
@@ -235,6 +233,7 @@ class FunctionSqsProperties(BaseModel):
 class FunctionSqsEvent(BaseModel):
     Type: Literal["SQS"]
     Properties: FunctionSqsProperties
+
 
 class FunctionApiFunctionAuth(BaseModel):
     ApiKeyRequired: Optional[bool]
