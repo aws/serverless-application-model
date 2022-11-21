@@ -503,7 +503,7 @@ class HttpApiGenerator(object):
         self,
         open_api_editor: OpenApiEditor,
         authorizers: Dict[str, ApiGatewayV2Authorizer],
-        default_authorizer: str,
+        default_authorizer: Optional[Any],
     ) -> None:
         """
         Sets the default authorizer if one is given in the template
@@ -518,11 +518,7 @@ class HttpApiGenerator(object):
         if is_intrinsic_no_value(default_authorizer):
             return
 
-        if is_intrinsic(default_authorizer):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Unable to set DefaultAuthorizer because intrinsic functions are not supported for this field.",
-            )
+        sam_expect(default_authorizer, self.logical_id, "Auth.DefaultAuthorizer").to_be_a_string()
 
         if not authorizers.get(default_authorizer):
             raise InvalidResourceException(

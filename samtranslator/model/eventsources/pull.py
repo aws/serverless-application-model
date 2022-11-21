@@ -11,6 +11,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRolePolicies
 from samtranslator.utils.types import Intrinsicable
+from samtranslator.validator.value_validator import sam_expect
 
 
 class PullEventSource(ResourceMacro):
@@ -155,9 +156,12 @@ class PullEventSource(ResourceMacro):
 
         destination_config_policy = None
         if self.DestinationConfig:
-            on_failure = self.DestinationConfig.get("OnFailure")
-            if on_failure is None:
-                raise InvalidEventException(self.logical_id, "'OnFailure' is a required field for 'DestinationConfig'")
+            on_failure: Dict[str, Any] = sam_expect(
+                self.DestinationConfig.get("OnFailure"),
+                self.logical_id,
+                "DestinationConfig.OnFailure",
+                is_sam_event=True,
+            ).to_be_a_map()
 
             # `Type` property is for sam to attach the right policies
             destination_type = on_failure.get("Type")

@@ -209,7 +209,7 @@ Resources:
             Path: /
             Method: get
 
-  NonStringDefaultAuthorizerApi:
+  IntrinsicDefaultAuthorizerApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       Auth:
@@ -221,6 +221,20 @@ Resources:
             IdentitySource: $request.header.Authorization
         # Correct usage: DefaultAuthorizer: MyAuth
         DefaultAuthorizer: !Ref MyAuth
+
+  NonStringDefaultAuthorizerApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          MyAuth:
+            JwtConfiguration:
+              audience: https://test-sam.com
+              issuer: https://test-sam.com
+            IdentitySource: $request.header.Authorization
+        # Correct usage: DefaultAuthorizer: MyAuth
+        DefaultAuthorizer:
+          This: should not be a dict
 
   NonDictAuthorizerRestApi:
     Type: AWS::Serverless::Api
