@@ -332,6 +332,7 @@
     },
     "FunctionCodeUri": {
       "title": "FunctionCodeUri",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Bucket": {
@@ -376,6 +377,7 @@
     },
     "FunctionDeadLetterQueue": {
       "title": "FunctionDeadLetterQueue",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "TargetArn": {
@@ -399,6 +401,7 @@
     },
     "FunctionDeploymentPreferenceHooks": {
       "title": "FunctionDeploymentPreferenceHooks",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "PostTraffic": {
@@ -428,6 +431,7 @@
     },
     "FunctionDeploymentPreference": {
       "title": "FunctionDeploymentPreference",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Alarms": {
@@ -497,8 +501,9 @@
       },
       "additionalProperties": false
     },
-    "FunctionEventInvokeConfiguration": {
-      "title": "FunctionEventInvokeConfiguration",
+    "FunctionEventInvokeConfig": {
+      "title": "FunctionEventInvokeConfig",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "DestinationConfig": {
@@ -517,6 +522,7 @@
     },
     "FunctionEvent": {
       "title": "FunctionEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Properties": {
@@ -534,6 +540,7 @@
     },
     "FunctionUrlConfig": {
       "title": "FunctionUrlConfig",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "AuthType": {
@@ -636,7 +643,7 @@
           "title": "Ephemeralstorage"
         },
         "EventInvokeConfig": {
-          "$ref": "#/definitions/FunctionEventInvokeConfiguration"
+          "$ref": "#/definitions/FunctionEventInvokeConfig"
         },
         "Events": {
           "title": "Events",
