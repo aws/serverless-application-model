@@ -1,7 +1,6 @@
 import json
 from re import match
-from functools import reduce
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
@@ -344,9 +343,9 @@ class ApiGatewayAuthorizer(object):
                 swagger[APIGATEWAY_AUTHORIZER_KEY]["authorizerCredentials"] = function_invoke_role
 
             if self._get_function_payload_type() == "REQUEST":  # type: ignore[no-untyped-call]
-                identity_source = self._get_identity_source()  # type: ignore[no-untyped-call]
+                identity_source = self._get_identity_source()
                 if identity_source:
-                    swagger[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()  # type: ignore[no-untyped-call]
+                    swagger[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()
 
         # Authorizer Validation Expression is only allowed on COGNITO_USER_POOLS and LAMBDA_TOKEN
         is_lambda_token_authorizer = authorizer_type == "LAMBDA" and self._get_function_payload_type() == "TOKEN"  # type: ignore[no-untyped-call]
@@ -362,21 +361,25 @@ class ApiGatewayAuthorizer(object):
     def _get_identity_validation_expression(self):  # type: ignore[no-untyped-def]
         return self.identity and self.identity.get("ValidationExpression")
 
-    def _build_identity_source_item(self, item_prefix, prop_value):  # type: ignore[no-untyped-def]
+    @staticmethod
+    def _build_identity_source_item(item_prefix: str, prop_value: str) -> str:
         item = item_prefix + prop_value
         if isinstance(prop_value, Py27UniStr):
             item = Py27UniStr(item)
         return item
 
-    def _build_identity_source_item_array(self, prop_key, item_prefix):  # type: ignore[no-untyped-def]
-        arr = []
-        if self.identity.get(prop_key):
-            arr = [
-                self._build_identity_source_item(item_prefix, prop_value) for prop_value in self.identity.get(prop_key)  # type: ignore[no-untyped-call]
-            ]
+    def _build_identity_source_item_array(self, prop_key: str, item_prefix: str) -> List[str]:
+        arr: List[str] = []
+        prop_value_list = self.identity.get(prop_key)
+        if prop_value_list:
+            prop_path = f"Auth.Authorizers.{self.name}.Identity.{prop_key}"
+            sam_expect(prop_value_list, self.api_logical_id, prop_path).to_be_a_list()
+            for index, prop_value in enumerate(prop_value_list):
+                sam_expect(prop_value, self.api_logical_id, f"{prop_path}[{index}]").to_be_a_string()
+                arr.append(self._build_identity_source_item(item_prefix, prop_value))
         return arr
 
-    def _get_identity_source(self):  # type: ignore[no-untyped-def]
+    def _get_identity_source(self) -> str:
         key_prefix_pairs = [
             ("Headers", "method.request.header."),
             ("QueryStrings", "method.request.querystring."),
@@ -384,12 +387,9 @@ class ApiGatewayAuthorizer(object):
             ("Context", "context."),
         ]
 
-        identity_source_array = reduce(  # type: ignore[var-annotated]
-            lambda accumulator, key_prefix_pair: accumulator  # type: ignore[no-any-return]
-            + self._build_identity_source_item_array(key_prefix_pair[0], key_prefix_pair[1]),  # type: ignore[no-untyped-call]
-            key_prefix_pairs,
-            [],
-        )
+        identity_source_array = []
+        for prop_key, item_prefix in key_prefix_pairs:
+            identity_source_array.extend(self._build_identity_source_item_array(prop_key, item_prefix))
 
         identity_source = ", ".join(identity_source_array)
         if any(isinstance(i, Py27UniStr) for i in identity_source_array):
