@@ -652,29 +652,102 @@ class AwsServerlessApi(BaseModel):
     Metadata: Unknown
 
 
+class HttpApiAuthOAuth2Authorizer(BaseModel):
+    AuthorizationScopes: Optional[List[str]]
+    IdentitySource: Optional[str]
+    JwtConfiguration: Optional[PassThrough]
+
+
+class HttpApiAuthLambdaAuthorizerIdentity(BaseModel):
+    Context: Optional[List[str]]
+    Headers: Optional[List[str]]
+    QueryStrings: Optional[List[str]]
+    ReauthorizeEvery: Optional[int]
+    StageVariables: Optional[List[str]]
+
+
+class HttpApiAuthLambdaAuthorizer(BaseModel):
+    # TODO: Many tests use floats for the version string; docs only mention string
+    AuthorizerPayloadFormatVersion: Union[Literal["1.0", "2.0"], float]
+    EnableSimpleResponses: Optional[bool]
+    FunctionArn: SamIntrinsic
+    FunctionInvokeRole: Optional[Union[str, SamIntrinsic]]
+    Identity: Optional[HttpApiAuthLambdaAuthorizerIdentity]
+
+
+class HttpApiAuth(BaseModel):
+    # TODO: Docs doesn't say it's a map
+    Authorizers: Optional[
+        Dict[
+            str,
+            Union[
+                HttpApiAuthOAuth2Authorizer,
+                HttpApiAuthLambdaAuthorizer,
+            ],
+        ]
+    ]
+    DefaultAuthorizer: Optional[str]
+    EnableIamAuthorizer: Optional[bool]
+
+
+class HttpApiCorsConfiguration(BaseModel):
+    AllowCredentials: Optional[bool]
+    AllowHeaders: Optional[List[str]]
+    AllowMethods: Optional[List[str]]
+    AllowOrigins: Optional[List[str]]
+    ExposeHeaders: Optional[List[str]]
+    MaxAge: Optional[int]
+
+
+class HttpApiDefinitionUri(BaseModel):
+    Bucket: str
+    Key: str
+    Version: Optional[str]
+
+
+class HttpApiDomainRoute53(BaseModel):
+    DistributionDomainName: Optional[PassThrough]
+    EvaluateTargetHealth: Optional[PassThrough]
+    HostedZoneId: Optional[PassThrough]
+    HostedZoneName: Optional[PassThrough]
+    IpV6: Optional[bool]
+
+
+class HttpApiDomain(BaseModel):
+    BasePath: Optional[List[str]]
+    CertificateArn: PassThrough
+    DomainName: PassThrough
+    EndpointConfiguration: Optional[Union[Literal["REGIONAL"], SamIntrinsic]]
+    MutualTlsAuthentication: Optional[PassThrough]
+    OwnershipVerificationCertificateArn: Optional[PassThrough]
+    Route53: Optional[HttpApiDomainRoute53]
+    SecurityPolicy: Optional[PassThrough]
+
+
 class HttpApiProperties(BaseModel):
-    AccessLogSettings: Unknown
-    Auth: Unknown
-    CorsConfiguration: Unknown
-    DefaultRouteSettings: Unknown
-    DefinitionBody: Unknown
-    DefinitionUri: Unknown
-    Description: Unknown
-    DisableExecuteApiEndpoint: Unknown
-    Domain: Unknown
-    FailOnWarnings: Unknown
-    RouteSettings: Unknown
-    StageName: Unknown
-    StageVariables: Unknown
-    Tags: Unknown
-    Name: Unknown
+    AccessLogSettings: Optional[PassThrough]
+    Auth: Optional[HttpApiAuth]
+    # TODO: Also string like in the docs?
+    CorsConfiguration: Optional[Union[SamIntrinsic, HttpApiCorsConfiguration]]
+    DefaultRouteSettings: Optional[PassThrough]
+    DefinitionBody: Optional[Dict[str, Any]]
+    DefinitionUri: Optional[Union[str, HttpApiDefinitionUri]]
+    Description: Optional[str]
+    DisableExecuteApiEndpoint: Optional[PassThrough]
+    Domain: Optional[HttpApiDomain]
+    FailOnWarnings: Optional[PassThrough]
+    RouteSettings: Optional[PassThrough]
+    StageName: Optional[PassThrough]
+    StageVariables: Optional[PassThrough]
+    Tags: Optional[Dict[str, Any]]
+    Name: Optional[PassThrough]  # TODO: Add to docs
 
 
 class AwsServerlessHttpApi(BaseModel):
     Type: Literal["AWS::Serverless::HttpApi"]
     Properties: Optional[HttpApiProperties]
-    Metadata: Unknown
-    Condition: Unknown
+    Metadata: Optional[PassThrough]
+    Condition: Optional[PassThrough]
 
 
 class ApplicationLocation(BaseModel):
