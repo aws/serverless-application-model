@@ -85,14 +85,275 @@ class FunctionEventInvokeConfig(BaseModel):
     MaximumRetryAttempts: Optional[int]
 
 
-class FunctionEvent(BaseModel):
-    Properties: Any
-    Type: str
+class FunctionS3Properties(BaseModel):
+    Bucket: Union[str, SamIntrinsic]
+    Events: PassThrough
+    Filter: Optional[PassThrough]
+
+
+class FunctionS3Event(BaseModel):
+    Properties: FunctionS3Properties
+    Type: Literal["S3"]
+
+
+class SqsSubscription(BaseModel):
+    BatchSize: Optional[Union[str, SamIntrinsic]]
+    Enabled: Optional[bool]
+    QueueArn: Union[str, SamIntrinsic]
+    QueuePolicyLogicalId: Optional[str]
+    QueueUrl: Union[str, SamIntrinsic]
+
+
+class FunctionSNSProperties(BaseModel):
+    FilterPolicy: Optional[PassThrough]
+    Region: Optional[PassThrough]
+    SqsSubscription: Optional[Union[bool, SqsSubscription]]
+    Topic: PassThrough
+
+
+class FunctionSNSEvent(BaseModel):
+    Properties: FunctionSNSProperties
+    Type: Literal["SNS"]
 
 
 class FunctionUrlConfig(BaseModel):
     AuthType: Union[str, SamIntrinsic]
     Cors: Optional[PassThrough]
+
+
+class FunctionKinesisProperties(BaseModel):
+    BatchSize: Optional[PassThrough]
+    BisectBatchOnFunctionError: Optional[PassThrough]
+    DestinationConfig: Optional[PassThrough]
+    Enabled: Optional[PassThrough]
+    FilterCriteria: Optional[PassThrough]
+    FunctionResponseTypes: Optional[PassThrough]
+    MaximumBatchingWindowInSeconds: Optional[PassThrough]
+    MaximumRecordAgeInSeconds: Optional[PassThrough]
+    MaximumRetryAttempts: Optional[PassThrough]
+    ParallelizationFactor: Optional[PassThrough]
+    StartingPosition: PassThrough
+    Stream: PassThrough
+    TumblingWindowInSeconds: Optional[PassThrough]
+
+
+class FunctionKinesisEvent(BaseModel):
+    Type: Literal["Kinesis"]
+    Properties: FunctionKinesisProperties
+
+
+class FunctionDynamoDBProperties(BaseModel):
+    BatchSize: Optional[PassThrough]
+    BisectBatchOnFunctionError: Optional[PassThrough]
+    DestinationConfig: Optional[PassThrough]
+    Enabled: Optional[PassThrough]
+    FilterCriteria: Optional[PassThrough]
+    FunctionResponseTypes: Optional[PassThrough]
+    MaximumBatchingWindowInSeconds: Optional[PassThrough]
+    MaximumRecordAgeInSeconds: Optional[PassThrough]
+    MaximumRetryAttempts: Optional[PassThrough]
+    ParallelizationFactor: Optional[PassThrough]
+    StartingPosition: PassThrough
+    Stream: PassThrough
+    TumblingWindowInSeconds: Optional[PassThrough]
+
+
+class FunctionDynamoDBEvent(BaseModel):
+    Type: Literal["DynamoDB"]
+    Properties: FunctionDynamoDBProperties
+
+
+class FunctionSqsProperties(BaseModel):
+    BatchSize: Optional[PassThrough]
+    Enabled: Optional[PassThrough]
+    FilterCriteria: Optional[PassThrough]
+    MaximumBatchingWindowInSeconds: Optional[PassThrough]
+    Queue: PassThrough
+
+
+class FunctionSqsEvent(BaseModel):
+    Type: Literal["SQS"]
+    Properties: FunctionSqsProperties
+
+
+class FunctionApiProperties(BaseModel):
+    Auth: Unknown
+    Method: Unknown
+    Path: Unknown
+    RequestModel: Unknown
+    RequestParameters: Unknown
+    RestApiId: Unknown
+
+
+class FunctionApiEvent(BaseModel):
+    Type: Literal["Api"]
+    Properties: FunctionApiProperties
+
+
+class FunctionScheduleProperties(BaseModel):
+    DeadLetterConfig: Unknown
+    Description: Unknown
+    Enabled: Unknown
+    Input: Unknown
+    Name: Unknown
+    RetryPolicy: Unknown
+    Schedule: Unknown
+    State: Unknown
+
+
+class FunctionScheduleEvent(BaseModel):
+    Type: Literal["Schedule"]
+    Properties: FunctionScheduleProperties
+
+
+class FunctionScheduleV2Properties(BaseModel):
+    DeadLetterConfig: Unknown
+    Description: Unknown
+    EndDate: Unknown
+    FlexibleTimeWindow: Unknown
+    GroupName: Unknown
+    Input: Unknown
+    KmsKeyArn: Unknown
+    Name: Unknown
+    PermissionsBoundary: Unknown
+    RetryPolicy: Unknown
+    ScheduleExpression: Unknown
+    ScheduleExpressionTimezone: Unknown
+    StartDate: Unknown
+    State: Unknown
+
+
+class FunctionScheduleV2Event(BaseModel):
+    Type: Literal["ScheduleV2"]
+    Properties: FunctionScheduleV2Properties
+
+
+class FunctionCloudWatchProperties(BaseModel):
+    Enabled: Unknown
+    EventBusName: Unknown
+    Input: Unknown
+    InputPath: Unknown
+    Pattern: Unknown
+    State: Unknown
+
+
+class FunctionCloudWatchEvent(BaseModel):
+    Type: Literal["CloudWatchEvent"]
+    Properties: FunctionCloudWatchProperties
+
+
+class FunctionEventBridgeRuleProperties(BaseModel):
+    DeadLetterConfig: Unknown
+    EventBusName: Unknown
+    Input: Unknown
+    InputPath: Unknown
+    Pattern: Unknown
+    RetryPolicy: Unknown
+    Target: Unknown
+
+
+class FunctionEventBridgeRuleEvent(BaseModel):
+    Type: Literal["EventBridgeRule"]
+    Properties: FunctionEventBridgeRuleProperties
+
+
+class FunctionCloudWatchLogsProperties(BaseModel):
+    FilterPattern: Unknown
+    LogGroupName: Unknown
+
+
+class FunctionCloudWatchLogsEvent(BaseModel):
+    Type: Literal["CloudWatchLogs"]
+    Properties: FunctionCloudWatchLogsProperties
+
+
+class FunctionIoTRuleProperties(BaseModel):
+    AwsIotSqlVersion: Unknown
+    Sql: Unknown
+
+
+class FunctionIoTRuleEvent(BaseModel):
+    Type: Literal["IoTRule"]
+    Properties: FunctionIoTRuleProperties
+
+
+class FunctionAlexaSkillProperties(BaseModel):
+    SkillId: Unknown
+
+
+class FunctionAlexaSkillEvent(BaseModel):
+    Type: Literal["AlexaSkill"]
+    Properties: Optional[FunctionAlexaSkillProperties]
+
+
+class FunctionCognitoProperties(BaseModel):
+    Trigger: Unknown
+    UserPool: Unknown
+
+
+class FunctionCognitoEvent(BaseModel):
+    Type: Literal["Cognito"]
+    Properties: FunctionCognitoProperties
+
+
+class FunctionHttpApiProperties(BaseModel):
+    ApiId: Unknown
+    Auth: Unknown
+    Method: Unknown
+    Path: Unknown
+    PayloadFormatVersion: Unknown
+    RouteSettings: Unknown
+    TimeoutInMillis: Unknown
+
+
+class FunctionHttpApiEvent(BaseModel):
+    Type: Literal["HttpApi"]
+    Properties: Optional[FunctionHttpApiProperties]
+
+
+class FunctionMSKProperties(BaseModel):
+    ConsumerGroupId: Unknown
+    FilterCriteria: Unknown
+    MaximumBatchingWindowInSeconds: Unknown
+    StartingPosition: Unknown
+    Stream: Unknown
+    Topics: Unknown
+
+
+class FunctionMSKEvent(BaseModel):
+    Type: Literal["MSK"]
+    Properties: FunctionMSKProperties
+
+
+class FunctionMQProperties(BaseModel):
+    BatchSize: Unknown
+    Broker: Unknown
+    Enabled: Unknown
+    FilterCriteria: Unknown
+    MaximumBatchingWindowInSeconds: Unknown
+    Queues: Unknown
+    SecretsManagerKmsKeyId: Unknown
+    SourceAccessConfigurations: Unknown
+
+
+class FunctionMQEvent(BaseModel):
+    Type: Literal["MQ"]
+    Properties: FunctionMQProperties
+
+
+class FunctionSelfManagedKafkaProperties(BaseModel):
+    BatchSize: Unknown
+    ConsumerGroupId: Unknown
+    Enabled: Unknown
+    FilterCriteria: Unknown
+    KafkaBootstrapServers: Unknown
+    SourceAccessConfigurations: Unknown
+    Topics: Unknown
+
+
+class FunctionSelfManagedKafkaEvent(BaseModel):
+    Type: Literal["SelfManagedKafka"]
+    Properties: FunctionSelfManagedKafkaProperties
 
 
 class FunctionProperties(BaseModel):
@@ -108,7 +369,31 @@ class FunctionProperties(BaseModel):
     Environment: Optional[PassThrough]
     EphemeralStorage: Optional[PassThrough]
     EventInvokeConfig: Optional[FunctionEventInvokeConfig]
-    Events: Optional[Dict[str, FunctionEvent]]
+    Events: Optional[
+        Dict[
+            str,
+            Union[
+                FunctionS3Event,
+                FunctionSNSEvent,
+                FunctionKinesisEvent,
+                FunctionDynamoDBEvent,
+                FunctionSqsEvent,
+                FunctionApiEvent,
+                FunctionScheduleEvent,
+                FunctionScheduleV2Event,
+                FunctionCloudWatchEvent,
+                FunctionEventBridgeRuleEvent,
+                FunctionCloudWatchLogsEvent,
+                FunctionIoTRuleEvent,
+                FunctionAlexaSkillEvent,
+                FunctionCognitoEvent,
+                FunctionHttpApiEvent,
+                FunctionMSKEvent,
+                FunctionMQEvent,
+                FunctionSelfManagedKafkaEvent,
+            ],
+        ]
+    ]
     FileSystemConfigs: Optional[PassThrough]
     FunctionName: Optional[PassThrough]
     FunctionUrlConfig: Optional[FunctionUrlConfig]
