@@ -10,6 +10,7 @@ from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.validator.value_validator import sam_expect
 
 
 class ApiGatewayRestApi(Resource):
@@ -284,12 +285,7 @@ class ApiGatewayAuthorizer(object):
         if not identity:
             return True
 
-        if not isinstance(identity, dict):
-            # TODO: we should have a more centralized validation approach.
-            raise InvalidResourceException(
-                self.api_logical_id,
-                f"Invalid type for {self.name} Authorizer's Identity. It must be a dictionary.",
-            )
+        sam_expect(identity, self.api_logical_id, f"Authorizer.{self.name}.Identity").to_be_a_map()
 
         headers = identity.get("Headers")
         query_strings = identity.get("QueryStrings")
