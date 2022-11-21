@@ -12,8 +12,6 @@ Unknown = Optional[Any]
 # Value passed directly to CloudFormation; not used by SAM
 PassThrough = Any  # TODO: Make it behave like typescript's unknown
 
-ResourcePolicy = Union[str, Dict[str, Any]]
-
 # Intrinsic resolvable by the SAM transform
 SamIntrinsic = Dict[str, Any]
 
@@ -96,6 +94,22 @@ class EventsScheduleV2Properties(BaseModel):
 class EventsScheduleV2(BaseModel):
     Type: Literal["ScheduleV2"]
     Properties: EventsScheduleV2Properties
+
+
+class ResourcePolicy(BaseModel):
+    AwsAccountBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
+    AwsAccountWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
+    CustomStatements: Optional[List[Union[str, Dict[str, Any]]]]
+    IntrinsicVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
+    IntrinsicVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
+    IntrinsicVpceBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
+    IntrinsicVpceWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
+    IpRangeBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
+    IpRangeWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
+    SourceVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
+    SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
+
+
 
 
 class FunctionCodeUri(BaseModel):
@@ -222,27 +236,12 @@ class FunctionSqsEvent(BaseModel):
     Type: Literal["SQS"]
     Properties: FunctionSqsProperties
 
-
-class FunctionResourcePolicy(BaseModel):
-    AwsAccountBlacklist: Optional[List[ResourcePolicy]]
-    AwsAccountWhitelist: Optional[List[ResourcePolicy]]
-    CustomStatements: Optional[List[ResourcePolicy]]
-    IntrinsicVpcBlacklist: Optional[List[ResourcePolicy]]
-    IntrinsicVpcWhitelist: Optional[List[ResourcePolicy]]
-    IntrinsicVpceBlacklist: Optional[List[ResourcePolicy]]
-    IntrinsicVpceWhitelist: Optional[List[ResourcePolicy]]
-    IpRangeBlacklist: Optional[List[ResourcePolicy]]
-    IpRangeWhitelist: Optional[List[ResourcePolicy]]
-    SourceVpcBlacklist: Optional[List[ResourcePolicy]]
-    SourceVpcWhitelist: Optional[List[ResourcePolicy]]
-
-
 class FunctionApiFunctionAuth(BaseModel):
     ApiKeyRequired: Optional[bool]
     AuthorizationScopes: Optional[List[str]]
     Authorizer: Optional[str]
     InvokeRole: Optional[Union[str, SamIntrinsic]]
-    ResourcePolicy: Optional[FunctionResourcePolicy]
+    ResourcePolicy: Optional[ResourcePolicy]
 
 
 class FunctionRequestModel(BaseModel):
@@ -526,25 +525,11 @@ class StateMachineEventsEventBridgeRule(BaseModel):
     Properties: StateMachineEventsEventBridgeRuleProperties
 
 
-class StateMachineEventsApiAuthResourcePolicy(BaseModel):
-    AwsAccountBlacklist: Optional[List[str]]
-    AwsAccountWhitelist: Optional[List[str]]
-    CustomStatements: Optional[List[str]]
-    IntrinsicVpcBlacklist: Optional[List[str]]
-    IntrinsicVpcWhitelist: Optional[List[str]]
-    IntrinsicVpceBlacklist: Optional[List[str]]
-    IntrinsicVpceWhitelist: Optional[List[str]]
-    IpRangeBlacklist: Optional[List[str]]
-    IpRangeWhitelist: Optional[List[str]]
-    SourceVpcBlacklist: Optional[List[str]]
-    SourceVpcWhitelist: Optional[List[str]]
-
-
 class StateMachineEventsApiAuth(BaseModel):
     ApiKeyRequired: Optional[bool]
     AuthorizationScopes: Optional[List[str]]
     Authorizer: Optional[str]
-    ResourcePolicy: Optional[StateMachineEventsApiAuthResourcePolicy]
+    ResourcePolicy: Optional[ResourcePolicy]
 
 
 class StateMachineEventsApiProperties(BaseModel):

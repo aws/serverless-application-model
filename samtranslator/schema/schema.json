@@ -856,8 +856,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionResourcePolicy": {
-      "title": "FunctionResourcePolicy",
+    "ResourcePolicy": {
+      "title": "ResourcePolicy",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1050,7 +1050,7 @@
           ]
         },
         "ResourcePolicy": {
-          "$ref": "#/definitions/FunctionResourcePolicy"
+          "$ref": "#/definitions/ResourcePolicy"
         }
       },
       "additionalProperties": false
@@ -2315,91 +2315,6 @@
       ],
       "additionalProperties": false
     },
-    "StateMachineEventsApiAuthResourcePolicy": {
-      "title": "StateMachineEventsApiAuthResourcePolicy",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AwsAccountBlacklist": {
-          "title": "Awsaccountblacklist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "AwsAccountWhitelist": {
-          "title": "Awsaccountwhitelist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "CustomStatements": {
-          "title": "Customstatements",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IntrinsicVpcBlacklist": {
-          "title": "Intrinsicvpcblacklist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IntrinsicVpcWhitelist": {
-          "title": "Intrinsicvpcwhitelist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IntrinsicVpceBlacklist": {
-          "title": "Intrinsicvpceblacklist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IntrinsicVpceWhitelist": {
-          "title": "Intrinsicvpcewhitelist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IpRangeBlacklist": {
-          "title": "Iprangeblacklist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IpRangeWhitelist": {
-          "title": "Iprangewhitelist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "SourceVpcBlacklist": {
-          "title": "Sourcevpcblacklist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "SourceVpcWhitelist": {
-          "title": "Sourcevpcwhitelist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
     "StateMachineEventsApiAuth": {
       "title": "StateMachineEventsApiAuth",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
@@ -2421,7 +2336,7 @@
           "type": "string"
         },
         "ResourcePolicy": {
-          "$ref": "#/definitions/StateMachineEventsApiAuthResourcePolicy"
+          "$ref": "#/definitions/ResourcePolicy"
         }
       },
       "additionalProperties": false
