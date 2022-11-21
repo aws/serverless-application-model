@@ -58,3 +58,29 @@ Resources:
             FunctionArn: Function.Arn
             FunctionPayloadType: REQUEST
             Identity: This should not be a string
+
+  MyRestApiInvalidHeadersType:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          LambdaRequestIdentityNotObject:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Headers: this should be a list
+
+  MyRestApiInvalidHeadersItemType:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          LambdaRequestIdentityNotObject:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Headers:
+              - This is of correct type
+              - Key: This array item should not be a dict
