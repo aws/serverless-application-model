@@ -47,6 +47,7 @@
   "definitions": {
     "GlobalsFunction": {
       "title": "GlobalsFunction",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Handler": {
@@ -120,6 +121,7 @@
     },
     "GlobalsApi": {
       "title": "GlobalsApi",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Auth": {
@@ -178,6 +180,7 @@
     },
     "GlobalsHttpApi": {
       "title": "GlobalsHttpApi",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Auth": {
@@ -212,6 +215,7 @@
     },
     "GlobalsSimpleTable": {
       "title": "GlobalsSimpleTable",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "SSESpecification": {
@@ -222,6 +226,7 @@
     },
     "Globals": {
       "title": "Globals",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Function": {
@@ -241,6 +246,7 @@
     },
     "ResourceReference": {
       "title": "ResourceReference",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Id": {
@@ -274,6 +280,7 @@
     },
     "ConnectorProperties": {
       "title": "ConnectorProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Source": {
@@ -303,6 +310,7 @@
     },
     "AwsServerlessConnector": {
       "title": "AwsServerlessConnector",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Type": {
@@ -324,6 +332,7 @@
     },
     "FunctionProperties": {
       "title": "FunctionProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Architectures": {
@@ -436,6 +445,7 @@
     },
     "AwsServerlessFunction": {
       "title": "AwsServerlessFunction",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Type": {
@@ -471,6 +481,7 @@
     },
     "SimpleTablePrimaryKey": {
       "title": "SimpleTablePrimaryKey",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Name": {
@@ -484,6 +495,7 @@
     },
     "SimpleTableProperties": {
       "title": "SimpleTableProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "PrimaryKey": {
@@ -507,6 +519,7 @@
     },
     "AwsServerlessSimpleTable": {
       "title": "AwsServerlessSimpleTable",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Type": {
@@ -525,12 +538,278 @@
       ],
       "additionalProperties": false
     },
+    "StateMachineEventsScheduleProperties": {
+      "title": "StateMachineEventsScheduleProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DeadLetterConfig": {
+          "title": "Deadletterconfig"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "Enabled": {
+          "title": "Enabled"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "RetryPolicy": {
+          "title": "Retrypolicy"
+        },
+        "Schedule": {
+          "title": "Schedule"
+        },
+        "State": {
+          "title": "State"
+        }
+      },
+      "additionalProperties": false
+    },
+    "StateMachineEventsSchedule": {
+      "title": "StateMachineEventsSchedule",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "Schedule"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/StateMachineEventsScheduleProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "StateMachineEventsScheduleV2Properties": {
+      "title": "StateMachineEventsScheduleV2Properties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DeadLetterConfig": {
+          "title": "Deadletterconfig"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "EndDate": {
+          "title": "Enddate"
+        },
+        "FlexibleTimeWindow": {
+          "title": "Flexibletimewindow"
+        },
+        "GroupName": {
+          "title": "Groupname"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "KmsKeyArn": {
+          "title": "Kmskeyarn"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "PermissionsBoundary": {
+          "title": "Permissionsboundary"
+        },
+        "RetryPolicy": {
+          "title": "Retrypolicy"
+        },
+        "RoleArn": {
+          "title": "Rolearn"
+        },
+        "ScheduleExpression": {
+          "title": "Scheduleexpression"
+        },
+        "ScheduleExpressionTimezone": {
+          "title": "Scheduleexpressiontimezone"
+        },
+        "StartDate": {
+          "title": "Startdate"
+        },
+        "State": {
+          "title": "State"
+        }
+      },
+      "additionalProperties": false
+    },
+    "StateMachineEventsScheduleV2": {
+      "title": "StateMachineEventsScheduleV2",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "ScheduleV2"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/StateMachineEventsScheduleV2Properties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "StateMachineEventsCloudWatchEventProperties": {
+      "title": "StateMachineEventsCloudWatchEventProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "EventBusName": {
+          "title": "Eventbusname"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "InputPath": {
+          "title": "Inputpath"
+        },
+        "Pattern": {
+          "title": "Pattern"
+        }
+      },
+      "additionalProperties": false
+    },
+    "StateMachineEventsCloudWatchEvent": {
+      "title": "StateMachineEventsCloudWatchEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "CloudWatchEvent"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/StateMachineEventsCloudWatchEventProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "StateMachineEventsEventBridgeRuleProperties": {
+      "title": "StateMachineEventsEventBridgeRuleProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DeadLetterConfig": {
+          "title": "Deadletterconfig"
+        },
+        "EventBusName": {
+          "title": "Eventbusname"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "InputPath": {
+          "title": "Inputpath"
+        },
+        "Pattern": {
+          "title": "Pattern"
+        },
+        "RetryPolicy": {
+          "title": "Retrypolicy"
+        }
+      },
+      "additionalProperties": false
+    },
+    "StateMachineEventsEventBridgeRule": {
+      "title": "StateMachineEventsEventBridgeRule",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "EventBridgeRule"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/StateMachineEventsEventBridgeRuleProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "StateMachineEventsApiProperties": {
+      "title": "StateMachineEventsApiProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Auth": {
+          "title": "Auth"
+        },
+        "Method": {
+          "title": "Method"
+        },
+        "Path": {
+          "title": "Path"
+        },
+        "RestApiId": {
+          "title": "Restapiid"
+        },
+        "UnescapeMappingTemplate": {
+          "title": "Unescapemappingtemplate"
+        }
+      },
+      "additionalProperties": false
+    },
+    "StateMachineEventsApi": {
+      "title": "StateMachineEventsApi",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "Api"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/StateMachineEventsApiProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
     "StateMachineProperties": {
       "title": "StateMachineProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Definition": {
-          "title": "Definition"
+          "title": "Definition",
+          "type": "object"
         },
         "DefinitionSubstitutions": {
           "title": "Definitionsubstitutions"
@@ -539,7 +818,27 @@
           "title": "Definitionuri"
         },
         "Events": {
-          "title": "Events"
+          "title": "Events",
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/StateMachineEventsSchedule"
+              },
+              {
+                "$ref": "#/definitions/StateMachineEventsScheduleV2"
+              },
+              {
+                "$ref": "#/definitions/StateMachineEventsCloudWatchEvent"
+              },
+              {
+                "$ref": "#/definitions/StateMachineEventsEventBridgeRule"
+              },
+              {
+                "$ref": "#/definitions/StateMachineEventsApi"
+              }
+            ]
+          }
         },
         "Logging": {
           "title": "Logging"
@@ -570,6 +869,7 @@
     },
     "AwsServerlessStateMachine": {
       "title": "AwsServerlessStateMachine",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Type": {
@@ -594,6 +894,7 @@
     },
     "LayerVersionContentUri": {
       "title": "LayerVersionContentUri",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Bucket": {
@@ -610,6 +911,7 @@
     },
     "LayerVersionProperties": {
       "title": "LayerVersionProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "CompatibleArchitectures": {
@@ -657,6 +959,7 @@
     },
     "AwsServerlessLayerVersion": {
       "title": "AwsServerlessLayerVersion",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Type": {
@@ -684,6 +987,7 @@
     },
     "ApiProperties": {
       "title": "ApiProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "AccessLogSetting": {
@@ -769,6 +1073,7 @@
     },
     "AwsServerlessApi": {
       "title": "AwsServerlessApi",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Type": {
@@ -802,6 +1107,7 @@
     },
     "HttpApiProperties": {
       "title": "HttpApiProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "AccessLogSettings": {
@@ -854,6 +1160,7 @@
     },
     "AwsServerlessHttpApi": {
       "title": "AwsServerlessHttpApi",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Type": {
@@ -880,6 +1187,7 @@
     },
     "ApplicationLocation": {
       "title": "ApplicationLocation",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "ApplicationId": {
@@ -913,6 +1221,7 @@
     },
     "ApplicationProperties": {
       "title": "ApplicationProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Location": {
@@ -947,6 +1256,7 @@
     },
     "AwsServerlessApplication": {
       "title": "AwsServerlessApplication",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Type": {
