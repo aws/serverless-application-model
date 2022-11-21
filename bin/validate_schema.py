@@ -14,6 +14,8 @@ def get_templates() -> Iterator[Path]:
     paths = (
         list(Path("tests/translator/input").glob("**/*.yaml"))
         + list(Path("tests/translator/input").glob("**/*.yml"))
+        + list(Path("tests/validator/input").glob("**/*.yaml"))
+        + list(Path("tests/validator/input").glob("**/*.yml"))
         + list(Path("integration/resources/templates").glob("**/*.yaml"))
         + list(Path("integration/resources/templates").glob("**/*.yml"))
     )

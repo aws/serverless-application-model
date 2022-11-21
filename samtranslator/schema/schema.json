@@ -538,19 +538,42 @@
       ],
       "additionalProperties": false
     },
+    "StateMachineEventsScheduleDeadLetterConfig": {
+      "title": "StateMachineEventsScheduleDeadLetterConfig",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "title": "Arn"
+        },
+        "QueueLogicalId": {
+          "title": "Queuelogicalid",
+          "type": "string"
+        },
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SQS"
+          ],
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
     "StateMachineEventsScheduleProperties": {
       "title": "StateMachineEventsScheduleProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "DeadLetterConfig": {
-          "title": "Deadletterconfig"
+          "$ref": "#/definitions/StateMachineEventsScheduleDeadLetterConfig"
         },
         "Description": {
           "title": "Description"
         },
         "Enabled": {
-          "title": "Enabled"
+          "title": "Enabled",
+          "type": "boolean"
         },
         "Input": {
           "title": "Input"
@@ -598,7 +621,7 @@
       "type": "object",
       "properties": {
         "DeadLetterConfig": {
-          "title": "Deadletterconfig"
+          "$ref": "#/definitions/StateMachineEventsScheduleDeadLetterConfig"
         },
         "Description": {
           "title": "Description"
@@ -709,13 +732,35 @@
       ],
       "additionalProperties": false
     },
+    "StateMachineEventsEventBridgeRuleDeadLetterConfig": {
+      "title": "StateMachineEventsEventBridgeRuleDeadLetterConfig",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "title": "Arn"
+        },
+        "QueueLogicalId": {
+          "title": "Queuelogicalid",
+          "type": "string"
+        },
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SQS"
+          ],
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
     "StateMachineEventsEventBridgeRuleProperties": {
       "title": "StateMachineEventsEventBridgeRuleProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "DeadLetterConfig": {
-          "title": "Deadletterconfig"
+          "$ref": "#/definitions/StateMachineEventsEventBridgeRuleDeadLetterConfig"
         },
         "EventBusName": {
           "title": "Eventbusname"
@@ -757,27 +802,146 @@
       ],
       "additionalProperties": false
     },
+    "StateMachineEventsApiAuthResourcePolicy": {
+      "title": "StateMachineEventsApiAuthResourcePolicy",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AwsAccountBlacklist": {
+          "title": "Awsaccountblacklist",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "AwsAccountWhitelist": {
+          "title": "Awsaccountwhitelist",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "CustomStatements": {
+          "title": "Customstatements",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "IntrinsicVpcBlacklist": {
+          "title": "Intrinsicvpcblacklist",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "IntrinsicVpcWhitelist": {
+          "title": "Intrinsicvpcwhitelist",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "IntrinsicVpceBlacklist": {
+          "title": "Intrinsicvpceblacklist",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "IntrinsicVpceWhitelist": {
+          "title": "Intrinsicvpcewhitelist",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "IpRangeBlacklist": {
+          "title": "Iprangeblacklist",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "IpRangeWhitelist": {
+          "title": "Iprangewhitelist",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "SourceVpcBlacklist": {
+          "title": "Sourcevpcblacklist",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "SourceVpcWhitelist": {
+          "title": "Sourcevpcwhitelist",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "StateMachineEventsApiAuth": {
+      "title": "StateMachineEventsApiAuth",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "ApiKeyRequired": {
+          "title": "Apikeyrequired",
+          "type": "boolean"
+        },
+        "AuthorizationScopes": {
+          "title": "Authorizationscopes",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Authorizer": {
+          "title": "Authorizer",
+          "type": "string"
+        },
+        "ResourcePolicy": {
+          "$ref": "#/definitions/StateMachineEventsApiAuthResourcePolicy"
+        }
+      },
+      "additionalProperties": false
+    },
     "StateMachineEventsApiProperties": {
       "title": "StateMachineEventsApiProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Auth": {
-          "title": "Auth"
+          "$ref": "#/definitions/StateMachineEventsApiAuth"
         },
         "Method": {
-          "title": "Method"
+          "title": "Method",
+          "type": "string"
         },
         "Path": {
-          "title": "Path"
+          "title": "Path",
+          "type": "string"
         },
         "RestApiId": {
-          "title": "Restapiid"
+          "title": "Restapiid",
+          "type": "object"
         },
         "UnescapeMappingTemplate": {
-          "title": "Unescapemappingtemplate"
+          "title": "Unescapemappingtemplate",
+          "type": "boolean"
         }
       },
+      "required": [
+        "Method",
+        "Path"
+      ],
       "additionalProperties": false
     },
     "StateMachineEventsApi": {
@@ -812,10 +976,17 @@
           "type": "object"
         },
         "DefinitionSubstitutions": {
-          "title": "Definitionsubstitutions"
+          "title": "Definitionsubstitutions",
+          "type": "object"
         },
         "DefinitionUri": {
-          "title": "Definitionuri"
+          "title": "Definitionuri",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {}
+          ]
         },
         "Events": {
           "title": "Events",
@@ -850,13 +1021,34 @@
           "title": "Permissionsboundary"
         },
         "Policies": {
-          "title": "Policies"
+          "title": "Policies",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "object"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          ]
         },
         "Role": {
           "title": "Role"
         },
         "Tags": {
-          "title": "Tags"
+          "title": "Tags",
+          "type": "object"
         },
         "Tracing": {
           "title": "Tracing"
@@ -1092,11 +1284,17 @@
         "DeletionPolicy": {
           "title": "Deletionpolicy"
         },
+        "UpdatePolicy": {
+          "title": "Updatepolicy"
+        },
         "UpdateReplacePolicy": {
           "title": "Updatereplacepolicy"
         },
         "DependsOn": {
           "title": "Dependson"
+        },
+        "Metadata": {
+          "title": "Metadata"
         }
       },
       "required": [
