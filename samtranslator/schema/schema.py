@@ -79,7 +79,7 @@ class FunctionDeadLetterQueue(BaseModel):
     Type: Literal["SNS", "SQS"]
 
 
-class FunctionEventInvokeConfiguration(BaseModel):
+class FunctionEventInvokeConfig(BaseModel):
     DestinationConfig: Optional[PassThrough]
     MaximumEventAgeInSeconds: Optional[int]
     MaximumRetryAttempts: Optional[int]
@@ -107,7 +107,7 @@ class FunctionProperties(BaseModel):
     Description: Optional[PassThrough]
     Environment: Optional[PassThrough]
     EphemeralStorage: Optional[PassThrough]
-    EventInvokeConfig: Optional[FunctionEventInvokeConfiguration]
+    EventInvokeConfig: Optional[FunctionEventInvokeConfig]
     Events: Optional[Dict[str, FunctionEvent]]
     FileSystemConfigs: Optional[PassThrough]
     FunctionName: Optional[PassThrough]
