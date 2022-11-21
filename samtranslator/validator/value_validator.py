@@ -32,7 +32,7 @@ class _ResourcePropertyValueValidator(Generic[T]):
         else:
             self.resource_logical_id = resource_id
 
-    def to_be_a(self, expected_type: ExpectedType, message: Optional[str] = "") -> Optional[T]:
+    def to_be_a(self, expected_type: ExpectedType, message: Optional[str] = "") -> T:
         """
         Validate the type of the value and return the value if valid.
 
@@ -69,16 +69,16 @@ class _ResourcePropertyValueValidator(Generic[T]):
     #
     # alias methods:
     #
-    def to_be_a_map(self, message: Optional[str] = "") -> Optional[T]:
+    def to_be_a_map(self, message: Optional[str] = "") -> T:
         return self.to_be_a(ExpectedType.MAP, message)
 
-    def to_be_a_list(self, message: Optional[str] = "") -> Optional[T]:
+    def to_be_a_list(self, message: Optional[str] = "") -> T:
         return self.to_be_a(ExpectedType.LIST, message)
 
-    def to_be_a_string(self, message: Optional[str] = "") -> Optional[T]:
+    def to_be_a_string(self, message: Optional[str] = "") -> T:
         return self.to_be_a(ExpectedType.STRING, message)
 
-    def to_be_an_integer(self, message: Optional[str] = "") -> Optional[T]:
+    def to_be_an_integer(self, message: Optional[str] = "") -> T:
         return self.to_be_a(ExpectedType.INTEGER, message)
 
 
