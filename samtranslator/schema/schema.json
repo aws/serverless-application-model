@@ -332,6 +332,7 @@
     },
     "FunctionCodeUri": {
       "title": "FunctionCodeUri",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Bucket": {
@@ -376,6 +377,7 @@
     },
     "FunctionDeadLetterQueue": {
       "title": "FunctionDeadLetterQueue",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "TargetArn": {
@@ -399,6 +401,7 @@
     },
     "FunctionDeploymentPreferenceHooks": {
       "title": "FunctionDeploymentPreferenceHooks",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "PostTraffic": {
@@ -428,6 +431,7 @@
     },
     "FunctionDeploymentPreference": {
       "title": "FunctionDeploymentPreference",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Alarms": {
@@ -497,8 +501,9 @@
       },
       "additionalProperties": false
     },
-    "FunctionEventInvokeConfiguration": {
-      "title": "FunctionEventInvokeConfiguration",
+    "FunctionEventInvokeConfig": {
+      "title": "FunctionEventInvokeConfig",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "DestinationConfig": {
@@ -515,16 +520,712 @@
       },
       "additionalProperties": false
     },
-    "FunctionEvent": {
-      "title": "FunctionEvent",
+    "FunctionS3Properties": {
+      "title": "FunctionS3Properties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Bucket": {
+          "title": "Bucket",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Events": {
+          "title": "Events"
+        },
+        "Filter": {
+          "title": "Filter"
+        }
+      },
+      "required": [
+        "Bucket"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionS3Event": {
+      "title": "FunctionS3Event",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Properties": {
-          "title": "Properties"
+          "$ref": "#/definitions/FunctionS3Properties"
         },
         "Type": {
           "title": "Type",
+          "enum": [
+            "S3"
+          ],
           "type": "string"
+        }
+      },
+      "required": [
+        "Properties",
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "SqsSubscription": {
+      "title": "SqsSubscription",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "BatchSize": {
+          "title": "Batchsize",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Enabled": {
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "QueueArn": {
+          "title": "Queuearn",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "QueuePolicyLogicalId": {
+          "title": "Queuepolicylogicalid",
+          "type": "string"
+        },
+        "QueueUrl": {
+          "title": "Queueurl",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "QueueArn",
+        "QueueUrl"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionSNSProperties": {
+      "title": "FunctionSNSProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "FilterPolicy": {
+          "title": "Filterpolicy"
+        },
+        "Region": {
+          "title": "Region"
+        },
+        "SqsSubscription": {
+          "title": "Sqssubscription",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/SqsSubscription"
+            }
+          ]
+        },
+        "Topic": {
+          "title": "Topic"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionSNSEvent": {
+      "title": "FunctionSNSEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Properties": {
+          "$ref": "#/definitions/FunctionSNSProperties"
+        },
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SNS"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Properties",
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionKinesisProperties": {
+      "title": "FunctionKinesisProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "BatchSize": {
+          "title": "Batchsize"
+        },
+        "BisectBatchOnFunctionError": {
+          "title": "Bisectbatchonfunctionerror"
+        },
+        "DestinationConfig": {
+          "title": "Destinationconfig"
+        },
+        "Enabled": {
+          "title": "Enabled"
+        },
+        "FilterCriteria": {
+          "title": "Filtercriteria"
+        },
+        "FunctionResponseTypes": {
+          "title": "Functionresponsetypes"
+        },
+        "MaximumBatchingWindowInSeconds": {
+          "title": "Maximumbatchingwindowinseconds"
+        },
+        "MaximumRecordAgeInSeconds": {
+          "title": "Maximumrecordageinseconds"
+        },
+        "MaximumRetryAttempts": {
+          "title": "Maximumretryattempts"
+        },
+        "ParallelizationFactor": {
+          "title": "Parallelizationfactor"
+        },
+        "StartingPosition": {
+          "title": "Startingposition"
+        },
+        "Stream": {
+          "title": "Stream"
+        },
+        "TumblingWindowInSeconds": {
+          "title": "Tumblingwindowinseconds"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionKinesisEvent": {
+      "title": "FunctionKinesisEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "Kinesis"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionKinesisProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionDynamoDBProperties": {
+      "title": "FunctionDynamoDBProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "BatchSize": {
+          "title": "Batchsize"
+        },
+        "BisectBatchOnFunctionError": {
+          "title": "Bisectbatchonfunctionerror"
+        },
+        "DestinationConfig": {
+          "title": "Destinationconfig"
+        },
+        "Enabled": {
+          "title": "Enabled"
+        },
+        "FilterCriteria": {
+          "title": "Filtercriteria"
+        },
+        "FunctionResponseTypes": {
+          "title": "Functionresponsetypes"
+        },
+        "MaximumBatchingWindowInSeconds": {
+          "title": "Maximumbatchingwindowinseconds"
+        },
+        "MaximumRecordAgeInSeconds": {
+          "title": "Maximumrecordageinseconds"
+        },
+        "MaximumRetryAttempts": {
+          "title": "Maximumretryattempts"
+        },
+        "ParallelizationFactor": {
+          "title": "Parallelizationfactor"
+        },
+        "StartingPosition": {
+          "title": "Startingposition"
+        },
+        "Stream": {
+          "title": "Stream"
+        },
+        "TumblingWindowInSeconds": {
+          "title": "Tumblingwindowinseconds"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionDynamoDBEvent": {
+      "title": "FunctionDynamoDBEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "DynamoDB"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionDynamoDBProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionSqsProperties": {
+      "title": "FunctionSqsProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "BatchSize": {
+          "title": "Batchsize"
+        },
+        "Enabled": {
+          "title": "Enabled"
+        },
+        "FilterCriteria": {
+          "title": "Filtercriteria"
+        },
+        "MaximumBatchingWindowInSeconds": {
+          "title": "Maximumbatchingwindowinseconds"
+        },
+        "Queue": {
+          "title": "Queue"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionSqsEvent": {
+      "title": "FunctionSqsEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SQS"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionSqsProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionApiProperties": {
+      "title": "FunctionApiProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Auth": {
+          "title": "Auth"
+        },
+        "Method": {
+          "title": "Method"
+        },
+        "Path": {
+          "title": "Path"
+        },
+        "RequestModel": {
+          "title": "Requestmodel"
+        },
+        "RequestParameters": {
+          "title": "Requestparameters"
+        },
+        "RestApiId": {
+          "title": "Restapiid"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionApiEvent": {
+      "title": "FunctionApiEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "Api"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionApiProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionScheduleProperties": {
+      "title": "FunctionScheduleProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DeadLetterConfig": {
+          "title": "Deadletterconfig"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "Enabled": {
+          "title": "Enabled"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "RetryPolicy": {
+          "title": "Retrypolicy"
+        },
+        "Schedule": {
+          "title": "Schedule"
+        },
+        "State": {
+          "title": "State"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionScheduleEvent": {
+      "title": "FunctionScheduleEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "Schedule"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionScheduleProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionScheduleV2Properties": {
+      "title": "FunctionScheduleV2Properties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DeadLetterConfig": {
+          "title": "Deadletterconfig"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "EndDate": {
+          "title": "Enddate"
+        },
+        "FlexibleTimeWindow": {
+          "title": "Flexibletimewindow"
+        },
+        "GroupName": {
+          "title": "Groupname"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "KmsKeyArn": {
+          "title": "Kmskeyarn"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "PermissionsBoundary": {
+          "title": "Permissionsboundary"
+        },
+        "RetryPolicy": {
+          "title": "Retrypolicy"
+        },
+        "ScheduleExpression": {
+          "title": "Scheduleexpression"
+        },
+        "ScheduleExpressionTimezone": {
+          "title": "Scheduleexpressiontimezone"
+        },
+        "StartDate": {
+          "title": "Startdate"
+        },
+        "State": {
+          "title": "State"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionScheduleV2Event": {
+      "title": "FunctionScheduleV2Event",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "ScheduleV2"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionScheduleV2Properties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionCloudWatchProperties": {
+      "title": "FunctionCloudWatchProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "title": "Enabled"
+        },
+        "EventBusName": {
+          "title": "Eventbusname"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "InputPath": {
+          "title": "Inputpath"
+        },
+        "Pattern": {
+          "title": "Pattern"
+        },
+        "State": {
+          "title": "State"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionCloudWatchEvent": {
+      "title": "FunctionCloudWatchEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "CloudWatchEvent"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionCloudWatchProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionEventBridgeRuleProperties": {
+      "title": "FunctionEventBridgeRuleProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DeadLetterConfig": {
+          "title": "Deadletterconfig"
+        },
+        "EventBusName": {
+          "title": "Eventbusname"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "InputPath": {
+          "title": "Inputpath"
+        },
+        "Pattern": {
+          "title": "Pattern"
+        },
+        "RetryPolicy": {
+          "title": "Retrypolicy"
+        },
+        "Target": {
+          "title": "Target"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionEventBridgeRuleEvent": {
+      "title": "FunctionEventBridgeRuleEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "EventBridgeRule"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionEventBridgeRuleProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionCloudWatchLogsProperties": {
+      "title": "FunctionCloudWatchLogsProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "FilterPattern": {
+          "title": "Filterpattern"
+        },
+        "LogGroupName": {
+          "title": "Loggroupname"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionCloudWatchLogsEvent": {
+      "title": "FunctionCloudWatchLogsEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "CloudWatchLogs"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionCloudWatchLogsProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionIoTRuleProperties": {
+      "title": "FunctionIoTRuleProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AwsIotSqlVersion": {
+          "title": "Awsiotsqlversion"
+        },
+        "Sql": {
+          "title": "Sql"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionIoTRuleEvent": {
+      "title": "FunctionIoTRuleEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "IoTRule"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionIoTRuleProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionAlexaSkillProperties": {
+      "title": "FunctionAlexaSkillProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "SkillId": {
+          "title": "Skillid"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionAlexaSkillEvent": {
+      "title": "FunctionAlexaSkillEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AlexaSkill"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionAlexaSkillProperties"
         }
       },
       "required": [
@@ -532,8 +1233,248 @@
       ],
       "additionalProperties": false
     },
+    "FunctionCognitoProperties": {
+      "title": "FunctionCognitoProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Trigger": {
+          "title": "Trigger"
+        },
+        "UserPool": {
+          "title": "Userpool"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionCognitoEvent": {
+      "title": "FunctionCognitoEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "Cognito"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionCognitoProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionHttpApiProperties": {
+      "title": "FunctionHttpApiProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "ApiId": {
+          "title": "Apiid"
+        },
+        "Auth": {
+          "title": "Auth"
+        },
+        "Method": {
+          "title": "Method"
+        },
+        "Path": {
+          "title": "Path"
+        },
+        "PayloadFormatVersion": {
+          "title": "Payloadformatversion"
+        },
+        "RouteSettings": {
+          "title": "Routesettings"
+        },
+        "TimeoutInMillis": {
+          "title": "Timeoutinmillis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionHttpApiEvent": {
+      "title": "FunctionHttpApiEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "HttpApi"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionHttpApiProperties"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionMSKProperties": {
+      "title": "FunctionMSKProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "ConsumerGroupId": {
+          "title": "Consumergroupid"
+        },
+        "FilterCriteria": {
+          "title": "Filtercriteria"
+        },
+        "MaximumBatchingWindowInSeconds": {
+          "title": "Maximumbatchingwindowinseconds"
+        },
+        "StartingPosition": {
+          "title": "Startingposition"
+        },
+        "Stream": {
+          "title": "Stream"
+        },
+        "Topics": {
+          "title": "Topics"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionMSKEvent": {
+      "title": "FunctionMSKEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "MSK"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionMSKProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionMQProperties": {
+      "title": "FunctionMQProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "BatchSize": {
+          "title": "Batchsize"
+        },
+        "Broker": {
+          "title": "Broker"
+        },
+        "Enabled": {
+          "title": "Enabled"
+        },
+        "FilterCriteria": {
+          "title": "Filtercriteria"
+        },
+        "MaximumBatchingWindowInSeconds": {
+          "title": "Maximumbatchingwindowinseconds"
+        },
+        "Queues": {
+          "title": "Queues"
+        },
+        "SecretsManagerKmsKeyId": {
+          "title": "Secretsmanagerkmskeyid"
+        },
+        "SourceAccessConfigurations": {
+          "title": "Sourceaccessconfigurations"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionMQEvent": {
+      "title": "FunctionMQEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "MQ"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionMQProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionSelfManagedKafkaProperties": {
+      "title": "FunctionSelfManagedKafkaProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "BatchSize": {
+          "title": "Batchsize"
+        },
+        "ConsumerGroupId": {
+          "title": "Consumergroupid"
+        },
+        "Enabled": {
+          "title": "Enabled"
+        },
+        "FilterCriteria": {
+          "title": "Filtercriteria"
+        },
+        "KafkaBootstrapServers": {
+          "title": "Kafkabootstrapservers"
+        },
+        "SourceAccessConfigurations": {
+          "title": "Sourceaccessconfigurations"
+        },
+        "Topics": {
+          "title": "Topics"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionSelfManagedKafkaEvent": {
+      "title": "FunctionSelfManagedKafkaEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SelfManagedKafka"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/FunctionSelfManagedKafkaProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
     "FunctionUrlConfig": {
       "title": "FunctionUrlConfig",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "AuthType": {
@@ -636,13 +1577,68 @@
           "title": "Ephemeralstorage"
         },
         "EventInvokeConfig": {
-          "$ref": "#/definitions/FunctionEventInvokeConfiguration"
+          "$ref": "#/definitions/FunctionEventInvokeConfig"
         },
         "Events": {
           "title": "Events",
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/FunctionEvent"
+            "anyOf": [
+              {
+                "$ref": "#/definitions/FunctionS3Event"
+              },
+              {
+                "$ref": "#/definitions/FunctionSNSEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionKinesisEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionDynamoDBEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionSqsEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionApiEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionScheduleEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionScheduleV2Event"
+              },
+              {
+                "$ref": "#/definitions/FunctionCloudWatchEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionEventBridgeRuleEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionCloudWatchLogsEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionIoTRuleEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionAlexaSkillEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionCognitoEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionHttpApiEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionMSKEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionMQEvent"
+              },
+              {
+                "$ref": "#/definitions/FunctionSelfManagedKafkaEvent"
+              }
+            ]
           }
         },
         "FileSystemConfigs": {
