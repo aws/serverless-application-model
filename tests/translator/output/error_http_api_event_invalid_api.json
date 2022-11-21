@@ -1,8 +1,3 @@
 {
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [HttpApiFunction] is invalid. Event with id [Api] is invalid. ApiId must be a valid reference to an 'AWS::Serverless::HttpApi' resource in same template.",
-  "errors": [
-    {
-      "errorMessage": "Resource with id [HttpApiFunction] is invalid. Event with id [Api] is invalid. ApiId must be a valid reference to an 'AWS::Serverless::HttpApi' resource in same template."
-    }
-  ]
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 3. Resource with id [HttpApiFunction] is invalid. Event with id [Api] is invalid. ApiId must be a valid reference to an 'AWS::Serverless::HttpApi' resource in same template. Resource with id [HttpApiFunctionInvalidRouteSettings] is invalid. Event with id [ApiNullRouteSettings] is invalid. Property 'RouteSettings' should be a map. Resource with id [HttpApiFunctionInvalidRouteSettings2] is invalid. Event with id [ApiRouteSettingsNotMap] is invalid. Property 'RouteSettings' should be a map."
 }

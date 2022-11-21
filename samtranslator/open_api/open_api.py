@@ -626,7 +626,7 @@ class OpenApiEditor(object):
         return False
 
     @property
-    def openapi(self):  # type: ignore[no-untyped-def]
+    def openapi(self) -> Dict[str, Any]:
         """
         Returns a **copy** of the OpenApi specification as a dictionary.
 
