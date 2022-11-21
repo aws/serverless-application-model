@@ -50,7 +50,7 @@ class SamTemplate(object):
 
         resource_dict = resource
         if isinstance(resource, SamResource):
-            resource_dict = resource.to_dict()  # type: ignore[no-untyped-call]
+            resource_dict = resource.to_dict()
 
         self.resources[logical_id] = resource_dict
 
