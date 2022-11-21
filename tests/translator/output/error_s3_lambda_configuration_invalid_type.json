@@ -1,8 +1,3 @@
 {
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [AnotherBucket] is invalid. Invalid type for NotificationConfiguration. Resource with id [RandomBucket] is invalid. Invalid type for LambdaConfigurations. Must be a list.",
-  "errors": [
-    {
-      "errorMessage": "Resource with id [AppFunctionS3Event] is invalid. Invalid type for LambdaConfigurations. Must be a list."
-    }
-  ]
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [AnotherBucket] is invalid. Property 'NotificationConfiguration' should be a map. Resource with id [RandomBucket] is invalid. Invalid type for LambdaConfigurations. Must be a list."
 }
