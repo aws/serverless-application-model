@@ -61,7 +61,7 @@ class SamResource(object):
 
         return SamResourceType.has_value(self.type)  # type: ignore[no-untyped-call]
 
-    def to_dict(self):  # type: ignore[no-untyped-def]
+    def to_dict(self) -> Dict[str, Any]:
 
         if self.valid():  # type: ignore[no-untyped-call]
             # Touch a resource dictionary ONLY if it is valid
