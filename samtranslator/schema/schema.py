@@ -118,11 +118,100 @@ class AwsServerlessSimpleTable(BaseModel):
     Properties: Optional[SimpleTableProperties]
 
 
+class StateMachineEventsScheduleProperties(BaseModel):
+    DeadLetterConfig: Unknown
+    Description: Unknown
+    Enabled: Unknown
+    Input: Unknown
+    Name: Unknown
+    RetryPolicy: Unknown
+    Schedule: Unknown
+    State: Unknown
+
+
+class StateMachineEventsSchedule(BaseModel):
+    Type: Literal["Schedule"]
+    Properties: StateMachineEventsScheduleProperties
+
+
+class StateMachineEventsScheduleV2Properties(BaseModel):
+    DeadLetterConfig: Unknown
+    Description: Unknown
+    EndDate: Unknown
+    FlexibleTimeWindow: Unknown
+    GroupName: Unknown
+    Input: Unknown
+    KmsKeyArn: Unknown
+    Name: Unknown
+    PermissionsBoundary: Unknown
+    RetryPolicy: Unknown
+    RoleArn: Unknown  # TODO: Add to docs
+    ScheduleExpression: Unknown
+    ScheduleExpressionTimezone: Unknown
+    StartDate: Unknown
+    State: Unknown
+
+
+class StateMachineEventsScheduleV2(BaseModel):
+    Type: Literal["ScheduleV2"]
+    Properties: StateMachineEventsScheduleV2Properties
+
+
+class StateMachineEventsCloudWatchEventProperties(BaseModel):
+    EventBusName: Unknown
+    Input: Unknown
+    InputPath: Unknown
+    Pattern: Unknown
+
+
+class StateMachineEventsCloudWatchEvent(BaseModel):
+    Type: Literal["CloudWatchEvent"]
+    Properties: StateMachineEventsCloudWatchEventProperties
+
+
+class StateMachineEventsEventBridgeRuleProperties(BaseModel):
+    DeadLetterConfig: Unknown
+    EventBusName: Unknown
+    Input: Unknown
+    InputPath: Unknown
+    Pattern: Unknown
+    RetryPolicy: Unknown
+
+
+class StateMachineEventsEventBridgeRule(BaseModel):
+    Type: Literal["EventBridgeRule"]
+    Properties: StateMachineEventsEventBridgeRuleProperties
+
+
+class StateMachineEventsApiProperties(BaseModel):
+    Auth: Unknown
+    Method: Unknown
+    Path: Unknown
+    RestApiId: Unknown
+    UnescapeMappingTemplate: Unknown  # TODO: Add to docs
+
+
+class StateMachineEventsApi(BaseModel):
+    Type: Literal["Api"]
+    Properties: StateMachineEventsApiProperties
+
+
 class StateMachineProperties(BaseModel):
-    Definition: Unknown
+    Definition: Optional[Dict[str, Any]]
     DefinitionSubstitutions: Unknown
     DefinitionUri: Unknown
-    Events: Unknown
+    Events: Optional[
+        Dict[
+            str,
+            Union[
+                StateMachineEventsSchedule,
+                StateMachineEventsScheduleV2,
+                StateMachineEventsCloudWatchEvent,
+                StateMachineEventsEventBridgeRule,
+                StateMachineEventsApi,
+            ],
+        ]
+    ]
     Logging: Unknown
     Name: Unknown
     PermissionsBoundary: Unknown
@@ -136,7 +225,7 @@ class StateMachineProperties(BaseModel):
 class AwsServerlessStateMachine(BaseModel):
     Type: Literal["AWS::Serverless::StateMachine"]
     Properties: StateMachineProperties
-    Condition: Unknown
+    Condition: Optional[PassThrough]
 
 
 class LayerVersionContentUri(BaseModel):
