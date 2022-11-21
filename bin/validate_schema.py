@@ -33,6 +33,11 @@ def get_templates() -> Iterator[Path]:
         "sns_outside_sqs",  # 8 is not of type string
         "function_with_cwe_dlq_and_retry_policy",  # Doesn't match schema at all...
         "function_with_cwe_dlq_generated",  # Doesn't match schema at all...
+        "function_with_request_parameters",  # RequestParameters don't match documentation. Documentation and its example don't match either
+        "api_with_request_parameters_openapi",  # RequestParameters don't match documentation. Documentation and its example don't match either
+        "api_with_aws_iam_auth_overrides",  # null for invokeRole
+        "eventbridgerule",  # missing required field 'Patterns'
+        "self_managed_kafka_with_intrinsics",  # 'EnableValue' is of type bool but defined as string
     ]
 
     def should_skip(s: str) -> bool:

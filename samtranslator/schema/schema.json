@@ -856,30 +856,294 @@
       ],
       "additionalProperties": false
     },
+    "ResourcePolicy": {
+      "title": "ResourcePolicy",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AwsAccountBlacklist": {
+          "title": "Awsaccountblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "AwsAccountWhitelist": {
+          "title": "Awsaccountwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "CustomStatements": {
+          "title": "Customstatements",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpcBlacklist": {
+          "title": "Intrinsicvpcblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpcWhitelist": {
+          "title": "Intrinsicvpcwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpceBlacklist": {
+          "title": "Intrinsicvpceblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpceWhitelist": {
+          "title": "Intrinsicvpcewhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IpRangeBlacklist": {
+          "title": "Iprangeblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IpRangeWhitelist": {
+          "title": "Iprangewhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "SourceVpcBlacklist": {
+          "title": "Sourcevpcblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "SourceVpcWhitelist": {
+          "title": "Sourcevpcwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionApiFunctionAuth": {
+      "title": "FunctionApiFunctionAuth",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "ApiKeyRequired": {
+          "title": "Apikeyrequired",
+          "type": "boolean"
+        },
+        "AuthorizationScopes": {
+          "title": "Authorizationscopes",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Authorizer": {
+          "title": "Authorizer",
+          "type": "string"
+        },
+        "InvokeRole": {
+          "title": "Invokerole",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "ResourcePolicy": {
+          "$ref": "#/definitions/ResourcePolicy"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FunctionRequestModel": {
+      "title": "FunctionRequestModel",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "Required": {
+          "title": "Required",
+          "type": "boolean"
+        },
+        "ValidateBody": {
+          "title": "Validatebody",
+          "type": "boolean"
+        },
+        "ValidateParameters": {
+          "title": "Validateparameters",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "Model"
+      ],
+      "additionalProperties": false
+    },
+    "FunctionRequestParameter": {
+      "title": "FunctionRequestParameter",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Caching": {
+          "title": "Caching",
+          "type": "boolean"
+        },
+        "Required": {
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
     "FunctionApiProperties": {
       "title": "FunctionApiProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Auth": {
-          "title": "Auth"
+          "$ref": "#/definitions/FunctionApiFunctionAuth"
         },
         "Method": {
-          "title": "Method"
+          "title": "Method",
+          "type": "string"
         },
         "Path": {
-          "title": "Path"
+          "title": "Path",
+          "type": "string"
         },
         "RequestModel": {
-          "title": "Requestmodel"
+          "$ref": "#/definitions/FunctionRequestModel"
         },
         "RequestParameters": {
-          "title": "Requestparameters"
+          "title": "Requestparameters",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/FunctionRequestParameter"
+            }
+          ]
         },
         "RestApiId": {
-          "title": "Restapiid"
+          "title": "Restapiid",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         }
       },
+      "required": [
+        "Method",
+        "Path"
+      ],
       "additionalProperties": false
     },
     "FunctionApiEvent": {
@@ -904,19 +1168,42 @@
       ],
       "additionalProperties": false
     },
-    "FunctionScheduleProperties": {
-      "title": "FunctionScheduleProperties",
+    "EventsDeadLetterConfig": {
+      "title": "EventsDeadLetterConfig",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "title": "Arn"
+        },
+        "QueueLogicalId": {
+          "title": "Queuelogicalid",
+          "type": "string"
+        },
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SQS"
+          ],
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EventsScheduleProperties": {
+      "title": "EventsScheduleProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "DeadLetterConfig": {
-          "title": "Deadletterconfig"
+          "$ref": "#/definitions/EventsDeadLetterConfig"
         },
         "Description": {
           "title": "Description"
         },
         "Enabled": {
-          "title": "Enabled"
+          "title": "Enabled",
+          "type": "boolean"
         },
         "Input": {
           "title": "Input"
@@ -936,8 +1223,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionScheduleEvent": {
-      "title": "FunctionScheduleEvent",
+    "EventsSchedule": {
+      "title": "EventsSchedule",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -949,7 +1236,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionScheduleProperties"
+          "$ref": "#/definitions/EventsScheduleProperties"
         }
       },
       "required": [
@@ -958,13 +1245,13 @@
       ],
       "additionalProperties": false
     },
-    "FunctionScheduleV2Properties": {
-      "title": "FunctionScheduleV2Properties",
+    "EventsScheduleV2Properties": {
+      "title": "EventsScheduleV2Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "DeadLetterConfig": {
-          "title": "Deadletterconfig"
+          "$ref": "#/definitions/EventsDeadLetterConfig"
         },
         "Description": {
           "title": "Description"
@@ -993,6 +1280,9 @@
         "RetryPolicy": {
           "title": "Retrypolicy"
         },
+        "RoleArn": {
+          "title": "Rolearn"
+        },
         "ScheduleExpression": {
           "title": "Scheduleexpression"
         },
@@ -1008,8 +1298,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionScheduleV2Event": {
-      "title": "FunctionScheduleV2Event",
+    "EventsScheduleV2": {
+      "title": "EventsScheduleV2",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1021,7 +1311,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionScheduleV2Properties"
+          "$ref": "#/definitions/EventsScheduleV2Properties"
         }
       },
       "required": [
@@ -1036,7 +1326,8 @@
       "type": "object",
       "properties": {
         "Enabled": {
-          "title": "Enabled"
+          "title": "Enabled",
+          "type": "boolean"
         },
         "EventBusName": {
           "title": "Eventbusname"
@@ -1084,7 +1375,7 @@
       "type": "object",
       "properties": {
         "DeadLetterConfig": {
-          "title": "Deadletterconfig"
+          "$ref": "#/definitions/EventsDeadLetterConfig"
         },
         "EventBusName": {
           "title": "Eventbusname"
@@ -1207,7 +1498,8 @@
       "type": "object",
       "properties": {
         "SkillId": {
-          "title": "Skillid"
+          "title": "Skillid",
+          "type": "string"
         }
       },
       "additionalProperties": false
@@ -1242,9 +1534,20 @@
           "title": "Trigger"
         },
         "UserPool": {
-          "title": "Userpool"
+          "title": "Userpool",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         }
       },
+      "required": [
+        "UserPool"
+      ],
       "additionalProperties": false
     },
     "FunctionCognitoEvent": {
@@ -1269,31 +1572,76 @@
       ],
       "additionalProperties": false
     },
+    "FunctionHttpApiAuth": {
+      "title": "FunctionHttpApiAuth",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AuthorizationScopes": {
+          "title": "Authorizationscopes",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Authorizer": {
+          "title": "Authorizer",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
     "FunctionHttpApiProperties": {
       "title": "FunctionHttpApiProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "ApiId": {
-          "title": "Apiid"
+          "title": "Apiid",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         },
         "Auth": {
-          "title": "Auth"
+          "$ref": "#/definitions/FunctionHttpApiAuth"
         },
         "Method": {
-          "title": "Method"
+          "title": "Method",
+          "type": "string"
         },
         "Path": {
-          "title": "Path"
+          "title": "Path",
+          "type": "string"
         },
         "PayloadFormatVersion": {
-          "title": "Payloadformatversion"
+          "title": "Payloadformatversion",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         },
         "RouteSettings": {
           "title": "Routesettings"
         },
         "TimeoutInMillis": {
-          "title": "Timeoutinmillis"
+          "title": "Timeoutinmillis",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
         }
       },
       "additionalProperties": false
@@ -1391,7 +1739,8 @@
           "title": "Queues"
         },
         "SecretsManagerKmsKeyId": {
-          "title": "Secretsmanagerkmskeyid"
+          "title": "Secretsmanagerkmskeyid",
+          "type": "string"
         },
         "SourceAccessConfigurations": {
           "title": "Sourceaccessconfigurations"
@@ -1439,7 +1788,18 @@
           "title": "Filtercriteria"
         },
         "KafkaBootstrapServers": {
-          "title": "Kafkabootstrapservers"
+          "title": "Kafkabootstrapservers",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
         },
         "SourceAccessConfigurations": {
           "title": "Sourceaccessconfigurations"
@@ -1603,10 +1963,10 @@
                 "$ref": "#/definitions/FunctionApiEvent"
               },
               {
-                "$ref": "#/definitions/FunctionScheduleEvent"
+                "$ref": "#/definitions/EventsSchedule"
               },
               {
-                "$ref": "#/definitions/FunctionScheduleV2Event"
+                "$ref": "#/definitions/EventsScheduleV2"
               },
               {
                 "$ref": "#/definitions/FunctionCloudWatchEvent"
@@ -1843,158 +2203,6 @@
       ],
       "additionalProperties": false
     },
-    "StateMachineEventsScheduleDeadLetterConfig": {
-      "title": "StateMachineEventsScheduleDeadLetterConfig",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Arn": {
-          "title": "Arn"
-        },
-        "QueueLogicalId": {
-          "title": "Queuelogicalid",
-          "type": "string"
-        },
-        "Type": {
-          "title": "Type",
-          "enum": [
-            "SQS"
-          ],
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    },
-    "StateMachineEventsScheduleProperties": {
-      "title": "StateMachineEventsScheduleProperties",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "DeadLetterConfig": {
-          "$ref": "#/definitions/StateMachineEventsScheduleDeadLetterConfig"
-        },
-        "Description": {
-          "title": "Description"
-        },
-        "Enabled": {
-          "title": "Enabled",
-          "type": "boolean"
-        },
-        "Input": {
-          "title": "Input"
-        },
-        "Name": {
-          "title": "Name"
-        },
-        "RetryPolicy": {
-          "title": "Retrypolicy"
-        },
-        "Schedule": {
-          "title": "Schedule"
-        },
-        "State": {
-          "title": "State"
-        }
-      },
-      "additionalProperties": false
-    },
-    "StateMachineEventsSchedule": {
-      "title": "StateMachineEventsSchedule",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Type": {
-          "title": "Type",
-          "enum": [
-            "Schedule"
-          ],
-          "type": "string"
-        },
-        "Properties": {
-          "$ref": "#/definitions/StateMachineEventsScheduleProperties"
-        }
-      },
-      "required": [
-        "Type",
-        "Properties"
-      ],
-      "additionalProperties": false
-    },
-    "StateMachineEventsScheduleV2Properties": {
-      "title": "StateMachineEventsScheduleV2Properties",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "DeadLetterConfig": {
-          "$ref": "#/definitions/StateMachineEventsScheduleDeadLetterConfig"
-        },
-        "Description": {
-          "title": "Description"
-        },
-        "EndDate": {
-          "title": "Enddate"
-        },
-        "FlexibleTimeWindow": {
-          "title": "Flexibletimewindow"
-        },
-        "GroupName": {
-          "title": "Groupname"
-        },
-        "Input": {
-          "title": "Input"
-        },
-        "KmsKeyArn": {
-          "title": "Kmskeyarn"
-        },
-        "Name": {
-          "title": "Name"
-        },
-        "PermissionsBoundary": {
-          "title": "Permissionsboundary"
-        },
-        "RetryPolicy": {
-          "title": "Retrypolicy"
-        },
-        "RoleArn": {
-          "title": "Rolearn"
-        },
-        "ScheduleExpression": {
-          "title": "Scheduleexpression"
-        },
-        "ScheduleExpressionTimezone": {
-          "title": "Scheduleexpressiontimezone"
-        },
-        "StartDate": {
-          "title": "Startdate"
-        },
-        "State": {
-          "title": "State"
-        }
-      },
-      "additionalProperties": false
-    },
-    "StateMachineEventsScheduleV2": {
-      "title": "StateMachineEventsScheduleV2",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Type": {
-          "title": "Type",
-          "enum": [
-            "ScheduleV2"
-          ],
-          "type": "string"
-        },
-        "Properties": {
-          "$ref": "#/definitions/StateMachineEventsScheduleV2Properties"
-        }
-      },
-      "required": [
-        "Type",
-        "Properties"
-      ],
-      "additionalProperties": false
-    },
     "StateMachineEventsCloudWatchEventProperties": {
       "title": "StateMachineEventsCloudWatchEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
@@ -2107,91 +2315,6 @@
       ],
       "additionalProperties": false
     },
-    "StateMachineEventsApiAuthResourcePolicy": {
-      "title": "StateMachineEventsApiAuthResourcePolicy",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AwsAccountBlacklist": {
-          "title": "Awsaccountblacklist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "AwsAccountWhitelist": {
-          "title": "Awsaccountwhitelist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "CustomStatements": {
-          "title": "Customstatements",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IntrinsicVpcBlacklist": {
-          "title": "Intrinsicvpcblacklist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IntrinsicVpcWhitelist": {
-          "title": "Intrinsicvpcwhitelist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IntrinsicVpceBlacklist": {
-          "title": "Intrinsicvpceblacklist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IntrinsicVpceWhitelist": {
-          "title": "Intrinsicvpcewhitelist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IpRangeBlacklist": {
-          "title": "Iprangeblacklist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IpRangeWhitelist": {
-          "title": "Iprangewhitelist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "SourceVpcBlacklist": {
-          "title": "Sourcevpcblacklist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "SourceVpcWhitelist": {
-          "title": "Sourcevpcwhitelist",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
     "StateMachineEventsApiAuth": {
       "title": "StateMachineEventsApiAuth",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
@@ -2213,7 +2336,7 @@
           "type": "string"
         },
         "ResourcePolicy": {
-          "$ref": "#/definitions/StateMachineEventsApiAuthResourcePolicy"
+          "$ref": "#/definitions/ResourcePolicy"
         }
       },
       "additionalProperties": false
@@ -2299,10 +2422,10 @@
           "additionalProperties": {
             "anyOf": [
               {
-                "$ref": "#/definitions/StateMachineEventsSchedule"
+                "$ref": "#/definitions/EventsSchedule"
               },
               {
-                "$ref": "#/definitions/StateMachineEventsScheduleV2"
+                "$ref": "#/definitions/EventsScheduleV2"
               },
               {
                 "$ref": "#/definitions/StateMachineEventsCloudWatchEvent"
