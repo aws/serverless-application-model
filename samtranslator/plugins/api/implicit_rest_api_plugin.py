@@ -121,7 +121,7 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
         """
         Uses the implicit API in this file to generate an Implicit API resource
         """
-        return ImplicitApiResource().to_dict()  # type: ignore[no-untyped-call]
+        return ImplicitApiResource().to_dict()
 
     def _get_api_definition_from_editor(self, editor):  # type: ignore[no-untyped-def]
         """
