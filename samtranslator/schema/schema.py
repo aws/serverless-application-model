@@ -12,6 +12,8 @@ Unknown = Optional[Any]
 # Value passed directly to CloudFormation; not used by SAM
 PassThrough = Any  # TODO: Make it behave like typescript's unknown
 
+ResourcePolicy = Union[str, Dict[str, Any]]
+
 # Intrinsic resolvable by the SAM transform
 SamIntrinsic = Dict[str, Any]
 
@@ -49,6 +51,52 @@ class ConnectorProperties(BaseModel):
 class AwsServerlessConnector(BaseModel):
     Type: Literal["AWS::Serverless::Connector"]
     Properties: ConnectorProperties
+
+
+
+class EventsDeadLetterConfig(BaseModel):
+    Arn: Optional[PassThrough]
+    QueueLogicalId: Optional[str]
+    Type: Optional[Literal["SQS"]]
+
+
+class EventsScheduleProperties(BaseModel):
+    DeadLetterConfig: Optional[EventsDeadLetterConfig]
+    Description: Optional[PassThrough]
+    Enabled: Optional[bool]
+    Input: Optional[PassThrough]
+    Name: Optional[PassThrough]
+    RetryPolicy: Optional[PassThrough]
+    Schedule: Optional[PassThrough]
+    State: Optional[PassThrough]
+
+
+class EventsSchedule(BaseModel):
+    Type: Literal["Schedule"]
+    Properties: EventsScheduleProperties
+
+
+class EventsScheduleV2Properties(BaseModel):
+    DeadLetterConfig: Optional[EventsDeadLetterConfig]
+    Description: Optional[PassThrough]
+    EndDate: Optional[PassThrough]
+    FlexibleTimeWindow: Optional[PassThrough]
+    GroupName: Optional[PassThrough]
+    Input: Optional[PassThrough]
+    KmsKeyArn: Optional[PassThrough]
+    Name: Optional[PassThrough]
+    PermissionsBoundary: Optional[PassThrough]
+    RetryPolicy: Optional[PassThrough]
+    RoleArn: Optional[PassThrough]  # TODO: Add to docs
+    ScheduleExpression: Optional[PassThrough]
+    ScheduleExpressionTimezone: Optional[PassThrough]
+    StartDate: Optional[PassThrough]
+    State: Optional[PassThrough]
+
+
+class EventsScheduleV2(BaseModel):
+    Type: Literal["ScheduleV2"]
+    Properties: EventsScheduleV2Properties
 
 
 class FunctionCodeUri(BaseModel):
@@ -176,13 +224,47 @@ class FunctionSqsEvent(BaseModel):
     Properties: FunctionSqsProperties
 
 
+class FunctionResourcePolicy(BaseModel):
+    AwsAccountBlacklist: Optional[List[ResourcePolicy]]
+    AwsAccountWhitelist: Optional[List[ResourcePolicy]]
+    CustomStatements: Optional[List[ResourcePolicy]]
+    IntrinsicVpcBlacklist: Optional[List[ResourcePolicy]]
+    IntrinsicVpcWhitelist: Optional[List[ResourcePolicy]]
+    IntrinsicVpceBlacklist: Optional[List[ResourcePolicy]]
+    IntrinsicVpceWhitelist: Optional[List[ResourcePolicy]]
+    IpRangeBlacklist: Optional[List[ResourcePolicy]]
+    IpRangeWhitelist: Optional[List[ResourcePolicy]]
+    SourceVpcBlacklist: Optional[List[ResourcePolicy]]
+    SourceVpcWhitelist: Optional[List[ResourcePolicy]]
+
+
+class FunctionApiFunctionAuth(BaseModel):
+    ApiKeyRequired: Optional[bool]
+    AuthorizationScopes: Optional[List[str]]
+    Authorizer: Optional[str]
+    InvokeRole: Optional[Union[str, SamIntrinsic]]
+    ResourcePolicy: Optional[FunctionResourcePolicy]
+
+
+class FunctionRequestModel(BaseModel):
+    Model: str
+    Required: Optional[bool]
+    ValidateBody: Optional[bool]
+    ValidateParameters: Optional[bool]
+
+
+class FunctionRequestParameter(BaseModel):
+    Caching: Optional[bool]
+    Required: Optional[bool]
+
+
 class FunctionApiProperties(BaseModel):
-    Auth: Unknown
-    Method: Unknown
-    Path: Unknown
-    RequestModel: Unknown
-    RequestParameters: Unknown
-    RestApiId: Unknown
+    Auth: Optional[FunctionApiFunctionAuth]
+    Method: str
+    Path: str
+    RequestModel: Optional[FunctionRequestModel]
+    RequestParameters: Optional[Union[str, FunctionRequestParameter]]
+    RestApiId: Optional[Union[str, SamIntrinsic]]
 
 
 class FunctionApiEvent(BaseModel):
@@ -190,51 +272,13 @@ class FunctionApiEvent(BaseModel):
     Properties: FunctionApiProperties
 
 
-class FunctionScheduleProperties(BaseModel):
-    DeadLetterConfig: Unknown
-    Description: Unknown
-    Enabled: Unknown
-    Input: Unknown
-    Name: Unknown
-    RetryPolicy: Unknown
-    Schedule: Unknown
-    State: Unknown
-
-
-class FunctionScheduleEvent(BaseModel):
-    Type: Literal["Schedule"]
-    Properties: FunctionScheduleProperties
-
-
-class FunctionScheduleV2Properties(BaseModel):
-    DeadLetterConfig: Unknown
-    Description: Unknown
-    EndDate: Unknown
-    FlexibleTimeWindow: Unknown
-    GroupName: Unknown
-    Input: Unknown
-    KmsKeyArn: Unknown
-    Name: Unknown
-    PermissionsBoundary: Unknown
-    RetryPolicy: Unknown
-    ScheduleExpression: Unknown
-    ScheduleExpressionTimezone: Unknown
-    StartDate: Unknown
-    State: Unknown
-
-
-class FunctionScheduleV2Event(BaseModel):
-    Type: Literal["ScheduleV2"]
-    Properties: FunctionScheduleV2Properties
-
-
 class FunctionCloudWatchProperties(BaseModel):
-    Enabled: Unknown
-    EventBusName: Unknown
-    Input: Unknown
-    InputPath: Unknown
-    Pattern: Unknown
-    State: Unknown
+    Enabled: Optional[bool]
+    EventBusName: Optional[PassThrough]
+    Input: Optional[PassThrough]
+    InputPath: Optional[PassThrough]
+    Pattern: Optional[PassThrough]
+    State: Optional[PassThrough]
 
 
 class FunctionCloudWatchEvent(BaseModel):
@@ -243,13 +287,13 @@ class FunctionCloudWatchEvent(BaseModel):
 
 
 class FunctionEventBridgeRuleProperties(BaseModel):
-    DeadLetterConfig: Unknown
-    EventBusName: Unknown
-    Input: Unknown
-    InputPath: Unknown
-    Pattern: Unknown
-    RetryPolicy: Unknown
-    Target: Unknown
+    DeadLetterConfig: Optional[EventsDeadLetterConfig]
+    EventBusName: Optional[PassThrough]
+    Input: Optional[PassThrough]
+    InputPath: Optional[PassThrough]
+    Pattern: PassThrough
+    RetryPolicy: Optional[PassThrough]
+    Target: Optional[PassThrough]
 
 
 class FunctionEventBridgeRuleEvent(BaseModel):
@@ -258,8 +302,8 @@ class FunctionEventBridgeRuleEvent(BaseModel):
 
 
 class FunctionCloudWatchLogsProperties(BaseModel):
-    FilterPattern: Unknown
-    LogGroupName: Unknown
+    FilterPattern: PassThrough
+    LogGroupName: PassThrough
 
 
 class FunctionCloudWatchLogsEvent(BaseModel):
@@ -268,8 +312,8 @@ class FunctionCloudWatchLogsEvent(BaseModel):
 
 
 class FunctionIoTRuleProperties(BaseModel):
-    AwsIotSqlVersion: Unknown
-    Sql: Unknown
+    AwsIotSqlVersion: Optional[PassThrough]
+    Sql: PassThrough
 
 
 class FunctionIoTRuleEvent(BaseModel):
@@ -278,7 +322,7 @@ class FunctionIoTRuleEvent(BaseModel):
 
 
 class FunctionAlexaSkillProperties(BaseModel):
-    SkillId: Unknown
+    SkillId: Optional[str]
 
 
 class FunctionAlexaSkillEvent(BaseModel):
@@ -287,8 +331,8 @@ class FunctionAlexaSkillEvent(BaseModel):
 
 
 class FunctionCognitoProperties(BaseModel):
-    Trigger: Unknown
-    UserPool: Unknown
+    Trigger: PassThrough
+    UserPool: Union[str, SamIntrinsic]
 
 
 class FunctionCognitoEvent(BaseModel):
@@ -296,14 +340,19 @@ class FunctionCognitoEvent(BaseModel):
     Properties: FunctionCognitoProperties
 
 
+class FunctionHttpApiAuth(BaseModel):
+    AuthorizationScopes: Optional[List[str]]
+    Authorizer: Optional[str]
+
+
 class FunctionHttpApiProperties(BaseModel):
-    ApiId: Unknown
-    Auth: Unknown
-    Method: Unknown
-    Path: Unknown
-    PayloadFormatVersion: Unknown
-    RouteSettings: Unknown
-    TimeoutInMillis: Unknown
+    ApiId: Optional[Union[str, SamIntrinsic]]
+    Auth: Optional[FunctionHttpApiAuth]
+    Method: Optional[str]
+    Path: Optional[str]
+    PayloadFormatVersion: Optional[Union[str, SamIntrinsic]]
+    RouteSettings: Optional[PassThrough]
+    TimeoutInMillis: Optional[Union[int, SamIntrinsic]]
 
 
 class FunctionHttpApiEvent(BaseModel):
@@ -312,12 +361,12 @@ class FunctionHttpApiEvent(BaseModel):
 
 
 class FunctionMSKProperties(BaseModel):
-    ConsumerGroupId: Unknown
-    FilterCriteria: Unknown
-    MaximumBatchingWindowInSeconds: Unknown
-    StartingPosition: Unknown
-    Stream: Unknown
-    Topics: Unknown
+    ConsumerGroupId: Optional[PassThrough]
+    FilterCriteria: Optional[PassThrough]
+    MaximumBatchingWindowInSeconds: Optional[PassThrough]
+    StartingPosition: PassThrough
+    Stream: PassThrough
+    Topics: PassThrough
 
 
 class FunctionMSKEvent(BaseModel):
@@ -326,14 +375,14 @@ class FunctionMSKEvent(BaseModel):
 
 
 class FunctionMQProperties(BaseModel):
-    BatchSize: Unknown
-    Broker: Unknown
-    Enabled: Unknown
-    FilterCriteria: Unknown
-    MaximumBatchingWindowInSeconds: Unknown
-    Queues: Unknown
-    SecretsManagerKmsKeyId: Unknown
-    SourceAccessConfigurations: Unknown
+    BatchSize: Optional[PassThrough]
+    Broker: PassThrough
+    Enabled: Optional[PassThrough]
+    FilterCriteria: Optional[PassThrough]
+    MaximumBatchingWindowInSeconds: Optional[PassThrough]
+    Queues: PassThrough
+    SecretsManagerKmsKeyId: Optional[str]
+    SourceAccessConfigurations: PassThrough
 
 
 class FunctionMQEvent(BaseModel):
@@ -342,13 +391,13 @@ class FunctionMQEvent(BaseModel):
 
 
 class FunctionSelfManagedKafkaProperties(BaseModel):
-    BatchSize: Unknown
-    ConsumerGroupId: Unknown
-    Enabled: Unknown
-    FilterCriteria: Unknown
-    KafkaBootstrapServers: Unknown
-    SourceAccessConfigurations: Unknown
-    Topics: Unknown
+    BatchSize: Optional[PassThrough]
+    ConsumerGroupId: Optional[PassThrough]
+    Enabled: Optional[PassThrough]
+    FilterCriteria: Optional[PassThrough]
+    KafkaBootstrapServers: Optional[List[Union[str, SamIntrinsic]]]
+    SourceAccessConfigurations: PassThrough
+    Topics: PassThrough
 
 
 class FunctionSelfManagedKafkaEvent(BaseModel):
@@ -379,8 +428,8 @@ class FunctionProperties(BaseModel):
                 FunctionDynamoDBEvent,
                 FunctionSqsEvent,
                 FunctionApiEvent,
-                FunctionScheduleEvent,
-                FunctionScheduleV2Event,
+                EventsSchedule,
+                EventsScheduleV2,
                 FunctionCloudWatchEvent,
                 FunctionEventBridgeRuleEvent,
                 FunctionCloudWatchLogsEvent,
@@ -444,51 +493,6 @@ class SimpleTableProperties(BaseModel):
 class AwsServerlessSimpleTable(BaseModel):
     Type: Literal["AWS::Serverless::SimpleTable"]
     Properties: Optional[SimpleTableProperties]
-
-
-class StateMachineEventsScheduleDeadLetterConfig(BaseModel):
-    Arn: Optional[PassThrough]
-    QueueLogicalId: Optional[str]
-    Type: Optional[Literal["SQS"]]
-
-
-class StateMachineEventsScheduleProperties(BaseModel):
-    DeadLetterConfig: Optional[StateMachineEventsScheduleDeadLetterConfig]
-    Description: Optional[PassThrough]
-    Enabled: Optional[bool]
-    Input: Optional[PassThrough]
-    Name: Optional[PassThrough]
-    RetryPolicy: Optional[PassThrough]
-    Schedule: Optional[PassThrough]
-    State: Optional[PassThrough]
-
-
-class StateMachineEventsSchedule(BaseModel):
-    Type: Literal["Schedule"]
-    Properties: StateMachineEventsScheduleProperties
-
-
-class StateMachineEventsScheduleV2Properties(BaseModel):
-    DeadLetterConfig: Optional[StateMachineEventsScheduleDeadLetterConfig]
-    Description: Optional[PassThrough]
-    EndDate: Optional[PassThrough]
-    FlexibleTimeWindow: Optional[PassThrough]
-    GroupName: Optional[PassThrough]
-    Input: Optional[PassThrough]
-    KmsKeyArn: Optional[PassThrough]
-    Name: Optional[PassThrough]
-    PermissionsBoundary: Optional[PassThrough]
-    RetryPolicy: Optional[PassThrough]
-    RoleArn: Optional[PassThrough]  # TODO: Add to docs
-    ScheduleExpression: Optional[PassThrough]
-    ScheduleExpressionTimezone: Optional[PassThrough]
-    StartDate: Optional[PassThrough]
-    State: Optional[PassThrough]
-
-
-class StateMachineEventsScheduleV2(BaseModel):
-    Type: Literal["ScheduleV2"]
-    Properties: StateMachineEventsScheduleV2Properties
 
 
 class StateMachineEventsCloudWatchEventProperties(BaseModel):
@@ -565,8 +569,8 @@ class StateMachineProperties(BaseModel):
         Dict[
             str,
             Union[
-                StateMachineEventsSchedule,
-                StateMachineEventsScheduleV2,
+                EventsSchedule,
+                EventsScheduleV2,
                 StateMachineEventsCloudWatchEvent,
                 StateMachineEventsEventBridgeRule,
                 StateMachineEventsApi,
