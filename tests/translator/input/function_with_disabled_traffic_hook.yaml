@@ -21,12 +21,12 @@ Resources:
         Hooks:
           PreTraffic:
             Ref: preTrafficHook
-        Events:
-          Api:
-            Type: Api
-            Properties:
-              Path: /test
-              Method: get
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /test
+            Method: get
 
   preTrafficHook:
     Type: AWS::Serverless::Function
