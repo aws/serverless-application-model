@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional, Union
 import pydantic
 from pydantic import Extra
 
-
 # TODO: Get rid of this in favor of proper types
 Unknown = Optional[Any]
 
@@ -52,42 +51,86 @@ class AwsServerlessConnector(BaseModel):
     Properties: ConnectorProperties
 
 
+class FunctionCodeUri(BaseModel):
+    Bucket: Union[str, SamIntrinsic]
+    Key: Union[str, SamIntrinsic]
+    Version: Optional[Union[str, SamIntrinsic]]
+
+
+class FunctionDeploymentPreferenceHooks(BaseModel):
+    PostTraffic: Optional[Union[str, SamIntrinsic]]
+    PreTraffic: Optional[Union[str, SamIntrinsic]]
+
+
+class FunctionDeploymentPreference(BaseModel):
+    Alarms: Optional[Union[List[SamIntrinsic], SamIntrinsic]]
+    Enabled: Optional[Union[bool, SamIntrinsic]]
+    Hooks: Optional[FunctionDeploymentPreferenceHooks]
+    PassthroughCondition: Optional[Union[bool, SamIntrinsic]]
+    Role: Optional[Union[str, SamIntrinsic]]
+    TriggerConfigurations: Optional[PassThrough]
+    Type: Optional[
+        Union[str, SamIntrinsic]
+    ]  # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field.
+
+
+class FunctionDeadLetterQueue(BaseModel):
+    TargetArn: str
+    Type: Literal["SNS", "SQS"]
+
+
+class FunctionEventInvokeConfig(BaseModel):
+    DestinationConfig: Optional[PassThrough]
+    MaximumEventAgeInSeconds: Optional[int]
+    MaximumRetryAttempts: Optional[int]
+
+
+class FunctionEvent(BaseModel):
+    Properties: Any
+    Type: str
+
+
+class FunctionUrlConfig(BaseModel):
+    AuthType: Union[str, SamIntrinsic]
+    Cors: Optional[PassThrough]
+
+
 class FunctionProperties(BaseModel):
-    Architectures: Unknown
-    AssumeRolePolicyDocument: Unknown
-    AutoPublishAlias: Unknown
-    AutoPublishCodeSha256: Unknown
-    CodeSigningConfigArn: Unknown
-    CodeUri: Unknown
-    DeadLetterQueue: Unknown
-    DeploymentPreference: Unknown
-    Description: Unknown
-    Environment: Unknown
-    EphemeralStorage: Unknown
-    EventInvokeConfig: Unknown
-    Events: Unknown
-    FileSystemConfigs: Unknown
-    FunctionName: Unknown
-    FunctionUrlConfig: Unknown
-    Handler: Unknown
-    ImageConfig: Unknown
-    ImageUri: Unknown
-    InlineCode: Unknown
-    KmsKeyArn: Unknown
-    Layers: Unknown
-    MemorySize: Unknown
-    PackageType: Unknown
-    PermissionsBoundary: Unknown
-    Policies: Unknown
-    ProvisionedConcurrencyConfig: Unknown
-    ReservedConcurrentExecutions: Unknown
-    Role: Unknown
-    Runtime: Unknown
-    Tags: Unknown
-    Timeout: Unknown
-    Tracing: Unknown
-    VersionDescription: Unknown
-    VpcConfig: Unknown
+    Architectures: Optional[PassThrough]
+    AssumeRolePolicyDocument: Optional[Dict[str, Any]]
+    AutoPublishAlias: Optional[Union[str, SamIntrinsic]]
+    AutoPublishCodeSha256: Optional[Union[str, SamIntrinsic]]
+    CodeSigningConfigArn: Optional[Union[str, SamIntrinsic]]
+    CodeUri: Optional[Union[str, FunctionCodeUri]]
+    DeadLetterQueue: Optional[Union[SamIntrinsic, FunctionDeadLetterQueue]]
+    DeploymentPreference: Optional[FunctionDeploymentPreference]
+    Description: Optional[PassThrough]
+    Environment: Optional[PassThrough]
+    EphemeralStorage: Optional[PassThrough]
+    EventInvokeConfig: Optional[FunctionEventInvokeConfig]
+    Events: Optional[Dict[str, FunctionEvent]]
+    FileSystemConfigs: Optional[PassThrough]
+    FunctionName: Optional[PassThrough]
+    FunctionUrlConfig: Optional[FunctionUrlConfig]
+    Handler: Optional[PassThrough]
+    ImageConfig: Optional[PassThrough]
+    ImageUri: Optional[PassThrough]
+    InlineCode: Optional[PassThrough]
+    KmsKeyArn: Optional[PassThrough]
+    Layers: Optional[PassThrough]
+    MemorySize: Optional[PassThrough]
+    PackageType: Optional[PassThrough]
+    PermissionsBoundary: Optional[PassThrough]
+    Policies: Optional[Union[str, List[Union[str, SamIntrinsic]], SamIntrinsic]]
+    ProvisionedConcurrencyConfig: Optional[PassThrough]
+    ReservedConcurrentExecutions: Optional[PassThrough]
+    Role: Optional[Union[str, SamIntrinsic]]
+    Runtime: Optional[PassThrough]
+    Tags: Optional[Dict[str, Any]]
+    Timeout: Optional[PassThrough]
+    Tracing: Optional[Union[str, SamIntrinsic]]
+    VersionDescription: Optional[PassThrough]
+    VpcConfig: Optional[PassThrough]
 
 
 class AwsServerlessFunction(BaseModel):
