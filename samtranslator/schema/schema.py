@@ -118,15 +118,21 @@ class AwsServerlessSimpleTable(BaseModel):
     Properties: Optional[SimpleTableProperties]
 
 
+class StateMachineEventsScheduleDeadLetterConfig(BaseModel):
+    Arn: Optional[PassThrough]
+    QueueLogicalId: Optional[str]
+    Type: Optional[Literal["SQS"]]
+
+
 class StateMachineEventsScheduleProperties(BaseModel):
-    DeadLetterConfig: Unknown
-    Description: Unknown
-    Enabled: Unknown
-    Input: Unknown
-    Name: Unknown
-    RetryPolicy: Unknown
-    Schedule: Unknown
-    State: Unknown
+    DeadLetterConfig: Optional[StateMachineEventsScheduleDeadLetterConfig]
+    Description: Optional[PassThrough]
+    Enabled: Optional[bool]
+    Input: Optional[PassThrough]
+    Name: Optional[PassThrough]
+    RetryPolicy: Optional[PassThrough]
+    Schedule: Optional[PassThrough]
+    State: Optional[PassThrough]
 
 
 class StateMachineEventsSchedule(BaseModel):
@@ -135,21 +141,21 @@ class StateMachineEventsSchedule(BaseModel):
 
 
 class StateMachineEventsScheduleV2Properties(BaseModel):
-    DeadLetterConfig: Unknown
-    Description: Unknown
-    EndDate: Unknown
-    FlexibleTimeWindow: Unknown
-    GroupName: Unknown
-    Input: Unknown
-    KmsKeyArn: Unknown
-    Name: Unknown
-    PermissionsBoundary: Unknown
-    RetryPolicy: Unknown
-    RoleArn: Unknown  # TODO: Add to docs
-    ScheduleExpression: Unknown
-    ScheduleExpressionTimezone: Unknown
-    StartDate: Unknown
-    State: Unknown
+    DeadLetterConfig: Optional[StateMachineEventsScheduleDeadLetterConfig]
+    Description: Optional[PassThrough]
+    EndDate: Optional[PassThrough]
+    FlexibleTimeWindow: Optional[PassThrough]
+    GroupName: Optional[PassThrough]
+    Input: Optional[PassThrough]
+    KmsKeyArn: Optional[PassThrough]
+    Name: Optional[PassThrough]
+    PermissionsBoundary: Optional[PassThrough]
+    RetryPolicy: Optional[PassThrough]
+    RoleArn: Optional[PassThrough]  # TODO: Add to docs
+    ScheduleExpression: Optional[PassThrough]
+    ScheduleExpressionTimezone: Optional[PassThrough]
+    StartDate: Optional[PassThrough]
+    State: Optional[PassThrough]
 
 
 class StateMachineEventsScheduleV2(BaseModel):
@@ -158,10 +164,10 @@ class StateMachineEventsScheduleV2(BaseModel):
 
 
 class StateMachineEventsCloudWatchEventProperties(BaseModel):
-    EventBusName: Unknown
-    Input: Unknown
-    InputPath: Unknown
-    Pattern: Unknown
+    EventBusName: Optional[PassThrough]
+    Input: Optional[PassThrough]
+    InputPath: Optional[PassThrough]
+    Pattern: Optional[PassThrough]
 
 
 class StateMachineEventsCloudWatchEvent(BaseModel):
@@ -169,13 +175,19 @@ class StateMachineEventsCloudWatchEvent(BaseModel):
     Properties: StateMachineEventsCloudWatchEventProperties
 
 
+class StateMachineEventsEventBridgeRuleDeadLetterConfig(BaseModel):
+    Arn: Optional[PassThrough]
+    QueueLogicalId: Optional[str]
+    Type: Optional[Literal["SQS"]]
+
+
 class StateMachineEventsEventBridgeRuleProperties(BaseModel):
-    DeadLetterConfig: Unknown
-    EventBusName: Unknown
-    Input: Unknown
-    InputPath: Unknown
-    Pattern: Unknown
-    RetryPolicy: Unknown
+    DeadLetterConfig: Optional[StateMachineEventsEventBridgeRuleDeadLetterConfig]
+    EventBusName: Optional[PassThrough]
+    Input: Optional[PassThrough]
+    InputPath: Optional[PassThrough]
+    Pattern: Optional[PassThrough]
+    RetryPolicy: Optional[PassThrough]
 
 
 class StateMachineEventsEventBridgeRule(BaseModel):
@@ -183,12 +195,33 @@ class StateMachineEventsEventBridgeRule(BaseModel):
     Properties: StateMachineEventsEventBridgeRuleProperties
 
 
+class StateMachineEventsApiAuthResourcePolicy(BaseModel):
+    AwsAccountBlacklist: Optional[List[str]]
+    AwsAccountWhitelist: Optional[List[str]]
+    CustomStatements: Optional[List[str]]
+    IntrinsicVpcBlacklist: Optional[List[str]]
+    IntrinsicVpcWhitelist: Optional[List[str]]
+    IntrinsicVpceBlacklist: Optional[List[str]]
+    IntrinsicVpceWhitelist: Optional[List[str]]
+    IpRangeBlacklist: Optional[List[str]]
+    IpRangeWhitelist: Optional[List[str]]
+    SourceVpcBlacklist: Optional[List[str]]
+    SourceVpcWhitelist: Optional[List[str]]
+
+
+class StateMachineEventsApiAuth(BaseModel):
+    ApiKeyRequired: Optional[bool]
+    AuthorizationScopes: Optional[List[str]]
+    Authorizer: Optional[str]
+    ResourcePolicy: Optional[StateMachineEventsApiAuthResourcePolicy]
+
+
 class StateMachineEventsApiProperties(BaseModel):
-    Auth: Unknown
-    Method: Unknown
-    Path: Unknown
-    RestApiId: Unknown
-    UnescapeMappingTemplate: Unknown  # TODO: Add to docs
+    Auth: Optional[StateMachineEventsApiAuth]
+    Method: str
+    Path: str
+    RestApiId: Optional[SamIntrinsic]
+    UnescapeMappingTemplate: Optional[bool]  # TODO: Add to docs
 
 
 class StateMachineEventsApi(BaseModel):
@@ -198,8 +231,8 @@ class StateMachineEventsApi(BaseModel):
 
 class StateMachineProperties(BaseModel):
     Definition: Optional[Dict[str, Any]]
-    DefinitionSubstitutions: Unknown
-    DefinitionUri: Unknown
+    DefinitionSubstitutions: Optional[Dict[str, Any]]
+    DefinitionUri: Optional[Union[str, PassThrough]]
     Events: Optional[
         Dict[
             str,
@@ -212,14 +245,14 @@ class StateMachineProperties(BaseModel):
             ],
         ]
     ]
-    Logging: Unknown
-    Name: Unknown
-    PermissionsBoundary: Unknown
-    Policies: Unknown
-    Role: Unknown
-    Tags: Unknown
-    Tracing: Unknown
-    Type: Unknown
+    Logging: Optional[PassThrough]
+    Name: Optional[PassThrough]
+    PermissionsBoundary: Optional[PassThrough]
+    Policies: Optional[Union[str, List[str], Dict[str, Any], List[Dict[str, Any]]]]
+    Role: Optional[PassThrough]
+    Tags: Optional[Dict[str, Any]]
+    Tracing: Optional[PassThrough]
+    Type: Optional[PassThrough]
 
 
 class AwsServerlessStateMachine(BaseModel):
@@ -285,8 +318,10 @@ class AwsServerlessApi(BaseModel):
     Properties: ApiProperties
     Condition: Unknown
     DeletionPolicy: Unknown
+    UpdatePolicy: Unknown
     UpdateReplacePolicy: Unknown
     DependsOn: Unknown
+    Metadata: Unknown
 
 
 class HttpApiProperties(BaseModel):
