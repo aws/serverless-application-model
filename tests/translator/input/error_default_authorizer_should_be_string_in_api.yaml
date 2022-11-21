@@ -2,12 +2,26 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Resources:
-  MyApi:
+  MyApiIntrinsicDefaultAuthorizer:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
         DefaultAuthorizer: !Ref MyCognitoAuth
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: arn:aws:1
+            Identity:
+              Header: MyAuthorizationHeader
+              ValidationExpression: myauthvalidationexpression
+
+  MyApiOtherTypeDefaultAuthorizer:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer:
+          What: is this?
         Authorizers:
           MyCognitoAuth:
             UserPoolArn: arn:aws:1
@@ -25,6 +39,12 @@ Resources:
         Api:
           Type: Api
           Properties:
-            RestApiId: !Ref MyApi
+            RestApiId: !Ref MyApiIntrinsicDefaultAuthorizer
+            Path: /
+            Method: get
+        Api2:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiOtherTypeDefaultAuthorizer
             Path: /
             Method: get
