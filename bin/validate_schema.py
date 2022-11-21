@@ -26,6 +26,7 @@ def get_templates() -> Iterator[Path]:
         "resource_with_invalid_type",
         "state_machine_with_null_events",
         "state_machine_with_cwe",  # Doesn't match schema at all...
+        "function_with_null_events",
     ]
 
     def should_skip(s: str) -> bool:
