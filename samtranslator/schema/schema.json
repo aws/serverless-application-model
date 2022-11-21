@@ -2608,6 +2608,286 @@
       ],
       "additionalProperties": false
     },
+    "HttpApiAuthOAuth2Authorizer": {
+      "title": "HttpApiAuthOAuth2Authorizer",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AuthorizationScopes": {
+          "title": "Authorizationscopes",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "IdentitySource": {
+          "title": "Identitysource",
+          "type": "string"
+        },
+        "JwtConfiguration": {
+          "title": "Jwtconfiguration"
+        }
+      },
+      "additionalProperties": false
+    },
+    "HttpApiAuthLambdaAuthorizerIdentity": {
+      "title": "HttpApiAuthLambdaAuthorizerIdentity",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Context": {
+          "title": "Context",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Headers": {
+          "title": "Headers",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "QueryStrings": {
+          "title": "Querystrings",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ReauthorizeEvery": {
+          "title": "Reauthorizeevery",
+          "type": "integer"
+        },
+        "StageVariables": {
+          "title": "Stagevariables",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "HttpApiAuthLambdaAuthorizer": {
+      "title": "HttpApiAuthLambdaAuthorizer",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AuthorizerPayloadFormatVersion": {
+          "title": "Authorizerpayloadformatversion",
+          "anyOf": [
+            {
+              "enum": [
+                "1.0",
+                "2.0"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "EnableSimpleResponses": {
+          "title": "Enablesimpleresponses",
+          "type": "boolean"
+        },
+        "FunctionArn": {
+          "title": "Functionarn",
+          "type": "object"
+        },
+        "FunctionInvokeRole": {
+          "title": "Functioninvokerole",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Identity": {
+          "$ref": "#/definitions/HttpApiAuthLambdaAuthorizerIdentity"
+        }
+      },
+      "required": [
+        "AuthorizerPayloadFormatVersion",
+        "FunctionArn"
+      ],
+      "additionalProperties": false
+    },
+    "HttpApiAuth": {
+      "title": "HttpApiAuth",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Authorizers": {
+          "title": "Authorizers",
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/HttpApiAuthOAuth2Authorizer"
+              },
+              {
+                "$ref": "#/definitions/HttpApiAuthLambdaAuthorizer"
+              }
+            ]
+          }
+        },
+        "DefaultAuthorizer": {
+          "title": "Defaultauthorizer",
+          "type": "string"
+        },
+        "EnableIamAuthorizer": {
+          "title": "Enableiamauthorizer",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "HttpApiCorsConfiguration": {
+      "title": "HttpApiCorsConfiguration",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AllowCredentials": {
+          "title": "Allowcredentials",
+          "type": "boolean"
+        },
+        "AllowHeaders": {
+          "title": "Allowheaders",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "AllowMethods": {
+          "title": "Allowmethods",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "AllowOrigins": {
+          "title": "Alloworigins",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ExposeHeaders": {
+          "title": "Exposeheaders",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "MaxAge": {
+          "title": "Maxage",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "HttpApiDefinitionUri": {
+      "title": "HttpApiDefinitionUri",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Bucket": {
+          "title": "Bucket",
+          "type": "string"
+        },
+        "Key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "Version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Bucket",
+        "Key"
+      ],
+      "additionalProperties": false
+    },
+    "HttpApiDomainRoute53": {
+      "title": "HttpApiDomainRoute53",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DistributionDomainName": {
+          "title": "Distributiondomainname"
+        },
+        "EvaluateTargetHealth": {
+          "title": "Evaluatetargethealth"
+        },
+        "HostedZoneId": {
+          "title": "Hostedzoneid"
+        },
+        "HostedZoneName": {
+          "title": "Hostedzonename"
+        },
+        "IpV6": {
+          "title": "Ipv6",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "HttpApiDomain": {
+      "title": "HttpApiDomain",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "BasePath": {
+          "title": "Basepath",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "CertificateArn": {
+          "title": "Certificatearn"
+        },
+        "DomainName": {
+          "title": "Domainname"
+        },
+        "EndpointConfiguration": {
+          "title": "Endpointconfiguration",
+          "anyOf": [
+            {
+              "enum": [
+                "REGIONAL"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "MutualTlsAuthentication": {
+          "title": "Mutualtlsauthentication"
+        },
+        "OwnershipVerificationCertificateArn": {
+          "title": "Ownershipverificationcertificatearn"
+        },
+        "Route53": {
+          "$ref": "#/definitions/HttpApiDomainRoute53"
+        },
+        "SecurityPolicy": {
+          "title": "Securitypolicy"
+        }
+      },
+      "additionalProperties": false
+    },
     "HttpApiProperties": {
       "title": "HttpApiProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
@@ -2617,28 +2897,46 @@
           "title": "Accesslogsettings"
         },
         "Auth": {
-          "title": "Auth"
+          "$ref": "#/definitions/HttpApiAuth"
         },
         "CorsConfiguration": {
-          "title": "Corsconfiguration"
+          "title": "Corsconfiguration",
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "#/definitions/HttpApiCorsConfiguration"
+            }
+          ]
         },
         "DefaultRouteSettings": {
           "title": "Defaultroutesettings"
         },
         "DefinitionBody": {
-          "title": "Definitionbody"
+          "title": "Definitionbody",
+          "type": "object"
         },
         "DefinitionUri": {
-          "title": "Definitionuri"
+          "title": "Definitionuri",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/HttpApiDefinitionUri"
+            }
+          ]
         },
         "Description": {
-          "title": "Description"
+          "title": "Description",
+          "type": "string"
         },
         "DisableExecuteApiEndpoint": {
           "title": "Disableexecuteapiendpoint"
         },
         "Domain": {
-          "title": "Domain"
+          "$ref": "#/definitions/HttpApiDomain"
         },
         "FailOnWarnings": {
           "title": "Failonwarnings"
@@ -2653,7 +2951,8 @@
           "title": "Stagevariables"
         },
         "Tags": {
-          "title": "Tags"
+          "title": "Tags",
+          "type": "object"
         },
         "Name": {
           "title": "Name"
