@@ -53,7 +53,6 @@ class AwsServerlessConnector(BaseModel):
     Properties: ConnectorProperties
 
 
-
 class EventsDeadLetterConfig(BaseModel):
     Arn: Optional[PassThrough]
     QueueLogicalId: Optional[str]
