@@ -49,7 +49,6 @@ def get_templates() -> Iterator[Path]:
         "api_with_auth_all_maximum_openapi_3",  # 'UserPoolArn' expects to be a string, but received list
         "api_with_authorizers_max_openapi",  # 'UserPoolArn' expects to be a string, but received list
         "api_with_authorizers_max",  # 'UserPoolArn' expects to be a string, but received list
-        "state_machine_with_api_authorizer",  # 'Headers' expects to be list
         "api_with_any_method_in_swagger",  # Missing required field 'FunctionArn'
     ]
 
