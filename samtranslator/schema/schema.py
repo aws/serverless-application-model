@@ -467,11 +467,11 @@ class FunctionProperties(BaseModel):
 class AwsServerlessFunction(BaseModel):
     Type: Literal["AWS::Serverless::Function"]
     Properties: Optional[FunctionProperties]
-    DeletionPolicy: Unknown
-    UpdateReplacePolicy: Unknown
-    Condition: Unknown
-    DependsOn: Unknown
-    Metadata: Unknown
+    DeletionPolicy: Optional[PassThrough]
+    UpdateReplacePolicy: Optional[PassThrough]
+    Condition: Optional[PassThrough]
+    DependsOn: Optional[PassThrough]
+    Metadata: Optional[PassThrough]
 
 
 class SimpleTablePrimaryKey(BaseModel):
@@ -701,7 +701,7 @@ class ApiProperties(BaseModel):
     Mode: Optional[PassThrough]
     Models: Optional[SamIntrinsic]
     Name: Optional[PassThrough]
-    OpenApiVersion: Optional[Union[float, str]] # TODO: float doesn't exist in documentation
+    OpenApiVersion: Optional[Union[float, str]]  # TODO: float doesn't exist in documentation
     StageName: Union[str, SamIntrinsic]
     Tags: Optional[PassThrough]
     TracingEnabled: Optional[PassThrough]
@@ -711,12 +711,12 @@ class ApiProperties(BaseModel):
 class AwsServerlessApi(BaseModel):
     Type: Literal["AWS::Serverless::Api"]
     Properties: ApiProperties
-    Condition: Unknown
-    DeletionPolicy: Unknown
-    UpdatePolicy: Unknown
-    UpdateReplacePolicy: Unknown
-    DependsOn: Unknown
-    Metadata: Unknown
+    Condition: Optional[PassThrough]
+    DeletionPolicy: Optional[PassThrough]
+    UpdatePolicy: Optional[PassThrough]
+    UpdateReplacePolicy: Optional[PassThrough]
+    DependsOn: Optional[PassThrough]
+    Metadata: Optional[PassThrough]
 
 
 class HttpApiAuthOAuth2Authorizer(BaseModel):
