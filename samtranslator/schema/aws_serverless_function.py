@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic, Unknown
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
 
 
 class ResourcePolicy(BaseModel):
@@ -421,28 +421,28 @@ class Properties(BaseModel):
 
 
 class Globals(BaseModel):
-    Handler: Unknown
-    Runtime: Unknown
-    CodeUri: Unknown
-    DeadLetterQueue: Unknown
-    Description: Unknown
-    MemorySize: Unknown
-    Timeout: Unknown
-    VpcConfig: Unknown
-    Environment: Unknown
-    Tags: Unknown
-    Tracing: Unknown
-    KmsKeyArn: Unknown
-    Layers: Unknown
-    AutoPublishAlias: Unknown
-    DeploymentPreference: Unknown
-    PermissionsBoundary: Unknown
-    ReservedConcurrentExecutions: Unknown
-    ProvisionedConcurrencyConfig: Unknown
-    AssumeRolePolicyDocument: Unknown
-    EventInvokeConfig: Unknown
-    Architectures: Unknown
-    EphemeralStorage: Unknown
+    Handler: Optional[PassThrough]
+    Runtime: Optional[PassThrough]
+    CodeUri: Optional[Union[str, CodeUri]]
+    DeadLetterQueue: Optional[Union[SamIntrinsic, DeadLetterQueue]]
+    Description: Optional[PassThrough]
+    MemorySize: Optional[PassThrough]
+    Timeout: Optional[PassThrough]
+    VpcConfig: Optional[PassThrough]
+    Environment: Optional[PassThrough]
+    Tags: Optional[Dict[str, Any]]
+    Tracing: Optional[Union[str, SamIntrinsic]]
+    KmsKeyArn: Optional[PassThrough]
+    Layers: Optional[PassThrough]
+    AutoPublishAlias: Optional[Union[str, SamIntrinsic]]
+    DeploymentPreference: Optional[DeploymentPreference]
+    PermissionsBoundary: Optional[PassThrough]
+    ReservedConcurrentExecutions: Optional[PassThrough]
+    ProvisionedConcurrencyConfig: Optional[PassThrough]
+    AssumeRolePolicyDocument:  Optional[Dict[str, Any]]
+    EventInvokeConfig: Optional[EventInvokeConfig]
+    Architectures: Optional[PassThrough]
+    EphemeralStorage: Optional[PassThrough]
 
 
 class Resource(BaseModel):

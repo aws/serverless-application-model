@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic, Unknown
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
 
 
 class ResourcePolicy(BaseModel):
@@ -64,7 +64,7 @@ class LambdaRequestAuthorizer(BaseModel):
 
 
 class UsagePlan(BaseModel):
-    CreateUsagePlan: Literal["PER_API", "SHARED", "NONE"]
+    CreateUsagePlan: Union[Literal["PER_API", "SHARED", "NONE"], SamIntrinsic]
     Description: Optional[PassThrough]
     Quota: Optional[PassThrough]
     Tags: Optional[PassThrough]
@@ -126,7 +126,7 @@ class Properties(BaseModel):
     CacheClusterEnabled: Optional[PassThrough]
     CacheClusterSize: Optional[PassThrough]
     CanarySetting: Optional[PassThrough]
-    Cors: Optional[Union[str, Cors]]
+    Cors: Optional[Union[str, SamIntrinsic, Cors]]
     DefinitionBody: Optional[PassThrough]
     DefinitionUri: Optional[PassThrough]
     Description: Optional[PassThrough]
@@ -148,23 +148,23 @@ class Properties(BaseModel):
 
 
 class Globals(BaseModel):
-    Auth: Unknown
-    Name: Unknown
-    DefinitionUri: Unknown
-    CacheClusterEnabled: Unknown
-    CacheClusterSize: Unknown
-    Variables: Unknown
-    EndpointConfiguration: Unknown
-    MethodSettings: Unknown
-    BinaryMediaTypes: Unknown
-    MinimumCompressionSize: Unknown
-    Cors: Unknown
-    GatewayResponses: Unknown
-    AccessLogSetting: Unknown
-    CanarySetting: Unknown
-    TracingEnabled: Unknown
-    OpenApiVersion: Unknown
-    Domain: Unknown
+    Auth: Optional[Auth]
+    Name: Optional[PassThrough]
+    DefinitionUri: Optional[PassThrough]
+    CacheClusterEnabled: Optional[PassThrough]
+    CacheClusterSize: Optional[PassThrough]
+    Variables: Optional[PassThrough]
+    EndpointConfiguration: Optional[PassThrough]
+    MethodSettings: Optional[PassThrough]
+    BinaryMediaTypes: Optional[PassThrough]
+    MinimumCompressionSize: Optional[PassThrough]
+    Cors: Optional[Union[str, SamIntrinsic, Cors]]
+    GatewayResponses: Optional[PassThrough]
+    AccessLogSetting: Optional[PassThrough]
+    CanarySetting: Optional[PassThrough]
+    TracingEnabled: Optional[PassThrough]
+    OpenApiVersion: Optional[Union[float, str]]  # TODO: float doesn't exist in documentation
+    Domain: Optional[Domain]
 
 
 class Resource(BaseModel):

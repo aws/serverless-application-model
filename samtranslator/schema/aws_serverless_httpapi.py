@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic, Unknown
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
 
 
 class OAuth2Authorizer(BaseModel):
@@ -97,15 +97,15 @@ class Properties(BaseModel):
 
 
 class Globals(BaseModel):
-    Auth: Unknown
-    AccessLogSettings: Unknown
-    StageVariables: Unknown
-    Tags: Unknown
-    RouteSettings: Unknown
-    FailOnWarnings: Unknown
-    Domain: Unknown
-    CorsConfiguration: Unknown
-    DefaultRouteSettings: Unknown
+    Auth: Optional[Auth]
+    AccessLogSettings: Optional[PassThrough]
+    StageVariables: Optional[PassThrough]
+    Tags: Optional[Dict[str, Any]]
+    RouteSettings: Optional[PassThrough]
+    FailOnWarnings: Optional[PassThrough]
+    Domain: Optional[Domain]
+    CorsConfiguration: Optional[PassThrough]
+    DefaultRouteSettings: Optional[PassThrough]
 
 
 class Resource(BaseModel):

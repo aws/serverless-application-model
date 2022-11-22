@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, Unknown
+from samtranslator.schema.common import PassThrough, BaseModel
 
 
 class PrimaryKey(BaseModel):
@@ -19,7 +19,7 @@ class Properties(BaseModel):
 
 
 class Globals(BaseModel):
-    SSESpecification: Unknown
+    SSESpecification: Optional[PassThrough]
 
 
 class Resource(BaseModel):
