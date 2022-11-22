@@ -38,6 +38,18 @@ def get_templates() -> Iterator[Path]:
         "api_with_aws_iam_auth_overrides",  # null for invokeRole
         "eventbridgerule",  # missing required field 'Patterns'
         "self_managed_kafka_with_intrinsics",  # 'EnableValue' is of type bool but defined as string
+        "api_with_resource_policy_global",  # 'ResourcePolicy CustomStatements' output expects a List
+        "api_with_resource_policy",  # 'ResourcePolicy CustomStatements' output expects a List
+        "api_with_if_conditional_with_resource_policy",  # 'ResourcePolicy CustomStatements' output expects a List
+        "api_rest_paths_with_if_condition_swagger",  # 'EnableSimpleResponses' and 'AuthorizerPayloadFormatVersion' not defined in documentation
+        "api_rest_paths_with_if_condition_openapi",  # 'EnableSimpleResponses' and 'AuthorizerPayloadFormatVersion' not defined in documentation
+        "state_machine_with_api_authorizer_maximum",  # 'UserPoolArn' expects to be a string, but received list
+        "api_with_auth_all_maximum",  # 'UserPoolArn' expects to be a string, but received list
+        "api_with_auth_and_conditions_all_max",  # 'UserPoolArn' expects to be a string, but received list
+        "api_with_auth_all_maximum_openapi_3",  # 'UserPoolArn' expects to be a string, but received list
+        "api_with_authorizers_max_openapi",  # 'UserPoolArn' expects to be a string, but received list
+        "api_with_authorizers_max",  # 'UserPoolArn' expects to be a string, but received list
+        "api_with_any_method_in_swagger",  # Missing required field 'FunctionArn'
     ]
 
     def should_skip(s: str) -> bool:

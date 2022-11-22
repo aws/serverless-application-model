@@ -467,11 +467,11 @@ class FunctionProperties(BaseModel):
 class AwsServerlessFunction(BaseModel):
     Type: Literal["AWS::Serverless::Function"]
     Properties: Optional[FunctionProperties]
-    DeletionPolicy: Unknown
-    UpdateReplacePolicy: Unknown
-    Condition: Unknown
-    DependsOn: Unknown
-    Metadata: Unknown
+    DeletionPolicy: Optional[PassThrough]
+    UpdateReplacePolicy: Optional[PassThrough]
+    Condition: Optional[PassThrough]
+    DependsOn: Optional[PassThrough]
+    Metadata: Optional[PassThrough]
 
 
 class SimpleTablePrimaryKey(BaseModel):
@@ -599,44 +599,124 @@ class AwsServerlessLayerVersion(BaseModel):
     DeletionPolicy: Optional[PassThrough]
 
 
+class ApiAuthCognitoAuthorizationIdentity(BaseModel):
+    Header: Optional[str]
+    ReauthorizeEvery: Optional[Union[int, SamIntrinsic]]
+    ValidationExpression: Optional[str]
+
+
+class ApiAuthCognitoAuthorizer(BaseModel):
+    AuthorizationScopes: Optional[List[str]]
+    Identity: Optional[ApiAuthCognitoAuthorizationIdentity]
+    UserPoolArn: Union[str, SamIntrinsic]
+
+
+class ApiAuthLambdaTokenAuthorizationIdentity(BaseModel):
+    Header: Optional[str]
+    ReauthorizeEvery: Optional[Union[int, SamIntrinsic]]
+    ValidationExpression: Optional[str]
+
+
+class ApiAuthLambdaRequestAuthorizationIdentity(BaseModel):
+    Context: Optional[List[str]]
+    Headers: Optional[List[str]]
+    QueryStrings: Optional[List[str]]
+    ReauthorizeEvery: Optional[Union[int, SamIntrinsic]]
+    StageVariables: Optional[List[str]]
+
+
+class ApiAuthLambdaAuthorizer(BaseModel):
+    AuthorizationScopes: Optional[List[str]]
+    FunctionArn: Union[str, SamIntrinsic]
+    FunctionInvokeRole: Optional[str]
+    FunctionPayloadType: Optional[Literal["REQUEST", "TOKEN"]]
+    Identity: Optional[Union[ApiAuthLambdaRequestAuthorizationIdentity, ApiAuthLambdaTokenAuthorizationIdentity]]
+
+
+class ApiAuthUsagePlan(BaseModel):
+    CreateUsagePlan: Literal["PER_API", "SHARED", "NONE"]
+    Description: Optional[PassThrough]
+    Quota: Optional[PassThrough]
+    Tags: Optional[PassThrough]
+    Throttle: Optional[PassThrough]
+    UsagePlanName: Optional[PassThrough]
+
+
+class ApiAuthProperties(BaseModel):
+    AddDefaultAuthorizerToCorsPreflight: Optional[bool]
+    ApiKeyRequired: Optional[bool]
+    Authorizers: Optional[Dict[str, Union[ApiAuthCognitoAuthorizer, ApiAuthLambdaAuthorizer]]]
+    DefaultAuthorizer: Optional[str]
+    InvokeRole: Optional[str]
+    ResourcePolicy: Optional[ResourcePolicy]
+    UsagePlan: Optional[ApiAuthUsagePlan]
+
+
+class ApiCorsConfiguration(BaseModel):
+    AllowCredentials: Optional[bool]
+    AllowHeaders: Optional[str]
+    AllowMethods: Optional[str]
+    AllowOrigin: str
+    MaxAge: Optional[str]
+
+
+class ApiDomainRoute53Configuration(BaseModel):
+    DistributionDomainName: Optional[PassThrough]
+    EvaluateTargetHealth: Optional[PassThrough]
+    HostedZoneId: Optional[PassThrough]
+    HostedZoneName: Optional[PassThrough]
+    IpV6: Optional[bool]
+
+
+class ApiDomainConfiguration(BaseModel):
+    BasePath: Optional[PassThrough]
+    CertificateArn: PassThrough
+    DomainName: PassThrough
+    EndpointConfiguration: Optional[Union[Literal["REGIONAL", "EDGE"], SamIntrinsic]]
+    MutualTlsAuthentication: Optional[PassThrough]
+    OwnershipVerificationCertificateArn: Optional[PassThrough]
+    Route53: Optional[ApiDomainRoute53Configuration]
+    SecurityPolicy: Optional[PassThrough]
+
+
 class ApiProperties(BaseModel):
-    AccessLogSetting: Unknown
-    ApiKeySourceType: Unknown
-    Auth: Unknown
-    BinaryMediaTypes: Unknown
-    CacheClusterEnabled: Unknown
-    CacheClusterSize: Unknown
-    CanarySetting: Unknown
-    Cors: Unknown
-    DefinitionBody: Unknown
-    DefinitionUri: Unknown
-    Description: Unknown
-    DisableExecuteApiEndpoint: Unknown
-    Domain: Unknown
-    EndpointConfiguration: Unknown
-    FailOnWarnings: Unknown
-    GatewayResponses: Unknown
-    MethodSettings: Unknown
-    MinimumCompressionSize: Unknown
-    Mode: Unknown
-    Models: Unknown
-    Name: Unknown
-    OpenApiVersion: Unknown
-    StageName: Unknown
-    Tags: Unknown
-    TracingEnabled: Unknown
-    Variables: Unknown
+    AccessLogSetting: Optional[PassThrough]
+    ApiKeySourceType: Optional[PassThrough]
+    Auth: Optional[ApiAuthProperties]
+    BinaryMediaTypes: Optional[PassThrough]
+    CacheClusterEnabled: Optional[PassThrough]
+    CacheClusterSize: Optional[PassThrough]
+    CanarySetting: Optional[PassThrough]
+    Cors: Optional[Union[str, ApiCorsConfiguration]]
+    DefinitionBody: Optional[PassThrough]
+    DefinitionUri: Optional[PassThrough]
+    Description: Optional[PassThrough]
+    DisableExecuteApiEndpoint: Optional[PassThrough]
+    Domain: Optional[ApiDomainConfiguration]
+    EndpointConfiguration: Optional[PassThrough]
+    FailOnWarnings: Optional[PassThrough]
+    GatewayResponses: Optional[SamIntrinsic]
+    MethodSettings: Optional[PassThrough]
+    MinimumCompressionSize: Optional[PassThrough]
+    Mode: Optional[PassThrough]
+    Models: Optional[SamIntrinsic]
+    Name: Optional[PassThrough]
+    OpenApiVersion: Optional[Union[float, str]]  # TODO: float doesn't exist in documentation
+    StageName: Union[str, SamIntrinsic]
+    Tags: Optional[PassThrough]
+    TracingEnabled: Optional[PassThrough]
+    Variables: Optional[PassThrough]
 
 
 class AwsServerlessApi(BaseModel):
     Type: Literal["AWS::Serverless::Api"]
     Properties: ApiProperties
-    Condition: Unknown
-    DeletionPolicy: Unknown
-    UpdatePolicy: Unknown
-    UpdateReplacePolicy: Unknown
-    DependsOn: Unknown
-    Metadata: Unknown
+    Condition: Optional[PassThrough]
+    DeletionPolicy: Optional[PassThrough]
+    UpdatePolicy: Optional[PassThrough]
+    UpdateReplacePolicy: Optional[PassThrough]
+    DependsOn: Optional[PassThrough]
+    Metadata: Optional[PassThrough]
 
 
 class HttpApiAuthOAuth2Authorizer(BaseModel):
