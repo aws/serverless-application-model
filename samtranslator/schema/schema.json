@@ -964,7 +964,8 @@
           ]
         },
         "GatewayResponses": {
-          "title": "Gatewayresponses"
+          "title": "Gatewayresponses",
+          "type": "object"
         },
         "AccessLogSetting": {
           "title": "Accesslogsetting"
@@ -3892,50 +3893,6 @@
       ],
       "additionalProperties": false
     },
-    "CorsConfiguration": {
-      "title": "CorsConfiguration",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AllowCredentials": {
-          "title": "Allowcredentials",
-          "type": "boolean"
-        },
-        "AllowHeaders": {
-          "title": "Allowheaders",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "AllowMethods": {
-          "title": "Allowmethods",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "AllowOrigins": {
-          "title": "Alloworigins",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "ExposeHeaders": {
-          "title": "Exposeheaders",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "MaxAge": {
-          "title": "Maxage",
-          "type": "integer"
-        }
-      },
-      "additionalProperties": false
-    },
     "DefinitionUri": {
       "title": "DefinitionUri",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
@@ -3972,15 +3929,7 @@
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Auth"
         },
         "CorsConfiguration": {
-          "title": "Corsconfiguration",
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "$ref": "#/definitions/CorsConfiguration"
-            }
-          ]
+          "title": "Corsconfiguration"
         },
         "DefaultRouteSettings": {
           "title": "Defaultroutesettings"
