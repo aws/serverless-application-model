@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic, Unknown
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
 
 
 class ResourcePolicy(BaseModel):
@@ -64,7 +64,7 @@ class LambdaRequestAuthorizer(BaseModel):
 
 
 class UsagePlan(BaseModel):
-    CreateUsagePlan: Literal["PER_API", "SHARED", "NONE"]
+    CreateUsagePlan: Union[Literal["PER_API", "SHARED", "NONE"], SamIntrinsic]
     Description: Optional[PassThrough]
     Quota: Optional[PassThrough]
     Tags: Optional[PassThrough]
@@ -118,53 +118,70 @@ class Domain(BaseModel):
     SecurityPolicy: Optional[PassThrough]
 
 
+Name = Optional[PassThrough]
+DefinitionUri = Optional[PassThrough]
+CacheClusterEnabled = Optional[PassThrough]
+CacheClusterSize = Optional[PassThrough]
+Variables = Optional[PassThrough]
+EndpointConfiguration = Optional[PassThrough]
+MethodSettings = Optional[PassThrough]
+BinaryMediaTypes = Optional[PassThrough]
+MinimumCompressionSize = Optional[PassThrough]
+CorsType = Optional[Union[str, SamIntrinsic, Cors]]
+GatewayResponses = Optional[SamIntrinsic]
+AccessLogSetting = Optional[PassThrough]
+CanarySetting = Optional[PassThrough]
+TracingEnabled = Optional[PassThrough]
+OpenApiVersion = Optional[Union[float, str]]  # TODO: float doesn't exist in documentation
+
+
 class Properties(BaseModel):
-    AccessLogSetting: Optional[PassThrough]
+    AccessLogSetting: Optional[AccessLogSetting]
     ApiKeySourceType: Optional[PassThrough]
     Auth: Optional[Auth]
-    BinaryMediaTypes: Optional[PassThrough]
-    CacheClusterEnabled: Optional[PassThrough]
-    CacheClusterSize: Optional[PassThrough]
-    CanarySetting: Optional[PassThrough]
-    Cors: Optional[Union[str, Cors]]
+    BinaryMediaTypes: Optional[BinaryMediaTypes]
+    CacheClusterEnabled: Optional[CacheClusterEnabled]
+    CacheClusterSize: Optional[CacheClusterSize]
+    CanarySetting: Optional[CanarySetting]
+    Cors: Optional[CorsType]
     DefinitionBody: Optional[PassThrough]
-    DefinitionUri: Optional[PassThrough]
+    DefinitionUri: Optional[DefinitionUri]
     Description: Optional[PassThrough]
     DisableExecuteApiEndpoint: Optional[PassThrough]
     Domain: Optional[Domain]
-    EndpointConfiguration: Optional[PassThrough]
+    EndpointConfiguration: Optional[EndpointConfiguration]
     FailOnWarnings: Optional[PassThrough]
-    GatewayResponses: Optional[SamIntrinsic]
-    MethodSettings: Optional[PassThrough]
-    MinimumCompressionSize: Optional[PassThrough]
+    GatewayResponses: Optional[GatewayResponses]
+    MethodSettings: Optional[MethodSettings]
+    MinimumCompressionSize: Optional[MinimumCompressionSize]
     Mode: Optional[PassThrough]
     Models: Optional[SamIntrinsic]
-    Name: Optional[PassThrough]
-    OpenApiVersion: Optional[Union[float, str]]  # TODO: float doesn't exist in documentation
+    Name: Optional[Name]
+    OpenApiVersion: Optional[OpenApiVersion]
     StageName: Union[str, SamIntrinsic]
     Tags: Optional[PassThrough]
-    TracingEnabled: Optional[PassThrough]
-    Variables: Optional[PassThrough]
+    TracingEnabled: Optional[TracingEnabled]
+    Variables: Optional[Variables]
 
 
 class Globals(BaseModel):
-    Auth: Unknown
-    Name: Unknown
-    DefinitionUri: Unknown
-    CacheClusterEnabled: Unknown
-    CacheClusterSize: Unknown
-    Variables: Unknown
-    EndpointConfiguration: Unknown
-    MethodSettings: Unknown
-    BinaryMediaTypes: Unknown
-    MinimumCompressionSize: Unknown
-    Cors: Unknown
-    GatewayResponses: Unknown
-    AccessLogSetting: Unknown
-    CanarySetting: Unknown
-    TracingEnabled: Unknown
-    OpenApiVersion: Unknown
-    Domain: Unknown
+    Auth: Optional[Auth]
+    Name: Optional[Name]
+    DefinitionUri: Optional[DefinitionUri]
+    CacheClusterEnabled: Optional[CacheClusterEnabled]
+    CacheClusterSize: Optional[CacheClusterSize]
+    Variables: Optional[Variables]
+    EndpointConfiguration: Optional[EndpointConfiguration]
+    MethodSettings: Optional[MethodSettings]
+    BinaryMediaTypes: Optional[BinaryMediaTypes]
+    MinimumCompressionSize: Optional[MinimumCompressionSize]
+    Cors: Optional[CorsType]
+    GatewayResponses: Optional[GatewayResponses]
+    AccessLogSetting: Optional[AccessLogSetting]
+    CanarySetting: Optional[CanarySetting]
+    TracingEnabled: Optional[TracingEnabled]
+    OpenApiVersion: Optional[OpenApiVersion]
+    Domain: Optional[Domain]
 
 
 class Resource(BaseModel):

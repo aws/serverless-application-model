@@ -45,291 +45,6 @@
     "Resources"
   ],
   "definitions": {
-    "samtranslator__schema__aws_serverless_function__Globals": {
-      "title": "Globals",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Handler": {
-          "title": "Handler"
-        },
-        "Runtime": {
-          "title": "Runtime"
-        },
-        "CodeUri": {
-          "title": "Codeuri"
-        },
-        "DeadLetterQueue": {
-          "title": "Deadletterqueue"
-        },
-        "Description": {
-          "title": "Description"
-        },
-        "MemorySize": {
-          "title": "Memorysize"
-        },
-        "Timeout": {
-          "title": "Timeout"
-        },
-        "VpcConfig": {
-          "title": "Vpcconfig"
-        },
-        "Environment": {
-          "title": "Environment"
-        },
-        "Tags": {
-          "title": "Tags"
-        },
-        "Tracing": {
-          "title": "Tracing"
-        },
-        "KmsKeyArn": {
-          "title": "Kmskeyarn"
-        },
-        "Layers": {
-          "title": "Layers"
-        },
-        "AutoPublishAlias": {
-          "title": "Autopublishalias"
-        },
-        "DeploymentPreference": {
-          "title": "Deploymentpreference"
-        },
-        "PermissionsBoundary": {
-          "title": "Permissionsboundary"
-        },
-        "ReservedConcurrentExecutions": {
-          "title": "Reservedconcurrentexecutions"
-        },
-        "ProvisionedConcurrencyConfig": {
-          "title": "Provisionedconcurrencyconfig"
-        },
-        "AssumeRolePolicyDocument": {
-          "title": "Assumerolepolicydocument"
-        },
-        "EventInvokeConfig": {
-          "title": "Eventinvokeconfig"
-        },
-        "Architectures": {
-          "title": "Architectures"
-        },
-        "EphemeralStorage": {
-          "title": "Ephemeralstorage"
-        }
-      },
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_api__Globals": {
-      "title": "Globals",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Auth": {
-          "title": "Auth"
-        },
-        "Name": {
-          "title": "Name"
-        },
-        "DefinitionUri": {
-          "title": "Definitionuri"
-        },
-        "CacheClusterEnabled": {
-          "title": "Cacheclusterenabled"
-        },
-        "CacheClusterSize": {
-          "title": "Cacheclustersize"
-        },
-        "Variables": {
-          "title": "Variables"
-        },
-        "EndpointConfiguration": {
-          "title": "Endpointconfiguration"
-        },
-        "MethodSettings": {
-          "title": "Methodsettings"
-        },
-        "BinaryMediaTypes": {
-          "title": "Binarymediatypes"
-        },
-        "MinimumCompressionSize": {
-          "title": "Minimumcompressionsize"
-        },
-        "Cors": {
-          "title": "Cors"
-        },
-        "GatewayResponses": {
-          "title": "Gatewayresponses"
-        },
-        "AccessLogSetting": {
-          "title": "Accesslogsetting"
-        },
-        "CanarySetting": {
-          "title": "Canarysetting"
-        },
-        "TracingEnabled": {
-          "title": "Tracingenabled"
-        },
-        "OpenApiVersion": {
-          "title": "Openapiversion"
-        },
-        "Domain": {
-          "title": "Domain"
-        }
-      },
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_httpapi__Globals": {
-      "title": "Globals",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Auth": {
-          "title": "Auth"
-        },
-        "AccessLogSettings": {
-          "title": "Accesslogsettings"
-        },
-        "StageVariables": {
-          "title": "Stagevariables"
-        },
-        "Tags": {
-          "title": "Tags"
-        },
-        "RouteSettings": {
-          "title": "Routesettings"
-        },
-        "FailOnWarnings": {
-          "title": "Failonwarnings"
-        },
-        "Domain": {
-          "title": "Domain"
-        },
-        "CorsConfiguration": {
-          "title": "Corsconfiguration"
-        },
-        "DefaultRouteSettings": {
-          "title": "Defaultroutesettings"
-        }
-      },
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_simpletable__Globals": {
-      "title": "Globals",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "SSESpecification": {
-          "title": "Ssespecification"
-        }
-      },
-      "additionalProperties": false
-    },
-    "__main____Globals": {
-      "title": "Globals",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Function": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__Globals"
-        },
-        "Api": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Globals"
-        },
-        "HttpApi": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Globals"
-        },
-        "SimpleTable": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_simpletable__Globals"
-        }
-      },
-      "additionalProperties": false
-    },
-    "ResourceReference": {
-      "title": "ResourceReference",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Id": {
-          "title": "Id",
-          "type": "string"
-        },
-        "Arn": {
-          "title": "Arn"
-        },
-        "Name": {
-          "title": "Name"
-        },
-        "Qualifier": {
-          "title": "Qualifier"
-        },
-        "QueueUrl": {
-          "title": "Queueurl"
-        },
-        "ResourceId": {
-          "title": "Resourceid"
-        },
-        "RoleName": {
-          "title": "Rolename"
-        },
-        "Type": {
-          "title": "Type",
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_connector__Properties": {
-      "title": "Properties",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Source": {
-          "$ref": "#/definitions/ResourceReference"
-        },
-        "Destination": {
-          "$ref": "#/definitions/ResourceReference"
-        },
-        "Permissions": {
-          "title": "Permissions",
-          "type": "array",
-          "items": {
-            "enum": [
-              "Read",
-              "Write"
-            ],
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "Source",
-        "Destination",
-        "Permissions"
-      ],
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_connector__Resource": {
-      "title": "Resource",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Type": {
-          "title": "Type",
-          "enum": [
-            "AWS::Serverless::Connector"
-          ],
-          "type": "string"
-        },
-        "Properties": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_connector__Properties"
-        }
-      },
-      "required": [
-        "Type",
-        "Properties"
-      ],
-      "additionalProperties": false
-    },
     "CodeUri": {
       "title": "CodeUri",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
@@ -518,6 +233,1129 @@
           "type": "integer"
         }
       },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_function__Globals": {
+      "title": "Globals",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Handler": {
+          "title": "Handler"
+        },
+        "Runtime": {
+          "title": "Runtime"
+        },
+        "CodeUri": {
+          "title": "Codeuri",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/CodeUri"
+            }
+          ]
+        },
+        "DeadLetterQueue": {
+          "title": "Deadletterqueue",
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "#/definitions/DeadLetterQueue"
+            }
+          ]
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "MemorySize": {
+          "title": "Memorysize"
+        },
+        "Timeout": {
+          "title": "Timeout"
+        },
+        "VpcConfig": {
+          "title": "Vpcconfig"
+        },
+        "Environment": {
+          "title": "Environment"
+        },
+        "Tags": {
+          "title": "Tags",
+          "type": "object"
+        },
+        "Tracing": {
+          "title": "Tracing",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "KmsKeyArn": {
+          "title": "Kmskeyarn"
+        },
+        "Layers": {
+          "title": "Layers"
+        },
+        "AutoPublishAlias": {
+          "title": "Autopublishalias",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "DeploymentPreference": {
+          "$ref": "#/definitions/DeploymentPreference"
+        },
+        "PermissionsBoundary": {
+          "title": "Permissionsboundary"
+        },
+        "ReservedConcurrentExecutions": {
+          "title": "Reservedconcurrentexecutions"
+        },
+        "ProvisionedConcurrencyConfig": {
+          "title": "Provisionedconcurrencyconfig"
+        },
+        "AssumeRolePolicyDocument": {
+          "title": "Assumerolepolicydocument",
+          "type": "object"
+        },
+        "EventInvokeConfig": {
+          "$ref": "#/definitions/EventInvokeConfig"
+        },
+        "Architectures": {
+          "title": "Architectures"
+        },
+        "EphemeralStorage": {
+          "title": "Ephemeralstorage"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CognitoAuthorizerIdentity": {
+      "title": "CognitoAuthorizerIdentity",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Header": {
+          "title": "Header",
+          "type": "string"
+        },
+        "ReauthorizeEvery": {
+          "title": "Reauthorizeevery",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "ValidationExpression": {
+          "title": "Validationexpression",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CognitoAuthorizer": {
+      "title": "CognitoAuthorizer",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AuthorizationScopes": {
+          "title": "Authorizationscopes",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Identity": {
+          "$ref": "#/definitions/CognitoAuthorizerIdentity"
+        },
+        "UserPoolArn": {
+          "title": "Userpoolarn",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "UserPoolArn"
+      ],
+      "additionalProperties": false
+    },
+    "LambdaTokenAuthorizerIdentity": {
+      "title": "LambdaTokenAuthorizerIdentity",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "ReauthorizeEvery": {
+          "title": "Reauthorizeevery",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "ValidationExpression": {
+          "title": "Validationexpression",
+          "type": "string"
+        },
+        "Header": {
+          "title": "Header",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "LambdaTokenAuthorizer": {
+      "title": "LambdaTokenAuthorizer",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AuthorizationScopes": {
+          "title": "Authorizationscopes",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "FunctionArn": {
+          "title": "Functionarn",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "FunctionInvokeRole": {
+          "title": "Functioninvokerole",
+          "type": "string"
+        },
+        "FunctionPayloadType": {
+          "title": "Functionpayloadtype",
+          "enum": [
+            "REQUEST",
+            "TOKEN"
+          ],
+          "type": "string"
+        },
+        "Identity": {
+          "$ref": "#/definitions/LambdaTokenAuthorizerIdentity"
+        }
+      },
+      "required": [
+        "FunctionArn"
+      ],
+      "additionalProperties": false
+    },
+    "LambdaRequestAuthorizerIdentity": {
+      "title": "LambdaRequestAuthorizerIdentity",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Context": {
+          "title": "Context",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Headers": {
+          "title": "Headers",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "QueryStrings": {
+          "title": "Querystrings",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ReauthorizeEvery": {
+          "title": "Reauthorizeevery",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "StageVariables": {
+          "title": "Stagevariables",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "LambdaRequestAuthorizer": {
+      "title": "LambdaRequestAuthorizer",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AuthorizationScopes": {
+          "title": "Authorizationscopes",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "FunctionArn": {
+          "title": "Functionarn",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "FunctionInvokeRole": {
+          "title": "Functioninvokerole",
+          "type": "string"
+        },
+        "FunctionPayloadType": {
+          "title": "Functionpayloadtype",
+          "enum": [
+            "REQUEST",
+            "TOKEN"
+          ],
+          "type": "string"
+        },
+        "Identity": {
+          "$ref": "#/definitions/LambdaRequestAuthorizerIdentity"
+        }
+      },
+      "required": [
+        "FunctionArn"
+      ],
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_api__ResourcePolicy": {
+      "title": "ResourcePolicy",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AwsAccountBlacklist": {
+          "title": "Awsaccountblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "AwsAccountWhitelist": {
+          "title": "Awsaccountwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "CustomStatements": {
+          "title": "Customstatements",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpcBlacklist": {
+          "title": "Intrinsicvpcblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpcWhitelist": {
+          "title": "Intrinsicvpcwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpceBlacklist": {
+          "title": "Intrinsicvpceblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpceWhitelist": {
+          "title": "Intrinsicvpcewhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IpRangeBlacklist": {
+          "title": "Iprangeblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IpRangeWhitelist": {
+          "title": "Iprangewhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "SourceVpcBlacklist": {
+          "title": "Sourcevpcblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "SourceVpcWhitelist": {
+          "title": "Sourcevpcwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "UsagePlan": {
+      "title": "UsagePlan",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "CreateUsagePlan": {
+          "title": "Createusageplan",
+          "anyOf": [
+            {
+              "enum": [
+                "PER_API",
+                "SHARED",
+                "NONE"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "Quota": {
+          "title": "Quota"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "Throttle": {
+          "title": "Throttle"
+        },
+        "UsagePlanName": {
+          "title": "Usageplanname"
+        }
+      },
+      "required": [
+        "CreateUsagePlan"
+      ],
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_api__Auth": {
+      "title": "Auth",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AddDefaultAuthorizerToCorsPreflight": {
+          "title": "Adddefaultauthorizertocorspreflight",
+          "type": "boolean"
+        },
+        "ApiKeyRequired": {
+          "title": "Apikeyrequired",
+          "type": "boolean"
+        },
+        "Authorizers": {
+          "title": "Authorizers",
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CognitoAuthorizer"
+              },
+              {
+                "$ref": "#/definitions/LambdaTokenAuthorizer"
+              },
+              {
+                "$ref": "#/definitions/LambdaRequestAuthorizer"
+              }
+            ]
+          }
+        },
+        "DefaultAuthorizer": {
+          "title": "Defaultauthorizer",
+          "type": "string"
+        },
+        "InvokeRole": {
+          "title": "Invokerole",
+          "type": "string"
+        },
+        "ResourcePolicy": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__ResourcePolicy"
+        },
+        "UsagePlan": {
+          "$ref": "#/definitions/UsagePlan"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Cors": {
+      "title": "Cors",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AllowCredentials": {
+          "title": "Allowcredentials",
+          "type": "boolean"
+        },
+        "AllowHeaders": {
+          "title": "Allowheaders",
+          "type": "string"
+        },
+        "AllowMethods": {
+          "title": "Allowmethods",
+          "type": "string"
+        },
+        "AllowOrigin": {
+          "title": "Alloworigin",
+          "type": "string"
+        },
+        "MaxAge": {
+          "title": "Maxage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "AllowOrigin"
+      ],
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_api__Route53": {
+      "title": "Route53",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DistributionDomainName": {
+          "title": "Distributiondomainname"
+        },
+        "EvaluateTargetHealth": {
+          "title": "Evaluatetargethealth"
+        },
+        "HostedZoneId": {
+          "title": "Hostedzoneid"
+        },
+        "HostedZoneName": {
+          "title": "Hostedzonename"
+        },
+        "IpV6": {
+          "title": "Ipv6",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_api__Domain": {
+      "title": "Domain",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "BasePath": {
+          "title": "Basepath"
+        },
+        "CertificateArn": {
+          "title": "Certificatearn"
+        },
+        "DomainName": {
+          "title": "Domainname"
+        },
+        "EndpointConfiguration": {
+          "title": "Endpointconfiguration",
+          "anyOf": [
+            {
+              "enum": [
+                "REGIONAL",
+                "EDGE"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "MutualTlsAuthentication": {
+          "title": "Mutualtlsauthentication"
+        },
+        "OwnershipVerificationCertificateArn": {
+          "title": "Ownershipverificationcertificatearn"
+        },
+        "Route53": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Route53"
+        },
+        "SecurityPolicy": {
+          "title": "Securitypolicy"
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_api__Globals": {
+      "title": "Globals",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Auth": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Auth"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "DefinitionUri": {
+          "title": "Definitionuri"
+        },
+        "CacheClusterEnabled": {
+          "title": "Cacheclusterenabled"
+        },
+        "CacheClusterSize": {
+          "title": "Cacheclustersize"
+        },
+        "Variables": {
+          "title": "Variables"
+        },
+        "EndpointConfiguration": {
+          "title": "Endpointconfiguration"
+        },
+        "MethodSettings": {
+          "title": "Methodsettings"
+        },
+        "BinaryMediaTypes": {
+          "title": "Binarymediatypes"
+        },
+        "MinimumCompressionSize": {
+          "title": "Minimumcompressionsize"
+        },
+        "Cors": {
+          "title": "Cors",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "#/definitions/Cors"
+            }
+          ]
+        },
+        "GatewayResponses": {
+          "title": "Gatewayresponses",
+          "type": "object"
+        },
+        "AccessLogSetting": {
+          "title": "Accesslogsetting"
+        },
+        "CanarySetting": {
+          "title": "Canarysetting"
+        },
+        "TracingEnabled": {
+          "title": "Tracingenabled"
+        },
+        "OpenApiVersion": {
+          "title": "Openapiversion",
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "Domain": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Domain"
+        }
+      },
+      "additionalProperties": false
+    },
+    "OAuth2Authorizer": {
+      "title": "OAuth2Authorizer",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AuthorizationScopes": {
+          "title": "Authorizationscopes",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "IdentitySource": {
+          "title": "Identitysource",
+          "type": "string"
+        },
+        "JwtConfiguration": {
+          "title": "Jwtconfiguration"
+        }
+      },
+      "additionalProperties": false
+    },
+    "LambdaAuthorizerIdentity": {
+      "title": "LambdaAuthorizerIdentity",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Context": {
+          "title": "Context",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Headers": {
+          "title": "Headers",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "QueryStrings": {
+          "title": "Querystrings",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ReauthorizeEvery": {
+          "title": "Reauthorizeevery",
+          "type": "integer"
+        },
+        "StageVariables": {
+          "title": "Stagevariables",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "LambdaAuthorizer": {
+      "title": "LambdaAuthorizer",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AuthorizerPayloadFormatVersion": {
+          "title": "Authorizerpayloadformatversion",
+          "anyOf": [
+            {
+              "enum": [
+                "1.0",
+                "2.0"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "EnableSimpleResponses": {
+          "title": "Enablesimpleresponses",
+          "type": "boolean"
+        },
+        "FunctionArn": {
+          "title": "Functionarn",
+          "type": "object"
+        },
+        "FunctionInvokeRole": {
+          "title": "Functioninvokerole",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Identity": {
+          "$ref": "#/definitions/LambdaAuthorizerIdentity"
+        }
+      },
+      "required": [
+        "AuthorizerPayloadFormatVersion",
+        "FunctionArn"
+      ],
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_httpapi__Auth": {
+      "title": "Auth",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Authorizers": {
+          "title": "Authorizers",
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/OAuth2Authorizer"
+              },
+              {
+                "$ref": "#/definitions/LambdaAuthorizer"
+              }
+            ]
+          }
+        },
+        "DefaultAuthorizer": {
+          "title": "Defaultauthorizer",
+          "type": "string"
+        },
+        "EnableIamAuthorizer": {
+          "title": "Enableiamauthorizer",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_httpapi__Route53": {
+      "title": "Route53",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DistributionDomainName": {
+          "title": "Distributiondomainname"
+        },
+        "EvaluateTargetHealth": {
+          "title": "Evaluatetargethealth"
+        },
+        "HostedZoneId": {
+          "title": "Hostedzoneid"
+        },
+        "HostedZoneName": {
+          "title": "Hostedzonename"
+        },
+        "IpV6": {
+          "title": "Ipv6",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_httpapi__Domain": {
+      "title": "Domain",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "BasePath": {
+          "title": "Basepath",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "CertificateArn": {
+          "title": "Certificatearn"
+        },
+        "DomainName": {
+          "title": "Domainname"
+        },
+        "EndpointConfiguration": {
+          "title": "Endpointconfiguration",
+          "anyOf": [
+            {
+              "enum": [
+                "REGIONAL"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "MutualTlsAuthentication": {
+          "title": "Mutualtlsauthentication"
+        },
+        "OwnershipVerificationCertificateArn": {
+          "title": "Ownershipverificationcertificatearn"
+        },
+        "Route53": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Route53"
+        },
+        "SecurityPolicy": {
+          "title": "Securitypolicy"
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_httpapi__Globals": {
+      "title": "Globals",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Auth": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Auth"
+        },
+        "AccessLogSettings": {
+          "title": "Accesslogsettings"
+        },
+        "StageVariables": {
+          "title": "Stagevariables"
+        },
+        "Tags": {
+          "title": "Tags",
+          "type": "object"
+        },
+        "RouteSettings": {
+          "title": "Routesettings"
+        },
+        "FailOnWarnings": {
+          "title": "Failonwarnings"
+        },
+        "Domain": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Domain"
+        },
+        "CorsConfiguration": {
+          "title": "Corsconfiguration"
+        },
+        "DefaultRouteSettings": {
+          "title": "Defaultroutesettings"
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_simpletable__Globals": {
+      "title": "Globals",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "SSESpecification": {
+          "title": "Ssespecification"
+        }
+      },
+      "additionalProperties": false
+    },
+    "__main____Globals": {
+      "title": "Globals",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Function": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__Globals"
+        },
+        "Api": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Globals"
+        },
+        "HttpApi": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Globals"
+        },
+        "SimpleTable": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_simpletable__Globals"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ResourceReference": {
+      "title": "ResourceReference",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "Arn": {
+          "title": "Arn"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "Qualifier": {
+          "title": "Qualifier"
+        },
+        "QueueUrl": {
+          "title": "Queueurl"
+        },
+        "ResourceId": {
+          "title": "Resourceid"
+        },
+        "RoleName": {
+          "title": "Rolename"
+        },
+        "Type": {
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_connector__Properties": {
+      "title": "Properties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Source": {
+          "$ref": "#/definitions/ResourceReference"
+        },
+        "Destination": {
+          "$ref": "#/definitions/ResourceReference"
+        },
+        "Permissions": {
+          "title": "Permissions",
+          "type": "array",
+          "items": {
+            "enum": [
+              "Read",
+              "Write"
+            ],
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "Source",
+        "Destination",
+        "Permissions"
+      ],
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_connector__Resource": {
+      "title": "Resource",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "AWS::Serverless::Connector"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_connector__Properties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
       "additionalProperties": false
     },
     "S3EventProperties": {
@@ -2897,570 +3735,6 @@
       ],
       "additionalProperties": false
     },
-    "CognitoAuthorizerIdentity": {
-      "title": "CognitoAuthorizerIdentity",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Header": {
-          "title": "Header",
-          "type": "string"
-        },
-        "ReauthorizeEvery": {
-          "title": "Reauthorizeevery",
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "ValidationExpression": {
-          "title": "Validationexpression",
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    },
-    "CognitoAuthorizer": {
-      "title": "CognitoAuthorizer",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AuthorizationScopes": {
-          "title": "Authorizationscopes",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Identity": {
-          "$ref": "#/definitions/CognitoAuthorizerIdentity"
-        },
-        "UserPoolArn": {
-          "title": "Userpoolarn",
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        }
-      },
-      "required": [
-        "UserPoolArn"
-      ],
-      "additionalProperties": false
-    },
-    "LambdaTokenAuthorizerIdentity": {
-      "title": "LambdaTokenAuthorizerIdentity",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "ReauthorizeEvery": {
-          "title": "Reauthorizeevery",
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "ValidationExpression": {
-          "title": "Validationexpression",
-          "type": "string"
-        },
-        "Header": {
-          "title": "Header",
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    },
-    "LambdaTokenAuthorizer": {
-      "title": "LambdaTokenAuthorizer",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AuthorizationScopes": {
-          "title": "Authorizationscopes",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "FunctionArn": {
-          "title": "Functionarn",
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "FunctionInvokeRole": {
-          "title": "Functioninvokerole",
-          "type": "string"
-        },
-        "FunctionPayloadType": {
-          "title": "Functionpayloadtype",
-          "enum": [
-            "REQUEST",
-            "TOKEN"
-          ],
-          "type": "string"
-        },
-        "Identity": {
-          "$ref": "#/definitions/LambdaTokenAuthorizerIdentity"
-        }
-      },
-      "required": [
-        "FunctionArn"
-      ],
-      "additionalProperties": false
-    },
-    "LambdaRequestAuthorizerIdentity": {
-      "title": "LambdaRequestAuthorizerIdentity",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Context": {
-          "title": "Context",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Headers": {
-          "title": "Headers",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "QueryStrings": {
-          "title": "Querystrings",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "ReauthorizeEvery": {
-          "title": "Reauthorizeevery",
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "StageVariables": {
-          "title": "Stagevariables",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "LambdaRequestAuthorizer": {
-      "title": "LambdaRequestAuthorizer",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AuthorizationScopes": {
-          "title": "Authorizationscopes",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "FunctionArn": {
-          "title": "Functionarn",
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "FunctionInvokeRole": {
-          "title": "Functioninvokerole",
-          "type": "string"
-        },
-        "FunctionPayloadType": {
-          "title": "Functionpayloadtype",
-          "enum": [
-            "REQUEST",
-            "TOKEN"
-          ],
-          "type": "string"
-        },
-        "Identity": {
-          "$ref": "#/definitions/LambdaRequestAuthorizerIdentity"
-        }
-      },
-      "required": [
-        "FunctionArn"
-      ],
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_api__ResourcePolicy": {
-      "title": "ResourcePolicy",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AwsAccountBlacklist": {
-          "title": "Awsaccountblacklist",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "AwsAccountWhitelist": {
-          "title": "Awsaccountwhitelist",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "CustomStatements": {
-          "title": "Customstatements",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "IntrinsicVpcBlacklist": {
-          "title": "Intrinsicvpcblacklist",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "IntrinsicVpcWhitelist": {
-          "title": "Intrinsicvpcwhitelist",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "IntrinsicVpceBlacklist": {
-          "title": "Intrinsicvpceblacklist",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "IntrinsicVpceWhitelist": {
-          "title": "Intrinsicvpcewhitelist",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "IpRangeBlacklist": {
-          "title": "Iprangeblacklist",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "IpRangeWhitelist": {
-          "title": "Iprangewhitelist",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "SourceVpcBlacklist": {
-          "title": "Sourcevpcblacklist",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "SourceVpcWhitelist": {
-          "title": "Sourcevpcwhitelist",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "UsagePlan": {
-      "title": "UsagePlan",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "CreateUsagePlan": {
-          "title": "Createusageplan",
-          "enum": [
-            "PER_API",
-            "SHARED",
-            "NONE"
-          ],
-          "type": "string"
-        },
-        "Description": {
-          "title": "Description"
-        },
-        "Quota": {
-          "title": "Quota"
-        },
-        "Tags": {
-          "title": "Tags"
-        },
-        "Throttle": {
-          "title": "Throttle"
-        },
-        "UsagePlanName": {
-          "title": "Usageplanname"
-        }
-      },
-      "required": [
-        "CreateUsagePlan"
-      ],
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_api__Auth": {
-      "title": "Auth",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AddDefaultAuthorizerToCorsPreflight": {
-          "title": "Adddefaultauthorizertocorspreflight",
-          "type": "boolean"
-        },
-        "ApiKeyRequired": {
-          "title": "Apikeyrequired",
-          "type": "boolean"
-        },
-        "Authorizers": {
-          "title": "Authorizers",
-          "type": "object",
-          "additionalProperties": {
-            "anyOf": [
-              {
-                "$ref": "#/definitions/CognitoAuthorizer"
-              },
-              {
-                "$ref": "#/definitions/LambdaTokenAuthorizer"
-              },
-              {
-                "$ref": "#/definitions/LambdaRequestAuthorizer"
-              }
-            ]
-          }
-        },
-        "DefaultAuthorizer": {
-          "title": "Defaultauthorizer",
-          "type": "string"
-        },
-        "InvokeRole": {
-          "title": "Invokerole",
-          "type": "string"
-        },
-        "ResourcePolicy": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__ResourcePolicy"
-        },
-        "UsagePlan": {
-          "$ref": "#/definitions/UsagePlan"
-        }
-      },
-      "additionalProperties": false
-    },
-    "Cors": {
-      "title": "Cors",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AllowCredentials": {
-          "title": "Allowcredentials",
-          "type": "boolean"
-        },
-        "AllowHeaders": {
-          "title": "Allowheaders",
-          "type": "string"
-        },
-        "AllowMethods": {
-          "title": "Allowmethods",
-          "type": "string"
-        },
-        "AllowOrigin": {
-          "title": "Alloworigin",
-          "type": "string"
-        },
-        "MaxAge": {
-          "title": "Maxage",
-          "type": "string"
-        }
-      },
-      "required": [
-        "AllowOrigin"
-      ],
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_api__Route53": {
-      "title": "Route53",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "DistributionDomainName": {
-          "title": "Distributiondomainname"
-        },
-        "EvaluateTargetHealth": {
-          "title": "Evaluatetargethealth"
-        },
-        "HostedZoneId": {
-          "title": "Hostedzoneid"
-        },
-        "HostedZoneName": {
-          "title": "Hostedzonename"
-        },
-        "IpV6": {
-          "title": "Ipv6",
-          "type": "boolean"
-        }
-      },
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_api__Domain": {
-      "title": "Domain",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "BasePath": {
-          "title": "Basepath"
-        },
-        "CertificateArn": {
-          "title": "Certificatearn"
-        },
-        "DomainName": {
-          "title": "Domainname"
-        },
-        "EndpointConfiguration": {
-          "title": "Endpointconfiguration",
-          "anyOf": [
-            {
-              "enum": [
-                "REGIONAL",
-                "EDGE"
-              ],
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "MutualTlsAuthentication": {
-          "title": "Mutualtlsauthentication"
-        },
-        "OwnershipVerificationCertificateArn": {
-          "title": "Ownershipverificationcertificatearn"
-        },
-        "Route53": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Route53"
-        },
-        "SecurityPolicy": {
-          "title": "Securitypolicy"
-        }
-      },
-      "additionalProperties": false
-    },
     "samtranslator__schema__aws_serverless_api__Properties": {
       "title": "Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
@@ -3492,6 +3766,9 @@
           "anyOf": [
             {
               "type": "string"
+            },
+            {
+              "type": "object"
             },
             {
               "$ref": "#/definitions/Cors"
@@ -3616,191 +3893,6 @@
       ],
       "additionalProperties": false
     },
-    "OAuth2Authorizer": {
-      "title": "OAuth2Authorizer",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AuthorizationScopes": {
-          "title": "Authorizationscopes",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "IdentitySource": {
-          "title": "Identitysource",
-          "type": "string"
-        },
-        "JwtConfiguration": {
-          "title": "Jwtconfiguration"
-        }
-      },
-      "additionalProperties": false
-    },
-    "LambdaAuthorizerIdentity": {
-      "title": "LambdaAuthorizerIdentity",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Context": {
-          "title": "Context",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Headers": {
-          "title": "Headers",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "QueryStrings": {
-          "title": "Querystrings",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "ReauthorizeEvery": {
-          "title": "Reauthorizeevery",
-          "type": "integer"
-        },
-        "StageVariables": {
-          "title": "Stagevariables",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "LambdaAuthorizer": {
-      "title": "LambdaAuthorizer",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AuthorizerPayloadFormatVersion": {
-          "title": "Authorizerpayloadformatversion",
-          "anyOf": [
-            {
-              "enum": [
-                "1.0",
-                "2.0"
-              ],
-              "type": "string"
-            },
-            {
-              "type": "number"
-            }
-          ]
-        },
-        "EnableSimpleResponses": {
-          "title": "Enablesimpleresponses",
-          "type": "boolean"
-        },
-        "FunctionArn": {
-          "title": "Functionarn",
-          "type": "object"
-        },
-        "FunctionInvokeRole": {
-          "title": "Functioninvokerole",
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "Identity": {
-          "$ref": "#/definitions/LambdaAuthorizerIdentity"
-        }
-      },
-      "required": [
-        "AuthorizerPayloadFormatVersion",
-        "FunctionArn"
-      ],
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_httpapi__Auth": {
-      "title": "Auth",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Authorizers": {
-          "title": "Authorizers",
-          "type": "object",
-          "additionalProperties": {
-            "anyOf": [
-              {
-                "$ref": "#/definitions/OAuth2Authorizer"
-              },
-              {
-                "$ref": "#/definitions/LambdaAuthorizer"
-              }
-            ]
-          }
-        },
-        "DefaultAuthorizer": {
-          "title": "Defaultauthorizer",
-          "type": "string"
-        },
-        "EnableIamAuthorizer": {
-          "title": "Enableiamauthorizer",
-          "type": "boolean"
-        }
-      },
-      "additionalProperties": false
-    },
-    "CorsConfiguration": {
-      "title": "CorsConfiguration",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "AllowCredentials": {
-          "title": "Allowcredentials",
-          "type": "boolean"
-        },
-        "AllowHeaders": {
-          "title": "Allowheaders",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "AllowMethods": {
-          "title": "Allowmethods",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "AllowOrigins": {
-          "title": "Alloworigins",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "ExposeHeaders": {
-          "title": "Exposeheaders",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "MaxAge": {
-          "title": "Maxage",
-          "type": "integer"
-        }
-      },
-      "additionalProperties": false
-    },
     "DefinitionUri": {
       "title": "DefinitionUri",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
@@ -3825,77 +3917,6 @@
       ],
       "additionalProperties": false
     },
-    "samtranslator__schema__aws_serverless_httpapi__Route53": {
-      "title": "Route53",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "DistributionDomainName": {
-          "title": "Distributiondomainname"
-        },
-        "EvaluateTargetHealth": {
-          "title": "Evaluatetargethealth"
-        },
-        "HostedZoneId": {
-          "title": "Hostedzoneid"
-        },
-        "HostedZoneName": {
-          "title": "Hostedzonename"
-        },
-        "IpV6": {
-          "title": "Ipv6",
-          "type": "boolean"
-        }
-      },
-      "additionalProperties": false
-    },
-    "samtranslator__schema__aws_serverless_httpapi__Domain": {
-      "title": "Domain",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "BasePath": {
-          "title": "Basepath",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "CertificateArn": {
-          "title": "Certificatearn"
-        },
-        "DomainName": {
-          "title": "Domainname"
-        },
-        "EndpointConfiguration": {
-          "title": "Endpointconfiguration",
-          "anyOf": [
-            {
-              "enum": [
-                "REGIONAL"
-              ],
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "MutualTlsAuthentication": {
-          "title": "Mutualtlsauthentication"
-        },
-        "OwnershipVerificationCertificateArn": {
-          "title": "Ownershipverificationcertificatearn"
-        },
-        "Route53": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Route53"
-        },
-        "SecurityPolicy": {
-          "title": "Securitypolicy"
-        }
-      },
-      "additionalProperties": false
-    },
     "samtranslator__schema__aws_serverless_httpapi__Properties": {
       "title": "Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
@@ -3908,15 +3929,7 @@
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Auth"
         },
         "CorsConfiguration": {
-          "title": "Corsconfiguration",
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "$ref": "#/definitions/CorsConfiguration"
-            }
-          ]
+          "title": "Corsconfiguration"
         },
         "DefaultRouteSettings": {
           "title": "Defaultroutesettings"

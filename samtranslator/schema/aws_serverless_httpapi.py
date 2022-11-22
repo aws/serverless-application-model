@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic, Unknown
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
 
 
 class OAuth2Authorizer(BaseModel):
@@ -77,35 +77,44 @@ class Domain(BaseModel):
     SecurityPolicy: Optional[PassThrough]
 
 
+AccessLogSettings = Optional[PassThrough]
+StageVariables = Optional[PassThrough]
+Tags = Optional[Dict[str, Any]]
+RouteSettings = Optional[PassThrough]
+FailOnWarnings = Optional[PassThrough]
+CorsConfigurationType = Optional[PassThrough]
+DefaultRouteSettings = Optional[PassThrough]
+
+
 class Properties(BaseModel):
-    AccessLogSettings: Optional[PassThrough]
+    AccessLogSettings: Optional[AccessLogSettings]
     Auth: Optional[Auth]
     # TODO: Also string like in the docs?
-    CorsConfiguration: Optional[Union[SamIntrinsic, CorsConfiguration]]
-    DefaultRouteSettings: Optional[PassThrough]
+    CorsConfiguration: Optional[CorsConfigurationType]
+    DefaultRouteSettings: Optional[DefaultRouteSettings]
     DefinitionBody: Optional[Dict[str, Any]]
     DefinitionUri: Optional[Union[str, DefinitionUri]]
     Description: Optional[str]
     DisableExecuteApiEndpoint: Optional[PassThrough]
     Domain: Optional[Domain]
-    FailOnWarnings: Optional[PassThrough]
-    RouteSettings: Optional[PassThrough]
+    FailOnWarnings: Optional[FailOnWarnings]
+    RouteSettings: Optional[RouteSettings]
     StageName: Optional[PassThrough]
-    StageVariables: Optional[PassThrough]
-    Tags: Optional[Dict[str, Any]]
+    StageVariables: Optional[StageVariables]
+    Tags: Optional[Tags]
     Name: Optional[PassThrough]  # TODO: Add to docs
 
 
 class Globals(BaseModel):
-    Auth: Unknown
-    AccessLogSettings: Unknown
-    StageVariables: Unknown
-    Tags: Unknown
-    RouteSettings: Unknown
-    FailOnWarnings: Unknown
-    Domain: Unknown
-    CorsConfiguration: Unknown
-    DefaultRouteSettings: Unknown
+    Auth: Optional[Auth]
+    AccessLogSettings: Optional[AccessLogSettings]
+    StageVariables: Optional[StageVariables]
+    Tags: Optional[Tags]
+    RouteSettings: Optional[RouteSettings]
+    FailOnWarnings: Optional[FailOnWarnings]
+    Domain: Optional[Domain]
+    CorsConfiguration: Optional[CorsConfigurationType]
+    DefaultRouteSettings: Optional[DefaultRouteSettings]
 
 
 class Resource(BaseModel):

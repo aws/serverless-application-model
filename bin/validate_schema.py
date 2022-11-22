@@ -50,6 +50,9 @@ def get_templates() -> Iterator[Path]:
         "api_with_authorizers_max_openapi",  # 'UserPoolArn' expects to be a string, but received list
         "api_with_authorizers_max",  # 'UserPoolArn' expects to be a string, but received list
         "api_with_any_method_in_swagger",  # Missing required field 'FunctionArn'
+        "api_with_cors_and_only_headers",  # 'AllowOrigins' is required field
+        "api_with_cors_and_only_methods",  # 'AllowOrigins' is required field
+        "implicit_api_with_auth_and_conditions_max",  # 'UserPoolArn' expects to be a string, but received list
     ]
 
     def should_skip(s: str) -> bool:

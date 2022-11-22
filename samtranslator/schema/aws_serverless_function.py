@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic, Unknown
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
 
 
 class ResourcePolicy(BaseModel):
@@ -358,18 +358,40 @@ class ScheduleV2Event(BaseModel):
     Properties: ScheduleV2EventProperties
 
 
+Handler = Optional[PassThrough]
+Runtime = Optional[PassThrough]
+CodeUriType = Optional[Union[str, CodeUri]]
+DeadLetterQueueType = Optional[Union[SamIntrinsic, DeadLetterQueue]]
+Description = Optional[PassThrough]
+MemorySize = Optional[PassThrough]
+Timeout = Optional[PassThrough]
+VpcConfig = Optional[PassThrough]
+Environment = Optional[PassThrough]
+Tags = Optional[Dict[str, Any]]
+Tracing = Optional[Union[str, SamIntrinsic]]
+KmsKeyArn = Optional[PassThrough]
+Layers = Optional[PassThrough]
+AutoPublishAlias = Optional[Union[str, SamIntrinsic]]
+PermissionsBoundary = Optional[PassThrough]
+ReservedConcurrentExecutions = Optional[PassThrough]
+ProvisionedConcurrencyConfig = Optional[PassThrough]
+AssumeRolePolicyDocument = Optional[Dict[str, Any]]
+Architectures = Optional[PassThrough]
+EphemeralStorage = Optional[PassThrough]
+
+
 class Properties(BaseModel):
-    Architectures: Optional[PassThrough]
-    AssumeRolePolicyDocument: Optional[Dict[str, Any]]
-    AutoPublishAlias: Optional[Union[str, SamIntrinsic]]
+    Architectures: Optional[Architectures]
+    AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument]
+    AutoPublishAlias: Optional[AutoPublishAlias]
     AutoPublishCodeSha256: Optional[Union[str, SamIntrinsic]]
     CodeSigningConfigArn: Optional[Union[str, SamIntrinsic]]
-    CodeUri: Optional[Union[str, CodeUri]]
-    DeadLetterQueue: Optional[Union[SamIntrinsic, DeadLetterQueue]]
+    CodeUri: Optional[CodeUriType]
+    DeadLetterQueue: Optional[DeadLetterQueueType]
     DeploymentPreference: Optional[DeploymentPreference]
-    Description: Optional[PassThrough]
-    Environment: Optional[PassThrough]
-    EphemeralStorage: Optional[PassThrough]
+    Description: Optional[Description]
+    Environment: Optional[Environment]
+    EphemeralStorage: Optional[EphemeralStorage]
     EventInvokeConfig: Optional[EventInvokeConfig]
     Events: Optional[
         Dict[
@@ -399,50 +421,50 @@ class Properties(BaseModel):
     FileSystemConfigs: Optional[PassThrough]
     FunctionName: Optional[PassThrough]
     FunctionUrlConfig: Optional[FunctionUrlConfig]
-    Handler: Optional[PassThrough]
+    Handler: Optional[Handler]
     ImageConfig: Optional[PassThrough]
     ImageUri: Optional[PassThrough]
     InlineCode: Optional[PassThrough]
-    KmsKeyArn: Optional[PassThrough]
-    Layers: Optional[PassThrough]
-    MemorySize: Optional[PassThrough]
+    KmsKeyArn: Optional[KmsKeyArn]
+    Layers: Optional[Layers]
+    MemorySize: Optional[MemorySize]
     PackageType: Optional[PassThrough]
-    PermissionsBoundary: Optional[PassThrough]
+    PermissionsBoundary: Optional[PermissionsBoundary]
     Policies: Optional[Union[str, List[Union[str, SamIntrinsic]], SamIntrinsic]]
-    ProvisionedConcurrencyConfig: Optional[PassThrough]
-    ReservedConcurrentExecutions: Optional[PassThrough]
+    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig]
+    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions]
     Role: Optional[Union[str, SamIntrinsic]]
-    Runtime: Optional[PassThrough]
-    Tags: Optional[Dict[str, Any]]
-    Timeout: Optional[PassThrough]
-    Tracing: Optional[Union[str, SamIntrinsic]]
+    Runtime: Optional[Runtime]
+    Tags: Optional[Tags]
+    Timeout: Optional[Timeout]
+    Tracing: Optional[Tracing]
     VersionDescription: Optional[PassThrough]
-    VpcConfig: Optional[PassThrough]
+    VpcConfig: Optional[VpcConfig]
 
 
 class Globals(BaseModel):
-    Handler: Unknown
-    Runtime: Unknown
-    CodeUri: Unknown
-    DeadLetterQueue: Unknown
-    Description: Unknown
-    MemorySize: Unknown
-    Timeout: Unknown
-    VpcConfig: Unknown
-    Environment: Unknown
-    Tags: Unknown
-    Tracing: Unknown
-    KmsKeyArn: Unknown
-    Layers: Unknown
-    AutoPublishAlias: Unknown
-    DeploymentPreference: Unknown
-    PermissionsBoundary: Unknown
-    ReservedConcurrentExecutions: Unknown
-    ProvisionedConcurrencyConfig: Unknown
-    AssumeRolePolicyDocument: Unknown
-    EventInvokeConfig: Unknown
-    Architectures: Unknown
-    EphemeralStorage: Unknown
+    Handler: Optional[Handler]
+    Runtime: Optional[Runtime]
+    CodeUri: Optional[CodeUriType]
+    DeadLetterQueue: Optional[DeadLetterQueueType]
+    Description: Optional[Description]
+    MemorySize: Optional[MemorySize]
+    Timeout: Optional[Timeout]
+    VpcConfig: Optional[VpcConfig]
+    Environment: Optional[Environment]
+    Tags: Optional[Tags]
+    Tracing: Optional[Tracing]
+    KmsKeyArn: Optional[KmsKeyArn]
+    Layers: Optional[Layers]
+    AutoPublishAlias: Optional[AutoPublishAlias]
+    DeploymentPreference: Optional[DeploymentPreference]
+    PermissionsBoundary: Optional[PermissionsBoundary]
+    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions]
+    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig]
+    AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument]
+    EventInvokeConfig: Optional[EventInvokeConfig]
+    Architectures: Optional[Architectures]
+    EphemeralStorage: Optional[EphemeralStorage]
 
 
 class Resource(BaseModel):
