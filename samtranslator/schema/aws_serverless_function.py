@@ -334,8 +334,8 @@ class SelfManagedKafkaEvent(BaseModel):
 
 
 # TODO: Same as ScheduleV2EventProperties in state machine?
-# TODO: Enable pylint duplicate-code if updated; see https://github.com/PyCQA/pylint/issues/214
 class ScheduleV2EventProperties(BaseModel):
+    # pylint: disable=duplicate-code
     DeadLetterConfig: Optional[DeadLetterConfig]
     Description: Optional[PassThrough]
     EndDate: Optional[PassThrough]

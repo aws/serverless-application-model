@@ -108,7 +108,6 @@ disable=
     C0302, # too-many-lines
     W9013, # missing-yield-doc
     W9014, # missing-yield-type-doc
-    R0801, # duplicate-code, cannot be individually disabled (https://github.com/PyCQA/pylint/issues/214), enable when pylint updated
 
 
 [REPORTS]
