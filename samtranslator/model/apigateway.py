@@ -127,6 +127,7 @@ class ApiGatewayResponse(object):
         status_code: Optional[str] = None,
     ) -> None:
         if response_parameters:
+            # response_parameters has been validated in ApiGenerator._add_gateway_responses()
             for response_parameter_key in response_parameters.keys():
                 if response_parameter_key not in ApiGatewayResponse.ResponseParameterProperties:
                     raise InvalidResourceException(

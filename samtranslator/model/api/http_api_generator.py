@@ -656,7 +656,13 @@ class HttpApiGenerator(object):
                 self.logical_id,
                 "Description works only with inline OpenApi specified in the 'DefinitionBody' property.",
             )
-        if self.definition_body.get("info", {}).get("description"):
+        info = self.definition_body.get("info", {})
+        if not isinstance(info, dict):
+            raise InvalidResourceException(
+                self.logical_id,
+                "'info' in OpenApi definition body must be a map.",
+            )
+        if info.get("description"):
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to set Description because it is already defined within inline OpenAPI specified in the "
@@ -677,7 +683,14 @@ class HttpApiGenerator(object):
                 "Name works only with inline OpenApi specified in the 'DefinitionBody' property.",
             )
 
-        if self.definition_body.get("info", {}).get("title") != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
+        info = self.definition_body.get("info", {})
+        if not isinstance(info, dict):
+            raise InvalidResourceException(
+                self.logical_id,
+                "'info' in OpenApi definition body must be a map.",
+            )
+
+        if info.get("title") != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to set Name because it is already defined within inline OpenAPI specified in the "
