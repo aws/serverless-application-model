@@ -439,7 +439,7 @@ class Globals(BaseModel):
     PermissionsBoundary: Optional[PassThrough]
     ReservedConcurrentExecutions: Optional[PassThrough]
     ProvisionedConcurrencyConfig: Optional[PassThrough]
-    AssumeRolePolicyDocument:  Optional[Dict[str, Any]]
+    AssumeRolePolicyDocument: Optional[Dict[str, Any]]
     EventInvokeConfig: Optional[EventInvokeConfig]
     Architectures: Optional[PassThrough]
     EphemeralStorage: Optional[PassThrough]
