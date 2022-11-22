@@ -69,6 +69,7 @@ class TestConnectors(BaseTest):
 
     @parameterized.expand(
         [
+            ("combination/connector_sfn_to_function_without_policy",),
             ("combination/connector_sfn_to_table_read",),
             ("combination/connector_sfn_to_table_write",),
             ("combination/connector_sfn_to_sqs_write",),
