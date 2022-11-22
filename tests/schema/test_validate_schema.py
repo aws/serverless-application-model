@@ -69,24 +69,22 @@ def get_all_test_templates():
     )
 
 
-SCHEMA_VALIDATION_TESTS = [os.path.splitext(f)[0] for f in get_all_test_templates() if not should_skip_test(str(f))]
+SCHEMA_VALIDATION_TESTS = [str(f) for f in get_all_test_templates() if not should_skip_test(str(f))]
 
 
 class TestValidateSchema(TestCase):
     @parameterized.expand(itertools.product(SCHEMA_VALIDATION_TESTS))
     def test_validate_schema(self, testcase):
-        file_name = testcase + ".yaml"
-        obj = json.loads(to_json(Path(file_name).read_bytes()))
+        obj = json.loads(to_json(Path(testcase).read_bytes()))
         validate(obj, schema=SCHEMA)
 
     @parameterized.expand(
         [
-            "tests/translator/input/error_schema_validation_wrong_property",
-            "tests/translator/input/error_schema_validation_wrong_type",
+            "tests/translator/input/error_schema_validation_wrong_property.yaml",
+            "tests/translator/input/error_schema_validation_wrong_type.yaml",
         ]
     )
     def test_validate_schema_error(self, testcase):
-        file_name = testcase + ".yaml"
-        obj = json.loads(to_json(Path(file_name).read_bytes()))
+        obj = json.loads(to_json(Path(testcase).read_bytes()))
         with pytest.raises(ValidationError):
             validate(obj, schema=SCHEMA)
