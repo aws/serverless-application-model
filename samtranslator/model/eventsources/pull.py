@@ -32,6 +32,7 @@ class PullEventSource(ResourceMacro):
     # TODO: Make `PullEventSource` an abstract class and not giving `resource_type` initial value.
     resource_type: str = None  # type: ignore
     requires_stream_queue_broker = True
+    relative_id: str  # overriding the Optional[str]: for event, relative id is not None
     property_types = {
         "Stream": PropertyType(False, is_str()),
         "Queue": PropertyType(False, is_str()),
@@ -154,7 +155,7 @@ class PullEventSource(ResourceMacro):
                     "Property ConsumerGroupId not defined for resource of type {}.".format(self.resource_type),
                 )
 
-        destination_config_policy = None
+        destination_config_policy: Optional[Dict[str, Any]] = None
         if self.DestinationConfig:
             on_failure: Dict[str, Any] = sam_expect(
                 self.DestinationConfig.get("OnFailure"),
@@ -309,8 +310,11 @@ class MQ(PullEventSource):
                 "Provided SourceAccessConfigurations cannot be parsed into a list.",
             )
         basic_auth_uri = None
-        for conf in self.SourceAccessConfigurations:
-            event_type = conf.get("Type")
+        for index, conf in enumerate(self.SourceAccessConfigurations):
+            sam_expect(conf, self.relative_id, f"SourceAccessConfigurations[{index}]", is_sam_event=True).to_be_a_map()
+            event_type: str = sam_expect(
+                conf.get("Type"), self.relative_id, f"SourceAccessConfigurations[{index}].Type", is_sam_event=True
+            ).to_be_a_string()
             if event_type not in ("BASIC_AUTH", "VIRTUAL_HOST"):
                 raise InvalidEventException(
                     self.relative_id,
@@ -445,12 +449,13 @@ class SelfManagedKafka(PullEventSource):
                 "SourceAccessConfigurations for self managed kafka event should be a list.",
             )
         for config in source_access_configurations:
+            sam_expect(config, self.relative_id, "SourceAccessConfigurations").to_be_a_map()
             if config.get("Type") == "VPC_SUBNET":
-                self.validate_uri(config, "VPC_SUBNET")  # type: ignore[no-untyped-call]
+                self.validate_uri(config.get("URI"), "VPC_SUBNET")
                 has_vpc_subnet = True
 
             elif config.get("Type") == "VPC_SECURITY_GROUP":
-                self.validate_uri(config, "VPC_SECURITY_GROUP")  # type: ignore[no-untyped-call]
+                self.validate_uri(config.get("URI"), "VPC_SECURITY_GROUP")
                 has_vpc_security_group = True
 
             elif config.get("Type") in self.AUTH_MECHANISM:
@@ -459,7 +464,7 @@ class SelfManagedKafka(PullEventSource):
                         self.relative_id,
                         "Multiple auth mechanism properties specified in SourceAccessConfigurations for self managed kafka event.",
                     )
-                self.validate_uri(config, "auth mechanism")  # type: ignore[no-untyped-call]
+                self.validate_uri(config.get("URI"), "auth mechanism")
                 authentication_uri = config.get("URI")
 
             else:
@@ -475,14 +480,14 @@ class SelfManagedKafka(PullEventSource):
             )
         return authentication_uri, (has_vpc_subnet and has_vpc_security_group)
 
-    def validate_uri(self, config, msg):  # type: ignore[no-untyped-def]
-        if not config.get("URI"):
+    def validate_uri(self, uri: Optional[Any], msg: str) -> None:
+        if not uri:
             raise InvalidEventException(
                 self.relative_id,
                 "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
             )
 
-        if not isinstance(config.get("URI"), str) and not is_intrinsic(config.get("URI")):
+        if not isinstance(uri, str) and not is_intrinsic(uri):
             raise InvalidEventException(
                 self.relative_id,
                 "Wrong Type for {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(

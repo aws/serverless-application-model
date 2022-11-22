@@ -111,7 +111,14 @@ class OpenApiEditor(object):
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path_name, method_name, False):  # type: ignore[no-untyped-call]
             integration = method_definition.get(self._X_APIGW_INTEGRATION, Py27Dict())
-
+            if not isinstance(integration, dict):
+                raise InvalidDocumentException(
+                    [
+                        InvalidTemplateException(
+                            f"Value of '{self._X_APIGW_INTEGRATION}' must be a dictionary according to Swagger spec."
+                        )
+                    ]
+                )
             # Extract the integration uri out of a conditional if necessary
             uri = integration.get("uri")
             if not isinstance(uri, dict):
@@ -533,6 +540,14 @@ class OpenApiEditor(object):
 
         servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
         for config in servers_configurations:
+            if not isinstance(config, dict):
+                raise InvalidDocumentException(
+                    [
+                        InvalidTemplateException(
+                            f"Value of '{self._SERVERS}' item must be a dictionary according to Swagger spec."
+                        )
+                    ]
+                )
             endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, {})
             endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint
             config[self._X_APIGW_ENDPOINT_CONFIG] = endpoint_configuration
@@ -575,6 +590,14 @@ class OpenApiEditor(object):
         ALLOW_CREDENTIALS = "allowCredentials"
         cors_headers = [ALLOW_ORIGINS, ALLOW_HEADERS, ALLOW_METHODS, EXPOSE_HEADERS, MAX_AGE, ALLOW_CREDENTIALS]
         cors_configuration = self._doc.get(self._X_APIGW_CORS, {})
+        if not isinstance(cors_configuration, dict):
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        f"Value of '{self._X_APIGW_CORS}' must be a dictionary according to Swagger spec."
+                    )
+                ]
+            )
 
         # intrinsics will not work if cors configuration is defined in open api and as a property to the HttpApi
         if allow_origins and is_intrinsic(allow_origins):
