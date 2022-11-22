@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from typing import Dict, Optional, Union
 
 
@@ -42,5 +44,10 @@ class Model(LenientBaseModel):
     ]
 
 
+def main() -> None:
+    obj = Model.schema()
+    print(json.dumps(obj, indent=2))
+
+
 if __name__ == "__main__":
-    print(Model.schema_json(indent=2))
+    main()

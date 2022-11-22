@@ -2,7 +2,11 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic, get_docs_prop
+
+
+def prop(field: str) -> Any:
+    return get_docs_prop("AWS::Serverless::Function.Properties." + field)
 
 
 class ResourcePolicy(BaseModel):
@@ -386,7 +390,7 @@ class Properties(BaseModel):
     AutoPublishAlias: Optional[AutoPublishAlias]
     AutoPublishCodeSha256: Optional[Union[str, SamIntrinsic]]
     CodeSigningConfigArn: Optional[Union[str, SamIntrinsic]]
-    CodeUri: Optional[CodeUriType]
+    CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType]
     DeploymentPreference: Optional[DeploymentPreference]
     Description: Optional[Description]
@@ -424,7 +428,7 @@ class Properties(BaseModel):
     Handler: Optional[Handler]
     ImageConfig: Optional[PassThrough]
     ImageUri: Optional[PassThrough]
-    InlineCode: Optional[PassThrough]
+    InlineCode: Optional[PassThrough] = prop("InlineCode")
     KmsKeyArn: Optional[KmsKeyArn]
     Layers: Optional[Layers]
     MemorySize: Optional[MemorySize]
