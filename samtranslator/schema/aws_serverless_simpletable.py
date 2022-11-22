@@ -12,6 +12,7 @@ class PrimaryKey(BaseModel):
 
 SSESpecification = Optional[PassThrough]
 
+
 class Properties(BaseModel):
     PrimaryKey: Optional[PrimaryKey]
     ProvisionedThroughput: Optional[PassThrough]

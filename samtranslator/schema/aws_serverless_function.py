@@ -379,6 +379,7 @@ AssumeRolePolicyDocument = Optional[Dict[str, Any]]
 Architectures = Optional[PassThrough]
 EphemeralStorage = Optional[PassThrough]
 
+
 class Properties(BaseModel):
     Architectures: Optional[Architectures]
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument]
