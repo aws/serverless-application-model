@@ -701,7 +701,7 @@ class ApiProperties(BaseModel):
     Mode: Optional[PassThrough]
     Models: Optional[SamIntrinsic]
     Name: Optional[PassThrough]
-    OpenApiVersion: Optional[Union[float, str]]
+    OpenApiVersion: Optional[Union[float, str]] # TODO: float doesn't exist in documentation
     StageName: Union[str, SamIntrinsic]
     Tags: Optional[PassThrough]
     TracingEnabled: Optional[PassThrough]
