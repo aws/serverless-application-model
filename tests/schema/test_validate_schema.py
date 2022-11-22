@@ -17,7 +17,6 @@ SCHEMA = json.loads(Path("samtranslator/schema/schema.json").read_bytes())
 # TODO: Enable (most likely) everything but 'error_*' and 'basic_schema_validation_failure'
 SKIPPED_TESTS = [
     "error_",
-    "basic_schema_validation_failure", # Designed to fail schema validation
     "unsupported_resources",
     "resource_with_invalid_type",
     "state_machine_with_null_events",
@@ -51,6 +50,7 @@ SKIPPED_TESTS = [
     "implicit_api_with_auth_and_conditions_max",  # 'UserPoolArn' expects to be a string, but received list
 ]
 
+
 def should_skip_test(s: str) -> bool:
     for test in SKIPPED_TESTS:
         if test in s:
@@ -69,24 +69,15 @@ def get_all_test_templates():
     )
 
 
-SCHEMA_VALIDATION_TESTS = [
-    os.path.splitext(f)[0]
-    for f in get_all_test_templates()
-    if not should_skip_test(str(f))
-]
+SCHEMA_VALIDATION_TESTS = [os.path.splitext(f)[0] for f in get_all_test_templates() if not should_skip_test(str(f))]
 
 
 class TestValidateSchema(TestCase):
-    @parameterized.expand(
-        itertools.product(
-            SCHEMA_VALIDATION_TESTS
-        )
-    )
+    @parameterized.expand(itertools.product(SCHEMA_VALIDATION_TESTS))
     def test_validate_schema(self, testcase):
         file_name = testcase + ".yaml"
         obj = json.loads(to_json(Path(file_name).read_bytes()))
         validate(obj, schema=SCHEMA)
-
 
     def test_validate_schema_error(self):
         failure_file_name = "tests/translator/input/error_schema_validation.yaml"
