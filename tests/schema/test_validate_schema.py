@@ -79,10 +79,12 @@ class TestValidateSchema(TestCase):
         obj = json.loads(to_json(Path(file_name).read_bytes()))
         validate(obj, schema=SCHEMA)
 
-    @parameterized.expand([
-        "tests/translator/input/error_schema_validation_wrong_property",
-        "tests/translator/input/error_schema_validation_wrong_type",
-    ])
+    @parameterized.expand(
+        [
+            "tests/translator/input/error_schema_validation_wrong_property",
+            "tests/translator/input/error_schema_validation_wrong_type",
+        ]
+    )
     def test_validate_schema_error(self, testcase):
         file_name = testcase + ".yaml"
         obj = json.loads(to_json(Path(file_name).read_bytes()))
