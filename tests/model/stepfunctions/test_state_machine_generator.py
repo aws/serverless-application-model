@@ -56,12 +56,8 @@ class StepFunctionsStateMachine(TestCase):
         self.kwargs["definition_uri"] = "s3://my-demo-bucket/my_asl_file.asl.json"
         self.kwargs["role"] = None
         self.kwargs["policies"] = None
-        with self.assertRaises(InvalidResourceException) as error:
-            StateMachineGenerator(**self.kwargs).to_cloudformation()
-        self.assertEqual(
-            error.exception.message,
-            "Resource with id [StateMachineId] is invalid. Either 'Role' or 'Policies' property must be specified.",
-        )
+        generated_resources = StateMachineGenerator(**self.kwargs).to_cloudformation()
+        self.assertEqual(generated_resources[1].resource_type, "AWS::IAM::Role")
 
     def test_state_machine_both_role_and_policies(self):
         self.kwargs["definition_uri"] = "s3://my-demo-bucket/my_asl_file.asl.json"
@@ -73,7 +69,8 @@ class StepFunctionsStateMachine(TestCase):
             StateMachineGenerator(**self.kwargs).to_cloudformation()
         self.assertEqual(
             error.exception.message,
-            "Resource with id [StateMachineId] is invalid. Specify either 'Role' or 'Policies' property and not both.",
+            "Resource with id [StateMachineId] is invalid. "
+            + StateMachineGenerator.SFN_INVALID_PROPERTY_BOTH_ROLE_POLICY,
         )
 
     def test_state_machine_invalid_definition_uri_string(self):

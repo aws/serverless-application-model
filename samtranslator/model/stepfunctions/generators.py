@@ -21,6 +21,9 @@ class StateMachineGenerator(object):
     _SAM_VALUE = "SAM"
     _SUBSTITUTION_NAME_TEMPLATE = "definition_substitution_%s"
     _SUBSTITUTION_KEY_TEMPLATE = "${definition_substitution_%s}"
+    SFN_INVALID_PROPERTY_BOTH_ROLE_POLICY = (
+        "Specify either 'Role' or 'Policies' (but not both at the same time) or neither of them"
+    )
 
     def __init__(  # type: ignore[no-untyped-def]
         self,
@@ -129,20 +132,17 @@ class StateMachineGenerator(object):
             )
 
         if self.role and self.policies:
-            raise InvalidResourceException(
-                self.logical_id, "Specify either 'Role' or 'Policies' property and not both."
-            )
+            raise InvalidResourceException(self.logical_id, self.SFN_INVALID_PROPERTY_BOTH_ROLE_POLICY)
         if self.role:
             self.state_machine.RoleArn = self.role
-        elif self.policies:
-            if not self.managed_policy_map:
+        else:
+            if self.policies and not self.managed_policy_map:
                 raise Exception("Managed policy map is empty, but should not be.")
-
+            if not self.policies:
+                self.policies = []
             execution_role = self._construct_role()  # type: ignore[no-untyped-call]
             self.state_machine.RoleArn = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
-        else:
-            raise InvalidResourceException(self.logical_id, "Either 'Role' or 'Policies' property must be specified.")
 
         self.state_machine.StateMachineName = self.name
         self.state_machine.StateMachineType = self.type
