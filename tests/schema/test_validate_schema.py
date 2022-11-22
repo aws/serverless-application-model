@@ -79,8 +79,12 @@ class TestValidateSchema(TestCase):
         obj = json.loads(to_json(Path(file_name).read_bytes()))
         validate(obj, schema=SCHEMA)
 
-    def test_validate_schema_error(self):
-        failure_file_name = "tests/translator/input/error_schema_validation.yaml"
-        obj = json.loads(to_json(Path(failure_file_name).read_bytes()))
+    @parameterized.expand([
+        "tests/translator/input/error_schema_validation_wrong_property",
+        "tests/translator/input/error_schema_validation_wrong_type",
+    ])
+    def test_validate_schema_error(self, testcase):
+        file_name = testcase + ".yaml"
+        obj = json.loads(to_json(Path(file_name).read_bytes()))
         with pytest.raises(ValidationError):
             validate(obj, schema=SCHEMA)

@@ -1,0 +1,8 @@
+{
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyConnector] is invalid. 'Id' is missing or not a string.",
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MyConnector] is invalid. 'Id' is missing or not a string."
+    }
+  ]
+}
