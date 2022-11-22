@@ -24,10 +24,6 @@ black:
 	bin/yaml-format.py --write integration --add-test-metadata
 
 black-check:
-	# Checking latest schema was generated (run `make schema` if this fails)
-	python samtranslator/schema/schema.py > .tmp_schema.json
-	diff -u samtranslator/schema/schema.json .tmp_schema.json
-	rm .tmp_schema.json
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
 	bin/json-format.py --check tests integration
 	bin/yaml-format.py --check tests
@@ -38,8 +34,6 @@ lint:
 	mypy --strict samtranslator bin
 	# Linter performs static analysis to catch latent bugs
 	pylint --rcfile .pylintrc samtranslator
-	# Ensure templates adhere to JSON schema
-	bin/validate_schema.py
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup

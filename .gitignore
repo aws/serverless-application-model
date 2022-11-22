@@ -117,5 +117,3 @@ venv.bak/
 
 # Companion stack config
 integration/config/file_to_s3_map_modified.json
-
-.tmp_schema.json
