@@ -3,7 +3,7 @@
   "type": "object",
   "properties": {
     "Globals": {
-      "$ref": "#/definitions/Globals"
+      "$ref": "#/definitions/__main____Globals"
     },
     "Resources": {
       "title": "Resources",
@@ -11,31 +11,31 @@
       "additionalProperties": {
         "anyOf": [
           {
-            "$ref": "#/definitions/AwsServerlessConnector"
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_connector__Resource"
           },
           {
-            "$ref": "#/definitions/AwsServerlessFunction"
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__Resource"
           },
           {
-            "$ref": "#/definitions/AwsServerlessSimpleTable"
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_simpletable__Resource"
           },
           {
-            "$ref": "#/definitions/AwsServerlessStateMachine"
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__Resource"
           },
           {
-            "$ref": "#/definitions/AwsServerlessLayerVersion"
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_layerversion__Resource"
           },
           {
-            "$ref": "#/definitions/AwsServerlessApi"
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Resource"
           },
           {
-            "$ref": "#/definitions/AwsServerlessHttpApi"
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Resource"
           },
           {
-            "$ref": "#/definitions/AwsServerlessApplication"
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_application__Resource"
           },
           {
-            "$ref": "#/definitions/AnyNonServerlessResource"
+            "$ref": "#/definitions/samtranslator__schema__any_cfn_resource__Resource"
           }
         ]
       }
@@ -45,8 +45,8 @@
     "Resources"
   ],
   "definitions": {
-    "GlobalsFunction": {
-      "title": "GlobalsFunction",
+    "samtranslator__schema__aws_serverless_function__Globals": {
+      "title": "Globals",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -119,8 +119,8 @@
       },
       "additionalProperties": false
     },
-    "GlobalsApi": {
-      "title": "GlobalsApi",
+    "samtranslator__schema__aws_serverless_api__Globals": {
+      "title": "Globals",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -178,8 +178,8 @@
       },
       "additionalProperties": false
     },
-    "GlobalsHttpApi": {
-      "title": "GlobalsHttpApi",
+    "samtranslator__schema__aws_serverless_httpapi__Globals": {
+      "title": "Globals",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -213,8 +213,8 @@
       },
       "additionalProperties": false
     },
-    "GlobalsSimpleTable": {
-      "title": "GlobalsSimpleTable",
+    "samtranslator__schema__aws_serverless_simpletable__Globals": {
+      "title": "Globals",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -224,22 +224,22 @@
       },
       "additionalProperties": false
     },
-    "Globals": {
+    "__main____Globals": {
       "title": "Globals",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Function": {
-          "$ref": "#/definitions/GlobalsFunction"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__Globals"
         },
         "Api": {
-          "$ref": "#/definitions/GlobalsApi"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Globals"
         },
         "HttpApi": {
-          "$ref": "#/definitions/GlobalsHttpApi"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Globals"
         },
         "SimpleTable": {
-          "$ref": "#/definitions/GlobalsSimpleTable"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_simpletable__Globals"
         }
       },
       "additionalProperties": false
@@ -278,8 +278,8 @@
       },
       "additionalProperties": false
     },
-    "ConnectorProperties": {
-      "title": "ConnectorProperties",
+    "samtranslator__schema__aws_serverless_connector__Properties": {
+      "title": "Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -308,8 +308,8 @@
       ],
       "additionalProperties": false
     },
-    "AwsServerlessConnector": {
-      "title": "AwsServerlessConnector",
+    "samtranslator__schema__aws_serverless_connector__Resource": {
+      "title": "Resource",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -321,7 +321,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/ConnectorProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_connector__Properties"
         }
       },
       "required": [
@@ -330,8 +330,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionCodeUri": {
-      "title": "FunctionCodeUri",
+    "CodeUri": {
+      "title": "CodeUri",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -375,8 +375,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionDeadLetterQueue": {
-      "title": "FunctionDeadLetterQueue",
+    "DeadLetterQueue": {
+      "title": "DeadLetterQueue",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -399,8 +399,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionDeploymentPreferenceHooks": {
-      "title": "FunctionDeploymentPreferenceHooks",
+    "Hooks": {
+      "title": "Hooks",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -429,8 +429,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionDeploymentPreference": {
-      "title": "FunctionDeploymentPreference",
+    "DeploymentPreference": {
+      "title": "DeploymentPreference",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -460,7 +460,7 @@
           ]
         },
         "Hooks": {
-          "$ref": "#/definitions/FunctionDeploymentPreferenceHooks"
+          "$ref": "#/definitions/Hooks"
         },
         "PassthroughCondition": {
           "title": "Passthroughcondition",
@@ -501,8 +501,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionEventInvokeConfig": {
-      "title": "FunctionEventInvokeConfig",
+    "EventInvokeConfig": {
+      "title": "EventInvokeConfig",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -520,8 +520,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionS3Properties": {
-      "title": "FunctionS3Properties",
+    "S3EventProperties": {
+      "title": "S3EventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -548,13 +548,13 @@
       ],
       "additionalProperties": false
     },
-    "FunctionS3Event": {
-      "title": "FunctionS3Event",
+    "S3Event": {
+      "title": "S3Event",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Properties": {
-          "$ref": "#/definitions/FunctionS3Properties"
+          "$ref": "#/definitions/S3EventProperties"
         },
         "Type": {
           "title": "Type",
@@ -623,8 +623,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionSNSProperties": {
-      "title": "FunctionSNSProperties",
+    "SNSEventProperties": {
+      "title": "SNSEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -651,13 +651,13 @@
       },
       "additionalProperties": false
     },
-    "FunctionSNSEvent": {
-      "title": "FunctionSNSEvent",
+    "SNSEvent": {
+      "title": "SNSEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Properties": {
-          "$ref": "#/definitions/FunctionSNSProperties"
+          "$ref": "#/definitions/SNSEventProperties"
         },
         "Type": {
           "title": "Type",
@@ -673,8 +673,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionKinesisProperties": {
-      "title": "FunctionKinesisProperties",
+    "KinesisEventProperties": {
+      "title": "KinesisEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -720,8 +720,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionKinesisEvent": {
-      "title": "FunctionKinesisEvent",
+    "KinesisEvent": {
+      "title": "KinesisEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -733,7 +733,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionKinesisProperties"
+          "$ref": "#/definitions/KinesisEventProperties"
         }
       },
       "required": [
@@ -742,8 +742,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionDynamoDBProperties": {
-      "title": "FunctionDynamoDBProperties",
+    "DynamoDBEventProperties": {
+      "title": "DynamoDBEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -789,8 +789,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionDynamoDBEvent": {
-      "title": "FunctionDynamoDBEvent",
+    "DynamoDBEvent": {
+      "title": "DynamoDBEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -802,7 +802,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionDynamoDBProperties"
+          "$ref": "#/definitions/DynamoDBEventProperties"
         }
       },
       "required": [
@@ -811,8 +811,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionSqsProperties": {
-      "title": "FunctionSqsProperties",
+    "SQSEventProperties": {
+      "title": "SQSEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -834,8 +834,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionSqsEvent": {
-      "title": "FunctionSqsEvent",
+    "SQSEvent": {
+      "title": "SQSEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -847,7 +847,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionSqsProperties"
+          "$ref": "#/definitions/SQSEventProperties"
         }
       },
       "required": [
@@ -856,7 +856,7 @@
       ],
       "additionalProperties": false
     },
-    "ResourcePolicy": {
+    "samtranslator__schema__aws_serverless_function__ResourcePolicy": {
       "title": "ResourcePolicy",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
@@ -1018,8 +1018,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionApiFunctionAuth": {
-      "title": "FunctionApiFunctionAuth",
+    "ApiAuth": {
+      "title": "ApiAuth",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1050,13 +1050,13 @@
           ]
         },
         "ResourcePolicy": {
-          "$ref": "#/definitions/ResourcePolicy"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ResourcePolicy"
         }
       },
       "additionalProperties": false
     },
-    "FunctionRequestModel": {
-      "title": "FunctionRequestModel",
+    "RequestModel": {
+      "title": "RequestModel",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1082,8 +1082,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionRequestParameter": {
-      "title": "FunctionRequestParameter",
+    "RequestParameters": {
+      "title": "RequestParameters",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1098,13 +1098,13 @@
       },
       "additionalProperties": false
     },
-    "FunctionApiProperties": {
-      "title": "FunctionApiProperties",
+    "samtranslator__schema__aws_serverless_function__ApiEventProperties": {
+      "title": "ApiEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Auth": {
-          "$ref": "#/definitions/FunctionApiFunctionAuth"
+          "$ref": "#/definitions/ApiAuth"
         },
         "Method": {
           "title": "Method",
@@ -1115,7 +1115,7 @@
           "type": "string"
         },
         "RequestModel": {
-          "$ref": "#/definitions/FunctionRequestModel"
+          "$ref": "#/definitions/RequestModel"
         },
         "RequestParameters": {
           "title": "Requestparameters",
@@ -1124,7 +1124,7 @@
               "type": "string"
             },
             {
-              "$ref": "#/definitions/FunctionRequestParameter"
+              "$ref": "#/definitions/RequestParameters"
             }
           ]
         },
@@ -1146,8 +1146,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionApiEvent": {
-      "title": "FunctionApiEvent",
+    "samtranslator__schema__aws_serverless_function__ApiEvent": {
+      "title": "ApiEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1159,7 +1159,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionApiProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ApiEventProperties"
         }
       },
       "required": [
@@ -1168,8 +1168,8 @@
       ],
       "additionalProperties": false
     },
-    "EventsDeadLetterConfig": {
-      "title": "EventsDeadLetterConfig",
+    "samtranslator__schema__aws_serverless_function__DeadLetterConfig": {
+      "title": "DeadLetterConfig",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1196,7 +1196,7 @@
       "type": "object",
       "properties": {
         "DeadLetterConfig": {
-          "$ref": "#/definitions/EventsDeadLetterConfig"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__DeadLetterConfig"
         },
         "Description": {
           "title": "Description"
@@ -1223,8 +1223,8 @@
       },
       "additionalProperties": false
     },
-    "EventsSchedule": {
-      "title": "EventsSchedule",
+    "samtranslator__schema__aws_serverless_function__ScheduleEvent": {
+      "title": "ScheduleEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1245,13 +1245,13 @@
       ],
       "additionalProperties": false
     },
-    "EventsScheduleV2Properties": {
-      "title": "EventsScheduleV2Properties",
+    "samtranslator__schema__aws_serverless_function__ScheduleV2EventProperties": {
+      "title": "ScheduleV2EventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "DeadLetterConfig": {
-          "$ref": "#/definitions/EventsDeadLetterConfig"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__DeadLetterConfig"
         },
         "Description": {
           "title": "Description"
@@ -1298,8 +1298,8 @@
       },
       "additionalProperties": false
     },
-    "EventsScheduleV2": {
-      "title": "EventsScheduleV2",
+    "samtranslator__schema__aws_serverless_function__ScheduleV2Event": {
+      "title": "ScheduleV2Event",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1311,7 +1311,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/EventsScheduleV2Properties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ScheduleV2EventProperties"
         }
       },
       "required": [
@@ -1320,8 +1320,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionCloudWatchProperties": {
-      "title": "FunctionCloudWatchProperties",
+    "samtranslator__schema__aws_serverless_function__CloudWatchEventProperties": {
+      "title": "CloudWatchEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1347,8 +1347,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionCloudWatchEvent": {
-      "title": "FunctionCloudWatchEvent",
+    "samtranslator__schema__aws_serverless_function__CloudWatchEvent": {
+      "title": "CloudWatchEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1360,7 +1360,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionCloudWatchProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__CloudWatchEventProperties"
         }
       },
       "required": [
@@ -1369,13 +1369,13 @@
       ],
       "additionalProperties": false
     },
-    "FunctionEventBridgeRuleProperties": {
-      "title": "FunctionEventBridgeRuleProperties",
+    "samtranslator__schema__aws_serverless_function__EventBridgeRuleEventProperties": {
+      "title": "EventBridgeRuleEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "DeadLetterConfig": {
-          "$ref": "#/definitions/EventsDeadLetterConfig"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__DeadLetterConfig"
         },
         "EventBusName": {
           "title": "Eventbusname"
@@ -1398,8 +1398,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionEventBridgeRuleEvent": {
-      "title": "FunctionEventBridgeRuleEvent",
+    "samtranslator__schema__aws_serverless_function__EventBridgeRuleEvent": {
+      "title": "EventBridgeRuleEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1411,7 +1411,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionEventBridgeRuleProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__EventBridgeRuleEventProperties"
         }
       },
       "required": [
@@ -1420,8 +1420,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionCloudWatchLogsProperties": {
-      "title": "FunctionCloudWatchLogsProperties",
+    "CloudWatchLogsEventProperties": {
+      "title": "CloudWatchLogsEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1434,8 +1434,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionCloudWatchLogsEvent": {
-      "title": "FunctionCloudWatchLogsEvent",
+    "CloudWatchLogsEvent": {
+      "title": "CloudWatchLogsEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1447,7 +1447,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionCloudWatchLogsProperties"
+          "$ref": "#/definitions/CloudWatchLogsEventProperties"
         }
       },
       "required": [
@@ -1456,8 +1456,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionIoTRuleProperties": {
-      "title": "FunctionIoTRuleProperties",
+    "IoTRuleEventProperties": {
+      "title": "IoTRuleEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1470,8 +1470,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionIoTRuleEvent": {
-      "title": "FunctionIoTRuleEvent",
+    "IoTRuleEvent": {
+      "title": "IoTRuleEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1483,7 +1483,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionIoTRuleProperties"
+          "$ref": "#/definitions/IoTRuleEventProperties"
         }
       },
       "required": [
@@ -1492,8 +1492,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionAlexaSkillProperties": {
-      "title": "FunctionAlexaSkillProperties",
+    "AlexaSkillEventProperties": {
+      "title": "AlexaSkillEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1504,8 +1504,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionAlexaSkillEvent": {
-      "title": "FunctionAlexaSkillEvent",
+    "AlexaSkillEvent": {
+      "title": "AlexaSkillEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1517,7 +1517,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionAlexaSkillProperties"
+          "$ref": "#/definitions/AlexaSkillEventProperties"
         }
       },
       "required": [
@@ -1525,8 +1525,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionCognitoProperties": {
-      "title": "FunctionCognitoProperties",
+    "CognitoEventProperties": {
+      "title": "CognitoEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1550,8 +1550,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionCognitoEvent": {
-      "title": "FunctionCognitoEvent",
+    "CognitoEvent": {
+      "title": "CognitoEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1563,7 +1563,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionCognitoProperties"
+          "$ref": "#/definitions/CognitoEventProperties"
         }
       },
       "required": [
@@ -1572,8 +1572,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionHttpApiAuth": {
-      "title": "FunctionHttpApiAuth",
+    "HttpApiAuth": {
+      "title": "HttpApiAuth",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1591,8 +1591,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionHttpApiProperties": {
-      "title": "FunctionHttpApiProperties",
+    "HttpApiEventProperties": {
+      "title": "HttpApiEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1608,7 +1608,7 @@
           ]
         },
         "Auth": {
-          "$ref": "#/definitions/FunctionHttpApiAuth"
+          "$ref": "#/definitions/HttpApiAuth"
         },
         "Method": {
           "title": "Method",
@@ -1646,8 +1646,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionHttpApiEvent": {
-      "title": "FunctionHttpApiEvent",
+    "HttpApiEvent": {
+      "title": "HttpApiEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1659,7 +1659,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionHttpApiProperties"
+          "$ref": "#/definitions/HttpApiEventProperties"
         }
       },
       "required": [
@@ -1667,8 +1667,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionMSKProperties": {
-      "title": "FunctionMSKProperties",
+    "MSKEventProperties": {
+      "title": "MSKEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1693,8 +1693,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionMSKEvent": {
-      "title": "FunctionMSKEvent",
+    "MSKEvent": {
+      "title": "MSKEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1706,7 +1706,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionMSKProperties"
+          "$ref": "#/definitions/MSKEventProperties"
         }
       },
       "required": [
@@ -1715,8 +1715,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionMQProperties": {
-      "title": "FunctionMQProperties",
+    "MQEventProperties": {
+      "title": "MQEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1748,8 +1748,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionMQEvent": {
-      "title": "FunctionMQEvent",
+    "MQEvent": {
+      "title": "MQEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1761,7 +1761,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionMQProperties"
+          "$ref": "#/definitions/MQEventProperties"
         }
       },
       "required": [
@@ -1770,8 +1770,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionSelfManagedKafkaProperties": {
-      "title": "FunctionSelfManagedKafkaProperties",
+    "SelfManagedKafkaEventProperties": {
+      "title": "SelfManagedKafkaEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1810,8 +1810,8 @@
       },
       "additionalProperties": false
     },
-    "FunctionSelfManagedKafkaEvent": {
-      "title": "FunctionSelfManagedKafkaEvent",
+    "SelfManagedKafkaEvent": {
+      "title": "SelfManagedKafkaEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1823,7 +1823,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionSelfManagedKafkaProperties"
+          "$ref": "#/definitions/SelfManagedKafkaEventProperties"
         }
       },
       "required": [
@@ -1857,8 +1857,8 @@
       ],
       "additionalProperties": false
     },
-    "FunctionProperties": {
-      "title": "FunctionProperties",
+    "samtranslator__schema__aws_serverless_function__Properties": {
+      "title": "Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -1909,7 +1909,7 @@
               "type": "string"
             },
             {
-              "$ref": "#/definitions/FunctionCodeUri"
+              "$ref": "#/definitions/CodeUri"
             }
           ]
         },
@@ -1920,12 +1920,12 @@
               "type": "object"
             },
             {
-              "$ref": "#/definitions/FunctionDeadLetterQueue"
+              "$ref": "#/definitions/DeadLetterQueue"
             }
           ]
         },
         "DeploymentPreference": {
-          "$ref": "#/definitions/FunctionDeploymentPreference"
+          "$ref": "#/definitions/DeploymentPreference"
         },
         "Description": {
           "title": "Description"
@@ -1937,7 +1937,7 @@
           "title": "Ephemeralstorage"
         },
         "EventInvokeConfig": {
-          "$ref": "#/definitions/FunctionEventInvokeConfig"
+          "$ref": "#/definitions/EventInvokeConfig"
         },
         "Events": {
           "title": "Events",
@@ -1945,58 +1945,58 @@
           "additionalProperties": {
             "anyOf": [
               {
-                "$ref": "#/definitions/FunctionS3Event"
+                "$ref": "#/definitions/S3Event"
               },
               {
-                "$ref": "#/definitions/FunctionSNSEvent"
+                "$ref": "#/definitions/SNSEvent"
               },
               {
-                "$ref": "#/definitions/FunctionKinesisEvent"
+                "$ref": "#/definitions/KinesisEvent"
               },
               {
-                "$ref": "#/definitions/FunctionDynamoDBEvent"
+                "$ref": "#/definitions/DynamoDBEvent"
               },
               {
-                "$ref": "#/definitions/FunctionSqsEvent"
+                "$ref": "#/definitions/SQSEvent"
               },
               {
-                "$ref": "#/definitions/FunctionApiEvent"
+                "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ApiEvent"
               },
               {
-                "$ref": "#/definitions/EventsSchedule"
+                "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ScheduleEvent"
               },
               {
-                "$ref": "#/definitions/EventsScheduleV2"
+                "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ScheduleV2Event"
               },
               {
-                "$ref": "#/definitions/FunctionCloudWatchEvent"
+                "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__CloudWatchEvent"
               },
               {
-                "$ref": "#/definitions/FunctionEventBridgeRuleEvent"
+                "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__EventBridgeRuleEvent"
               },
               {
-                "$ref": "#/definitions/FunctionCloudWatchLogsEvent"
+                "$ref": "#/definitions/CloudWatchLogsEvent"
               },
               {
-                "$ref": "#/definitions/FunctionIoTRuleEvent"
+                "$ref": "#/definitions/IoTRuleEvent"
               },
               {
-                "$ref": "#/definitions/FunctionAlexaSkillEvent"
+                "$ref": "#/definitions/AlexaSkillEvent"
               },
               {
-                "$ref": "#/definitions/FunctionCognitoEvent"
+                "$ref": "#/definitions/CognitoEvent"
               },
               {
-                "$ref": "#/definitions/FunctionHttpApiEvent"
+                "$ref": "#/definitions/HttpApiEvent"
               },
               {
-                "$ref": "#/definitions/FunctionMSKEvent"
+                "$ref": "#/definitions/MSKEvent"
               },
               {
-                "$ref": "#/definitions/FunctionMQEvent"
+                "$ref": "#/definitions/MQEvent"
               },
               {
-                "$ref": "#/definitions/FunctionSelfManagedKafkaEvent"
+                "$ref": "#/definitions/SelfManagedKafkaEvent"
               }
             ]
           }
@@ -2108,8 +2108,8 @@
       },
       "additionalProperties": false
     },
-    "AwsServerlessFunction": {
-      "title": "AwsServerlessFunction",
+    "samtranslator__schema__aws_serverless_function__Resource": {
+      "title": "Resource",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2121,7 +2121,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/FunctionProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__Properties"
         },
         "DeletionPolicy": {
           "title": "Deletionpolicy"
@@ -2144,8 +2144,8 @@
       ],
       "additionalProperties": false
     },
-    "SimpleTablePrimaryKey": {
-      "title": "SimpleTablePrimaryKey",
+    "PrimaryKey": {
+      "title": "PrimaryKey",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2158,13 +2158,13 @@
       },
       "additionalProperties": false
     },
-    "SimpleTableProperties": {
-      "title": "SimpleTableProperties",
+    "samtranslator__schema__aws_serverless_simpletable__Properties": {
+      "title": "Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "PrimaryKey": {
-          "$ref": "#/definitions/SimpleTablePrimaryKey"
+          "$ref": "#/definitions/PrimaryKey"
         },
         "ProvisionedThroughput": {
           "title": "Provisionedthroughput"
@@ -2182,8 +2182,8 @@
       },
       "additionalProperties": false
     },
-    "AwsServerlessSimpleTable": {
-      "title": "AwsServerlessSimpleTable",
+    "samtranslator__schema__aws_serverless_simpletable__Resource": {
+      "title": "Resource",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2195,7 +2195,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/SimpleTableProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_simpletable__Properties"
         }
       },
       "required": [
@@ -2203,50 +2203,8 @@
       ],
       "additionalProperties": false
     },
-    "StateMachineEventsCloudWatchEventProperties": {
-      "title": "StateMachineEventsCloudWatchEventProperties",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "EventBusName": {
-          "title": "Eventbusname"
-        },
-        "Input": {
-          "title": "Input"
-        },
-        "InputPath": {
-          "title": "Inputpath"
-        },
-        "Pattern": {
-          "title": "Pattern"
-        }
-      },
-      "additionalProperties": false
-    },
-    "StateMachineEventsCloudWatchEvent": {
-      "title": "StateMachineEventsCloudWatchEvent",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Type": {
-          "title": "Type",
-          "enum": [
-            "CloudWatchEvent"
-          ],
-          "type": "string"
-        },
-        "Properties": {
-          "$ref": "#/definitions/StateMachineEventsCloudWatchEventProperties"
-        }
-      },
-      "required": [
-        "Type",
-        "Properties"
-      ],
-      "additionalProperties": false
-    },
-    "StateMachineEventsEventBridgeRuleDeadLetterConfig": {
-      "title": "StateMachineEventsEventBridgeRuleDeadLetterConfig",
+    "samtranslator__schema__aws_serverless_statemachine__DeadLetterConfig": {
+      "title": "DeadLetterConfig",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2267,13 +2225,185 @@
       },
       "additionalProperties": false
     },
-    "StateMachineEventsEventBridgeRuleProperties": {
-      "title": "StateMachineEventsEventBridgeRuleProperties",
+    "ScheduleEventProperties": {
+      "title": "ScheduleEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "DeadLetterConfig": {
-          "$ref": "#/definitions/StateMachineEventsEventBridgeRuleDeadLetterConfig"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__DeadLetterConfig"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "Enabled": {
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "RetryPolicy": {
+          "title": "Retrypolicy"
+        },
+        "Schedule": {
+          "title": "Schedule"
+        },
+        "State": {
+          "title": "State"
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_statemachine__ScheduleEvent": {
+      "title": "ScheduleEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "Schedule"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/ScheduleEventProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_statemachine__ScheduleV2EventProperties": {
+      "title": "ScheduleV2EventProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DeadLetterConfig": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__DeadLetterConfig"
+        },
+        "Description": {
+          "title": "Description"
+        },
+        "EndDate": {
+          "title": "Enddate"
+        },
+        "FlexibleTimeWindow": {
+          "title": "Flexibletimewindow"
+        },
+        "GroupName": {
+          "title": "Groupname"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "KmsKeyArn": {
+          "title": "Kmskeyarn"
+        },
+        "Name": {
+          "title": "Name"
+        },
+        "PermissionsBoundary": {
+          "title": "Permissionsboundary"
+        },
+        "RetryPolicy": {
+          "title": "Retrypolicy"
+        },
+        "RoleArn": {
+          "title": "Rolearn"
+        },
+        "ScheduleExpression": {
+          "title": "Scheduleexpression"
+        },
+        "ScheduleExpressionTimezone": {
+          "title": "Scheduleexpressiontimezone"
+        },
+        "StartDate": {
+          "title": "Startdate"
+        },
+        "State": {
+          "title": "State"
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_statemachine__ScheduleV2Event": {
+      "title": "ScheduleV2Event",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "ScheduleV2"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__ScheduleV2EventProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_statemachine__CloudWatchEventProperties": {
+      "title": "CloudWatchEventProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "EventBusName": {
+          "title": "Eventbusname"
+        },
+        "Input": {
+          "title": "Input"
+        },
+        "InputPath": {
+          "title": "Inputpath"
+        },
+        "Pattern": {
+          "title": "Pattern"
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_statemachine__CloudWatchEvent": {
+      "title": "CloudWatchEvent",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "CloudWatchEvent"
+          ],
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__CloudWatchEventProperties"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_statemachine__EventBridgeRuleEventProperties": {
+      "title": "EventBridgeRuleEventProperties",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "DeadLetterConfig": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__DeadLetterConfig"
         },
         "EventBusName": {
           "title": "Eventbusname"
@@ -2293,8 +2423,8 @@
       },
       "additionalProperties": false
     },
-    "StateMachineEventsEventBridgeRule": {
-      "title": "StateMachineEventsEventBridgeRule",
+    "samtranslator__schema__aws_serverless_statemachine__EventBridgeRuleEvent": {
+      "title": "EventBridgeRuleEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2306,7 +2436,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/StateMachineEventsEventBridgeRuleProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__EventBridgeRuleEventProperties"
         }
       },
       "required": [
@@ -2315,8 +2445,170 @@
       ],
       "additionalProperties": false
     },
-    "StateMachineEventsApiAuth": {
-      "title": "StateMachineEventsApiAuth",
+    "samtranslator__schema__aws_serverless_statemachine__ResourcePolicy": {
+      "title": "ResourcePolicy",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AwsAccountBlacklist": {
+          "title": "Awsaccountblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "AwsAccountWhitelist": {
+          "title": "Awsaccountwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "CustomStatements": {
+          "title": "Customstatements",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpcBlacklist": {
+          "title": "Intrinsicvpcblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpcWhitelist": {
+          "title": "Intrinsicvpcwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpceBlacklist": {
+          "title": "Intrinsicvpceblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpceWhitelist": {
+          "title": "Intrinsicvpcewhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IpRangeBlacklist": {
+          "title": "Iprangeblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IpRangeWhitelist": {
+          "title": "Iprangewhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "SourceVpcBlacklist": {
+          "title": "Sourcevpcblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "SourceVpcWhitelist": {
+          "title": "Sourcevpcwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "samtranslator__schema__aws_serverless_statemachine__Auth": {
+      "title": "Auth",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2336,18 +2628,18 @@
           "type": "string"
         },
         "ResourcePolicy": {
-          "$ref": "#/definitions/ResourcePolicy"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__ResourcePolicy"
         }
       },
       "additionalProperties": false
     },
-    "StateMachineEventsApiProperties": {
-      "title": "StateMachineEventsApiProperties",
+    "samtranslator__schema__aws_serverless_statemachine__ApiEventProperties": {
+      "title": "ApiEventProperties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
         "Auth": {
-          "$ref": "#/definitions/StateMachineEventsApiAuth"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__Auth"
         },
         "Method": {
           "title": "Method",
@@ -2372,8 +2664,8 @@
       ],
       "additionalProperties": false
     },
-    "StateMachineEventsApi": {
-      "title": "StateMachineEventsApi",
+    "samtranslator__schema__aws_serverless_statemachine__ApiEvent": {
+      "title": "ApiEvent",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2385,7 +2677,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/StateMachineEventsApiProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__ApiEventProperties"
         }
       },
       "required": [
@@ -2394,8 +2686,8 @@
       ],
       "additionalProperties": false
     },
-    "StateMachineProperties": {
-      "title": "StateMachineProperties",
+    "samtranslator__schema__aws_serverless_statemachine__Properties": {
+      "title": "Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2422,19 +2714,19 @@
           "additionalProperties": {
             "anyOf": [
               {
-                "$ref": "#/definitions/EventsSchedule"
+                "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__ScheduleEvent"
               },
               {
-                "$ref": "#/definitions/EventsScheduleV2"
+                "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__ScheduleV2Event"
               },
               {
-                "$ref": "#/definitions/StateMachineEventsCloudWatchEvent"
+                "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__CloudWatchEvent"
               },
               {
-                "$ref": "#/definitions/StateMachineEventsEventBridgeRule"
+                "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__EventBridgeRuleEvent"
               },
               {
-                "$ref": "#/definitions/StateMachineEventsApi"
+                "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__ApiEvent"
               }
             ]
           }
@@ -2487,8 +2779,8 @@
       },
       "additionalProperties": false
     },
-    "AwsServerlessStateMachine": {
-      "title": "AwsServerlessStateMachine",
+    "samtranslator__schema__aws_serverless_statemachine__Resource": {
+      "title": "Resource",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2500,7 +2792,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/StateMachineProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__Properties"
         },
         "Condition": {
           "title": "Condition"
@@ -2512,8 +2804,8 @@
       ],
       "additionalProperties": false
     },
-    "LayerVersionContentUri": {
-      "title": "LayerVersionContentUri",
+    "ContentUri": {
+      "title": "ContentUri",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2529,8 +2821,8 @@
       },
       "additionalProperties": false
     },
-    "LayerVersionProperties": {
-      "title": "LayerVersionProperties",
+    "samtranslator__schema__aws_serverless_layerversion__Properties": {
+      "title": "Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2547,7 +2839,7 @@
               "type": "string"
             },
             {
-              "$ref": "#/definitions/LayerVersionContentUri"
+              "$ref": "#/definitions/ContentUri"
             }
           ]
         },
@@ -2577,8 +2869,8 @@
       ],
       "additionalProperties": false
     },
-    "AwsServerlessLayerVersion": {
-      "title": "AwsServerlessLayerVersion",
+    "samtranslator__schema__aws_serverless_layerversion__Resource": {
+      "title": "Resource",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2590,7 +2882,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/LayerVersionProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_layerversion__Properties"
         },
         "Condition": {
           "title": "Condition"
@@ -2605,8 +2897,8 @@
       ],
       "additionalProperties": false
     },
-    "ApiAuthCognitoAuthorizationIdentity": {
-      "title": "ApiAuthCognitoAuthorizationIdentity",
+    "CognitoAuthorizerIdentity": {
+      "title": "CognitoAuthorizerIdentity",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2632,8 +2924,8 @@
       },
       "additionalProperties": false
     },
-    "ApiAuthCognitoAuthorizer": {
-      "title": "ApiAuthCognitoAuthorizer",
+    "CognitoAuthorizer": {
+      "title": "CognitoAuthorizer",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2645,7 +2937,7 @@
           }
         },
         "Identity": {
-          "$ref": "#/definitions/ApiAuthCognitoAuthorizationIdentity"
+          "$ref": "#/definitions/CognitoAuthorizerIdentity"
         },
         "UserPoolArn": {
           "title": "Userpoolarn",
@@ -2664,8 +2956,79 @@
       ],
       "additionalProperties": false
     },
-    "ApiAuthLambdaRequestAuthorizationIdentity": {
-      "title": "ApiAuthLambdaRequestAuthorizationIdentity",
+    "LambdaTokenAuthorizerIdentity": {
+      "title": "LambdaTokenAuthorizerIdentity",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "ReauthorizeEvery": {
+          "title": "Reauthorizeevery",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "ValidationExpression": {
+          "title": "Validationexpression",
+          "type": "string"
+        },
+        "Header": {
+          "title": "Header",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "LambdaTokenAuthorizer": {
+      "title": "LambdaTokenAuthorizer",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AuthorizationScopes": {
+          "title": "Authorizationscopes",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "FunctionArn": {
+          "title": "Functionarn",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "FunctionInvokeRole": {
+          "title": "Functioninvokerole",
+          "type": "string"
+        },
+        "FunctionPayloadType": {
+          "title": "Functionpayloadtype",
+          "enum": [
+            "REQUEST",
+            "TOKEN"
+          ],
+          "type": "string"
+        },
+        "Identity": {
+          "$ref": "#/definitions/LambdaTokenAuthorizerIdentity"
+        }
+      },
+      "required": [
+        "FunctionArn"
+      ],
+      "additionalProperties": false
+    },
+    "LambdaRequestAuthorizerIdentity": {
+      "title": "LambdaRequestAuthorizerIdentity",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2711,35 +3074,8 @@
       },
       "additionalProperties": false
     },
-    "ApiAuthLambdaTokenAuthorizationIdentity": {
-      "title": "ApiAuthLambdaTokenAuthorizationIdentity",
-      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
-      "type": "object",
-      "properties": {
-        "Header": {
-          "title": "Header",
-          "type": "string"
-        },
-        "ReauthorizeEvery": {
-          "title": "Reauthorizeevery",
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "ValidationExpression": {
-          "title": "Validationexpression",
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    },
-    "ApiAuthLambdaAuthorizer": {
-      "title": "ApiAuthLambdaAuthorizer",
+    "LambdaRequestAuthorizer": {
+      "title": "LambdaRequestAuthorizer",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2774,15 +3110,7 @@
           "type": "string"
         },
         "Identity": {
-          "title": "Identity",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/ApiAuthLambdaRequestAuthorizationIdentity"
-            },
-            {
-              "$ref": "#/definitions/ApiAuthLambdaTokenAuthorizationIdentity"
-            }
-          ]
+          "$ref": "#/definitions/LambdaRequestAuthorizerIdentity"
         }
       },
       "required": [
@@ -2790,8 +3118,170 @@
       ],
       "additionalProperties": false
     },
-    "ApiAuthUsagePlan": {
-      "title": "ApiAuthUsagePlan",
+    "samtranslator__schema__aws_serverless_api__ResourcePolicy": {
+      "title": "ResourcePolicy",
+      "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
+      "type": "object",
+      "properties": {
+        "AwsAccountBlacklist": {
+          "title": "Awsaccountblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "AwsAccountWhitelist": {
+          "title": "Awsaccountwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "CustomStatements": {
+          "title": "Customstatements",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpcBlacklist": {
+          "title": "Intrinsicvpcblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpcWhitelist": {
+          "title": "Intrinsicvpcwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpceBlacklist": {
+          "title": "Intrinsicvpceblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IntrinsicVpceWhitelist": {
+          "title": "Intrinsicvpcewhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IpRangeBlacklist": {
+          "title": "Iprangeblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "IpRangeWhitelist": {
+          "title": "Iprangewhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "SourceVpcBlacklist": {
+          "title": "Sourcevpcblacklist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "SourceVpcWhitelist": {
+          "title": "Sourcevpcwhitelist",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "UsagePlan": {
+      "title": "UsagePlan",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2825,8 +3315,8 @@
       ],
       "additionalProperties": false
     },
-    "ApiAuthProperties": {
-      "title": "ApiAuthProperties",
+    "samtranslator__schema__aws_serverless_api__Auth": {
+      "title": "Auth",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2844,10 +3334,13 @@
           "additionalProperties": {
             "anyOf": [
               {
-                "$ref": "#/definitions/ApiAuthCognitoAuthorizer"
+                "$ref": "#/definitions/CognitoAuthorizer"
               },
               {
-                "$ref": "#/definitions/ApiAuthLambdaAuthorizer"
+                "$ref": "#/definitions/LambdaTokenAuthorizer"
+              },
+              {
+                "$ref": "#/definitions/LambdaRequestAuthorizer"
               }
             ]
           }
@@ -2861,16 +3354,16 @@
           "type": "string"
         },
         "ResourcePolicy": {
-          "$ref": "#/definitions/ResourcePolicy"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__ResourcePolicy"
         },
         "UsagePlan": {
-          "$ref": "#/definitions/ApiAuthUsagePlan"
+          "$ref": "#/definitions/UsagePlan"
         }
       },
       "additionalProperties": false
     },
-    "ApiCorsConfiguration": {
-      "title": "ApiCorsConfiguration",
+    "Cors": {
+      "title": "Cors",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2900,8 +3393,8 @@
       ],
       "additionalProperties": false
     },
-    "ApiDomainRoute53Configuration": {
-      "title": "ApiDomainRoute53Configuration",
+    "samtranslator__schema__aws_serverless_api__Route53": {
+      "title": "Route53",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2924,8 +3417,8 @@
       },
       "additionalProperties": false
     },
-    "ApiDomainConfiguration": {
-      "title": "ApiDomainConfiguration",
+    "samtranslator__schema__aws_serverless_api__Domain": {
+      "title": "Domain",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2960,7 +3453,7 @@
           "title": "Ownershipverificationcertificatearn"
         },
         "Route53": {
-          "$ref": "#/definitions/ApiDomainRoute53Configuration"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Route53"
         },
         "SecurityPolicy": {
           "title": "Securitypolicy"
@@ -2968,8 +3461,8 @@
       },
       "additionalProperties": false
     },
-    "ApiProperties": {
-      "title": "ApiProperties",
+    "samtranslator__schema__aws_serverless_api__Properties": {
+      "title": "Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -2980,7 +3473,7 @@
           "title": "Apikeysourcetype"
         },
         "Auth": {
-          "$ref": "#/definitions/ApiAuthProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Auth"
         },
         "BinaryMediaTypes": {
           "title": "Binarymediatypes"
@@ -3001,7 +3494,7 @@
               "type": "string"
             },
             {
-              "$ref": "#/definitions/ApiCorsConfiguration"
+              "$ref": "#/definitions/Cors"
             }
           ]
         },
@@ -3018,7 +3511,7 @@
           "title": "Disableexecuteapiendpoint"
         },
         "Domain": {
-          "$ref": "#/definitions/ApiDomainConfiguration"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Domain"
         },
         "EndpointConfiguration": {
           "title": "Endpointconfiguration"
@@ -3083,8 +3576,8 @@
       ],
       "additionalProperties": false
     },
-    "AwsServerlessApi": {
-      "title": "AwsServerlessApi",
+    "samtranslator__schema__aws_serverless_api__Resource": {
+      "title": "Resource",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3096,7 +3589,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/ApiProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Properties"
         },
         "Condition": {
           "title": "Condition"
@@ -3123,8 +3616,8 @@
       ],
       "additionalProperties": false
     },
-    "HttpApiAuthOAuth2Authorizer": {
-      "title": "HttpApiAuthOAuth2Authorizer",
+    "OAuth2Authorizer": {
+      "title": "OAuth2Authorizer",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3145,8 +3638,8 @@
       },
       "additionalProperties": false
     },
-    "HttpApiAuthLambdaAuthorizerIdentity": {
-      "title": "HttpApiAuthLambdaAuthorizerIdentity",
+    "LambdaAuthorizerIdentity": {
+      "title": "LambdaAuthorizerIdentity",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3185,8 +3678,8 @@
       },
       "additionalProperties": false
     },
-    "HttpApiAuthLambdaAuthorizer": {
-      "title": "HttpApiAuthLambdaAuthorizer",
+    "LambdaAuthorizer": {
+      "title": "LambdaAuthorizer",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3225,7 +3718,7 @@
           ]
         },
         "Identity": {
-          "$ref": "#/definitions/HttpApiAuthLambdaAuthorizerIdentity"
+          "$ref": "#/definitions/LambdaAuthorizerIdentity"
         }
       },
       "required": [
@@ -3234,8 +3727,8 @@
       ],
       "additionalProperties": false
     },
-    "HttpApiAuth": {
-      "title": "HttpApiAuth",
+    "samtranslator__schema__aws_serverless_httpapi__Auth": {
+      "title": "Auth",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3245,10 +3738,10 @@
           "additionalProperties": {
             "anyOf": [
               {
-                "$ref": "#/definitions/HttpApiAuthOAuth2Authorizer"
+                "$ref": "#/definitions/OAuth2Authorizer"
               },
               {
-                "$ref": "#/definitions/HttpApiAuthLambdaAuthorizer"
+                "$ref": "#/definitions/LambdaAuthorizer"
               }
             ]
           }
@@ -3264,8 +3757,8 @@
       },
       "additionalProperties": false
     },
-    "HttpApiCorsConfiguration": {
-      "title": "HttpApiCorsConfiguration",
+    "CorsConfiguration": {
+      "title": "CorsConfiguration",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3308,8 +3801,8 @@
       },
       "additionalProperties": false
     },
-    "HttpApiDefinitionUri": {
-      "title": "HttpApiDefinitionUri",
+    "DefinitionUri": {
+      "title": "DefinitionUri",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3332,8 +3825,8 @@
       ],
       "additionalProperties": false
     },
-    "HttpApiDomainRoute53": {
-      "title": "HttpApiDomainRoute53",
+    "samtranslator__schema__aws_serverless_httpapi__Route53": {
+      "title": "Route53",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3356,8 +3849,8 @@
       },
       "additionalProperties": false
     },
-    "HttpApiDomain": {
-      "title": "HttpApiDomain",
+    "samtranslator__schema__aws_serverless_httpapi__Domain": {
+      "title": "Domain",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3395,7 +3888,7 @@
           "title": "Ownershipverificationcertificatearn"
         },
         "Route53": {
-          "$ref": "#/definitions/HttpApiDomainRoute53"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Route53"
         },
         "SecurityPolicy": {
           "title": "Securitypolicy"
@@ -3403,8 +3896,8 @@
       },
       "additionalProperties": false
     },
-    "HttpApiProperties": {
-      "title": "HttpApiProperties",
+    "samtranslator__schema__aws_serverless_httpapi__Properties": {
+      "title": "Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3412,7 +3905,7 @@
           "title": "Accesslogsettings"
         },
         "Auth": {
-          "$ref": "#/definitions/HttpApiAuth"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Auth"
         },
         "CorsConfiguration": {
           "title": "Corsconfiguration",
@@ -3421,7 +3914,7 @@
               "type": "object"
             },
             {
-              "$ref": "#/definitions/HttpApiCorsConfiguration"
+              "$ref": "#/definitions/CorsConfiguration"
             }
           ]
         },
@@ -3439,7 +3932,7 @@
               "type": "string"
             },
             {
-              "$ref": "#/definitions/HttpApiDefinitionUri"
+              "$ref": "#/definitions/DefinitionUri"
             }
           ]
         },
@@ -3451,7 +3944,7 @@
           "title": "Disableexecuteapiendpoint"
         },
         "Domain": {
-          "$ref": "#/definitions/HttpApiDomain"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Domain"
         },
         "FailOnWarnings": {
           "title": "Failonwarnings"
@@ -3475,8 +3968,8 @@
       },
       "additionalProperties": false
     },
-    "AwsServerlessHttpApi": {
-      "title": "AwsServerlessHttpApi",
+    "samtranslator__schema__aws_serverless_httpapi__Resource": {
+      "title": "Resource",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3488,7 +3981,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/HttpApiProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Properties"
         },
         "Metadata": {
           "title": "Metadata"
@@ -3502,8 +3995,8 @@
       ],
       "additionalProperties": false
     },
-    "ApplicationLocation": {
-      "title": "ApplicationLocation",
+    "Location": {
+      "title": "Location",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3536,8 +4029,8 @@
       ],
       "additionalProperties": false
     },
-    "ApplicationProperties": {
-      "title": "ApplicationProperties",
+    "samtranslator__schema__aws_serverless_application__Properties": {
+      "title": "Properties",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3548,7 +4041,7 @@
               "type": "string"
             },
             {
-              "$ref": "#/definitions/ApplicationLocation"
+              "$ref": "#/definitions/Location"
             }
           ]
         },
@@ -3571,8 +4064,8 @@
       ],
       "additionalProperties": false
     },
-    "AwsServerlessApplication": {
-      "title": "AwsServerlessApplication",
+    "samtranslator__schema__aws_serverless_application__Resource": {
+      "title": "Resource",
       "description": "By default strict\nhttps://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally",
       "type": "object",
       "properties": {
@@ -3584,7 +4077,7 @@
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/ApplicationProperties"
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_application__Properties"
         },
         "Condition": {
           "title": "Condition"
@@ -3596,8 +4089,8 @@
       ],
       "additionalProperties": false
     },
-    "AnyNonServerlessResource": {
-      "title": "AnyNonServerlessResource",
+    "samtranslator__schema__any_cfn_resource__Resource": {
+      "title": "Resource",
       "type": "object",
       "properties": {
         "Type": {
