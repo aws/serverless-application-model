@@ -964,8 +964,6 @@ class ApiGenerator(object):
                 sam_expect(
                     response_parameters, self.logical_id, f"GatewayResponses.{response_type}.ResponseParameters"
                 ).to_be_a_map()
-            if response_templates:
-                sam_expect(response_templates, self.logical_id, f"GatewayResponses.{response_type}.ResponseTemplates")
             gateway_responses[response_type] = ApiGatewayResponse(
                 api_logical_id=self.logical_id,
                 response_parameters=response_parameters,
@@ -1037,13 +1035,12 @@ class ApiGenerator(object):
                 del definition_body["securityDefinitions"]
             if definition_body.get("definitions"):
                 components = definition_body.get("components", Py27Dict())
-                # the follow lines to check if components is None
+                # the following line to check if components is None
                 # is copied from the previous if...
                 # In the previous line, the default value `Py27Dict()` will be only returned only if `components`
                 # property is not in definition_body dict, but if it exist, and its value is None, so None will be
                 # returned and not the default value. That is why the below line is required.
                 components = components if components else Py27Dict()
-                components["securitySchemes"] = definition_body["securityDefinitions"]
                 components["schemas"] = definition_body["definitions"]
                 definition_body["components"] = components
                 del definition_body["definitions"]
