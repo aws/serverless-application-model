@@ -23,6 +23,7 @@ def get_docs_prop(field: str) -> Any:
     docs = _DOCS["docs"]["properties"][field]
     return Field(
         description=docs,
+        # https://code.visualstudio.com/docs/languages/json#_use-rich-formatting-in-hovers
         markdownDescription=docs,
     )
 
