@@ -83,7 +83,8 @@ Resources:
       Source:
         Id: MyApiGateway
       Destination:
-        Id: MyServerlessFunction
+        - Id: MyServerlessFunction
+        - Id: MyFunction
       Permissions:
       - Write
 
