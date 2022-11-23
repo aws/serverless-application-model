@@ -6,6 +6,7 @@ from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.types import is_type, one_of, is_str, list_of
 from samtranslator.model.intrinsics import ref, fnSub
+from samtranslator.schema.common import PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
@@ -123,10 +124,11 @@ class ApiGatewayResponse(object):
         self,
         api_logical_id: str,
         response_parameters: Optional[Dict[str, Any]] = None,
-        response_templates: Optional[Dict[str, Any]] = None,
+        response_templates: Optional[PassThrough] = None,
         status_code: Optional[str] = None,
     ) -> None:
         if response_parameters:
+            # response_parameters has been validated in ApiGenerator._add_gateway_responses()
             for response_parameter_key in response_parameters.keys():
                 if response_parameter_key not in ApiGatewayResponse.ResponseParameterProperties:
                     raise InvalidResourceException(

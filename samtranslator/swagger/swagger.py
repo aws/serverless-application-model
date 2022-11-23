@@ -67,7 +67,7 @@ class SwaggerEditor(object):
         # so we don't need to validate wherever we use them.
         for path in self.iter_on_path():
             for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
-                SwaggerEditor.validate_path_item_is_dict(path_item, path)  # type: ignore[no-untyped-call]
+                SwaggerEditor.validate_path_item_is_dict(path_item, path)
 
     def get_conditional_contents(self, item):  # type: ignore[no-untyped-def]
         """
@@ -1368,7 +1368,7 @@ class SwaggerEditor(object):
             raise InvalidDocumentException([InvalidTemplateException(exception_message)])
 
     @staticmethod
-    def validate_path_item_is_dict(path_item, path):  # type: ignore[no-untyped-def]
+    def validate_path_item_is_dict(path_item: Any, path: str) -> None:
         """
         Throws exception if path_item is not a dict
 
