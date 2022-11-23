@@ -212,12 +212,81 @@
       },
       "additionalProperties": false
     },
+    "EventInvokeOnFailure": {
+      "title": "EventInvokeOnFailure",
+      "type": "object",
+      "properties": {
+        "Destination": {
+          "title": "Destination",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SQS",
+            "SNS",
+            "Lambda",
+            "EventBridge"
+          ],
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EventInvokeOnSuccess": {
+      "title": "EventInvokeOnSuccess",
+      "type": "object",
+      "properties": {
+        "Destination": {
+          "title": "Destination",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SQS",
+            "SNS",
+            "Lambda",
+            "EventBridge"
+          ],
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EventInvokeDestinationConfig": {
+      "title": "EventInvokeDestinationConfig",
+      "type": "object",
+      "properties": {
+        "OnFailure": {
+          "$ref": "#/definitions/EventInvokeOnFailure"
+        },
+        "OnSuccess": {
+          "$ref": "#/definitions/EventInvokeOnSuccess"
+        }
+      },
+      "additionalProperties": false
+    },
     "EventInvokeConfig": {
       "title": "EventInvokeConfig",
       "type": "object",
       "properties": {
         "DestinationConfig": {
-          "title": "Destinationconfig"
+          "$ref": "#/definitions/EventInvokeDestinationConfig"
         },
         "MaximumEventAgeInSeconds": {
           "title": "Maximumeventageinseconds",
@@ -285,6 +354,10 @@
           "title": "Tracing",
           "anyOf": [
             {
+              "enum": [
+                "Active",
+                "PassThrough"
+              ],
               "type": "string"
             },
             {
@@ -449,7 +522,6 @@
         "FunctionPayloadType": {
           "title": "Functionpayloadtype",
           "enum": [
-            "REQUEST",
             "TOKEN"
           ],
           "type": "string"
@@ -538,8 +610,7 @@
         "FunctionPayloadType": {
           "title": "Functionpayloadtype",
           "enum": [
-            "REQUEST",
-            "TOKEN"
+            "REQUEST"
           ],
           "type": "string"
         },
@@ -2152,6 +2223,16 @@
       ],
       "additionalProperties": false
     },
+    "EventBridgeRuleTarget": {
+      "title": "EventBridgeRuleTarget",
+      "type": "object",
+      "properties": {
+        "Id": {
+          "title": "Id"
+        }
+      },
+      "additionalProperties": false
+    },
     "samtranslator__schema__aws_serverless_function__EventBridgeRuleEventProperties": {
       "title": "EventBridgeRuleEventProperties",
       "type": "object",
@@ -2175,7 +2256,7 @@
           "title": "Retrypolicy"
         },
         "Target": {
-          "title": "Target"
+          "$ref": "#/definitions/EventBridgeRuleTarget"
         }
       },
       "additionalProperties": false
@@ -2858,6 +2939,10 @@
           "title": "Tracing",
           "anyOf": [
             {
+              "enum": [
+                "Active",
+                "PassThrough"
+              ],
               "type": "string"
             },
             {
@@ -3641,6 +3726,35 @@
       ],
       "additionalProperties": false
     },
+    "samtranslator__schema__aws_serverless_api__DefinitionUri": {
+      "title": "DefinitionUri",
+      "type": "object",
+      "properties": {
+        "Bucket": {
+          "title": "Bucket"
+        },
+        "Key": {
+          "title": "Key"
+        },
+        "Version": {
+          "title": "Version"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EndpointConfiguration": {
+      "title": "EndpointConfiguration",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type"
+        },
+        "VPCEndpointIds": {
+          "title": "Vpcendpointids"
+        }
+      },
+      "additionalProperties": false
+    },
     "samtranslator__schema__aws_serverless_api__Properties": {
       "title": "Properties",
       "type": "object",
@@ -3681,10 +3795,19 @@
           ]
         },
         "DefinitionBody": {
-          "title": "Definitionbody"
+          "title": "Definitionbody",
+          "type": "object"
         },
         "DefinitionUri": {
-          "title": "Definitionuri"
+          "title": "Definitionuri",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__DefinitionUri"
+            }
+          ]
         },
         "Description": {
           "title": "Description"
@@ -3696,7 +3819,15 @@
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Domain"
         },
         "EndpointConfiguration": {
-          "title": "Endpointconfiguration"
+          "title": "Endpointconfiguration",
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "#/definitions/EndpointConfiguration"
+            }
+          ]
         },
         "FailOnWarnings": {
           "title": "Failonwarnings"
@@ -3744,7 +3875,8 @@
           ]
         },
         "Tags": {
-          "title": "Tags"
+          "title": "Tags",
+          "type": "object"
         },
         "TracingEnabled": {
           "title": "Tracingenabled"
@@ -3797,7 +3929,7 @@
       ],
       "additionalProperties": false
     },
-    "DefinitionUri": {
+    "samtranslator__schema__aws_serverless_httpapi__DefinitionUri": {
       "title": "DefinitionUri",
       "type": "object",
       "properties": {
@@ -3847,7 +3979,7 @@
               "type": "string"
             },
             {
-              "$ref": "#/definitions/DefinitionUri"
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__DefinitionUri"
             }
           ]
         },

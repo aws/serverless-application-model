@@ -51,8 +51,23 @@ class DeadLetterQueue(BaseModel):
     Type: Literal["SNS", "SQS"]
 
 
+class EventInvokeOnFailure(BaseModel):
+    Destination: Optional[Union[str, SamIntrinsic]]
+    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]]
+
+
+class EventInvokeOnSuccess(BaseModel):
+    Destination: Optional[Union[str, SamIntrinsic]]
+    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]]
+
+
+class EventInvokeDestinationConfig(BaseModel):
+    OnFailure: Optional[EventInvokeOnFailure]
+    OnSuccess: Optional[EventInvokeOnSuccess]
+
+
 class EventInvokeConfig(BaseModel):
-    DestinationConfig: Optional[PassThrough]
+    DestinationConfig: Optional[EventInvokeDestinationConfig]
     MaximumEventAgeInSeconds: Optional[int]
     MaximumRetryAttempts: Optional[int]
 
@@ -218,6 +233,10 @@ class ScheduleEvent(BaseModel):
     Properties: EventsScheduleProperties
 
 
+class EventBridgeRuleTarget(BaseModel):
+    Id: PassThrough
+
+
 class EventBridgeRuleEventProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig]
     EventBusName: Optional[PassThrough]
@@ -225,7 +244,7 @@ class EventBridgeRuleEventProperties(BaseModel):
     InputPath: Optional[PassThrough]
     Pattern: PassThrough
     RetryPolicy: Optional[PassThrough]
-    Target: Optional[PassThrough]
+    Target: Optional[EventBridgeRuleTarget]
 
 
 class EventBridgeRuleEvent(BaseModel):
@@ -372,7 +391,7 @@ Timeout = Optional[PassThrough]
 VpcConfig = Optional[PassThrough]
 Environment = Optional[PassThrough]
 Tags = Optional[Dict[str, Any]]
-Tracing = Optional[Union[str, SamIntrinsic]]
+Tracing = Optional[Union[Literal["Active", "PassThrough"], SamIntrinsic]]
 KmsKeyArn = Optional[PassThrough]
 Layers = Optional[PassThrough]
 AutoPublishAlias = Optional[Union[str, SamIntrinsic]]
