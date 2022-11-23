@@ -1073,25 +1073,27 @@ class ApiGenerator(object):
                                     "dictionary according to Swagger spec.".format(path),
                                 )
                                 response_200 = field_val.get("200")
-                                if response_200:
-                                    SwaggerEditor.validate_is_dict(
-                                        response_200,
-                                        "Value of responses.200 in options method for path {} must be a "
-                                        "dictionary according to Swagger spec.".format(path),
-                                    )
-                                    response_200_headers = response_200.get("headers")
-                                    if response_200_headers:
-                                        SwaggerEditor.validate_is_dict(
-                                            response_200_headers,
-                                            "Value of response's headers in options method for path {} must be a "
-                                            "dictionary according to Swagger spec.".format(path),
-                                        )
-                                        for header, header_val in response_200_headers.items():
-                                            new_header_val_with_schema = Py27Dict()
-                                            new_header_val_with_schema["schema"] = header_val
-                                            definition_body["paths"][path]["options"][field]["200"]["headers"][
-                                                header
-                                            ] = new_header_val_with_schema
+                                if not response_200:
+                                    continue
+                                SwaggerEditor.validate_is_dict(
+                                    response_200,
+                                    "Value of responses.200 in options method for path {} must be a "
+                                    "dictionary according to Swagger spec.".format(path),
+                                )
+                                response_200_headers = response_200.get("headers")
+                                if not response_200_headers:
+                                    continue
+                                SwaggerEditor.validate_is_dict(
+                                    response_200_headers,
+                                    "Value of response's headers in options method for path {} must be a "
+                                    "dictionary according to Swagger spec.".format(path),
+                                )
+                                for header, header_val in response_200_headers.items():
+                                    new_header_val_with_schema = Py27Dict()
+                                    new_header_val_with_schema["schema"] = header_val
+                                    definition_body["paths"][path]["options"][field]["200"]["headers"][
+                                        header
+                                    ] = new_header_val_with_schema
 
         return definition_body
 
