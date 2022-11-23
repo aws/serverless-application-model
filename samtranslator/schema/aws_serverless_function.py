@@ -50,14 +50,15 @@ class DeadLetterQueue(BaseModel):
     TargetArn: str
     Type: Literal["SNS", "SQS"]
 
+
 class EventInvokeOnFailure(BaseModel):
     Destination: Optional[Union[str, SamIntrinsic]]
-    Type: Optional[Literal['SQS', 'SNS', 'Lambda', "EventBridge"]]
+    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]]
 
 
 class EventInvokeOnSuccess(BaseModel):
     Destination: Optional[Union[str, SamIntrinsic]]
-    Type: Optional[Literal['SQS', 'SNS', 'Lambda', "EventBridge"]]
+    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]]
 
 
 class EventInvokeDestinationConfig(BaseModel):
@@ -390,7 +391,7 @@ Timeout = Optional[PassThrough]
 VpcConfig = Optional[PassThrough]
 Environment = Optional[PassThrough]
 Tags = Optional[Dict[str, Any]]
-Tracing = Optional[Union[Literal['Active', 'PassThrough'], SamIntrinsic]]
+Tracing = Optional[Union[Literal["Active", "PassThrough"], SamIntrinsic]]
 KmsKeyArn = Optional[PassThrough]
 Layers = Optional[PassThrough]
 AutoPublishAlias = Optional[Union[str, SamIntrinsic]]

@@ -129,7 +129,6 @@ class EndpointConfiguration(BaseModel):
     VPCEndpointIds: Optional[PassThrough]
 
 
-
 Name = Optional[PassThrough]
 DefinitionUriType = Optional[Union[str, DefinitionUri]]
 CacheClusterEnabled = Optional[PassThrough]
