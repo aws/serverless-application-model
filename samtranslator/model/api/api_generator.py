@@ -957,10 +957,17 @@ class ApiGenerator(object):
         # The dicts below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
         gateway_responses = Py27Dict()
         for response_type, response in self.gateway_responses.items():
+            sam_expect(response, self.logical_id, f"GatewayResponses.{response_type}").to_be_a_map()
+            response_parameters = response.get("ResponseParameters", Py27Dict())
+            response_templates = response.get("ResponseTemplates", Py27Dict())
+            if response_parameters:
+                sam_expect(
+                    response_parameters, self.logical_id, f"GatewayResponses.{response_type}.ResponseParameters"
+                ).to_be_a_map()
             gateway_responses[response_type] = ApiGatewayResponse(
                 api_logical_id=self.logical_id,
-                response_parameters=response.get("ResponseParameters", Py27Dict()),
-                response_templates=response.get("ResponseTemplates", Py27Dict()),
+                response_parameters=response_parameters,
+                response_templates=response_templates,
                 status_code=response.get("StatusCode", None),
             )
 
@@ -1028,6 +1035,12 @@ class ApiGenerator(object):
                 del definition_body["securityDefinitions"]
             if definition_body.get("definitions"):
                 components = definition_body.get("components", Py27Dict())
+                # the following line to check if components is None
+                # is copied from the previous if...
+                # In the previous line, the default value `Py27Dict()` will be only returned only if `components`
+                # property is not in definition_body dict, but if it exist, and its value is None, so None will be
+                # returned and not the default value. That is why the below line is required.
+                components = components if components else Py27Dict()
                 components["schemas"] = definition_body["definitions"]
                 definition_body["components"] = components
                 del definition_body["definitions"]
@@ -1035,9 +1048,18 @@ class ApiGenerator(object):
             # adds `schema` for the headers in responses for openapi3
             paths = definition_body.get("paths")
             if paths:
+                SwaggerEditor.validate_is_dict(
+                    paths,
+                    "Value of paths must be a dictionary according to Swagger spec.",
+                )
                 for path, path_item in paths.items():
-                    SwaggerEditor.validate_path_item_is_dict(path_item, path)  # type: ignore[no-untyped-call]
+                    SwaggerEditor.validate_path_item_is_dict(path_item, path)
                     if path_item.get("options"):
+                        SwaggerEditor.validate_is_dict(
+                            path_item.get("options"),
+                            "Value of options method for path {} must be a "
+                            "dictionary according to Swagger spec.".format(path),
+                        )
                         options = path_item.get("options").copy()
                         for field, field_val in options.items():
                             # remove unsupported produces and consumes in options for openapi3
@@ -1050,19 +1072,28 @@ class ApiGenerator(object):
                                     "Value of responses in options method for path {} must be a "
                                     "dictionary according to Swagger spec.".format(path),
                                 )
-                                if field_val.get("200") and field_val.get("200").get("headers"):
-                                    headers = field_val["200"]["headers"]
-                                    SwaggerEditor.validate_is_dict(
-                                        headers,
-                                        "Value of response's headers in options method for path {} must be a "
-                                        "dictionary according to Swagger spec.".format(path),
-                                    )
-                                    for header, header_val in headers.items():
-                                        new_header_val_with_schema = Py27Dict()
-                                        new_header_val_with_schema["schema"] = header_val
-                                        definition_body["paths"][path]["options"][field]["200"]["headers"][
-                                            header
-                                        ] = new_header_val_with_schema
+                                response_200 = field_val.get("200")
+                                if not response_200:
+                                    continue
+                                SwaggerEditor.validate_is_dict(
+                                    response_200,
+                                    "Value of responses.200 in options method for path {} must be a "
+                                    "dictionary according to Swagger spec.".format(path),
+                                )
+                                response_200_headers = response_200.get("headers")
+                                if not response_200_headers:
+                                    continue
+                                SwaggerEditor.validate_is_dict(
+                                    response_200_headers,
+                                    "Value of response's headers in options method for path {} must be a "
+                                    "dictionary according to Swagger spec.".format(path),
+                                )
+                                for header, header_val in response_200_headers.items():
+                                    new_header_val_with_schema = Py27Dict()
+                                    new_header_val_with_schema["schema"] = header_val
+                                    definition_body["paths"][path]["options"][field]["200"]["headers"][
+                                        header
+                                    ] = new_header_val_with_schema
 
         return definition_body
 
