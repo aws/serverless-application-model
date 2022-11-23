@@ -1792,7 +1792,7 @@ class SamConnector(SamResourceMacro):
             multi_dest = False
             self.Destination = [self.Destination]
 
-        generated_resources: List[Resource] = []
+        list_generated_resources: List[Resource] = []
 
         for index, dest in enumerate(self.Destination):
             try:
@@ -1858,6 +1858,8 @@ class SamConnector(SamResourceMacro):
 
             verify_profile_variables_replaced(profile_properties)
 
+            generated_resources: List[Resource] = []
+
             if profile_type == "AWS_IAM_ROLE_MANAGED_POLICY":
                 generated_resources.append(
                     self._construct_iam_policy(
@@ -1878,12 +1880,13 @@ class SamConnector(SamResourceMacro):
                 )
 
             self._add_connector_metadata(generated_resources, original_template, source, destination)
+            list_generated_resources.extend(generated_resources)
 
-        generated_logical_ids = [resource.logical_id for resource in generated_resources]
+        generated_logical_ids = [resource.logical_id for resource in list_generated_resources]
         replace_depends_on_logical_id(self.logical_id, generated_logical_ids, resource_resolver)
 
-        if generated_resources:
-            return generated_resources
+        if list_generated_resources:
+            return list_generated_resources
 
         # Should support all profile types
         raise TypeError(f"Unknown profile policy type '{profile_type}'")

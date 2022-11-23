@@ -4,33 +4,6 @@ Resources:
     Properties:
       StageName: Prod
 
-  MyHttpApi:
-    Type: AWS::Serverless::HttpApi
-    Properties:
-      StageName: Prod
-
-  MyApiGateway:
-    Type: AWS::ApiGateway::RestApi
-    Properties:
-      Description: A test API
-      Name: MyRestAPI
-
-  MyApiGatewayRootMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      AuthorizationType: NONE
-      HttpMethod: POST
-      Integration:
-        Type: MOCK
-      ResourceId: !GetAtt MyApiGateway.RootResourceId
-      RestApiId: !Ref MyApiGateway
-
-  MyApiGatewayV2:
-    Type: AWS::ApiGatewayV2::Api
-    Properties:
-      Name: MyApi
-      ProtocolType: WEBSOCKET
-
   MyServerlessFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -73,36 +46,7 @@ Resources:
       Source:
         Id: MyServerlessApi
       Destination:
-        Id: MyFunction
-      Permissions:
-      - Write
-
-  MyConnectorApigwToLambda:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: MyApiGateway
-      Destination:
-        Id: MyServerlessFunction
-      Permissions:
-      - Write
-
-  MyConnectorApiV2ToLambda:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: MyApiGatewayV2
-      Destination:
-        Id: MyServerlessFunction
-      Permissions:
-      - Write
-
-  MyConnectorServerlessHttpApiToLambda:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: MyHttpApi
-      Destination:
-        Id: MyFunction
+      - Id: MyFunction
+      - Id: MyServerlessFunction
       Permissions:
       - Write
