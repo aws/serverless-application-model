@@ -48,6 +48,7 @@ SKIPPED_TESTS = [
     "api_with_cors_and_only_headers",  # 'AllowOrigins' is required field
     "api_with_cors_and_only_methods",  # 'AllowOrigins' is required field
     "implicit_api_with_auth_and_conditions_max",  # 'UserPoolArn' expects to be a string, but received list
+    "success_complete_api",  # 'DefinitionBody` expects JSON, but string inputted
 ]
 
 
