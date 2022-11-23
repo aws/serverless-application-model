@@ -1,5 +1,5 @@
 import copy
-from typing import cast, Any, List
+from typing import Optional, cast, Any, List
 
 
 def as_array(x: Any) -> List[Any]:
@@ -21,3 +21,27 @@ def insert_unique(xs: Any, vs: Any) -> List[Any]:
             xs.append(v)
 
     return cast(List[Any], xs)  # mypy doesn't recognize it
+
+
+class InvalidValueType(Exception):
+    def __init__(self, relative_path: str) -> None:
+        self.relative_path = relative_path
+
+    def full_path(self, path_prefix: str) -> str:
+        if not self.relative_path:
+            return path_prefix
+        return path_prefix + "." + self.relative_path
+
+
+def dict_deep_get(d: Any, path: str) -> Optional[Any]:
+    relative_path = ""
+    _path_nodes = path.split(".")
+    while _path_nodes:
+        if d is None:
+            return None
+        if not isinstance(d, dict):
+            raise InvalidValueType(relative_path)
+        d = d.get(_path_nodes[0])
+        relative_path = (relative_path + f".{_path_nodes[0]}").lstrip(".")
+        _path_nodes = _path_nodes[1:]
+    return d
