@@ -1285,7 +1285,18 @@
           "$ref": "#/definitions/ResourceReference"
         },
         "Destination": {
-          "$ref": "#/definitions/ResourceReference"
+          "title": "Destination",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ResourceReference"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ResourceReference"
+              }
+            }
+          ]
         },
         "Permissions": {
           "title": "Permissions",
