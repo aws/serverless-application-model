@@ -21,8 +21,8 @@ LenientBaseModel = pydantic.BaseModel
 _DOCS = json.loads(Path("samtranslator", "schema", "docs.json").read_text())
 
 
-def get_docs_prop(field: str) -> Any:
-    docs = _DOCS["properties"][field]
+def get_docs_prop(stem: str, name: str) -> Any:
+    docs = _DOCS["properties"][stem][name]
     return Field(
         description=docs,
         # https://code.visualstudio.com/docs/languages/json#_use-rich-formatting-in-hovers
