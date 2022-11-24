@@ -3,9 +3,10 @@
 import argparse
 import json
 from pathlib import Path
+from typing import Iterator, Tuple, Dict
 
 
-def parse(s: str):
+def parse(s: str) -> Iterator[Tuple[str, str]]:
     parts = s.split("\n\n")
     for part in parts:
         if part.startswith(" `"):
@@ -13,12 +14,12 @@ def parse(s: str):
             yield name, part.strip()
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", type=Path)
     args = parser.parse_args()
 
-    props = {}
+    props: Dict[str, Dict[str, str]] = {}
     for path in args.dir.glob("*.md"):
         props[path.stem] = {}
         for name, description in parse(path.read_text()):
