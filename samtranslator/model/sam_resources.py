@@ -1903,7 +1903,6 @@ class SamConnector(SamResourceMacro):
         if list_generated_resources:
             return list_generated_resources
 
-        # Should support all profile types
         raise TypeError("The destination is empty")
 
     def _get_policy_statements(self, profile: ConnectorProfile) -> Dict[str, Any]:
