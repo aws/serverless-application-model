@@ -7,77 +7,113 @@ from typing_extensions import Literal
 from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_docs_prop
 
 
-def prop(field: str) -> Any:
-    return get_docs_prop("sam-resource-function", field)
+def resourcepolicy(name: str) -> Any:
+    return get_docs_prop("sam-property-api-resourcepolicystatement", name)
 
 
 class ResourcePolicy(BaseModel):
-    AwsAccountBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
-    AwsAccountWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
-    CustomStatements: Optional[List[Union[str, Dict[str, Any]]]]
-    IntrinsicVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
-    IntrinsicVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
-    IntrinsicVpceBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
-    IntrinsicVpceWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
-    IpRangeBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
-    IpRangeWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
-    SourceVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
-    SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
+    AwsAccountBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountBlacklist")
+    AwsAccountWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountWhitelist")
+    CustomStatements: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("CustomStatements")
+    IntrinsicVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcBlacklist")
+    IntrinsicVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcWhitelist")
+    IntrinsicVpceBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceBlacklist")
+    IntrinsicVpceWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceWhitelist")
+    IpRangeBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeBlacklist")
+    IpRangeWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeWhitelist")
+    SourceVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcBlacklist")
+    SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcWhitelist")
+
+
+def codeuri(name: str) -> Any:
+    return get_docs_prop("sam-property-function-functioncode", name)
 
 
 class CodeUri(BaseModel):
-    Bucket: SamIntrinsicable[str]
-    Key: SamIntrinsicable[str]
-    Version: Optional[SamIntrinsicable[str]]
+    Bucket: SamIntrinsicable[str] = codeuri("Bucket")
+    Key: SamIntrinsicable[str] = codeuri("Key")
+    Version: Optional[SamIntrinsicable[str]] = codeuri("Version")
+
+
+def hooks(name: str) -> Any:
+    return get_docs_prop("sam-property-function-hooks", name)
 
 
 class Hooks(BaseModel):
-    PostTraffic: Optional[SamIntrinsicable[str]]
-    PreTraffic: Optional[SamIntrinsicable[str]]
+    PostTraffic: Optional[SamIntrinsicable[str]] = hooks("PostTraffic")
+    PreTraffic: Optional[SamIntrinsicable[str]] = hooks("PreTraffic")
+
+
+def deploymentpreference(name: str) -> Any:
+    return get_docs_prop("sam-property-function-deploymentpreference", name)
 
 
 class DeploymentPreference(BaseModel):
-    Alarms: Optional[SamIntrinsicable[List[Dict[str, Any]]]]
-    Enabled: Optional[SamIntrinsicable[bool]]
-    Hooks: Optional[Hooks]
-    PassthroughCondition: Optional[SamIntrinsicable[bool]]
-    Role: Optional[SamIntrinsicable[str]]
-    TriggerConfigurations: Optional[PassThrough]
-    Type: Optional[
-        SamIntrinsicable[str]
-    ]  # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field.
+    Alarms: Optional[SamIntrinsicable[List[Dict[str, Any]]]] = deploymentpreference("Alarms")
+    Enabled: Optional[SamIntrinsicable[bool]] = deploymentpreference("Enabled")
+    Hooks: Optional[Hooks] = deploymentpreference("Hooks")
+    PassthroughCondition: Optional[SamIntrinsicable[bool]] = deploymentpreference("PassthroughCondition")
+    Role: Optional[SamIntrinsicable[str]] = deploymentpreference("Role")
+    TriggerConfigurations: Optional[PassThrough] = deploymentpreference("TriggerConfigurations")
+    Type: Optional[SamIntrinsicable[str]] = deploymentpreference(
+        "Type"
+    )  # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field.
+
+
+def dlq(name: str) -> Any:
+    return get_docs_prop("sam-property-function-deadletterqueue", name)
 
 
 class DeadLetterQueue(BaseModel):
-    TargetArn: str
-    Type: Literal["SNS", "SQS"]
+    TargetArn: str = dlq("TargetArn")
+    Type: Literal["SNS", "SQS"] = dlq("Type")
+
+
+def eventinvokeonfailure(name: str) -> Any:
+    return get_docs_prop("sam-property-function-onfailure", name)
 
 
 class EventInvokeOnFailure(BaseModel):
-    Destination: Optional[SamIntrinsicable[str]]
-    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]]
+    Destination: Optional[SamIntrinsicable[str]] = eventinvokeonfailure("Destination")
+    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]] = eventinvokeonfailure("Type")
+
+
+def eventinvokeonsuccess(name: str) -> Any:
+    return get_docs_prop("sam-property-function-onsuccess", name)
 
 
 class EventInvokeOnSuccess(BaseModel):
-    Destination: Optional[SamIntrinsicable[str]]
-    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]]
+    Destination: Optional[SamIntrinsicable[str]] = eventinvokeonsuccess("Destination")
+    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]] = eventinvokeonsuccess("Type")
+
+
+def eventinvokedestinationconfig(name: str) -> Any:
+    return get_docs_prop("sam-property-function-eventinvokedestinationconfiguration", name)
 
 
 class EventInvokeDestinationConfig(BaseModel):
-    OnFailure: Optional[EventInvokeOnFailure]
-    OnSuccess: Optional[EventInvokeOnSuccess]
+    OnFailure: Optional[EventInvokeOnFailure] = eventinvokedestinationconfig("OnFailure")
+    OnSuccess: Optional[EventInvokeOnSuccess] = eventinvokedestinationconfig("OnSuccess")
+
+
+def eventinvokeconfig(name: str) -> Any:
+    return get_docs_prop("sam-property-function-eventinvokeconfiguration", name)
 
 
 class EventInvokeConfig(BaseModel):
-    DestinationConfig: Optional[EventInvokeDestinationConfig]
-    MaximumEventAgeInSeconds: Optional[int]
-    MaximumRetryAttempts: Optional[int]
+    DestinationConfig: Optional[EventInvokeDestinationConfig] = eventinvokeconfig("DestinationConfig")
+    MaximumEventAgeInSeconds: Optional[int] = eventinvokeconfig("MaximumEventAgeInSeconds")
+    MaximumRetryAttempts: Optional[int] = eventinvokeconfig("MaximumRetryAttempts")
+
+
+def s3eventproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-s3", name)
 
 
 class S3EventProperties(BaseModel):
-    Bucket: SamIntrinsicable[str]
-    Events: PassThrough
-    Filter: Optional[PassThrough]
+    Bucket: SamIntrinsicable[str] = s3eventproperties("Bucket")
+    Events: PassThrough = s3eventproperties("Events")
+    Filter: Optional[PassThrough] = s3eventproperties("Filter")
 
 
 class S3Event(BaseModel):
@@ -85,19 +121,27 @@ class S3Event(BaseModel):
     Type: Literal["S3"]
 
 
+def sqssubscription(name: str) -> Any:
+    return get_docs_prop("sam-property-function-sqssubscriptionobject", name)
+
+
 class SqsSubscription(BaseModel):
-    BatchSize: Optional[SamIntrinsicable[str]]
-    Enabled: Optional[bool]
-    QueueArn: SamIntrinsicable[str]
-    QueuePolicyLogicalId: Optional[str]
-    QueueUrl: SamIntrinsicable[str]
+    BatchSize: Optional[SamIntrinsicable[str]] = sqssubscription("BatchSize")
+    Enabled: Optional[bool] = sqssubscription("Enabled")
+    QueueArn: SamIntrinsicable[str] = sqssubscription("QueueArn")
+    QueuePolicyLogicalId: Optional[str] = sqssubscription("QueuePolicyLogicalId")
+    QueueUrl: SamIntrinsicable[str] = sqssubscription("QueueUrl")
+
+
+def snseventproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-sns", name)
 
 
 class SNSEventProperties(BaseModel):
-    FilterPolicy: Optional[PassThrough]
-    Region: Optional[PassThrough]
-    SqsSubscription: Optional[Union[bool, SqsSubscription]]
-    Topic: PassThrough
+    FilterPolicy: Optional[PassThrough] = snseventproperties("FilterPolicy")
+    Region: Optional[PassThrough] = snseventproperties("Region")
+    SqsSubscription: Optional[Union[bool, SqsSubscription]] = snseventproperties("SqsSubscription")
+    Topic: PassThrough = snseventproperties("Topic")
 
 
 class SNSEvent(BaseModel):
@@ -185,13 +229,17 @@ class RequestParameters(BaseModel):
     Required: Optional[bool]
 
 
+def apieventproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-api", name)
+
+
 class ApiEventProperties(BaseModel):
-    Auth: Optional[ApiAuth]
-    Method: str
-    Path: str
-    RequestModel: Optional[RequestModel]
-    RequestParameters: Optional[Union[str, RequestParameters]]
-    RestApiId: Optional[SamIntrinsicable[str]]
+    Auth: Optional[ApiAuth] = apieventproperties("Auth")
+    Method: str = apieventproperties("Method")
+    Path: str = apieventproperties("Path")
+    RequestModel: Optional[RequestModel] = apieventproperties("RequestModel")
+    RequestParameters: Optional[Union[str, RequestParameters]] = apieventproperties("RequestParameters")
+    RestApiId: Optional[SamIntrinsicable[str]] = apieventproperties("RestApiId")
 
 
 class ApiEvent(BaseModel):
@@ -327,15 +375,19 @@ class MSKEvent(BaseModel):
     Properties: MSKEventProperties
 
 
+def mqeventproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-mq", name)
+
+
 class MQEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough]
-    Broker: PassThrough
-    Enabled: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    MaximumBatchingWindowInSeconds: Optional[PassThrough]
-    Queues: PassThrough
-    SecretsManagerKmsKeyId: Optional[str]
-    SourceAccessConfigurations: PassThrough
+    BatchSize: Optional[PassThrough] = mqeventproperties("BatchSize")
+    Broker: PassThrough = mqeventproperties("Broker")
+    Enabled: Optional[PassThrough] = mqeventproperties("Enabled")
+    FilterCriteria: Optional[PassThrough]  # TODO: Add to docs
+    MaximumBatchingWindowInSeconds: Optional[PassThrough] = mqeventproperties("MaximumBatchingWindowInSeconds")
+    Queues: PassThrough = mqeventproperties("Queues")
+    SecretsManagerKmsKeyId: Optional[str] = mqeventproperties("SecretsManagerKmsKeyId")
+    SourceAccessConfigurations: PassThrough = mqeventproperties("SourceAccessConfigurations")
 
 
 class MQEvent(BaseModel):
@@ -405,6 +457,10 @@ Architectures = Optional[PassThrough]
 EphemeralStorage = Optional[PassThrough]
 
 
+def prop(name: str) -> Any:
+    return get_docs_prop("sam-resource-function", name)
+
+
 class Properties(BaseModel):
     Architectures: Optional[Architectures] = prop("Architectures")
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
@@ -469,14 +525,14 @@ class Properties(BaseModel):
 
 class Globals(BaseModel):
     Handler: Optional[Handler] = prop("Handler")
-    Runtime: Optional[Runtime]
-    CodeUri: Optional[CodeUriType]
-    DeadLetterQueue: Optional[DeadLetterQueueType]
-    Description: Optional[Description]
-    MemorySize: Optional[MemorySize]
-    Timeout: Optional[Timeout]
-    VpcConfig: Optional[VpcConfig]
-    Environment: Optional[Environment]
+    Runtime: Optional[Runtime] = prop("Runtime")
+    CodeUri: Optional[CodeUriType] = prop("CodeUri")
+    DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
+    Description: Optional[Description] = prop("Description")
+    MemorySize: Optional[MemorySize] = prop("MemorySize")
+    Timeout: Optional[Timeout] = prop("Timeout")
+    VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
+    Environment: Optional[Environment] = prop("Environment")
     Tags: Optional[Tags]
     Tracing: Optional[Tracing]
     KmsKeyArn: Optional[KmsKeyArn]
