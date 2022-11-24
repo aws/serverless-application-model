@@ -1902,7 +1902,7 @@ class SamConnector(SamResourceMacro):
         if list_generated_resources:
             return list_generated_resources
 
-        raise TypeError(f"The connector {self.logical_id} doesn't generate any resources")
+        raise InvalidResourceException(self.logical_id, "The destination is an empty list")
 
     def _get_policy_statements(self, profile: ConnectorProfile) -> Dict[str, Any]:
         policy_statements = []
