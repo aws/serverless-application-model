@@ -20,9 +20,9 @@ def main():
 
     props = {}
     for path in args.dir.glob("*.md"):
+        props[path.stem] = {}
         for name, description in parse(path.read_text()):
-            field = f"{path.stem}.{name}"
-            props[field] = description
+            props[path.stem][name] = description
 
     print(
         json.dumps(
