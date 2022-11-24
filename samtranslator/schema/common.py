@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from typing import Any, Dict, Optional, Union, TypeVar
+from functools import partial
 
 import pydantic
 from pydantic import Extra, Field
@@ -21,7 +22,11 @@ LenientBaseModel = pydantic.BaseModel
 _DOCS = json.loads(Path("samtranslator", "schema", "docs.json").read_bytes())
 
 
-def get_docs_prop(stem: str, name: str) -> Any:
+def get_prop(stem: str):
+    return partial(_get_prop, stem)
+
+
+def _get_prop(stem: str, name: str) -> Any:
     docs = _DOCS["properties"][stem][name]
     return Field(
         description=docs,

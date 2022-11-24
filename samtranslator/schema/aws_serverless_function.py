@@ -4,11 +4,33 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_docs_prop
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop
 
 
-def resourcepolicy(name: str) -> Any:
-    return get_docs_prop("sam-property-api-resourcepolicystatement", name)
+alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
+apieventproperties = get_prop("sam-property-function-api")
+cloudwatcheventproperties = get_prop("sam-property-function-cloudwatchevent")
+codeuri = get_prop("sam-property-function-functioncode")
+deadletterconfig = get_prop("sam-property-function-deadletterconfig")
+deploymentpreference = get_prop("sam-property-function-deploymentpreference")
+dlq = get_prop("sam-property-function-deadletterqueue")
+dynamodbeventproperties = get_prop("sam-property-function-dynamodb")
+eventbridgeruleeventproperties = get_prop("sam-property-function-eventbridgerule")
+eventinvokeconfig = get_prop("sam-property-function-eventinvokeconfiguration")
+eventinvokedestinationconfig = get_prop("sam-property-function-eventinvokedestinationconfiguration")
+eventinvokeonfailure = get_prop("sam-property-function-onfailure")
+eventinvokeonsuccess = get_prop("sam-property-function-onsuccess")
+eventsscheduleproperties = get_prop("sam-property-function-schedule")
+functionurlconfig = get_prop("sam-property-function-functionurlconfig")
+hooks = get_prop("sam-property-function-hooks")
+iotruleeventproperties = get_prop("sam-property-function-iotrule")
+kinesiseventproperties = get_prop("sam-property-function-kinesis")
+mqeventproperties = get_prop("sam-property-function-mq")
+prop = get_prop("sam-resource-function")
+resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
+s3eventproperties = get_prop("sam-property-function-s3")
+snseventproperties = get_prop("sam-property-function-sns")
+sqssubscription = get_prop("sam-property-function-sqssubscriptionobject")
 
 
 class ResourcePolicy(BaseModel):
@@ -25,27 +47,15 @@ class ResourcePolicy(BaseModel):
     SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcWhitelist")
 
 
-def codeuri(name: str) -> Any:
-    return get_docs_prop("sam-property-function-functioncode", name)
-
-
 class CodeUri(BaseModel):
     Bucket: SamIntrinsicable[str] = codeuri("Bucket")
     Key: SamIntrinsicable[str] = codeuri("Key")
     Version: Optional[SamIntrinsicable[str]] = codeuri("Version")
 
 
-def hooks(name: str) -> Any:
-    return get_docs_prop("sam-property-function-hooks", name)
-
-
 class Hooks(BaseModel):
     PostTraffic: Optional[SamIntrinsicable[str]] = hooks("PostTraffic")
     PreTraffic: Optional[SamIntrinsicable[str]] = hooks("PreTraffic")
-
-
-def deploymentpreference(name: str) -> Any:
-    return get_docs_prop("sam-property-function-deploymentpreference", name)
 
 
 class DeploymentPreference(BaseModel):
@@ -60,17 +70,9 @@ class DeploymentPreference(BaseModel):
     )  # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field.
 
 
-def dlq(name: str) -> Any:
-    return get_docs_prop("sam-property-function-deadletterqueue", name)
-
-
 class DeadLetterQueue(BaseModel):
     TargetArn: str = dlq("TargetArn")
     Type: Literal["SNS", "SQS"] = dlq("Type")
-
-
-def eventinvokeonfailure(name: str) -> Any:
-    return get_docs_prop("sam-property-function-onfailure", name)
 
 
 class EventInvokeOnFailure(BaseModel):
@@ -78,17 +80,9 @@ class EventInvokeOnFailure(BaseModel):
     Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]] = eventinvokeonfailure("Type")
 
 
-def eventinvokeonsuccess(name: str) -> Any:
-    return get_docs_prop("sam-property-function-onsuccess", name)
-
-
 class EventInvokeOnSuccess(BaseModel):
     Destination: Optional[SamIntrinsicable[str]] = eventinvokeonsuccess("Destination")
     Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]] = eventinvokeonsuccess("Type")
-
-
-def eventinvokedestinationconfig(name: str) -> Any:
-    return get_docs_prop("sam-property-function-eventinvokedestinationconfiguration", name)
 
 
 class EventInvokeDestinationConfig(BaseModel):
@@ -96,18 +90,10 @@ class EventInvokeDestinationConfig(BaseModel):
     OnSuccess: Optional[EventInvokeOnSuccess] = eventinvokedestinationconfig("OnSuccess")
 
 
-def eventinvokeconfig(name: str) -> Any:
-    return get_docs_prop("sam-property-function-eventinvokeconfiguration", name)
-
-
 class EventInvokeConfig(BaseModel):
     DestinationConfig: Optional[EventInvokeDestinationConfig] = eventinvokeconfig("DestinationConfig")
     MaximumEventAgeInSeconds: Optional[int] = eventinvokeconfig("MaximumEventAgeInSeconds")
     MaximumRetryAttempts: Optional[int] = eventinvokeconfig("MaximumRetryAttempts")
-
-
-def s3eventproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-s3", name)
 
 
 class S3EventProperties(BaseModel):
@@ -121,20 +107,12 @@ class S3Event(BaseModel):
     Type: Literal["S3"]
 
 
-def sqssubscription(name: str) -> Any:
-    return get_docs_prop("sam-property-function-sqssubscriptionobject", name)
-
-
 class SqsSubscription(BaseModel):
     BatchSize: Optional[SamIntrinsicable[str]] = sqssubscription("BatchSize")
     Enabled: Optional[bool] = sqssubscription("Enabled")
     QueueArn: SamIntrinsicable[str] = sqssubscription("QueueArn")
     QueuePolicyLogicalId: Optional[str] = sqssubscription("QueuePolicyLogicalId")
     QueueUrl: SamIntrinsicable[str] = sqssubscription("QueueUrl")
-
-
-def snseventproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-sns", name)
 
 
 class SNSEventProperties(BaseModel):
@@ -149,17 +127,9 @@ class SNSEvent(BaseModel):
     Type: Literal["SNS"]
 
 
-def functionurlconfig(name: str) -> Any:
-    return get_docs_prop("sam-property-function-functionurlconfig", name)
-
-
 class FunctionUrlConfig(BaseModel):
     AuthType: SamIntrinsicable[str] = functionurlconfig("AuthType")
     Cors: Optional[PassThrough] = functionurlconfig("Cors")
-
-
-def kinesiseventproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-kinesis", name)
 
 
 class KinesisEventProperties(BaseModel):
@@ -181,10 +151,6 @@ class KinesisEventProperties(BaseModel):
 class KinesisEvent(BaseModel):
     Type: Literal["Kinesis"]
     Properties: KinesisEventProperties
-
-
-def dynamodbeventproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-dynamodb", name)
 
 
 class DynamoDBEventProperties(BaseModel):
@@ -241,10 +207,6 @@ class RequestParameters(BaseModel):
     Required: Optional[bool]
 
 
-def apieventproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-api", name)
-
-
 class ApiEventProperties(BaseModel):
     Auth: Optional[ApiAuth] = apieventproperties("Auth")
     Method: str = apieventproperties("Method")
@@ -257,10 +219,6 @@ class ApiEventProperties(BaseModel):
 class ApiEvent(BaseModel):
     Type: Literal["Api"]
     Properties: ApiEventProperties
-
-
-def cloudwatcheventproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-cloudwatchevent", name)
 
 
 class CloudWatchEventProperties(BaseModel):
@@ -277,18 +235,10 @@ class CloudWatchEvent(BaseModel):
     Properties: CloudWatchEventProperties
 
 
-def deadletterconfig(name: str) -> Any:
-    return get_docs_prop("sam-property-function-deadletterconfig", name)
-
-
 class DeadLetterConfig(BaseModel):
     Arn: Optional[PassThrough] = deadletterconfig("Arn")
     QueueLogicalId: Optional[str] = deadletterconfig("QueueLogicalId")
     Type: Optional[Literal["SQS"]] = deadletterconfig("Type")
-
-
-def eventsscheduleproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-schedule", name)
 
 
 class EventsScheduleProperties(BaseModel):
@@ -309,10 +259,6 @@ class ScheduleEvent(BaseModel):
 
 class EventBridgeRuleTarget(BaseModel):
     Id: PassThrough
-
-
-def eventbridgeruleeventproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-eventbridgerule", name)
 
 
 class EventBridgeRuleEventProperties(BaseModel):
@@ -340,10 +286,6 @@ class CloudWatchLogsEvent(BaseModel):
     Properties: CloudWatchLogsEventProperties
 
 
-def iotruleeventproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-iotrule", name)
-
-
 class IoTRuleEventProperties(BaseModel):
     AwsIotSqlVersion: Optional[PassThrough] = iotruleeventproperties("AwsIotSqlVersion")
     Sql: PassThrough = iotruleeventproperties("Sql")
@@ -352,10 +294,6 @@ class IoTRuleEventProperties(BaseModel):
 class IoTRuleEvent(BaseModel):
     Type: Literal["IoTRule"]
     Properties: IoTRuleEventProperties
-
-
-def alexaskilleventproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-alexaskill", name)
 
 
 class AlexaSkillEventProperties(BaseModel):
@@ -409,10 +347,6 @@ class MSKEventProperties(BaseModel):
 class MSKEvent(BaseModel):
     Type: Literal["MSK"]
     Properties: MSKEventProperties
-
-
-def mqeventproperties(name: str) -> Any:
-    return get_docs_prop("sam-property-function-mq", name)
 
 
 class MQEventProperties(BaseModel):
@@ -491,10 +425,6 @@ ProvisionedConcurrencyConfig = Optional[PassThrough]
 AssumeRolePolicyDocument = Optional[Dict[str, Any]]
 Architectures = Optional[PassThrough]
 EphemeralStorage = Optional[PassThrough]
-
-
-def prop(name: str) -> Any:
-    return get_docs_prop("sam-resource-function", name)
 
 
 class Properties(BaseModel):
