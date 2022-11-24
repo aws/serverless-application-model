@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
@@ -17,6 +16,7 @@ cloudwatcheventproperties = get_prop("sam-property-statemachine-statemachineclou
 eventbridgeruleeventproperties = get_prop("sam-property-statemachine-statemachineeventbridgerule")
 apieventproperties = get_prop("sam-property-statemachine-statemachineapi")
 apiauth = get_prop("sam-property-statemachine-apistatemachineauth")
+
 
 class DeadLetterConfig(BaseModel):
     Arn: Optional[PassThrough] = deadletterconfig("Arn")
@@ -51,11 +51,12 @@ class ScheduleV2EventProperties(BaseModel):
     Name: Optional[PassThrough] = scheduleeventv2properties("Name")
     PermissionsBoundary: Optional[PassThrough] = scheduleeventv2properties("PermissionsBoundary")
     RetryPolicy: Optional[PassThrough] = scheduleeventv2properties("RetryPolicy")
-    RoleArn: Optional[PassThrough] # TODO: Add to docs
+    RoleArn: Optional[PassThrough]  # TODO: Add to docs
     ScheduleExpression: Optional[PassThrough] = scheduleeventv2properties("ScheduleExpression")
     ScheduleExpressionTimezone: Optional[PassThrough] = scheduleeventv2properties("ScheduleExpressionTimezone")
     StartDate: Optional[PassThrough] = scheduleeventv2properties("StartDate")
     State: Optional[PassThrough] = scheduleeventv2properties("State")
+
 
 class ScheduleV2Event(BaseModel):
     Type: Literal["ScheduleV2"]
