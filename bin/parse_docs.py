@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+"""
+Script to parse a directory containing the AWS SAM documentation in Markdown
+format (e.g. https://github.com/awsdocs/aws-sam-developer-guide/tree/main/doc_source).
+Outputs in the docs.json format expected by the SAM JSON schema code (see
+samtranslator/schema/schema.py).
+"""
 
 import argparse
 import json
@@ -7,6 +13,7 @@ from typing import Iterator, Tuple, Dict
 
 
 def parse(s: str) -> Iterator[Tuple[str, str]]:
+    """Parse an AWS SAM docs page in Markdown format, yielding each property."""
     parts = s.split("\n\n")
     for part in parts:
         if part.startswith(" `"):
