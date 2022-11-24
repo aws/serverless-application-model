@@ -4,6 +4,10 @@ Script to parse a directory containing the AWS SAM documentation in Markdown
 format (e.g. https://github.com/awsdocs/aws-sam-developer-guide/tree/main/doc_source).
 Outputs in the docs.json format expected by the SAM JSON schema code (see
 samtranslator/schema/schema.py).
+
+Usage:
+  git clone https://github.com/awsdocs/aws-sam-developer-guide.git
+  bin/parse_docs.py aws-sam-developer-guide/doc_source > samtranslator/schema/docs.json
 """
 
 import argparse
