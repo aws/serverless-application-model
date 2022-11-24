@@ -18,7 +18,7 @@ Unknown = Optional[Any]
 
 LenientBaseModel = pydantic.BaseModel
 
-_DOCS = json.loads(Path("samtranslator", "schema", "docs.json").read_text())
+_DOCS = json.loads(Path("samtranslator", "schema", "docs.json").read_bytes())
 
 
 def get_docs_prop(stem: str, name: str) -> Any:
