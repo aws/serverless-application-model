@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union, TypeVar
 
 import pydantic
 from pydantic import Extra, Field
@@ -9,6 +9,8 @@ import yaml
 PassThrough = Any  # TODO: Make it behave like typescript's unknown
 
 # Intrinsic resolvable by the SAM transform
+T = TypeVar("T")
+SamIntrinsicable = Union[Dict[str, Any], T]
 SamIntrinsic = Dict[str, Any]
 
 # TODO: Get rid of this in favor of proper types
