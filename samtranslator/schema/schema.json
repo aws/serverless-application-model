@@ -1418,7 +1418,9 @@
       "type": "object",
       "properties": {
         "SSESpecification": {
-          "title": "Ssespecification"
+          "title": "SSESpecification",
+          "description": "Specifies the settings to enable server\\-side encryption\\.  \n*Type*: [SSESpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SSESpecification`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html) property of an `AWS::DynamoDB::Table` resource\\.",
+          "markdownDescription": "Specifies the settings to enable server\\-side encryption\\.  \n*Type*: [SSESpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SSESpecification`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html) property of an `AWS::DynamoDB::Table` resource\\."
         }
       },
       "additionalProperties": false
@@ -1448,28 +1450,44 @@
       "properties": {
         "Id": {
           "title": "Id",
+          "description": "The [logical ID](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html) of a resource in the same template\\.  \nWhen `Id` is specified, if the connector generates AWS Identity and Access Management \\(IAM\\) policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The [logical ID](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html) of a resource in the same template\\.  \nWhen `Id` is specified, if the connector generates AWS Identity and Access Management \\(IAM\\) policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "string"
         },
         "Arn": {
-          "title": "Arn"
+          "title": "Arn",
+          "description": "The ARN of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The ARN of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\."
         },
         "Name": {
-          "title": "Name"
+          "title": "Name",
+          "description": "The name of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The name of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\."
         },
         "Qualifier": {
-          "title": "Qualifier"
+          "title": "Qualifier",
+          "description": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](reference-sam-connector.md)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](reference-sam-connector.md)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\."
         },
         "QueueUrl": {
-          "title": "Queueurl"
+          "title": "QueueUrl",
+          "description": "The Amazon SQS queue URL\\. This property only applies to Amazon SQS resources\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The Amazon SQS queue URL\\. This property only applies to Amazon SQS resources\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\."
         },
         "ResourceId": {
-          "title": "Resourceid"
+          "title": "ResourceId",
+          "description": "The ID of a resource\\. For example, the API Gateway API ID\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The ID of a resource\\. For example, the API Gateway API ID\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\."
         },
         "RoleName": {
-          "title": "Rolename"
+          "title": "RoleName",
+          "description": "The role name associated with a resource\\.  \nWhen `Id` is specified, if the connector generates IAM policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The role name associated with a resource\\.  \nWhen `Id` is specified, if the connector generates IAM policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\."
         },
         "Type": {
           "title": "Type",
+          "description": "The AWS CloudFormation type of a resource\\. For more information, go to [AWS resource and property types reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html)\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The AWS CloudFormation type of a resource\\. For more information, go to [AWS resource and property types reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html)\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "string"
         }
       },
@@ -1480,13 +1498,29 @@
       "type": "object",
       "properties": {
         "Source": {
-          "$ref": "#/definitions/ResourceReference"
+          "title": "Source",
+          "description": "The source resource\\.  \n*Type*: [ResourceReference](sam-property-connector-resourcereference.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The source resource\\.  \n*Type*: [ResourceReference](sam-property-connector-resourcereference.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceReference"
+            }
+          ]
         },
         "Destination": {
-          "$ref": "#/definitions/ResourceReference"
+          "title": "Destination",
+          "description": "The destination resource\\.  \n*Type*: [ResourceReference](sam-property-connector-resourcereference.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The destination resource\\.  \n*Type*: [ResourceReference](sam-property-connector-resourcereference.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceReference"
+            }
+          ]
         },
         "Permissions": {
           "title": "Permissions",
+          "description": "The permission type that the source resource is allowed to perform on the destination resource\\.  \n`Read` includes AWS Identity and Access Management \\(IAM\\) actions that allow reading data from the resource\\.  \n`Write` inclues IAM actions that allow initiating and writing data to a resource\\.  \n*Valid values*: `Read` or `Write`  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The permission type that the source resource is allowed to perform on the destination resource\\.  \n`Read` includes AWS Identity and Access Management \\(IAM\\) actions that allow reading data from the resource\\.  \n`Write` inclues IAM actions that allow initiating and writing data to a resource\\.  \n*Valid values*: `Read` or `Write`  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "array",
           "items": {
             "enum": [
@@ -3545,10 +3579,14 @@
       "type": "object",
       "properties": {
         "Name": {
-          "title": "Name"
+          "title": "Name",
+          "description": "Attribute name of the primary key\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AttributeName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-attributedef.html#cfn-dynamodb-attributedef-attributename) property of the `AWS::DynamoDB::Table` `AttributeDefinition` data type\\.  \n*Additional notes*: This property is also passed to the [AttributeName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-keyschema.html#aws-properties-dynamodb-keyschema-attributename) property of an `AWS::DynamoDB::Table KeySchema` data type\\.",
+          "markdownDescription": "Attribute name of the primary key\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AttributeName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-attributedef.html#cfn-dynamodb-attributedef-attributename) property of the `AWS::DynamoDB::Table` `AttributeDefinition` data type\\.  \n*Additional notes*: This property is also passed to the [AttributeName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-keyschema.html#aws-properties-dynamodb-keyschema-attributename) property of an `AWS::DynamoDB::Table KeySchema` data type\\."
         },
         "Type": {
-          "title": "Type"
+          "title": "Type",
+          "description": "The data type for the primary key\\.  \n*Valid values*: `String`, `Number`, `Binary`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AttributeType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-attributedef.html#cfn-dynamodb-attributedef-attributename-attributetype) property of the `AWS::DynamoDB::Table` `AttributeDefinition` data type\\.",
+          "markdownDescription": "The data type for the primary key\\.  \n*Valid values*: `String`, `Number`, `Binary`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AttributeType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-attributedef.html#cfn-dynamodb-attributedef-attributename-attributetype) property of the `AWS::DynamoDB::Table` `AttributeDefinition` data type\\."
         }
       },
       "additionalProperties": false
@@ -3558,19 +3596,34 @@
       "type": "object",
       "properties": {
         "PrimaryKey": {
-          "$ref": "#/definitions/PrimaryKey"
+          "title": "PrimaryKey",
+          "description": "Attribute name and type to be used as the table's primary key\\. If not provided, the primary key will be a `String` with a value of `id`\\.  \nThe value of this property cannot be modified after this resource is created\\.\n*Type*: [PrimaryKeyObject](sam-property-simpletable-primarykeyobject.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Attribute name and type to be used as the table's primary key\\. If not provided, the primary key will be a `String` with a value of `id`\\.  \nThe value of this property cannot be modified after this resource is created\\.\n*Type*: [PrimaryKeyObject](sam-property-simpletable-primarykeyobject.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/PrimaryKey"
+            }
+          ]
         },
         "ProvisionedThroughput": {
-          "title": "Provisionedthroughput"
+          "title": "ProvisionedThroughput",
+          "description": "Read and write throughput provisioning information\\.  \nIf `ProvisionedThroughput` is not specified `BillingMode` will be specified as `PAY_PER_REQUEST`\\.  \n*Type*: [ProvisionedThroughput](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-provisionedthroughput.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedThroughput`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-provisionedthroughput.html) property of an `AWS::DynamoDB::Table` resource\\.",
+          "markdownDescription": "Read and write throughput provisioning information\\.  \nIf `ProvisionedThroughput` is not specified `BillingMode` will be specified as `PAY_PER_REQUEST`\\.  \n*Type*: [ProvisionedThroughput](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-provisionedthroughput.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedThroughput`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-provisionedthroughput.html) property of an `AWS::DynamoDB::Table` resource\\."
         },
         "SSESpecification": {
-          "title": "Ssespecification"
+          "title": "SSESpecification",
+          "description": "Specifies the settings to enable server\\-side encryption\\.  \n*Type*: [SSESpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SSESpecification`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html) property of an `AWS::DynamoDB::Table` resource\\.",
+          "markdownDescription": "Specifies the settings to enable server\\-side encryption\\.  \n*Type*: [SSESpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SSESpecification`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html) property of an `AWS::DynamoDB::Table` resource\\."
         },
         "TableName": {
-          "title": "Tablename"
+          "title": "TableName",
+          "description": "Name for the DynamoDB Table\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TableName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html#cfn-dynamodb-table-tablename) property of an `AWS::DynamoDB::Table` resource\\.",
+          "markdownDescription": "Name for the DynamoDB Table\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TableName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html#cfn-dynamodb-table-tablename) property of an `AWS::DynamoDB::Table` resource\\."
         },
         "Tags": {
           "title": "Tags",
+          "description": "A map \\(string to string\\) that specifies the tags to be added to this SimpleTable\\. For details about valid keys and values for tags, see [Resource tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html) in the *AWS CloudFormation User Guide*\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html#cfn-dynamodb-table-tags) property of an `AWS::DynamoDB::Table` resource\\. The Tags property in SAM consists of Key:Value pairs; in CloudFormation it consists of a list of Tag objects\\.",
+          "markdownDescription": "A map \\(string to string\\) that specifies the tags to be added to this SimpleTable\\. For details about valid keys and values for tags, see [Resource tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html) in the *AWS CloudFormation User Guide*\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html#cfn-dynamodb-table-tags) property of an `AWS::DynamoDB::Table` resource\\. The Tags property in SAM consists of Key:Value pairs; in CloudFormation it consists of a list of Tag objects\\.",
           "type": "object"
         }
       },
@@ -4194,13 +4247,19 @@
       "type": "object",
       "properties": {
         "Bucket": {
-          "title": "Bucket"
+          "title": "Bucket",
+          "description": "The Amazon S3 bucket of the layer archive\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3Bucket`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3bucket) property of the `AWS::Lambda::LayerVersion` `Content` data type\\.",
+          "markdownDescription": "The Amazon S3 bucket of the layer archive\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3Bucket`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3bucket) property of the `AWS::Lambda::LayerVersion` `Content` data type\\."
         },
         "Key": {
-          "title": "Key"
+          "title": "Key",
+          "description": "The Amazon S3 key of the layer archive\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3key) property of the `AWS::Lambda::LayerVersion` `Content` data type\\.",
+          "markdownDescription": "The Amazon S3 key of the layer archive\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3key) property of the `AWS::Lambda::LayerVersion` `Content` data type\\."
         },
         "Version": {
-          "title": "Version"
+          "title": "Version",
+          "description": "For versioned objects, the version of the layer archive object to use\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3ObjectVersion`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3objectversion) property of the `AWS::Lambda::LayerVersion` `Content` data type\\.",
+          "markdownDescription": "For versioned objects, the version of the layer archive object to use\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3ObjectVersion`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3objectversion) property of the `AWS::Lambda::LayerVersion` `Content` data type\\."
         }
       },
       "additionalProperties": false
@@ -4210,13 +4269,19 @@
       "type": "object",
       "properties": {
         "CompatibleArchitectures": {
-          "title": "Compatiblearchitectures"
+          "title": "CompatibleArchitectures",
+          "description": "Specifies the supported instruction set architectures for the layer version\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `x86_64`, `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CompatibleArchitectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-compatiblearchitectures) property of an `AWS::Lambda::LayerVersion` resource\\.",
+          "markdownDescription": "Specifies the supported instruction set architectures for the layer version\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `x86_64`, `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CompatibleArchitectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-compatiblearchitectures) property of an `AWS::Lambda::LayerVersion` resource\\."
         },
         "CompatibleRuntimes": {
-          "title": "Compatibleruntimes"
+          "title": "CompatibleRuntimes",
+          "description": "List of runtimes compatible with this LayerVersion\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CompatibleRuntimes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-compatibleruntimes) property of an `AWS::Lambda::LayerVersion` resource\\.",
+          "markdownDescription": "List of runtimes compatible with this LayerVersion\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CompatibleRuntimes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-compatibleruntimes) property of an `AWS::Lambda::LayerVersion` resource\\."
         },
         "ContentUri": {
-          "title": "Contenturi",
+          "title": "ContentUri",
+          "description": "Amazon S3 Uri, path to local folder, or LayerContent object of the layer code\\.  \nIf an Amazon S3 Uri or LayerContent object is provided, The Amazon S3 object referenced must be a valid ZIP archive that contains the contents of an [Lambda layer](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html)\\.  \nIf a path to a local folder is provided, for the content to be transformed properly the template must go through the workflow that includes [sam build](sam-cli-command-reference-sam-build.md) followed by either [sam deploy](sam-cli-command-reference-sam-deploy.md) or [sam package](sam-cli-command-reference-sam-package.md)\\. By default, relative paths are resolved with respect to the AWS SAM template's location\\.  \n*Type*: String \\| [LayerContent](sam-property-layerversion-layercontent.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is similar to the [`Content`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-content) property of an `AWS::Lambda::LayerVersion` resource\\. The nested Amazon S3 properties are named differently\\.",
+          "markdownDescription": "Amazon S3 Uri, path to local folder, or LayerContent object of the layer code\\.  \nIf an Amazon S3 Uri or LayerContent object is provided, The Amazon S3 object referenced must be a valid ZIP archive that contains the contents of an [Lambda layer](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html)\\.  \nIf a path to a local folder is provided, for the content to be transformed properly the template must go through the workflow that includes [sam build](sam-cli-command-reference-sam-build.md) followed by either [sam deploy](sam-cli-command-reference-sam-deploy.md) or [sam package](sam-cli-command-reference-sam-package.md)\\. By default, relative paths are resolved with respect to the AWS SAM template's location\\.  \n*Type*: String \\| [LayerContent](sam-property-layerversion-layercontent.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is similar to the [`Content`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-content) property of an `AWS::Lambda::LayerVersion` resource\\. The nested Amazon S3 properties are named differently\\.",
           "anyOf": [
             {
               "type": "string"
@@ -4227,16 +4292,24 @@
           ]
         },
         "Description": {
-          "title": "Description"
+          "title": "Description",
+          "description": "Description of this layer\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-description) property of an `AWS::Lambda::LayerVersion` resource\\.",
+          "markdownDescription": "Description of this layer\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-description) property of an `AWS::Lambda::LayerVersion` resource\\."
         },
         "LayerName": {
-          "title": "Layername"
+          "title": "LayerName",
+          "description": "The name or Amazon Resource Name \\(ARN\\) of the layer\\.  \n*Type*: String  \n*Required*: No  \n*Default*: Resource logical id  \n*AWS CloudFormation compatibility*: This property is similar to the [`LayerName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-layername) property of an `AWS::Lambda::LayerVersion` resource\\. If you don't specify a name, the logical id of the resource will be used as the name\\.",
+          "markdownDescription": "The name or Amazon Resource Name \\(ARN\\) of the layer\\.  \n*Type*: String  \n*Required*: No  \n*Default*: Resource logical id  \n*AWS CloudFormation compatibility*: This property is similar to the [`LayerName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-layername) property of an `AWS::Lambda::LayerVersion` resource\\. If you don't specify a name, the logical id of the resource will be used as the name\\."
         },
         "LicenseInfo": {
-          "title": "Licenseinfo"
+          "title": "LicenseInfo",
+          "description": "Information about the license for this LayerVersion\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`LicenseInfo`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-licenseinfo) property of an `AWS::Lambda::LayerVersion` resource\\.",
+          "markdownDescription": "Information about the license for this LayerVersion\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`LicenseInfo`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-licenseinfo) property of an `AWS::Lambda::LayerVersion` resource\\."
         },
         "RetentionPolicy": {
-          "title": "Retentionpolicy",
+          "title": "RetentionPolicy",
+          "description": "Specifies whether old versions of your LayerVersion are retained or deleted after an update\\.  \n*Valid values*: `Retain` or `Delete`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: When you specify `Retain`, AWS SAM adds a [Resource attributes](sam-specification-resource-attributes.md) of `DeletionPolicy: Retain` to the transformed `AWS::Lambda::LayerVersion` resource\\.",
+          "markdownDescription": "Specifies whether old versions of your LayerVersion are retained or deleted after an update\\.  \n*Valid values*: `Retain` or `Delete`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: When you specify `Retain`, AWS SAM adds a [Resource attributes](sam-specification-resource-attributes.md) of `DeletionPolicy: Retain` to the transformed `AWS::Lambda::LayerVersion` resource\\.",
           "anyOf": [
             {
               "type": "object"
@@ -4599,7 +4672,9 @@
       "type": "object",
       "properties": {
         "ApplicationId": {
-          "title": "Applicationid",
+          "title": "ApplicationId",
+          "description": "The Amazon Resource Name \\(ARN\\) of the application\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The Amazon Resource Name \\(ARN\\) of the application\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "type": "object"
@@ -4610,7 +4685,9 @@
           ]
         },
         "SemanticVersion": {
-          "title": "Semanticversion",
+          "title": "SemanticVersion",
+          "description": "The semantic version of the application\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The semantic version of the application\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "type": "object"
@@ -4633,6 +4710,8 @@
       "properties": {
         "Location": {
           "title": "Location",
+          "description": "Template URL, file path, or location object of a nested application\\.  \nIf a template URL is provided, it must follow the format specified in the [CloudFormation TemplateUrl documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-templateurl) and contain a valid CloudFormation or SAM template\\. An [ApplicationLocationObject](sam-property-application-applicationlocationobject.md) can be used to specify an application that has been published to the [AWS Serverless Application Repository](https://docs.aws.amazon.com/serverlessrepo/latest/devguide/what-is-serverlessrepo.html)\\.  \nIf a local file path is provided, the template must go through the workflow that includes the `sam deploy` or `sam package` command, in order for the application to be transformed properly\\.  \n*Type*: String \\| [ApplicationLocationObject](sam-property-application-applicationlocationobject.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is similar to the [`TemplateURL`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-templateurl) property of an `AWS::CloudFormation::Stack` resource\\. The CloudFormation version does not take an [ApplicationLocationObject](sam-property-application-applicationlocationobject.md) to retrieve an application from the AWS Serverless Application Repository\\.",
+          "markdownDescription": "Template URL, file path, or location object of a nested application\\.  \nIf a template URL is provided, it must follow the format specified in the [CloudFormation TemplateUrl documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-templateurl) and contain a valid CloudFormation or SAM template\\. An [ApplicationLocationObject](sam-property-application-applicationlocationobject.md) can be used to specify an application that has been published to the [AWS Serverless Application Repository](https://docs.aws.amazon.com/serverlessrepo/latest/devguide/what-is-serverlessrepo.html)\\.  \nIf a local file path is provided, the template must go through the workflow that includes the `sam deploy` or `sam package` command, in order for the application to be transformed properly\\.  \n*Type*: String \\| [ApplicationLocationObject](sam-property-application-applicationlocationobject.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is similar to the [`TemplateURL`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-templateurl) property of an `AWS::CloudFormation::Stack` resource\\. The CloudFormation version does not take an [ApplicationLocationObject](sam-property-application-applicationlocationobject.md) to retrieve an application from the AWS Serverless Application Repository\\.",
           "anyOf": [
             {
               "type": "string"
@@ -4643,17 +4722,25 @@
           ]
         },
         "NotificationARNs": {
-          "title": "Notificationarns"
+          "title": "NotificationARNs",
+          "description": "A list of existing Amazon SNS topics where notifications about stack events are sent\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`NotificationARNs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-notificationarns) property of an `AWS::CloudFormation::Stack` resource\\.",
+          "markdownDescription": "A list of existing Amazon SNS topics where notifications about stack events are sent\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`NotificationARNs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-notificationarns) property of an `AWS::CloudFormation::Stack` resource\\."
         },
         "Parameters": {
-          "title": "Parameters"
+          "title": "Parameters",
+          "description": "Application parameter values\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Parameters`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-parameters) property of an `AWS::CloudFormation::Stack` resource\\.",
+          "markdownDescription": "Application parameter values\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Parameters`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-parameters) property of an `AWS::CloudFormation::Stack` resource\\."
         },
         "Tags": {
           "title": "Tags",
+          "description": "A map \\(string to string\\) that specifies the tags to be added to this application\\. Keys and values are limited to alphanumeric characters\\. Keys can be 1 to 127 Unicode characters in length and cannot be prefixed with aws:\\. Values can be 1 to 255 Unicode characters in length\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-tags) property of an `AWS::CloudFormation::Stack` resource\\. The Tags property in SAM consists of Key:Value pairs; in CloudFormation it consists of a list of Tag objects\\. When the stack is created, SAM will automatically add a `lambda:createdBy:SAM` tag to this application\\. In addition, if this application is from the AWS Serverless Application Repository, then SAM will also automatically the two additional tags `serverlessrepo:applicationId:ApplicationId` and `serverlessrepo:semanticVersion:SemanticVersion`\\.",
+          "markdownDescription": "A map \\(string to string\\) that specifies the tags to be added to this application\\. Keys and values are limited to alphanumeric characters\\. Keys can be 1 to 127 Unicode characters in length and cannot be prefixed with aws:\\. Values can be 1 to 255 Unicode characters in length\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-tags) property of an `AWS::CloudFormation::Stack` resource\\. The Tags property in SAM consists of Key:Value pairs; in CloudFormation it consists of a list of Tag objects\\. When the stack is created, SAM will automatically add a `lambda:createdBy:SAM` tag to this application\\. In addition, if this application is from the AWS Serverless Application Repository, then SAM will also automatically the two additional tags `serverlessrepo:applicationId:ApplicationId` and `serverlessrepo:semanticVersion:SemanticVersion`\\.",
           "type": "object"
         },
         "TimeoutInMinutes": {
-          "title": "Timeoutinminutes"
+          "title": "TimeoutInMinutes",
+          "description": "The length of time, in minutes, that AWS CloudFormation waits for the nested stack to reach the `CREATE_COMPLETE` state\\. The default is no timeout\\. When AWS CloudFormation detects that the nested stack has reached the `CREATE_COMPLETE` state, it marks the nested stack resource as `CREATE_COMPLETE` in the parent stack and resumes creating the parent stack\\. If the timeout period expires before the nested stack reaches `CREATE_COMPLETE`, AWS CloudFormation marks the nested stack as failed and rolls back both the nested stack and parent stack\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TimeoutInMinutes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-timeoutinminutes) property of an `AWS::CloudFormation::Stack` resource\\.",
+          "markdownDescription": "The length of time, in minutes, that AWS CloudFormation waits for the nested stack to reach the `CREATE_COMPLETE` state\\. The default is no timeout\\. When AWS CloudFormation detects that the nested stack has reached the `CREATE_COMPLETE` state, it marks the nested stack resource as `CREATE_COMPLETE` in the parent stack and resumes creating the parent stack\\. If the timeout period expires before the nested stack reaches `CREATE_COMPLETE`, AWS CloudFormation marks the nested stack as failed and rolls back both the nested stack and parent stack\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TimeoutInMinutes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-timeoutinminutes) property of an `AWS::CloudFormation::Stack` resource\\."
         }
       },
       "required": [
