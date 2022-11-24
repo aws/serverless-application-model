@@ -432,10 +432,14 @@
         },
         "Tags": {
           "title": "Tags",
+          "description": "`Tags`   <a name=\"sam-function-tags\"></a>\nA map \\(string to string\\) that specifies the tags added to this function\\. For details about valid keys and values for tags, see [Tag Key and Value Requirements](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html#configuration-tags-restrictions) in the *AWS Lambda Developer Guide*\\.  \nWhen the stack is created, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the `[Tags](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tags)` property of an `AWS::Lambda::Function` resource\\. The `Tags` property in AWS SAM consists of key\\-value pairs \\(whereas in AWS CloudFormation this property consists of a list of `Tag` objects\\)\\. Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.",
+          "markdownDescription": "`Tags`   <a name=\"sam-function-tags\"></a>\nA map \\(string to string\\) that specifies the tags added to this function\\. For details about valid keys and values for tags, see [Tag Key and Value Requirements](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html#configuration-tags-restrictions) in the *AWS Lambda Developer Guide*\\.  \nWhen the stack is created, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the `[Tags](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tags)` property of an `AWS::Lambda::Function` resource\\. The `Tags` property in AWS SAM consists of key\\-value pairs \\(whereas in AWS CloudFormation this property consists of a list of `Tag` objects\\)\\. Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.",
           "type": "object"
         },
         "Tracing": {
           "title": "Tracing",
+          "description": "`Tracing`   <a name=\"sam-function-tracing\"></a>\nThe string that specifies the function's X\\-Ray tracing mode\\. For more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `Active` or `PassThrough`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the `[TracingConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig)` property of an `AWS::Lambda::Function` resource\\. If the `Tracing` property is set to `Active` and the `Role` property is not specified, then AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.",
+          "markdownDescription": "`Tracing`   <a name=\"sam-function-tracing\"></a>\nThe string that specifies the function's X\\-Ray tracing mode\\. For more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `Active` or `PassThrough`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the `[TracingConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig)` property of an `AWS::Lambda::Function` resource\\. If the `Tracing` property is set to `Active` and the `Role` property is not specified, then AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.",
           "anyOf": [
             {
               "type": "object"
@@ -450,13 +454,19 @@
           ]
         },
         "KmsKeyArn": {
-          "title": "Kmskeyarn"
+          "title": "Kmskeyarn",
+          "description": "`KmsKeyArn`   <a name=\"sam-function-kmskeyarn\"></a>\nThe ARN of an AWS Key Management Service \\(AWS KMS\\) key that Lambda uses to encrypt and decrypt your function's environment variables\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[KmsKeyArn](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-kmskeyarn)` property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "`KmsKeyArn`   <a name=\"sam-function-kmskeyarn\"></a>\nThe ARN of an AWS Key Management Service \\(AWS KMS\\) key that Lambda uses to encrypt and decrypt your function's environment variables\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[KmsKeyArn](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-kmskeyarn)` property of an `AWS::Lambda::Function` resource\\."
         },
         "Layers": {
-          "title": "Layers"
+          "title": "Layers",
+          "description": "`Layers`   <a name=\"sam-function-layers\"></a>\nThe list of `LayerVersion` ARNs that this function should use\\. The order specified here is the order in which they will be imported when running the Lambda function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[Layers](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers)` property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "`Layers`   <a name=\"sam-function-layers\"></a>\nThe list of `LayerVersion` ARNs that this function should use\\. The order specified here is the order in which they will be imported when running the Lambda function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[Layers](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers)` property of an `AWS::Lambda::Function` resource\\."
         },
         "AutoPublishAlias": {
           "title": "Autopublishalias",
+          "description": "`AutoPublishAlias`   <a name=\"sam-function-autopublishalias\"></a>\nThe name of the Lambda alias\\. For more information about Lambda aliases, see [Lambda function aliases](https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html) in the *AWS Lambda Developer Guide*\\. For examples that use this property, see [Deploying serverless applications gradually](automating-updates-to-serverless-apps.md)\\.  \nAWS SAM generates [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html) and [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html) resources when this property is set\\. For information about this scenario, see [AutoPublishAlias property is specified](sam-specification-generated-resources-function.md#sam-specification-generated-resources-function-autopublishalias)\\. For general information about generated AWS CloudFormation resources, see [Generated AWS CloudFormation resources](sam-specification-generated-resources.md)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`AutoPublishAlias`   <a name=\"sam-function-autopublishalias\"></a>\nThe name of the Lambda alias\\. For more information about Lambda aliases, see [Lambda function aliases](https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html) in the *AWS Lambda Developer Guide*\\. For examples that use this property, see [Deploying serverless applications gradually](automating-updates-to-serverless-apps.md)\\.  \nAWS SAM generates [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html) and [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html) resources when this property is set\\. For information about this scenario, see [AutoPublishAlias property is specified](sam-specification-generated-resources-function.md#sam-specification-generated-resources-function-autopublishalias)\\. For general information about generated AWS CloudFormation resources, see [Generated AWS CloudFormation resources](sam-specification-generated-resources.md)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "type": "object"
@@ -467,29 +477,55 @@
           ]
         },
         "DeploymentPreference": {
-          "$ref": "#/definitions/DeploymentPreference"
+          "title": "Deploymentpreference",
+          "description": "`DeploymentPreference`   <a name=\"sam-function-deploymentpreference\"></a>\nThe settings to enable gradual Lambda deployments\\.  \nIf a `DeploymentPreference` object is specified, AWS SAM creates an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-application.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-application.html) called `ServerlessDeploymentApplication` \\(one per stack\\), an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html) called `<function-logical-id>DeploymentGroup`, and an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html) called `CodeDeployServiceRole`\\.  \n*Type*: [DeploymentPreference](sam-property-function-deploymentpreference.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*See also*: For more information about this property, see [Deploying serverless applications gradually](automating-updates-to-serverless-apps.md)\\.",
+          "markdownDescription": "`DeploymentPreference`   <a name=\"sam-function-deploymentpreference\"></a>\nThe settings to enable gradual Lambda deployments\\.  \nIf a `DeploymentPreference` object is specified, AWS SAM creates an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-application.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-application.html) called `ServerlessDeploymentApplication` \\(one per stack\\), an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html) called `<function-logical-id>DeploymentGroup`, and an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html) called `CodeDeployServiceRole`\\.  \n*Type*: [DeploymentPreference](sam-property-function-deploymentpreference.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*See also*: For more information about this property, see [Deploying serverless applications gradually](automating-updates-to-serverless-apps.md)\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DeploymentPreference"
+            }
+          ]
         },
         "PermissionsBoundary": {
-          "title": "Permissionsboundary"
+          "title": "Permissionsboundary",
+          "description": "`PermissionsBoundary`   <a name=\"sam-function-permissionsboundary\"></a>\nThe ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[PermissionsBoundary](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary)` property of an `AWS::IAM::Role` resource\\.",
+          "markdownDescription": "`PermissionsBoundary`   <a name=\"sam-function-permissionsboundary\"></a>\nThe ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[PermissionsBoundary](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary)` property of an `AWS::IAM::Role` resource\\."
         },
         "ReservedConcurrentExecutions": {
-          "title": "Reservedconcurrentexecutions"
+          "title": "Reservedconcurrentexecutions",
+          "description": "`ReservedConcurrentExecutions`   <a name=\"sam-function-reservedconcurrentexecutions\"></a>\nThe maximum number of concurrent executions that you want to reserve for the function\\.  \nFor more information about this property, see [Lambda Function Scaling](https://docs.aws.amazon.com/lambda/latest/dg/scaling.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ReservedConcurrentExecutions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-reservedconcurrentexecutions)` property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "`ReservedConcurrentExecutions`   <a name=\"sam-function-reservedconcurrentexecutions\"></a>\nThe maximum number of concurrent executions that you want to reserve for the function\\.  \nFor more information about this property, see [Lambda Function Scaling](https://docs.aws.amazon.com/lambda/latest/dg/scaling.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ReservedConcurrentExecutions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-reservedconcurrentexecutions)` property of an `AWS::Lambda::Function` resource\\."
         },
         "ProvisionedConcurrencyConfig": {
-          "title": "Provisionedconcurrencyconfig"
+          "title": "Provisionedconcurrencyconfig",
+          "description": "`ProvisionedConcurrencyConfig`   <a name=\"sam-function-provisionedconcurrencyconfig\"></a>\nThe provisioned concurrency configuration of a function's alias\\.  \n**Note**: `ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.  \n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)` property of an `AWS::Lambda::Alias` resource\\.",
+          "markdownDescription": "`ProvisionedConcurrencyConfig`   <a name=\"sam-function-provisionedconcurrencyconfig\"></a>\nThe provisioned concurrency configuration of a function's alias\\.  \n**Note**: `ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.  \n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)` property of an `AWS::Lambda::Alias` resource\\."
         },
         "AssumeRolePolicyDocument": {
           "title": "Assumerolepolicydocument",
+          "description": "`AssumeRolePolicyDocument`   <a name=\"sam-function-assumerolepolicydocument\"></a>\nAdds an AssumeRolePolicyDocument for the default created `Role` for this function\\. If this property isn't specified, AWS SAM adds a default assume role for this function\\.  \n*Type*: JSON  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the `[AssumeRolePolicyDocument](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-assumerolepolicydocument)` property of an `AWS::IAM::Role` resource\\. AWS SAM adds this property to the generated IAM role for this function\\. If a role's Amazon Resource Name \\(ARN\\) is provided for this function, this property does nothing\\.",
+          "markdownDescription": "`AssumeRolePolicyDocument`   <a name=\"sam-function-assumerolepolicydocument\"></a>\nAdds an AssumeRolePolicyDocument for the default created `Role` for this function\\. If this property isn't specified, AWS SAM adds a default assume role for this function\\.  \n*Type*: JSON  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the `[AssumeRolePolicyDocument](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-assumerolepolicydocument)` property of an `AWS::IAM::Role` resource\\. AWS SAM adds this property to the generated IAM role for this function\\. If a role's Amazon Resource Name \\(ARN\\) is provided for this function, this property does nothing\\.",
           "type": "object"
         },
         "EventInvokeConfig": {
-          "$ref": "#/definitions/EventInvokeConfig"
+          "title": "Eventinvokeconfig",
+          "description": "`EventInvokeConfig`   <a name=\"sam-function-eventinvokeconfig\"></a>\nThe object that describes event invoke configuration on a Lambda function\\.  \n*Type*: [EventInvokeConfiguration](sam-property-function-eventinvokeconfiguration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`EventInvokeConfig`   <a name=\"sam-function-eventinvokeconfig\"></a>\nThe object that describes event invoke configuration on a Lambda function\\.  \n*Type*: [EventInvokeConfiguration](sam-property-function-eventinvokeconfiguration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/EventInvokeConfig"
+            }
+          ]
         },
         "Architectures": {
-          "title": "Architectures"
+          "title": "Architectures",
+          "description": "`Architectures`   <a name=\"sam-function-architectures\"></a>\nThe instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[Architectures](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures)` property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "`Architectures`   <a name=\"sam-function-architectures\"></a>\nThe instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[Architectures](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures)` property of an `AWS::Lambda::Function` resource\\."
         },
         "EphemeralStorage": {
-          "title": "Ephemeralstorage"
+          "title": "Ephemeralstorage",
+          "description": "`EphemeralStorage`   <a name=\"sam-function-ephemeralstorage\"></a>\nAn object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)` property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "`EphemeralStorage`   <a name=\"sam-function-ephemeralstorage\"></a>\nAn object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)` property of an `AWS::Lambda::Function` resource\\."
         }
       },
       "additionalProperties": false
@@ -2079,10 +2115,14 @@
       "properties": {
         "ApiKeyRequired": {
           "title": "Apikeyrequired",
+          "description": "`ApiKeyRequired`   <a name=\"sam-function-apifunctionauth-apikeyrequired\"></a>\nRequires an API key for this API, path, and method\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`ApiKeyRequired`   <a name=\"sam-function-apifunctionauth-apikeyrequired\"></a>\nRequires an API key for this API, path, and method\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "boolean"
         },
         "AuthorizationScopes": {
           "title": "Authorizationscopes",
+          "description": "`AuthorizationScopes`   <a name=\"sam-function-apifunctionauth-authorizationscopes\"></a>\nThe authorization scopes to apply to this API, path, and method\\.  \nThe scopes that you specify will override any scopes applied by the `DefaultAuthorizer` property if you have specified it\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`AuthorizationScopes`   <a name=\"sam-function-apifunctionauth-authorizationscopes\"></a>\nThe authorization scopes to apply to this API, path, and method\\.  \nThe scopes that you specify will override any scopes applied by the `DefaultAuthorizer` property if you have specified it\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "array",
           "items": {
             "type": "string"
@@ -2090,10 +2130,14 @@
         },
         "Authorizer": {
           "title": "Authorizer",
+          "description": "`Authorizer`   <a name=\"sam-function-apifunctionauth-authorizer\"></a>\nThe `Authorizer` for a specific Function  \nIf you have specified a Global Authorizer on the API and want to make a specific Function public, override by setting `Authorizer` to `NONE`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`Authorizer`   <a name=\"sam-function-apifunctionauth-authorizer\"></a>\nThe `Authorizer` for a specific Function  \nIf you have specified a Global Authorizer on the API and want to make a specific Function public, override by setting `Authorizer` to `NONE`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "string"
         },
         "InvokeRole": {
           "title": "Invokerole",
+          "description": "`InvokeRole`   <a name=\"sam-function-apifunctionauth-invokerole\"></a>\nSpecifies the `InvokeRole` to use for `AWS_IAM` authorization\\.  \n*Type*: String  \n*Required*: No  \n*Default*: `CALLER_CREDENTIALS`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: `CALLER_CREDENTIALS` maps to `arn:aws:iam::*:user/*`, which uses the caller credentials to invoke the endpoint\\.",
+          "markdownDescription": "`InvokeRole`   <a name=\"sam-function-apifunctionauth-invokerole\"></a>\nSpecifies the `InvokeRole` to use for `AWS_IAM` authorization\\.  \n*Type*: String  \n*Required*: No  \n*Default*: `CALLER_CREDENTIALS`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: `CALLER_CREDENTIALS` maps to `arn:aws:iam::*:user/*`, which uses the caller credentials to invoke the endpoint\\.",
           "anyOf": [
             {
               "type": "object"
@@ -2104,7 +2148,14 @@
           ]
         },
         "ResourcePolicy": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ResourcePolicy"
+          "title": "Resourcepolicy",
+          "description": "`ResourcePolicy`   <a name=\"sam-function-apifunctionauth-resourcepolicy\"></a>\nConfigure Resource Policy for this path on an API\\.  \n*Type*: [ResourcePolicyStatement](sam-property-function-resourcepolicystatement.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`ResourcePolicy`   <a name=\"sam-function-apifunctionauth-resourcepolicy\"></a>\nConfigure Resource Policy for this path on an API\\.  \n*Type*: [ResourcePolicyStatement](sam-property-function-resourcepolicystatement.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ResourcePolicy"
+            }
+          ]
         }
       },
       "additionalProperties": false
@@ -2141,10 +2192,14 @@
       "properties": {
         "Caching": {
           "title": "Caching",
+          "description": "`Caching`   <a name=\"sam-function-requestparameter-caching\"></a>\nAdds `cacheKeyParameters` section to the API Gateway OpenApi definition  \n*Type*: Boolean  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`Caching`   <a name=\"sam-function-requestparameter-caching\"></a>\nAdds `cacheKeyParameters` section to the API Gateway OpenApi definition  \n*Type*: Boolean  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "boolean"
         },
         "Required": {
           "title": "Required",
+          "description": "`Required`   <a name=\"sam-function-requestparameter-required\"></a>\nThis field specifies whether a parameter is required  \n*Type*: Boolean  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`Required`   <a name=\"sam-function-requestparameter-required\"></a>\nThis field specifies whether a parameter is required  \n*Type*: Boolean  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "boolean"
         }
       },
@@ -2472,7 +2527,9 @@
       "type": "object",
       "properties": {
         "Id": {
-          "title": "Id"
+          "title": "Id",
+          "description": "`Id`   <a name=\"sam-function-target-id\"></a>\nThe logical ID of the target\\.  \nThe value of `Id` can include alphanumeric characters, periods \\(`.`\\), hyphens \\(`-`\\), and underscores \\(`_`\\)\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[Id](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-id)` property of the `AWS::Events::Rule` `Target` data type\\.",
+          "markdownDescription": "`Id`   <a name=\"sam-function-target-id\"></a>\nThe logical ID of the target\\.  \nThe value of `Id` can include alphanumeric characters, periods \\(`.`\\), hyphens \\(`-`\\), and underscores \\(`_`\\)\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[Id](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-id)` property of the `AWS::Events::Rule` `Target` data type\\."
         }
       },
       "additionalProperties": false
@@ -2660,10 +2717,14 @@
       "type": "object",
       "properties": {
         "Trigger": {
-          "title": "Trigger"
+          "title": "Trigger",
+          "description": "`Trigger`   <a name=\"sam-function-cognito-trigger\"></a>\nThe Lambda trigger configuration information for the new user pool\\.  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[LambdaConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cognito-userpool-lambdaconfig.html)` property of an `AWS::Cognito::UserPool` resource\\.",
+          "markdownDescription": "`Trigger`   <a name=\"sam-function-cognito-trigger\"></a>\nThe Lambda trigger configuration information for the new user pool\\.  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[LambdaConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cognito-userpool-lambdaconfig.html)` property of an `AWS::Cognito::UserPool` resource\\."
         },
         "UserPool": {
           "title": "Userpool",
+          "description": "`UserPool`   <a name=\"sam-function-cognito-userpool\"></a>\nReference to UserPool defined in the same template  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`UserPool`   <a name=\"sam-function-cognito-userpool\"></a>\nReference to UserPool defined in the same template  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "type": "object"
@@ -2706,6 +2767,8 @@
       "properties": {
         "AuthorizationScopes": {
           "title": "Authorizationscopes",
+          "description": "`AuthorizationScopes`   <a name=\"sam-function-httpapifunctionauth-authorizationscopes\"></a>\nThe authorization scopes to apply to this API, path, and method\\.  \nScopes listed here will override any scopes applied by the `DefaultAuthorizer` if one exists\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`AuthorizationScopes`   <a name=\"sam-function-httpapifunctionauth-authorizationscopes\"></a>\nThe authorization scopes to apply to this API, path, and method\\.  \nScopes listed here will override any scopes applied by the `DefaultAuthorizer` if one exists\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "array",
           "items": {
             "type": "string"
@@ -2713,6 +2776,8 @@
         },
         "Authorizer": {
           "title": "Authorizer",
+          "description": "`Authorizer`   <a name=\"sam-function-httpapifunctionauth-authorizer\"></a>\nThe `Authorizer` for a specific Function\\. To use IAM authorization, specify `AWS_IAM` and specify `true` for `EnableIamAuthorizer` in the `Globals` section of your template\\.  \nIf you have specified a Global Authorizer on the API and want to make a specific Function public, override by setting `Authorizer` to `NONE`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`Authorizer`   <a name=\"sam-function-httpapifunctionauth-authorizer\"></a>\nThe `Authorizer` for a specific Function\\. To use IAM authorization, specify `AWS_IAM` and specify `true` for `EnableIamAuthorizer` in the `Globals` section of your template\\.  \nIf you have specified a Global Authorizer on the API and want to make a specific Function public, override by setting `Authorizer` to `NONE`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "string"
         }
       },
@@ -2724,6 +2789,8 @@
       "properties": {
         "ApiId": {
           "title": "Apiid",
+          "description": "`ApiId`   <a name=\"sam-function-httpapi-apiid\"></a>\nIdentifier of an [AWS::Serverless::HttpApi](sam-resource-httpapi.md) resource defined in this template\\.  \nIf not defined, a default [AWS::Serverless::HttpApi](sam-resource-httpapi.md) resource is created called `ServerlessHttpApi` using a generated OpenApi document containing a union of all paths and methods defined by Api events defined in this template that do not specify an `ApiId`\\.  \nThis cannot reference an [AWS::Serverless::HttpApi](sam-resource-httpapi.md) resource defined in another template\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`ApiId`   <a name=\"sam-function-httpapi-apiid\"></a>\nIdentifier of an [AWS::Serverless::HttpApi](sam-resource-httpapi.md) resource defined in this template\\.  \nIf not defined, a default [AWS::Serverless::HttpApi](sam-resource-httpapi.md) resource is created called `ServerlessHttpApi` using a generated OpenApi document containing a union of all paths and methods defined by Api events defined in this template that do not specify an `ApiId`\\.  \nThis cannot reference an [AWS::Serverless::HttpApi](sam-resource-httpapi.md) resource defined in another template\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "type": "object"
@@ -2734,18 +2801,31 @@
           ]
         },
         "Auth": {
-          "$ref": "#/definitions/HttpApiAuth"
+          "title": "Auth",
+          "description": "`Auth`   <a name=\"sam-function-httpapi-auth\"></a>\nAuth configuration for this specific Api\\+Path\\+Method\\.  \nUseful for overriding the API's `DefaultAuthorizer` or setting auth config on an individual path when no `DefaultAuthorizer` is specified\\.  \n*Type*: [HttpApiFunctionAuth](sam-property-function-httpapifunctionauth.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`Auth`   <a name=\"sam-function-httpapi-auth\"></a>\nAuth configuration for this specific Api\\+Path\\+Method\\.  \nUseful for overriding the API's `DefaultAuthorizer` or setting auth config on an individual path when no `DefaultAuthorizer` is specified\\.  \n*Type*: [HttpApiFunctionAuth](sam-property-function-httpapifunctionauth.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/HttpApiAuth"
+            }
+          ]
         },
         "Method": {
           "title": "Method",
+          "description": "`Method`   <a name=\"sam-function-httpapi-method\"></a>\nHTTP method for which this function is invoked\\.  \nIf no `Path` and `Method` are specified, SAM will create a default API path that routes any request that doesn't map to a different endpoint to this Lambda function\\. Only one of these default paths can exist per API\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`Method`   <a name=\"sam-function-httpapi-method\"></a>\nHTTP method for which this function is invoked\\.  \nIf no `Path` and `Method` are specified, SAM will create a default API path that routes any request that doesn't map to a different endpoint to this Lambda function\\. Only one of these default paths can exist per API\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "string"
         },
         "Path": {
           "title": "Path",
+          "description": "`Path`   <a name=\"sam-function-httpapi-path\"></a>\nUri path for which this function is invoked\\. Must start with `/`\\.  \nIf no `Path` and `Method` are specified, SAM will create a default API path that routes any request that doesn't map to a different endpoint to this Lambda function\\. Only one of these default paths can exist per API\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`Path`   <a name=\"sam-function-httpapi-path\"></a>\nUri path for which this function is invoked\\. Must start with `/`\\.  \nIf no `Path` and `Method` are specified, SAM will create a default API path that routes any request that doesn't map to a different endpoint to this Lambda function\\. Only one of these default paths can exist per API\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "string"
         },
         "PayloadFormatVersion": {
           "title": "Payloadformatversion",
+          "description": "`PayloadFormatVersion`   <a name=\"sam-function-httpapi-payloadformatversion\"></a>\nSpecifies the format of the payload sent to an integration\\.  \nNOTE: PayloadFormatVersion requires SAM to modify your OpenAPI definition, so it only works with inline OpenApi defined in the `DefinitionBody` property\\.  \n*Type*: String  \n*Required*: No  \n*Default*: 2\\.0  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`PayloadFormatVersion`   <a name=\"sam-function-httpapi-payloadformatversion\"></a>\nSpecifies the format of the payload sent to an integration\\.  \nNOTE: PayloadFormatVersion requires SAM to modify your OpenAPI definition, so it only works with inline OpenApi defined in the `DefinitionBody` property\\.  \n*Type*: String  \n*Required*: No  \n*Default*: 2\\.0  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "type": "object"
@@ -2756,10 +2836,14 @@
           ]
         },
         "RouteSettings": {
-          "title": "Routesettings"
+          "title": "Routesettings",
+          "description": "`RouteSettings`   <a name=\"sam-function-httpapi-routesettings\"></a>\nThe per\\-route route settings for this HTTP API\\. For more information about route settings, see [AWS::ApiGatewayV2::Stage RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-stage-routesettings.html) in the *API Gateway Developer Guide*\\.  \nNote: If RouteSettings are specified in both the HttpApi resource and event source, AWS SAM merges them with the event source properties taking precedence\\.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)` property of an `AWS::ApiGatewayV2::Stage` resource\\.",
+          "markdownDescription": "`RouteSettings`   <a name=\"sam-function-httpapi-routesettings\"></a>\nThe per\\-route route settings for this HTTP API\\. For more information about route settings, see [AWS::ApiGatewayV2::Stage RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-stage-routesettings.html) in the *API Gateway Developer Guide*\\.  \nNote: If RouteSettings are specified in both the HttpApi resource and event source, AWS SAM merges them with the event source properties taking precedence\\.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)` property of an `AWS::ApiGatewayV2::Stage` resource\\."
         },
         "TimeoutInMillis": {
           "title": "Timeoutinmillis",
+          "description": "`TimeoutInMillis`   <a name=\"sam-function-httpapi-timeoutinmillis\"></a>\nCustom timeout between 50 and 29,000 milliseconds\\.  \nNOTE: TimeoutInMillis requires SAM to modify your OpenAPI definition, so it only works with inline OpenApi defined in the `DefinitionBody` property\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 5000  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`TimeoutInMillis`   <a name=\"sam-function-httpapi-timeoutinmillis\"></a>\nCustom timeout between 50 and 29,000 milliseconds\\.  \nNOTE: TimeoutInMillis requires SAM to modify your OpenAPI definition, so it only works with inline OpenApi defined in the `DefinitionBody` property\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 5000  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "type": "object"
@@ -2910,19 +2994,25 @@
       "type": "object",
       "properties": {
         "BatchSize": {
-          "title": "Batchsize"
+          "title": "Batchsize",
+          "description": "`BatchSize`   <a name=\"sam-function-selfmanagedkafka-batchsize\"></a>\nThe maximum number of records in each batch that Lambda pulls from your stream and sends to your function\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 100  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[BatchSize](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-batchsize)` property of an `AWS::Lambda::EventSourceMapping` resource\\.  \n*Minimum*: `1`  \n*Maximum*: `10000`",
+          "markdownDescription": "`BatchSize`   <a name=\"sam-function-selfmanagedkafka-batchsize\"></a>\nThe maximum number of records in each batch that Lambda pulls from your stream and sends to your function\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 100  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[BatchSize](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-batchsize)` property of an `AWS::Lambda::EventSourceMapping` resource\\.  \n*Minimum*: `1`  \n*Maximum*: `10000`"
         },
         "ConsumerGroupId": {
           "title": "Consumergroupid"
         },
         "Enabled": {
-          "title": "Enabled"
+          "title": "Enabled",
+          "description": "`Enabled`   <a name=\"sam-function-selfmanagedkafka-enabled\"></a>\nDisables the event source mapping to pause polling and invocation\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[Enabled](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-enabled)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "`Enabled`   <a name=\"sam-function-selfmanagedkafka-enabled\"></a>\nDisables the event source mapping to pause polling and invocation\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[Enabled](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-enabled)` property of an `AWS::Lambda::EventSourceMapping` resource\\."
         },
         "FilterCriteria": {
           "title": "Filtercriteria"
         },
         "KafkaBootstrapServers": {
           "title": "Kafkabootstrapservers",
+          "description": "`KafkaBootstrapServers`   <a name=\"sam-function-selfmanagedkafka-kafkabootstrapservers\"></a>\nThe list of bootstrap servers for your Kafka brokers\\. Include the port, for example `broker.example.com:xxxx`  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "`KafkaBootstrapServers`   <a name=\"sam-function-selfmanagedkafka-kafkabootstrapservers\"></a>\nThe list of bootstrap servers for your Kafka brokers\\. Include the port, for example `broker.example.com:xxxx`  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "array",
           "items": {
             "anyOf": [
@@ -2936,10 +3026,14 @@
           }
         },
         "SourceAccessConfigurations": {
-          "title": "Sourceaccessconfigurations"
+          "title": "Sourceaccessconfigurations",
+          "description": "`SourceAccessConfigurations`   <a name=\"sam-function-selfmanagedkafka-sourceaccessconfigurations\"></a>\nAn array of the authentication protocol, VPC components, or virtual host to secure and define your event source\\.  \n*Type*: [SourceAccessConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[SourceAccessConfigurations](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "`SourceAccessConfigurations`   <a name=\"sam-function-selfmanagedkafka-sourceaccessconfigurations\"></a>\nAn array of the authentication protocol, VPC components, or virtual host to secure and define your event source\\.  \n*Type*: [SourceAccessConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[SourceAccessConfigurations](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations)` property of an `AWS::Lambda::EventSourceMapping` resource\\."
         },
         "Topics": {
-          "title": "Topics"
+          "title": "Topics",
+          "description": "`Topics`   <a name=\"sam-function-selfmanagedkafka-topics\"></a>\nThe name of the Kafka topic\\.  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[Topics](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-topics)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "`Topics`   <a name=\"sam-function-selfmanagedkafka-topics\"></a>\nThe name of the Kafka topic\\.  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[Topics](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-topics)` property of an `AWS::Lambda::EventSourceMapping` resource\\."
         }
       },
       "additionalProperties": false

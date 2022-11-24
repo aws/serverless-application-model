@@ -8,14 +8,17 @@ from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable
 
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
+apiauth = get_prop("sam-property-function-apifunctionauth")
 apieventproperties = get_prop("sam-property-function-api")
 cloudwatcheventproperties = get_prop("sam-property-function-cloudwatchevent")
 codeuri = get_prop("sam-property-function-functioncode")
+cognitoeventproperties = get_prop("sam-property-function-cognito")
 deadletterconfig = get_prop("sam-property-function-deadletterconfig")
 deploymentpreference = get_prop("sam-property-function-deploymentpreference")
 dlq = get_prop("sam-property-function-deadletterqueue")
 dynamodbeventproperties = get_prop("sam-property-function-dynamodb")
 eventbridgeruleeventproperties = get_prop("sam-property-function-eventbridgerule")
+eventbridgeruletarget = get_prop("sam-property-function-target")
 eventinvokeconfig = get_prop("sam-property-function-eventinvokeconfiguration")
 eventinvokedestinationconfig = get_prop("sam-property-function-eventinvokedestinationconfiguration")
 eventinvokeonfailure = get_prop("sam-property-function-onfailure")
@@ -23,12 +26,16 @@ eventinvokeonsuccess = get_prop("sam-property-function-onsuccess")
 eventsscheduleproperties = get_prop("sam-property-function-schedule")
 functionurlconfig = get_prop("sam-property-function-functionurlconfig")
 hooks = get_prop("sam-property-function-hooks")
+httpapiauth = get_prop("sam-property-function-httpapifunctionauth")
+httpapieventproperties = get_prop("sam-property-function-httpapi")
 iotruleeventproperties = get_prop("sam-property-function-iotrule")
 kinesiseventproperties = get_prop("sam-property-function-kinesis")
 mqeventproperties = get_prop("sam-property-function-mq")
 prop = get_prop("sam-resource-function")
+requestparameters = get_prop("sam-property-function-requestparameter")
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 s3eventproperties = get_prop("sam-property-function-s3")
+selfmanagedkafkaeventproperties = get_prop("sam-property-function-selfmanagedkafka")
 snseventproperties = get_prop("sam-property-function-sns")
 sqssubscription = get_prop("sam-property-function-sqssubscriptionobject")
 
@@ -188,11 +195,11 @@ class SQSEvent(BaseModel):
 
 
 class ApiAuth(BaseModel):
-    ApiKeyRequired: Optional[bool]
-    AuthorizationScopes: Optional[List[str]]
-    Authorizer: Optional[str]
-    InvokeRole: Optional[SamIntrinsicable[str]]
-    ResourcePolicy: Optional[ResourcePolicy]
+    ApiKeyRequired: Optional[bool] = apiauth("ApiKeyRequired")
+    AuthorizationScopes: Optional[List[str]] = apiauth("AuthorizationScopes")
+    Authorizer: Optional[str] = apiauth("Authorizer")
+    InvokeRole: Optional[SamIntrinsicable[str]] = apiauth("InvokeRole")
+    ResourcePolicy: Optional[ResourcePolicy] = apiauth("ResourcePolicy")
 
 
 class RequestModel(BaseModel):
@@ -203,8 +210,8 @@ class RequestModel(BaseModel):
 
 
 class RequestParameters(BaseModel):
-    Caching: Optional[bool]
-    Required: Optional[bool]
+    Caching: Optional[bool] = requestparameters("Caching")
+    Required: Optional[bool] = requestparameters("Required")
 
 
 class ApiEventProperties(BaseModel):
@@ -258,7 +265,7 @@ class ScheduleEvent(BaseModel):
 
 
 class EventBridgeRuleTarget(BaseModel):
-    Id: PassThrough
+    Id: PassThrough = eventbridgeruletarget("Id")
 
 
 class EventBridgeRuleEventProperties(BaseModel):
@@ -306,8 +313,8 @@ class AlexaSkillEvent(BaseModel):
 
 
 class CognitoEventProperties(BaseModel):
-    Trigger: PassThrough
-    UserPool: SamIntrinsicable[str]
+    Trigger: PassThrough = cognitoeventproperties("Trigger")
+    UserPool: SamIntrinsicable[str] = cognitoeventproperties("UserPool")
 
 
 class CognitoEvent(BaseModel):
@@ -316,18 +323,18 @@ class CognitoEvent(BaseModel):
 
 
 class HttpApiAuth(BaseModel):
-    AuthorizationScopes: Optional[List[str]]
-    Authorizer: Optional[str]
+    AuthorizationScopes: Optional[List[str]] = httpapiauth("AuthorizationScopes")
+    Authorizer: Optional[str] = httpapiauth("Authorizer")
 
 
 class HttpApiEventProperties(BaseModel):
-    ApiId: Optional[SamIntrinsicable[str]]
-    Auth: Optional[HttpApiAuth]
-    Method: Optional[str]
-    Path: Optional[str]
-    PayloadFormatVersion: Optional[SamIntrinsicable[str]]
-    RouteSettings: Optional[PassThrough]
-    TimeoutInMillis: Optional[SamIntrinsicable[int]]
+    ApiId: Optional[SamIntrinsicable[str]] = httpapieventproperties("ApiId")
+    Auth: Optional[HttpApiAuth] = httpapieventproperties("Auth")
+    Method: Optional[str] = httpapieventproperties("Method")
+    Path: Optional[str] = httpapieventproperties("Path")
+    PayloadFormatVersion: Optional[SamIntrinsicable[str]] = httpapieventproperties("PayloadFormatVersion")
+    RouteSettings: Optional[PassThrough] = httpapieventproperties("RouteSettings")
+    TimeoutInMillis: Optional[SamIntrinsicable[int]] = httpapieventproperties("TimeoutInMillis")
 
 
 class HttpApiEvent(BaseModel):
@@ -366,13 +373,15 @@ class MQEvent(BaseModel):
 
 
 class SelfManagedKafkaEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough]
-    ConsumerGroupId: Optional[PassThrough]
-    Enabled: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    KafkaBootstrapServers: Optional[List[SamIntrinsicable[str]]]
-    SourceAccessConfigurations: PassThrough
-    Topics: PassThrough
+    BatchSize: Optional[PassThrough] = selfmanagedkafkaeventproperties("BatchSize")
+    ConsumerGroupId: Optional[PassThrough]  # TODO: Add to docs
+    Enabled: Optional[PassThrough] = selfmanagedkafkaeventproperties("Enabled")
+    FilterCriteria: Optional[PassThrough]  # TODO: Add to docs
+    KafkaBootstrapServers: Optional[List[SamIntrinsicable[str]]] = selfmanagedkafkaeventproperties(
+        "KafkaBootstrapServers"
+    )
+    SourceAccessConfigurations: PassThrough = selfmanagedkafkaeventproperties("SourceAccessConfigurations")
+    Topics: PassThrough = selfmanagedkafkaeventproperties("Topics")
 
 
 class SelfManagedKafkaEvent(BaseModel):
@@ -499,19 +508,19 @@ class Globals(BaseModel):
     Timeout: Optional[Timeout] = prop("Timeout")
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
     Environment: Optional[Environment] = prop("Environment")
-    Tags: Optional[Tags]
-    Tracing: Optional[Tracing]
-    KmsKeyArn: Optional[KmsKeyArn]
-    Layers: Optional[Layers]
-    AutoPublishAlias: Optional[AutoPublishAlias]
-    DeploymentPreference: Optional[DeploymentPreference]
-    PermissionsBoundary: Optional[PermissionsBoundary]
-    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions]
-    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig]
-    AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument]
-    EventInvokeConfig: Optional[EventInvokeConfig]
-    Architectures: Optional[Architectures]
-    EphemeralStorage: Optional[EphemeralStorage]
+    Tags: Optional[Tags] = prop("Tags")
+    Tracing: Optional[Tracing] = prop("Tracing")
+    KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
+    Layers: Optional[Layers] = prop("Layers")
+    AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
+    DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
+    PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
+    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
+    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
+    AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
+    EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
+    Architectures: Optional[Architectures] = prop("Architectures")
+    EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
 
 
 class Resource(BaseModel):
