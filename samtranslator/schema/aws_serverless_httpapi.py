@@ -101,7 +101,7 @@ DefaultRouteSettings = Optional[PassThrough]
 
 
 class Properties(BaseModel):
-    AccessLogSettings: Optional[AccessLogSettings] = properties("AccessLogSetting")
+    AccessLogSettings: Optional[AccessLogSettings] = properties("AccessLogSettings")
     Auth: Optional[Auth] = properties("Auth")
     # TODO: Also string like in the docs?
     CorsConfiguration: Optional[CorsConfigurationType] = properties("CorsConfiguration")
@@ -121,7 +121,7 @@ class Properties(BaseModel):
 
 class Globals(BaseModel):
     Auth: Optional[Auth] = properties("Auth")
-    AccessLogSettings: Optional[AccessLogSettings] = properties("AccessLogSetting")
+    AccessLogSettings: Optional[AccessLogSettings] = properties("AccessLogSettings")
     StageVariables: Optional[StageVariables] = properties("StageVariables")
     Tags: Optional[Tags] = properties("Tags")
     RouteSettings: Optional[RouteSettings] = properties("RouteSettings")
