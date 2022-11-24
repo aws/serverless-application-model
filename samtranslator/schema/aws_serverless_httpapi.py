@@ -16,6 +16,7 @@ route53 = get_prop("sam-property-httpapi-route53configuration")
 domain = get_prop("sam-property-httpapi-httpapidomainconfiguration")
 properties = get_prop("sam-resource-httpapi")
 
+
 class OAuth2Authorizer(BaseModel):
     AuthorizationScopes: Optional[List[str]] = oauth2authorizer("AuthorizationScopes")
     IdentitySource: Optional[str] = oauth2authorizer("IdentitySource")
@@ -32,7 +33,9 @@ class LambdaAuthorizerIdentity(BaseModel):
 
 class LambdaAuthorizer(BaseModel):
     # TODO: Many tests use floats for the version string; docs only mention string
-    AuthorizerPayloadFormatVersion: Union[Literal["1.0", "2.0"], float] = lambdaauthorizer("AuthorizerPayloadFormatVersion")
+    AuthorizerPayloadFormatVersion: Union[Literal["1.0", "2.0"], float] = lambdaauthorizer(
+        "AuthorizerPayloadFormatVersion"
+    )
     EnableSimpleResponses: Optional[bool] = lambdaauthorizer("EnableSimpleResponses")
     FunctionArn: SamIntrinsicable[str] = lambdaauthorizer("FunctionArn")
     FunctionInvokeRole: Optional[SamIntrinsicable[str]] = lambdaauthorizer("FunctionInvokeRole")
