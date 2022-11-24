@@ -10,7 +10,7 @@ def parse(s: str):
     for part in parts:
         if part.startswith(" `"):
             name = part.split("`")[1]
-            yield name, part
+            yield name, part.strip()
 
 
 def main():
