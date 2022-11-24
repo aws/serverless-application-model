@@ -11,6 +11,7 @@ alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
 apiauth = get_prop("sam-property-function-apifunctionauth")
 apieventproperties = get_prop("sam-property-function-api")
 cloudwatcheventproperties = get_prop("sam-property-function-cloudwatchevent")
+cloudwatchlogseventproperties = get_prop("sam-property-function-cloudwatchlogs")
 codeuri = get_prop("sam-property-function-functioncode")
 cognitoeventproperties = get_prop("sam-property-function-cognito")
 deadletterconfig = get_prop("sam-property-function-deadletterconfig")
@@ -32,11 +33,13 @@ iotruleeventproperties = get_prop("sam-property-function-iotrule")
 kinesiseventproperties = get_prop("sam-property-function-kinesis")
 mqeventproperties = get_prop("sam-property-function-mq")
 prop = get_prop("sam-resource-function")
+requestmodel = get_prop("sam-property-function-requestmodel")
 requestparameters = get_prop("sam-property-function-requestparameter")
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 s3eventproperties = get_prop("sam-property-function-s3")
 selfmanagedkafkaeventproperties = get_prop("sam-property-function-selfmanagedkafka")
 snseventproperties = get_prop("sam-property-function-sns")
+sqseventproperties = get_prop("sam-property-function-sqs")
 sqssubscription = get_prop("sam-property-function-sqssubscriptionobject")
 
 
@@ -182,11 +185,11 @@ class DynamoDBEvent(BaseModel):
 
 
 class SQSEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough]
-    Enabled: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    MaximumBatchingWindowInSeconds: Optional[PassThrough]
-    Queue: PassThrough
+    BatchSize: Optional[PassThrough] = sqseventproperties("BatchSize")
+    Enabled: Optional[PassThrough] = sqseventproperties("Enabled")
+    FilterCriteria: Optional[PassThrough] = sqseventproperties("FilterCriteria")
+    MaximumBatchingWindowInSeconds: Optional[PassThrough] = sqseventproperties("MaximumBatchingWindowInSeconds")
+    Queue: PassThrough = sqseventproperties("Queue")
 
 
 class SQSEvent(BaseModel):
@@ -203,10 +206,10 @@ class ApiAuth(BaseModel):
 
 
 class RequestModel(BaseModel):
-    Model: str
-    Required: Optional[bool]
-    ValidateBody: Optional[bool]
-    ValidateParameters: Optional[bool]
+    Model: str = requestmodel("Model")
+    Required: Optional[bool] = requestmodel("Required")
+    ValidateBody: Optional[bool] = requestmodel("ValidateBody")
+    ValidateParameters: Optional[bool] = requestmodel("ValidateParameters")
 
 
 class RequestParameters(BaseModel):
@@ -284,8 +287,8 @@ class EventBridgeRuleEvent(BaseModel):
 
 
 class CloudWatchLogsEventProperties(BaseModel):
-    FilterPattern: PassThrough
-    LogGroupName: PassThrough
+    FilterPattern: PassThrough = cloudwatchlogseventproperties("FilterPattern")
+    LogGroupName: PassThrough = cloudwatchlogseventproperties("LogGroupName")
 
 
 class CloudWatchLogsEvent(BaseModel):
