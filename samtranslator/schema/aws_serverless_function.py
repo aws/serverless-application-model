@@ -6,7 +6,7 @@ from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic, ge
 
 
 def prop(field: str) -> Any:
-    return get_docs_prop("AWS::Serverless::Function.Properties." + field)
+    return get_docs_prop("sam-resource-function." + field)
 
 
 class ResourcePolicy(BaseModel):
