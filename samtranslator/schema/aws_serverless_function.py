@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
@@ -404,18 +406,18 @@ EphemeralStorage = Optional[PassThrough]
 
 
 class Properties(BaseModel):
-    Architectures: Optional[Architectures]
-    AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument]
-    AutoPublishAlias: Optional[AutoPublishAlias]
-    AutoPublishCodeSha256: Optional[SamIntrinsicable[str]]
+    Architectures: Optional[Architectures] = prop("Architectures")
+    AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
+    AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
+    AutoPublishCodeSha256: Optional[SamIntrinsicable[str]] = prop("AutoPublishCodeSha256")
     CodeSigningConfigArn: Optional[SamIntrinsicable[str]] = prop("CodeSigningConfigArn")
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
-    DeadLetterQueue: Optional[DeadLetterQueueType]
-    DeploymentPreference: Optional[DeploymentPreference]
-    Description: Optional[Description]
-    Environment: Optional[Environment]
-    EphemeralStorage: Optional[EphemeralStorage]
-    EventInvokeConfig: Optional[EventInvokeConfig]
+    DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
+    DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
+    Description: Optional[Description] = prop("Description")
+    Environment: Optional[Environment] = prop("Environment")
+    EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
+    EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Events: Optional[
         Dict[
             str,
@@ -440,33 +442,33 @@ class Properties(BaseModel):
                 SelfManagedKafkaEvent,
             ],
         ]
-    ]
-    FileSystemConfigs: Optional[PassThrough]
-    FunctionName: Optional[PassThrough]
-    FunctionUrlConfig: Optional[FunctionUrlConfig]
-    Handler: Optional[Handler]
-    ImageConfig: Optional[PassThrough]
-    ImageUri: Optional[PassThrough]
+    ] = prop("Events")
+    FileSystemConfigs: Optional[PassThrough] = prop("FileSystemConfigs")
+    FunctionName: Optional[PassThrough] = prop("FunctionName")
+    FunctionUrlConfig: Optional[FunctionUrlConfig] = prop("FunctionUrlConfig")
+    Handler: Optional[Handler] = prop("Handler")
+    ImageConfig: Optional[PassThrough] = prop("ImageConfig")
+    ImageUri: Optional[PassThrough] = prop("ImageUri")
     InlineCode: Optional[PassThrough] = prop("InlineCode")
-    KmsKeyArn: Optional[KmsKeyArn]
-    Layers: Optional[Layers]
-    MemorySize: Optional[MemorySize]
-    PackageType: Optional[PassThrough]
-    PermissionsBoundary: Optional[PermissionsBoundary]
-    Policies: Optional[SamIntrinsicable[Union[str, List[SamIntrinsicable[str]]]]]
-    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig]
-    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions]
-    Role: Optional[SamIntrinsicable[str]]
-    Runtime: Optional[Runtime]
-    Tags: Optional[Tags]
-    Timeout: Optional[Timeout]
-    Tracing: Optional[Tracing]
-    VersionDescription: Optional[PassThrough]
-    VpcConfig: Optional[VpcConfig]
+    KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
+    Layers: Optional[Layers] = prop("Layers")
+    MemorySize: Optional[MemorySize] = prop("MemorySize")
+    PackageType: Optional[PassThrough] = prop("PackageType")
+    PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
+    Policies: Optional[SamIntrinsicable[Union[str, List[SamIntrinsicable[str]]]]] = prop("Policies")
+    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
+    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
+    Role: Optional[SamIntrinsicable[str]] = prop("Role")
+    Runtime: Optional[Runtime] = prop("Runtime")
+    Tags: Optional[Tags] = prop("Tags")
+    Timeout: Optional[Timeout] = prop("Timeout")
+    Tracing: Optional[Tracing] = prop("Timeout")
+    VersionDescription: Optional[PassThrough] = prop("VersionDescription")
+    VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
 
 
 class Globals(BaseModel):
-    Handler: Optional[Handler]
+    Handler: Optional[Handler] = prop("Handler")
     Runtime: Optional[Runtime]
     CodeUri: Optional[CodeUriType]
     DeadLetterQueue: Optional[DeadLetterQueueType]
