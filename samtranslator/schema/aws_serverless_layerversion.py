@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable
 
 
 class ContentUri(BaseModel):
@@ -18,7 +18,7 @@ class Properties(BaseModel):
     Description: Optional[PassThrough]
     LayerName: Optional[PassThrough]
     LicenseInfo: Optional[PassThrough]
-    RetentionPolicy: Optional[Union[str, SamIntrinsic]]
+    RetentionPolicy: Optional[SamIntrinsicable[str]]
 
 
 class Resource(BaseModel):

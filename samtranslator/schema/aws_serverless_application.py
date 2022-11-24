@@ -2,12 +2,12 @@ from typing import Optional, Any, Dict, Union
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable
 
 
 class Location(BaseModel):
-    ApplicationId: Union[str, SamIntrinsic]
-    SemanticVersion: Union[str, SamIntrinsic]
+    ApplicationId: SamIntrinsicable[str]
+    SemanticVersion: SamIntrinsicable[str]
 
 
 class Properties(BaseModel):

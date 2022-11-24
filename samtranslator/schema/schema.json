@@ -53,10 +53,10 @@
           "title": "Bucket",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -64,10 +64,10 @@
           "title": "Key",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -75,10 +75,10 @@
           "title": "Version",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -120,10 +120,10 @@
           "title": "Posttraffic",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -131,10 +131,10 @@
           "title": "Pretraffic",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -149,13 +149,13 @@
           "title": "Alarms",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "type": "array",
               "items": {
                 "type": "object"
               }
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -163,10 +163,10 @@
           "title": "Enabled",
           "anyOf": [
             {
-              "type": "boolean"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "boolean"
             }
           ]
         },
@@ -177,10 +177,10 @@
           "title": "Passthroughcondition",
           "anyOf": [
             {
-              "type": "boolean"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "boolean"
             }
           ]
         },
@@ -188,10 +188,10 @@
           "title": "Role",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -202,12 +202,81 @@
           "title": "Type",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "EventInvokeOnFailure": {
+      "title": "EventInvokeOnFailure",
+      "type": "object",
+      "properties": {
+        "Destination": {
+          "title": "Destination",
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SQS",
+            "SNS",
+            "Lambda",
+            "EventBridge"
+          ],
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EventInvokeOnSuccess": {
+      "title": "EventInvokeOnSuccess",
+      "type": "object",
+      "properties": {
+        "Destination": {
+          "title": "Destination",
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "Type": {
+          "title": "Type",
+          "enum": [
+            "SQS",
+            "SNS",
+            "Lambda",
+            "EventBridge"
+          ],
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EventInvokeDestinationConfig": {
+      "title": "EventInvokeDestinationConfig",
+      "type": "object",
+      "properties": {
+        "OnFailure": {
+          "$ref": "#/definitions/EventInvokeOnFailure"
+        },
+        "OnSuccess": {
+          "$ref": "#/definitions/EventInvokeOnSuccess"
         }
       },
       "additionalProperties": false
@@ -217,7 +286,7 @@
       "type": "object",
       "properties": {
         "DestinationConfig": {
-          "title": "Destinationconfig"
+          "$ref": "#/definitions/EventInvokeDestinationConfig"
         },
         "MaximumEventAgeInSeconds": {
           "title": "Maximumeventageinseconds",
@@ -285,10 +354,14 @@
           "title": "Tracing",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "enum": [
+                "Active",
+                "PassThrough"
+              ],
+              "type": "string"
             }
           ]
         },
@@ -302,10 +375,10 @@
           "title": "Autopublishalias",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -349,10 +422,10 @@
           "title": "Reauthorizeevery",
           "anyOf": [
             {
-              "type": "integer"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "integer"
             }
           ]
         },
@@ -381,10 +454,10 @@
           "title": "Userpoolarn",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -402,10 +475,10 @@
           "title": "Reauthorizeevery",
           "anyOf": [
             {
-              "type": "integer"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "integer"
             }
           ]
         },
@@ -435,10 +508,10 @@
           "title": "Functionarn",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -449,7 +522,6 @@
         "FunctionPayloadType": {
           "title": "Functionpayloadtype",
           "enum": [
-            "REQUEST",
             "TOKEN"
           ],
           "type": "string"
@@ -492,10 +564,10 @@
           "title": "Reauthorizeevery",
           "anyOf": [
             {
-              "type": "integer"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "integer"
             }
           ]
         },
@@ -524,10 +596,10 @@
           "title": "Functionarn",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -538,8 +610,7 @@
         "FunctionPayloadType": {
           "title": "Functionpayloadtype",
           "enum": [
-            "REQUEST",
-            "TOKEN"
+            "REQUEST"
           ],
           "type": "string"
         },
@@ -721,15 +792,15 @@
           "title": "Createusageplan",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "enum": [
                 "PER_API",
                 "SHARED",
                 "NONE"
               ],
               "type": "string"
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -870,14 +941,14 @@
           "title": "Endpointconfiguration",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "enum": [
                 "REGIONAL",
                 "EDGE"
               ],
               "type": "string"
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -934,10 +1005,10 @@
           "title": "Cors",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             },
             {
               "$ref": "#/definitions/Cors"
@@ -1059,16 +1130,23 @@
         },
         "FunctionArn": {
           "title": "Functionarn",
-          "type": "object"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ]
         },
         "FunctionInvokeRole": {
           "title": "Functioninvokerole",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -1155,13 +1233,13 @@
           "title": "Endpointconfiguration",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "enum": [
                 "REGIONAL"
               ],
               "type": "string"
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -1335,10 +1413,10 @@
           "title": "Bucket",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -1383,10 +1461,10 @@
           "title": "Batchsize",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -1398,10 +1476,10 @@
           "title": "Queuearn",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -1413,10 +1491,10 @@
           "title": "Queueurl",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -1836,10 +1914,10 @@
           "title": "Invokerole",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -1923,10 +2001,10 @@
           "title": "Restapiid",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -2152,6 +2230,16 @@
       ],
       "additionalProperties": false
     },
+    "EventBridgeRuleTarget": {
+      "title": "EventBridgeRuleTarget",
+      "type": "object",
+      "properties": {
+        "Id": {
+          "title": "Id"
+        }
+      },
+      "additionalProperties": false
+    },
     "samtranslator__schema__aws_serverless_function__EventBridgeRuleEventProperties": {
       "title": "EventBridgeRuleEventProperties",
       "type": "object",
@@ -2175,7 +2263,7 @@
           "title": "Retrypolicy"
         },
         "Target": {
-          "title": "Target"
+          "$ref": "#/definitions/EventBridgeRuleTarget"
         }
       },
       "additionalProperties": false
@@ -2311,10 +2399,10 @@
           "title": "Userpool",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -2371,10 +2459,10 @@
           "title": "Apiid",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2393,10 +2481,10 @@
           "title": "Payloadformatversion",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2407,10 +2495,10 @@
           "title": "Timeoutinmillis",
           "anyOf": [
             {
-              "type": "integer"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "integer"
             }
           ]
         }
@@ -2604,10 +2692,10 @@
           "title": "Authtype",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2635,10 +2723,10 @@
           "title": "Autopublishalias",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2646,10 +2734,10 @@
           "title": "Autopublishcodesha256",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2659,10 +2747,10 @@
           "markdownDescription": " `CodeSigningConfigArn`   <a name=\"sam-function-codesigningconfigarn\"></a>\nThe ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](authoring-codesigning.md)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[CodeSigningConfigArn](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn)` property of an `AWS::Lambda::Function` resource\\.",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2809,6 +2897,9 @@
           "title": "Policies",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "type": "string"
             },
             {
@@ -2823,9 +2914,6 @@
                   }
                 ]
               }
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -2839,10 +2927,10 @@
           "title": "Role",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2860,10 +2948,14 @@
           "title": "Tracing",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "enum": [
+                "Active",
+                "PassThrough"
+              ],
+              "type": "string"
             }
           ]
         },
@@ -3403,7 +3495,14 @@
         },
         "RestApiId": {
           "title": "Restapiid",
-          "type": "object"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ]
         },
         "UnescapeMappingTemplate": {
           "title": "Unescapemappingtemplate",
@@ -3603,10 +3702,10 @@
           "title": "Retentionpolicy",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -3643,6 +3742,35 @@
       ],
       "additionalProperties": false
     },
+    "samtranslator__schema__aws_serverless_api__DefinitionUri": {
+      "title": "DefinitionUri",
+      "type": "object",
+      "properties": {
+        "Bucket": {
+          "title": "Bucket"
+        },
+        "Key": {
+          "title": "Key"
+        },
+        "Version": {
+          "title": "Version"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EndpointConfiguration": {
+      "title": "EndpointConfiguration",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "title": "Type"
+        },
+        "VPCEndpointIds": {
+          "title": "Vpcendpointids"
+        }
+      },
+      "additionalProperties": false
+    },
     "samtranslator__schema__aws_serverless_api__Properties": {
       "title": "Properties",
       "type": "object",
@@ -3672,10 +3800,10 @@
           "title": "Cors",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             },
             {
               "$ref": "#/definitions/Cors"
@@ -3683,10 +3811,19 @@
           ]
         },
         "DefinitionBody": {
-          "title": "Definitionbody"
+          "title": "Definitionbody",
+          "type": "object"
         },
         "DefinitionUri": {
-          "title": "Definitionuri"
+          "title": "Definitionuri",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__DefinitionUri"
+            }
+          ]
         },
         "Description": {
           "title": "Description"
@@ -3698,7 +3835,15 @@
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_api__Domain"
         },
         "EndpointConfiguration": {
-          "title": "Endpointconfiguration"
+          "title": "Endpointconfiguration",
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "#/definitions/EndpointConfiguration"
+            }
+          ]
         },
         "FailOnWarnings": {
           "title": "Failonwarnings"
@@ -3738,15 +3883,16 @@
           "title": "Stagename",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
         "Tags": {
-          "title": "Tags"
+          "title": "Tags",
+          "type": "object"
         },
         "TracingEnabled": {
           "title": "Tracingenabled"
@@ -3799,7 +3945,7 @@
       ],
       "additionalProperties": false
     },
-    "DefinitionUri": {
+    "samtranslator__schema__aws_serverless_httpapi__DefinitionUri": {
       "title": "DefinitionUri",
       "type": "object",
       "properties": {
@@ -3849,7 +3995,7 @@
               "type": "string"
             },
             {
-              "$ref": "#/definitions/DefinitionUri"
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__DefinitionUri"
             }
           ]
         },
@@ -3919,10 +4065,10 @@
           "title": "Applicationid",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -3930,10 +4076,10 @@
           "title": "Semanticversion",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }

@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable
 
 
 class ResourcePolicy(BaseModel):
@@ -21,18 +21,18 @@ class ResourcePolicy(BaseModel):
 
 class CognitoAuthorizerIdentity(BaseModel):
     Header: Optional[str]
-    ReauthorizeEvery: Optional[Union[int, SamIntrinsic]]
+    ReauthorizeEvery: Optional[SamIntrinsicable[int]]
     ValidationExpression: Optional[str]
 
 
 class CognitoAuthorizer(BaseModel):
     AuthorizationScopes: Optional[List[str]]
     Identity: Optional[CognitoAuthorizerIdentity]
-    UserPoolArn: Union[str, SamIntrinsic]
+    UserPoolArn: SamIntrinsicable[str]
 
 
 class LambdaTokenAuthorizerIdentity(BaseModel):
-    ReauthorizeEvery: Optional[Union[int, SamIntrinsic]]
+    ReauthorizeEvery: Optional[SamIntrinsicable[int]]
     ValidationExpression: Optional[str]
     Header: Optional[
         str
@@ -43,28 +43,28 @@ class LambdaRequestAuthorizerIdentity(BaseModel):
     Context: Optional[List[str]]
     Headers: Optional[List[str]]
     QueryStrings: Optional[List[str]]
-    ReauthorizeEvery: Optional[Union[int, SamIntrinsic]]
+    ReauthorizeEvery: Optional[SamIntrinsicable[int]]
     StageVariables: Optional[List[str]]
 
 
 class LambdaTokenAuthorizer(BaseModel):
     AuthorizationScopes: Optional[List[str]]
-    FunctionArn: Union[str, SamIntrinsic]
+    FunctionArn: SamIntrinsicable[str]
     FunctionInvokeRole: Optional[str]
-    FunctionPayloadType: Optional[Literal["REQUEST", "TOKEN"]]
+    FunctionPayloadType: Optional[Literal["TOKEN"]]
     Identity: Optional[LambdaTokenAuthorizerIdentity]
 
 
 class LambdaRequestAuthorizer(BaseModel):
     AuthorizationScopes: Optional[List[str]]
-    FunctionArn: Union[str, SamIntrinsic]
+    FunctionArn: SamIntrinsicable[str]
     FunctionInvokeRole: Optional[str]
-    FunctionPayloadType: Optional[Literal["REQUEST", "TOKEN"]]
+    FunctionPayloadType: Optional[Literal["REQUEST"]]
     Identity: Optional[LambdaRequestAuthorizerIdentity]
 
 
 class UsagePlan(BaseModel):
-    CreateUsagePlan: Union[Literal["PER_API", "SHARED", "NONE"], SamIntrinsic]
+    CreateUsagePlan: SamIntrinsicable[Literal["PER_API", "SHARED", "NONE"]]
     Description: Optional[PassThrough]
     Quota: Optional[PassThrough]
     Tags: Optional[PassThrough]
@@ -111,24 +111,35 @@ class Domain(BaseModel):
     BasePath: Optional[PassThrough]
     CertificateArn: PassThrough
     DomainName: PassThrough
-    EndpointConfiguration: Optional[Union[Literal["REGIONAL", "EDGE"], SamIntrinsic]]
+    EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE"]]]
     MutualTlsAuthentication: Optional[PassThrough]
     OwnershipVerificationCertificateArn: Optional[PassThrough]
     Route53: Optional[Route53]
     SecurityPolicy: Optional[PassThrough]
 
 
+class DefinitionUri(BaseModel):
+    Bucket: PassThrough
+    Key: PassThrough
+    Version: Optional[PassThrough]
+
+
+class EndpointConfiguration(BaseModel):
+    Type: Optional[PassThrough]
+    VPCEndpointIds: Optional[PassThrough]
+
+
 Name = Optional[PassThrough]
-DefinitionUri = Optional[PassThrough]
+DefinitionUriType = Optional[Union[str, DefinitionUri]]
 CacheClusterEnabled = Optional[PassThrough]
 CacheClusterSize = Optional[PassThrough]
 Variables = Optional[PassThrough]
-EndpointConfiguration = Optional[PassThrough]
+EndpointConfigurationType = Optional[SamIntrinsicable[EndpointConfiguration]]
 MethodSettings = Optional[PassThrough]
 BinaryMediaTypes = Optional[PassThrough]
 MinimumCompressionSize = Optional[PassThrough]
-CorsType = Optional[Union[str, SamIntrinsic, Cors]]
-GatewayResponses = Optional[SamIntrinsic]
+CorsType = Optional[SamIntrinsicable[Union[str, Cors]]]
+GatewayResponses = Optional[Dict[str, Any]]
 AccessLogSetting = Optional[PassThrough]
 CanarySetting = Optional[PassThrough]
 TracingEnabled = Optional[PassThrough]
@@ -144,22 +155,22 @@ class Properties(BaseModel):
     CacheClusterSize: Optional[CacheClusterSize]
     CanarySetting: Optional[CanarySetting]
     Cors: Optional[CorsType]
-    DefinitionBody: Optional[PassThrough]
-    DefinitionUri: Optional[DefinitionUri]
+    DefinitionBody: Optional[Dict[str, Any]]
+    DefinitionUri: Optional[DefinitionUriType]
     Description: Optional[PassThrough]
     DisableExecuteApiEndpoint: Optional[PassThrough]
     Domain: Optional[Domain]
-    EndpointConfiguration: Optional[EndpointConfiguration]
+    EndpointConfiguration: Optional[EndpointConfigurationType]
     FailOnWarnings: Optional[PassThrough]
     GatewayResponses: Optional[GatewayResponses]
     MethodSettings: Optional[MethodSettings]
     MinimumCompressionSize: Optional[MinimumCompressionSize]
     Mode: Optional[PassThrough]
-    Models: Optional[SamIntrinsic]
+    Models: Optional[Dict[str, Any]]
     Name: Optional[Name]
     OpenApiVersion: Optional[OpenApiVersion]
-    StageName: Union[str, SamIntrinsic]
-    Tags: Optional[PassThrough]
+    StageName: SamIntrinsicable[str]
+    Tags: Optional[Dict[str, Any]]
     TracingEnabled: Optional[TracingEnabled]
     Variables: Optional[Variables]
 
@@ -167,11 +178,11 @@ class Properties(BaseModel):
 class Globals(BaseModel):
     Auth: Optional[Auth]
     Name: Optional[Name]
-    DefinitionUri: Optional[DefinitionUri]
+    DefinitionUri: Optional[PassThrough]
     CacheClusterEnabled: Optional[CacheClusterEnabled]
     CacheClusterSize: Optional[CacheClusterSize]
     Variables: Optional[Variables]
-    EndpointConfiguration: Optional[EndpointConfiguration]
+    EndpointConfiguration: Optional[PassThrough]
     MethodSettings: Optional[MethodSettings]
     BinaryMediaTypes: Optional[BinaryMediaTypes]
     MinimumCompressionSize: Optional[MinimumCompressionSize]
