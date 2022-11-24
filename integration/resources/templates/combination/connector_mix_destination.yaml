@@ -17,7 +17,7 @@ Resources:
               DetailType: "Test",
             }]
           }).promise();
-
+          await new Promise(resolve => setTimeout(resolve, 5000));
           const sqs = new AWS.SQS();
           const data = await sqs.getQueueAttributes({
             QueueUrl: process.env.QUEUE_URL,
