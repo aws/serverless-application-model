@@ -22,7 +22,7 @@ LenientBaseModel = pydantic.BaseModel
 _DOCS = json.loads(Path("samtranslator", "schema", "docs.json").read_bytes())
 
 
-def get_prop(stem: str):
+def get_prop(stem: str) -> Any:
     return partial(_get_prop, stem)
 
 
