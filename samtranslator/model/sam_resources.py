@@ -1782,7 +1782,7 @@ class SamConnector(SamResourceMacro):
         "Permissions": PropertyType(True, list_of(is_str())),
     }
 
-    def generate_resource(
+    def generate_resources(
         self,
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
@@ -1797,10 +1797,9 @@ class SamConnector(SamResourceMacro):
                 f"Unable to create connector from {source.resource_type} to {destination.resource_type}; it's not supported or the template is invalid.",
             )
 
-        profile_type, profile_properties = profile["Type"], profile["Properties"]
-
         # removing duplicate permissions
         self.Permissions = list(set(self.Permissions))
+        profile_type, profile_properties = profile["Type"], profile["Properties"]
         profile_permissions = profile_properties["AccessCategories"]
         valid_permissions_combinations = profile_properties.get("ValidAccessCategories")
 
@@ -1839,7 +1838,6 @@ class SamConnector(SamResourceMacro):
             "Source.Qualifier": source.qualifier,
             "Destination.Qualifier": destination.qualifier,
         }
-
         try:
             profile_properties = profile_replace(profile_properties, replacement)
         except ValueError as e:
@@ -1848,7 +1846,6 @@ class SamConnector(SamResourceMacro):
         verify_profile_variables_replaced(profile_properties)
 
         generated_resources: List[Resource] = []
-
         if profile_type == "AWS_IAM_ROLE_MANAGED_POLICY":
             generated_resources.append(
                 self._construct_iam_policy(
@@ -1870,7 +1867,7 @@ class SamConnector(SamResourceMacro):
                 )
             )
         else:
-            raise InvalidResourceException(self.logical_id, f"Profile type {profile_type} is not supported")
+            raise TypeError(f"Profile type {profile_type} is not supported")
         return generated_resources
 
     @cw_timer
@@ -1892,10 +1889,10 @@ class SamConnector(SamResourceMacro):
             except ConnectorResourceError as e:
                 raise InvalidResourceException(self.logical_id, str(e))
 
-            generated_resource = self.generate_resource(source, destination, dest_index, multi_dest, resource_resolver)
+            generated_resources = self.generate_resources(source, destination, dest_index, multi_dest, resource_resolver)
 
-            self._add_connector_metadata(generated_resource, original_template, source, destination)
-            list_generated_resources.extend(generated_resource)
+            self._add_connector_metadata(generated_resources, original_template, source, destination)
+            list_generated_resources.extend(generated_resources)
 
         generated_logical_ids = [resource.logical_id for resource in list_generated_resources]
         replace_depends_on_logical_id(self.logical_id, generated_logical_ids, resource_resolver)
@@ -1903,7 +1900,7 @@ class SamConnector(SamResourceMacro):
         if list_generated_resources:
             return list_generated_resources
 
-        raise TypeError("The destination is empty")
+        raise TypeError(f"The connector {self.logical_id} doesn't generate any resources")
 
     def _get_policy_statements(self, profile: ConnectorProfile) -> Dict[str, Any]:
         policy_statements = []
