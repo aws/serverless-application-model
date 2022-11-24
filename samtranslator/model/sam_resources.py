@@ -1889,7 +1889,9 @@ class SamConnector(SamResourceMacro):
             except ConnectorResourceError as e:
                 raise InvalidResourceException(self.logical_id, str(e))
 
-            generated_resources = self.generate_resources(source, destination, dest_index, multi_dest, resource_resolver)
+            generated_resources = self.generate_resources(
+                source, destination, dest_index, multi_dest, resource_resolver
+            )
 
             self._add_connector_metadata(generated_resources, original_template, source, destination)
             list_generated_resources.extend(generated_resources)
