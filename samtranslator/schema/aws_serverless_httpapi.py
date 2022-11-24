@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable
 
 
 class OAuth2Authorizer(BaseModel):
@@ -23,8 +23,8 @@ class LambdaAuthorizer(BaseModel):
     # TODO: Many tests use floats for the version string; docs only mention string
     AuthorizerPayloadFormatVersion: Union[Literal["1.0", "2.0"], float]
     EnableSimpleResponses: Optional[bool]
-    FunctionArn: SamIntrinsic
-    FunctionInvokeRole: Optional[Union[str, SamIntrinsic]]
+    FunctionArn: SamIntrinsicable[str]
+    FunctionInvokeRole: Optional[SamIntrinsicable[str]]
     Identity: Optional[LambdaAuthorizerIdentity]
 
 
@@ -70,7 +70,7 @@ class Domain(BaseModel):
     BasePath: Optional[List[str]]
     CertificateArn: PassThrough
     DomainName: PassThrough
-    EndpointConfiguration: Optional[Union[Literal["REGIONAL"], SamIntrinsic]]
+    EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL"]]]
     MutualTlsAuthentication: Optional[PassThrough]
     OwnershipVerificationCertificateArn: Optional[PassThrough]
     Route53: Optional[Route53]
