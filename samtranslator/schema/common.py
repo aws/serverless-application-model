@@ -1,9 +1,10 @@
+import json
 from pathlib import Path
 from typing import Any, Dict, Optional, Union, TypeVar
+from functools import partial
 
 import pydantic
 from pydantic import Extra, Field
-import yaml
 
 # Value passed directly to CloudFormation; not used by SAM
 PassThrough = Any  # TODO: Make it behave like typescript's unknown
@@ -18,12 +19,17 @@ Unknown = Optional[Any]
 
 LenientBaseModel = pydantic.BaseModel
 
-_DOCS = yaml.safe_load(Path("samtranslator", "schema", "docs.yaml").read_bytes())
+_DOCS = json.loads(Path("samtranslator", "schema", "docs.json").read_bytes())
 
 
-def get_docs_prop(field: str) -> Any:
-    docs = _DOCS["docs"]["properties"][field]
+def get_prop(stem: str) -> Any:
+    return partial(_get_prop, stem)
+
+
+def _get_prop(stem: str, name: str) -> Any:
+    docs = _DOCS["properties"][stem][name]
     return Field(
+        title=name,
         description=docs,
         # https://code.visualstudio.com/docs/languages/json#_use-rich-formatting-in-hovers
         markdownDescription=docs,
