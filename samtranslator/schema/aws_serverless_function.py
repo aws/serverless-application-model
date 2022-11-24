@@ -389,7 +389,7 @@ class Properties(BaseModel):
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument]
     AutoPublishAlias: Optional[AutoPublishAlias]
     AutoPublishCodeSha256: Optional[Union[str, SamIntrinsic]]
-    CodeSigningConfigArn: Optional[Union[str, SamIntrinsic]]
+    CodeSigningConfigArn: Optional[Union[str, SamIntrinsic]] = prop("CodeSigningConfigArn")
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType]
     DeploymentPreference: Optional[DeploymentPreference]
