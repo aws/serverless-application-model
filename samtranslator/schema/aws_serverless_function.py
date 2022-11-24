@@ -32,11 +32,13 @@ httpapieventproperties = get_prop("sam-property-function-httpapi")
 iotruleeventproperties = get_prop("sam-property-function-iotrule")
 kinesiseventproperties = get_prop("sam-property-function-kinesis")
 mqeventproperties = get_prop("sam-property-function-mq")
+mskeventproperties = get_prop("sam-property-function-msk")
 prop = get_prop("sam-resource-function")
 requestmodel = get_prop("sam-property-function-requestmodel")
 requestparameters = get_prop("sam-property-function-requestparameter")
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 s3eventproperties = get_prop("sam-property-function-s3")
+schedulev2eventproperties = get_prop("sam-property-function-schedulev2")
 selfmanagedkafkaeventproperties = get_prop("sam-property-function-selfmanagedkafka")
 snseventproperties = get_prop("sam-property-function-sns")
 sqseventproperties = get_prop("sam-property-function-sqs")
@@ -232,12 +234,12 @@ class ApiEvent(BaseModel):
 
 
 class CloudWatchEventProperties(BaseModel):
-    Enabled: Optional[bool]  # TODO: Add to docs
+    Enabled: Optional[bool] = cloudwatcheventproperties("Enabled")
     EventBusName: Optional[PassThrough] = cloudwatcheventproperties("EventBusName")
     Input: Optional[PassThrough] = cloudwatcheventproperties("Input")
     InputPath: Optional[PassThrough] = cloudwatcheventproperties("InputPath")
     Pattern: Optional[PassThrough] = cloudwatcheventproperties("Pattern")
-    State: Optional[PassThrough]  # TODO: Add to docs
+    State: Optional[PassThrough] = cloudwatcheventproperties("State")
 
 
 class CloudWatchEvent(BaseModel):
@@ -259,7 +261,7 @@ class EventsScheduleProperties(BaseModel):
     Name: Optional[PassThrough] = eventsscheduleproperties("Name")
     RetryPolicy: Optional[PassThrough] = eventsscheduleproperties("RetryPolicy")
     Schedule: Optional[PassThrough] = eventsscheduleproperties("Schedule")
-    State: Optional[PassThrough]  # TODO: Add to docs
+    State: Optional[PassThrough] = eventsscheduleproperties("State")
 
 
 class ScheduleEvent(BaseModel):
@@ -346,12 +348,12 @@ class HttpApiEvent(BaseModel):
 
 
 class MSKEventProperties(BaseModel):
-    ConsumerGroupId: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    MaximumBatchingWindowInSeconds: Optional[PassThrough]
-    StartingPosition: PassThrough
-    Stream: PassThrough
-    Topics: PassThrough
+    ConsumerGroupId: Optional[PassThrough] = mskeventproperties("ConsumerGroupId")
+    FilterCriteria: Optional[PassThrough] = mskeventproperties("FilterCriteria")
+    MaximumBatchingWindowInSeconds: Optional[PassThrough] = mskeventproperties("MaximumBatchingWindowInSeconds")
+    StartingPosition: PassThrough = mskeventproperties("StartingPosition")
+    Stream: PassThrough = mskeventproperties("Stream")
+    Topics: PassThrough = mskeventproperties("Topics")
 
 
 class MSKEvent(BaseModel):
@@ -363,7 +365,7 @@ class MQEventProperties(BaseModel):
     BatchSize: Optional[PassThrough] = mqeventproperties("BatchSize")
     Broker: PassThrough = mqeventproperties("Broker")
     Enabled: Optional[PassThrough] = mqeventproperties("Enabled")
-    FilterCriteria: Optional[PassThrough]  # TODO: Add to docs
+    FilterCriteria: Optional[PassThrough] = mqeventproperties("FilterCriteria")
     MaximumBatchingWindowInSeconds: Optional[PassThrough] = mqeventproperties("MaximumBatchingWindowInSeconds")
     Queues: PassThrough = mqeventproperties("Queues")
     SecretsManagerKmsKeyId: Optional[str] = mqeventproperties("SecretsManagerKmsKeyId")
@@ -377,9 +379,9 @@ class MQEvent(BaseModel):
 
 class SelfManagedKafkaEventProperties(BaseModel):
     BatchSize: Optional[PassThrough] = selfmanagedkafkaeventproperties("BatchSize")
-    ConsumerGroupId: Optional[PassThrough]  # TODO: Add to docs
+    ConsumerGroupId: Optional[PassThrough] = selfmanagedkafkaeventproperties("ConsumerGroupId")
     Enabled: Optional[PassThrough] = selfmanagedkafkaeventproperties("Enabled")
-    FilterCriteria: Optional[PassThrough]  # TODO: Add to docs
+    FilterCriteria: Optional[PassThrough] = selfmanagedkafkaeventproperties("FilterCriteria")
     KafkaBootstrapServers: Optional[List[SamIntrinsicable[str]]] = selfmanagedkafkaeventproperties(
         "KafkaBootstrapServers"
     )
@@ -394,22 +396,21 @@ class SelfManagedKafkaEvent(BaseModel):
 
 # TODO: Same as ScheduleV2EventProperties in state machine?
 class ScheduleV2EventProperties(BaseModel):
-    # pylint: disable=duplicate-code
-    DeadLetterConfig: Optional[DeadLetterConfig]
-    Description: Optional[PassThrough]
-    EndDate: Optional[PassThrough]
-    FlexibleTimeWindow: Optional[PassThrough]
-    GroupName: Optional[PassThrough]
-    Input: Optional[PassThrough]
-    KmsKeyArn: Optional[PassThrough]
-    Name: Optional[PassThrough]
-    PermissionsBoundary: Optional[PassThrough]
-    RetryPolicy: Optional[PassThrough]
+    DeadLetterConfig: Optional[DeadLetterConfig] = schedulev2eventproperties("DeadLetterConfig")
+    Description: Optional[PassThrough] = schedulev2eventproperties("Description")
+    EndDate: Optional[PassThrough] = schedulev2eventproperties("EndDate")
+    FlexibleTimeWindow: Optional[PassThrough] = schedulev2eventproperties("FlexibleTimeWindow")
+    GroupName: Optional[PassThrough] = schedulev2eventproperties("GroupName")
+    Input: Optional[PassThrough] = schedulev2eventproperties("Input")
+    KmsKeyArn: Optional[PassThrough] = schedulev2eventproperties("KmsKeyArn")
+    Name: Optional[PassThrough] = schedulev2eventproperties("Name")
+    PermissionsBoundary: Optional[PassThrough] = schedulev2eventproperties("PermissionsBoundary")
+    RetryPolicy: Optional[PassThrough] = schedulev2eventproperties("RetryPolicy")
     RoleArn: Optional[PassThrough]  # TODO: Add to docs
-    ScheduleExpression: Optional[PassThrough]
-    ScheduleExpressionTimezone: Optional[PassThrough]
-    StartDate: Optional[PassThrough]
-    State: Optional[PassThrough]
+    ScheduleExpression: Optional[PassThrough] = schedulev2eventproperties("ScheduleExpression")
+    ScheduleExpressionTimezone: Optional[PassThrough] = schedulev2eventproperties("ScheduleExpressionTimezone")
+    StartDate: Optional[PassThrough] = schedulev2eventproperties("StartDate")
+    State: Optional[PassThrough] = schedulev2eventproperties("State")
 
 
 class ScheduleV2Event(BaseModel):
