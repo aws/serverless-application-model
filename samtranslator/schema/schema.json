@@ -4101,13 +4101,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `EventBridgeRule`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `EventBridgeRule`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "Schedule"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/ScheduleEventProperties"
+          "title": "Properties",
+          "description": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](sam-property-statemachine-statemachineschedule.md) \\| [ScheduleV2](sam-property-statemachine-statemachineschedulev2.md) \\| [CloudWatchEvent](sam-property-statemachine-statemachinecloudwatchevent.md) \\| [EventBridgeRule](sam-property-statemachine-statemachineeventbridgerule.md) \\| [Api](sam-property-statemachine-statemachineapi.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](sam-property-statemachine-statemachineschedule.md) \\| [ScheduleV2](sam-property-statemachine-statemachineschedulev2.md) \\| [CloudWatchEvent](sam-property-statemachine-statemachinecloudwatchevent.md) \\| [EventBridgeRule](sam-property-statemachine-statemachineeventbridgerule.md) \\| [Api](sam-property-statemachine-statemachineapi.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/ScheduleEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -4207,13 +4216,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `EventBridgeRule`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `EventBridgeRule`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "ScheduleV2"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__ScheduleV2EventProperties"
+          "title": "Properties",
+          "description": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](sam-property-statemachine-statemachineschedule.md) \\| [ScheduleV2](sam-property-statemachine-statemachineschedulev2.md) \\| [CloudWatchEvent](sam-property-statemachine-statemachinecloudwatchevent.md) \\| [EventBridgeRule](sam-property-statemachine-statemachineeventbridgerule.md) \\| [Api](sam-property-statemachine-statemachineapi.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](sam-property-statemachine-statemachineschedule.md) \\| [ScheduleV2](sam-property-statemachine-statemachineschedulev2.md) \\| [CloudWatchEvent](sam-property-statemachine-statemachinecloudwatchevent.md) \\| [EventBridgeRule](sam-property-statemachine-statemachineeventbridgerule.md) \\| [Api](sam-property-statemachine-statemachineapi.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__ScheduleV2EventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -4255,13 +4273,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `EventBridgeRule`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `EventBridgeRule`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "CloudWatchEvent"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__CloudWatchEventProperties"
+          "title": "Properties",
+          "description": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](sam-property-statemachine-statemachineschedule.md) \\| [ScheduleV2](sam-property-statemachine-statemachineschedulev2.md) \\| [CloudWatchEvent](sam-property-statemachine-statemachinecloudwatchevent.md) \\| [EventBridgeRule](sam-property-statemachine-statemachineeventbridgerule.md) \\| [Api](sam-property-statemachine-statemachineapi.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](sam-property-statemachine-statemachineschedule.md) \\| [ScheduleV2](sam-property-statemachine-statemachineschedulev2.md) \\| [CloudWatchEvent](sam-property-statemachine-statemachinecloudwatchevent.md) \\| [EventBridgeRule](sam-property-statemachine-statemachineeventbridgerule.md) \\| [Api](sam-property-statemachine-statemachineapi.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__CloudWatchEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -4318,13 +4345,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `EventBridgeRule`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `EventBridgeRule`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "EventBridgeRule"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__EventBridgeRuleEventProperties"
+          "title": "Properties",
+          "description": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](sam-property-statemachine-statemachineschedule.md) \\| [ScheduleV2](sam-property-statemachine-statemachineschedulev2.md) \\| [CloudWatchEvent](sam-property-statemachine-statemachinecloudwatchevent.md) \\| [EventBridgeRule](sam-property-statemachine-statemachineeventbridgerule.md) \\| [Api](sam-property-statemachine-statemachineapi.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](sam-property-statemachine-statemachineschedule.md) \\| [ScheduleV2](sam-property-statemachine-statemachineschedulev2.md) \\| [CloudWatchEvent](sam-property-statemachine-statemachinecloudwatchevent.md) \\| [EventBridgeRule](sam-property-statemachine-statemachineeventbridgerule.md) \\| [Api](sam-property-statemachine-statemachineapi.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__EventBridgeRuleEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -4610,13 +4646,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `EventBridgeRule`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `EventBridgeRule`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "Api"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__ApiEventProperties"
+          "title": "Properties",
+          "description": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](sam-property-statemachine-statemachineschedule.md) \\| [ScheduleV2](sam-property-statemachine-statemachineschedulev2.md) \\| [CloudWatchEvent](sam-property-statemachine-statemachinecloudwatchevent.md) \\| [EventBridgeRule](sam-property-statemachine-statemachineeventbridgerule.md) \\| [Api](sam-property-statemachine-statemachineapi.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](sam-property-statemachine-statemachineschedule.md) \\| [ScheduleV2](sam-property-statemachine-statemachineschedulev2.md) \\| [CloudWatchEvent](sam-property-statemachine-statemachinecloudwatchevent.md) \\| [EventBridgeRule](sam-property-statemachine-statemachineeventbridgerule.md) \\| [Api](sam-property-statemachine-statemachineapi.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__ApiEventProperties"
+            }
+          ]
         }
       },
       "required": [

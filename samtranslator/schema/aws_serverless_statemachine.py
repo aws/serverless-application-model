@@ -16,6 +16,7 @@ cloudwatcheventproperties = get_prop("sam-property-statemachine-statemachineclou
 eventbridgeruleeventproperties = get_prop("sam-property-statemachine-statemachineeventbridgerule")
 apieventproperties = get_prop("sam-property-statemachine-statemachineapi")
 apiauth = get_prop("sam-property-statemachine-apistatemachineauth")
+event = get_prop("sam-property-statemachine-statemachineeventsource")
 
 
 class DeadLetterConfig(BaseModel):
@@ -36,8 +37,8 @@ class ScheduleEventProperties(BaseModel):
 
 
 class ScheduleEvent(BaseModel):
-    Type: Literal["Schedule"]
-    Properties: ScheduleEventProperties
+    Type: Literal["Schedule"] = event("Type")
+    Properties: ScheduleEventProperties = event("Properties")
 
 
 class ScheduleV2EventProperties(BaseModel):
@@ -59,8 +60,8 @@ class ScheduleV2EventProperties(BaseModel):
 
 
 class ScheduleV2Event(BaseModel):
-    Type: Literal["ScheduleV2"]
-    Properties: ScheduleV2EventProperties
+    Type: Literal["ScheduleV2"] = event("Type")
+    Properties: ScheduleV2EventProperties = event("Properties")
 
 
 class ResourcePolicy(BaseModel):
@@ -85,8 +86,8 @@ class CloudWatchEventProperties(BaseModel):
 
 
 class CloudWatchEvent(BaseModel):
-    Type: Literal["CloudWatchEvent"]
-    Properties: CloudWatchEventProperties
+    Type: Literal["CloudWatchEvent"] = event("Type")
+    Properties: CloudWatchEventProperties = event("Properties")
 
 
 class EventBridgeRuleEventProperties(BaseModel):
@@ -94,13 +95,13 @@ class EventBridgeRuleEventProperties(BaseModel):
     EventBusName: Optional[PassThrough] = eventbridgeruleeventproperties("EventBusName")
     Input: Optional[PassThrough] = eventbridgeruleeventproperties("Input")
     InputPath: Optional[PassThrough] = eventbridgeruleeventproperties("InputPath")
-    Pattern: PassThrough = eventbridgeruleeventproperties("Pattern")
+    Pattern: Optional[PassThrough] = eventbridgeruleeventproperties("Pattern")
     RetryPolicy: Optional[PassThrough] = eventbridgeruleeventproperties("RetryPolicy")
 
 
 class EventBridgeRuleEvent(BaseModel):
-    Type: Literal["EventBridgeRule"]
-    Properties: EventBridgeRuleEventProperties
+    Type: Literal["EventBridgeRule"] = event("Type")
+    Properties: EventBridgeRuleEventProperties = event("Properties")
 
 
 class Auth(BaseModel):
@@ -119,8 +120,8 @@ class ApiEventProperties(BaseModel):
 
 
 class ApiEvent(BaseModel):
-    Type: Literal["Api"]
-    Properties: ApiEventProperties
+    Type: Literal["Api"] = event("Type")
+    Properties: ApiEventProperties = event("Properties")
 
 
 class Properties(BaseModel):
