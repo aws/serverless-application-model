@@ -1,5 +1,3 @@
-# yaml-language-server: $schema=/Users/rehnc/Desktop/serverless-application-model/samtranslator/schema/schema.json
-
 AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   AuthorizationTypeRef:
