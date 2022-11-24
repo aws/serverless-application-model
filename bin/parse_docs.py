@@ -32,8 +32,9 @@ def main() -> None:
 
     props: Dict[str, Dict[str, str]] = {}
     for path in args.dir.glob("*.md"):
-        props[path.stem] = {}
         for name, description in parse(path.read_text()):
+            if path.stem not in props:
+                props[path.stem] = {}
             props[path.stem][name] = description
 
     print(
