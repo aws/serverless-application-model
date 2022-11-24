@@ -1782,6 +1782,97 @@ class SamConnector(SamResourceMacro):
         "Permissions": PropertyType(True, list_of(is_str())),
     }
 
+    def generate_resource(
+        self,
+        source: ConnectorResourceReference,
+        destination: ConnectorResourceReference,
+        dest_index: int,
+        multi_dest: bool,
+        resource_resolver: ResourceResolver,
+    ) -> List[Resource]:
+        profile = get_profile(source.resource_type, destination.resource_type)
+        if not profile:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"Unable to create connector from {source.resource_type} to {destination.resource_type}; it's not supported or the template is invalid.",
+            )
+
+        profile_type, profile_properties = profile["Type"], profile["Properties"]
+
+        # removing duplicate permissions
+        self.Permissions = list(set(self.Permissions))
+        profile_permissions = profile_properties["AccessCategories"]
+        valid_permissions_combinations = profile_properties.get("ValidAccessCategories")
+
+        valid_permissions_str = ", ".join(profile_permissions)
+        if not self.Permissions:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'Permissions' cannot be empty; valid values are: {valid_permissions_str}.",
+            )
+
+        for permission in self.Permissions:
+            if permission not in profile_permissions:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    f"Unsupported 'Permissions' provided for connector from {source.resource_type} to {destination.resource_type}; valid values are: {valid_permissions_str}.",
+                )
+
+        if valid_permissions_combinations:
+            sorted_permissions_combinations = [sorted(permission) for permission in valid_permissions_combinations]
+            if sorted(self.Permissions) not in sorted_permissions_combinations:
+                valid_permissions_combination_str = ", ".join(
+                    " + ".join(permission) for permission in sorted_permissions_combinations
+                )
+                raise InvalidResourceException(
+                    self.logical_id,
+                    f"Unsupported 'Permissions' provided for connector from {source.resource_type} to {destination.resource_type}; valid combinations are: {valid_permissions_combination_str}.",
+                )
+
+        replacement = {
+            "Source.Arn": source.arn,
+            "Destination.Arn": destination.arn,
+            "Source.ResourceId": source.resource_id,
+            "Destination.ResourceId": destination.resource_id,
+            "Source.Name": source.name,
+            "Destination.Name": destination.name,
+            "Source.Qualifier": source.qualifier,
+            "Destination.Qualifier": destination.qualifier,
+        }
+
+        try:
+            profile_properties = profile_replace(profile_properties, replacement)
+        except ValueError as e:
+            raise InvalidResourceException(self.logical_id, str(e))
+
+        verify_profile_variables_replaced(profile_properties)
+
+        generated_resources: List[Resource] = []
+
+        if profile_type == "AWS_IAM_ROLE_MANAGED_POLICY":
+            generated_resources.append(
+                self._construct_iam_policy(
+                    source, destination, profile_properties, resource_resolver, dest_index, multi_dest
+                )
+            )
+        elif profile_type == "AWS_SQS_QUEUE_POLICY":
+            generated_resources.append(
+                self._construct_sqs_queue_policy(source, destination, profile_properties, dest_index, multi_dest)
+            )
+        elif profile_type == "AWS_SNS_TOPIC_POLICY":
+            generated_resources.append(
+                self._construct_sns_topic_policy(source, destination, profile_properties, dest_index, multi_dest)
+            )
+        elif profile_type == "AWS_LAMBDA_PERMISSION":
+            generated_resources.extend(
+                self._construct_lambda_permission_policy(
+                    source, destination, profile_properties, dest_index, multi_dest
+                )
+            )
+        else:
+            raise InvalidResourceException(self.logical_id, f"Profile type {profile_type} is not supported")
+        return generated_resources
+
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:  # type: ignore
         resource_resolver: ResourceResolver = kwargs["resource_resolver"]
@@ -1794,93 +1885,17 @@ class SamConnector(SamResourceMacro):
 
         list_generated_resources: List[Resource] = []
 
-        for index, dest in enumerate(self.Destination):
+        for dest_index, dest in enumerate(self.Destination):
             try:
                 destination = get_resource_reference(dest, resource_resolver, self.Source)
                 source = get_resource_reference(self.Source, resource_resolver, dest)
             except ConnectorResourceError as e:
                 raise InvalidResourceException(self.logical_id, str(e))
 
-            profile = get_profile(source.resource_type, destination.resource_type)
+            generated_resource = self.generate_resource(source, destination, dest_index, multi_dest, resource_resolver)
 
-            if not profile:
-                raise InvalidResourceException(
-                    self.logical_id,
-                    f"Unable to create connector from {source.resource_type} to {destination.resource_type}; it's not supported or the template is invalid.",
-                )
-
-            # removing duplicate permissions
-            self.Permissions = list(set(self.Permissions))
-            profile_type, profile_properties = profile["Type"], profile["Properties"]
-            profile_permissions = profile_properties["AccessCategories"]
-            valid_permissions_combinations = profile_properties.get("ValidAccessCategories")
-
-            valid_permissions_str = ", ".join(profile_permissions)
-            if not self.Permissions:
-                raise InvalidResourceException(
-                    self.logical_id,
-                    f"'Permissions' cannot be empty; valid values are: {valid_permissions_str}.",
-                )
-
-            for permission in self.Permissions:
-                if permission not in profile_permissions:
-                    raise InvalidResourceException(
-                        self.logical_id,
-                        f"Unsupported 'Permissions' provided for connector from {source.resource_type} to {destination.resource_type}; valid values are: {valid_permissions_str}.",
-                    )
-
-            if valid_permissions_combinations:
-                sorted_permissions_combinations = [sorted(permission) for permission in valid_permissions_combinations]
-                if sorted(self.Permissions) not in sorted_permissions_combinations:
-                    valid_permissions_combination_str = ", ".join(
-                        " + ".join(permission) for permission in sorted_permissions_combinations
-                    )
-                    raise InvalidResourceException(
-                        self.logical_id,
-                        f"Unsupported 'Permissions' provided for connector from {source.resource_type} to {destination.resource_type}; valid combinations are: {valid_permissions_combination_str}.",
-                    )
-
-            replacement = {
-                "Source.Arn": source.arn,
-                "Destination.Arn": destination.arn,
-                "Source.ResourceId": source.resource_id,
-                "Destination.ResourceId": destination.resource_id,
-                "Source.Name": source.name,
-                "Destination.Name": destination.name,
-                "Source.Qualifier": source.qualifier,
-                "Destination.Qualifier": destination.qualifier,
-            }
-
-            try:
-                profile_properties = profile_replace(profile_properties, replacement)
-            except ValueError as e:
-                raise InvalidResourceException(self.logical_id, str(e))
-
-            verify_profile_variables_replaced(profile_properties)
-
-            generated_resources: List[Resource] = []
-
-            if profile_type == "AWS_IAM_ROLE_MANAGED_POLICY":
-                generated_resources.append(
-                    self._construct_iam_policy(
-                        source, destination, profile_properties, resource_resolver, index, multi_dest
-                    )
-                )
-            if profile_type == "AWS_SQS_QUEUE_POLICY":
-                generated_resources.append(
-                    self._construct_sqs_queue_policy(source, destination, profile_properties, index, multi_dest)
-                )
-            if profile_type == "AWS_SNS_TOPIC_POLICY":
-                generated_resources.append(
-                    self._construct_sns_topic_policy(source, destination, profile_properties, index, multi_dest)
-                )
-            if profile_type == "AWS_LAMBDA_PERMISSION":
-                generated_resources.extend(
-                    self._construct_lambda_permission_policy(source, destination, profile_properties, index, multi_dest)
-                )
-
-            self._add_connector_metadata(generated_resources, original_template, source, destination)
-            list_generated_resources.extend(generated_resources)
+            self._add_connector_metadata(generated_resource, original_template, source, destination)
+            list_generated_resources.extend(generated_resource)
 
         generated_logical_ids = [resource.logical_id for resource in list_generated_resources]
         replace_depends_on_logical_id(self.logical_id, generated_logical_ids, resource_resolver)
@@ -1889,7 +1904,7 @@ class SamConnector(SamResourceMacro):
             return list_generated_resources
 
         # Should support all profile types
-        raise TypeError(f"Unknown profile policy type '{profile_type}'")
+        raise TypeError("The destination is empty")
 
     def _get_policy_statements(self, profile: ConnectorProfile) -> Dict[str, Any]:
         policy_statements = []
@@ -1908,7 +1923,7 @@ class SamConnector(SamResourceMacro):
         destination: ConnectorResourceReference,
         profile: ConnectorProfile,
         resource_resolver: ResourceResolver,
-        index: int,
+        dest_index: int,
         multi_dest: bool,
     ) -> IAMManagedPolicy:
         source_policy = profile["SourcePolicy"]
@@ -1923,7 +1938,7 @@ class SamConnector(SamResourceMacro):
 
         policy_document = self._get_policy_statements(profile)
 
-        policy_name = f"{self.logical_id}PolicyDestination{index}" if multi_dest else f"{self.logical_id}Policy"
+        policy_name = f"{self.logical_id}PolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}Policy"
         policy = IAMManagedPolicy(policy_name)
         policy.PolicyDocument = policy_document
         policy.Roles = [role_name]
@@ -1947,7 +1962,7 @@ class SamConnector(SamResourceMacro):
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
         profile: ConnectorProfile,
-        index: int,
+        dest_index: int,
         multi_dest: bool,
     ) -> List[LambdaPermission]:
         source_policy = profile["SourcePolicy"]
@@ -1964,7 +1979,7 @@ class SamConnector(SamResourceMacro):
         for name in profile["AccessCategories"].keys():
             if name in self.Permissions:
                 permission_name = (
-                    f"{self.logical_id}{name}LambdaPermissionDestination{index}"
+                    f"{self.logical_id}{name}LambdaPermissionDestination{dest_index}"
                     if multi_dest
                     else f"{self.logical_id}{name}LambdaPermission"
                 )
@@ -1984,7 +1999,7 @@ class SamConnector(SamResourceMacro):
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
         profile: ConnectorProfile,
-        index: int,
+        dest_index: int,
         multi_dest: bool,
     ) -> SNSTopicPolicy:
         source_policy = profile["SourcePolicy"]
@@ -1998,7 +2013,7 @@ class SamConnector(SamResourceMacro):
             )
 
         topic_policy_name = (
-            f"{self.logical_id}TopicPolicyDestination{index}" if multi_dest else f"{self.logical_id}TopicPolicy"
+            f"{self.logical_id}TopicPolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}TopicPolicy"
         )
         topic_policy = SNSTopicPolicy(topic_policy_name)
         topic_policy.Topics = [topic_arn]
@@ -2011,7 +2026,7 @@ class SamConnector(SamResourceMacro):
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
         profile: ConnectorProfile,
-        index: int,
+        dest_index: int,
         multi_dest: bool,
     ) -> SQSQueuePolicy:
         source_policy = profile["SourcePolicy"]
@@ -2025,7 +2040,7 @@ class SamConnector(SamResourceMacro):
             )
 
         queue_policy_name = (
-            f"{self.logical_id}QueuePolicyDestination{index}" if multi_dest else f"{self.logical_id}QueuePolicy"
+            f"{self.logical_id}QueuePolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}QueuePolicy"
         )
         queue_policy = SQSQueuePolicy(queue_policy_name)
         queue_policy.PolicyDocument = self._get_policy_statements(profile)
