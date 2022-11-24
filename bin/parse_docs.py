@@ -12,6 +12,7 @@ Usage:
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Iterator, Tuple, Dict
 
@@ -25,6 +26,12 @@ def parse(s: str) -> Iterator[Tuple[str, str]]:
             yield name, part.strip()
 
 
+# TODO: Change in the docs instead?
+def fix_markdown_code_link(s: str) -> str:
+    """Turns `[foo](bar)` into [`foo`](bar); the former doesn't display as a link."""
+    return re.sub(r"`\[(\w+)\]\(([^ ]+)\)`", r"[`\1`](\2)", s)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", type=Path)
@@ -35,6 +42,7 @@ def main() -> None:
         for name, description in parse(path.read_text()):
             if path.stem not in props:
                 props[path.stem] = {}
+            description = fix_markdown_code_link(description)
             props[path.stem][name] = description
 
     print(
