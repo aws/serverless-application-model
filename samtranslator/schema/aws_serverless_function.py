@@ -149,25 +149,33 @@ class SNSEvent(BaseModel):
     Type: Literal["SNS"]
 
 
+def functionurlconfig(name: str) -> Any:
+    return get_docs_prop("sam-property-function-functionurlconfig", name)
+
+
 class FunctionUrlConfig(BaseModel):
-    AuthType: SamIntrinsicable[str]
-    Cors: Optional[PassThrough]
+    AuthType: SamIntrinsicable[str] = functionurlconfig("AuthType")
+    Cors: Optional[PassThrough] = functionurlconfig("Cors")
+
+
+def kinesiseventproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-kinesis", name)
 
 
 class KinesisEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough]
-    BisectBatchOnFunctionError: Optional[PassThrough]
-    DestinationConfig: Optional[PassThrough]
-    Enabled: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    FunctionResponseTypes: Optional[PassThrough]
-    MaximumBatchingWindowInSeconds: Optional[PassThrough]
-    MaximumRecordAgeInSeconds: Optional[PassThrough]
-    MaximumRetryAttempts: Optional[PassThrough]
-    ParallelizationFactor: Optional[PassThrough]
-    StartingPosition: PassThrough
-    Stream: PassThrough
-    TumblingWindowInSeconds: Optional[PassThrough]
+    BatchSize: Optional[PassThrough] = kinesiseventproperties("BatchSize")
+    BisectBatchOnFunctionError: Optional[PassThrough] = kinesiseventproperties("BisectBatchOnFunctionError")
+    DestinationConfig: Optional[PassThrough] = kinesiseventproperties("DestinationConfig")
+    Enabled: Optional[PassThrough] = kinesiseventproperties("Enabled")
+    FilterCriteria: Optional[PassThrough] = kinesiseventproperties("FilterCriteria")
+    FunctionResponseTypes: Optional[PassThrough] = kinesiseventproperties("FunctionResponseTypes")
+    MaximumBatchingWindowInSeconds: Optional[PassThrough] = kinesiseventproperties("MaximumBatchingWindowInSeconds")
+    MaximumRecordAgeInSeconds: Optional[PassThrough] = kinesiseventproperties("MaximumRecordAgeInSeconds")
+    MaximumRetryAttempts: Optional[PassThrough] = kinesiseventproperties("MaximumRetryAttempts")
+    ParallelizationFactor: Optional[PassThrough] = kinesiseventproperties("ParallelizationFactor")
+    StartingPosition: PassThrough = kinesiseventproperties("StartingPosition")
+    Stream: PassThrough = kinesiseventproperties("Stream")
+    TumblingWindowInSeconds: Optional[PassThrough] = kinesiseventproperties("TumblingWindowInSeconds")
 
 
 class KinesisEvent(BaseModel):
@@ -175,20 +183,24 @@ class KinesisEvent(BaseModel):
     Properties: KinesisEventProperties
 
 
+def dynamodbeventproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-dynamodb", name)
+
+
 class DynamoDBEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough]
-    BisectBatchOnFunctionError: Optional[PassThrough]
-    DestinationConfig: Optional[PassThrough]
-    Enabled: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    FunctionResponseTypes: Optional[PassThrough]
-    MaximumBatchingWindowInSeconds: Optional[PassThrough]
-    MaximumRecordAgeInSeconds: Optional[PassThrough]
-    MaximumRetryAttempts: Optional[PassThrough]
-    ParallelizationFactor: Optional[PassThrough]
-    StartingPosition: PassThrough
-    Stream: PassThrough
-    TumblingWindowInSeconds: Optional[PassThrough]
+    BatchSize: Optional[PassThrough] = dynamodbeventproperties("BatchSize")
+    BisectBatchOnFunctionError: Optional[PassThrough] = dynamodbeventproperties("BisectBatchOnFunctionError")
+    DestinationConfig: Optional[PassThrough] = dynamodbeventproperties("DestinationConfig")
+    Enabled: Optional[PassThrough] = dynamodbeventproperties("Enabled")
+    FilterCriteria: Optional[PassThrough] = dynamodbeventproperties("FilterCriteria")
+    FunctionResponseTypes: Optional[PassThrough] = dynamodbeventproperties("FunctionResponseTypes")
+    MaximumBatchingWindowInSeconds: Optional[PassThrough] = dynamodbeventproperties("MaximumBatchingWindowInSeconds")
+    MaximumRecordAgeInSeconds: Optional[PassThrough] = dynamodbeventproperties("MaximumRecordAgeInSeconds")
+    MaximumRetryAttempts: Optional[PassThrough] = dynamodbeventproperties("MaximumRetryAttempts")
+    ParallelizationFactor: Optional[PassThrough] = dynamodbeventproperties("ParallelizationFactor")
+    StartingPosition: PassThrough = dynamodbeventproperties("StartingPosition")
+    Stream: PassThrough = dynamodbeventproperties("Stream")
+    TumblingWindowInSeconds: Optional[PassThrough] = dynamodbeventproperties("TumblingWindowInSeconds")
 
 
 class DynamoDBEvent(BaseModel):
@@ -247,13 +259,17 @@ class ApiEvent(BaseModel):
     Properties: ApiEventProperties
 
 
+def cloudwatcheventproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-cloudwatchevent", name)
+
+
 class CloudWatchEventProperties(BaseModel):
-    Enabled: Optional[bool]
-    EventBusName: Optional[PassThrough]
-    Input: Optional[PassThrough]
-    InputPath: Optional[PassThrough]
-    Pattern: Optional[PassThrough]
-    State: Optional[PassThrough]
+    Enabled: Optional[bool]  # TODO: Add to docs
+    EventBusName: Optional[PassThrough] = cloudwatcheventproperties("EventBusName")
+    Input: Optional[PassThrough] = cloudwatcheventproperties("Input")
+    InputPath: Optional[PassThrough] = cloudwatcheventproperties("InputPath")
+    Pattern: Optional[PassThrough] = cloudwatcheventproperties("Pattern")
+    State: Optional[PassThrough]  # TODO: Add to docs
 
 
 class CloudWatchEvent(BaseModel):
@@ -261,21 +277,29 @@ class CloudWatchEvent(BaseModel):
     Properties: CloudWatchEventProperties
 
 
+def deadletterconfig(name: str) -> Any:
+    return get_docs_prop("sam-property-function-deadletterconfig", name)
+
+
 class DeadLetterConfig(BaseModel):
-    Arn: Optional[PassThrough]
-    QueueLogicalId: Optional[str]
-    Type: Optional[Literal["SQS"]]
+    Arn: Optional[PassThrough] = deadletterconfig("Arn")
+    QueueLogicalId: Optional[str] = deadletterconfig("QueueLogicalId")
+    Type: Optional[Literal["SQS"]] = deadletterconfig("Type")
+
+
+def eventsscheduleproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-schedule", name)
 
 
 class EventsScheduleProperties(BaseModel):
-    DeadLetterConfig: Optional[DeadLetterConfig]
-    Description: Optional[PassThrough]
-    Enabled: Optional[bool]
-    Input: Optional[PassThrough]
-    Name: Optional[PassThrough]
-    RetryPolicy: Optional[PassThrough]
-    Schedule: Optional[PassThrough]
-    State: Optional[PassThrough]
+    DeadLetterConfig: Optional[DeadLetterConfig] = eventsscheduleproperties("DeadLetterConfig")
+    Description: Optional[PassThrough] = eventsscheduleproperties("Description")
+    Enabled: Optional[bool] = eventsscheduleproperties("Enabled")
+    Input: Optional[PassThrough] = eventsscheduleproperties("Input")
+    Name: Optional[PassThrough] = eventsscheduleproperties("Name")
+    RetryPolicy: Optional[PassThrough] = eventsscheduleproperties("RetryPolicy")
+    Schedule: Optional[PassThrough] = eventsscheduleproperties("Schedule")
+    State: Optional[PassThrough]  # TODO: Add to docs
 
 
 class ScheduleEvent(BaseModel):
@@ -287,14 +311,18 @@ class EventBridgeRuleTarget(BaseModel):
     Id: PassThrough
 
 
+def eventbridgeruleeventproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-eventbridgerule", name)
+
+
 class EventBridgeRuleEventProperties(BaseModel):
-    DeadLetterConfig: Optional[DeadLetterConfig]
-    EventBusName: Optional[PassThrough]
-    Input: Optional[PassThrough]
-    InputPath: Optional[PassThrough]
-    Pattern: PassThrough
-    RetryPolicy: Optional[PassThrough]
-    Target: Optional[EventBridgeRuleTarget]
+    DeadLetterConfig: Optional[DeadLetterConfig] = eventbridgeruleeventproperties("DeadLetterConfig")
+    EventBusName: Optional[PassThrough] = eventbridgeruleeventproperties("EventBusName")
+    Input: Optional[PassThrough] = eventbridgeruleeventproperties("Input")
+    InputPath: Optional[PassThrough] = eventbridgeruleeventproperties("InputPath")
+    Pattern: PassThrough = eventbridgeruleeventproperties("Pattern")
+    RetryPolicy: Optional[PassThrough] = eventbridgeruleeventproperties("RetryPolicy")
+    Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
 
 
 class EventBridgeRuleEvent(BaseModel):
@@ -312,9 +340,13 @@ class CloudWatchLogsEvent(BaseModel):
     Properties: CloudWatchLogsEventProperties
 
 
+def iotruleeventproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-iotrule", name)
+
+
 class IoTRuleEventProperties(BaseModel):
-    AwsIotSqlVersion: Optional[PassThrough]
-    Sql: PassThrough
+    AwsIotSqlVersion: Optional[PassThrough] = iotruleeventproperties("AwsIotSqlVersion")
+    Sql: PassThrough = iotruleeventproperties("Sql")
 
 
 class IoTRuleEvent(BaseModel):
@@ -322,8 +354,12 @@ class IoTRuleEvent(BaseModel):
     Properties: IoTRuleEventProperties
 
 
+def alexaskilleventproperties(name: str) -> Any:
+    return get_docs_prop("sam-property-function-alexaskill", name)
+
+
 class AlexaSkillEventProperties(BaseModel):
-    SkillId: Optional[str]
+    SkillId: Optional[str] = alexaskilleventproperties("SkillId")
 
 
 class AlexaSkillEvent(BaseModel):
