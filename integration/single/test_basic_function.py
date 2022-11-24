@@ -43,6 +43,23 @@ class TestBasicFunction(BaseTest):
 
         self.assertEqual(self.get_resource_status_by_logical_id("MyLambdaFunction"), "UPDATE_COMPLETE")
 
+    def test_basic_function_with_role_path(self):
+        self.create_and_verify_stack("single/function_with_role_path")
+
+        lambda_client = self.client_provider.lambda_client
+        function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
+        role_name = self.get_physical_id_by_type("AWS::IAM::Role")
+        response = lambda_client.get_function(FunctionName=function_name)
+
+        role_arn = response.get("Configuration", {}).get("Role")
+        self.assertIsNotNone(role_arn)
+        self.assertIn("/foo/bar/", role_arn)
+
+        iam_client = self.client_provider.iam_client
+        response = iam_client.get_role(RoleName=role_name)
+
+        self.assertEqual(response["Role"]["Path"], "/foo/bar/")
+
     @parameterized.expand(
         [
             "single/function_with_http_api_events",

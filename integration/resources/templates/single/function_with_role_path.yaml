@@ -1,0 +1,10 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ${codeuri}
+      Handler: hello.handler
+      Runtime: python3.8
+      RolePath: /foo/bar/
+Metadata:
+  SamTransformTest: true
