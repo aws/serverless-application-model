@@ -32,6 +32,10 @@ def fix_markdown_code_link(s: str) -> str:
     return re.sub(r"`\[(\w+)\]\(([^ ]+)\)`", r"[`\1`](\2)", s)
 
 
+def remove_first_line(s: str) -> str:
+    return s.split("\n", 1)[1]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", type=Path)
@@ -42,6 +46,7 @@ def main() -> None:
         for name, description in parse(path.read_text()):
             if path.stem not in props:
                 props[path.stem] = {}
+            description = remove_first_line(description)  # Remove property name; already in the schema title
             description = fix_markdown_code_link(description)
             props[path.stem][name] = description
 
