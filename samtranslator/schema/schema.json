@@ -53,10 +53,10 @@
           "title": "Bucket",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -64,10 +64,10 @@
           "title": "Key",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -75,10 +75,10 @@
           "title": "Version",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -120,10 +120,10 @@
           "title": "Posttraffic",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -131,10 +131,10 @@
           "title": "Pretraffic",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -149,13 +149,13 @@
           "title": "Alarms",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "type": "array",
               "items": {
                 "type": "object"
               }
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -163,10 +163,10 @@
           "title": "Enabled",
           "anyOf": [
             {
-              "type": "boolean"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "boolean"
             }
           ]
         },
@@ -177,10 +177,10 @@
           "title": "Passthroughcondition",
           "anyOf": [
             {
-              "type": "boolean"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "boolean"
             }
           ]
         },
@@ -188,10 +188,10 @@
           "title": "Role",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -202,10 +202,10 @@
           "title": "Type",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -220,10 +220,10 @@
           "title": "Destination",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -248,10 +248,10 @@
           "title": "Destination",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -354,14 +354,14 @@
           "title": "Tracing",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "enum": [
                 "Active",
                 "PassThrough"
               ],
               "type": "string"
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -375,10 +375,10 @@
           "title": "Autopublishalias",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -422,10 +422,10 @@
           "title": "Reauthorizeevery",
           "anyOf": [
             {
-              "type": "integer"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "integer"
             }
           ]
         },
@@ -454,10 +454,10 @@
           "title": "Userpoolarn",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -475,10 +475,10 @@
           "title": "Reauthorizeevery",
           "anyOf": [
             {
-              "type": "integer"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "integer"
             }
           ]
         },
@@ -508,10 +508,10 @@
           "title": "Functionarn",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -564,10 +564,10 @@
           "title": "Reauthorizeevery",
           "anyOf": [
             {
-              "type": "integer"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "integer"
             }
           ]
         },
@@ -596,10 +596,10 @@
           "title": "Functionarn",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -792,15 +792,15 @@
           "title": "Createusageplan",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "enum": [
                 "PER_API",
                 "SHARED",
                 "NONE"
               ],
               "type": "string"
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -941,14 +941,14 @@
           "title": "Endpointconfiguration",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "enum": [
                 "REGIONAL",
                 "EDGE"
               ],
               "type": "string"
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -1005,10 +1005,10 @@
           "title": "Cors",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             },
             {
               "$ref": "#/definitions/Cors"
@@ -1130,16 +1130,23 @@
         },
         "FunctionArn": {
           "title": "Functionarn",
-          "type": "object"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ]
         },
         "FunctionInvokeRole": {
           "title": "Functioninvokerole",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -1226,13 +1233,13 @@
           "title": "Endpointconfiguration",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "enum": [
                 "REGIONAL"
               ],
               "type": "string"
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -1406,10 +1413,10 @@
           "title": "Bucket",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -1454,10 +1461,10 @@
           "title": "Batchsize",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -1469,10 +1476,10 @@
           "title": "Queuearn",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -1484,10 +1491,10 @@
           "title": "Queueurl",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -1907,10 +1914,10 @@
           "title": "Invokerole",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -1994,10 +2001,10 @@
           "title": "Restapiid",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -2392,10 +2399,10 @@
           "title": "Userpool",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -2452,10 +2459,10 @@
           "title": "Apiid",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2474,10 +2481,10 @@
           "title": "Payloadformatversion",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2488,10 +2495,10 @@
           "title": "Timeoutinmillis",
           "anyOf": [
             {
-              "type": "integer"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "integer"
             }
           ]
         }
@@ -2685,10 +2692,10 @@
           "title": "Authtype",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2716,10 +2723,10 @@
           "title": "Autopublishalias",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2727,10 +2734,10 @@
           "title": "Autopublishcodesha256",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2738,10 +2745,10 @@
           "title": "Codesigningconfigarn",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2888,6 +2895,9 @@
           "title": "Policies",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "type": "string"
             },
             {
@@ -2902,9 +2912,6 @@
                   }
                 ]
               }
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -2918,10 +2925,10 @@
           "title": "Role",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -2939,14 +2946,14 @@
           "title": "Tracing",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "enum": [
                 "Active",
                 "PassThrough"
               ],
               "type": "string"
-            },
-            {
-              "type": "object"
             }
           ]
         },
@@ -3486,7 +3493,14 @@
         },
         "RestApiId": {
           "title": "Restapiid",
-          "type": "object"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ]
         },
         "UnescapeMappingTemplate": {
           "title": "Unescapemappingtemplate",
@@ -3686,10 +3700,10 @@
           "title": "Retentionpolicy",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }
@@ -3784,10 +3798,10 @@
           "title": "Cors",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             },
             {
               "$ref": "#/definitions/Cors"
@@ -3867,10 +3881,10 @@
           "title": "Stagename",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -4049,10 +4063,10 @@
           "title": "Applicationid",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         },
@@ -4060,10 +4074,10 @@
           "title": "Semanticversion",
           "anyOf": [
             {
-              "type": "string"
+              "type": "object"
             },
             {
-              "type": "object"
+              "type": "string"
             }
           ]
         }

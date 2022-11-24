@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable
 
 
 class DeadLetterConfig(BaseModel):
@@ -101,7 +101,7 @@ class ApiEventProperties(BaseModel):
     Auth: Optional[Auth]
     Method: str
     Path: str
-    RestApiId: Optional[SamIntrinsic]
+    RestApiId: Optional[SamIntrinsicable[str]]
     UnescapeMappingTemplate: Optional[bool]  # TODO: Add to docs
 
 

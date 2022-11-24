@@ -2,7 +2,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic, get_docs_prop
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_docs_prop
 
 
 def prop(field: str) -> Any:
@@ -24,25 +24,25 @@ class ResourcePolicy(BaseModel):
 
 
 class CodeUri(BaseModel):
-    Bucket: Union[str, SamIntrinsic]
-    Key: Union[str, SamIntrinsic]
-    Version: Optional[Union[str, SamIntrinsic]]
+    Bucket: SamIntrinsicable[str]
+    Key: SamIntrinsicable[str]
+    Version: Optional[SamIntrinsicable[str]]
 
 
 class Hooks(BaseModel):
-    PostTraffic: Optional[Union[str, SamIntrinsic]]
-    PreTraffic: Optional[Union[str, SamIntrinsic]]
+    PostTraffic: Optional[SamIntrinsicable[str]]
+    PreTraffic: Optional[SamIntrinsicable[str]]
 
 
 class DeploymentPreference(BaseModel):
-    Alarms: Optional[Union[List[SamIntrinsic], SamIntrinsic]]
-    Enabled: Optional[Union[bool, SamIntrinsic]]
+    Alarms: Optional[SamIntrinsicable[List[Dict[str, Any]]]]
+    Enabled: Optional[SamIntrinsicable[bool]]
     Hooks: Optional[Hooks]
-    PassthroughCondition: Optional[Union[bool, SamIntrinsic]]
-    Role: Optional[Union[str, SamIntrinsic]]
+    PassthroughCondition: Optional[SamIntrinsicable[bool]]
+    Role: Optional[SamIntrinsicable[str]]
     TriggerConfigurations: Optional[PassThrough]
     Type: Optional[
-        Union[str, SamIntrinsic]
+        SamIntrinsicable[str]
     ]  # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field.
 
 
@@ -52,12 +52,12 @@ class DeadLetterQueue(BaseModel):
 
 
 class EventInvokeOnFailure(BaseModel):
-    Destination: Optional[Union[str, SamIntrinsic]]
+    Destination: Optional[SamIntrinsicable[str]]
     Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]]
 
 
 class EventInvokeOnSuccess(BaseModel):
-    Destination: Optional[Union[str, SamIntrinsic]]
+    Destination: Optional[SamIntrinsicable[str]]
     Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]]
 
 
@@ -73,7 +73,7 @@ class EventInvokeConfig(BaseModel):
 
 
 class S3EventProperties(BaseModel):
-    Bucket: Union[str, SamIntrinsic]
+    Bucket: SamIntrinsicable[str]
     Events: PassThrough
     Filter: Optional[PassThrough]
 
@@ -84,11 +84,11 @@ class S3Event(BaseModel):
 
 
 class SqsSubscription(BaseModel):
-    BatchSize: Optional[Union[str, SamIntrinsic]]
+    BatchSize: Optional[SamIntrinsicable[str]]
     Enabled: Optional[bool]
-    QueueArn: Union[str, SamIntrinsic]
+    QueueArn: SamIntrinsicable[str]
     QueuePolicyLogicalId: Optional[str]
-    QueueUrl: Union[str, SamIntrinsic]
+    QueueUrl: SamIntrinsicable[str]
 
 
 class SNSEventProperties(BaseModel):
@@ -104,7 +104,7 @@ class SNSEvent(BaseModel):
 
 
 class FunctionUrlConfig(BaseModel):
-    AuthType: Union[str, SamIntrinsic]
+    AuthType: SamIntrinsicable[str]
     Cors: Optional[PassThrough]
 
 
@@ -167,7 +167,7 @@ class ApiAuth(BaseModel):
     ApiKeyRequired: Optional[bool]
     AuthorizationScopes: Optional[List[str]]
     Authorizer: Optional[str]
-    InvokeRole: Optional[Union[str, SamIntrinsic]]
+    InvokeRole: Optional[SamIntrinsicable[str]]
     ResourcePolicy: Optional[ResourcePolicy]
 
 
@@ -189,7 +189,7 @@ class ApiEventProperties(BaseModel):
     Path: str
     RequestModel: Optional[RequestModel]
     RequestParameters: Optional[Union[str, RequestParameters]]
-    RestApiId: Optional[Union[str, SamIntrinsic]]
+    RestApiId: Optional[SamIntrinsicable[str]]
 
 
 class ApiEvent(BaseModel):
@@ -283,7 +283,7 @@ class AlexaSkillEvent(BaseModel):
 
 class CognitoEventProperties(BaseModel):
     Trigger: PassThrough
-    UserPool: Union[str, SamIntrinsic]
+    UserPool: SamIntrinsicable[str]
 
 
 class CognitoEvent(BaseModel):
@@ -297,13 +297,13 @@ class HttpApiAuth(BaseModel):
 
 
 class HttpApiEventProperties(BaseModel):
-    ApiId: Optional[Union[str, SamIntrinsic]]
+    ApiId: Optional[SamIntrinsicable[str]]
     Auth: Optional[HttpApiAuth]
     Method: Optional[str]
     Path: Optional[str]
-    PayloadFormatVersion: Optional[Union[str, SamIntrinsic]]
+    PayloadFormatVersion: Optional[SamIntrinsicable[str]]
     RouteSettings: Optional[PassThrough]
-    TimeoutInMillis: Optional[Union[int, SamIntrinsic]]
+    TimeoutInMillis: Optional[SamIntrinsicable[int]]
 
 
 class HttpApiEvent(BaseModel):
@@ -346,7 +346,7 @@ class SelfManagedKafkaEventProperties(BaseModel):
     ConsumerGroupId: Optional[PassThrough]
     Enabled: Optional[PassThrough]
     FilterCriteria: Optional[PassThrough]
-    KafkaBootstrapServers: Optional[List[Union[str, SamIntrinsic]]]
+    KafkaBootstrapServers: Optional[List[SamIntrinsicable[str]]]
     SourceAccessConfigurations: PassThrough
     Topics: PassThrough
 
@@ -384,17 +384,17 @@ class ScheduleV2Event(BaseModel):
 Handler = Optional[PassThrough]
 Runtime = Optional[PassThrough]
 CodeUriType = Optional[Union[str, CodeUri]]
-DeadLetterQueueType = Optional[Union[SamIntrinsic, DeadLetterQueue]]
+DeadLetterQueueType = Optional[SamIntrinsicable[DeadLetterQueue]]
 Description = Optional[PassThrough]
 MemorySize = Optional[PassThrough]
 Timeout = Optional[PassThrough]
 VpcConfig = Optional[PassThrough]
 Environment = Optional[PassThrough]
 Tags = Optional[Dict[str, Any]]
-Tracing = Optional[Union[Literal["Active", "PassThrough"], SamIntrinsic]]
+Tracing = Optional[SamIntrinsicable[Literal["Active", "PassThrough"]]]
 KmsKeyArn = Optional[PassThrough]
 Layers = Optional[PassThrough]
-AutoPublishAlias = Optional[Union[str, SamIntrinsic]]
+AutoPublishAlias = Optional[SamIntrinsicable[str]]
 PermissionsBoundary = Optional[PassThrough]
 ReservedConcurrentExecutions = Optional[PassThrough]
 ProvisionedConcurrencyConfig = Optional[PassThrough]
@@ -407,8 +407,8 @@ class Properties(BaseModel):
     Architectures: Optional[Architectures]
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument]
     AutoPublishAlias: Optional[AutoPublishAlias]
-    AutoPublishCodeSha256: Optional[Union[str, SamIntrinsic]]
-    CodeSigningConfigArn: Optional[Union[str, SamIntrinsic]]
+    AutoPublishCodeSha256: Optional[SamIntrinsicable[str]]
+    CodeSigningConfigArn: Optional[SamIntrinsicable[str]]
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType]
     DeploymentPreference: Optional[DeploymentPreference]
@@ -453,10 +453,10 @@ class Properties(BaseModel):
     MemorySize: Optional[MemorySize]
     PackageType: Optional[PassThrough]
     PermissionsBoundary: Optional[PermissionsBoundary]
-    Policies: Optional[Union[str, List[Union[str, SamIntrinsic]], SamIntrinsic]]
+    Policies: Optional[SamIntrinsicable[Union[str, List[SamIntrinsicable[str]]]]]
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig]
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions]
-    Role: Optional[Union[str, SamIntrinsic]]
+    Role: Optional[SamIntrinsicable[str]]
     Runtime: Optional[Runtime]
     Tags: Optional[Tags]
     Timeout: Optional[Timeout]
