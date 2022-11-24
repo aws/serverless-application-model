@@ -432,6 +432,7 @@ Tracing = Optional[SamIntrinsicable[Literal["Active", "PassThrough"]]]
 KmsKeyArn = Optional[PassThrough]
 Layers = Optional[PassThrough]
 AutoPublishAlias = Optional[SamIntrinsicable[str]]
+RolePath = Optional[PassThrough]
 PermissionsBoundary = Optional[PassThrough]
 ReservedConcurrentExecutions = Optional[PassThrough]
 ProvisionedConcurrencyConfig = Optional[PassThrough]
@@ -489,6 +490,7 @@ class Properties(BaseModel):
     Layers: Optional[Layers] = prop("Layers")
     MemorySize: Optional[MemorySize] = prop("MemorySize")
     PackageType: Optional[PassThrough] = prop("PackageType")
+    RolePath: Optional[RolePath]
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
     Policies: Optional[SamIntrinsicable[Union[str, List[SamIntrinsicable[str]]]]] = prop("Policies")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
@@ -518,6 +520,7 @@ class Globals(BaseModel):
     Layers: Optional[Layers] = prop("Layers")
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
+    RolePath: Optional[RolePath]
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")

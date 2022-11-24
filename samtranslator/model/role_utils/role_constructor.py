@@ -12,6 +12,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
     resource_policies,
     managed_policy_arns=None,
     policy_documents=None,
+    role_path=None,
     permissions_boundary=None,
     tags=None,
 ) -> IAMRole:
@@ -24,6 +25,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
     :param resource_policies: ResourcePolicies object encapuslating the policies property of SAM resource
     :param managed_policy_arns: List of managed policy ARNs to be associated with the role
     :param policy_documents: List of policy documents to be associated with the role
+    :param role_path: The path to the role
     :param permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
     :param tags: Tags to be associated with the role
 
@@ -103,6 +105,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
 
     execution_role.ManagedPolicyArns = list(managed_policy_arns)
     execution_role.Policies = policy_documents or None
+    execution_role.Path = role_path
     execution_role.PermissionsBoundary = permissions_boundary
     execution_role.Tags = tags
 

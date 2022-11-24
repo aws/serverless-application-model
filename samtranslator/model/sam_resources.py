@@ -103,6 +103,7 @@ class SamFunction(SamResourceMacro):
         "Role": PropertyType(False, is_str()),
         "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
         "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
+        "RolePath": PassThroughProperty(False),
         "PermissionsBoundary": PropertyType(False, is_str()),
         "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
         "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
@@ -141,6 +142,7 @@ class SamFunction(SamResourceMacro):
     Role: Optional[Intrinsicable[str]]
     AssumeRolePolicyDocument: Optional[Dict[str, Any]]
     Policies: Optional[List[Any]]
+    RolePath: Optional[Intrinsicable[str]]
     PermissionsBoundary: Optional[Intrinsicable[str]]
     Environment: Optional[Dict[str, Any]]
     Events: Optional[Dict[str, Any]]
@@ -588,6 +590,7 @@ class SamFunction(SamResourceMacro):
             resource_policies=function_policies,
             managed_policy_arns=managed_policy_arns,
             policy_documents=policy_documents,
+            role_path=self.RolePath,
             permissions_boundary=self.PermissionsBoundary,
             tags=self._construct_tag_list(self.Tags),
         )
