@@ -154,12 +154,7 @@
             {
               "type": "array",
               "items": {
-                "anyOf": [
-                  {
-                    "type": "object"
-                  },
-                  {}
-                ]
+                "type": "object"
               }
             }
           ]
@@ -1022,12 +1017,7 @@
         },
         "GatewayResponses": {
           "title": "Gatewayresponses",
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {}
-          ]
+          "type": "object"
         },
         "AccessLogSetting": {
           "title": "Accesslogsetting"
@@ -1144,7 +1134,9 @@
             {
               "type": "object"
             },
-            {}
+            {
+              "type": "string"
+            }
           ]
         },
         "FunctionInvokeRole": {
@@ -3505,7 +3497,9 @@
             {
               "type": "object"
             },
-            {}
+            {
+              "type": "string"
+            }
           ]
         },
         "UnescapeMappingTemplate": {
@@ -3854,12 +3848,7 @@
         },
         "GatewayResponses": {
           "title": "Gatewayresponses",
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {}
-          ]
+          "type": "object"
         },
         "MethodSettings": {
           "title": "Methodsettings"
@@ -3872,12 +3861,7 @@
         },
         "Models": {
           "title": "Models",
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {}
-          ]
+          "type": "object"
         },
         "Name": {
           "title": "Name"

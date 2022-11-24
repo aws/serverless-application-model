@@ -101,7 +101,7 @@ class ApiEventProperties(BaseModel):
     Auth: Optional[Auth]
     Method: str
     Path: str
-    RestApiId: Optional[SamIntrinsicable]
+    RestApiId: Optional[SamIntrinsicable[str]]
     UnescapeMappingTemplate: Optional[bool]  # TODO: Add to docs
 
 

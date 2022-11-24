@@ -35,7 +35,7 @@ class Hooks(BaseModel):
 
 
 class DeploymentPreference(BaseModel):
-    Alarms: Optional[SamIntrinsicable[List[SamIntrinsicable]]]
+    Alarms: Optional[SamIntrinsicable[List[Dict[str, Any]]]]
     Enabled: Optional[SamIntrinsicable[bool]]
     Hooks: Optional[Hooks]
     PassthroughCondition: Optional[SamIntrinsicable[bool]]

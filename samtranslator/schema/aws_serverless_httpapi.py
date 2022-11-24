@@ -23,7 +23,7 @@ class LambdaAuthorizer(BaseModel):
     # TODO: Many tests use floats for the version string; docs only mention string
     AuthorizerPayloadFormatVersion: Union[Literal["1.0", "2.0"], float]
     EnableSimpleResponses: Optional[bool]
-    FunctionArn: SamIntrinsicable
+    FunctionArn: SamIntrinsicable[str]
     FunctionInvokeRole: Optional[SamIntrinsicable[str]]
     Identity: Optional[LambdaAuthorizerIdentity]
 
