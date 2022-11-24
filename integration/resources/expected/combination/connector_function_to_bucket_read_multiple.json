@@ -1,0 +1,26 @@
+[
+  {
+    "LogicalResourceId": "LambdaRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "Bucket",
+    "ResourceType": "AWS::S3::Bucket"
+  },
+  {
+    "LogicalResourceId": "Bucket2",
+    "ResourceType": "AWS::S3::Bucket"
+  },
+  {
+    "LogicalResourceId": "ConnectorPolicyDestination0",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  },
+  {
+    "LogicalResourceId": "ConnectorPolicyDestination1",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  }
+]

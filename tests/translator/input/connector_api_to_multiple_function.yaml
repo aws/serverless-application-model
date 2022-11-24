@@ -1,0 +1,52 @@
+Resources:
+  MyServerlessApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+  MyServerlessFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+        };
+
+  MyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  MyFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt MyRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          exports.handler = async (event) => {
+            console.log(JSON.stringify(event));
+          };
+
+  MyConnectorServerlessApiToLambda:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyServerlessApi
+      Destination:
+      - Id: MyFunction
+      - Id: MyServerlessFunction
+      Permissions:
+      - Write

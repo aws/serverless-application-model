@@ -700,7 +700,8 @@ class TestInvalidSamConnectors(TestCase):
         connector.Destination = {"Id": "table"}
         connector.Permissions = ["INVOKE"]
         with self.assertRaisesRegex(
-            InvalidResourceException, ".+Unsupported 'Permissions' provided; valid values are: Read, Write."
+            InvalidResourceException,
+            ".+Unsupported 'Permissions' provided for connector from AWS::Lambda::Function to AWS::DynamoDB::Table; valid values are: Read, Write.",
         ):
             connector.to_cloudformation(**self.kwargs)[0]
 
@@ -710,7 +711,8 @@ class TestInvalidSamConnectors(TestCase):
         connector.Destination = {"Id": "func2"}
         connector.Permissions = ["INVOKE"]
         with self.assertRaisesRegex(
-            InvalidResourceException, ".+Unsupported 'Permissions' provided; valid values are: Read."
+            InvalidResourceException,
+            ".+Unsupported 'Permissions' provided for connector from AWS::DynamoDB::Table to AWS::Lambda::Function; valid values are: Read.",
         ):
             connector.to_cloudformation(**self.kwargs)[0]
 
@@ -720,6 +722,7 @@ class TestInvalidSamConnectors(TestCase):
         connector.Destination = {"Id": "func2"}
         connector.Permissions = ["Read"]
         with self.assertRaisesRegex(
-            InvalidResourceException, "Unsupported 'Permissions' provided; valid combinations are: Read \\+ Write."
+            InvalidResourceException,
+            "Unsupported 'Permissions' provided for connector from AWS::SQS::Queue to AWS::Lambda::Function; valid combinations are: Read \\+ Write.",
         ):
             connector.to_cloudformation(**self.kwargs)[0]
