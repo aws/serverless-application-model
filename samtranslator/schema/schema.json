@@ -1374,18 +1374,24 @@
       "type": "object",
       "properties": {
         "AuthorizationScopes": {
-          "title": "Authorizationscopes",
+          "title": "AuthorizationScopes",
+          "description": "List of authorization scopes for this authorizer\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "List of authorization scopes for this authorizer\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
         "IdentitySource": {
-          "title": "Identitysource",
+          "title": "IdentitySource",
+          "description": "Identity source expression for this authorizer\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Identity source expression for this authorizer\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "string"
         },
         "JwtConfiguration": {
-          "title": "Jwtconfiguration"
+          "title": "JwtConfiguration",
+          "description": "JWT configuration for this authorizer\\.  \nThis is passed through to the `jwtConfiguration` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \nUse lowercase `issuer` and `audience` properties with [AWS::Serverless::HttpApi](sam-resource-httpapi.md) and uppercase `Issuer` and `Audience` properties with [AWS::ApiGatewayV2::Authorizer](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-authorizer-jwtconfiguration.html)\\.\n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "JWT configuration for this authorizer\\.  \nThis is passed through to the `jwtConfiguration` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \nUse lowercase `issuer` and `audience` properties with [AWS::Serverless::HttpApi](sam-resource-httpapi.md) and uppercase `Issuer` and `Audience` properties with [AWS::ApiGatewayV2::Authorizer](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-authorizer-jwtconfiguration.html)\\.\n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\."
         }
       },
       "additionalProperties": false
@@ -1396,6 +1402,8 @@
       "properties": {
         "Context": {
           "title": "Context",
+          "description": "Converts the given context strings to a list of mapping expressions in the format `$context.contextString`\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Converts the given context strings to a list of mapping expressions in the format `$context.contextString`\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "array",
           "items": {
             "type": "string"
@@ -1403,24 +1411,32 @@
         },
         "Headers": {
           "title": "Headers",
+          "description": "Converts the headers to a list of mapping expressions in the format `$request.header.name`\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Converts the headers to a list of mapping expressions in the format `$request.header.name`\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
         "QueryStrings": {
-          "title": "Querystrings",
+          "title": "QueryStrings",
+          "description": "Converts the given query strings to a list of mapping expressions in the format `$request.querystring.queryString`\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Converts the given query strings to a list of mapping expressions in the format `$request.querystring.queryString`\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
         "ReauthorizeEvery": {
-          "title": "Reauthorizeevery",
+          "title": "ReauthorizeEvery",
+          "description": "The time\\-to\\-live \\(TTL\\) period, in seconds, that specifies how long API Gateway caches authorizer results\\. If you specify a value greater than 0, API Gateway caches the authorizer responses\\. The maximum value is 3600, or 1 hour\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The time\\-to\\-live \\(TTL\\) period, in seconds, that specifies how long API Gateway caches authorizer results\\. If you specify a value greater than 0, API Gateway caches the authorizer responses\\. The maximum value is 3600, or 1 hour\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "integer"
         },
         "StageVariables": {
-          "title": "Stagevariables",
+          "title": "StageVariables",
+          "description": "Converts the given stage variables to a list of mapping expressions in the format `$stageVariables.stageVariable`\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Converts the given stage variables to a list of mapping expressions in the format `$stageVariables.stageVariable`\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "array",
           "items": {
             "type": "string"
@@ -1434,7 +1450,9 @@
       "type": "object",
       "properties": {
         "AuthorizerPayloadFormatVersion": {
-          "title": "Authorizerpayloadformatversion",
+          "title": "AuthorizerPayloadFormatVersion",
+          "description": "Specifies the format of the payload sent to an HTTP API Lambda authorizer\\. Required for HTTP API Lambda authorizers\\.  \nThis is passed through to the `authorizerPayloadFormatVersion` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Valid values*: `1.0` or `2.0`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specifies the format of the payload sent to an HTTP API Lambda authorizer\\. Required for HTTP API Lambda authorizers\\.  \nThis is passed through to the `authorizerPayloadFormatVersion` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Valid values*: `1.0` or `2.0`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "enum": [
@@ -1449,11 +1467,15 @@
           ]
         },
         "EnableSimpleResponses": {
-          "title": "Enablesimpleresponses",
+          "title": "EnableSimpleResponses",
+          "description": "Specifies whether a Lambda authorizer returns a response in a simple format\\. By default, a Lambda authorizer must return an AWS Identity and Access Management \\(IAM\\) policy\\. If enabled, the Lambda authorizer can return a boolean value instead of an IAM policy\\.  \nThis is passed through to the `enableSimpleResponses` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specifies whether a Lambda authorizer returns a response in a simple format\\. By default, a Lambda authorizer must return an AWS Identity and Access Management \\(IAM\\) policy\\. If enabled, the Lambda authorizer can return a boolean value instead of an IAM policy\\.  \nThis is passed through to the `enableSimpleResponses` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "boolean"
         },
         "FunctionArn": {
-          "title": "Functionarn",
+          "title": "FunctionArn",
+          "description": "The Amazon Resource Name \\(ARN\\) of the Lambda function that provides authorization for the API\\.  \nThis is passed through to the `authorizerUri` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The Amazon Resource Name \\(ARN\\) of the Lambda function that provides authorization for the API\\.  \nThis is passed through to the `authorizerUri` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "type": "object"
@@ -1464,7 +1486,9 @@
           ]
         },
         "FunctionInvokeRole": {
-          "title": "Functioninvokerole",
+          "title": "FunctionInvokeRole",
+          "description": "The ARN of the IAM role that has the credentials required for API Gateway to invoke the authorizer function\\. Specify this parameter if your function's resource\\-based policy doesn't grant API Gateway `lambda:InvokeFunction` permission\\.  \nThis is passed through to the `authorizerCredentials` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \nFor more information, see [Create a Lambda authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html#http-api-lambda-authorizer.example-create) in the *API Gateway Developer Guide*\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The ARN of the IAM role that has the credentials required for API Gateway to invoke the authorizer function\\. Specify this parameter if your function's resource\\-based policy doesn't grant API Gateway `lambda:InvokeFunction` permission\\.  \nThis is passed through to the `authorizerCredentials` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \nFor more information, see [Create a Lambda authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html#http-api-lambda-authorizer.example-create) in the *API Gateway Developer Guide*\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "type": "object"
@@ -1475,7 +1499,14 @@
           ]
         },
         "Identity": {
-          "$ref": "#/definitions/LambdaAuthorizerIdentity"
+          "title": "Identity",
+          "description": "Specifies an `IdentitySource` in an incoming request for an authorizer\\.  \nThis is passed through to the `identitySource` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: [LambdaAuthorizationIdentity](sam-property-httpapi-lambdaauthorizationidentity.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specifies an `IdentitySource` in an incoming request for an authorizer\\.  \nThis is passed through to the `identitySource` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: [LambdaAuthorizationIdentity](sam-property-httpapi-lambdaauthorizationidentity.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/LambdaAuthorizerIdentity"
+            }
+          ]
         }
       },
       "required": [
@@ -1490,6 +1521,8 @@
       "properties": {
         "Authorizers": {
           "title": "Authorizers",
+          "description": "The authorizer used to control access to your API Gateway API\\.  \n*Type*: [OAuth2Authorizer](sam-property-httpapi-oauth2authorizer.md) \\| [LambdaAuthorizer](sam-property-httpapi-lambdaauthorizer.md)  \n*Required*: No  \n*Default*: None  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: AWS SAM adds the authorizers to the OpenAPI definition\\.",
+          "markdownDescription": "The authorizer used to control access to your API Gateway API\\.  \n*Type*: [OAuth2Authorizer](sam-property-httpapi-oauth2authorizer.md) \\| [LambdaAuthorizer](sam-property-httpapi-lambdaauthorizer.md)  \n*Required*: No  \n*Default*: None  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: AWS SAM adds the authorizers to the OpenAPI definition\\.",
           "type": "object",
           "additionalProperties": {
             "anyOf": [
@@ -1503,11 +1536,15 @@
           }
         },
         "DefaultAuthorizer": {
-          "title": "Defaultauthorizer",
+          "title": "DefaultAuthorizer",
+          "description": "Specify the default authorizer to use for authorizing API calls to your API Gateway API\\. You can specify `AWS_IAM` as a default authorizer if `EnableIamAuthorizer` is set to `true`\\. Otherwise, specify an authorizer that you've defined in `Authorizers`\\.  \n*Type*: String  \n*Required*: No  \n*Default*: None  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specify the default authorizer to use for authorizing API calls to your API Gateway API\\. You can specify `AWS_IAM` as a default authorizer if `EnableIamAuthorizer` is set to `true`\\. Otherwise, specify an authorizer that you've defined in `Authorizers`\\.  \n*Type*: String  \n*Required*: No  \n*Default*: None  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "string"
         },
         "EnableIamAuthorizer": {
-          "title": "Enableiamauthorizer",
+          "title": "EnableIamAuthorizer",
+          "description": "Specify whether to use IAM authorization for the API route\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specify whether to use IAM authorization for the API route\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "boolean"
         }
       },
@@ -1518,19 +1555,29 @@
       "type": "object",
       "properties": {
         "DistributionDomainName": {
-          "title": "Distributiondomainname"
+          "title": "DistributionDomainName",
+          "description": "Configures a custom distribution of the API custom domain name\\.  \n*Type*: String  \n*Required*: No  \n*Default*: Use the API Gateway distribution\\.  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DNSName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget-1.html#cfn-route53-aliastarget-dnshostname) property of an `AWS::Route53::RecordSetGroup AliasTarget` resource\\.  \n*Additional notes*: The domain name of a [CloudFront distribution](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html)\\.",
+          "markdownDescription": "Configures a custom distribution of the API custom domain name\\.  \n*Type*: String  \n*Required*: No  \n*Default*: Use the API Gateway distribution\\.  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DNSName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget-1.html#cfn-route53-aliastarget-dnshostname) property of an `AWS::Route53::RecordSetGroup AliasTarget` resource\\.  \n*Additional notes*: The domain name of a [CloudFront distribution](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html)\\."
         },
         "EvaluateTargetHealth": {
-          "title": "Evaluatetargethealth"
+          "title": "EvaluateTargetHealth",
+          "description": "When EvaluateTargetHealth is true, an alias record inherits the health of the referenced AWS resource, such as an Elastic Load Balancing load balancer or another record in the hosted zone\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EvaluateTargetHealth`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html#cfn-route53-aliastarget-evaluatetargethealth) property of an `AWS::Route53::RecordSetGroup AliasTarget` resource\\.  \n*Additional notes*: You can't set EvaluateTargetHealth to true when the alias target is a CloudFront distribution\\.",
+          "markdownDescription": "When EvaluateTargetHealth is true, an alias record inherits the health of the referenced AWS resource, such as an Elastic Load Balancing load balancer or another record in the hosted zone\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EvaluateTargetHealth`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html#cfn-route53-aliastarget-evaluatetargethealth) property of an `AWS::Route53::RecordSetGroup AliasTarget` resource\\.  \n*Additional notes*: You can't set EvaluateTargetHealth to true when the alias target is a CloudFront distribution\\."
         },
         "HostedZoneId": {
-          "title": "Hostedzoneid"
+          "title": "HostedZoneId",
+          "description": "The ID of the hosted zone that you want to create records in\\.  \nSpecify either `HostedZoneName` or `HostedZoneId`, but not both\\. If you have multiple hosted zones with the same domain name, you must specify the hosted zone using `HostedZoneId`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`HostedZoneId`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset-1.html#cfn-route53-recordset-hostedzoneid) property of an `AWS::Route53::RecordSetGroup RecordSet` resource\\.",
+          "markdownDescription": "The ID of the hosted zone that you want to create records in\\.  \nSpecify either `HostedZoneName` or `HostedZoneId`, but not both\\. If you have multiple hosted zones with the same domain name, you must specify the hosted zone using `HostedZoneId`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`HostedZoneId`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset-1.html#cfn-route53-recordset-hostedzoneid) property of an `AWS::Route53::RecordSetGroup RecordSet` resource\\."
         },
         "HostedZoneName": {
-          "title": "Hostedzonename"
+          "title": "HostedZoneName",
+          "description": "The name of the hosted zone that you want to create records in\\.  \nSpecify either `HostedZoneName` or `HostedZoneId`, but not both\\. If you have multiple hosted zones with the same domain name, you must specify the hosted zone using `HostedZoneId`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`HostedZoneName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset-1.html#cfn-route53-recordset-hostedzonename) property of an `AWS::Route53::RecordSetGroup RecordSet` resource\\.",
+          "markdownDescription": "The name of the hosted zone that you want to create records in\\.  \nSpecify either `HostedZoneName` or `HostedZoneId`, but not both\\. If you have multiple hosted zones with the same domain name, you must specify the hosted zone using `HostedZoneId`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`HostedZoneName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset-1.html#cfn-route53-recordset-hostedzonename) property of an `AWS::Route53::RecordSetGroup RecordSet` resource\\."
         },
         "IpV6": {
-          "title": "Ipv6",
+          "title": "IpV6",
+          "description": "When this property is set, AWS SAM creates a `AWS::Route53::RecordSet` resource and sets [Type](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset.html#cfn-route53-recordset-type) to `AAAA` for the provided HostedZone\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "When this property is set, AWS SAM creates a `AWS::Route53::RecordSet` resource and sets [Type](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset.html#cfn-route53-recordset-type) to `AAAA` for the provided HostedZone\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "boolean"
         }
       },
@@ -1541,20 +1588,28 @@
       "type": "object",
       "properties": {
         "BasePath": {
-          "title": "Basepath",
+          "title": "BasePath",
+          "description": "A list of the basepaths to configure with the Amazon API Gateway domain name\\.  \n*Type*: List  \n*Required*: No  \n*Default*: /  \n*AWS CloudFormation compatibility*: This property is similar to the [`ApiMappingKey`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-apimapping.html#cfn-apigatewayv2-apimapping-apimappingkey) property of an `AWS::ApiGatewayV2::ApiMapping` resource\\. AWS SAM creates multiple `AWS::ApiGatewayV2::ApiMapping` resources, one per value specified in this property\\.",
+          "markdownDescription": "A list of the basepaths to configure with the Amazon API Gateway domain name\\.  \n*Type*: List  \n*Required*: No  \n*Default*: /  \n*AWS CloudFormation compatibility*: This property is similar to the [`ApiMappingKey`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-apimapping.html#cfn-apigatewayv2-apimapping-apimappingkey) property of an `AWS::ApiGatewayV2::ApiMapping` resource\\. AWS SAM creates multiple `AWS::ApiGatewayV2::ApiMapping` resources, one per value specified in this property\\.",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
         "CertificateArn": {
-          "title": "Certificatearn"
+          "title": "CertificateArn",
+          "description": "The Amazon Resource Name \\(ARN\\) of an AWS managed certificate for this domain name's endpoint\\. AWS Certificate Manager is the only supported source\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CertificateArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-domainname-domainnameconfiguration.html#cfn-apigatewayv2-domainname-domainnameconfiguration-certificatearn) property of an `AWS::ApiGateway2::DomainName DomainNameConfiguration` resource\\.",
+          "markdownDescription": "The Amazon Resource Name \\(ARN\\) of an AWS managed certificate for this domain name's endpoint\\. AWS Certificate Manager is the only supported source\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CertificateArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-domainname-domainnameconfiguration.html#cfn-apigatewayv2-domainname-domainnameconfiguration-certificatearn) property of an `AWS::ApiGateway2::DomainName DomainNameConfiguration` resource\\."
         },
         "DomainName": {
-          "title": "Domainname"
+          "title": "DomainName",
+          "description": "The custom domain name for your API Gateway API\\. Uppercase letters are not supported\\.  \nAWS SAM generates an `AWS::ApiGatewayV2::DomainName` resource when this property is set\\. For information about this scenario, see [DomainName property is specified](sam-specification-generated-resources-httpapi.md#sam-specification-generated-resources-httpapi-domain-name)\\. For information about generated AWS CloudFormation resources, see [Generated AWS CloudFormation resources](sam-specification-generated-resources.md)\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DomainName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-domainname.html#cfn-apigatewayv2-domainname-domainname) property of an `AWS::ApiGateway2::DomainName` resource\\.",
+          "markdownDescription": "The custom domain name for your API Gateway API\\. Uppercase letters are not supported\\.  \nAWS SAM generates an `AWS::ApiGatewayV2::DomainName` resource when this property is set\\. For information about this scenario, see [DomainName property is specified](sam-specification-generated-resources-httpapi.md#sam-specification-generated-resources-httpapi-domain-name)\\. For information about generated AWS CloudFormation resources, see [Generated AWS CloudFormation resources](sam-specification-generated-resources.md)\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DomainName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-domainname.html#cfn-apigatewayv2-domainname-domainname) property of an `AWS::ApiGateway2::DomainName` resource\\."
         },
         "EndpointConfiguration": {
-          "title": "Endpointconfiguration",
+          "title": "EndpointConfiguration",
+          "description": "Defines the type of API Gateway endpoint to map to the custom domain\\. The value of this property determines how the `CertificateArn` property is mapped in AWS CloudFormation\\.  \nThe only valid value for HTTP APIs is `REGIONAL`\\.  \n*Type*: String  \n*Required*: No  \n*Default*: `REGIONAL`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Defines the type of API Gateway endpoint to map to the custom domain\\. The value of this property determines how the `CertificateArn` property is mapped in AWS CloudFormation\\.  \nThe only valid value for HTTP APIs is `REGIONAL`\\.  \n*Type*: String  \n*Required*: No  \n*Default*: `REGIONAL`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
               "type": "object"
@@ -1568,16 +1623,29 @@
           ]
         },
         "MutualTlsAuthentication": {
-          "title": "Mutualtlsauthentication"
+          "title": "MutualTlsAuthentication",
+          "description": "The mutual transport layer security \\(TLS\\) authentication configuration for a custom domain name\\.  \n*Type*: [MutualTlsAuthentication](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-domainname.html#cfn-apigatewayv2-domainname-mutualtlsauthentication)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MutualTlsAuthentication`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-domainname.html#cfn-apigatewayv2-domainname-mutualtlsauthentication) property of an `AWS::ApiGatewayV2::DomainName` resource\\.",
+          "markdownDescription": "The mutual transport layer security \\(TLS\\) authentication configuration for a custom domain name\\.  \n*Type*: [MutualTlsAuthentication](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-domainname.html#cfn-apigatewayv2-domainname-mutualtlsauthentication)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MutualTlsAuthentication`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-domainname.html#cfn-apigatewayv2-domainname-mutualtlsauthentication) property of an `AWS::ApiGatewayV2::DomainName` resource\\."
         },
         "OwnershipVerificationCertificateArn": {
-          "title": "Ownershipverificationcertificatearn"
+          "title": "OwnershipVerificationCertificateArn",
+          "description": "The ARN of the public certificate issued by ACM to validate ownership of your custom domain\\. Required only when you configure mutual TLS and you specify an ACM imported or private CA certificate ARN for the `CertificateArn`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`OwnershipVerificationCertificateArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-domainname-domainnameconfiguration.html#cfn-apigatewayv2-domainname-domainnameconfiguration-ownershipverificationcertificatearn) property of the `AWS::ApiGatewayV2::DomainName` `DomainNameConfiguration` data type\\.",
+          "markdownDescription": "The ARN of the public certificate issued by ACM to validate ownership of your custom domain\\. Required only when you configure mutual TLS and you specify an ACM imported or private CA certificate ARN for the `CertificateArn`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`OwnershipVerificationCertificateArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-domainname-domainnameconfiguration.html#cfn-apigatewayv2-domainname-domainnameconfiguration-ownershipverificationcertificatearn) property of the `AWS::ApiGatewayV2::DomainName` `DomainNameConfiguration` data type\\."
         },
         "Route53": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Route53"
+          "title": "Route53",
+          "description": "Defines an Amazon Route\u00a053 configuration\\.  \n*Type*: [Route53Configuration](sam-property-httpapi-route53configuration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Defines an Amazon Route\u00a053 configuration\\.  \n*Type*: [Route53Configuration](sam-property-httpapi-route53configuration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Route53"
+            }
+          ]
         },
         "SecurityPolicy": {
-          "title": "Securitypolicy"
+          "title": "SecurityPolicy",
+          "description": "The TLS version of the security policy for this domain name\\.  \nThe only valid value for HTTP APIs is `TLS_1_2`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SecurityPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-domainname-domainnameconfiguration.html#cfn-apigatewayv2-domainname-domainnameconfiguration-securitypolicy) property of the `AWS::ApiGatewayV2::DomainName` `DomainNameConfiguration` data type\\.",
+          "markdownDescription": "The TLS version of the security policy for this domain name\\.  \nThe only valid value for HTTP APIs is `TLS_1_2`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SecurityPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-domainname-domainnameconfiguration.html#cfn-apigatewayv2-domainname-domainnameconfiguration-securitypolicy) property of the `AWS::ApiGatewayV2::DomainName` `DomainNameConfiguration` data type\\."
         }
       },
       "additionalProperties": false
@@ -1587,32 +1655,60 @@
       "type": "object",
       "properties": {
         "Auth": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Auth"
+          "title": "Auth",
+          "description": "Configures authorization for controlling access to your API Gateway HTTP API\\.  \nFor more information, see [Controlling access to HTTP APIs with JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html) in the *API Gateway Developer Guide*\\.  \n*Type*: [HttpApiAuth](sam-property-httpapi-httpapiauth.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Configures authorization for controlling access to your API Gateway HTTP API\\.  \nFor more information, see [Controlling access to HTTP APIs with JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html) in the *API Gateway Developer Guide*\\.  \n*Type*: [HttpApiAuth](sam-property-httpapi-httpapiauth.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Auth"
+            }
+          ]
         },
         "AccessLogSettings": {
-          "title": "Accesslogsettings"
+          "title": "AccessLogSettings",
+          "description": "The settings for access logging in a stage\\.  \n*Type*: [AccessLogSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings) property of an `AWS::ApiGatewayV2::Stage` resource\\.",
+          "markdownDescription": "The settings for access logging in a stage\\.  \n*Type*: [AccessLogSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings) property of an `AWS::ApiGatewayV2::Stage` resource\\."
         },
         "StageVariables": {
-          "title": "Stagevariables"
+          "title": "StageVariables",
+          "description": "A map that defines the stage variables\\. Variable names can have alphanumeric and underscore characters\\. The values must match \\[A\\-Za\\-z0\\-9\\-\\.\\_\\~:/?\\#&=,\\]\\+\\.  \n*Type*: [Json](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StageVariables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables) property of an `AWS::ApiGatewayV2::Stage` resource\\.",
+          "markdownDescription": "A map that defines the stage variables\\. Variable names can have alphanumeric and underscore characters\\. The values must match \\[A\\-Za\\-z0\\-9\\-\\.\\_\\~:/?\\#&=,\\]\\+\\.  \n*Type*: [Json](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StageVariables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables) property of an `AWS::ApiGatewayV2::Stage` resource\\."
         },
         "Tags": {
           "title": "Tags",
+          "description": "A map \\(string to string\\) that specifies the tags to add to this API Gateway stage\\. Keys can be 1 to 128 Unicode characters in length and cannot include the prefix `aws:`\\. You can use any of the following characters: the set of Unicode letters, digits, whitespace, `_`, `.`, `/`, `=`, `+`, and `-`\\. Values can be 1 to 256 Unicode characters in length\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: The `Tags` property requires AWS SAM to modify your OpenAPI definition, so tags are added only if the `DefinitionBody` property is specified\u2014no tags are added if the `DefinitionUri` property is specified\\. AWS SAM automatically adds an `httpapi:createdBy:SAM` tag\\. Tags are also added to the `AWS::ApiGatewayV2::Stage` resource and the `AWS::ApiGatewayV2::DomainName` resource \\(if `DomainName` is specified\\)\\.",
+          "markdownDescription": "A map \\(string to string\\) that specifies the tags to add to this API Gateway stage\\. Keys can be 1 to 128 Unicode characters in length and cannot include the prefix `aws:`\\. You can use any of the following characters: the set of Unicode letters, digits, whitespace, `_`, `.`, `/`, `=`, `+`, and `-`\\. Values can be 1 to 256 Unicode characters in length\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: The `Tags` property requires AWS SAM to modify your OpenAPI definition, so tags are added only if the `DefinitionBody` property is specified\u2014no tags are added if the `DefinitionUri` property is specified\\. AWS SAM automatically adds an `httpapi:createdBy:SAM` tag\\. Tags are also added to the `AWS::ApiGatewayV2::Stage` resource and the `AWS::ApiGatewayV2::DomainName` resource \\(if `DomainName` is specified\\)\\.",
           "type": "object"
         },
         "RouteSettings": {
-          "title": "Routesettings"
+          "title": "RouteSettings",
+          "description": "The route settings, per route, for this HTTP API\\. For more information, see [Working with routes for HTTP APIs](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html) in the *API Gateway Developer Guide*\\.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings) property of an `AWS::ApiGatewayV2::Stage` resource\\.",
+          "markdownDescription": "The route settings, per route, for this HTTP API\\. For more information, see [Working with routes for HTTP APIs](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html) in the *API Gateway Developer Guide*\\.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings) property of an `AWS::ApiGatewayV2::Stage` resource\\."
         },
         "FailOnWarnings": {
-          "title": "Failonwarnings"
+          "title": "FailOnWarnings",
+          "description": "Specifies whether to roll back the HTTP API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-failonwarnings) property of an `AWS::ApiGatewayV2::Api` resource\\.",
+          "markdownDescription": "Specifies whether to roll back the HTTP API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-failonwarnings) property of an `AWS::ApiGatewayV2::Api` resource\\."
         },
         "Domain": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Domain"
+          "title": "Domain",
+          "description": "Configures a custom domain for this API Gateway HTTP API\\.  \n*Type*: [HttpApiDomainConfiguration](sam-property-httpapi-httpapidomainconfiguration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Configures a custom domain for this API Gateway HTTP API\\.  \n*Type*: [HttpApiDomainConfiguration](sam-property-httpapi-httpapidomainconfiguration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Domain"
+            }
+          ]
         },
         "CorsConfiguration": {
-          "title": "Corsconfiguration"
+          "title": "CorsConfiguration",
+          "description": "Manages cross\\-origin resource sharing \\(CORS\\) for all your API Gateway HTTP APIs\\. Specify the domain to allow as a string, or specify an `HttpApiCorsConfiguration` object\\. Note that CORS requires AWS SAM to modify your OpenAPI definition, so CORS works only if the `DefinitionBody` property is specified\\.  \nFor more information, see [Configuring CORS for an HTTP API](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html) in the *API Gateway Developer Guide*\\.  \nIf `CorsConfiguration` is set both in an OpenAPI definition and at the property level, then AWS SAM merges both configuration sources with the properties taking precedence\\. If this property is set to `true`, then all origins are allowed\\.\n*Type*: String \\| [HttpApiCorsConfiguration](sam-property-httpapi-httpapicorsconfiguration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Manages cross\\-origin resource sharing \\(CORS\\) for all your API Gateway HTTP APIs\\. Specify the domain to allow as a string, or specify an `HttpApiCorsConfiguration` object\\. Note that CORS requires AWS SAM to modify your OpenAPI definition, so CORS works only if the `DefinitionBody` property is specified\\.  \nFor more information, see [Configuring CORS for an HTTP API](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html) in the *API Gateway Developer Guide*\\.  \nIf `CorsConfiguration` is set both in an OpenAPI definition and at the property level, then AWS SAM merges both configuration sources with the properties taking precedence\\. If this property is set to `true`, then all origins are allowed\\.\n*Type*: String \\| [HttpApiCorsConfiguration](sam-property-httpapi-httpapicorsconfiguration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\."
         },
         "DefaultRouteSettings": {
-          "title": "Defaultroutesettings"
+          "title": "DefaultRouteSettings",
+          "description": "The default route settings for this HTTP API\\. These settings apply to all routes unless overridden by the `RouteSettings` property for certain routes\\.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings) property of an `AWS::ApiGatewayV2::Stage` resource\\.",
+          "markdownDescription": "The default route settings for this HTTP API\\. These settings apply to all routes unless overridden by the `RouteSettings` property for certain routes\\.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings) property of an `AWS::ApiGatewayV2::Stage` resource\\."
         }
       },
       "additionalProperties": false
@@ -4999,14 +5095,20 @@
       "properties": {
         "Bucket": {
           "title": "Bucket",
+          "description": "The name of the Amazon S3 bucket where the OpenAPI file is stored\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Bucket`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-api-bodys3location.html#cfn-apigatewayv2-api-bodys3location-bucket) property of the `AWS::ApiGatewayV2::Api` `BodyS3Location` data type\\.",
+          "markdownDescription": "The name of the Amazon S3 bucket where the OpenAPI file is stored\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Bucket`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-api-bodys3location.html#cfn-apigatewayv2-api-bodys3location-bucket) property of the `AWS::ApiGatewayV2::Api` `BodyS3Location` data type\\.",
           "type": "string"
         },
         "Key": {
           "title": "Key",
+          "description": "The Amazon S3 key of the OpenAPI file\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-api-bodys3location.html#cfn-apigatewayv2-api-bodys3location-key) property of the `AWS::ApiGatewayV2::Api` `BodyS3Location` data type\\.",
+          "markdownDescription": "The Amazon S3 key of the OpenAPI file\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-api-bodys3location.html#cfn-apigatewayv2-api-bodys3location-key) property of the `AWS::ApiGatewayV2::Api` `BodyS3Location` data type\\.",
           "type": "string"
         },
         "Version": {
           "title": "Version",
+          "description": "For versioned objects, the version of the OpenAPI file\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Version`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-api-bodys3location.html#cfn-apigatewayv2-api-bodys3location-version) property of the `AWS::ApiGatewayV2::Api` `BodyS3Location` data type\\.",
+          "markdownDescription": "For versioned objects, the version of the OpenAPI file\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Version`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-api-bodys3location.html#cfn-apigatewayv2-api-bodys3location-version) property of the `AWS::ApiGatewayV2::Api` `BodyS3Location` data type\\.",
           "type": "string"
         }
       },
@@ -5021,23 +5123,40 @@
       "type": "object",
       "properties": {
         "AccessLogSettings": {
-          "title": "Accesslogsettings"
+          "title": "AccessLogSettings",
+          "description": "The settings for access logging in a stage\\.  \n*Type*: [AccessLogSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings) property of an `AWS::ApiGatewayV2::Stage` resource\\.",
+          "markdownDescription": "The settings for access logging in a stage\\.  \n*Type*: [AccessLogSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-accesslogsettings) property of an `AWS::ApiGatewayV2::Stage` resource\\."
         },
         "Auth": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Auth"
+          "title": "Auth",
+          "description": "Configures authorization for controlling access to your API Gateway HTTP API\\.  \nFor more information, see [Controlling access to HTTP APIs with JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html) in the *API Gateway Developer Guide*\\.  \n*Type*: [HttpApiAuth](sam-property-httpapi-httpapiauth.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Configures authorization for controlling access to your API Gateway HTTP API\\.  \nFor more information, see [Controlling access to HTTP APIs with JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html) in the *API Gateway Developer Guide*\\.  \n*Type*: [HttpApiAuth](sam-property-httpapi-httpapiauth.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Auth"
+            }
+          ]
         },
         "CorsConfiguration": {
-          "title": "Corsconfiguration"
+          "title": "CorsConfiguration",
+          "description": "Manages cross\\-origin resource sharing \\(CORS\\) for all your API Gateway HTTP APIs\\. Specify the domain to allow as a string, or specify an `HttpApiCorsConfiguration` object\\. Note that CORS requires AWS SAM to modify your OpenAPI definition, so CORS works only if the `DefinitionBody` property is specified\\.  \nFor more information, see [Configuring CORS for an HTTP API](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html) in the *API Gateway Developer Guide*\\.  \nIf `CorsConfiguration` is set both in an OpenAPI definition and at the property level, then AWS SAM merges both configuration sources with the properties taking precedence\\. If this property is set to `true`, then all origins are allowed\\.\n*Type*: String \\| [HttpApiCorsConfiguration](sam-property-httpapi-httpapicorsconfiguration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Manages cross\\-origin resource sharing \\(CORS\\) for all your API Gateway HTTP APIs\\. Specify the domain to allow as a string, or specify an `HttpApiCorsConfiguration` object\\. Note that CORS requires AWS SAM to modify your OpenAPI definition, so CORS works only if the `DefinitionBody` property is specified\\.  \nFor more information, see [Configuring CORS for an HTTP API](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html) in the *API Gateway Developer Guide*\\.  \nIf `CorsConfiguration` is set both in an OpenAPI definition and at the property level, then AWS SAM merges both configuration sources with the properties taking precedence\\. If this property is set to `true`, then all origins are allowed\\.\n*Type*: String \\| [HttpApiCorsConfiguration](sam-property-httpapi-httpapicorsconfiguration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\."
         },
         "DefaultRouteSettings": {
-          "title": "Defaultroutesettings"
+          "title": "DefaultRouteSettings",
+          "description": "The default route settings for this HTTP API\\. These settings apply to all routes unless overridden by the `RouteSettings` property for certain routes\\.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings) property of an `AWS::ApiGatewayV2::Stage` resource\\.",
+          "markdownDescription": "The default route settings for this HTTP API\\. These settings apply to all routes unless overridden by the `RouteSettings` property for certain routes\\.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings) property of an `AWS::ApiGatewayV2::Stage` resource\\."
         },
         "DefinitionBody": {
-          "title": "Definitionbody",
+          "title": "DefinitionBody",
+          "description": "The OpenAPI definition that describes your HTTP API\\. If you don't specify a `DefinitionUri` or a `DefinitionBody`, AWS SAM generates a `DefinitionBody` for you based on your template configuration\\.  \n*Type*: JSON  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Body`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-body) property of an `AWS::ApiGatewayV2::Api` resource\\. If certain properties are provided, AWS SAM may insert content into or modify the `DefinitionBody` before it is passed to AWS CloudFormation\\. Properties include `Auth` and an `EventSource` of type HttpApi for a corresponding `AWS::Serverless::Function` resource\\.",
+          "markdownDescription": "The OpenAPI definition that describes your HTTP API\\. If you don't specify a `DefinitionUri` or a `DefinitionBody`, AWS SAM generates a `DefinitionBody` for you based on your template configuration\\.  \n*Type*: JSON  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Body`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-body) property of an `AWS::ApiGatewayV2::Api` resource\\. If certain properties are provided, AWS SAM may insert content into or modify the `DefinitionBody` before it is passed to AWS CloudFormation\\. Properties include `Auth` and an `EventSource` of type HttpApi for a corresponding `AWS::Serverless::Function` resource\\.",
           "type": "object"
         },
         "DefinitionUri": {
-          "title": "Definitionuri",
+          "title": "DefinitionUri",
+          "description": "The Amazon Simple Storage Service \\(Amazon S3\\) URI, local file path, or location object of the the OpenAPI definition that defines the HTTP API\\. The Amazon S3 object that this property references must be a valid OpenAPI definition file\\. If you don't specify a `DefinitionUri` or a `DefinitionBody` are specified, AWS SAM generates a `DefinitionBody` for you based on your template configuration\\.  \nIf you provide a local file path, the template must go through the workflow that includes the `sam deploy` or `sam package` command for the definition to be transformed properly\\.  \nIntrinsic functions are not supported in external OpenApi definition files that you reference with `DefinitionUri`\\. To import an OpenApi definition into the template, use the `DefinitionBody` property with the [Include transform](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/create-reusable-transform-function-snippets-and-add-to-your-template-with-aws-include-transform.html)\\.  \n*Type*: String \\| [HttpApiDefinition](sam-property-httpapi-httpapidefinition.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`BodyS3Location`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-bodys3location) property of an `AWS::ApiGatewayV2::Api` resource\\. The nested Amazon S3 properties are named differently\\.",
+          "markdownDescription": "The Amazon Simple Storage Service \\(Amazon S3\\) URI, local file path, or location object of the the OpenAPI definition that defines the HTTP API\\. The Amazon S3 object that this property references must be a valid OpenAPI definition file\\. If you don't specify a `DefinitionUri` or a `DefinitionBody` are specified, AWS SAM generates a `DefinitionBody` for you based on your template configuration\\.  \nIf you provide a local file path, the template must go through the workflow that includes the `sam deploy` or `sam package` command for the definition to be transformed properly\\.  \nIntrinsic functions are not supported in external OpenApi definition files that you reference with `DefinitionUri`\\. To import an OpenApi definition into the template, use the `DefinitionBody` property with the [Include transform](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/create-reusable-transform-function-snippets-and-add-to-your-template-with-aws-include-transform.html)\\.  \n*Type*: String \\| [HttpApiDefinition](sam-property-httpapi-httpapidefinition.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`BodyS3Location`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-bodys3location) property of an `AWS::ApiGatewayV2::Api` resource\\. The nested Amazon S3 properties are named differently\\.",
           "anyOf": [
             {
               "type": "string"
@@ -5049,28 +5168,49 @@
         },
         "Description": {
           "title": "Description",
+          "description": "A description of the HttpApi resource\\.  \nThis property requires AWS SAM to modify the HttpApi resource's OpenAPI definition, to set the `description` field\\. The following two scenarios result in an error: 1\\) The `DefinitionBody` property is specified with the `description` field set in the OpenAPI definition \\(since this is a conflict that AWS SAM won't resolve\\), or 2\\) The `DefinitionUri` property is specified \\(since AWS SAM won't modify an OpenAPI definition that it retrieves from Amazon S3\\)\\.\n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "A description of the HttpApi resource\\.  \nThis property requires AWS SAM to modify the HttpApi resource's OpenAPI definition, to set the `description` field\\. The following two scenarios result in an error: 1\\) The `DefinitionBody` property is specified with the `description` field set in the OpenAPI definition \\(since this is a conflict that AWS SAM won't resolve\\), or 2\\) The `DefinitionUri` property is specified \\(since AWS SAM won't modify an OpenAPI definition that it retrieves from Amazon S3\\)\\.\n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "string"
         },
         "DisableExecuteApiEndpoint": {
-          "title": "Disableexecuteapiendpoint"
+          "title": "DisableExecuteApiEndpoint",
+          "description": "Specifies whether clients can invoke your HTTP API by using the default `execute-api` endpoint `https://{api_id}.execute-api.{region}.amazonaws.com`\\. By default, clients can invoke your API with the default endpoint\\. To require that clients only use a custom domain name to invoke your API, disable the default endpoint\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DisableExecuteApiEndpoint`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-disableexecuteapiendpoint) property of an `AWS::ApiGatewayV2::Api` resource\\.",
+          "markdownDescription": "Specifies whether clients can invoke your HTTP API by using the default `execute-api` endpoint `https://{api_id}.execute-api.{region}.amazonaws.com`\\. By default, clients can invoke your API with the default endpoint\\. To require that clients only use a custom domain name to invoke your API, disable the default endpoint\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DisableExecuteApiEndpoint`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-disableexecuteapiendpoint) property of an `AWS::ApiGatewayV2::Api` resource\\."
         },
         "Domain": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Domain"
+          "title": "Domain",
+          "description": "Configures a custom domain for this API Gateway HTTP API\\.  \n*Type*: [HttpApiDomainConfiguration](sam-property-httpapi-httpapidomainconfiguration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Configures a custom domain for this API Gateway HTTP API\\.  \n*Type*: [HttpApiDomainConfiguration](sam-property-httpapi-httpapidomainconfiguration.md)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_httpapi__Domain"
+            }
+          ]
         },
         "FailOnWarnings": {
-          "title": "Failonwarnings"
+          "title": "FailOnWarnings",
+          "description": "Specifies whether to roll back the HTTP API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-failonwarnings) property of an `AWS::ApiGatewayV2::Api` resource\\.",
+          "markdownDescription": "Specifies whether to roll back the HTTP API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-failonwarnings) property of an `AWS::ApiGatewayV2::Api` resource\\."
         },
         "RouteSettings": {
-          "title": "Routesettings"
+          "title": "RouteSettings",
+          "description": "The route settings, per route, for this HTTP API\\. For more information, see [Working with routes for HTTP APIs](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html) in the *API Gateway Developer Guide*\\.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings) property of an `AWS::ApiGatewayV2::Stage` resource\\.",
+          "markdownDescription": "The route settings, per route, for this HTTP API\\. For more information, see [Working with routes for HTTP APIs](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html) in the *API Gateway Developer Guide*\\.  \n*Type*: [RouteSettings](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RouteSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-routesettings) property of an `AWS::ApiGatewayV2::Stage` resource\\."
         },
         "StageName": {
-          "title": "Stagename"
+          "title": "StageName",
+          "description": "The name of the API stage\\. If no name is specified, AWS SAM uses the `$default` stage from API Gateway\\.  \n*Type*: String  \n*Required*: No  \n*Default*: $default  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StageName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagename) property of an `AWS::ApiGatewayV2::Stage` resource\\.",
+          "markdownDescription": "The name of the API stage\\. If no name is specified, AWS SAM uses the `$default` stage from API Gateway\\.  \n*Type*: String  \n*Required*: No  \n*Default*: $default  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StageName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagename) property of an `AWS::ApiGatewayV2::Stage` resource\\."
         },
         "StageVariables": {
-          "title": "Stagevariables"
+          "title": "StageVariables",
+          "description": "A map that defines the stage variables\\. Variable names can have alphanumeric and underscore characters\\. The values must match \\[A\\-Za\\-z0\\-9\\-\\.\\_\\~:/?\\#&=,\\]\\+\\.  \n*Type*: [Json](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StageVariables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables) property of an `AWS::ApiGatewayV2::Stage` resource\\.",
+          "markdownDescription": "A map that defines the stage variables\\. Variable names can have alphanumeric and underscore characters\\. The values must match \\[A\\-Za\\-z0\\-9\\-\\.\\_\\~:/?\\#&=,\\]\\+\\.  \n*Type*: [Json](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StageVariables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-stage.html#cfn-apigatewayv2-stage-stagevariables) property of an `AWS::ApiGatewayV2::Stage` resource\\."
         },
         "Tags": {
           "title": "Tags",
+          "description": "A map \\(string to string\\) that specifies the tags to add to this API Gateway stage\\. Keys can be 1 to 128 Unicode characters in length and cannot include the prefix `aws:`\\. You can use any of the following characters: the set of Unicode letters, digits, whitespace, `_`, `.`, `/`, `=`, `+`, and `-`\\. Values can be 1 to 256 Unicode characters in length\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: The `Tags` property requires AWS SAM to modify your OpenAPI definition, so tags are added only if the `DefinitionBody` property is specified\u2014no tags are added if the `DefinitionUri` property is specified\\. AWS SAM automatically adds an `httpapi:createdBy:SAM` tag\\. Tags are also added to the `AWS::ApiGatewayV2::Stage` resource and the `AWS::ApiGatewayV2::DomainName` resource \\(if `DomainName` is specified\\)\\.",
+          "markdownDescription": "A map \\(string to string\\) that specifies the tags to add to this API Gateway stage\\. Keys can be 1 to 128 Unicode characters in length and cannot include the prefix `aws:`\\. You can use any of the following characters: the set of Unicode letters, digits, whitespace, `_`, `.`, `/`, `=`, `+`, and `-`\\. Values can be 1 to 256 Unicode characters in length\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: The `Tags` property requires AWS SAM to modify your OpenAPI definition, so tags are added only if the `DefinitionBody` property is specified\u2014no tags are added if the `DefinitionUri` property is specified\\. AWS SAM automatically adds an `httpapi:createdBy:SAM` tag\\. Tags are also added to the `AWS::ApiGatewayV2::Stage` resource and the `AWS::ApiGatewayV2::DomainName` resource \\(if `DomainName` is specified\\)\\.",
           "type": "object"
         },
         "Name": {
