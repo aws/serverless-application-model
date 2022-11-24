@@ -1801,10 +1801,19 @@
       "type": "object",
       "properties": {
         "Properties": {
-          "$ref": "#/definitions/S3EventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/S3EventProperties"
+            }
+          ]
         },
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "S3"
           ],
@@ -1919,10 +1928,19 @@
       "type": "object",
       "properties": {
         "Properties": {
-          "$ref": "#/definitions/SNSEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/SNSEventProperties"
+            }
+          ]
         },
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "SNS"
           ],
@@ -2013,13 +2031,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "Kinesis"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/KinesisEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/KinesisEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -2106,13 +2133,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "DynamoDB"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/DynamoDBEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DynamoDBEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -2159,13 +2195,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "SQS"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/SQSEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/SQSEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -2536,13 +2581,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "Api"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ApiEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ApiEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -2637,13 +2691,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "Schedule"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/EventsScheduleProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/EventsScheduleProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -2743,13 +2806,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "ScheduleV2"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ScheduleV2EventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__ScheduleV2EventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -2802,13 +2874,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "CloudWatchEvent"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__CloudWatchEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__CloudWatchEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -2887,13 +2968,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "EventBridgeRule"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__EventBridgeRuleEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__EventBridgeRuleEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -2925,13 +3015,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "CloudWatchLogs"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/CloudWatchLogsEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CloudWatchLogsEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -2963,13 +3062,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "IoTRule"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/IoTRuleEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/IoTRuleEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -2997,13 +3105,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "AlexaSkill"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/AlexaSkillEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/AlexaSkillEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -3045,13 +3162,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "Cognito"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/CognitoEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CognitoEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -3161,13 +3287,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "HttpApi"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/HttpApiEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/HttpApiEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -3218,13 +3353,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "MSK"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/MSKEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MSKEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -3287,13 +3431,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "MQ"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/MQEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MQEventProperties"
+            }
+          ]
         }
       },
       "required": [
@@ -3361,13 +3514,22 @@
       "properties": {
         "Type": {
           "title": "Type",
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "enum": [
             "SelfManagedKafka"
           ],
           "type": "string"
         },
         "Properties": {
-          "$ref": "#/definitions/SelfManagedKafkaEventProperties"
+          "title": "Properties",
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](sam-property-function-s3.md) \\| [SNS](sam-property-function-sns.md) \\| [Kinesis](sam-property-function-kinesis.md) \\| [DynamoDB](sam-property-function-dynamodb.md) \\| [SQS](sam-property-function-sqs.md) \\| [Api](sam-property-function-api.md) \\| [Schedule](sam-property-function-schedule.md) \\| [ScheduleV2](sam-property-function-schedulev2.md) \\| [CloudWatchEvent](sam-property-function-cloudwatchevent.md) \\| [EventBridgeRule](sam-property-function-eventbridgerule.md) \\| [CloudWatchLogs](sam-property-function-cloudwatchlogs.md) \\| [IoTRule](sam-property-function-iotrule.md) \\| [AlexaSkill](sam-property-function-alexaskill.md) \\| [Cognito](sam-property-function-cognito.md) \\| [HttpApi](sam-property-function-httpapi.md) \\| [MSK](sam-property-function-msk.md) \\| [MQ](sam-property-function-mq.md) \\| [SelfManagedKafka](sam-property-function-selfmanagedkafka.md)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/SelfManagedKafkaEventProperties"
+            }
+          ]
         }
       },
       "required": [
