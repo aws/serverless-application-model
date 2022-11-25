@@ -3,7 +3,6 @@
   "Description": "lambda-dynamodb",
   "Resources": {
     "Function": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "src",
@@ -29,23 +28,22 @@
           ]
         },
         "Runtime": "nodejs14.x",
-        "Timeout": 30,
         "Tags": [
           {
             "Key": "lambda:createdBy",
             "Value": "SAM"
           }
         ],
+        "Timeout": 30,
         "TracingConfig": {
           "Mode": "Active"
         }
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "FunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -58,7 +56,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "aws:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -70,10 +69,10 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     },
     "StateMachine": {
-      "Type": "AWS::StepFunctions::StateMachine",
       "Properties": {
         "DefinitionString": {
           "Fn::Join": [
@@ -105,9 +104,15 @@
             ]
           ]
         },
+        "DefinitionSubstitutions": {
+          "FunctionArn": {
+            "Fn::GetAtt": [
+              "Function",
+              "Arn"
+            ]
+          }
+        },
         "LoggingConfiguration": {
-          "Level": "ALL",
-          "IncludeExecutionData": true,
           "Destinations": [
             {
               "CloudWatchLogsLogGroup": {
@@ -119,7 +124,9 @@
                 }
               }
             }
-          ]
+          ],
+          "IncludeExecutionData": true,
+          "Level": "ALL"
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -137,24 +144,15 @@
             "Value": "SAM"
           }
         ],
-        "DefinitionSubstitutions": {
-          "FunctionArn": {
-            "Fn::GetAtt": [
-              "Function",
-              "Arn"
-            ]
-          }
-        },
         "TracingConfiguration": {
           "Enabled": true
         }
-      }
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
     },
     "StateMachineRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -167,18 +165,17 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "aws:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess"
         ],
         "Policies": [
           {
-            "PolicyName": "StateMachineRolePolicy1",
             "PolicyDocument": {
               "Statement": [
                 {
-                  "Effect": "Allow",
                   "Action": [
                     "logs:CreateLogDelivery",
                     "logs:GetLogDelivery",
@@ -189,20 +186,21 @@
                     "logs:DescribeResourcePolicies",
                     "logs:DescribeLogGroups"
                   ],
+                  "Effect": "Allow",
                   "Resource": "*"
                 }
               ]
-            }
+            },
+            "PolicyName": "StateMachineRolePolicy1"
           },
           {
-            "PolicyName": "StateMachineRolePolicy2",
             "PolicyDocument": {
               "Statement": [
                 {
-                  "Effect": "Allow",
                   "Action": [
                     "lambda:InvokeFunction"
                   ],
+                  "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [
                       "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*",
@@ -215,7 +213,8 @@
                   }
                 }
               ]
-            }
+            },
+            "PolicyName": "StateMachineRolePolicy2"
           }
         ],
         "Tags": [
@@ -224,7 +223,8 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

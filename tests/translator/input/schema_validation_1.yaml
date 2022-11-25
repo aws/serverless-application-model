@@ -1,4 +1,3 @@
-
 AWSTemplateFormatVersion: '2010-09-09'
 Description: lambda-dynamodb
 Transform: AWS::Serverless-2016-10-31
@@ -28,24 +27,24 @@ Resources:
         Level: ALL
         IncludeExecutionData: true
         Destinations:
-          - CloudWatchLogsLogGroup:
-              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+        - CloudWatchLogsLogGroup:
+            LogGroupArn: !GetAtt StateMachineLogGroup.Arn
       Policies:
-        - AWSXrayWriteOnlyAccess
-        - Statement:
-            - Effect: Allow
-              Action:
-                - logs:CreateLogDelivery
-                - logs:GetLogDelivery
-                - logs:UpdateLogDelivery
-                - logs:DeleteLogDelivery
-                - logs:ListLogDeliveries
-                - logs:PutResourcePolicy
-                - logs:DescribeResourcePolicies
-                - logs:DescribeLogGroups
-              Resource: '*'
-        - LambdaInvokePolicy:
-            FunctionName: !Ref Function
+      - AWSXrayWriteOnlyAccess
+      - Statement:
+        - Effect: Allow
+          Action:
+          - logs:CreateLogDelivery
+          - logs:GetLogDelivery
+          - logs:UpdateLogDelivery
+          - logs:DeleteLogDelivery
+          - logs:ListLogDeliveries
+          - logs:PutResourcePolicy
+          - logs:DescribeResourcePolicies
+          - logs:DescribeLogGroups
+          Resource: '*'
+      - LambdaInvokePolicy:
+          FunctionName: !Ref Function
       Tracing:
         Enabled: true
       Type: STANDARD
@@ -56,8 +55,8 @@ Resources:
     Properties:
       FunctionName: !Sub ${AWS::StackName}-Function
       Description: !Sub
-        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
-        - ResourceName: Function
+      - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+      - ResourceName: Function
       CodeUri: s3://src/Function
       Handler: index.handler
       Runtime: nodejs14.x
@@ -65,4 +64,4 @@ Resources:
       Timeout: 30
       Tracing: Active
       Policies:
-        - AWSXrayWriteOnlyAccess
+      - AWSXrayWriteOnlyAccess
