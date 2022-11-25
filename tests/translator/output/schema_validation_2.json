@@ -1,0 +1,129 @@
+{
+ "AWSTemplateFormatVersion": "2010-09-09",
+ "Description": "A Step Functions Standard Workflow sending payloads to an SQS queue. This pattern will not wait for a callback from SQS\n",
+ "Resources": {
+  "MyQueue": {
+   "Type": "AWS::SQS::Queue"
+  },
+  "MyStateMachineExecutionRole": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Principal": {
+        "Service": [
+         {
+          "Fn::Sub": "states.${AWS::Region}.amazonaws.com"
+         }
+        ]
+       },
+       "Action": "sts:AssumeRole"
+      }
+     ]
+    },
+    "Path": "/"
+   }
+  },
+  "StateMachinetoSQS": {
+   "Type": "AWS::StepFunctions::StateMachine",
+   "Properties": {
+    "DefinitionString": {
+     "Fn::Join": [
+      "\n",
+      [
+       "{",
+       "    \"StartAt\": \"SendToMyQueue\",",
+       "    \"States\": {",
+       "        \"SendToMyQueue\": {",
+       "            \"End\": true,",
+       "            \"Parameters\": {",
+       "                \"MessageBody.$\": \"$.message\",",
+       "                \"QueueUrl\": \"${definition_substitution_1}\"",
+       "            },",
+       "            \"Resource\": \"arn:aws:states:::sqs:sendMessage\",",
+       "            \"Type\": \"Task\"",
+       "        }",
+       "    }",
+       "}"
+      ]
+     ]
+    },
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "MyStateMachineExecutionRole",
+      "Arn"
+     ]
+    },
+    "Tags": [
+     {
+      "Key": "stateMachine:createdBy",
+      "Value": "SAM"
+     }
+    ],
+    "DefinitionSubstitutions": {
+     "definition_substitution_1": {
+      "Ref": "MyQueue"
+     }
+    }
+   }
+  },
+  "SFNToSQSPolicy": {
+   "Type": "AWS::IAM::ManagedPolicy",
+   "Metadata": {
+    "aws:sam:connectors": {
+     "SFNToSQS": {
+      "Source": {
+       "Type": "AWS::Serverless::StateMachine"
+      },
+      "Destination": {
+       "Type": "AWS::SQS::Queue"
+      }
+     }
+    }
+   },
+   "Properties": {
+    "PolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": [
+        "sqs:SendMessage"
+       ],
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "MyQueue",
+          "Arn"
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    "Roles": [
+     {
+      "Ref": "MyStateMachineExecutionRole"
+     }
+    ]
+   }
+  }
+ },
+ "Outputs": {
+  "StateMachinetoSQSArn": {
+   "Value": {
+    "Ref": "StateMachinetoSQS"
+   },
+   "Description": "StateMachinetoSQS Arn"
+  },
+  "MyQueueURL": {
+   "Value": {
+    "Ref": "MyQueue"
+   },
+   "Description": "MyQueue URL"
+  }
+ }
+}

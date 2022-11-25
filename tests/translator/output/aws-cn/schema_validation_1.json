@@ -1,0 +1,230 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "lambda-dynamodb",
+  "Resources": {
+    "Function": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "src",
+          "S3Key": "Function"
+        },
+        "Description": {
+          "Fn::Sub": [
+            "Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}",
+            {
+              "ResourceName": "Function"
+            }
+          ]
+        },
+        "FunctionName": {
+          "Fn::Sub": "${AWS::StackName}-Function"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 3008,
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Timeout": 30,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "TracingConfig": {
+          "Mode": "Active"
+        }
+      }
+    },
+    "FunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "aws:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "aws:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "StateMachine": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"Start\",",
+              "    \"States\": {",
+              "        \"Done\": {",
+              "            \"End\": true,",
+              "            \"Type\": \"Pass\"",
+              "        },",
+              "        \"Start\": {",
+              "            \"Next\": \"TaskState\",",
+              "            \"Type\": \"Pass\"",
+              "        },",
+              "        \"TaskState\": {",
+              "            \"Comment\": \"Stackery creates an attachment point for each 'Task' state\",",
+              "            \"Next\": \"Done\",",
+              "            \"Parameters\": {",
+              "                \"FunctionName\": \"${FunctionArn}\",",
+              "                \"Payload.$\": \"$\"",
+              "            },",
+              "            \"Resource\": \"aws:aws-cn:states:::lambda:invoke\",",
+              "            \"Type\": \"Task\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "LoggingConfiguration": {
+          "Level": "ALL",
+          "IncludeExecutionData": true,
+          "Destinations": [
+            {
+              "CloudWatchLogsLogGroup": {
+                "LogGroupArn": {
+                  "Fn::GetAtt": [
+                    "StateMachineLogGroup",
+                    "Arn"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StateMachineRole",
+            "Arn"
+          ]
+        },
+        "StateMachineName": {
+          "Fn::Sub": "${AWS::StackName}-StateMachine"
+        },
+        "StateMachineType": "STANDARD",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "DefinitionSubstitutions": {
+          "FunctionArn": {
+            "Fn::GetAtt": [
+              "Function",
+              "Arn"
+            ]
+          }
+        },
+        "TracingConfiguration": {
+          "Enabled": true
+        }
+      }
+    },
+    "StateMachineRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "aws:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "StateMachineRolePolicy1",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogDelivery",
+                    "logs:GetLogDelivery",
+                    "logs:UpdateLogDelivery",
+                    "logs:DeleteLogDelivery",
+                    "logs:ListLogDeliveries",
+                    "logs:PutResourcePolicy",
+                    "logs:DescribeResourcePolicies",
+                    "logs:DescribeLogGroups"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "StateMachineRolePolicy2",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*",
+                      {
+                        "functionName": {
+                          "Ref": "Function"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    }
+  }
+}
