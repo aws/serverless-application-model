@@ -80,6 +80,7 @@ from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.utils.types import Intrinsicable
+from samtranslator.schema.common import PassThrough
 from samtranslator.validator.value_validator import sam_expect
 
 
@@ -142,7 +143,7 @@ class SamFunction(SamResourceMacro):
     Role: Optional[Intrinsicable[str]]
     AssumeRolePolicyDocument: Optional[Dict[str, Any]]
     Policies: Optional[List[Any]]
-    RolePath: Optional[Intrinsicable[str]]
+    RolePath: Optional[PassThrough]
     PermissionsBoundary: Optional[Intrinsicable[str]]
     Environment: Optional[Dict[str, Any]]
     Events: Optional[Dict[str, Any]]
