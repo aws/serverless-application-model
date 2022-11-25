@@ -4,10 +4,12 @@
 Usage:
     add_transform_test.py --template-file=sam-template.yaml [--disable-api-configuration]
     add_transform_test.py --template-file=sam-template.yaml
+    add_transform_test.py --template-file=sam-template.yaml [--disable-update-partition]
 
 Options:
     --template-file=<i>             Location of SAM template to transform [default: template.yaml].
     --disable-api-configuration     Disable adding REGIONAL configuration to AWS::ApiGateway::RestApi
+    --disable-update-partition      Disable updating the partition of arn to aws-cn/aws-us-gov
 """
 import json
 import subprocess
@@ -46,6 +48,14 @@ def add_regional_endpoint_configuration_if_needed(template: Dict[str, Any]) -> D
     return template
 
 
+def replace_aws_partition(partition: str, file_path: str) -> None:
+    template = read_json_file(file_path)
+    with open(file_path, "w") as file:
+        updated_template = json.loads(json.dumps(template).replace("arn:aws", f"aws:{partition}"))
+        file.write(json.dumps(updated_template, indent=2))
+    print(f"Transform Test output files generated {file_path}")
+
+
 def generate_transform_test_output_files(input_file_path: str, file_basename: str) -> None:
     output_file_option = file_basename + ".json"
 
@@ -67,22 +77,20 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
         transform_test_output_path = os.path.join(TRANSFORM_TEST_DIR, "output", output_file_option)
         shutil.copyfile(temp_output_file.name, transform_test_output_path)
 
-        regional_transform_test_output_paths = [
-            os.path.join(TRANSFORM_TEST_DIR, path, output_file_option)
-            for path in [
-                "output/aws-cn/",
-                "output/aws-us-gov/",
-            ]
-        ]
+        regional_transform_test_output_paths = {
+            "aws-cn": os.path.join(TRANSFORM_TEST_DIR, "output/aws-cn/", output_file_option),
+            "aws-us-gov": os.path.join(TRANSFORM_TEST_DIR, "output/aws-us-gov/", output_file_option),
+        }
 
         if not CLI_OPTIONS.get("--disable-api-configuration"):
             template = read_json_file(temp_output_file.name)
             template = add_regional_endpoint_configuration_if_needed(template)
             write_json_file(template, temp_output_file.name)
 
-        for output_path in regional_transform_test_output_paths:
+        for partition, output_path in regional_transform_test_output_paths.items():
             shutil.copyfile(temp_output_file.name, output_path)
-            print(f"Transform Test output files generated {output_path}")
+            if not CLI_OPTIONS.get("--disable-update-partition"):
+                replace_aws_partition(partition, output_path)
 
 
 def get_input_file_path() -> str:
