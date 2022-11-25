@@ -9,6 +9,7 @@ from samtranslator.feature_toggle.dialup import (
     SimpleAccountPercentileDialup,
 )
 from samtranslator.metrics.method_decorator import cw_timer
+from samtranslator.utils.constants import BOTO3_CONNECT_TIMEOUT
 
 LOG = logging.getLogger(__name__)
 
@@ -133,7 +134,9 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
             # Lambda function has 120 seconds limit
             # (5 + 5) * 2, 20 seconds maximum timeout duration
             # In case of high latency from AppConfig, we can always fall back to use an empty config and continue transform
-            client_config = Config(connect_timeout=5, read_timeout=5, retries={"total_max_attempts": 2})
+            client_config = Config(
+                connect_timeout=BOTO3_CONNECT_TIMEOUT, read_timeout=5, retries={"total_max_attempts": 2}
+            )
             self.app_config_client = (
                 boto3.client("appconfig", config=client_config) if not app_config_client else app_config_client
             )

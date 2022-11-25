@@ -1,381 +1,439 @@
+from __future__ import annotations
+
 from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsic, get_docs_prop
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop
 
 
-def prop(field: str) -> Any:
-    return get_docs_prop("AWS::Serverless::Function.Properties." + field)
+alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
+apiauth = get_prop("sam-property-function-apifunctionauth")
+apieventproperties = get_prop("sam-property-function-api")
+cloudwatcheventproperties = get_prop("sam-property-function-cloudwatchevent")
+cloudwatchlogseventproperties = get_prop("sam-property-function-cloudwatchlogs")
+codeuri = get_prop("sam-property-function-functioncode")
+cognitoeventproperties = get_prop("sam-property-function-cognito")
+deadletterconfig = get_prop("sam-property-function-deadletterconfig")
+deploymentpreference = get_prop("sam-property-function-deploymentpreference")
+dlq = get_prop("sam-property-function-deadletterqueue")
+dynamodbeventproperties = get_prop("sam-property-function-dynamodb")
+event = get_prop("sam-property-function-eventsource")
+eventbridgeruleeventproperties = get_prop("sam-property-function-eventbridgerule")
+eventbridgeruletarget = get_prop("sam-property-function-target")
+eventinvokeconfig = get_prop("sam-property-function-eventinvokeconfiguration")
+eventinvokedestinationconfig = get_prop("sam-property-function-eventinvokedestinationconfiguration")
+eventinvokeonfailure = get_prop("sam-property-function-onfailure")
+eventinvokeonsuccess = get_prop("sam-property-function-onsuccess")
+eventsscheduleproperties = get_prop("sam-property-function-schedule")
+functionurlconfig = get_prop("sam-property-function-functionurlconfig")
+hooks = get_prop("sam-property-function-hooks")
+httpapiauth = get_prop("sam-property-function-httpapifunctionauth")
+httpapieventproperties = get_prop("sam-property-function-httpapi")
+iotruleeventproperties = get_prop("sam-property-function-iotrule")
+kinesiseventproperties = get_prop("sam-property-function-kinesis")
+mqeventproperties = get_prop("sam-property-function-mq")
+mskeventproperties = get_prop("sam-property-function-msk")
+prop = get_prop("sam-resource-function")
+requestmodel = get_prop("sam-property-function-requestmodel")
+requestparameters = get_prop("sam-property-function-requestparameter")
+resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
+s3eventproperties = get_prop("sam-property-function-s3")
+schedulev2eventproperties = get_prop("sam-property-function-schedulev2")
+selfmanagedkafkaeventproperties = get_prop("sam-property-function-selfmanagedkafka")
+snseventproperties = get_prop("sam-property-function-sns")
+sqseventproperties = get_prop("sam-property-function-sqs")
+sqssubscription = get_prop("sam-property-function-sqssubscriptionobject")
 
 
 class ResourcePolicy(BaseModel):
-    AwsAccountBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
-    AwsAccountWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
-    CustomStatements: Optional[List[Union[str, Dict[str, Any]]]]
-    IntrinsicVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
-    IntrinsicVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
-    IntrinsicVpceBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
-    IntrinsicVpceWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
-    IpRangeBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
-    IpRangeWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
-    SourceVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]]
-    SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]]
+    AwsAccountBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountBlacklist")
+    AwsAccountWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountWhitelist")
+    CustomStatements: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("CustomStatements")
+    IntrinsicVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcBlacklist")
+    IntrinsicVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcWhitelist")
+    IntrinsicVpceBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceBlacklist")
+    IntrinsicVpceWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceWhitelist")
+    IpRangeBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeBlacklist")
+    IpRangeWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeWhitelist")
+    SourceVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcBlacklist")
+    SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcWhitelist")
 
 
 class CodeUri(BaseModel):
-    Bucket: Union[str, SamIntrinsic]
-    Key: Union[str, SamIntrinsic]
-    Version: Optional[Union[str, SamIntrinsic]]
+    Bucket: SamIntrinsicable[str] = codeuri("Bucket")
+    Key: SamIntrinsicable[str] = codeuri("Key")
+    Version: Optional[SamIntrinsicable[str]] = codeuri("Version")
 
 
 class Hooks(BaseModel):
-    PostTraffic: Optional[Union[str, SamIntrinsic]]
-    PreTraffic: Optional[Union[str, SamIntrinsic]]
+    PostTraffic: Optional[SamIntrinsicable[str]] = hooks("PostTraffic")
+    PreTraffic: Optional[SamIntrinsicable[str]] = hooks("PreTraffic")
 
 
 class DeploymentPreference(BaseModel):
-    Alarms: Optional[Union[List[SamIntrinsic], SamIntrinsic]]
-    Enabled: Optional[Union[bool, SamIntrinsic]]
-    Hooks: Optional[Hooks]
-    PassthroughCondition: Optional[Union[bool, SamIntrinsic]]
-    Role: Optional[Union[str, SamIntrinsic]]
-    TriggerConfigurations: Optional[PassThrough]
-    Type: Optional[
-        Union[str, SamIntrinsic]
-    ]  # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field.
+    Alarms: Optional[SamIntrinsicable[List[Dict[str, Any]]]] = deploymentpreference("Alarms")
+    Enabled: Optional[SamIntrinsicable[bool]] = deploymentpreference("Enabled")
+    Hooks: Optional[Hooks] = deploymentpreference("Hooks")
+    PassthroughCondition: Optional[SamIntrinsicable[bool]] = deploymentpreference("PassthroughCondition")
+    Role: Optional[SamIntrinsicable[str]] = deploymentpreference("Role")
+    TriggerConfigurations: Optional[PassThrough] = deploymentpreference("TriggerConfigurations")
+    Type: Optional[SamIntrinsicable[str]] = deploymentpreference(
+        "Type"
+    )  # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field.
 
 
 class DeadLetterQueue(BaseModel):
-    TargetArn: str
-    Type: Literal["SNS", "SQS"]
+    TargetArn: str = dlq("TargetArn")
+    Type: Literal["SNS", "SQS"] = dlq("Type")
+
+
+class EventInvokeOnFailure(BaseModel):
+    Destination: Optional[SamIntrinsicable[str]] = eventinvokeonfailure("Destination")
+    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]] = eventinvokeonfailure("Type")
+
+
+class EventInvokeOnSuccess(BaseModel):
+    Destination: Optional[SamIntrinsicable[str]] = eventinvokeonsuccess("Destination")
+    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]] = eventinvokeonsuccess("Type")
+
+
+class EventInvokeDestinationConfig(BaseModel):
+    OnFailure: Optional[EventInvokeOnFailure] = eventinvokedestinationconfig("OnFailure")
+    OnSuccess: Optional[EventInvokeOnSuccess] = eventinvokedestinationconfig("OnSuccess")
 
 
 class EventInvokeConfig(BaseModel):
-    DestinationConfig: Optional[PassThrough]
-    MaximumEventAgeInSeconds: Optional[int]
-    MaximumRetryAttempts: Optional[int]
+    DestinationConfig: Optional[EventInvokeDestinationConfig] = eventinvokeconfig("DestinationConfig")
+    MaximumEventAgeInSeconds: Optional[int] = eventinvokeconfig("MaximumEventAgeInSeconds")
+    MaximumRetryAttempts: Optional[int] = eventinvokeconfig("MaximumRetryAttempts")
 
 
 class S3EventProperties(BaseModel):
-    Bucket: Union[str, SamIntrinsic]
-    Events: PassThrough
-    Filter: Optional[PassThrough]
+    Bucket: SamIntrinsicable[str] = s3eventproperties("Bucket")
+    Events: PassThrough = s3eventproperties("Events")
+    Filter: Optional[PassThrough] = s3eventproperties("Filter")
 
 
 class S3Event(BaseModel):
-    Properties: S3EventProperties
-    Type: Literal["S3"]
+    Properties: S3EventProperties = event("Properties")
+    Type: Literal["S3"] = event("Type")
 
 
 class SqsSubscription(BaseModel):
-    BatchSize: Optional[Union[str, SamIntrinsic]]
-    Enabled: Optional[bool]
-    QueueArn: Union[str, SamIntrinsic]
-    QueuePolicyLogicalId: Optional[str]
-    QueueUrl: Union[str, SamIntrinsic]
+    BatchSize: Optional[SamIntrinsicable[str]] = sqssubscription("BatchSize")
+    Enabled: Optional[bool] = sqssubscription("Enabled")
+    QueueArn: SamIntrinsicable[str] = sqssubscription("QueueArn")
+    QueuePolicyLogicalId: Optional[str] = sqssubscription("QueuePolicyLogicalId")
+    QueueUrl: SamIntrinsicable[str] = sqssubscription("QueueUrl")
 
 
 class SNSEventProperties(BaseModel):
-    FilterPolicy: Optional[PassThrough]
-    Region: Optional[PassThrough]
-    SqsSubscription: Optional[Union[bool, SqsSubscription]]
-    Topic: PassThrough
+    FilterPolicy: Optional[PassThrough] = snseventproperties("FilterPolicy")
+    Region: Optional[PassThrough] = snseventproperties("Region")
+    SqsSubscription: Optional[Union[bool, SqsSubscription]] = snseventproperties("SqsSubscription")
+    Topic: PassThrough = snseventproperties("Topic")
 
 
 class SNSEvent(BaseModel):
-    Properties: SNSEventProperties
-    Type: Literal["SNS"]
+    Properties: SNSEventProperties = event("Properties")
+    Type: Literal["SNS"] = event("Type")
 
 
 class FunctionUrlConfig(BaseModel):
-    AuthType: Union[str, SamIntrinsic]
-    Cors: Optional[PassThrough]
+    AuthType: SamIntrinsicable[str] = functionurlconfig("AuthType")
+    Cors: Optional[PassThrough] = functionurlconfig("Cors")
 
 
 class KinesisEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough]
-    BisectBatchOnFunctionError: Optional[PassThrough]
-    DestinationConfig: Optional[PassThrough]
-    Enabled: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    FunctionResponseTypes: Optional[PassThrough]
-    MaximumBatchingWindowInSeconds: Optional[PassThrough]
-    MaximumRecordAgeInSeconds: Optional[PassThrough]
-    MaximumRetryAttempts: Optional[PassThrough]
-    ParallelizationFactor: Optional[PassThrough]
-    StartingPosition: PassThrough
-    Stream: PassThrough
-    TumblingWindowInSeconds: Optional[PassThrough]
+    BatchSize: Optional[PassThrough] = kinesiseventproperties("BatchSize")
+    BisectBatchOnFunctionError: Optional[PassThrough] = kinesiseventproperties("BisectBatchOnFunctionError")
+    DestinationConfig: Optional[PassThrough] = kinesiseventproperties("DestinationConfig")
+    Enabled: Optional[PassThrough] = kinesiseventproperties("Enabled")
+    FilterCriteria: Optional[PassThrough] = kinesiseventproperties("FilterCriteria")
+    FunctionResponseTypes: Optional[PassThrough] = kinesiseventproperties("FunctionResponseTypes")
+    MaximumBatchingWindowInSeconds: Optional[PassThrough] = kinesiseventproperties("MaximumBatchingWindowInSeconds")
+    MaximumRecordAgeInSeconds: Optional[PassThrough] = kinesiseventproperties("MaximumRecordAgeInSeconds")
+    MaximumRetryAttempts: Optional[PassThrough] = kinesiseventproperties("MaximumRetryAttempts")
+    ParallelizationFactor: Optional[PassThrough] = kinesiseventproperties("ParallelizationFactor")
+    StartingPosition: PassThrough = kinesiseventproperties("StartingPosition")
+    Stream: PassThrough = kinesiseventproperties("Stream")
+    TumblingWindowInSeconds: Optional[PassThrough] = kinesiseventproperties("TumblingWindowInSeconds")
 
 
 class KinesisEvent(BaseModel):
-    Type: Literal["Kinesis"]
-    Properties: KinesisEventProperties
+    Type: Literal["Kinesis"] = event("Type")
+    Properties: KinesisEventProperties = event("Properties")
 
 
 class DynamoDBEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough]
-    BisectBatchOnFunctionError: Optional[PassThrough]
-    DestinationConfig: Optional[PassThrough]
-    Enabled: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    FunctionResponseTypes: Optional[PassThrough]
-    MaximumBatchingWindowInSeconds: Optional[PassThrough]
-    MaximumRecordAgeInSeconds: Optional[PassThrough]
-    MaximumRetryAttempts: Optional[PassThrough]
-    ParallelizationFactor: Optional[PassThrough]
-    StartingPosition: PassThrough
-    Stream: PassThrough
-    TumblingWindowInSeconds: Optional[PassThrough]
+    BatchSize: Optional[PassThrough] = dynamodbeventproperties("BatchSize")
+    BisectBatchOnFunctionError: Optional[PassThrough] = dynamodbeventproperties("BisectBatchOnFunctionError")
+    DestinationConfig: Optional[PassThrough] = dynamodbeventproperties("DestinationConfig")
+    Enabled: Optional[PassThrough] = dynamodbeventproperties("Enabled")
+    FilterCriteria: Optional[PassThrough] = dynamodbeventproperties("FilterCriteria")
+    FunctionResponseTypes: Optional[PassThrough] = dynamodbeventproperties("FunctionResponseTypes")
+    MaximumBatchingWindowInSeconds: Optional[PassThrough] = dynamodbeventproperties("MaximumBatchingWindowInSeconds")
+    MaximumRecordAgeInSeconds: Optional[PassThrough] = dynamodbeventproperties("MaximumRecordAgeInSeconds")
+    MaximumRetryAttempts: Optional[PassThrough] = dynamodbeventproperties("MaximumRetryAttempts")
+    ParallelizationFactor: Optional[PassThrough] = dynamodbeventproperties("ParallelizationFactor")
+    StartingPosition: PassThrough = dynamodbeventproperties("StartingPosition")
+    Stream: PassThrough = dynamodbeventproperties("Stream")
+    TumblingWindowInSeconds: Optional[PassThrough] = dynamodbeventproperties("TumblingWindowInSeconds")
 
 
 class DynamoDBEvent(BaseModel):
-    Type: Literal["DynamoDB"]
-    Properties: DynamoDBEventProperties
+    Type: Literal["DynamoDB"] = event("Type")
+    Properties: DynamoDBEventProperties = event("Properties")
 
 
 class SQSEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough]
-    Enabled: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    MaximumBatchingWindowInSeconds: Optional[PassThrough]
-    Queue: PassThrough
+    BatchSize: Optional[PassThrough] = sqseventproperties("BatchSize")
+    Enabled: Optional[PassThrough] = sqseventproperties("Enabled")
+    FilterCriteria: Optional[PassThrough] = sqseventproperties("FilterCriteria")
+    MaximumBatchingWindowInSeconds: Optional[PassThrough] = sqseventproperties("MaximumBatchingWindowInSeconds")
+    Queue: PassThrough = sqseventproperties("Queue")
 
 
 class SQSEvent(BaseModel):
-    Type: Literal["SQS"]
-    Properties: SQSEventProperties
+    Type: Literal["SQS"] = event("Type")
+    Properties: SQSEventProperties = event("Properties")
 
 
 class ApiAuth(BaseModel):
-    ApiKeyRequired: Optional[bool]
-    AuthorizationScopes: Optional[List[str]]
-    Authorizer: Optional[str]
-    InvokeRole: Optional[Union[str, SamIntrinsic]]
-    ResourcePolicy: Optional[ResourcePolicy]
+    ApiKeyRequired: Optional[bool] = apiauth("ApiKeyRequired")
+    AuthorizationScopes: Optional[List[str]] = apiauth("AuthorizationScopes")
+    Authorizer: Optional[str] = apiauth("Authorizer")
+    InvokeRole: Optional[SamIntrinsicable[str]] = apiauth("InvokeRole")
+    ResourcePolicy: Optional[ResourcePolicy] = apiauth("ResourcePolicy")
 
 
 class RequestModel(BaseModel):
-    Model: str
-    Required: Optional[bool]
-    ValidateBody: Optional[bool]
-    ValidateParameters: Optional[bool]
+    Model: str = requestmodel("Model")
+    Required: Optional[bool] = requestmodel("Required")
+    ValidateBody: Optional[bool] = requestmodel("ValidateBody")
+    ValidateParameters: Optional[bool] = requestmodel("ValidateParameters")
 
 
 class RequestParameters(BaseModel):
-    Caching: Optional[bool]
-    Required: Optional[bool]
+    Caching: Optional[bool] = requestparameters("Caching")
+    Required: Optional[bool] = requestparameters("Required")
 
 
 class ApiEventProperties(BaseModel):
-    Auth: Optional[ApiAuth]
-    Method: str
-    Path: str
-    RequestModel: Optional[RequestModel]
-    RequestParameters: Optional[Union[str, RequestParameters]]
-    RestApiId: Optional[Union[str, SamIntrinsic]]
+    Auth: Optional[ApiAuth] = apieventproperties("Auth")
+    Method: str = apieventproperties("Method")
+    Path: str = apieventproperties("Path")
+    RequestModel: Optional[RequestModel] = apieventproperties("RequestModel")
+    RequestParameters: Optional[Union[str, RequestParameters]] = apieventproperties("RequestParameters")
+    RestApiId: Optional[SamIntrinsicable[str]] = apieventproperties("RestApiId")
 
 
 class ApiEvent(BaseModel):
-    Type: Literal["Api"]
-    Properties: ApiEventProperties
+    Type: Literal["Api"] = event("Type")
+    Properties: ApiEventProperties = event("Properties")
 
 
 class CloudWatchEventProperties(BaseModel):
-    Enabled: Optional[bool]
-    EventBusName: Optional[PassThrough]
-    Input: Optional[PassThrough]
-    InputPath: Optional[PassThrough]
-    Pattern: Optional[PassThrough]
-    State: Optional[PassThrough]
+    Enabled: Optional[bool] = cloudwatcheventproperties("Enabled")
+    EventBusName: Optional[PassThrough] = cloudwatcheventproperties("EventBusName")
+    Input: Optional[PassThrough] = cloudwatcheventproperties("Input")
+    InputPath: Optional[PassThrough] = cloudwatcheventproperties("InputPath")
+    Pattern: Optional[PassThrough] = cloudwatcheventproperties("Pattern")
+    State: Optional[PassThrough] = cloudwatcheventproperties("State")
 
 
 class CloudWatchEvent(BaseModel):
-    Type: Literal["CloudWatchEvent"]
-    Properties: CloudWatchEventProperties
+    Type: Literal["CloudWatchEvent"] = event("Type")
+    Properties: CloudWatchEventProperties = event("Properties")
 
 
 class DeadLetterConfig(BaseModel):
-    Arn: Optional[PassThrough]
-    QueueLogicalId: Optional[str]
-    Type: Optional[Literal["SQS"]]
+    Arn: Optional[PassThrough] = deadletterconfig("Arn")
+    QueueLogicalId: Optional[str] = deadletterconfig("QueueLogicalId")
+    Type: Optional[Literal["SQS"]] = deadletterconfig("Type")
 
 
 class EventsScheduleProperties(BaseModel):
-    DeadLetterConfig: Optional[DeadLetterConfig]
-    Description: Optional[PassThrough]
-    Enabled: Optional[bool]
-    Input: Optional[PassThrough]
-    Name: Optional[PassThrough]
-    RetryPolicy: Optional[PassThrough]
-    Schedule: Optional[PassThrough]
-    State: Optional[PassThrough]
+    DeadLetterConfig: Optional[DeadLetterConfig] = eventsscheduleproperties("DeadLetterConfig")
+    Description: Optional[PassThrough] = eventsscheduleproperties("Description")
+    Enabled: Optional[bool] = eventsscheduleproperties("Enabled")
+    Input: Optional[PassThrough] = eventsscheduleproperties("Input")
+    Name: Optional[PassThrough] = eventsscheduleproperties("Name")
+    RetryPolicy: Optional[PassThrough] = eventsscheduleproperties("RetryPolicy")
+    Schedule: Optional[PassThrough] = eventsscheduleproperties("Schedule")
+    State: Optional[PassThrough] = eventsscheduleproperties("State")
 
 
 class ScheduleEvent(BaseModel):
-    Type: Literal["Schedule"]
-    Properties: EventsScheduleProperties
+    Type: Literal["Schedule"] = event("Type")
+    Properties: EventsScheduleProperties = event("Properties")
+
+
+class EventBridgeRuleTarget(BaseModel):
+    Id: PassThrough = eventbridgeruletarget("Id")
 
 
 class EventBridgeRuleEventProperties(BaseModel):
-    DeadLetterConfig: Optional[DeadLetterConfig]
-    EventBusName: Optional[PassThrough]
-    Input: Optional[PassThrough]
-    InputPath: Optional[PassThrough]
-    Pattern: PassThrough
-    RetryPolicy: Optional[PassThrough]
-    Target: Optional[PassThrough]
+    DeadLetterConfig: Optional[DeadLetterConfig] = eventbridgeruleeventproperties("DeadLetterConfig")
+    EventBusName: Optional[PassThrough] = eventbridgeruleeventproperties("EventBusName")
+    Input: Optional[PassThrough] = eventbridgeruleeventproperties("Input")
+    InputPath: Optional[PassThrough] = eventbridgeruleeventproperties("InputPath")
+    Pattern: PassThrough = eventbridgeruleeventproperties("Pattern")
+    RetryPolicy: Optional[PassThrough] = eventbridgeruleeventproperties("RetryPolicy")
+    Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
 
 
 class EventBridgeRuleEvent(BaseModel):
-    Type: Literal["EventBridgeRule"]
-    Properties: EventBridgeRuleEventProperties
+    Type: Literal["EventBridgeRule"] = event("Type")
+    Properties: EventBridgeRuleEventProperties = event("Properties")
 
 
 class CloudWatchLogsEventProperties(BaseModel):
-    FilterPattern: PassThrough
-    LogGroupName: PassThrough
+    FilterPattern: PassThrough = cloudwatchlogseventproperties("FilterPattern")
+    LogGroupName: PassThrough = cloudwatchlogseventproperties("LogGroupName")
 
 
 class CloudWatchLogsEvent(BaseModel):
-    Type: Literal["CloudWatchLogs"]
-    Properties: CloudWatchLogsEventProperties
+    Type: Literal["CloudWatchLogs"] = event("Type")
+    Properties: CloudWatchLogsEventProperties = event("Properties")
 
 
 class IoTRuleEventProperties(BaseModel):
-    AwsIotSqlVersion: Optional[PassThrough]
-    Sql: PassThrough
+    AwsIotSqlVersion: Optional[PassThrough] = iotruleeventproperties("AwsIotSqlVersion")
+    Sql: PassThrough = iotruleeventproperties("Sql")
 
 
 class IoTRuleEvent(BaseModel):
-    Type: Literal["IoTRule"]
-    Properties: IoTRuleEventProperties
+    Type: Literal["IoTRule"] = event("Type")
+    Properties: IoTRuleEventProperties = event("Properties")
 
 
 class AlexaSkillEventProperties(BaseModel):
-    SkillId: Optional[str]
+    SkillId: Optional[str] = alexaskilleventproperties("SkillId")
 
 
 class AlexaSkillEvent(BaseModel):
-    Type: Literal["AlexaSkill"]
-    Properties: Optional[AlexaSkillEventProperties]
+    Type: Literal["AlexaSkill"] = event("Type")
+    Properties: Optional[AlexaSkillEventProperties] = event("Properties")
 
 
 class CognitoEventProperties(BaseModel):
-    Trigger: PassThrough
-    UserPool: Union[str, SamIntrinsic]
+    Trigger: PassThrough = cognitoeventproperties("Trigger")
+    UserPool: SamIntrinsicable[str] = cognitoeventproperties("UserPool")
 
 
 class CognitoEvent(BaseModel):
-    Type: Literal["Cognito"]
-    Properties: CognitoEventProperties
+    Type: Literal["Cognito"] = event("Type")
+    Properties: CognitoEventProperties = event("Properties")
 
 
 class HttpApiAuth(BaseModel):
-    AuthorizationScopes: Optional[List[str]]
-    Authorizer: Optional[str]
+    AuthorizationScopes: Optional[List[str]] = httpapiauth("AuthorizationScopes")
+    Authorizer: Optional[str] = httpapiauth("Authorizer")
 
 
 class HttpApiEventProperties(BaseModel):
-    ApiId: Optional[Union[str, SamIntrinsic]]
-    Auth: Optional[HttpApiAuth]
-    Method: Optional[str]
-    Path: Optional[str]
-    PayloadFormatVersion: Optional[Union[str, SamIntrinsic]]
-    RouteSettings: Optional[PassThrough]
-    TimeoutInMillis: Optional[Union[int, SamIntrinsic]]
+    ApiId: Optional[SamIntrinsicable[str]] = httpapieventproperties("ApiId")
+    Auth: Optional[HttpApiAuth] = httpapieventproperties("Auth")
+    Method: Optional[str] = httpapieventproperties("Method")
+    Path: Optional[str] = httpapieventproperties("Path")
+    PayloadFormatVersion: Optional[SamIntrinsicable[str]] = httpapieventproperties("PayloadFormatVersion")
+    RouteSettings: Optional[PassThrough] = httpapieventproperties("RouteSettings")
+    TimeoutInMillis: Optional[SamIntrinsicable[int]] = httpapieventproperties("TimeoutInMillis")
 
 
 class HttpApiEvent(BaseModel):
-    Type: Literal["HttpApi"]
-    Properties: Optional[HttpApiEventProperties]
+    Type: Literal["HttpApi"] = event("Type")
+    Properties: Optional[HttpApiEventProperties] = event("Properties")
 
 
 class MSKEventProperties(BaseModel):
-    ConsumerGroupId: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    MaximumBatchingWindowInSeconds: Optional[PassThrough]
-    StartingPosition: PassThrough
-    Stream: PassThrough
-    Topics: PassThrough
+    ConsumerGroupId: Optional[PassThrough] = mskeventproperties("ConsumerGroupId")
+    FilterCriteria: Optional[PassThrough] = mskeventproperties("FilterCriteria")
+    MaximumBatchingWindowInSeconds: Optional[PassThrough] = mskeventproperties("MaximumBatchingWindowInSeconds")
+    StartingPosition: PassThrough = mskeventproperties("StartingPosition")
+    Stream: PassThrough = mskeventproperties("Stream")
+    Topics: PassThrough = mskeventproperties("Topics")
 
 
 class MSKEvent(BaseModel):
-    Type: Literal["MSK"]
-    Properties: MSKEventProperties
+    Type: Literal["MSK"] = event("Type")
+    Properties: MSKEventProperties = event("Properties")
 
 
 class MQEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough]
-    Broker: PassThrough
-    Enabled: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    MaximumBatchingWindowInSeconds: Optional[PassThrough]
-    Queues: PassThrough
-    SecretsManagerKmsKeyId: Optional[str]
-    SourceAccessConfigurations: PassThrough
+    BatchSize: Optional[PassThrough] = mqeventproperties("BatchSize")
+    Broker: PassThrough = mqeventproperties("Broker")
+    Enabled: Optional[PassThrough] = mqeventproperties("Enabled")
+    FilterCriteria: Optional[PassThrough] = mqeventproperties("FilterCriteria")
+    MaximumBatchingWindowInSeconds: Optional[PassThrough] = mqeventproperties("MaximumBatchingWindowInSeconds")
+    Queues: PassThrough = mqeventproperties("Queues")
+    SecretsManagerKmsKeyId: Optional[str] = mqeventproperties("SecretsManagerKmsKeyId")
+    SourceAccessConfigurations: PassThrough = mqeventproperties("SourceAccessConfigurations")
 
 
 class MQEvent(BaseModel):
-    Type: Literal["MQ"]
-    Properties: MQEventProperties
+    Type: Literal["MQ"] = event("Type")
+    Properties: MQEventProperties = event("Properties")
 
 
 class SelfManagedKafkaEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough]
-    ConsumerGroupId: Optional[PassThrough]
-    Enabled: Optional[PassThrough]
-    FilterCriteria: Optional[PassThrough]
-    KafkaBootstrapServers: Optional[List[Union[str, SamIntrinsic]]]
-    SourceAccessConfigurations: PassThrough
-    Topics: PassThrough
+    BatchSize: Optional[PassThrough] = selfmanagedkafkaeventproperties("BatchSize")
+    ConsumerGroupId: Optional[PassThrough] = selfmanagedkafkaeventproperties("ConsumerGroupId")
+    Enabled: Optional[PassThrough] = selfmanagedkafkaeventproperties("Enabled")
+    FilterCriteria: Optional[PassThrough] = selfmanagedkafkaeventproperties("FilterCriteria")
+    KafkaBootstrapServers: Optional[List[SamIntrinsicable[str]]] = selfmanagedkafkaeventproperties(
+        "KafkaBootstrapServers"
+    )
+    SourceAccessConfigurations: PassThrough = selfmanagedkafkaeventproperties("SourceAccessConfigurations")
+    Topics: PassThrough = selfmanagedkafkaeventproperties("Topics")
 
 
 class SelfManagedKafkaEvent(BaseModel):
-    Type: Literal["SelfManagedKafka"]
-    Properties: SelfManagedKafkaEventProperties
+    Type: Literal["SelfManagedKafka"] = event("Type")
+    Properties: SelfManagedKafkaEventProperties = event("Properties")
 
 
 # TODO: Same as ScheduleV2EventProperties in state machine?
 class ScheduleV2EventProperties(BaseModel):
-    # pylint: disable=duplicate-code
-    DeadLetterConfig: Optional[DeadLetterConfig]
-    Description: Optional[PassThrough]
-    EndDate: Optional[PassThrough]
-    FlexibleTimeWindow: Optional[PassThrough]
-    GroupName: Optional[PassThrough]
-    Input: Optional[PassThrough]
-    KmsKeyArn: Optional[PassThrough]
-    Name: Optional[PassThrough]
-    PermissionsBoundary: Optional[PassThrough]
-    RetryPolicy: Optional[PassThrough]
+    DeadLetterConfig: Optional[DeadLetterConfig] = schedulev2eventproperties("DeadLetterConfig")
+    Description: Optional[PassThrough] = schedulev2eventproperties("Description")
+    EndDate: Optional[PassThrough] = schedulev2eventproperties("EndDate")
+    FlexibleTimeWindow: Optional[PassThrough] = schedulev2eventproperties("FlexibleTimeWindow")
+    GroupName: Optional[PassThrough] = schedulev2eventproperties("GroupName")
+    Input: Optional[PassThrough] = schedulev2eventproperties("Input")
+    KmsKeyArn: Optional[PassThrough] = schedulev2eventproperties("KmsKeyArn")
+    Name: Optional[PassThrough] = schedulev2eventproperties("Name")
+    PermissionsBoundary: Optional[PassThrough] = schedulev2eventproperties("PermissionsBoundary")
+    RetryPolicy: Optional[PassThrough] = schedulev2eventproperties("RetryPolicy")
     RoleArn: Optional[PassThrough]  # TODO: Add to docs
-    ScheduleExpression: Optional[PassThrough]
-    ScheduleExpressionTimezone: Optional[PassThrough]
-    StartDate: Optional[PassThrough]
-    State: Optional[PassThrough]
+    ScheduleExpression: Optional[PassThrough] = schedulev2eventproperties("ScheduleExpression")
+    ScheduleExpressionTimezone: Optional[PassThrough] = schedulev2eventproperties("ScheduleExpressionTimezone")
+    StartDate: Optional[PassThrough] = schedulev2eventproperties("StartDate")
+    State: Optional[PassThrough] = schedulev2eventproperties("State")
 
 
 class ScheduleV2Event(BaseModel):
-    Type: Literal["ScheduleV2"]
-    Properties: ScheduleV2EventProperties
+    Type: Literal["ScheduleV2"] = event("Type")
+    Properties: ScheduleV2EventProperties = event("Properties")
 
 
 Handler = Optional[PassThrough]
 Runtime = Optional[PassThrough]
 CodeUriType = Optional[Union[str, CodeUri]]
-DeadLetterQueueType = Optional[Union[SamIntrinsic, DeadLetterQueue]]
+DeadLetterQueueType = Optional[SamIntrinsicable[DeadLetterQueue]]
 Description = Optional[PassThrough]
 MemorySize = Optional[PassThrough]
 Timeout = Optional[PassThrough]
 VpcConfig = Optional[PassThrough]
 Environment = Optional[PassThrough]
 Tags = Optional[Dict[str, Any]]
-Tracing = Optional[Union[str, SamIntrinsic]]
+Tracing = Optional[SamIntrinsicable[Literal["Active", "PassThrough"]]]
 KmsKeyArn = Optional[PassThrough]
 Layers = Optional[PassThrough]
-AutoPublishAlias = Optional[Union[str, SamIntrinsic]]
+AutoPublishAlias = Optional[SamIntrinsicable[str]]
+RolePath = Optional[PassThrough]  # TODO: update docs when live
 PermissionsBoundary = Optional[PassThrough]
 ReservedConcurrentExecutions = Optional[PassThrough]
 ProvisionedConcurrencyConfig = Optional[PassThrough]
@@ -385,18 +443,18 @@ EphemeralStorage = Optional[PassThrough]
 
 
 class Properties(BaseModel):
-    Architectures: Optional[Architectures]
-    AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument]
-    AutoPublishAlias: Optional[AutoPublishAlias]
-    AutoPublishCodeSha256: Optional[Union[str, SamIntrinsic]]
-    CodeSigningConfigArn: Optional[Union[str, SamIntrinsic]]
+    Architectures: Optional[Architectures] = prop("Architectures")
+    AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
+    AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
+    AutoPublishCodeSha256: Optional[SamIntrinsicable[str]] = prop("AutoPublishCodeSha256")
+    CodeSigningConfigArn: Optional[SamIntrinsicable[str]] = prop("CodeSigningConfigArn")
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
-    DeadLetterQueue: Optional[DeadLetterQueueType]
-    DeploymentPreference: Optional[DeploymentPreference]
-    Description: Optional[Description]
-    Environment: Optional[Environment]
-    EphemeralStorage: Optional[EphemeralStorage]
-    EventInvokeConfig: Optional[EventInvokeConfig]
+    DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
+    DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
+    Description: Optional[Description] = prop("Description")
+    Environment: Optional[Environment] = prop("Environment")
+    EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
+    EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Events: Optional[
         Dict[
             str,
@@ -421,54 +479,56 @@ class Properties(BaseModel):
                 SelfManagedKafkaEvent,
             ],
         ]
-    ]
-    FileSystemConfigs: Optional[PassThrough]
-    FunctionName: Optional[PassThrough]
-    FunctionUrlConfig: Optional[FunctionUrlConfig]
-    Handler: Optional[Handler]
-    ImageConfig: Optional[PassThrough]
-    ImageUri: Optional[PassThrough]
+    ] = prop("Events")
+    FileSystemConfigs: Optional[PassThrough] = prop("FileSystemConfigs")
+    FunctionName: Optional[PassThrough] = prop("FunctionName")
+    FunctionUrlConfig: Optional[FunctionUrlConfig] = prop("FunctionUrlConfig")
+    Handler: Optional[Handler] = prop("Handler")
+    ImageConfig: Optional[PassThrough] = prop("ImageConfig")
+    ImageUri: Optional[PassThrough] = prop("ImageUri")
     InlineCode: Optional[PassThrough] = prop("InlineCode")
-    KmsKeyArn: Optional[KmsKeyArn]
-    Layers: Optional[Layers]
-    MemorySize: Optional[MemorySize]
-    PackageType: Optional[PassThrough]
-    PermissionsBoundary: Optional[PermissionsBoundary]
-    Policies: Optional[Union[str, List[Union[str, SamIntrinsic]], SamIntrinsic]]
-    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig]
-    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions]
-    Role: Optional[Union[str, SamIntrinsic]]
-    Runtime: Optional[Runtime]
-    Tags: Optional[Tags]
-    Timeout: Optional[Timeout]
-    Tracing: Optional[Tracing]
-    VersionDescription: Optional[PassThrough]
-    VpcConfig: Optional[VpcConfig]
+    KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
+    Layers: Optional[Layers] = prop("Layers")
+    MemorySize: Optional[MemorySize] = prop("MemorySize")
+    PackageType: Optional[PassThrough] = prop("PackageType")
+    RolePath: Optional[RolePath]
+    PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
+    Policies: Optional[SamIntrinsicable[Union[str, List[SamIntrinsicable[str]]]]] = prop("Policies")
+    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
+    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
+    Role: Optional[SamIntrinsicable[str]] = prop("Role")
+    Runtime: Optional[Runtime] = prop("Runtime")
+    Tags: Optional[Tags] = prop("Tags")
+    Timeout: Optional[Timeout] = prop("Timeout")
+    Tracing: Optional[Tracing] = prop("Timeout")
+    VersionDescription: Optional[PassThrough] = prop("VersionDescription")
+    VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
 
 
 class Globals(BaseModel):
-    Handler: Optional[Handler]
-    Runtime: Optional[Runtime]
-    CodeUri: Optional[CodeUriType]
-    DeadLetterQueue: Optional[DeadLetterQueueType]
-    Description: Optional[Description]
-    MemorySize: Optional[MemorySize]
-    Timeout: Optional[Timeout]
-    VpcConfig: Optional[VpcConfig]
-    Environment: Optional[Environment]
-    Tags: Optional[Tags]
-    Tracing: Optional[Tracing]
-    KmsKeyArn: Optional[KmsKeyArn]
-    Layers: Optional[Layers]
-    AutoPublishAlias: Optional[AutoPublishAlias]
-    DeploymentPreference: Optional[DeploymentPreference]
-    PermissionsBoundary: Optional[PermissionsBoundary]
-    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions]
-    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig]
-    AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument]
-    EventInvokeConfig: Optional[EventInvokeConfig]
-    Architectures: Optional[Architectures]
-    EphemeralStorage: Optional[EphemeralStorage]
+    Handler: Optional[Handler] = prop("Handler")
+    Runtime: Optional[Runtime] = prop("Runtime")
+    CodeUri: Optional[CodeUriType] = prop("CodeUri")
+    DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
+    Description: Optional[Description] = prop("Description")
+    MemorySize: Optional[MemorySize] = prop("MemorySize")
+    Timeout: Optional[Timeout] = prop("Timeout")
+    VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
+    Environment: Optional[Environment] = prop("Environment")
+    Tags: Optional[Tags] = prop("Tags")
+    Tracing: Optional[Tracing] = prop("Tracing")
+    KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
+    Layers: Optional[Layers] = prop("Layers")
+    AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
+    DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
+    RolePath: Optional[RolePath]
+    PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
+    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
+    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
+    AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
+    EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
+    Architectures: Optional[Architectures] = prop("Architectures")
+    EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
 
 
 class Resource(BaseModel):

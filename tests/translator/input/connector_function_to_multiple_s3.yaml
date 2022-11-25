@@ -1,0 +1,30 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+        };
+
+  MyBucket:
+    Type: AWS::S3::Bucket
+
+  MyBucket2:
+    Type: AWS::S3::Bucket
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination:
+      - Id: MyBucket
+      - Type: AWS::S3::Bucket
+        Arn: !GetAtt MyBucket2.Arn
+      Permissions:
+      - Read
+      - Write
