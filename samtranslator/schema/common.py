@@ -17,6 +17,8 @@ SamIntrinsic = Dict[str, Any]
 # TODO: Get rid of this in favor of proper types
 Unknown = Optional[Any]
 
+DictStrAny = Dict[str, Any]
+
 LenientBaseModel = pydantic.BaseModel
 
 _DOCS = json.loads(Path("samtranslator", "schema", "docs.json").read_bytes())

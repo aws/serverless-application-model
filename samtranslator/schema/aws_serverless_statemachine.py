@@ -4,7 +4,7 @@ from typing import Optional, Any, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, DictStrAny, get_prop
 
 properties = get_prop("sam-resource-statemachine")
 deadletterconfig = get_prop("sam-property-statemachine-statemachinedeadletterconfig")
@@ -143,7 +143,7 @@ class Properties(BaseModel):
     Logging: Optional[PassThrough] = properties("Logging")
     Name: Optional[PassThrough] = properties("Name")
     PermissionsBoundary: Optional[PassThrough] = properties("PermissionsBoundary")
-    Policies: Optional[Union[str, List[str], Dict[str, Any], List[Dict[str, Any]]]] = properties("Policies")
+    Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = properties("Policies")
     Role: Optional[PassThrough] = properties("Role")
     Tags: Optional[Dict[str, Any]] = properties("Tags")
     Tracing: Optional[PassThrough] = properties("Tracing")

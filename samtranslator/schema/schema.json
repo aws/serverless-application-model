@@ -4851,21 +4851,22 @@
           "markdownDescription": "One or more policies that this state machine's execution role needs\\.  \nThis property accepts a single string or a list of strings\\. The property can be the name of AWS managed AWS Identity and Access Management \\(IAM\\) policies, AWS SAM policy templates, or one or more inline policy documents formatted as a map\\.  \nYou provide either a `Role` or `Policies`\\.  \nIf the `Role` property is set, this property is ignored\\.  \n*Type*: String \\| List \\| Map  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
+              "type": "object"
+            },
+            {
               "type": "string"
             },
             {
               "type": "array",
               "items": {
-                "type": "string"
-              }
-            },
-            {
-              "type": "object"
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "object"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object"
+                  }
+                ]
               }
             }
           ]
