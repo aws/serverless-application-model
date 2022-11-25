@@ -18,6 +18,7 @@ from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.utils.types import Intrinsicable
+from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
 
 _CORS_WILDCARD = "*"
@@ -656,13 +657,14 @@ class HttpApiGenerator(object):
                 self.logical_id,
                 "Description works only with inline OpenApi specified in the 'DefinitionBody' property.",
             )
-        info = self.definition_body.get("info", {})
-        if not isinstance(info, dict):
+        try:
+            description_in_definition_body = dict_deep_get(self.definition_body, "info.description")
+        except InvalidValueType as ex:
             raise InvalidResourceException(
                 self.logical_id,
-                "'info' in OpenApi definition body must be a map.",
+                f"Invalid 'DefinitionBody': {str(ex)}'.",
             )
-        if info.get("description"):
+        if description_in_definition_body:
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to set Description because it is already defined within inline OpenAPI specified in the "
@@ -683,14 +685,14 @@ class HttpApiGenerator(object):
                 "Name works only with inline OpenApi specified in the 'DefinitionBody' property.",
             )
 
-        info = self.definition_body.get("info", {})
-        if not isinstance(info, dict):
+        try:
+            title_in_definition_body = dict_deep_get(self.definition_body, "info.title")
+        except InvalidValueType as ex:
             raise InvalidResourceException(
                 self.logical_id,
-                "'info' in OpenApi definition body must be a map.",
+                f"Invalid 'DefinitionBody': {str(ex)}.",
             )
-
-        if info.get("title") != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
+        if title_in_definition_body != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to set Name because it is already defined within inline OpenAPI specified in the "
