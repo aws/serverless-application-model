@@ -36,6 +36,21 @@ def remove_first_line(s: str) -> str:
     return s.split("\n", 1)[1]
 
 
+def convert_to_full_path(description: str) -> str:
+    pattern = re.compile("\(([#\.a-zA-Z0-9_-]+)\)")
+    matched_content = pattern.findall(description)
+
+    for path in matched_content:
+        if "https://docs.aws.amazon.com/" not in path:
+            url = path.split(".")[0] + ".html"
+            if "#" in path:
+                url += "#" + path.split("#")[1]
+            description = description.replace(
+                path, f"https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/{url}"
+            )
+    return description
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", type=Path)
@@ -48,6 +63,7 @@ def main() -> None:
                 props[path.stem] = {}
             description = remove_first_line(description)  # Remove property name; already in the schema title
             description = fix_markdown_code_link(description)
+            description = convert_to_full_path(description)
             props[path.stem][name] = description
 
     print(
