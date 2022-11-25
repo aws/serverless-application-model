@@ -47,6 +47,7 @@ def add_regional_endpoint_configuration_if_needed(template: Dict[str, Any]) -> D
 
     return template
 
+
 def replace_aws_partition(partition: str, file_path: str):
     template = read_json_file(file_path)
     with open(file_path, "w") as file:
