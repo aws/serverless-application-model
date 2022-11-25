@@ -46,6 +46,12 @@ class Model(LenientBaseModel):
 
 def main() -> None:
     obj = Model.schema()
+
+    # http://json-schema.org/understanding-json-schema/reference/schema.html#schema
+    # https://github.com/pydantic/pydantic/issues/1478
+    # Validated in https://github.com/aws/serverless-application-model/blob/5c82f5d2ae95adabc9827398fba8ccfc3dbe101a/tests/schema/test_validate_schema.py#L91
+    obj["$schema"] = "http://json-schema.org/draft-04/schema#"
+
     print(json.dumps(obj, indent=2))
 
 
