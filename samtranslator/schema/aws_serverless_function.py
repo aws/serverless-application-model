@@ -18,6 +18,7 @@ deadletterconfig = get_prop("sam-property-function-deadletterconfig")
 deploymentpreference = get_prop("sam-property-function-deploymentpreference")
 dlq = get_prop("sam-property-function-deadletterqueue")
 dynamodbeventproperties = get_prop("sam-property-function-dynamodb")
+event = get_prop("sam-property-function-eventsource")
 eventbridgeruleeventproperties = get_prop("sam-property-function-eventbridgerule")
 eventbridgeruletarget = get_prop("sam-property-function-target")
 eventinvokeconfig = get_prop("sam-property-function-eventinvokeconfiguration")
@@ -115,8 +116,8 @@ class S3EventProperties(BaseModel):
 
 
 class S3Event(BaseModel):
-    Properties: S3EventProperties
-    Type: Literal["S3"]
+    Properties: S3EventProperties = event("Properties")
+    Type: Literal["S3"] = event("Type")
 
 
 class SqsSubscription(BaseModel):
@@ -135,8 +136,8 @@ class SNSEventProperties(BaseModel):
 
 
 class SNSEvent(BaseModel):
-    Properties: SNSEventProperties
-    Type: Literal["SNS"]
+    Properties: SNSEventProperties = event("Properties")
+    Type: Literal["SNS"] = event("Type")
 
 
 class FunctionUrlConfig(BaseModel):
@@ -161,8 +162,8 @@ class KinesisEventProperties(BaseModel):
 
 
 class KinesisEvent(BaseModel):
-    Type: Literal["Kinesis"]
-    Properties: KinesisEventProperties
+    Type: Literal["Kinesis"] = event("Type")
+    Properties: KinesisEventProperties = event("Properties")
 
 
 class DynamoDBEventProperties(BaseModel):
@@ -182,8 +183,8 @@ class DynamoDBEventProperties(BaseModel):
 
 
 class DynamoDBEvent(BaseModel):
-    Type: Literal["DynamoDB"]
-    Properties: DynamoDBEventProperties
+    Type: Literal["DynamoDB"] = event("Type")
+    Properties: DynamoDBEventProperties = event("Properties")
 
 
 class SQSEventProperties(BaseModel):
@@ -195,8 +196,8 @@ class SQSEventProperties(BaseModel):
 
 
 class SQSEvent(BaseModel):
-    Type: Literal["SQS"]
-    Properties: SQSEventProperties
+    Type: Literal["SQS"] = event("Type")
+    Properties: SQSEventProperties = event("Properties")
 
 
 class ApiAuth(BaseModel):
@@ -229,8 +230,8 @@ class ApiEventProperties(BaseModel):
 
 
 class ApiEvent(BaseModel):
-    Type: Literal["Api"]
-    Properties: ApiEventProperties
+    Type: Literal["Api"] = event("Type")
+    Properties: ApiEventProperties = event("Properties")
 
 
 class CloudWatchEventProperties(BaseModel):
@@ -243,8 +244,8 @@ class CloudWatchEventProperties(BaseModel):
 
 
 class CloudWatchEvent(BaseModel):
-    Type: Literal["CloudWatchEvent"]
-    Properties: CloudWatchEventProperties
+    Type: Literal["CloudWatchEvent"] = event("Type")
+    Properties: CloudWatchEventProperties = event("Properties")
 
 
 class DeadLetterConfig(BaseModel):
@@ -265,8 +266,8 @@ class EventsScheduleProperties(BaseModel):
 
 
 class ScheduleEvent(BaseModel):
-    Type: Literal["Schedule"]
-    Properties: EventsScheduleProperties
+    Type: Literal["Schedule"] = event("Type")
+    Properties: EventsScheduleProperties = event("Properties")
 
 
 class EventBridgeRuleTarget(BaseModel):
@@ -284,8 +285,8 @@ class EventBridgeRuleEventProperties(BaseModel):
 
 
 class EventBridgeRuleEvent(BaseModel):
-    Type: Literal["EventBridgeRule"]
-    Properties: EventBridgeRuleEventProperties
+    Type: Literal["EventBridgeRule"] = event("Type")
+    Properties: EventBridgeRuleEventProperties = event("Properties")
 
 
 class CloudWatchLogsEventProperties(BaseModel):
@@ -294,8 +295,8 @@ class CloudWatchLogsEventProperties(BaseModel):
 
 
 class CloudWatchLogsEvent(BaseModel):
-    Type: Literal["CloudWatchLogs"]
-    Properties: CloudWatchLogsEventProperties
+    Type: Literal["CloudWatchLogs"] = event("Type")
+    Properties: CloudWatchLogsEventProperties = event("Properties")
 
 
 class IoTRuleEventProperties(BaseModel):
@@ -304,8 +305,8 @@ class IoTRuleEventProperties(BaseModel):
 
 
 class IoTRuleEvent(BaseModel):
-    Type: Literal["IoTRule"]
-    Properties: IoTRuleEventProperties
+    Type: Literal["IoTRule"] = event("Type")
+    Properties: IoTRuleEventProperties = event("Properties")
 
 
 class AlexaSkillEventProperties(BaseModel):
@@ -313,8 +314,8 @@ class AlexaSkillEventProperties(BaseModel):
 
 
 class AlexaSkillEvent(BaseModel):
-    Type: Literal["AlexaSkill"]
-    Properties: Optional[AlexaSkillEventProperties]
+    Type: Literal["AlexaSkill"] = event("Type")
+    Properties: Optional[AlexaSkillEventProperties] = event("Properties")
 
 
 class CognitoEventProperties(BaseModel):
@@ -323,8 +324,8 @@ class CognitoEventProperties(BaseModel):
 
 
 class CognitoEvent(BaseModel):
-    Type: Literal["Cognito"]
-    Properties: CognitoEventProperties
+    Type: Literal["Cognito"] = event("Type")
+    Properties: CognitoEventProperties = event("Properties")
 
 
 class HttpApiAuth(BaseModel):
@@ -343,8 +344,8 @@ class HttpApiEventProperties(BaseModel):
 
 
 class HttpApiEvent(BaseModel):
-    Type: Literal["HttpApi"]
-    Properties: Optional[HttpApiEventProperties]
+    Type: Literal["HttpApi"] = event("Type")
+    Properties: Optional[HttpApiEventProperties] = event("Properties")
 
 
 class MSKEventProperties(BaseModel):
@@ -357,8 +358,8 @@ class MSKEventProperties(BaseModel):
 
 
 class MSKEvent(BaseModel):
-    Type: Literal["MSK"]
-    Properties: MSKEventProperties
+    Type: Literal["MSK"] = event("Type")
+    Properties: MSKEventProperties = event("Properties")
 
 
 class MQEventProperties(BaseModel):
@@ -373,8 +374,8 @@ class MQEventProperties(BaseModel):
 
 
 class MQEvent(BaseModel):
-    Type: Literal["MQ"]
-    Properties: MQEventProperties
+    Type: Literal["MQ"] = event("Type")
+    Properties: MQEventProperties = event("Properties")
 
 
 class SelfManagedKafkaEventProperties(BaseModel):
@@ -390,8 +391,8 @@ class SelfManagedKafkaEventProperties(BaseModel):
 
 
 class SelfManagedKafkaEvent(BaseModel):
-    Type: Literal["SelfManagedKafka"]
-    Properties: SelfManagedKafkaEventProperties
+    Type: Literal["SelfManagedKafka"] = event("Type")
+    Properties: SelfManagedKafkaEventProperties = event("Properties")
 
 
 # TODO: Same as ScheduleV2EventProperties in state machine?
@@ -414,8 +415,8 @@ class ScheduleV2EventProperties(BaseModel):
 
 
 class ScheduleV2Event(BaseModel):
-    Type: Literal["ScheduleV2"]
-    Properties: ScheduleV2EventProperties
+    Type: Literal["ScheduleV2"] = event("Type")
+    Properties: ScheduleV2EventProperties = event("Properties")
 
 
 Handler = Optional[PassThrough]
