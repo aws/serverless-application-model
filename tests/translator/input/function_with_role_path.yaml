@@ -1,0 +1,8 @@
+Resources:
+  MinimalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      RolePath: /foo/bar

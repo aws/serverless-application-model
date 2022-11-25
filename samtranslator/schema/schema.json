@@ -486,6 +486,9 @@
             }
           ]
         },
+        "RolePath": {
+          "title": "Rolepath"
+        },
         "PermissionsBoundary": {
           "title": "PermissionsBoundary",
           "description": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
@@ -3906,6 +3909,9 @@
           "title": "PackageType",
           "description": "The deployment package type of the Lambda function\\. For more information, see [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) in the *AWS Lambda Developer Guide*\\.  \n**Notes**:  \n1\\. If this property is set to `Zip` \\(default\\), then either `CodeUri` or `InlineCode` applies, and `ImageUri` is ignored\\.  \n2\\. If this property is set to `Image`, then only `ImageUri` applies, and both `CodeUri` and `InlineCode` are ignored\\. The Amazon ECR repository required to store the functionsl container image can be auto created by the AWS SAM CLI\\. For more information, see [sam deploy](sam-cli-command-reference-sam-deploy.md)\\.  \n*Valid values*: `Zip` or `Image`  \n*Type*: String  \n*Required*: No  \n*Default*: `Zip`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PackageType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-packagetype) property of an `AWS::Lambda::Function` resource\\.",
           "markdownDescription": "The deployment package type of the Lambda function\\. For more information, see [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) in the *AWS Lambda Developer Guide*\\.  \n**Notes**:  \n1\\. If this property is set to `Zip` \\(default\\), then either `CodeUri` or `InlineCode` applies, and `ImageUri` is ignored\\.  \n2\\. If this property is set to `Image`, then only `ImageUri` applies, and both `CodeUri` and `InlineCode` are ignored\\. The Amazon ECR repository required to store the functionsl container image can be auto created by the AWS SAM CLI\\. For more information, see [sam deploy](sam-cli-command-reference-sam-deploy.md)\\.  \n*Valid values*: `Zip` or `Image`  \n*Type*: String  \n*Required*: No  \n*Default*: `Zip`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PackageType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-packagetype) property of an `AWS::Lambda::Function` resource\\."
+        },
+        "RolePath": {
+          "title": "Rolepath"
         },
         "PermissionsBoundary": {
           "title": "PermissionsBoundary",
