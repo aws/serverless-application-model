@@ -143,7 +143,7 @@ To disable this feature, run the following command instead.
 python3 bin/add_transform_test.py --template-file template.yaml --disable-api-configuration
 ```
 
-The script will update the partition of arn based on the output path. To disable updating the partition of arn
+The script automatically updates hardcoded ARN partitions to match the output partition. To disable this, use:
 ```bash
 python3 bin/add_transform_test.py --template-file template.yaml --disable-update-partition
 ```
