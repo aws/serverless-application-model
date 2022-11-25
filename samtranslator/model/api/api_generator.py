@@ -17,7 +17,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, InvalidTemplateException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.schema.common import PassThrough
@@ -28,6 +28,7 @@ from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)
@@ -1067,20 +1068,16 @@ class ApiGenerator(object):
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
-                                SwaggerEditor.validate_is_dict(
-                                    field_val,
-                                    "Value of responses in options method for path {} must be a "
-                                    "dictionary according to Swagger spec.".format(path),
-                                )
-                                response_200 = field_val.get("200")
-                                if not response_200:
-                                    continue
-                                SwaggerEditor.validate_is_dict(
-                                    response_200,
-                                    "Value of responses.200 in options method for path {} must be a "
-                                    "dictionary according to Swagger spec.".format(path),
-                                )
-                                response_200_headers = response_200.get("headers")
+                                try:
+                                    response_200_headers = dict_deep_get(field_val, "200.headers")
+                                except InvalidValueType as ex:
+                                    raise InvalidDocumentException(
+                                        [
+                                            InvalidTemplateException(
+                                                f"Invalid responses in options method for path {path}: {str(ex)}.",
+                                            )
+                                        ]
+                                    ) from ex
                                 if not response_200_headers:
                                     continue
                                 SwaggerEditor.validate_is_dict(

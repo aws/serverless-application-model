@@ -7,6 +7,7 @@ from samtranslator.model.intrinsics import ref, make_conditional, is_intrinsic, 
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.utils.types import Intrinsicable
+from samtranslator.utils.utils import dict_deep_get, InvalidValueType
 import json
 
 
@@ -54,10 +55,13 @@ class OpenApiEditor(object):
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
-        self.security_schemes = self._doc.get("components", Py27Dict()).get("securitySchemes", Py27Dict())
-        self.definitions = self._doc.get("definitions", Py27Dict())
-        self.tags = self._doc.get("tags", [])
-        self.info = self._doc.get("info", Py27Dict())
+        try:
+            self.security_schemes = dict_deep_get(self._doc, "components.securitySchemes") or Py27Dict()
+            self.definitions = dict_deep_get(self._doc, "definitions") or Py27Dict()
+            self.tags = dict_deep_get(self._doc, "tags") or []
+            self.info = dict_deep_get(self._doc, "info") or Py27Dict()
+        except InvalidValueType as ex:
+            raise InvalidDocumentException([InvalidTemplateException(f"Invalid OpenApi document: {str(ex)}")]) from ex
 
     def get_conditional_contents(self, item):  # type: ignore[no-untyped-def]
         """
