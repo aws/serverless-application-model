@@ -662,7 +662,7 @@ class HttpApiGenerator(object):
         except InvalidValueType as ex:
             raise InvalidResourceException(
                 self.logical_id,
-                f"Invalid value of '{ex.relative_path}' in the 'DefinitionBody' property: it should be a map.",
+                f"Invalid 'DefinitionBody': {str(ex)}'.",
             )
         if description_in_definition_body:
             raise InvalidResourceException(
@@ -690,7 +690,7 @@ class HttpApiGenerator(object):
         except InvalidValueType as ex:
             raise InvalidResourceException(
                 self.logical_id,
-                f"Invalid value of '{ex.relative_path}' in the 'DefinitionBody' property: it should be a map.",
+                f"Invalid 'DefinitionBody': {str(ex)}.",
             )
         if title_in_definition_body != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
             raise InvalidResourceException(

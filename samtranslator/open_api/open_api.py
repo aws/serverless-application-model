@@ -61,9 +61,7 @@ class OpenApiEditor(object):
             self.tags = dict_deep_get(self._doc, "tags") or []
             self.info = dict_deep_get(self._doc, "info") or Py27Dict()
         except InvalidValueType as ex:
-            raise InvalidDocumentException(
-                [InvalidTemplateException(f"Invalid OpenApi document. Invalid values for {ex.relative_path}")]
-            )
+            raise InvalidDocumentException([InvalidTemplateException(f"Invalid OpenApi document: {str(ex)}")]) from ex
 
     def get_conditional_contents(self, item):  # type: ignore[no-untyped-def]
         """

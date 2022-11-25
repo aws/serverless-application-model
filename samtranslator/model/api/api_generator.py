@@ -1074,11 +1074,10 @@ class ApiGenerator(object):
                                     raise InvalidDocumentException(
                                         [
                                             InvalidTemplateException(
-                                                f"Value of {ex.full_path('responses')} in options method for path {path} must be a "
-                                                "dictionary according to Swagger spec.",
+                                                f"Invalid responses in options method for path {path}: {str(ex)}.",
                                             )
                                         ]
-                                    )
+                                    ) from ex
                                 if not response_200_headers:
                                     continue
                                 SwaggerEditor.validate_is_dict(

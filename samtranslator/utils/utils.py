@@ -25,15 +25,19 @@ def insert_unique(xs: Any, vs: Any) -> List[Any]:
 
 class InvalidValueType(Exception):
     def __init__(self, relative_path: str) -> None:
-        self.relative_path = relative_path
-
-    def full_path(self, path_prefix: str) -> str:
-        if not self.relative_path:
-            return path_prefix
-        return path_prefix + "." + self.relative_path
+        if relative_path:
+            super().__init__(f"The value of '{relative_path}' should be a map")
+        else:
+            super().__init__("It should be a map")
 
 
 def dict_deep_get(d: Any, path: str) -> Optional[Any]:
+    """
+    Get the value deep in the dict.
+
+    If any value along the path doesn't exist, return None.
+    If any parent node exists but is not a dict, raise InvalidValueType.
+    """
     relative_path = ""
     _path_nodes = path.split(".")
     while _path_nodes:
