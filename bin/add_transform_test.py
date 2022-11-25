@@ -4,12 +4,10 @@
 Usage:
     add_transform_test.py --template-file=sam-template.yaml [--disable-api-configuration]
     add_transform_test.py --template-file=sam-template.yaml
-    add_transform_test.py --template-file=sam-template.yaml [--update-partition]
 
 Options:
     --template-file=<i>             Location of SAM template to transform [default: template.yaml].
     --disable-api-configuration     Disable adding REGIONAL configuration to AWS::ApiGateway::RestApi
-    --update-partition              Update the partition of ManagedPolicyArns in IAM Role
 """
 import json
 import subprocess
@@ -56,9 +54,8 @@ def update_partition(region: str, template: Dict[str, Any]) -> Dict[str, Any]:
                 ManagedPolicyArns = properties["ManagedPolicyArns"]
                 UpdatedArns = []
                 for ManagedPolicyArn in ManagedPolicyArns:
-                    split_arn = ManagedPolicyArn.split(":")
-                    split_arn[1] = region
-                    UpdatedArns.append(":".join(split_arn))
+                    replaced_arn = ManagedPolicyArn.replace("arn:aws:", f"arn:{region}:")
+                    UpdatedArns.append(replaced_arn)
                 properties["ManagedPolicyArns"] = UpdatedArns
     return template
 
@@ -95,12 +92,10 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
             write_json_file(template, temp_output_file.name)
 
         for region, output_path in regional_transform_test_output_paths.items():
-            print(output_path)
-            if CLI_OPTIONS.get("--update-partition"):
-                template = read_json_file(temp_output_file.name)
-                template = update_partition(region, template)
-                write_json_file(template, temp_output_file.name)
             shutil.copyfile(temp_output_file.name, output_path)
+            template = read_json_file(output_path)
+            template = update_partition(region, template)
+            write_json_file(template, output_path)
             print(f"Transform Test output files generated {output_path}")
 
 
