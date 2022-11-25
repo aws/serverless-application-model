@@ -94,8 +94,9 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
         for region, output_path in regional_transform_test_output_paths.items():
             shutil.copyfile(temp_output_file.name, output_path)
             template = read_json_file(output_path)
-            template = update_partition(region, template)
-            write_json_file(template, output_path)
+            with open(output_path, "w") as file:
+                updated_template = json.loads(json.dumps(template).replace("arn:aws", f"aws:{region}"))
+                file.write(json.dumps(updated_template, indent=2))
             print(f"Transform Test output files generated {output_path}")
 
 
