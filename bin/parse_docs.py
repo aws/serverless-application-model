@@ -37,12 +37,14 @@ def remove_first_line(s: str) -> str:
 
 
 def convert_to_full_path(description: str) -> str:
-    pattern = re.compile("\(([\.a-zA-Z0-9_-]+)\)")
+    pattern = re.compile("\(([#\.a-zA-Z0-9_-]+)\)")
     matched_content = pattern.findall(description)
 
     for path in matched_content:
         if "https://docs.aws.amazon.com/" not in path:
             url = path.split(".")[0] + ".html"
+            if "#" in path:
+                url += "#" + path.split("#")[1]
             description = description.replace(
                 path, f"https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/{url}"
             )
