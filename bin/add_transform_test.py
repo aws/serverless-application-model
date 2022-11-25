@@ -46,20 +46,6 @@ def add_regional_endpoint_configuration_if_needed(template: Dict[str, Any]) -> D
     return template
 
 
-def update_partition(region: str, template: Dict[str, Any]) -> Dict[str, Any]:
-    for _, resource in template["Resources"].items():
-        if resource["Type"] == "AWS::IAM::Role":
-            properties = resource["Properties"]
-            if "ManagedPolicyArns" in properties:
-                ManagedPolicyArns = properties["ManagedPolicyArns"]
-                UpdatedArns = []
-                for ManagedPolicyArn in ManagedPolicyArns:
-                    replaced_arn = ManagedPolicyArn.replace("arn:aws:", f"arn:{region}:")
-                    UpdatedArns.append(replaced_arn)
-                properties["ManagedPolicyArns"] = UpdatedArns
-    return template
-
-
 def generate_transform_test_output_files(input_file_path: str, file_basename: str) -> None:
     output_file_option = file_basename + ".json"
 
