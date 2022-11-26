@@ -97,7 +97,7 @@
               "                \"MessageBody.$\": \"$.message\",",
               "                \"QueueUrl\": \"${definition_substitution_1}\"",
               "            },",
-              "            \"Resource\": \"aws:aws-us-gov:states:::sqs:sendMessage\",",
+              "            \"Resource\": \"arn:aws-us-gov:states:::sqs:sendMessage\",",
               "            \"Type\": \"Task\"",
               "        }",
               "    }",

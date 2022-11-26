@@ -51,7 +51,7 @@ def add_regional_endpoint_configuration_if_needed(template: Dict[str, Any]) -> D
 def replace_aws_partition(partition: str, file_path: str) -> None:
     template = read_json_file(file_path)
     with open(file_path, "w") as file:
-        updated_template = json.loads(json.dumps(template).replace("arn:aws", f"aws:{partition}"))
+        updated_template = json.loads(json.dumps(template).replace("arn:aws:", f"arn:{partition}:"))
         file.write(json.dumps(updated_template, indent=2))
     print(f"Transform Test output files generated {file_path}")
 

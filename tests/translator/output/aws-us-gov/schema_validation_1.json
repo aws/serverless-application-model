@@ -60,8 +60,8 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "aws:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "aws:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess"
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess"
         ],
         "Tags": [
           {
@@ -96,7 +96,7 @@
               "                \"FunctionName\": \"${FunctionArn}\",",
               "                \"Payload.$\": \"$\"",
               "            },",
-              "            \"Resource\": \"aws:aws-us-gov:states:::lambda:invoke\",",
+              "            \"Resource\": \"arn:aws-us-gov:states:::lambda:invoke\",",
               "            \"Type\": \"Task\"",
               "        }",
               "    }",
@@ -169,7 +169,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "aws:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess"
+          "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess"
         ],
         "Policies": [
           {
