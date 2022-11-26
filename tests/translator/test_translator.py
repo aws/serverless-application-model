@@ -146,6 +146,8 @@ def mock_sar_service_call(self, service_call_function, logical_id, *args):
 
 
 class AbstractTestTranslator(TestCase):
+    maxDiff = None
+
     def _read_input(self, testcase):
         manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict

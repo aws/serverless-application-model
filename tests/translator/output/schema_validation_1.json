@@ -96,7 +96,7 @@
               "                \"FunctionName\": \"${FunctionArn}\",",
               "                \"Payload.$\": \"$\"",
               "            },",
-              "            \"Resource\": \"arn:aws:states:::lambda:invoke\",",
+              "            \"Resource\": \"someresource\",",
               "            \"Type\": \"Task\"",
               "        }",
               "    }",

@@ -16,7 +16,7 @@ Resources:
             Comment: Stackery creates an attachment point for each 'Task' state
             Type: Task
             Next: Done
-            Resource: arn:aws:states:::lambda:invoke
+            Resource: someresource
             Parameters:
               FunctionName: ${FunctionArn}
               Payload.$: $

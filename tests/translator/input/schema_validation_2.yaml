@@ -25,7 +25,7 @@ Resources:
         States:
           SendToMyQueue:
             Type: Task
-            Resource: arn:aws:states:::sqs:sendMessage
+            Resource: someresource
             Parameters:
               QueueUrl: !Ref MyQueue
               MessageBody.$: $.message
