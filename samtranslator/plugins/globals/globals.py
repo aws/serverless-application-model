@@ -68,7 +68,7 @@ class Globals(object):
     }
 
     @property
-    def supported_properties(self):
+    def supported_properties(self) -> Dict[str, List[str]]:
         return {
             SamResourceType.Function.value: [
                 key
