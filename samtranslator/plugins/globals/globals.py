@@ -4,6 +4,7 @@ from samtranslator.model.exceptions import ExceptionWithMessage
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
 from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.model.sam_resources import SamFunction, SamApi, SamHttpApi, SamSimpleTable
 
 
 class Globals(object):
@@ -19,72 +20,78 @@ class Globals(object):
     _API_TYPE = "AWS::Serverless::Api"
     _MANAGE_SWAGGER = "__MANAGE_SWAGGER"
 
-    supported_properties = {
-        # Everything on Serverless::Function except Role, Policies, FunctionName, Events
+    unsupported_properties = {
+        # TODO: previous comment says 'Everything on Serverless::Function except Role, Policies, FunctionName, Events'
+        # which doesn't seem to match what was previously written. Should confirm what are excluded.
         SamResourceType.Function.value: [
-            "Handler",
-            "Runtime",
-            "CodeUri",
-            "DeadLetterQueue",
-            "Description",
-            "MemorySize",
-            "Timeout",
-            "VpcConfig",
-            "Environment",
-            "Tags",
-            "Tracing",
-            "KmsKeyArn",
-            "AutoPublishAlias",
-            "Layers",
-            "DeploymentPreference",
-            "RolePath",
-            "PermissionsBoundary",
-            "ReservedConcurrentExecutions",
-            "ProvisionedConcurrencyConfig",
-            "AssumeRolePolicyDocument",
-            "EventInvokeConfig",
-            "FileSystemConfigs",
-            "CodeSigningConfigArn",
-            "Architectures",
-            "EphemeralStorage",
-            "FunctionUrlConfig",
+            "FunctionName",
+            "ImageUri",
+            "PackageType",
+            "InlineCode",
+            "Role",
+            "Policies",
+            "Events",
+            "AutoPublishCodeSha256",
+            "VersionDescription",
+            "ImageConfig",
         ],
-        # Everything except
-        #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
-        #   StageName: Because StageName cannot be overridden for Implicit APIs because of the current plugin
-        #              architecture
+        # TODO: previous comment says 'Everything except DefinitionBody, StageName'
+        # DefinitionBody: because its hard to reason about merge of Swagger dictionaries
+        # StageName: Because StageName cannot be overridden for Implicit APIs because of the current plugin architecture
+        # which doesn't seem to match what was written. Should confirm what are excluded.
         SamResourceType.Api.value: [
-            "Auth",
-            "Name",
-            "DefinitionUri",
-            "CacheClusterEnabled",
-            "CacheClusterSize",
-            "Variables",
-            "EndpointConfiguration",
-            "MethodSettings",
-            "BinaryMediaTypes",
-            "MinimumCompressionSize",
-            "Cors",
-            "GatewayResponses",
-            "AccessLogSetting",
-            "CanarySetting",
-            "TracingEnabled",
-            "OpenApiVersion",
-            "Domain",
+            "__MANAGE_SWAGGER",
+            "StageName",
+            "Tags",
+            "DefinitionBody",
+            "Models",
+            "FailOnWarnings",
+            "Description",
+            "Mode",
+            "DisableExecuteApiEndpoint",
+            "ApiKeySourceType",
         ],
         SamResourceType.HttpApi.value: [
-            "Auth",
-            "AccessLogSettings",
-            "StageVariables",
-            "Tags",
-            "CorsConfiguration",
-            "DefaultRouteSettings",
-            "Domain",
-            "RouteSettings",
-            "FailOnWarnings",
+            "__MANAGE_SWAGGER",
+            "Name",
+            "StageName",
+            "DefinitionBody",
+            "DefinitionUri",
+            "DisableExecuteApiEndpoint",
         ],
-        SamResourceType.SimpleTable.value: ["SSESpecification"],
+        SamResourceType.SimpleTable.value: [
+            "PrimaryKey",
+            "ProvisionedThroughput",
+            "TableName",
+            "Tags",
+        ],
     }
+
+    @property
+    def supported_properties(self):
+        return {
+            SamResourceType.Function.value: [
+                key
+                for key in SamFunction.property_types.keys()
+                if key not in self.unsupported_properties[SamResourceType.Function.value]
+            ],
+            SamResourceType.Api.value: [
+                key
+                for key in SamApi.property_types.keys()
+                if key not in self.unsupported_properties[SamResourceType.Api.value]
+            ],
+            SamResourceType.HttpApi.value: [
+                key
+                for key in SamHttpApi.property_types.keys()
+                if key not in self.unsupported_properties[SamResourceType.HttpApi.value]
+            ],
+            SamResourceType.SimpleTable.value: [
+                key
+                for key in SamSimpleTable.property_types.keys()
+                if key not in self.unsupported_properties[SamResourceType.SimpleTable.value]
+            ],
+        }
+
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {}
 
