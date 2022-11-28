@@ -3924,10 +3924,10 @@
           "markdownDescription": "One or more policies that this function needs\\. They will be appended to the default role for this function\\.  \nThis property accepts a single string or a list of strings, and can be the name of AWS managed policies or AWS SAM policy templates, or inline IAM policy documents formatted in YAML\\.  \nFor more information about AWS managed policies, see [AWS managed policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#aws-managed-policies) in the IAM User Guide\\. For more information about AWS SAM policy templates, see [AWS SAM policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html) in the AWS Serverless Application Model Developer Guide\\. For more information about inline policies, see [Inline policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#inline-policies) in the IAM User Guide\\.  \nIf the `Role` property is set, this property is ignored\\.\n*Type*: String \\| List \\| Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Policies`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-policies) property of an `AWS::IAM::Role` resource\\. AWS SAM supports AWS managed policy names and AWS SAM policy templates, in addition to JSON policy documents\\. AWS CloudFormation accepts only JSON policy documents\\.",
           "anyOf": [
             {
-              "type": "object"
+              "type": "string"
             },
             {
-              "type": "string"
+              "type": "object"
             },
             {
               "type": "array",
@@ -3984,9 +3984,9 @@
           "markdownDescription": "The maximum time in seconds that the function can run before it is stopped\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 3  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Timeout`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-timeout) property of an `AWS::Lambda::Function` resource\\."
         },
         "Tracing": {
-          "title": "Timeout",
-          "description": "The maximum time in seconds that the function can run before it is stopped\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 3  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Timeout`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-timeout) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The maximum time in seconds that the function can run before it is stopped\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 3  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Timeout`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-timeout) property of an `AWS::Lambda::Function` resource\\.",
+          "title": "Tracing",
+          "description": "The string that specifies the function's X\\-Ray tracing mode\\. For more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `Active` or `PassThrough`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\. If the `Tracing` property is set to `Active` and the `Role` property is not specified, then AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.",
+          "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\. For more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `Active` or `PassThrough`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\. If the `Tracing` property is set to `Active` and the `Role` property is not specified, then AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.",
           "anyOf": [
             {
               "type": "object"
@@ -4851,10 +4851,10 @@
           "markdownDescription": "One or more policies that this state machine's execution role needs\\.  \nThis property accepts a single string or a list of strings\\. The property can be the name of AWS managed AWS Identity and Access Management \\(IAM\\) policies, AWS SAM policy templates, or one or more inline policy documents formatted as a map\\.  \nYou provide either a `Role` or `Policies`\\.  \nIf the `Role` property is set, this property is ignored\\.  \n*Type*: String \\| List \\| Map  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
-              "type": "object"
+              "type": "string"
             },
             {
-              "type": "string"
+              "type": "object"
             },
             {
               "type": "array",

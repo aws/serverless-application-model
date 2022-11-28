@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Optional, Any, Dict, Union, List
+from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop, DictStrAny
 
 oauth2authorizer = get_prop("sam-property-httpapi-oauth2authorizer")
 lambdauthorizeridentity = get_prop("sam-property-httpapi-lambdaauthorizationidentity")
@@ -93,7 +93,7 @@ class Domain(BaseModel):
 
 AccessLogSettings = Optional[PassThrough]
 StageVariables = Optional[PassThrough]
-Tags = Optional[Dict[str, Any]]
+Tags = Optional[DictStrAny]
 RouteSettings = Optional[PassThrough]
 FailOnWarnings = Optional[PassThrough]
 CorsConfigurationType = Optional[PassThrough]
@@ -106,7 +106,7 @@ class Properties(BaseModel):
     # TODO: Also string like in the docs?
     CorsConfiguration: Optional[CorsConfigurationType] = properties("CorsConfiguration")
     DefaultRouteSettings: Optional[DefaultRouteSettings] = properties("DefaultRouteSettings")
-    DefinitionBody: Optional[Dict[str, Any]] = properties("DefinitionBody")
+    DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
     DefinitionUri: Optional[Union[str, DefinitionUri]] = properties("DefinitionUri")
     Description: Optional[str] = properties("Description")
     DisableExecuteApiEndpoint: Optional[PassThrough] = properties("DisableExecuteApiEndpoint")

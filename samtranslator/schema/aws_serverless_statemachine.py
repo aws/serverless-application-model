@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Any, Dict, Union, List
+from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
@@ -65,17 +65,17 @@ class ScheduleV2Event(BaseModel):
 
 
 class ResourcePolicy(BaseModel):
-    AwsAccountBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountBlacklist")
-    AwsAccountWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountWhitelist")
-    CustomStatements: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("CustomStatements")
-    IntrinsicVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcBlacklist")
-    IntrinsicVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcWhitelist")
-    IntrinsicVpceBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceBlacklist")
-    IntrinsicVpceWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceWhitelist")
-    IpRangeBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeBlacklist")
-    IpRangeWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeWhitelist")
-    SourceVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcBlacklist")
-    SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcWhitelist")
+    AwsAccountBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountBlacklist")
+    AwsAccountWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountWhitelist")
+    CustomStatements: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("CustomStatements")
+    IntrinsicVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcBlacklist")
+    IntrinsicVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcWhitelist")
+    IntrinsicVpceBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceBlacklist")
+    IntrinsicVpceWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceWhitelist")
+    IpRangeBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeBlacklist")
+    IpRangeWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeWhitelist")
+    SourceVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcBlacklist")
+    SourceVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcWhitelist")
 
 
 class CloudWatchEventProperties(BaseModel):
@@ -125,8 +125,8 @@ class ApiEvent(BaseModel):
 
 
 class Properties(BaseModel):
-    Definition: Optional[Dict[str, Any]] = properties("Definition")
-    DefinitionSubstitutions: Optional[Dict[str, Any]] = properties("DefinitionSubstitutions")
+    Definition: Optional[DictStrAny] = properties("Definition")
+    DefinitionSubstitutions: Optional[DictStrAny] = properties("DefinitionSubstitutions")
     DefinitionUri: Optional[Union[str, PassThrough]] = properties("DefinitionUri")
     Events: Optional[
         Dict[
@@ -145,7 +145,7 @@ class Properties(BaseModel):
     PermissionsBoundary: Optional[PassThrough] = properties("PermissionsBoundary")
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = properties("Policies")
     Role: Optional[PassThrough] = properties("Role")
-    Tags: Optional[Dict[str, Any]] = properties("Tags")
+    Tags: Optional[DictStrAny] = properties("Tags")
     Tracing: Optional[PassThrough] = properties("Tracing")
     Type: Optional[PassThrough] = properties("Type")
 
