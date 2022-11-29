@@ -714,6 +714,28 @@ class TestVersionsAndAliases(TestCase):
         LogicalIdGeneratorMock.assert_called_with(prefix, new_code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(self.lambda_func.Code)
 
+    def test_version_logical_id_changes_with_snapstart(self):
+        id_val = "LogicalId"
+        lambda_func = self._make_lambda_function(id_val)
+
+        lambda_func_snapstart = self._make_lambda_function(id_val)
+        lambda_func_snapstart.SnapStart = {"ApplyOn": "PublishedVersions"}
+
+        lambda_func_snapstart_none = self._make_lambda_function(id_val)
+        lambda_func_snapstart_none.SnapStart = {"ApplyOn": "None"}
+
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = lambda_func.Code
+
+        version1 = self.sam_func._construct_version(lambda_func, self.intrinsics_resolver_mock)
+        version_snapstart = self.sam_func._construct_version(lambda_func_snapstart, self.intrinsics_resolver_mock)
+        version_snapstart_none = self.sam_func._construct_version(
+            lambda_func_snapstart_none,
+            self.intrinsics_resolver_mock,
+        )
+        # SnapStart config changes the hash, except when ApplyOn is "None"
+        self.assertNotEqual(version1.logical_id, version_snapstart.logical_id)
+        self.assertEqual(version1.logical_id, version_snapstart_none.logical_id)
+
     def test_alias_creation(self):
         name = "aliasname"
 
