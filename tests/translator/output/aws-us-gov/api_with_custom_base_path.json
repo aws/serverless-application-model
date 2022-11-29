@@ -115,7 +115,7 @@
       },
       "Type": "AWS::ApiGateway::Stage"
     },
-    "MyApiWithStripHyphens": {
+    "MyApiWithoutStripHyphens": {
       "Properties": {
         "Body": {
           "info": {
@@ -138,38 +138,38 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithStripHyphensDeployment5d75e0c11b": {
+    "MyApiWithoutStripHyphensDeployment5d75e0c11b": {
       "Properties": {
         "Description": "RestApi deployment id: 5d75e0c11bcb584d195ab1a6a032eefa3eed3537",
         "RestApiId": {
-          "Ref": "MyApiWithStripHyphens"
+          "Ref": "MyApiWithoutStripHyphens"
         }
       },
       "Type": "AWS::ApiGateway::Deployment"
     },
-    "MyApiWithStripHyphensProdStage": {
+    "MyApiWithoutStripHyphensProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithStripHyphensDeployment5d75e0c11b"
+          "Ref": "MyApiWithoutStripHyphensDeployment5d75e0c11b"
         },
         "RestApiId": {
-          "Ref": "MyApiWithStripHyphens"
+          "Ref": "MyApiWithoutStripHyphens"
         },
         "StageName": "Prod"
       },
       "Type": "AWS::ApiGateway::Stage"
     },
-    "MyApiWithStripHyphensfoobarBasePathMapping": {
+    "MyApiWithoutStripHyphensfoobarBasePathMapping": {
       "Properties": {
         "BasePath": "foo-bar",
         "DomainName": {
           "Ref": "ApiGatewayDomainName67a385f467"
         },
         "RestApiId": {
-          "Ref": "MyApiWithStripHyphens"
+          "Ref": "MyApiWithoutStripHyphens"
         },
         "Stage": {
-          "Ref": "MyApiWithStripHyphensProdStage"
+          "Ref": "MyApiWithoutStripHyphensProdStage"
         }
       },
       "Type": "AWS::ApiGateway::BasePathMapping"

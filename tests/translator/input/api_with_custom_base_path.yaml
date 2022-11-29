@@ -33,7 +33,7 @@ Resources:
             Ref: HostedZoneId
           IpV6: true
 
-  MyApiWithStripHyphens:
+  MyApiWithoutStripHyphens:
     Type: AWS::Serverless::Api
     Properties:
       OpenApiVersion: 3.0.1
