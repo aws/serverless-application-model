@@ -2614,6 +2614,20 @@
       },
       "additionalProperties": false
     },
+    "Ref": {
+      "title": "Ref",
+      "type": "object",
+      "properties": {
+        "Ref": {
+          "title": "Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Ref"
+      ],
+      "additionalProperties": false
+    },
     "samtranslator__schema__aws_serverless_function__ApiEventProperties": {
       "title": "ApiEventProperties",
       "type": "object",
@@ -2669,10 +2683,10 @@
           "markdownDescription": "Identifier of a RestApi resource, which must contain an operation with the given path and method\\. Typically, this is set to reference an [AWS::Serverless::Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html) resource defined in this template\\.  \nIf you don't define this property, AWS SAM creates a default [AWS::Serverless::Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html) resource using a generated `OpenApi` document\\. That resource contains a union of all paths and methods defined by `Api` events in the same template that do not specify a `RestApiId`\\.  \nThis cannot reference an [AWS::Serverless::Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html) resource defined in another template\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "anyOf": [
             {
-              "type": "object"
+              "type": "string"
             },
             {
-              "type": "string"
+              "$ref": "#/definitions/Ref"
             }
           ]
         }

@@ -4,7 +4,7 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop, DictStrAny
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop, DictStrAny, Ref
 
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
@@ -226,7 +226,7 @@ class ApiEventProperties(BaseModel):
     Path: str = apieventproperties("Path")
     RequestModel: Optional[RequestModel] = apieventproperties("RequestModel")
     RequestParameters: Optional[Union[str, RequestParameters]] = apieventproperties("RequestParameters")
-    RestApiId: Optional[SamIntrinsicable[str]] = apieventproperties("RestApiId")
+    RestApiId: Optional[Union[str, Ref]] = apieventproperties("RestApiId")
 
 
 class ApiEvent(BaseModel):
