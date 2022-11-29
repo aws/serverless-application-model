@@ -17,6 +17,9 @@
   },
   "UnknownType4": {
    "Type": "Foo::Bar::Egg"
+  },
+  "UnknownType5": {
+   "Type": "Foo::Serverless::Egg"
   }
  }
 }
