@@ -502,6 +502,9 @@ class ApiGenerator(object):
         else:
             basepaths = None
 
+        # Boolean to allow/disallow hyphens in BasePath property
+        strip_hyphens = self.domain.get("StripHyphens", True)
+
         basepath_resource_list = []
 
         if basepaths is None:
@@ -514,7 +517,8 @@ class ApiGenerator(object):
             basepath_resource_list.extend([basepath_mapping])
         else:
             for basepath in basepaths:
-                # ignore leading and trailing `/` in the path name
+                # Remove possible leading and trailing '/' because a base path may only
+                # contain letters, numbers, and one of "$-_.+!*'()"
                 basepath = basepath.strip("/")
                 path = "".join(e for e in basepath if e.isalnum())
                 logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
@@ -524,7 +528,7 @@ class ApiGenerator(object):
                 basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
                 basepath_mapping.RestApiId = ref(rest_api.logical_id)
                 basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
-                basepath_mapping.BasePath = basepath
+                basepath_mapping.BasePath = path if strip_hyphens else basepath
                 basepath_resource_list.extend([basepath_mapping])
 
         # Create the Route53 RecordSetGroup resource
