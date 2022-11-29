@@ -112,6 +112,7 @@ class SamFunction(SamResourceMacro):
         "ImageConfig": PropertyType(False, is_type(dict)),
         "CodeSigningConfigArn": PropertyType(False, is_str()),
         "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "SnapStart": PropertyType(False, is_type(dict)),
         "FunctionUrlConfig": PropertyType(False, is_type(dict)),
     }
     event_resolver = ResourceTypeResolver(  # type: ignore[no-untyped-call]
@@ -458,6 +459,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.ImageConfig = self.ImageConfig  # type: ignore[attr-defined]
         lambda_function.PackageType = self.PackageType  # type: ignore[attr-defined]
         lambda_function.Architectures = self.Architectures  # type: ignore[attr-defined]
+        lambda_function.SnapStart = self.SnapStart  # type: ignore[attr-defined]
         lambda_function.EphemeralStorage = self.EphemeralStorage  # type: ignore[attr-defined]
 
         if self.Tracing:  # type: ignore[attr-defined]
@@ -810,6 +812,9 @@ class SamFunction(SamResourceMacro):
                 logical_dict.update(function.Environment)
             if function.MemorySize:
                 logical_dict.update({"MemorySize": function.MemorySize})
+            # If SnapStart is enabled we want to publish a new version, to have the corresponding snapshot
+            if function.SnapStart and function.SnapStart.get("ApplyOn", "None") != "None":
+                logical_dict.update({"SnapStart": function.SnapStart})
         logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
