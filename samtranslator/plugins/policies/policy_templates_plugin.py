@@ -31,7 +31,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
 
         self._policy_template_processor = policy_template_processor
 
-    @cw_timer(prefix="Plugin-PolicyTemplates")  # type: ignore[no-untyped-call]
+    @cw_timer(prefix="Plugin-PolicyTemplates")
     def on_before_transform_resource(self, logical_id, resource_type, resource_properties):  # type: ignore[no-untyped-def]
         """
         Hook method that gets called before "each" SAM resource gets processed

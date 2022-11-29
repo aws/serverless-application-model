@@ -62,7 +62,7 @@ class ImplicitApiPlugin(BasePlugin):
             "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
-    @cw_timer(prefix="Plugin-ImplicitApi")  # type: ignore[no-untyped-call]
+    @cw_timer(prefix="Plugin-ImplicitApi")
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """
         Hook method that gets called before the SAM template is processed.

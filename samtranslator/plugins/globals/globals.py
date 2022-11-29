@@ -45,6 +45,7 @@ class Globals(object):
             "FileSystemConfigs",
             "CodeSigningConfigArn",
             "Architectures",
+            "SnapStart",
             "EphemeralStorage",
             "FunctionUrlConfig",
         ],
@@ -85,7 +86,9 @@ class Globals(object):
         SamResourceType.SimpleTable.value: ["SSESpecification"],
     }
     # unreleased_properties *must be* part of supported_properties too
-    unreleased_properties: Dict[str, List[str]] = {}
+    unreleased_properties: Dict[str, List[str]] = {
+        SamResourceType.Function.value: ["SnapStart"],
+    }
 
     def __init__(self, template):  # type: ignore[no-untyped-def]
         """

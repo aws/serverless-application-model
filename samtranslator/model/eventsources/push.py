@@ -1,5 +1,6 @@
 import copy
 import re
+from typing import Any, Dict, Optional
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
@@ -69,8 +70,8 @@ class PushEventSource(ResourceMacro):
         if suffix.isalnum():
             permission_logical_id = prefix + "Permission" + suffix
         else:
-            generator = logical_id_generator.LogicalIdGenerator(prefix + "Permission", suffix)  # type: ignore[no-untyped-call]
-            permission_logical_id = generator.gen()  # type: ignore[no-untyped-call]
+            generator = logical_id_generator.LogicalIdGenerator(prefix + "Permission", suffix)
+            permission_logical_id = generator.gen()
         lambda_permission = LambdaPermission(
             permission_logical_id, attributes=function.get_passthrough_resource_attributes()
         )
@@ -107,7 +108,7 @@ class Schedule(PushEventSource):
         "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the EventBridge Rule and Lambda Permission to which this Schedule event source corresponds.
 
@@ -192,7 +193,7 @@ class CloudWatchEvent(PushEventSource):
         "State": PropertyType(False, is_str()),
     }
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the CloudWatch Events/EventBridge Rule and Lambda Permission to which
         this CloudWatch Events/EventBridge event source corresponds.
@@ -288,7 +289,7 @@ class S3(PushEventSource):
                 return {"bucket": resources[bucket_id], "bucket_id": bucket_id}
         raise InvalidEventException(self.relative_id, "S3 events must reference an S3 bucket in the same template.")
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the Lambda Permission resource allowing S3 to invoke the function this event source triggers.
 
@@ -392,7 +393,7 @@ class S3(PushEventSource):
                 "Fn::If": [permission.resource_attributes[CONDITION], ref(permission.logical_id), "no dependency"]
             }
         }
-        properties["Tags"] = tags + get_tag_list(dep_tag)  # type: ignore[no-untyped-call]
+        properties["Tags"] = tags + get_tag_list(dep_tag)
         return bucket
 
     def _inject_notification_configuration(self, function, bucket, bucket_id):  # type: ignore[no-untyped-def]
@@ -451,9 +452,10 @@ class SNS(PushEventSource):
         "Region": PropertyType(False, is_str()),
         "FilterPolicy": PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict))))),
         "SqsSubscription": PropertyType(False, one_of(is_type(bool), is_type(dict))),
+        "RedrivePolicy": PropertyType(False, is_type(dict)),
     }
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the Lambda Permission resource allowing SNS to invoke the function this event source triggers.
 
@@ -469,12 +471,13 @@ class SNS(PushEventSource):
 
         # SNS -> Lambda
         if not self.SqsSubscription:  # type: ignore[attr-defined]
-            subscription = self._inject_subscription(  # type: ignore[no-untyped-call]
+            subscription = self._inject_subscription(
                 "lambda",
                 function.get_runtime_attr("arn"),
                 self.Topic,  # type: ignore[attr-defined]
                 self.Region,  # type: ignore[attr-defined]
                 self.FilterPolicy,  # type: ignore[attr-defined]
+                self.RedrivePolicy,  # type: ignore[attr-defined]
                 function,
             )
             return [self._construct_permission(function, source_arn=self.Topic), subscription]  # type: ignore[attr-defined, no-untyped-call]
@@ -487,8 +490,8 @@ class SNS(PushEventSource):
             queue_url = queue.get_runtime_attr("queue_url")
 
             queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function)  # type: ignore[attr-defined, no-untyped-call]
-            subscription = self._inject_subscription(  # type: ignore[no-untyped-call]
-                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function  # type: ignore[attr-defined, attr-defined, attr-defined]
+            subscription = self._inject_subscription(
+                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function  # type: ignore[attr-defined, attr-defined, attr-defined]
             )
             event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)  # type: ignore[no-untyped-call]
 
@@ -512,7 +515,9 @@ class SNS(PushEventSource):
         queue_policy = self._inject_sqs_queue_policy(  # type: ignore[no-untyped-call]
             self.Topic, queue_arn, queue_url, function, queue_policy_logical_id  # type: ignore[attr-defined]
         )
-        subscription = self._inject_subscription("sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function)  # type: ignore[attr-defined, attr-defined, attr-defined, no-untyped-call]
+        subscription = self._inject_subscription(
+            "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function  # type: ignore[attr-defined, attr-defined, attr-defined]
+        )
         event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)  # type: ignore[no-untyped-call]
 
         resources = resources + event_source
@@ -520,7 +525,16 @@ class SNS(PushEventSource):
         resources.append(subscription)
         return resources
 
-    def _inject_subscription(self, protocol, endpoint, topic, region, filterPolicy, function):  # type: ignore[no-untyped-def]
+    def _inject_subscription(
+        self,
+        protocol: str,
+        endpoint: str,
+        topic: str,
+        region: Optional[str],
+        filterPolicy: Optional[Dict[str, Any]],
+        redrivePolicy: Optional[Dict[str, Any]],
+        function: Any,
+    ) -> SNSSubscription:
         subscription = SNSSubscription(self.logical_id, attributes=function.get_passthrough_resource_attributes())
         subscription.Protocol = protocol
         subscription.Endpoint = endpoint
@@ -531,6 +545,9 @@ class SNS(PushEventSource):
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
+
+        if redrivePolicy is not None:
+            subscription.RedrivePolicy = redrivePolicy
 
         return subscription
 
@@ -616,7 +633,7 @@ class Api(PushEventSource):
 
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """If the Api event source has a RestApi property, then simply return the Lambda Permission resource allowing
         API Gateway to call the function. If no RestApi is provided, then additionally inject the path, method, and the
@@ -934,7 +951,7 @@ class AlexaSkill(PushEventSource):
 
     property_types = {"SkillId": PropertyType(False, is_str())}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         function = kwargs.get("function")
 
@@ -953,7 +970,7 @@ class IoTRule(PushEventSource):
 
     property_types = {"Sql": PropertyType(True, is_str()), "AwsIotSqlVersion": PropertyType(False, is_str())}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         function = kwargs.get("function")
 
@@ -1016,7 +1033,7 @@ class Cognito(PushEventSource):
             self.relative_id, "Cognito events must reference a Cognito UserPool in the same template."
         )
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         function = kwargs.get("function")
 
@@ -1102,7 +1119,7 @@ class HttpApi(PushEventSource):
 
         return {"explicit_api": explicit_api}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore[no-untyped-call]
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """If the Api event source has a RestApi property, then simply return the Lambda Permission resource allowing
         API Gateway to call the function. If no RestApi is provided, then additionally inject the path, method, and the
@@ -1148,7 +1165,7 @@ class HttpApi(PushEventSource):
         editor = None
         if resources_to_link["explicit_api"].get("DefinitionBody"):
             try:
-                editor = OpenApiEditor(resources_to_link["explicit_api"].get("DefinitionBody"))  # type: ignore[no-untyped-call]
+                editor = OpenApiEditor(resources_to_link["explicit_api"].get("DefinitionBody"))
             except InvalidDocumentException as e:
                 api_logical_id = self.ApiId.get("Ref") if isinstance(self.ApiId, dict) else self.ApiId  # type: ignore[attr-defined]
                 raise InvalidResourceException(api_logical_id, " ".join(ex.message for ex in e.causes))
@@ -1201,7 +1218,7 @@ class HttpApi(PushEventSource):
 
         uri = _build_apigw_integration_uri(function, "${AWS::Partition}")  # type: ignore[no-untyped-call]
 
-        editor = OpenApiEditor(open_api_body)  # type: ignore[no-untyped-call]
+        editor = OpenApiEditor(open_api_body)
 
         if manage_swagger and editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined, no-untyped-call]
             # Cannot add the Lambda Integration, if it is already present

@@ -1,6 +1,7 @@
 import hashlib
 import json
 import sys
+from typing import Any, Optional
 
 
 class LogicalIdGenerator(object):
@@ -9,7 +10,7 @@ class LogicalIdGenerator(object):
     #       given by this class
     HASH_LENGTH = 10
 
-    def __init__(self, prefix, data_obj=None, data_hash=None):  # type: ignore[no-untyped-def]
+    def __init__(self, prefix: str, data_obj: Optional[Any] = None, data_hash: Optional[str] = None) -> None:
         """
         Generate logical IDs for resources that are stable, deterministic and platform independent
 
@@ -26,7 +27,7 @@ class LogicalIdGenerator(object):
         self.data_str = data_str
         self.data_hash = data_hash
 
-    def gen(self):  # type: ignore[no-untyped-def]
+    def gen(self) -> str:
         """
         Generate stable LogicalIds based on the prefix and given data. This method ensures that the logicalId is
         deterministic and stable based on input prefix & data object. In other words:

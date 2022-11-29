@@ -109,8 +109,8 @@ class ApiGatewayDeployment(Resource):
         if function_names and function_names.get(self.logical_id[:-10], None):
             hash_input.append(function_names.get(self.logical_id[:-10], ""))
         data = self._X_HASH_DELIMITER.join(hash_input)
-        generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)  # type: ignore[no-untyped-call]
-        self.logical_id = generator.gen()  # type: ignore[no-untyped-call]
+        generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)
+        self.logical_id = generator.gen()
         digest = generator.get_hash(length=40)  # type: ignore[no-untyped-call] # Get the full hash
         self.Description = "RestApi deployment id: {}".format(digest)
         stage.update_deployment_ref(self.logical_id)

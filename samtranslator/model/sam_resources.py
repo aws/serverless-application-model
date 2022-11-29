@@ -112,6 +112,7 @@ class SamFunction(SamResourceMacro):
         "ImageConfig": PropertyType(False, is_type(dict)),
         "CodeSigningConfigArn": PropertyType(False, is_str()),
         "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "SnapStart": PropertyType(False, is_type(dict)),
         "FunctionUrlConfig": PropertyType(False, is_type(dict)),
     }
     event_resolver = ResourceTypeResolver(  # type: ignore[no-untyped-call]
@@ -398,7 +399,7 @@ class SamFunction(SamResourceMacro):
 
     def _make_gen_condition_name(self, name: str, hash_input: str) -> str:
         # Make sure the property name is not over 255 characters (CFN limit)
-        hash_digest = logical_id_generator.LogicalIdGenerator("", hash_input).gen()  # type: ignore[no-untyped-call, no-untyped-call]
+        hash_digest = logical_id_generator.LogicalIdGenerator("", hash_input).gen()
         condition_name: str = name + hash_digest
         if len(condition_name) > 255:
             return input(condition_name)[:255]
@@ -458,6 +459,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.ImageConfig = self.ImageConfig  # type: ignore[attr-defined]
         lambda_function.PackageType = self.PackageType  # type: ignore[attr-defined]
         lambda_function.Architectures = self.Architectures  # type: ignore[attr-defined]
+        lambda_function.SnapStart = self.SnapStart  # type: ignore[attr-defined]
         lambda_function.EphemeralStorage = self.EphemeralStorage  # type: ignore[attr-defined]
 
         if self.Tracing:  # type: ignore[attr-defined]
@@ -810,7 +812,10 @@ class SamFunction(SamResourceMacro):
                 logical_dict.update(function.Environment)
             if function.MemorySize:
                 logical_dict.update({"MemorySize": function.MemorySize})
-        logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()  # type: ignore[no-untyped-call, no-untyped-call]
+            # If SnapStart is enabled we want to publish a new version, to have the corresponding snapshot
+            if function.SnapStart and function.SnapStart.get("ApplyOn", "None") != "None":
+                logical_dict.update({"SnapStart": function.SnapStart})
+        logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
         if attributes is None:
@@ -1230,7 +1235,7 @@ class SamHttpApi(SamResourceMacro):
         self.CorsConfiguration = intrinsics_resolver.resolve_parameter_refs(self.CorsConfiguration)  # type: ignore[has-type]
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)  # type: ignore[has-type]
 
-        api_generator = HttpApiGenerator(  # type: ignore[no-untyped-call]
+        api_generator = HttpApiGenerator(
             self.logical_id,
             self.StageVariables,  # type: ignore[attr-defined]
             self.depends_on,
@@ -1324,7 +1329,7 @@ class SamSimpleTable(SamResourceMacro):
             dynamodb_table.TableName = self.TableName  # type: ignore[attr-defined]
 
         if bool(self.Tags):  # type: ignore[attr-defined]
-            dynamodb_table.Tags = get_tag_list(self.Tags)  # type: ignore[attr-defined, no-untyped-call]
+            dynamodb_table.Tags = get_tag_list(self.Tags)  # type: ignore[attr-defined]
 
         return dynamodb_table
 
@@ -1457,7 +1462,7 @@ class SamLayerVersion(SamResourceMacro):
         if "Metadata" in hash_dict.get(old_logical_id):
             del hash_dict[old_logical_id]["Metadata"]
 
-        new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, hash_dict).gen()  # type: ignore[no-untyped-call, no-untyped-call]
+        new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, hash_dict).gen()
         self.logical_id = new_logical_id
 
         lambda_layer = LambdaLayerVersion(self.logical_id, depends_on=self.depends_on, attributes=attributes)
@@ -1632,8 +1637,8 @@ class SamConnector(SamResourceMacro):
         "Permissions": PropertyType(True, list_of(is_str())),
     }
 
-    @cw_timer  # type: ignore[misc]
-    def to_cloudformation(self, **kwargs) -> List:  # type: ignore[no-untyped-def, type-arg]
+    @cw_timer
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:  # type: ignore
         resource_resolver: ResourceResolver = kwargs["resource_resolver"]
         original_template = kwargs["original_template"]
 
