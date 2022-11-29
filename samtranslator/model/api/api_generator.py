@@ -514,6 +514,8 @@ class ApiGenerator(object):
             basepath_resource_list.extend([basepath_mapping])
         else:
             for basepath in basepaths:
+                # ignore leading and trailing `/` in the path name
+                basepath = basepath.strip("/")
                 path = "".join(e for e in basepath if e.isalnum())
                 logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
                 basepath_mapping = ApiGatewayBasePathMapping(
