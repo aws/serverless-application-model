@@ -502,8 +502,8 @@ class ApiGenerator(object):
         else:
             basepaths = None
 
-        # Boolean to allow/disallow hyphens in BasePath property
-        strip_hyphens = self.domain.get("StripHyphens", True)
+        # Boolean to allow/disallow symbols in BasePath property
+        strip_symbols = self.domain.get("BasePathStripSymbols", True)
 
         basepath_resource_list = []
 
@@ -520,7 +520,7 @@ class ApiGenerator(object):
                 # Remove possible leading and trailing '/' because a base path may only
                 # contain letters, numbers, and one of "$-_.+!*'()"
                 path = "".join(e for e in basepath if e.isalnum())
-                basepath = path if strip_hyphens else basepath.strip("/")
+                basepath = path if strip_symbols else basepath.strip("/")
                 logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
                 basepath_mapping = ApiGatewayBasePathMapping(
                     logical_id, attributes=self.passthrough_resource_attributes

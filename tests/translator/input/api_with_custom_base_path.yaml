@@ -33,7 +33,7 @@ Resources:
             Ref: HostedZoneId
           IpV6: true
 
-  MyApiWithoutStripHyphens:
+  MyApiWithBasePathSymbols:
     Type: AWS::Serverless::Api
     Properties:
       OpenApiVersion: 3.0.1
@@ -42,7 +42,7 @@ Resources:
         DomainName: MyEdgeDomainName
         CertificateArn: MyEdgeDomainCert
         EndpointConfiguration: EDGE
-        StripHyphens: false
+        BasePathStripSymbols: false
         Route53:
           HostedZoneId:
             Ref: HostedZoneId

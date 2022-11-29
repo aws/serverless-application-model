@@ -1198,8 +1198,8 @@
           "description": "A list of the basepaths to configure with the Amazon API Gateway domain name\\.  \n*Type*: List  \n*Required*: No  \n*Default*: /  \n*AWS CloudFormation compatibility*: This property is similar to the [`BasePath`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-basepathmapping.html#cfn-apigateway-basepathmapping-basepath) property of an `AWS::ApiGateway::BasePathMapping` resource\\. AWS SAM creates multiple `AWS::ApiGateway::BasePathMapping` resources, one per `BasePath` specified in this property\\.",
           "markdownDescription": "A list of the basepaths to configure with the Amazon API Gateway domain name\\.  \n*Type*: List  \n*Required*: No  \n*Default*: /  \n*AWS CloudFormation compatibility*: This property is similar to the [`BasePath`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-basepathmapping.html#cfn-apigateway-basepathmapping-basepath) property of an `AWS::ApiGateway::BasePathMapping` resource\\. AWS SAM creates multiple `AWS::ApiGateway::BasePathMapping` resources, one per `BasePath` specified in this property\\."
         },
-        "StripHyphens": {
-          "title": "Striphyphens",
+        "BasePathStripSymbols": {
+          "title": "Basepathstripsymbols",
           "type": "boolean"
         },
         "CertificateArn": {
