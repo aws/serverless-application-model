@@ -529,6 +529,9 @@
           "title": "EphemeralStorage",
           "description": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
           "markdownDescription": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\."
+        },
+        "SnapStart": {
+          "title": "Snapstart"
         }
       },
       "additionalProperties": false
@@ -3971,6 +3974,9 @@
           "title": "Runtime",
           "description": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
           "markdownDescription": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\."
+        },
+        "SnapStart": {
+          "title": "Snapstart"
         },
         "Tags": {
           "title": "Tags",
