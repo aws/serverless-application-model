@@ -5577,7 +5577,7 @@
       "properties": {
         "Type": {
           "title": "Type",
-          "pattern": "^((?!::Serverless::).)*$",
+          "pattern": "^(?!AWS::Serverless::).+$",
           "type": "string"
         }
       },
