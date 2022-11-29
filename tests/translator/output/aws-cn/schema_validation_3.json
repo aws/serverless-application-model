@@ -4,16 +4,16 @@
       "Type": "AWS::Foo::Bar"
     },
     "UnknownType2": {
-      "Type": "AWS::Foo::Bar",
       "Properties": {
         "Turtle": "Train"
-      }
+      },
+      "Type": "AWS::Foo::Bar"
     },
     "UnknownType3": {
-      "Type": "Foo::Bar::Egg",
       "Properties": {
         "Turtle": "Train"
-      }
+      },
+      "Type": "Foo::Bar::Egg"
     },
     "UnknownType4": {
       "Type": "Foo::Bar::Egg"
