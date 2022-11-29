@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   NormalApplication:
     Type: AWS::Serverless::Application

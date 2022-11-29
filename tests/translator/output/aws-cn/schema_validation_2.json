@@ -1,0 +1,129 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A Step Functions Standard Workflow sending payloads to an SQS queue. This pattern will not wait for a callback from SQS\n",
+  "Outputs": {
+    "MyQueueURL": {
+      "Description": "MyQueue URL",
+      "Value": {
+        "Ref": "MyQueue"
+      }
+    },
+    "StateMachinetoSQSArn": {
+      "Description": "StateMachinetoSQS Arn",
+      "Value": {
+        "Ref": "StateMachinetoSQS"
+      }
+    }
+  },
+  "Resources": {
+    "MyQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyStateMachineExecutionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  {
+                    "Fn::Sub": "states.${AWS::Region}.amazonaws.com"
+                  }
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Path": "/"
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SFNToSQSPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SFNToSQS": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::StateMachine"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:SendMessage"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyStateMachineExecutionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "StateMachinetoSQS": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"SendToMyQueue\",",
+              "    \"States\": {",
+              "        \"SendToMyQueue\": {",
+              "            \"End\": true,",
+              "            \"Parameters\": {",
+              "                \"MessageBody.$\": \"$.message\",",
+              "                \"QueueUrl\": \"${definition_substitution_1}\"",
+              "            },",
+              "            \"Resource\": \"someresource\",",
+              "            \"Type\": \"Task\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "DefinitionSubstitutions": {
+          "definition_substitution_1": {
+            "Ref": "MyQueue"
+          }
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MyStateMachineExecutionRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    }
+  }
+}

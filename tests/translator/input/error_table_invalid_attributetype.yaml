@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   Table:
     Type: AWS::Serverless::SimpleTable

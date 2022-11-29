@@ -37,6 +37,7 @@ class Globals(object):
             "AutoPublishAlias",
             "Layers",
             "DeploymentPreference",
+            "RolePath",
             "PermissionsBoundary",
             "ReservedConcurrentExecutions",
             "ProvisionedConcurrencyConfig",

@@ -59,7 +59,7 @@ setup(
     license="Apache License 2.0",
     # Exclude all but the code folders
     packages=find_packages(
-        exclude=("tests", "tests.*", "integration", "integration.*", "docs", "examples", "versions")
+        exclude=("bin", "bin.*", "tests", "tests.*", "integration", "integration.*", "docs", "examples", "versions")
     ),
     license_files=(
         "LICENSE",

@@ -11,14 +11,14 @@ Resources:
           Type: SelfManagedKafka
           Properties:
             KafkaBootstrapServers:
-              - abc.xyz.com:9092
-              - 123.45.67.89:9096 
+            - abc.xyz.com:9092
+            - 123.45.67.89:9096
             Topics:
-              - Topic1
+            - Topic1
             SourceAccessConfigurations:
-              - Type: BASIC_AUTH
-                URI:
-                  Ref: KafkaUserSecret
+            - Type: BASIC_AUTH
+              URI:
+                Ref: KafkaUserSecret
 
   KafkaUserSecret:
     Type: AWS::SecretsManager::Secret
@@ -27,3 +27,5 @@ Resources:
       SecretString:
         Fn::Sub: '{"username":"testBrokerUser","password":"testBrokerPassword"}'
 
+Metadata:
+  SamTransformTest: true

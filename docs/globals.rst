@@ -67,6 +67,7 @@ Currently, the following resources and properties are being supported:
       Layers:
       AutoPublishAlias:
       DeploymentPreference:
+      RolePath:
       PermissionsBoundary:
       ReservedConcurrentExecutions:
       EventInvokeConfig:

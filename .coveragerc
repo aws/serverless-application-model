@@ -1,5 +1,8 @@
 [run]
 branch = True
+omit =
+    # Schema tested by `make check-black`
+    samtranslator/schema/*
 [report]
 exclude_lines =
     pragma: no cover

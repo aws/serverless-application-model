@@ -7,7 +7,7 @@ Resources:
       Timeout: 10  # in case eb has delay
       InlineCode: |
         const AWS = require('aws-sdk');
-        
+
         exports.handler = async (event) => {
           const eb = new AWS.EventBridge();
           const response = await eb.putEvents({
@@ -33,10 +33,10 @@ Resources:
           QUEUE_URL: !Ref VerificationQueue
           EVENT_SOURCE: !Sub '${AWS::StackName}-test-event'
       Policies:
-        - EventBridgePutEventsPolicy:
-            EventBusName: default
-        - SQSPollerPolicy:
-            QueueName: !GetAtt VerificationQueue.QueueName
+      - EventBridgePutEventsPolicy:
+          EventBusName: default
+      - SQSPollerPolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
 
   EventRule:
     Type: AWS::Events::Rule
@@ -44,10 +44,10 @@ Resources:
       Description: !Sub 'EventRule-${AWS::StackName}'
       EventPattern:
         source:
-          - !Sub '${AWS::StackName}-test-event'
+        - !Sub '${AWS::StackName}-test-event'
       Targets:
-        - Arn: !GetAtt Function.Arn
-          Id: "Target"
+      - Arn: !GetAtt Function.Arn
+        Id: Target
 
   Function:
     Type: AWS::Serverless::Function
@@ -68,8 +68,8 @@ Resources:
         Variables:
           QUEUE_URL: !Ref VerificationQueue
       Policies:
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt VerificationQueue.QueueName
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
 
   VerificationQueue:
     Type: AWS::SQS::Queue
@@ -82,4 +82,6 @@ Resources:
       Destination:
         Id: Function
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true

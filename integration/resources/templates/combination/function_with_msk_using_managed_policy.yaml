@@ -8,12 +8,12 @@ Parameters:
 
 Resources:
   MyMskCluster:
-    Type: 'AWS::MSK::Cluster'
+    Type: AWS::MSK::Cluster
     Properties:
       BrokerNodeGroupInfo:
         ClientSubnets:
-          - Ref: PreCreatedSubnetOne
-          - Ref: PreCreatedSubnetTwo
+        - Ref: PreCreatedSubnetOne
+        - Ref: PreCreatedSubnetTwo
         InstanceType: kafka.t3.small
         StorageInfo:
           EBSStorageInfo:
@@ -37,5 +37,7 @@ Resources:
             Stream:
               Ref: MyMskCluster
             Topics:
-              - "MyDummyTestTopic"
+            - MyDummyTestTopic
 
+Metadata:
+  SamTransformTest: true

@@ -1,5 +1,14 @@
 [
-    { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-    { "LogicalResourceId":"MyApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-    { "LogicalResourceId":"MyApiStage", "ResourceType":"AWS::ApiGateway::Stage" }
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "MyApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "MyApiStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  }
 ]

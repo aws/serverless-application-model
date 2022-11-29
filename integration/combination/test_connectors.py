@@ -28,6 +28,7 @@ class TestConnectors(BaseTest):
             ("combination/connector_restapi_to_function",),
             ("combination/connector_httpapi_to_function",),
             ("combination/connector_function_to_bucket_read",),
+            ("combination/connector_function_to_bucket_read_multiple",),
             ("combination/connector_function_to_bucket_write",),
             ("combination/connector_function_to_table_read",),
             ("combination/connector_function_to_table_write",),
@@ -44,6 +45,8 @@ class TestConnectors(BaseTest):
             ("combination/connector_event_rule_to_eb_default_write",),
             ("combination/connector_event_rule_to_eb_custom_write",),
             ("combination/connector_event_rule_to_lambda_write",),
+            ("combination/connector_event_rule_to_lambda_write_multiple",),
+            ("combination/connector_mix_destination",),
             ("combination/connector_sqs_to_function",),
             ("combination/connector_sns_to_function_write",),
             ("combination/connector_table_to_function_read",),
@@ -69,6 +72,7 @@ class TestConnectors(BaseTest):
 
     @parameterized.expand(
         [
+            ("combination/connector_sfn_to_function_without_policy",),
             ("combination/connector_sfn_to_table_read",),
             ("combination/connector_sfn_to_table_write",),
             ("combination/connector_sfn_to_sqs_write",),

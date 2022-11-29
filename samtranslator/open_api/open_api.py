@@ -1,12 +1,13 @@
 import copy
 import re
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Dict, Iterator, Optional
 
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Authorizer
 from samtranslator.model.intrinsics import ref, make_conditional, is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.utils.types import Intrinsicable
+from samtranslator.utils.utils import dict_deep_get, InvalidValueType
 import json
 
 
@@ -33,6 +34,7 @@ class OpenApiEditor(object):
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
     _DEFAULT_PATH = "$default"
+    _DEFAULT_OPENAPI_TITLE = ref("AWS::StackName")
 
     def __init__(self, doc: Optional[Dict[str, Any]]) -> None:
         """
@@ -53,10 +55,13 @@ class OpenApiEditor(object):
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
-        self.security_schemes = self._doc.get("components", Py27Dict()).get("securitySchemes", Py27Dict())
-        self.definitions = self._doc.get("definitions", Py27Dict())
-        self.tags = self._doc.get("tags", [])
-        self.info = self._doc.get("info", Py27Dict())
+        try:
+            self.security_schemes = dict_deep_get(self._doc, "components.securitySchemes") or Py27Dict()
+            self.definitions = dict_deep_get(self._doc, "definitions") or Py27Dict()
+            self.tags = dict_deep_get(self._doc, "tags") or []
+            self.info = dict_deep_get(self._doc, "info") or Py27Dict()
+        except InvalidValueType as ex:
+            raise InvalidDocumentException([InvalidTemplateException(f"Invalid OpenApi document: {str(ex)}")]) from ex
 
     def get_conditional_contents(self, item):  # type: ignore[no-untyped-def]
         """
@@ -110,7 +115,14 @@ class OpenApiEditor(object):
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path_name, method_name, False):  # type: ignore[no-untyped-call]
             integration = method_definition.get(self._X_APIGW_INTEGRATION, Py27Dict())
-
+            if not isinstance(integration, dict):
+                raise InvalidDocumentException(
+                    [
+                        InvalidTemplateException(
+                            f"Value of '{self._X_APIGW_INTEGRATION}' must be a dictionary according to Swagger spec."
+                        )
+                    ]
+                )
             # Extract the integration uri out of a conditional if necessary
             uri = integration.get("uri")
             if not isinstance(uri, dict):
@@ -370,7 +382,6 @@ class OpenApiEditor(object):
         path: str,
         default_authorizer: str,
         authorizers: Dict[str, ApiGatewayV2Authorizer],
-        api_authorizers: Dict[str, Any],
     ) -> None:
         """
         Adds the default_authorizer to the security block for each method on this path unless an Authorizer
@@ -413,15 +424,13 @@ class OpenApiEditor(object):
                         # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                         if not self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                             continue
-                        existing_security = method_definition.get("security", [])
+                        existing_security = method_definition.get("security")
                         if existing_security:
                             continue
-                        authorizer_list: List[str] = []
-                        if authorizers:
-                            authorizer_list.extend(authorizers.keys())
+
                         security_dict = {}
-                        security_dict[default_authorizer] = self._get_authorization_scopes(  # type: ignore[no-untyped-call]
-                            api_authorizers, default_authorizer
+                        security_dict[default_authorizer] = self._get_authorization_scopes(
+                            authorizers, default_authorizer
                         )
                         authorizer_security = [security_dict]
 
@@ -463,14 +472,18 @@ class OpenApiEditor(object):
             authorization_scopes = []
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
-            existing_security = method_definition.get("security", [])
 
             security_dict = {}  # type: ignore[var-annotated]
             security_dict[authorizer_name] = []
 
             # Neither the NONE nor the AWS_IAM built-in authorizers support authorization scopes.
             if authorizer_name not in ["NONE", "AWS_IAM"]:
-                method_authorization_scopes = authorizers[authorizer_name].get("AuthorizationScopes")
+                authorizer = authorizers.get(authorizer_name, Py27Dict())
+                if not isinstance(authorizer, dict):
+                    raise InvalidDocumentException(
+                        [InvalidTemplateException(f"Type of authorizer '{authorizer_name}' must be a dictionary")]
+                    )
+                method_authorization_scopes = authorizer.get("AuthorizationScopes")
                 if authorization_scopes:
                     method_authorization_scopes = authorization_scopes
                 if authorizers[authorizer_name] and method_authorization_scopes:
@@ -478,6 +491,11 @@ class OpenApiEditor(object):
 
             authorizer_security = [security_dict]
 
+            existing_security = method_definition.get("security", [])
+            if not isinstance(existing_security, list):
+                raise InvalidDocumentException(
+                    [InvalidTemplateException(f"Type of security for path {path} method {method_name} must be a list")]
+                )
             # This assumes there are no authorizers already configured in the existing security block
             security = existing_security + authorizer_security
             if security:
@@ -526,6 +544,14 @@ class OpenApiEditor(object):
 
         servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
         for config in servers_configurations:
+            if not isinstance(config, dict):
+                raise InvalidDocumentException(
+                    [
+                        InvalidTemplateException(
+                            f"Value of '{self._SERVERS}' item must be a dictionary according to Swagger spec."
+                        )
+                    ]
+                )
             endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, {})
             endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint
             config[self._X_APIGW_ENDPOINT_CONFIG] = endpoint_configuration
@@ -568,6 +594,14 @@ class OpenApiEditor(object):
         ALLOW_CREDENTIALS = "allowCredentials"
         cors_headers = [ALLOW_ORIGINS, ALLOW_HEADERS, ALLOW_METHODS, EXPOSE_HEADERS, MAX_AGE, ALLOW_CREDENTIALS]
         cors_configuration = self._doc.get(self._X_APIGW_CORS, {})
+        if not isinstance(cors_configuration, dict):
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        f"Value of '{self._X_APIGW_CORS}' must be a dictionary according to Swagger spec."
+                    )
+                ]
+            )
 
         # intrinsics will not work if cors configuration is defined in open api and as a property to the HttpApi
         if allow_origins and is_intrinsic(allow_origins):
@@ -604,13 +638,22 @@ class OpenApiEditor(object):
             return
         self.info["description"] = description
 
+    def add_title(self, title: Intrinsicable[str]) -> None:
+        """Add title in open api definition, if it is not already defined
+
+        :param string description: Description of the API
+        """
+        if self.info.get("title") != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
+            return
+        self.info["title"] = title
+
     def has_api_gateway_cors(self):  # type: ignore[no-untyped-def]
         if self._doc.get(self._X_APIGW_CORS):
             return True
         return False
 
     @property
-    def openapi(self):  # type: ignore[no-untyped-def]
+    def openapi(self) -> Dict[str, Any]:
         """
         Returns a **copy** of the OpenApi specification as a dictionary.
 
@@ -660,23 +703,21 @@ class OpenApiEditor(object):
         skeleton["openapi"] = "3.0.1"
         skeleton["info"] = Py27Dict()
         skeleton["info"]["version"] = "1.0"
-        skeleton["info"]["title"] = ref("AWS::StackName")
+        skeleton["info"]["title"] = OpenApiEditor._DEFAULT_OPENAPI_TITLE
         skeleton["paths"] = Py27Dict()
         return skeleton
 
     @staticmethod
-    def _get_authorization_scopes(authorizers, default_authorizer):  # type: ignore[no-untyped-def]
+    def _get_authorization_scopes(authorizers: Dict[str, ApiGatewayV2Authorizer], default_authorizer: str) -> Any:
         """
         Returns auth scopes for an authorizer if present
         :param authorizers: authorizer definitions
         :param default_authorizer: name of the default authorizer
         """
-        if authorizers is not None:
-            if (
-                authorizers[default_authorizer]
-                and authorizers[default_authorizer].get("AuthorizationScopes") is not None
-            ):
-                return authorizers[default_authorizer].get("AuthorizationScopes")
+        authorizer = authorizers[default_authorizer]
+        if authorizer and authorizer.authorization_scopes is not None:
+            return authorizer.authorization_scopes
+
         return []
 
     @staticmethod

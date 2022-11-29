@@ -19,9 +19,11 @@ Resources:
             StartingPosition: LATEST
             TumblingWindowInSeconds: 120
             FunctionResponseTypes:
-              - ReportBatchItemFailures
+            - ReportBatchItemFailures
 
   MyStream:
     Type: AWS::Kinesis::Stream
     Properties:
       ShardCount: 1
+Metadata:
+  SamTransformTest: true

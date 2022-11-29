@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   HttpApiFunction:
     Type: AWS::Serverless::Function
@@ -12,3 +10,31 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref SomeApi
+
+  HttpApiFunctionInvalidRouteSettings:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: python3.7
+      Events:
+        ApiNullRouteSettings:
+          Type: HttpApi
+          Properties:
+            RouteSettings:
+            Path: /path
+            Method: POST
+
+  HttpApiFunctionInvalidRouteSettings2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: python3.7
+      Events:
+        ApiRouteSettingsNotMap:
+          Type: HttpApi
+          Properties:
+            RouteSettings: this should be a map
+            Path: /path2
+            Method: POST

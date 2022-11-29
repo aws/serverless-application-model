@@ -1,4 +1,5 @@
 # Help resolve intrinsic functions
+from typing import Any
 
 from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAttAction
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
@@ -32,7 +33,7 @@ class IntrinsicsResolver(object):
         self.supported_intrinsics = supported_intrinsics
         self.parameters = parameters
 
-    def resolve_parameter_refs(self, input):  # type: ignore[no-untyped-def]
+    def resolve_parameter_refs(self, _input: Any) -> Any:
         """
         Resolves references to parameters within the given dictionary recursively. Other intrinsic functions such as
         !GetAtt, !Sub or !Ref to non-parameters will be left untouched.
@@ -40,10 +41,10 @@ class IntrinsicsResolver(object):
         Result is a dictionary where parameter values are inlined. Don't pass this dictionary directly into
         transform's output because it changes the template structure by inlining parameter values.
 
-        :param input: Any primitive type (dict, array, string etc) whose values might contain intrinsic functions
+        :param _input: Any primitive type (dict, array, string etc) whose values might contain intrinsic functions
         :return: A copy of a dictionary with parameter references replaced by actual value.
         """
-        return self._traverse(input, self.parameters, self._try_resolve_parameter_refs)  # type: ignore[no-untyped-call]
+        return self._traverse(_input, self.parameters, self._try_resolve_parameter_refs)  # type: ignore[no-untyped-call]
 
     def resolve_sam_resource_refs(self, input, supported_resource_refs):  # type: ignore[no-untyped-def]
         """

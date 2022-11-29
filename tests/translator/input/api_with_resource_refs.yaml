@@ -1,5 +1,3 @@
-%YAML 1.1
----
 # Test if resource references work for both Explicit API & Implicit API resources
 
 Resources:

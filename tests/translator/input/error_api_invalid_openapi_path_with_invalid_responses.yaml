@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   ApiWithInvalidPath:
     Type: AWS::Serverless::Api
@@ -15,3 +13,5 @@ Resources:
           /foo:
             options:
               responses:
+                '200':
+                  headers: this should be a dict

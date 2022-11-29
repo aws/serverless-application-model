@@ -4,24 +4,24 @@ Resources:
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: lambda.amazonaws.com
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
       ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   MyRole2:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: lambda.amazonaws.com
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
       ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   TriggerFunction:
     Type: AWS::Lambda::Function
@@ -37,11 +37,11 @@ Resources:
             const req = https.get(process.env.API_URL, res => {
               
               var body = [];
-          
+
               res.on('data', function(chunk) {
                   body.push(chunk);
               });
-          
+
               res.on('end', function() {
                   try {
                     const message = JSON.parse(Buffer.concat(body).toString())['message'];
@@ -97,7 +97,7 @@ Resources:
     Properties:
       ApiId: !Ref HttpApi
       StageName: prod
-      AutoDeploy: True
+      AutoDeploy: true
 
   Integration:
     Type: AWS::ApiGatewayV2::Integration
@@ -124,4 +124,6 @@ Resources:
       Destination:
         Id: ConnectedFunction
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true

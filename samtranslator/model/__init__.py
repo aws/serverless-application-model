@@ -1,16 +1,19 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
 import re
 import inspect
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.types import Validator
+from samtranslator.model.types import Validator, any_type
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 
 class PropertyType(object):
     """Stores validation information for a CloudFormation resource property.
+
+    DEPRECATED: Use `Property` instead.
 
     :ivar bool required: True if the property is required, False otherwise
     :ivar callable validate: A function that returns True if the provided value is valid for this property, and raises \
@@ -28,6 +31,29 @@ class PropertyType(object):
         self.required = required
         self.validate = validate
         self.supports_intrinsics = supports_intrinsics
+
+
+class Property(PropertyType):
+    """Like `PropertyType`, except without intrinsics support.
+
+    Intrinsics are already resolved by AWS::LanguageExtensions (see https://github.com/aws/serverless-application-model/issues/2533),
+    and supporting intrinsics in the transform is error-prone due to more relaxed types (e.g. a
+    boolean property will evaluate as truthy when an intrinsic is passed to it).
+    """
+
+    def __init__(self, required: bool, validate: Validator) -> None:
+        super().__init__(required, validate, False)
+
+
+class PassThroughProperty(PropertyType):
+    """
+    Pass-through property.
+
+    SAM Translator should not try to read the value other than passing it to underlaying CFN resources.
+    """
+
+    def __init__(self, required: bool) -> None:
+        super().__init__(required, any_type(), False)
 
 
 class Resource(object):
@@ -93,7 +119,7 @@ class Resource(object):
         self.resource_attributes: Dict[str, Any] = {}
         if attributes is not None:
             for attr, value in attributes.items():
-                self.set_resource_attribute(attr, value)  # type: ignore[no-untyped-call]
+                self.set_resource_attribute(attr, value)
 
     @classmethod
     def get_supported_resource_attributes(cls):  # type: ignore[no-untyped-def]
@@ -157,7 +183,7 @@ class Resource(object):
         # all resource attributes ie. all attributes were unsupported before
         for attr in resource._supported_resource_attributes:
             if attr in resource_dict:
-                resource.set_resource_attribute(attr, resource_dict[attr])  # type: ignore[no-untyped-call]
+                resource.set_resource_attribute(attr, resource_dict[attr])
 
         resource.validate_properties()  # type: ignore[no-untyped-call]
         return resource
@@ -293,7 +319,7 @@ class Resource(object):
                     self.logical_id, "Type of property '{property_name}' is invalid.".format(property_name=name)
                 )
 
-    def set_resource_attribute(self, attr, value):  # type: ignore[no-untyped-def]
+    def set_resource_attribute(self, attr: str, value: Any) -> None:
         """Sets attributes on resource. Resource attributes are top-level entries of a CloudFormation resource
         that exist outside of the Properties dictionary
 
@@ -331,7 +357,7 @@ class Resource(object):
         """
         return isinstance(value, dict) and len(value) == 1
 
-    def get_runtime_attr(self, attr_name):  # type: ignore[no-untyped-def]
+    def get_runtime_attr(self, attr_name: str) -> Any:
         """
         Returns a CloudFormation construct that provides value for this attribute. If the resource does not provide
         this attribute, then this method raises an exception
@@ -439,7 +465,9 @@ class SamResourceMacro(ResourceMacro):
 
         return supported_resource_refs
 
-    def _construct_tag_list(self, tags, additional_tags=None):  # type: ignore[no-untyped-def]
+    def _construct_tag_list(
+        self, tags: Optional[Dict[str, Any]], additional_tags: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
         if not bool(tags):
             tags = {}
 
@@ -467,7 +495,12 @@ class SamResourceMacro(ResourceMacro):
                 "input.",
             )
 
-    def _resolve_string_parameter(self, intrinsics_resolver, parameter_value, parameter_name):  # type: ignore[no-untyped-def]
+    def _resolve_string_parameter(
+        self,
+        intrinsics_resolver: IntrinsicsResolver,
+        parameter_value: Optional[Union[str, Dict[str, Any]]],
+        parameter_name: str,
+    ) -> Optional[Union[str, Dict[str, Any]]]:
         if not parameter_value:
             return parameter_value
         value = intrinsics_resolver.resolve_parameter_refs(parameter_value)

@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Globals:
   Api:
     Name: some api

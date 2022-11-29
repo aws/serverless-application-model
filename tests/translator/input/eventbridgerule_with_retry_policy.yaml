@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   ScheduledFunction:
     Type: AWS::Serverless::Function
@@ -12,8 +10,8 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: rate(1 minute)
-          RetryPolicy:
-            MaximumRetryAttempts: 3
+            RetryPolicy:
+              MaximumRetryAttempts: 3
   TriggeredFunction:
     Type: AWS::Serverless::Function
     Properties:

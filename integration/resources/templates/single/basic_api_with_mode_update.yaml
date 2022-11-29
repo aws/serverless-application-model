@@ -6,7 +6,7 @@ Resources:
       Mode: overwrite
 
   TestFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
       Runtime: python3.8
@@ -22,3 +22,5 @@ Resources:
             Method: put
             RestApiId: !Ref MyApi
 
+Metadata:
+  SamTransformTest: true

@@ -24,6 +24,7 @@ from samtranslator.model.exceptions import InvalidEventException, InvalidResourc
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.validator.value_validator import sam_expect
 
 CONDITION = "Condition"
 
@@ -55,6 +56,7 @@ class PushEventSource(ResourceMacro):
     # line to avoid any potential behavior change.
     # TODO: Make `PushEventSource` an abstract class and not giving `principal` initial value.
     principal: str = None  # type: ignore
+    relative_id: str  # overriding the Optional[str]: for event, relative id is not None
 
     def _construct_permission(  # type: ignore[no-untyped-def]
         self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None
@@ -141,7 +143,7 @@ class Schedule(PushEventSource):
         events_rule.Name = self.Name  # type: ignore[attr-defined]
         events_rule.Description = self.Description  # type: ignore[attr-defined]
 
-        source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
+        source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
@@ -214,7 +216,7 @@ class CloudWatchEvent(PushEventSource):
         events_rule.EventBusName = self.EventBusName  # type: ignore[attr-defined]
         events_rule.EventPattern = self.Pattern  # type: ignore[attr-defined]
         events_rule.Name = self.RuleName  # type: ignore[attr-defined]
-        source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
+        source_arn = events_rule.get_runtime_attr("arn")
 
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
@@ -425,8 +427,7 @@ class S3(PushEventSource):
             notification_config = {}
             properties["NotificationConfiguration"] = notification_config
 
-        if not isinstance(notification_config, dict):
-            raise InvalidResourceException(bucket_id, "Invalid type for NotificationConfiguration.")
+        sam_expect(notification_config, bucket_id, "NotificationConfiguration").to_be_a_map()
 
         lambda_notifications = notification_config.get("LambdaConfigurations", None)
         if lambda_notifications is None:
@@ -455,6 +456,12 @@ class SNS(PushEventSource):
         "RedrivePolicy": PropertyType(False, is_type(dict)),
     }
 
+    Topic: str
+    Region: Optional[str]
+    FilterPolicy: Optional[Dict[str, Any]]
+    SqsSubscription: Optional[Any]
+    RedrivePolicy: Optional[Dict[str, Any]]
+
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the Lambda Permission resource allowing SNS to invoke the function this event source triggers.
@@ -470,28 +477,28 @@ class SNS(PushEventSource):
             raise TypeError("Missing required keyword argument: function")
 
         # SNS -> Lambda
-        if not self.SqsSubscription:  # type: ignore[attr-defined]
+        if not self.SqsSubscription:
             subscription = self._inject_subscription(
                 "lambda",
                 function.get_runtime_attr("arn"),
-                self.Topic,  # type: ignore[attr-defined]
-                self.Region,  # type: ignore[attr-defined]
-                self.FilterPolicy,  # type: ignore[attr-defined]
-                self.RedrivePolicy,  # type: ignore[attr-defined]
+                self.Topic,
+                self.Region,
+                self.FilterPolicy,
+                self.RedrivePolicy,
                 function,
             )
-            return [self._construct_permission(function, source_arn=self.Topic), subscription]  # type: ignore[attr-defined, no-untyped-call]
+            return [self._construct_permission(function, source_arn=self.Topic), subscription]  # type: ignore[no-untyped-call]
 
         # SNS -> SQS(Create New) -> Lambda
-        if isinstance(self.SqsSubscription, bool):  # type: ignore[attr-defined]
+        if isinstance(self.SqsSubscription, bool):
             resources = []  # type: ignore[var-annotated]
             queue = self._inject_sqs_queue(function)  # type: ignore[no-untyped-call]
             queue_arn = queue.get_runtime_attr("arn")
             queue_url = queue.get_runtime_attr("queue_url")
 
-            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function)  # type: ignore[attr-defined, no-untyped-call]
+            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function)  # type: ignore[no-untyped-call]
             subscription = self._inject_subscription(
-                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function  # type: ignore[attr-defined, attr-defined, attr-defined]
+                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function
             )
             event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)  # type: ignore[no-untyped-call]
 
@@ -503,20 +510,23 @@ class SNS(PushEventSource):
 
         # SNS -> SQS(Existing) -> Lambda
         resources = []
-        queue_arn = self.SqsSubscription.get("QueueArn", None)  # type: ignore[attr-defined]
-        queue_url = self.SqsSubscription.get("QueueUrl", None)  # type: ignore[attr-defined]
+        sqs_subscription: Dict[str, Any] = sam_expect(
+            self.SqsSubscription, self.relative_id, "SqsSubscription", is_sam_event=True
+        ).to_be_a_map()
+        queue_arn = sqs_subscription.get("QueueArn", None)
+        queue_url = sqs_subscription.get("QueueUrl", None)
         if not queue_arn or not queue_url:
             raise InvalidEventException(self.relative_id, "No QueueARN or QueueURL provided.")
 
-        queue_policy_logical_id = self.SqsSubscription.get("QueuePolicyLogicalId", None)  # type: ignore[attr-defined]
-        batch_size = self.SqsSubscription.get("BatchSize", None)  # type: ignore[attr-defined]
-        enabled = self.SqsSubscription.get("Enabled", None)  # type: ignore[attr-defined]
+        queue_policy_logical_id = sqs_subscription.get("QueuePolicyLogicalId", None)
+        batch_size = sqs_subscription.get("BatchSize", None)
+        enabled = sqs_subscription.get("Enabled", None)
 
         queue_policy = self._inject_sqs_queue_policy(  # type: ignore[no-untyped-call]
-            self.Topic, queue_arn, queue_url, function, queue_policy_logical_id  # type: ignore[attr-defined]
+            self.Topic, queue_arn, queue_url, function, queue_policy_logical_id
         )
         subscription = self._inject_subscription(
-            "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function  # type: ignore[attr-defined, attr-defined, attr-defined]
+            "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function
         )
         event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)  # type: ignore[no-untyped-call]
 
@@ -734,6 +744,7 @@ class Api(PushEventSource):
         editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
 
         if self.Auth:  # type: ignore[attr-defined]
+            sam_expect(self.Auth, self.relative_id, "Auth", is_sam_event=True).to_be_a_map()  # type: ignore[attr-defined]
             method_authorizer = self.Auth.get("Authorizer")  # type: ignore[attr-defined]
             api_auth = api.get("Auth")
             api_auth = intrinsics_resolver.resolve_parameter_refs(api_auth)
@@ -802,6 +813,7 @@ class Api(PushEventSource):
                     editor.add_custom_statements(resource_policy.get("CustomStatements"))  # type: ignore[no-untyped-call]
 
         if self.RequestModel:  # type: ignore[attr-defined]
+            sam_expect(self.RequestModel, self.relative_id, "RequestModel", is_sam_event=True).to_be_a_map()  # type: ignore[attr-defined]
             method_model = self.RequestModel.get("Model")  # type: ignore[attr-defined]
 
             if method_model:

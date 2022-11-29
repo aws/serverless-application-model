@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
@@ -183,3 +181,13 @@ Resources:
       Destination:
         Id: MyQueue
       Permissions: []
+
+  EmptyDestinationListConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination: []
+      Permissions:
+      - Read
+      - Write

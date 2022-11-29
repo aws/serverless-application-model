@@ -1,8 +1,26 @@
 [
-  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyLambdaFunctionCWEvent", "ResourceType":"AWS::Events::Rule" },
-  { "LogicalResourceId":"MyLambdaFunctionCWEventPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyDlq", "ResourceType":"AWS::SQS::Queue" },
-  { "LogicalResourceId":"MyLambdaFunctionCWEventQueuePolicy", "ResourceType":"AWS::SQS::QueuePolicy" }
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionCWEvent",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionCWEventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyDlq",
+    "ResourceType": "AWS::SQS::Queue"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionCWEventQueuePolicy",
+    "ResourceType": "AWS::SQS::QueuePolicy"
+  }
 ]

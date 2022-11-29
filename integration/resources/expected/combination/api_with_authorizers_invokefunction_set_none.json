@@ -1,15 +1,54 @@
 [
-  { "LogicalResourceId":"MyApiWithAwsIamAuthNoCallerCredentials", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"MyApiWithAwsIamAuthNoCallerCredentialsDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-  { "LogicalResourceId":"MyApiWithAwsIamAuthNoCallerCredentialsProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
-  { "LogicalResourceId":"MyFunctionDefaultInvokeRole", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyFunctionDefaultInvokeRoleAPI3PermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyFunctionDefaultInvokeRoleRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyFunctionNONEInvokeRole", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyFunctionNONEInvokeRoleAPI3PermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyFunctionNONEInvokeRoleRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyFunctionWithAwsIamAuth", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyFunctionWithAwsIamAuthMyApiWithNoAuthPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyFunctionWithAwsIamAuthRole", "ResourceType":"AWS::IAM::Role" }
+  {
+    "LogicalResourceId": "MyApiWithAwsIamAuthNoCallerCredentials",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "MyApiWithAwsIamAuthNoCallerCredentialsDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "MyApiWithAwsIamAuthNoCallerCredentialsProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "MyFunctionDefaultInvokeRole",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionDefaultInvokeRoleAPI3PermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionDefaultInvokeRoleRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyFunctionNONEInvokeRole",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionNONEInvokeRoleAPI3PermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionNONEInvokeRoleRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyFunctionWithAwsIamAuth",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionWithAwsIamAuthMyApiWithNoAuthPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionWithAwsIamAuthRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
 ]

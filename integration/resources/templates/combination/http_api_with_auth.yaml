@@ -14,7 +14,7 @@ Resources:
           Properties:
             Auth:
               Authorizer: MyOAuth2Auth
-            ApiId: 
+            ApiId:
               Ref: MyApi
             Method: GET
             Path: /get
@@ -23,14 +23,14 @@ Resources:
           Properties:
             Auth:
               Authorizer: MyLambdaAuth
-            ApiId: 
+            ApiId:
               Ref: MyApi
             Method: POST
             Path: /post
         DefaultApi:
           Type: HttpApi
           Properties:
-            ApiId: 
+            ApiId:
               Ref: MyApi
             Method: DEFAULT
             Path: /default/post
@@ -50,32 +50,34 @@ Resources:
       Auth:
         Authorizers:
           MyLambdaAuth:
-            FunctionArn: 
+            FunctionArn:
               Fn::GetAtt:
-                - MyAuthFn
-                - Arn
+              - MyAuthFn
+              - Arn
             FunctionInvokeRole:
               Fn::GetAtt:
-                - MyAuthFnRole
-                - Arn
+              - MyAuthFnRole
+              - Arn
             Identity:
               Context:
-                - contextVar
+              - contextVar
               Headers:
-                - Authorization
+              - Authorization
               QueryStrings:
-                - petId
+              - petId
               StageVariables:
-                - stageVar
+              - stageVar
               ReauthorizeEvery: 23
             EnableSimpleResponses: true
             AuthorizerPayloadFormatVersion: 2.0
           MyOAuth2Auth:
             AuthorizationScopes:
-              - scope4
+            - scope4
             JwtConfiguration:
-              issuer: "https://openid-connect.onelogin.com/oidc"
+              issuer: https://openid-connect.onelogin.com/oidc
               audience:
-                - MyApi
-            IdentitySource: "$request.querystring.param"
+              - MyApi
+            IdentitySource: $request.querystring.param
         DefaultAuthorizer: MyOAuth2Auth
+Metadata:
+  SamTransformTest: true

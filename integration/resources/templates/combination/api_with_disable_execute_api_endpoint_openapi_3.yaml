@@ -35,6 +35,8 @@ Resources:
             Path: /
 Outputs:
   ApiUrl:
-    Description: "API endpoint URL for Prod environment"
+    Description: API endpoint URL for Prod environment
     Value:
-      Fn::Sub: 'https://${RestApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+      Fn::Sub: https://${RestApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/
+Metadata:
+  SamTransformTest: true

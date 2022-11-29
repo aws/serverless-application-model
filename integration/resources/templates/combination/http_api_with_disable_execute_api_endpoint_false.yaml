@@ -18,21 +18,23 @@ Resources:
           Properties:
             Method: Get
             Path: /get
-            ApiId: 
+            ApiId:
               Ref: MyApi
         ImplicitPost:
           Type: HttpApi
           Properties:
             Method: Post
             Path: /post
-            ApiId: 
+            ApiId:
               Ref: MyApi
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      DisableExecuteApiEndpoint: False
+      DisableExecuteApiEndpoint: false
       StageName: Prod
 Outputs:
   ApiId:
     Value:
-      Ref: MyApi  
+      Ref: MyApi
+Metadata:
+  SamTransformTest: true

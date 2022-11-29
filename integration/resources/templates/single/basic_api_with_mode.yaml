@@ -6,7 +6,7 @@ Resources:
       Mode: overwrite
 
   TestFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
       Runtime: python3.8
@@ -32,3 +32,5 @@ Resources:
 Outputs:
   ApiEndpoint:
     Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/MyNewStageName"
+Metadata:
+  SamTransformTest: true

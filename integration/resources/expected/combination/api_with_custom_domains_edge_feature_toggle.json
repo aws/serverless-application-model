@@ -1,11 +1,38 @@
 [
-    { "LogicalResourceId":"RecordSetGroupc911be5759", "ResourceType":"AWS::Route53::RecordSetGroup" },
-    { "LogicalResourceId":"MyApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-    { "LogicalResourceId":"ApiGatewayDomainName299fac327d", "ResourceType":"AWS::ApiGateway::DomainName" },
-    { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-    { "LogicalResourceId":"MyApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
-    { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function" },
-    { "LogicalResourceId":"MyFunctionRole", "ResourceType":"AWS::IAM::Role" },
-    { "LogicalResourceId":"MyApigetBasePathMapping", "ResourceType":"AWS::ApiGateway::BasePathMapping" },
-    { "LogicalResourceId":"MyFunctionFetchPermissionProd", "ResourceType":"AWS::Lambda::Permission" }
-  ]
+  {
+    "LogicalResourceId": "RecordSetGroupc911be5759",
+    "ResourceType": "AWS::Route53::RecordSetGroup"
+  },
+  {
+    "LogicalResourceId": "MyApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "ApiGatewayDomainName299fac327d",
+    "ResourceType": "AWS::ApiGateway::DomainName"
+  },
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "MyApiProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyApigetBasePathMapping",
+    "ResourceType": "AWS::ApiGateway::BasePathMapping"
+  },
+  {
+    "LogicalResourceId": "MyFunctionFetchPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  }
+]

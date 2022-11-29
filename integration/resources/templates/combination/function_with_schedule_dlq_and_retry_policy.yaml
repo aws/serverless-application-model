@@ -13,26 +13,28 @@ Resources:
         Repeat:
           Type: Schedule
           Properties:
-              Schedule: 'rate(5 minutes)'
-              Input: '{"Hello": "world!"}'
-              Description: test schedule
-              Enabled: True
-              DeadLetterConfig:
-                Arn:
-                  Fn::GetAtt:
-                    - "MyDeadLetterQueue"
-                    - "Arn"
-              RetryPolicy:
-                MaximumRetryAttempts: 10
+            Schedule: rate(5 minutes)
+            Input: '{"Hello": "world!"}'
+            Description: test schedule
+            Enabled: true
+            DeadLetterConfig:
+              Arn:
+                Fn::GetAtt:
+                - MyDeadLetterQueue
+                - Arn
+            RetryPolicy:
+              MaximumRetryAttempts: 10
 
 Outputs:
   ScheduleName:
-    Description: "Name of the cw schedule"
+    Description: Name of the cw schedule
     Value:
       Ref: MyLambdaFunctionRepeat
   MyDLQArn:
-    Description: "Arn of the dead-letter queue created for the Schedule rule target"
+    Description: Arn of the dead-letter queue created for the Schedule rule target
     Value:
       Fn::GetAtt:
-        - "MyDeadLetterQueue"
-        - "Arn"
+      - MyDeadLetterQueue
+      - Arn
+Metadata:
+  SamTransformTest: true

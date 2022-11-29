@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   ManyLayersFunc:
     Type: AWS::Serverless::Function

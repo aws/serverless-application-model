@@ -8,7 +8,9 @@ Resources:
       DeadLetterQueue:
         Type: SNS
         TargetArn:
-          Ref: "MyTopic"
+          Ref: MyTopic
 
   MyTopic:
     Type: AWS::SNS::Topic
+Metadata:
+  SamTransformTest: true

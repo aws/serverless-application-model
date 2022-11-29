@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Globals:
   Function:
     CodeUri: s3://global-bucket/global.zip

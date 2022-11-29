@@ -1,9 +1,30 @@
 [
-  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyLambdaFunctionApiOnePermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyLambdaFunctionApiTwoPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"ServerlessRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-  { "LogicalResourceId":"ServerlessRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"ServerlessRestApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" }
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionApiOnePermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionApiTwoPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  }
 ]

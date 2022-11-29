@@ -13,7 +13,7 @@ Resources:
           Properties:
             Topic:
               Ref: MySnsTopic
-        
+
         SQSSubscriptionEvent:
           Type: SNS
           Properties:
@@ -26,3 +26,5 @@ Resources:
   MySnsTopic:
     Type: AWS::SNS::Topic
 
+Metadata:
+  SamTransformTest: true

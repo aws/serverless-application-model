@@ -10,14 +10,14 @@ Resources:
             Type: Task
             Resource:
               Fn::GetAtt: MyFunction.Arn
-            End: True
+            End: true
       Policies:
-        - SQSPollerPolicy:
-            QueueName:
-              Fn::GetAtt: ["MyQueue", "QueueName"]
-        - LambdaInvokePolicy:
-            FunctionName:
-              Ref: MyFunction
+      - SQSPollerPolicy:
+          QueueName:
+            Fn::GetAtt: [MyQueue, QueueName]
+      - LambdaInvokePolicy:
+          FunctionName:
+            Ref: MyFunction
 
   MyFunction:
     Type: AWS::Serverless::Function
@@ -31,6 +31,8 @@ Resources:
 
 Outputs:
   MyStateMachineRole:
-    Description: "ARN of the role created for the State Machine"
+    Description: ARN of the role created for the State Machine
     Value:
       Ref: MyStateMachineRole
+Metadata:
+  SamTransformTest: true

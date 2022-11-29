@@ -59,7 +59,7 @@ class Template(object):
         resolver = IntrinsicsResolver(necessary_parameter_values, supported_intrinsics)  # type: ignore[no-untyped-call]
         definition_copy = copy.deepcopy(self.definition)
 
-        return resolver.resolve_parameter_refs(definition_copy)  # type: ignore[no-untyped-call]
+        return resolver.resolve_parameter_refs(definition_copy)
 
     def missing_parameter_values(self, parameter_values):  # type: ignore[no-untyped-def]
         """
