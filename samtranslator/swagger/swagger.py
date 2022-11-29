@@ -121,6 +121,7 @@ class SwaggerEditor(BaseEditor):
             integration_uri = make_conditional(condition, integration_uri)
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
             # insert key one by one to preserce input order
             path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
@@ -187,6 +188,7 @@ class SwaggerEditor(BaseEditor):
             integration_uri = make_conditional(condition, integration_uri)
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             # Responses
             integration_responses = Py27Dict()
             # insert key one by one to preserce input order
@@ -233,18 +235,14 @@ class SwaggerEditor(BaseEditor):
         :yields list of (method name, method definition) tuples
         """
         for path_item in self.get_conditional_contents(self.paths.get(path_name)):
+            BaseEditor.validate_path_item_is_dict(path_item, path_name)
             for method_name, method in path_item.items():
                 # Excluding non-method sections
                 if method_name in SwaggerEditor._EXCLUDED_PATHS_FIELDS:
                     continue
 
                 for method_definition in self.get_conditional_contents(method):
-                    SwaggerEditor.validate_is_dict(
-                        method_definition,
-                        'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(
-                            method_name, method_definition, path_name
-                        ),
-                    )
+                    BaseEditor.validate_method_definition_is_dict(method_definition, path_name, method_name)
                     if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
                         method_definition
                     ):
@@ -280,6 +278,7 @@ class SwaggerEditor(BaseEditor):
         """
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             # Skip if Options is already present
             method = self._normalize_method_name(self._OPTIONS_METHOD)
             if method in path_item:
@@ -290,7 +289,7 @@ class SwaggerEditor(BaseEditor):
 
             if not allowed_methods:
                 # AllowMethods is not given. Let's try to generate the list from the given Swagger.
-                allowed_methods = self._make_cors_allowed_methods_for_path_item(path_item)  # type: ignore[no-untyped-call]
+                allowed_methods = self._make_cors_allowed_methods_for_path_item(path_item)
 
                 # APIGW expects the value to be a "string expression". Hence wrap in another quote. Ex: "'GET,POST,DELETE'"
                 allowed_methods = "'{}'".format(allowed_methods)
@@ -412,7 +411,7 @@ class SwaggerEditor(BaseEditor):
         to_return["responses"]["200"]["headers"] = response_headers
         return to_return
 
-    def _make_cors_allowed_methods_for_path_item(self, path_item):  # type: ignore[no-untyped-def]
+    def _make_cors_allowed_methods_for_path_item(self, path_item: Dict[str, Any]) -> str:
         """
         Creates the value for Access-Control-Allow-Methods header for given path item. All HTTP methods defined for this
         path item will be included in the result. If the path item contains "ANY" method, then *all available* HTTP methods will
@@ -993,6 +992,7 @@ class SwaggerEditor(BaseEditor):
         """
         methods = []
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             methods += list(path_item.keys())
 
         uri_list = []
