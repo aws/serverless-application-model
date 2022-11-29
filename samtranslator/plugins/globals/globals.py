@@ -88,7 +88,7 @@ class Globals(object):
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {
-        SamResourceType.Function.value: ["SnapStart"],
+        SamResourceType.Function.value: [],
     }
 
     def __init__(self, template):  # type: ignore[no-untyped-def]
