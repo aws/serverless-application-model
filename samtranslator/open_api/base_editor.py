@@ -48,18 +48,20 @@ class BaseEditor(object):
         :param dict method_definition: method definition dictionary
         :return: True if an integration exists
         """
-
         return bool(method_definition.get(BaseEditor._X_APIGW_INTEGRATION))
 
-    def method_has_integration(self, method: Dict[str, Any]) -> bool:
+    def method_has_integration(self, raw_method_definition: Dict[str, Any], path: str, method: str) -> bool:
         """
         Returns true if the given method contains a valid method definition.
         This uses the get_conditional_contents function to handle conditionals.
 
-        :param dict method: method dictionary
+        :param dict raw_method_definition: raw method dictionary
+        :param str path: path name
+        :param str method: method name
         :return: true if method has one or multiple integrations
         """
-        for method_definition in self.get_conditional_contents(method):
+        for method_definition in self.get_conditional_contents(raw_method_definition):
+            self.validate_method_definition_is_dict(method_definition, path, method)
             if self.method_definition_has_integration(method_definition):
                 return True
         return False
@@ -117,7 +119,7 @@ class BaseEditor(object):
         method = self._normalize_method_name(method)
         if method:
             for path_item in self.get_conditional_contents(self.paths.get(path)):
-                if not path_item or method not in path_item:
+                if not isinstance(path_item, dict) or method not in path_item:
                     return False
         return True
 
@@ -136,8 +138,11 @@ class BaseEditor(object):
             return False
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             method_definition = path_item.get(method)
-            if not (isinstance(method_definition, dict) and self.method_has_integration(method_definition)):
+            if not (
+                isinstance(method_definition, dict) and self.method_has_integration(method_definition, path, method)
+            ):
                 return False
         # Integration present and non-empty
         return True
@@ -192,7 +197,9 @@ class BaseEditor(object):
         normalized_method_name = self._normalize_method_name(method_name)
 
         for path_item in self.get_conditional_contents(self.paths.get(path_name)):
+            BaseEditor.validate_path_item_is_dict(path_item, path_name)
             for method_definition in self.get_conditional_contents(path_item.get(normalized_method_name)):
+                BaseEditor.validate_method_definition_is_dict(method_definition, path_name, method_name)
                 if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
                     method_definition
                 ):
@@ -222,6 +229,12 @@ class BaseEditor(object):
 
         BaseEditor.validate_is_dict(
             path_item, "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
+        )
+
+    @staticmethod
+    def validate_method_definition_is_dict(method_definition: Optional[Any], path: str, method: str) -> None:
+        BaseEditor.validate_is_dict(
+            method_definition, f"Definition of method '{method}' for path '{path}' should be a map."
         )
 
     @staticmethod
