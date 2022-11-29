@@ -350,9 +350,9 @@ class Api(EventSource):
 
         integration_uri = fnSub("arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution")
 
-        editor = SwaggerEditor(swagger_body)  # type: ignore[no-untyped-call]
+        editor = SwaggerEditor(swagger_body)
 
-        if editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined, no-untyped-call]
+        if editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined]
             # Cannot add the integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,

@@ -163,7 +163,7 @@ class Globals(object):
                     (cls._OPENAPIVERSION in properties)
                     and (cls._MANAGE_SWAGGER in properties)
                     and SwaggerEditor.safe_compare_regex_with_string(
-                        SwaggerEditor.get_openapi_version_3_regex(), properties[cls._OPENAPIVERSION]
+                        SwaggerEditor._OPENAPI_VERSION_3_REGEX, properties[cls._OPENAPIVERSION]
                     )
                 ):
                     if not isinstance(properties[cls._OPENAPIVERSION], str):
