@@ -99,7 +99,7 @@
       },
       "Type": "AWS::ApiGateway::Stage"
     },
-    "MyApiWithBasePathSymbols": {
+    "MyApiWithoutSanitizedBasePath": {
       "Properties": {
         "Body": {
           "info": {
@@ -114,38 +114,38 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithBasePathSymbolsDeployment0b7148d6da": {
+    "MyApiWithoutSanitizedBasePathDeploymentf9b0e4d5f9": {
       "Properties": {
-        "Description": "RestApi deployment id: 0b7148d6da5effee28d8df8185a11d370fa22597",
+        "Description": "RestApi deployment id: f9b0e4d5f969c76e13d94eb78781aa018b177aac",
         "RestApiId": {
-          "Ref": "MyApiWithBasePathSymbols"
+          "Ref": "MyApiWithoutSanitizedBasePath"
         }
       },
       "Type": "AWS::ApiGateway::Deployment"
     },
-    "MyApiWithBasePathSymbolsProdStage": {
+    "MyApiWithoutSanitizedBasePathProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithBasePathSymbolsDeployment0b7148d6da"
+          "Ref": "MyApiWithoutSanitizedBasePathDeploymentf9b0e4d5f9"
         },
         "RestApiId": {
-          "Ref": "MyApiWithBasePathSymbols"
+          "Ref": "MyApiWithoutSanitizedBasePath"
         },
         "StageName": "Prod"
       },
       "Type": "AWS::ApiGateway::Stage"
     },
-    "MyApiWithBasePathSymbolsfoobarBasePathMapping": {
+    "MyApiWithoutSanitizedBasePathfoobarBasePathMapping": {
       "Properties": {
         "BasePath": "foo-bar",
         "DomainName": {
           "Ref": "ApiGatewayDomainName67a385f467"
         },
         "RestApiId": {
-          "Ref": "MyApiWithBasePathSymbols"
+          "Ref": "MyApiWithoutSanitizedBasePath"
         },
         "Stage": {
-          "Ref": "MyApiWithBasePathSymbolsProdStage"
+          "Ref": "MyApiWithoutSanitizedBasePathProdStage"
         }
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
