@@ -502,6 +502,9 @@ class ApiGenerator(object):
         else:
             basepaths = None
 
+        # Boolean to allow/disallow symbols in BasePath property
+        normalize_basepath = self.domain.get("NormalizeBasePath", True)
+
         basepath_resource_list = []
 
         if basepaths is None:
@@ -513,8 +516,11 @@ class ApiGenerator(object):
             basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
             basepath_resource_list.extend([basepath_mapping])
         else:
-            for path in basepaths:
-                path = "".join(e for e in path if e.isalnum())
+            for basepath in basepaths:
+                # Remove possible leading and trailing '/' because a base path may only
+                # contain letters, numbers, and one of "$-_.+!*'()"
+                path = "".join(e for e in basepath if e.isalnum())
+                basepath = path if normalize_basepath else basepath
                 logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
                 basepath_mapping = ApiGatewayBasePathMapping(
                     logical_id, attributes=self.passthrough_resource_attributes
@@ -522,7 +528,7 @@ class ApiGenerator(object):
                 basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
                 basepath_mapping.RestApiId = ref(rest_api.logical_id)
                 basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
-                basepath_mapping.BasePath = path
+                basepath_mapping.BasePath = basepath
                 basepath_resource_list.extend([basepath_mapping])
 
         # Create the Route53 RecordSetGroup resource
