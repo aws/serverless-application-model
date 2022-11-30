@@ -62,6 +62,3 @@ class TestBasicLayerVersion(BaseTest):
         tag = next(tag for tag in tags if tag["key"] == key)
         self.assertIsNotNone(tag)
         self.assertEqual(tag["value"], value)
-
-    def _verify_role_path_presence(self, RolePath, key, value):
-        print("")
