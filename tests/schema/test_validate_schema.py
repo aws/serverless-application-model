@@ -77,7 +77,10 @@ class TestValidateSchema(TestCase):
     @parameterized.expand(itertools.product(SCHEMA_VALIDATION_TESTS))
     def test_validate_schema(self, testcase):
         obj = json.loads(to_json(Path(testcase).read_bytes()))
-        validate(obj, schema=SCHEMA)
+        try:
+            validate(obj, schema=SCHEMA)
+        except ValidationError as e:
+            raise TypeError(f"Template {testcase} does not validate against samtranslator/schema/schema.json JSON schema") from e
 
     @parameterized.expand(
         [
