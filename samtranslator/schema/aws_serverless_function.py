@@ -355,6 +355,7 @@ class MSKEventProperties(BaseModel):
     StartingPosition: PassThrough = mskeventproperties("StartingPosition")
     Stream: PassThrough = mskeventproperties("Stream")
     Topics: PassThrough = mskeventproperties("Topics")
+    SourceAccessConfigurations: Optional[PassThrough]  # TODO: update docs when live
 
 
 class MSKEvent(BaseModel):

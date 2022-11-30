@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters: {}
+
+Resources:
+  MyMskStreamProcessor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs12.x
+      Handler: index.handler
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Events:
+        MyMskEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Sub arn:${AWS::Partition}:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            Topics:
+            - MyDummyTestTopic
+            ConsumerGroupId: consumergroup1
+            SourceAccessConfigurations: This should be a list
