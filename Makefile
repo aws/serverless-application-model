@@ -6,7 +6,7 @@ init:
 	pip install -e '.[dev]'
 
 test:
-	AWS_DEFAULT_REGION=us-east-1 pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n 4 tests/*
+	AWS_DEFAULT_REGION=us-east-1 pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n auto tests/*
 
 test-fast:
 	pytest -x --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n auto tests/*
