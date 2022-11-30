@@ -127,6 +127,7 @@ class Route53(BaseModel):
 
 class Domain(BaseModel):
     BasePath: Optional[PassThrough] = domain("BasePath")
+    NormalizeBasePath: Optional[bool]  # TODO: Add documentation for this property
     CertificateArn: PassThrough = domain("CertificateArn")
     DomainName: PassThrough = domain("DomainName")
     EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE"]]] = domain("EndpointConfiguration")
