@@ -726,9 +726,9 @@ class Api(PushEventSource):
         partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
         uri = _build_apigw_integration_uri(function, partition)  # type: ignore[no-untyped-call]
 
-        editor = SwaggerEditor(swagger_body)  # type: ignore[no-untyped-call]
+        editor = SwaggerEditor(swagger_body)
 
-        if editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined, no-untyped-call]
+        if editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined]
             # Cannot add the Lambda Integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
@@ -1232,7 +1232,7 @@ class HttpApi(PushEventSource):
 
         editor = OpenApiEditor(open_api_body)
 
-        if manage_swagger and editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined, no-untyped-call]
+        if manage_swagger and editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined]
             # Cannot add the Lambda Integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,

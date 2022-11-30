@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: lambda-dynamodb
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub ${AWS::StackName}-StateMachine
+      Definition:
+        StartAt: Start
+        States:
+          Start:
+            Type: Pass
+            Next: TaskState
+          TaskState:
+            Comment: Stackery creates an attachment point for each 'Task' state
+            Type: Task
+            Next: Done
+            Resource: someresource
+            Parameters:
+              FunctionName: ${FunctionArn}
+              Payload.$: $
+          Done:
+            Type: Pass
+            End: true
+      Logging:
+        Level: ALL
+        IncludeExecutionData: true
+        Destinations:
+        - CloudWatchLogsLogGroup:
+            LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+      Policies:
+      - AWSXrayWriteOnlyAccess
+      - Statement:
+        - Effect: Allow
+          Action:
+          - logs:CreateLogDelivery
+          - logs:GetLogDelivery
+          - logs:UpdateLogDelivery
+          - logs:DeleteLogDelivery
+          - logs:ListLogDeliveries
+          - logs:PutResourcePolicy
+          - logs:DescribeResourcePolicies
+          - logs:DescribeLogGroups
+          Resource: '*'
+      - LambdaInvokePolicy:
+          FunctionName: !Ref Function
+      Tracing:
+        Enabled: true
+      Type: STANDARD
+      DefinitionSubstitutions:
+        FunctionArn: !GetAtt Function.Arn
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-Function
+      Description: !Sub
+      - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+      - ResourceName: Function
+      CodeUri: s3://src/Function
+      Handler: index.handler
+      Runtime: nodejs14.x
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+      - AWSXrayWriteOnlyAccess

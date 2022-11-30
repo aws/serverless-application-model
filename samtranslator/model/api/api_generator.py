@@ -17,7 +17,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, InvalidTemplateException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.schema.common import PassThrough
@@ -28,6 +28,7 @@ from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)
@@ -321,7 +322,7 @@ class ApiGenerator(object):
             raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
-        editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
+        editor = SwaggerEditor(self.definition_body)
         editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)  # type: ignore[no-untyped-call]
         self.definition_body = editor.swagger
 
@@ -643,7 +644,7 @@ class ApiGenerator(object):
         else:
             raise InvalidResourceException(self.logical_id, INVALID_ERROR)
 
-        if not SwaggerEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
+        if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Cors configuration because "
@@ -658,7 +659,7 @@ class ApiGenerator(object):
                 "'AllowOrigin' is \"'*'\" or not set",
             )
 
-        editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
+        editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
             try:
                 editor.add_cors(  # type: ignore[no-untyped-call]
@@ -687,7 +688,7 @@ class ApiGenerator(object):
         if self.binary_media and not self.definition_body:
             return
 
-        editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
+        editor = SwaggerEditor(self.definition_body)
         editor.add_binary_media_types(self.binary_media)  # type: ignore[no-untyped-call]
 
         # Assign the Swagger back to template
@@ -710,13 +711,13 @@ class ApiGenerator(object):
         if not all(key in AuthProperties._fields for key in self.auth.keys()):
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
 
-        if not SwaggerEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
+        if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Auth configuration because "
                 "'DefinitionBody' does not contain a valid Swagger definition.",
             )
-        swagger_editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
+        swagger_editor = SwaggerEditor(self.definition_body)
         auth_properties = AuthProperties(**self.auth)
         authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.DefaultAuthorizer)  # type: ignore[no-untyped-call]
 
@@ -730,8 +731,8 @@ class ApiGenerator(object):
             )
 
         if auth_properties.ApiKeyRequired:
-            swagger_editor.add_apikey_security_definition()  # type: ignore[no-untyped-call]
-            self._set_default_apikey_required(swagger_editor)  # type: ignore[no-untyped-call]
+            swagger_editor.add_apikey_security_definition()
+            self._set_default_apikey_required(swagger_editor)
 
         if auth_properties.ResourcePolicy:
             SwaggerEditor.validate_is_dict(
@@ -945,14 +946,14 @@ class ApiGenerator(object):
                         ),
                     )
 
-        if not SwaggerEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
+        if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Auth configuration because "
                 "'DefinitionBody' does not contain a valid Swagger definition.",
             )
 
-        swagger_editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
+        swagger_editor = SwaggerEditor(self.definition_body)
 
         # The dicts below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
         gateway_responses = Py27Dict()
@@ -991,7 +992,7 @@ class ApiGenerator(object):
                 self.logical_id, "Models works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
-        if not SwaggerEditor.is_valid(self.definition_body):  # type: ignore[no-untyped-call]
+        if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Models definitions because "
@@ -1001,7 +1002,7 @@ class ApiGenerator(object):
         if not all(isinstance(model, dict) for model in self.models.values()):
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Models' property")
 
-        swagger_editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
+        swagger_editor = SwaggerEditor(self.definition_body)
         swagger_editor.add_models(self.models)  # type: ignore[no-untyped-call]
 
         # Assign the Swagger back to template
@@ -1022,7 +1023,7 @@ class ApiGenerator(object):
             self.open_api_version = definition_body.get("openapi")
 
         if self.open_api_version and SwaggerEditor.safe_compare_regex_with_string(
-            SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version
+            SwaggerEditor._OPENAPI_VERSION_3_REGEX, self.open_api_version
         ):
             if definition_body.get("securityDefinitions"):
                 components = definition_body.get("components", Py27Dict())
@@ -1067,20 +1068,16 @@ class ApiGenerator(object):
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
-                                SwaggerEditor.validate_is_dict(
-                                    field_val,
-                                    "Value of responses in options method for path {} must be a "
-                                    "dictionary according to Swagger spec.".format(path),
-                                )
-                                response_200 = field_val.get("200")
-                                if not response_200:
-                                    continue
-                                SwaggerEditor.validate_is_dict(
-                                    response_200,
-                                    "Value of responses.200 in options method for path {} must be a "
-                                    "dictionary according to Swagger spec.".format(path),
-                                )
-                                response_200_headers = response_200.get("headers")
+                                try:
+                                    response_200_headers = dict_deep_get(field_val, "200.headers")
+                                except InvalidValueType as ex:
+                                    raise InvalidDocumentException(
+                                        [
+                                            InvalidTemplateException(
+                                                f"Invalid responses in options method for path {path}: {str(ex)}.",
+                                            )
+                                        ]
+                                    ) from ex
                                 if not response_200_headers:
                                     continue
                                 SwaggerEditor.validate_is_dict(
@@ -1211,7 +1208,7 @@ class ApiGenerator(object):
                 add_default_auth_to_preflight=add_default_auth_to_preflight,
             )
 
-    def _set_default_apikey_required(self, swagger_editor):  # type: ignore[no-untyped-def]
+    def _set_default_apikey_required(self, swagger_editor: SwaggerEditor) -> None:
         for path in swagger_editor.iter_on_path():
             swagger_editor.set_path_default_apikey_required(path)
 
