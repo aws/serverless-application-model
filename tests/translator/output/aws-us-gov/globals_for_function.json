@@ -37,6 +37,9 @@
           ]
         },
         "Runtime": "nodejs12.x",
+        "SnapStart": {
+          "ApplyOn": "None"
+        },
         "Tags": [
           {
             "Key": "lambda:createdBy",
@@ -165,6 +168,9 @@
           ]
         },
         "Runtime": "python2.7",
+        "SnapStart": {
+          "ApplyOn": "PublishedVersions"
+        },
         "Tags": [
           {
             "Key": "lambda:createdBy",
@@ -197,7 +203,7 @@
         },
         "FunctionVersion": {
           "Fn::GetAtt": [
-            "MinimalFunctionVersion0a06fc8fb1",
+            "MinimalFunctionVersione7c6f56e4d",
             "Version"
           ]
         },
@@ -242,7 +248,7 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "MinimalFunctionVersion0a06fc8fb1": {
+    "MinimalFunctionVersione7c6f56e4d": {
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Optional, Any, Dict, Union, List
+from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop, DictStrAny, Ref
 
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
@@ -47,17 +47,17 @@ sqssubscription = get_prop("sam-property-function-sqssubscriptionobject")
 
 
 class ResourcePolicy(BaseModel):
-    AwsAccountBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountBlacklist")
-    AwsAccountWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountWhitelist")
-    CustomStatements: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("CustomStatements")
-    IntrinsicVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcBlacklist")
-    IntrinsicVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcWhitelist")
-    IntrinsicVpceBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceBlacklist")
-    IntrinsicVpceWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceWhitelist")
-    IpRangeBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeBlacklist")
-    IpRangeWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeWhitelist")
-    SourceVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcBlacklist")
-    SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcWhitelist")
+    AwsAccountBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountBlacklist")
+    AwsAccountWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountWhitelist")
+    CustomStatements: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("CustomStatements")
+    IntrinsicVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcBlacklist")
+    IntrinsicVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcWhitelist")
+    IntrinsicVpceBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceBlacklist")
+    IntrinsicVpceWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceWhitelist")
+    IpRangeBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeBlacklist")
+    IpRangeWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeWhitelist")
+    SourceVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcBlacklist")
+    SourceVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcWhitelist")
 
 
 class CodeUri(BaseModel):
@@ -72,7 +72,7 @@ class Hooks(BaseModel):
 
 
 class DeploymentPreference(BaseModel):
-    Alarms: Optional[SamIntrinsicable[List[Dict[str, Any]]]] = deploymentpreference("Alarms")
+    Alarms: Optional[SamIntrinsicable[List[DictStrAny]]] = deploymentpreference("Alarms")
     Enabled: Optional[SamIntrinsicable[bool]] = deploymentpreference("Enabled")
     Hooks: Optional[Hooks] = deploymentpreference("Hooks")
     PassthroughCondition: Optional[SamIntrinsicable[bool]] = deploymentpreference("PassthroughCondition")
@@ -226,7 +226,7 @@ class ApiEventProperties(BaseModel):
     Path: str = apieventproperties("Path")
     RequestModel: Optional[RequestModel] = apieventproperties("RequestModel")
     RequestParameters: Optional[Union[str, RequestParameters]] = apieventproperties("RequestParameters")
-    RestApiId: Optional[SamIntrinsicable[str]] = apieventproperties("RestApiId")
+    RestApiId: Optional[Union[str, Ref]] = apieventproperties("RestApiId")
 
 
 class ApiEvent(BaseModel):
@@ -428,7 +428,7 @@ MemorySize = Optional[PassThrough]
 Timeout = Optional[PassThrough]
 VpcConfig = Optional[PassThrough]
 Environment = Optional[PassThrough]
-Tags = Optional[Dict[str, Any]]
+Tags = Optional[DictStrAny]
 Tracing = Optional[SamIntrinsicable[Literal["Active", "PassThrough"]]]
 KmsKeyArn = Optional[PassThrough]
 Layers = Optional[PassThrough]
@@ -437,9 +437,10 @@ RolePath = Optional[PassThrough]  # TODO: update docs when live
 PermissionsBoundary = Optional[PassThrough]
 ReservedConcurrentExecutions = Optional[PassThrough]
 ProvisionedConcurrencyConfig = Optional[PassThrough]
-AssumeRolePolicyDocument = Optional[Dict[str, Any]]
+AssumeRolePolicyDocument = Optional[DictStrAny]
 Architectures = Optional[PassThrough]
 EphemeralStorage = Optional[PassThrough]
+SnapStart = Optional[PassThrough]  # TODO: check the type
 
 
 class Properties(BaseModel):
@@ -491,16 +492,17 @@ class Properties(BaseModel):
     Layers: Optional[Layers] = prop("Layers")
     MemorySize: Optional[MemorySize] = prop("MemorySize")
     PackageType: Optional[PassThrough] = prop("PackageType")
-    RolePath: Optional[RolePath]
+    RolePath: Optional[RolePath]  # TODO: Add to docs
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
-    Policies: Optional[SamIntrinsicable[Union[str, List[SamIntrinsicable[str]]]]] = prop("Policies")
+    Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = prop("Policies")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
     Runtime: Optional[Runtime] = prop("Runtime")
+    SnapStart: Optional[SnapStart]  # TODO: add prop and types
     Tags: Optional[Tags] = prop("Tags")
     Timeout: Optional[Timeout] = prop("Timeout")
-    Tracing: Optional[Tracing] = prop("Timeout")
+    Tracing: Optional[Tracing] = prop("Tracing")
     VersionDescription: Optional[PassThrough] = prop("VersionDescription")
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
 
@@ -529,6 +531,7 @@ class Globals(BaseModel):
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Architectures: Optional[Architectures] = prop("Architectures")
     EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
+    SnapStart: Optional[SnapStart]  # TODO: add prop
 
 
 class Resource(BaseModel):

@@ -27,6 +27,7 @@ class LambdaFunction(Resource):
         "CodeSigningConfigArn": PropertyType(False, is_str()),
         "ImageConfig": PropertyType(False, is_type(dict)),
         "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "SnapStart": PropertyType(False, is_type(dict)),
         "EphemeralStorage": PropertyType(False, is_type(dict)),
     }
 

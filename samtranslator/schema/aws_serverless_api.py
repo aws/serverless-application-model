@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Optional, Any, Dict, Union, List
+from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop, DictStrAny
 
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 cognitoauthorizeridentity = get_prop("sam-property-api-cognitoauthorizationidentity")
@@ -24,17 +24,17 @@ properties = get_prop("sam-resource-api")
 
 
 class ResourcePolicy(BaseModel):
-    AwsAccountBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountBlacklist")
-    AwsAccountWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountWhitelist")
-    CustomStatements: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("CustomStatements")
-    IntrinsicVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcBlacklist")
-    IntrinsicVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcWhitelist")
-    IntrinsicVpceBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceBlacklist")
-    IntrinsicVpceWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceWhitelist")
-    IpRangeBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeBlacklist")
-    IpRangeWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeWhitelist")
-    SourceVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcBlacklist")
-    SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcWhitelist")
+    AwsAccountBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountBlacklist")
+    AwsAccountWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountWhitelist")
+    CustomStatements: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("CustomStatements")
+    IntrinsicVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcBlacklist")
+    IntrinsicVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcWhitelist")
+    IntrinsicVpceBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceBlacklist")
+    IntrinsicVpceWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceWhitelist")
+    IpRangeBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeBlacklist")
+    IpRangeWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeWhitelist")
+    SourceVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcBlacklist")
+    SourceVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcWhitelist")
 
 
 class CognitoAuthorizerIdentity(BaseModel):
@@ -157,7 +157,7 @@ MethodSettings = Optional[PassThrough]
 BinaryMediaTypes = Optional[PassThrough]
 MinimumCompressionSize = Optional[PassThrough]
 CorsType = Optional[SamIntrinsicable[Union[str, Cors]]]
-GatewayResponses = Optional[Dict[str, Any]]
+GatewayResponses = Optional[DictStrAny]
 AccessLogSetting = Optional[PassThrough]
 CanarySetting = Optional[PassThrough]
 TracingEnabled = Optional[PassThrough]
@@ -173,7 +173,7 @@ class Properties(BaseModel):
     CacheClusterSize: Optional[CacheClusterSize] = properties("CacheClusterSize")
     CanarySetting: Optional[CanarySetting] = properties("CanarySetting")
     Cors: Optional[CorsType] = properties("Cors")
-    DefinitionBody: Optional[Dict[str, Any]] = properties("DefinitionBody")
+    DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
     DefinitionUri: Optional[DefinitionUriType] = properties("DefinitionUri")
     Description: Optional[PassThrough] = properties("Description")
     DisableExecuteApiEndpoint: Optional[PassThrough] = properties("DisableExecuteApiEndpoint")
@@ -184,11 +184,11 @@ class Properties(BaseModel):
     MethodSettings: Optional[MethodSettings] = properties("MethodSettings")
     MinimumCompressionSize: Optional[MinimumCompressionSize] = properties("MinimumCompressionSize")
     Mode: Optional[PassThrough] = properties("Mode")
-    Models: Optional[Dict[str, Any]] = properties("Models")
+    Models: Optional[DictStrAny] = properties("Models")
     Name: Optional[Name] = properties("Name")
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
     StageName: SamIntrinsicable[str] = properties("StageName")
-    Tags: Optional[Dict[str, Any]] = properties("Tags")
+    Tags: Optional[DictStrAny] = properties("Tags")
     TracingEnabled: Optional[TracingEnabled] = properties("TracingEnabled")
     Variables: Optional[Variables] = properties("Variables")
 

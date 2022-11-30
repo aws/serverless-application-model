@@ -1,8 +1,8 @@
 ---
 name: Bug report
 about: Create an issue to report a bug for the SAM Translator
-title: "Bug: TITLE"
-labels: ['type/bug', 'stage/needs-triage']
+title: 'Bug: TITLE'
+labels: stage/needs-triage, type/bug
 assignees: ''
 
 ---

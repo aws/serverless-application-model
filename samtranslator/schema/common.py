@@ -17,6 +17,8 @@ SamIntrinsic = Dict[str, Any]
 # TODO: Get rid of this in favor of proper types
 Unknown = Optional[Any]
 
+DictStrAny = Dict[str, Any]
+
 LenientBaseModel = pydantic.BaseModel
 
 _DOCS = json.loads(Path("samtranslator", "schema", "docs.json").read_bytes())
@@ -40,3 +42,8 @@ def _get_prop(stem: str, name: str) -> Any:
 class BaseModel(LenientBaseModel):
     class Config:
         extra = Extra.forbid
+
+
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html
+class Ref(BaseModel):
+    Ref: str
