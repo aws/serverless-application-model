@@ -203,7 +203,7 @@ To add new properties, do the following:
     bin/parse_docs.py aws-sam-developer-guide/doc_source > samtranslator/schema/docs.json
     ```
 
-4. Run `make schema`.
+3. Run `make schema`.
 
 Profiling
 ---------
