@@ -44,6 +44,7 @@ class StateMachineGenerator(object):
         events,
         event_resources,
         event_resolver,
+        role_path=None,
         tags=None,
         resource_attributes=None,
         passthrough_resource_attributes=None,
@@ -63,6 +64,7 @@ class StateMachineGenerator(object):
         :param permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
         :param definition_substitutions: Variable-to-value mappings to be replaced in the State Machine definition
         :param role: Role ARN to use for the execution role
+        :param role_path: The file path of the execution role
         :param state_machine_type: Type of the State Machine
         :param tracing: Tracing configuration for the State Machine
         :param events: List of event sources for the State Machine
@@ -86,6 +88,7 @@ class StateMachineGenerator(object):
         self.permissions_boundary = permissions_boundary
         self.definition_substitutions = definition_substitutions
         self.role = role
+        self.role_path = role_path
         self.type = state_machine_type
         self.tracing = tracing
         self.events = events
@@ -220,6 +223,7 @@ class StateMachineGenerator(object):
 
         execution_role = construct_role_for_resource(
             resource_logical_id=self.logical_id,
+            role_path=self.role_path,
             attributes=self.passthrough_resource_attributes,
             managed_policy_map=self.managed_policy_map,
             assume_role_policy_document=IAMRolePolicies.stepfunctions_assume_role_policy(),  # type: ignore[no-untyped-call]
