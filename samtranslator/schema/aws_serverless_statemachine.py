@@ -145,6 +145,7 @@ class Properties(BaseModel):
     PermissionsBoundary: Optional[PassThrough] = properties("PermissionsBoundary")
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = properties("Policies")
     Role: Optional[PassThrough] = properties("Role")
+    RolePath: Optional[PassThrough]  # TODO: Add docs
     Tags: Optional[DictStrAny] = properties("Tags")
     Tracing: Optional[PassThrough] = properties("Tracing")
     Type: Optional[PassThrough] = properties("Type")

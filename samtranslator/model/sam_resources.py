@@ -1691,6 +1691,7 @@ class SamStateMachine(SamResourceMacro):
         "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
         "Logging": PropertyType(False, is_type(dict)),
         "Role": PropertyType(False, is_str()),
+        "RolePath": PassThroughProperty(False),
         "DefinitionSubstitutions": PropertyType(False, is_type(dict)),
         "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
         "Name": PropertyType(False, is_str()),
@@ -1705,6 +1706,7 @@ class SamStateMachine(SamResourceMacro):
     DefinitionUri: Optional[Intrinsicable[str]]
     Logging: Optional[Dict[str, Any]]
     Role: Optional[Intrinsicable[str]]
+    RolePath: Optional[PassThrough]
     DefinitionSubstitutions: Optional[Dict[str, Any]]
     Events: Optional[Dict[str, Any]]
     Name: Optional[Intrinsicable[str]]
@@ -1738,6 +1740,7 @@ class SamStateMachine(SamResourceMacro):
             permissions_boundary=self.PermissionsBoundary,
             definition_substitutions=self.DefinitionSubstitutions,
             role=self.Role,
+            role_path=self.RolePath,
             state_machine_type=self.Type,
             tracing=self.Tracing,
             events=self.Events,
