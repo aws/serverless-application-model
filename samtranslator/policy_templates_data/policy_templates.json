@@ -1668,7 +1668,7 @@
       "Description": "Gives access to a parameter to load secrets in this account. If not using default key, KMSDecryptPolicy will also be needed.",
       "Parameters": {
         "ParameterName": {
-          "Description":"The name of the secret stored in SSM in your account."
+          "Description":"The name of the secret stored in SSM in your account. Name doesn't contain a leading slash."
         }
       },
       "Definition": {
@@ -1690,6 +1690,43 @@
             "Resource": {
               "Fn::Sub": [
                 "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${parameterName}",
+                {
+                  "parameterName": {
+                    "Ref": "ParameterName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SanitizedSSMParameterReadPolicy": {
+      "Description": "Gives access to a parameter to load secrets in this account. If not using default key, KMSDecryptPolicy will also be needed.",
+      "Parameters": {
+        "ParameterName": {
+          "Description":"The name of the secret stored in SSM in your account. Name contains a leading slash."
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:DescribeParameters"
+            ],
+            "Resource": "*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:GetParameters",
+              "ssm:GetParameter",
+              "ssm:GetParametersByPath"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${parameterName}",
                 {
                   "parameterName": {
                     "Ref": "ParameterName"
