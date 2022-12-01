@@ -4223,6 +4223,11 @@
           "title": "State",
           "description": "The state of the rule\\.  \n*Accepted values:* `DISABLED | ENABLED`  \nSpecify either the `Enabled` or `State` property, but not both\\.\n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`State`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-state) property of an `AWS::Events::Rule` resource\\.",
           "markdownDescription": "The state of the rule\\.  \n*Accepted values:* `DISABLED | ENABLED`  \nSpecify either the `Enabled` or `State` property, but not both\\.\n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`State`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-state) property of an `AWS::Events::Rule` resource\\."
+        },
+        "Target": {
+          "title": "Target",
+          "description": "Configures the AWS resource that EventBridge invokes when a rule is triggered. Currently it only supports `Id` property\\.",
+          "markdownDescription": "Configures the AWS resource that EventBridge invokes when a rule is triggered. Currently it only supports `Id` property\\."
         }
       },
       "additionalProperties": false
@@ -4395,6 +4400,11 @@
           "title": "Pattern",
           "description": "Describes which events are routed to the specified target\\. For more information, see [Events and Event Patterns in EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [EventPattern](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventPattern`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern) property of an `AWS::Events::Rule` resource\\.",
           "markdownDescription": "Describes which events are routed to the specified target\\. For more information, see [Events and Event Patterns in EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [EventPattern](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventPattern`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern) property of an `AWS::Events::Rule` resource\\."
+        },
+        "Target": {
+          "title": "Target",
+          "description": "Configures the AWS resource that EventBridge invokes when a rule is triggered. Currently it only supports `Id` property\\.",
+          "markdownDescription": "Configures the AWS resource that EventBridge invokes when a rule is triggered. Currently it only supports `Id` property\\."
         }
       },
       "additionalProperties": false
@@ -4467,6 +4477,11 @@
           "title": "RetryPolicy",
           "description": "A `RetryPolicy` object that includes information about the retry policy settings\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [RetryPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RetryPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy) property of the `AWS::Events::Rule` `Target` data type\\.",
           "markdownDescription": "A `RetryPolicy` object that includes information about the retry policy settings\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [RetryPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RetryPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy) property of the `AWS::Events::Rule` `Target` data type\\."
+        },
+        "Target": {
+          "title": "Target",
+          "description": "Configures the AWS resource that EventBridge invokes when a rule is triggered. Currently it only supports `Id` property\\.",
+          "markdownDescription": "Configures the AWS resource that EventBridge invokes when a rule is triggered. Currently it only supports `Id` property\\."
         }
       },
       "additionalProperties": false
