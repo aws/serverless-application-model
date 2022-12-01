@@ -175,5 +175,5 @@ Resources:
       - Route53ChangeResourceRecordSetsPolicy:
           HostedZoneId: test
 
-      - SanitizedSSMParameterReadPolicy:
+      - SSMParameterWithSlashPrefixReadPolicy:
           ParameterName: /name

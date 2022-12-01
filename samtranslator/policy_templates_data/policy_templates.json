@@ -1701,7 +1701,7 @@
         ]
       }
     },
-    "SanitizedSSMParameterReadPolicy": {
+    "SSMParameterWithSlashPrefixReadPolicy": {
       "Description": "Gives access to a parameter to load secrets in this account. If not using default key, KMSDecryptPolicy will also be needed.",
       "Parameters": {
         "ParameterName": {
