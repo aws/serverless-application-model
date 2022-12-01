@@ -91,7 +91,7 @@ class Schedule(EventSource):
         "Description": PropertyType(False, is_str()),
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "RetryPolicy": PropertyType(False, is_type(dict)),
-        "Target": PropertyType(False, is_type(dict)),
+        "Target": Property(False, is_type(dict)),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
@@ -179,7 +179,7 @@ class CloudWatchEvent(EventSource):
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "RetryPolicy": PropertyType(False, is_type(dict)),
         "State": PropertyType(False, is_str()),
-        "Target": PropertyType(False, is_type(dict)),
+        "Target": Property(False, is_type(dict)),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
