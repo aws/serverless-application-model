@@ -25,6 +25,10 @@ class DeadLetterConfig(BaseModel):
     Type: Optional[Literal["SQS"]] = deadletterconfig("Type")
 
 
+class ScheduleTarget(BaseModel):
+    Id: PassThrough  # TODO: Add docs
+
+
 class ScheduleEventProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig] = scheduleeventproperties("DeadLetterConfig")
     Description: Optional[PassThrough] = scheduleeventproperties("Description")
@@ -34,7 +38,7 @@ class ScheduleEventProperties(BaseModel):
     RetryPolicy: Optional[PassThrough] = scheduleeventproperties("RetryPolicy")
     Schedule: Optional[PassThrough] = scheduleeventproperties("Schedule")
     State: Optional[PassThrough] = scheduleeventproperties("State")
-    Target: Optional[PassThrough]  # TODO: Add docs
+    Target: Optional[ScheduleTarget]  # TODO: Add docs
 
 
 class ScheduleEvent(BaseModel):
@@ -91,6 +95,10 @@ class CloudWatchEvent(BaseModel):
     Properties: CloudWatchEventProperties = event("Properties")
 
 
+class EventBridgeRuleTarget(BaseModel):
+    Id: PassThrough  # TODO: Add docs
+
+
 class EventBridgeRuleEventProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig] = eventbridgeruleeventproperties("DeadLetterConfig")
     EventBusName: Optional[PassThrough] = eventbridgeruleeventproperties("EventBusName")
@@ -98,7 +106,7 @@ class EventBridgeRuleEventProperties(BaseModel):
     InputPath: Optional[PassThrough] = eventbridgeruleeventproperties("InputPath")
     Pattern: Optional[PassThrough] = eventbridgeruleeventproperties("Pattern")
     RetryPolicy: Optional[PassThrough] = eventbridgeruleeventproperties("RetryPolicy")
-    Target: Optional[PassThrough]  # TODO: Add docs
+    Target: Optional[EventBridgeRuleTarget]  # TODO: Add docs
 
 
 class EventBridgeRuleEvent(BaseModel):
