@@ -34,7 +34,7 @@ class ScheduleEventProperties(BaseModel):
     RetryPolicy: Optional[PassThrough] = scheduleeventproperties("RetryPolicy")
     Schedule: Optional[PassThrough] = scheduleeventproperties("Schedule")
     State: Optional[PassThrough] = scheduleeventproperties("State")
-    Target: Optional[PassThrough] = scheduleeventproperties("Target")
+    Target: Optional[PassThrough]  # TODO: Add docs
 
 
 class ScheduleEvent(BaseModel):
@@ -84,7 +84,6 @@ class CloudWatchEventProperties(BaseModel):
     Input: Optional[PassThrough] = cloudwatcheventproperties("Input")
     InputPath: Optional[PassThrough] = cloudwatcheventproperties("InputPath")
     Pattern: Optional[PassThrough] = cloudwatcheventproperties("Pattern")
-    Target: Optional[PassThrough] = scheduleeventproperties("Target")
 
 
 class CloudWatchEvent(BaseModel):
@@ -99,7 +98,7 @@ class EventBridgeRuleEventProperties(BaseModel):
     InputPath: Optional[PassThrough] = eventbridgeruleeventproperties("InputPath")
     Pattern: Optional[PassThrough] = eventbridgeruleeventproperties("Pattern")
     RetryPolicy: Optional[PassThrough] = eventbridgeruleeventproperties("RetryPolicy")
-    Target: Optional[PassThrough] = scheduleeventproperties("Target")
+    Target: Optional[PassThrough]  # TODO: Add docs
 
 
 class EventBridgeRuleEvent(BaseModel):
