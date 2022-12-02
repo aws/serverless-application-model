@@ -1,2 +1,4 @@
 boto3>=1.19.5,==1.*
 jsonschema<5,>=3.2  # TODO: evaluate risk of removing jsonschema 3.x support
+pydantic~=1.9.1
+typing_extensions~=4.4.0 # 3.7 doesn't have Literal
