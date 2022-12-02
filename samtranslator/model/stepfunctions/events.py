@@ -28,6 +28,8 @@ class EventSource(ResourceMacro):
     # TODO: Make `EventSource` an abstract class and not giving `principal` initial value.
     principal: str = None  # type: ignore
 
+    Target: Optional[Dict[str, str]]
+
     def _generate_logical_id(self, prefix, suffix, resource_type):  # type: ignore[no-untyped-def]
         """Helper utility to generate a logicial ID for a new resource
 
@@ -89,6 +91,7 @@ class Schedule(EventSource):
         "Description": PropertyType(False, is_str()),
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "RetryPolicy": PropertyType(False, is_type(dict)),
+        "Target": Property(False, is_type(dict)),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
@@ -142,9 +145,12 @@ class Schedule(EventSource):
         :returns: the Target property
         :rtype: dict
         """
+        target_id = (
+            self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "StepFunctionsTarget"
+        )
         target = {
             "Arn": resource.get_runtime_attr("arn"),
-            "Id": self.logical_id + "StepFunctionsTarget",
+            "Id": target_id,
             "RoleArn": role.get_runtime_attr("arn"),
         }
         if self.Input is not None:  # type: ignore[attr-defined]
@@ -173,6 +179,7 @@ class CloudWatchEvent(EventSource):
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "RetryPolicy": PropertyType(False, is_type(dict)),
         "State": PropertyType(False, is_str()),
+        "Target": Property(False, is_type(dict)),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
@@ -221,9 +228,12 @@ class CloudWatchEvent(EventSource):
         :returns: the Target property
         :rtype: dict
         """
+        target_id = (
+            self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "StepFunctionsTarget"
+        )
         target = {
             "Arn": resource.get_runtime_attr("arn"),
-            "Id": self.logical_id + "StepFunctionsTarget",
+            "Id": target_id,
             "RoleArn": role.get_runtime_attr("arn"),
         }
         if self.Input is not None:  # type: ignore[attr-defined]

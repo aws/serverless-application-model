@@ -1,0 +1,212 @@
+{
+  "Resources": {
+    "StateMachineFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  console.log(\"Hello world!\")\n};\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "StateMachineFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "StateMachineFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachineIdWith30Characters": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"MyLambdaState\",",
+              "    \"States\": {",
+              "        \"MyLambdaState\": {",
+              "            \"End\": true,",
+              "            \"Resource\": \"${definition_substitution_1}\",",
+              "            \"Type\": \"Task\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "DefinitionSubstitutions": {
+          "definition_substitution_1": {
+            "Fn::GetAtt": [
+              "StateMachineFunction",
+              "Arn"
+            ]
+          }
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StateMachineIdWith30CharactersRole",
+            "Arn"
+          ]
+        },
+        "StateMachineType": "STANDARD",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "StateMachineIdWith30CharactersEventIdWith23Characters": {
+      "Properties": {
+        "Description": "test schedule",
+        "Name": "TestSchedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "State": "DISABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "StateMachineIdWith30Characters"
+            },
+            "Id": "MyTargetID",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "StateMachineIdWith30CharactersEventIdWith23CharactersRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "StateMachineIdWith30CharactersEventIdWith23CharactersRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachineIdWith30Characters"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineIdWith30CharactersEventIdWith23CharactersRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachineIdWith30CharactersRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*",
+                      {
+                        "functionName": {
+                          "Ref": "StateMachineFunction"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineIdWith30CharactersRolePolicy0"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

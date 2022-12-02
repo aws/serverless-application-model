@@ -3018,7 +3018,7 @@
       ],
       "additionalProperties": false
     },
-    "EventBridgeRuleTarget": {
+    "samtranslator__schema__aws_serverless_function__EventBridgeRuleTarget": {
       "title": "EventBridgeRuleTarget",
       "type": "object",
       "properties": {
@@ -3075,7 +3075,7 @@
           "markdownDescription": "The AWS resource that EventBridge invokes when a rule is triggered\\. You can use this property to specify the logical ID of the target\\. If this property is not specified, then AWS SAM generates the logical ID of the target\\.  \n*Type*: [Target](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-target.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Targets`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-targets) property of an `AWS::Events::Rule` resource\\. The AWS SAM version of this property only allows you to specify the logical ID of a single target\\.",
           "allOf": [
             {
-              "$ref": "#/definitions/EventBridgeRuleTarget"
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_function__EventBridgeRuleTarget"
             }
           ]
         }
@@ -4168,6 +4168,16 @@
       },
       "additionalProperties": false
     },
+    "ScheduleTarget": {
+      "title": "ScheduleTarget",
+      "type": "object",
+      "properties": {
+        "Id": {
+          "title": "Id"
+        }
+      },
+      "additionalProperties": false
+    },
     "ScheduleEventProperties": {
       "title": "ScheduleEventProperties",
       "type": "object",
@@ -4217,6 +4227,9 @@
           "title": "State",
           "description": "The state of the rule\\.  \n*Accepted values:* `DISABLED | ENABLED`  \nSpecify either the `Enabled` or `State` property, but not both\\.\n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`State`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-state) property of an `AWS::Events::Rule` resource\\.",
           "markdownDescription": "The state of the rule\\.  \n*Accepted values:* `DISABLED | ENABLED`  \nSpecify either the `Enabled` or `State` property, but not both\\.\n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`State`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-state) property of an `AWS::Events::Rule` resource\\."
+        },
+        "Target": {
+          "$ref": "#/definitions/ScheduleTarget"
         }
       },
       "additionalProperties": false
@@ -4423,6 +4436,16 @@
       ],
       "additionalProperties": false
     },
+    "samtranslator__schema__aws_serverless_statemachine__EventBridgeRuleTarget": {
+      "title": "EventBridgeRuleTarget",
+      "type": "object",
+      "properties": {
+        "Id": {
+          "title": "Id"
+        }
+      },
+      "additionalProperties": false
+    },
     "samtranslator__schema__aws_serverless_statemachine__EventBridgeRuleEventProperties": {
       "title": "EventBridgeRuleEventProperties",
       "type": "object",
@@ -4461,6 +4484,9 @@
           "title": "RetryPolicy",
           "description": "A `RetryPolicy` object that includes information about the retry policy settings\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [RetryPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RetryPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy) property of the `AWS::Events::Rule` `Target` data type\\.",
           "markdownDescription": "A `RetryPolicy` object that includes information about the retry policy settings\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [RetryPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RetryPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy) property of the `AWS::Events::Rule` `Target` data type\\."
+        },
+        "Target": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__EventBridgeRuleTarget"
         }
       },
       "additionalProperties": false
