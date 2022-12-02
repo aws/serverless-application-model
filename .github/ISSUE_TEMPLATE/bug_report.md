@@ -16,7 +16,7 @@ Add the --debug flag to any SAM CLI commands you are running. -->
 
 
 ### Steps to reproduce
-<!-- Provide detailed steps to reproduce the bug. -->
+<!-- Provide detailed steps to reproduce the bug. Include relevant parts of the SAM template. -->
 
 
 ### Observed result
