@@ -12,7 +12,9 @@ from parameterized import parameterized
 
 from samtranslator.yaml_helper import yaml_parse
 
-SCHEMA = json.loads(Path("samtranslator/schema/schema.json").read_bytes())
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+
+SCHEMA = json.loads(PROJECT_ROOT.joinpath("samtranslator/schema/schema.json").read_bytes())
 
 # TODO: Enable (most likely) everything but 'error_*' and 'basic_schema_validation_failure'
 SKIPPED_TESTS = [
@@ -61,12 +63,12 @@ def should_skip_test(s: str) -> bool:
 
 def get_all_test_templates():
     return (
-        list(Path("tests/translator/input").glob("**/*.yaml"))
-        + list(Path("tests/translator/input").glob("**/*.yml"))
-        + list(Path("tests/validator/input").glob("**/*.yaml"))
-        + list(Path("tests/validator/input").glob("**/*.yml"))
-        + list(Path("integration/resources/templates").glob("**/*.yaml"))
-        + list(Path("integration/resources/templates").glob("**/*.yml"))
+        list(Path(PROJECT_ROOT, "tests/translator/input").glob("**/*.yaml"))
+        + list(Path(PROJECT_ROOT, "tests/translator/input").glob("**/*.yml"))
+        + list(Path(PROJECT_ROOT, "tests/validator/input").glob("**/*.yaml"))
+        + list(Path(PROJECT_ROOT, "tests/validator/input").glob("**/*.yml"))
+        + list(Path(PROJECT_ROOT, "integration/resources/templates").glob("**/*.yaml"))
+        + list(Path(PROJECT_ROOT, "integration/resources/templates").glob("**/*.yml"))
     )
 
 
@@ -81,8 +83,8 @@ class TestValidateSchema(TestCase):
 
     @parameterized.expand(
         [
-            "tests/translator/input/error_schema_validation_wrong_property.yaml",
-            "tests/translator/input/error_schema_validation_wrong_type.yaml",
+            (PROJECT_ROOT.joinpath("tests/translator/input/error_schema_validation_wrong_property.yaml"),),
+            (PROJECT_ROOT.joinpath("tests/translator/input/error_schema_validation_wrong_type.yaml"),),
         ]
     )
     def test_validate_schema_error(self, testcase):
