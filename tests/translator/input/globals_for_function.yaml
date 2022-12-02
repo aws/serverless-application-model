@@ -24,6 +24,8 @@ Globals:
     ReservedConcurrentExecutions: 50
     Architectures:
     - x86_64
+    SnapStart:
+      ApplyOn: PublishedVersions
     EphemeralStorage:
       Size: 1024
 
@@ -52,4 +54,6 @@ Resources:
       PermissionsBoundary: arn:aws:1234:iam:boundary/OverridePermissionsBoundary
       Layers:
       - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer2:2
+      SnapStart:
+        ApplyOn: None
       ReservedConcurrentExecutions: 100

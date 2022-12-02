@@ -189,6 +189,22 @@ conventions are best practices that we have learnt over time.
     strong reason to do. You must explain the reason in great detail in
     comments.
 
+## Making schema changes
+
+The AWS SAM specification includes a JSON schema (see https://github.com/aws/serverless-application-model/discussions/2645). All test templates must validate against it.
+
+To add new properties, do the following:
+
+1. Add the property to the relevant resource schema under [`samtranslator/schema`](https://github.com/aws/serverless-application-model/tree/develop/samtranslator/schema) (e.g. [`samtranslator/schema/aws_serverless_function.py`](https://github.com/aws/serverless-application-model/blob/develop/samtranslator/schema/aws_serverless_function.py) for `AWS::Serverless::Function`).
+2. You can leave out the assignement part; it adds documentation to the schema properties. The team will take care of documentation updates. Typically we update documentation by running:
+
+    ```bash
+    git clone https://github.com/awsdocs/aws-sam-developer-guide.git
+    bin/parse_docs.py aws-sam-developer-guide/doc_source > samtranslator/schema/docs.json
+    ```
+
+3. Run `make schema`.
+
 Profiling
 ---------
 

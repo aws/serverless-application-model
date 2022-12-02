@@ -1,4 +1,5 @@
 from unittest.case import skipIf
+from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
 from integration.helpers.common_api import get_policy_statements
 
@@ -12,8 +13,14 @@ from integration.config.service_names import STATE_MACHINE_CWE_CWS
     "StateMachine CweCws is not supported in this testing region",
 )
 class TestStateMachineWithSchedule(BaseTest):
-    def test_state_machine_with_schedule(self):
-        self.create_and_verify_stack("combination/state_machine_with_schedule")
+    @parameterized.expand(
+        [
+            ("combination/state_machine_with_schedule",),
+            ("combination/state_machine_with_schedule_target_id",),
+        ]
+    )
+    def test_state_machine_with_schedule(self, template_file_path):
+        self.create_and_verify_stack(template_file_path)
         outputs = self.get_stack_outputs()
         state_machine_arn = outputs["MyStateMachineArn"]
         schedule_name = outputs["MyScheduleName"]

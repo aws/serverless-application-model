@@ -1,0 +1,35 @@
+%YAML 1.1
+---
+Parameters:
+  SnapStartParam:
+    Type: String
+    Default: None
+
+Resources:
+  SnapStartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      SnapStart:
+        ApplyOn: PublishedVersions
+
+  SnapStartParameterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      SnapStart:
+        ApplyOn: !Ref SnapStartParam
+
+  SnapStartFunctionWithAlias:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      AutoPublishAlias: live
+      SnapStart:
+        ApplyOn: PublishedVersions

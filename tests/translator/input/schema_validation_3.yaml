@@ -1,0 +1,19 @@
+Resources:
+  UnknownType1:
+    Type: AWS::Foo::Bar
+
+  UnknownType2:
+    Type: AWS::Foo::Bar
+    Properties:
+      Turtle: Train
+
+  UnknownType3:
+    Type: Foo::Bar::Egg
+    Properties:
+      Turtle: Train
+
+  UnknownType4:
+    Type: Foo::Bar::Egg
+
+  UnknownType5:
+    Type: Foo::Serverless::Egg

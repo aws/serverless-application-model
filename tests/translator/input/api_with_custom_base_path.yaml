@@ -1,0 +1,66 @@
+Globals:
+  Api:
+    Domain:
+      BasePath: foo-bar
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: Prod
+      Domain:
+        DomainName: MyEdgeDomainName
+        CertificateArn: MyEdgeDomainCert
+        EndpointConfiguration: EDGE
+        BasePath:
+        - foo-too
+        Route53:
+          HostedZoneId:
+            Ref: HostedZoneId
+          IpV6: true
+
+  MyApi2:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: Prod
+      Domain:
+        DomainName: MyEdgeDomainName
+        CertificateArn: MyEdgeDomainCert
+        EndpointConfiguration: EDGE
+        Route53:
+          HostedZoneId:
+            Ref: HostedZoneId
+          IpV6: true
+
+  MyApiWithoutNormalizedBasePath:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: Prod
+      Domain:
+        DomainName: MyEdgeDomainName
+        CertificateArn: MyEdgeDomainCert
+        EndpointConfiguration: EDGE
+        NormalizeBasePath: false
+        Route53:
+          HostedZoneId:
+            Ref: HostedZoneId
+          IpV6: true
+
+  MyApiWithoutNormalizedBasePathWithHyphen:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: Prod
+      Domain:
+        DomainName: MyEdgeDomainName
+        CertificateArn: MyEdgeDomainCert
+        EndpointConfiguration: EDGE
+        NormalizeBasePath: false
+        BasePath:
+        - /foo-too
+        Route53:
+          HostedZoneId:
+            Ref: HostedZoneId
+          IpV6: true

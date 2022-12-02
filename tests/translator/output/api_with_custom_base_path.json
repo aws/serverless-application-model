@@ -1,0 +1,334 @@
+{
+  "Resources": {
+    "ApiGatewayDomainName67a385f467": {
+      "Properties": {
+        "CertificateArn": "MyEdgeDomainCert",
+        "DomainName": "MyEdgeDomainName",
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        }
+      },
+      "Type": "AWS::ApiGateway::DomainName"
+    },
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {}
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApi2": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {}
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApi2Deployment485710cfb3": {
+      "Properties": {
+        "Description": "RestApi deployment id: 485710cfb3e55db206df517b5d277ae94da0bbba",
+        "RestApiId": {
+          "Ref": "MyApi2"
+        }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApi2ProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApi2Deployment485710cfb3"
+        },
+        "RestApiId": {
+          "Ref": "MyApi2"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyApi2foobarBasePathMapping": {
+      "Properties": {
+        "BasePath": "foobar",
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName67a385f467"
+        },
+        "RestApiId": {
+          "Ref": "MyApi2"
+        },
+        "Stage": {
+          "Ref": "MyApi2ProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "MyApiDeployment41cbf3d0f6": {
+      "Properties": {
+        "Description": "RestApi deployment id: 41cbf3d0f6e8f89e71435e382dd230eb600b66a2",
+        "RestApiId": {
+          "Ref": "MyApi"
+        }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment41cbf3d0f6"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyApiWithoutNormalizedBasePath": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {}
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiWithoutNormalizedBasePathDeployment11d19722bb": {
+      "Properties": {
+        "Description": "RestApi deployment id: 11d19722bb8994eaba07f229ab985f06d30c42d6",
+        "RestApiId": {
+          "Ref": "MyApiWithoutNormalizedBasePath"
+        }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiWithoutNormalizedBasePathProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithoutNormalizedBasePathDeployment11d19722bb"
+        },
+        "RestApiId": {
+          "Ref": "MyApiWithoutNormalizedBasePath"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyApiWithoutNormalizedBasePathWithHyphen": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {}
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiWithoutNormalizedBasePathWithHyphenDeployment43b3fbff50": {
+      "Properties": {
+        "Description": "RestApi deployment id: 43b3fbff506a380a3dd89acf64bd0731b1819dd8",
+        "RestApiId": {
+          "Ref": "MyApiWithoutNormalizedBasePathWithHyphen"
+        }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiWithoutNormalizedBasePathWithHyphenProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithoutNormalizedBasePathWithHyphenDeployment43b3fbff50"
+        },
+        "RestApiId": {
+          "Ref": "MyApiWithoutNormalizedBasePathWithHyphen"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyApiWithoutNormalizedBasePathWithHyphenfootooBasePathMapping": {
+      "Properties": {
+        "BasePath": "/foo-too",
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName67a385f467"
+        },
+        "RestApiId": {
+          "Ref": "MyApiWithoutNormalizedBasePathWithHyphen"
+        },
+        "Stage": {
+          "Ref": "MyApiWithoutNormalizedBasePathWithHyphenProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "MyApiWithoutNormalizedBasePathfoobarBasePathMapping": {
+      "Properties": {
+        "BasePath": "foo-bar",
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName67a385f467"
+        },
+        "RestApiId": {
+          "Ref": "MyApiWithoutNormalizedBasePath"
+        },
+        "Stage": {
+          "Ref": "MyApiWithoutNormalizedBasePathProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "MyApifootooBasePathMapping": {
+      "Properties": {
+        "BasePath": "footoo",
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName67a385f467"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "RecordSetGroup1194dea82a": {
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "HostedZoneId"
+        },
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName67a385f467",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": "MyEdgeDomainName",
+            "Type": "A"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName67a385f467",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": "MyEdgeDomainName",
+            "Type": "AAAA"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName67a385f467",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": "MyEdgeDomainName",
+            "Type": "A"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName67a385f467",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": "MyEdgeDomainName",
+            "Type": "AAAA"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName67a385f467",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": "MyEdgeDomainName",
+            "Type": "A"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName67a385f467",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": "MyEdgeDomainName",
+            "Type": "AAAA"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName67a385f467",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": "MyEdgeDomainName",
+            "Type": "A"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName67a385f467",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": "MyEdgeDomainName",
+            "Type": "AAAA"
+          }
+        ]
+      },
+      "Type": "AWS::Route53::RecordSetGroup"
+    }
+  }
+}

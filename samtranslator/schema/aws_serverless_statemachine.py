@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Optional, Any, Dict, Union, List
+from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop
+from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, DictStrAny, get_prop
 
 properties = get_prop("sam-resource-statemachine")
 deadletterconfig = get_prop("sam-property-statemachine-statemachinedeadletterconfig")
@@ -25,6 +25,10 @@ class DeadLetterConfig(BaseModel):
     Type: Optional[Literal["SQS"]] = deadletterconfig("Type")
 
 
+class ScheduleTarget(BaseModel):
+    Id: PassThrough  # TODO: Add docs
+
+
 class ScheduleEventProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig] = scheduleeventproperties("DeadLetterConfig")
     Description: Optional[PassThrough] = scheduleeventproperties("Description")
@@ -34,6 +38,7 @@ class ScheduleEventProperties(BaseModel):
     RetryPolicy: Optional[PassThrough] = scheduleeventproperties("RetryPolicy")
     Schedule: Optional[PassThrough] = scheduleeventproperties("Schedule")
     State: Optional[PassThrough] = scheduleeventproperties("State")
+    Target: Optional[ScheduleTarget]  # TODO: Add docs
 
 
 class ScheduleEvent(BaseModel):
@@ -65,17 +70,17 @@ class ScheduleV2Event(BaseModel):
 
 
 class ResourcePolicy(BaseModel):
-    AwsAccountBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountBlacklist")
-    AwsAccountWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("AwsAccountWhitelist")
-    CustomStatements: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("CustomStatements")
-    IntrinsicVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcBlacklist")
-    IntrinsicVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpcWhitelist")
-    IntrinsicVpceBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceBlacklist")
-    IntrinsicVpceWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IntrinsicVpceWhitelist")
-    IpRangeBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeBlacklist")
-    IpRangeWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("IpRangeWhitelist")
-    SourceVpcBlacklist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcBlacklist")
-    SourceVpcWhitelist: Optional[List[Union[str, Dict[str, Any]]]] = resourcepolicy("SourceVpcWhitelist")
+    AwsAccountBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountBlacklist")
+    AwsAccountWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountWhitelist")
+    CustomStatements: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("CustomStatements")
+    IntrinsicVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcBlacklist")
+    IntrinsicVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcWhitelist")
+    IntrinsicVpceBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceBlacklist")
+    IntrinsicVpceWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceWhitelist")
+    IpRangeBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeBlacklist")
+    IpRangeWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeWhitelist")
+    SourceVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcBlacklist")
+    SourceVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcWhitelist")
 
 
 class CloudWatchEventProperties(BaseModel):
@@ -90,6 +95,10 @@ class CloudWatchEvent(BaseModel):
     Properties: CloudWatchEventProperties = event("Properties")
 
 
+class EventBridgeRuleTarget(BaseModel):
+    Id: PassThrough  # TODO: Add docs
+
+
 class EventBridgeRuleEventProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig] = eventbridgeruleeventproperties("DeadLetterConfig")
     EventBusName: Optional[PassThrough] = eventbridgeruleeventproperties("EventBusName")
@@ -97,6 +106,7 @@ class EventBridgeRuleEventProperties(BaseModel):
     InputPath: Optional[PassThrough] = eventbridgeruleeventproperties("InputPath")
     Pattern: Optional[PassThrough] = eventbridgeruleeventproperties("Pattern")
     RetryPolicy: Optional[PassThrough] = eventbridgeruleeventproperties("RetryPolicy")
+    Target: Optional[EventBridgeRuleTarget]  # TODO: Add docs
 
 
 class EventBridgeRuleEvent(BaseModel):
@@ -125,8 +135,8 @@ class ApiEvent(BaseModel):
 
 
 class Properties(BaseModel):
-    Definition: Optional[Dict[str, Any]] = properties("Definition")
-    DefinitionSubstitutions: Optional[Dict[str, Any]] = properties("DefinitionSubstitutions")
+    Definition: Optional[DictStrAny] = properties("Definition")
+    DefinitionSubstitutions: Optional[DictStrAny] = properties("DefinitionSubstitutions")
     DefinitionUri: Optional[Union[str, PassThrough]] = properties("DefinitionUri")
     Events: Optional[
         Dict[
@@ -143,9 +153,10 @@ class Properties(BaseModel):
     Logging: Optional[PassThrough] = properties("Logging")
     Name: Optional[PassThrough] = properties("Name")
     PermissionsBoundary: Optional[PassThrough] = properties("PermissionsBoundary")
-    Policies: Optional[Union[str, List[str], Dict[str, Any], List[Dict[str, Any]]]] = properties("Policies")
+    Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = properties("Policies")
     Role: Optional[PassThrough] = properties("Role")
-    Tags: Optional[Dict[str, Any]] = properties("Tags")
+    RolePath: Optional[PassThrough]  # TODO: Add docs
+    Tags: Optional[DictStrAny] = properties("Tags")
     Tracing: Optional[PassThrough] = properties("Tracing")
     Type: Optional[PassThrough] = properties("Type")
 
