@@ -86,6 +86,6 @@ class TestValidateSchema(TestCase):
         ]
     )
     def test_validate_schema_error(self, testcase):
-        obj = json.loads(to_json(Path(testcase).read_bytes()))
+        obj = yaml_parse(Path(testcase).read_bytes())
         with pytest.raises(ValidationError):
             validate(obj, schema=SCHEMA)
