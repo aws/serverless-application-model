@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Union, TypeVar
 from functools import partial
@@ -21,7 +22,8 @@ DictStrAny = Dict[str, Any]
 
 LenientBaseModel = pydantic.BaseModel
 
-_DOCS = json.loads(Path("samtranslator", "schema", "docs.json").read_bytes())
+_thisdir = os.path.dirname(os.path.abspath(__file__))
+_DOCS = json.loads(Path(_thisdir, "docs.json").read_bytes())
 
 
 def get_prop(stem: str) -> Any:
