@@ -1,4 +1,4 @@
-from typing import Optional, List, Union
+from typing import Optional, List
 
 from typing_extensions import Literal
 
@@ -21,7 +21,7 @@ class ResourceReference(BaseModel):
 
 class Properties(BaseModel):
     Source: ResourceReference = properties("Source")
-    Destination: Union[ResourceReference, List[ResourceReference]] = properties("Destination")
+    Destination: ResourceReference = properties("Destination")
     Permissions: List[Literal["Read", "Write"]] = properties("Permissions")
 
 
