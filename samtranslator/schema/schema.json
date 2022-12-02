@@ -1821,15 +1821,9 @@
           "title": "Destination",
           "description": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "markdownDescription": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "anyOf": [
+          "allOf": [
             {
               "$ref": "#/definitions/ResourceReference"
-            },
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ResourceReference"
-              }
             }
           ]
         },
