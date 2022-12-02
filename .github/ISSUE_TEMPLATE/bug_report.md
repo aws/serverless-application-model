@@ -30,5 +30,5 @@ Add the --debug flag to any SAM CLI commands you are running. -->
 ### Additional environment details
 
 1. OS:
-2. If using SAM CLI, `sam --version`:
+2. If using the [SAM CLI](https://github.com/aws/aws-sam-cli), `sam --version`:
 3. AWS region:
