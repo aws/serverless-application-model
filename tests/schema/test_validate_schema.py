@@ -6,11 +6,11 @@ import itertools
 from pathlib import Path
 from typing import Iterator
 from unittest import TestCase
-from cfn_flip import to_json  # type: ignore
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from parameterized import parameterized
 
+from samtranslator.yaml_helper import yaml_parse
 
 SCHEMA = json.loads(Path("samtranslator/schema/schema.json").read_bytes())
 
@@ -76,7 +76,7 @@ SCHEMA_VALIDATION_TESTS = [str(f) for f in get_all_test_templates() if not shoul
 class TestValidateSchema(TestCase):
     @parameterized.expand(itertools.product(SCHEMA_VALIDATION_TESTS))
     def test_validate_schema(self, testcase):
-        obj = json.loads(to_json(Path(testcase).read_bytes()))
+        obj = yaml_parse(Path(testcase).read_bytes())
         validate(obj, schema=SCHEMA)
 
     @parameterized.expand(
@@ -86,6 +86,6 @@ class TestValidateSchema(TestCase):
         ]
     )
     def test_validate_schema_error(self, testcase):
-        obj = json.loads(to_json(Path(testcase).read_bytes()))
+        obj = yaml_parse(Path(testcase).read_bytes())
         with pytest.raises(ValidationError):
             validate(obj, schema=SCHEMA)
