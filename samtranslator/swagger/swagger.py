@@ -855,7 +855,6 @@ class SwaggerEditor(BaseEditor):
         for model_name, schema in models.items():
 
             model_type = schema.get("type")
-            model_properties = schema.get("properties")
 
             if not model_type:
                 raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'type'.")])
