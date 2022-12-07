@@ -1,0 +1,11 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Models:
+        MyModel:
+          items:
+            type: integer
+          type: array
+          title: MyModel

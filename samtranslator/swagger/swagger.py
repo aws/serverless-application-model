@@ -860,9 +860,6 @@ class SwaggerEditor(BaseEditor):
             if not model_type:
                 raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'type'.")])
 
-            if not model_properties:
-                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'properties'.")])
-
             self.definitions[model_name.lower()] = schema
 
     def add_resource_policy(self, resource_policy, path, stage):  # type: ignore[no-untyped-def]
