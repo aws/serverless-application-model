@@ -118,3 +118,5 @@ ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
   - W2531 # EOL runtime; not relevant for transform tests
   - E3001 # Invalid or unsupported Type; common in transform tests since they focus on SAM resources
+include_checks:
+  - I # https://github.com/aws-cloudformation/cfn-lint/blob/7219faeabe48063e68e1a3e63f0301c5b337d36e/README.md#info-rules
