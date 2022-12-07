@@ -95,6 +95,7 @@ ENV/
 env.bak/
 venv.bak/
 .pypirc
+.venv_cfn_lint
 
 # Spyder project settings
 .spyderproject
