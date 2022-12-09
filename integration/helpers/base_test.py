@@ -28,6 +28,7 @@ from tenacity import (
     retry,
     stop_after_attempt,
     wait_exponential,
+    wait_fixed,
     retry_if_exception_type,
     after_log,
     wait_random,
@@ -115,9 +116,17 @@ class BaseTest(TestCase):
         self.output_file_path = None
         self.sub_input_file_path = None
 
+    @retry(
+        stop=stop_after_attempt(5),
+        wait=wait_fixed(30),
+        retry=retry_if_exception_type(Exception),
+    )
     def tearDown(self):
         if self.stack_name:
-            self.client_provider.cfn_client.delete_stack(StackName=self.stack_name)
+            client = self.client_provider.cfn_client
+            client.delete_stack(StackName=self.stack_name)
+            waiter = client.get_waiter("stack_delete_complete")
+            waiter.wait(StackName=self.stack_name)
         if self.output_file_path and os.path.exists(self.output_file_path):
             os.remove(self.output_file_path)
         if self.sub_input_file_path and os.path.exists(self.sub_input_file_path):
