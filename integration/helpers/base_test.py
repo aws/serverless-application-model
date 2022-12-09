@@ -117,7 +117,7 @@ class BaseTest(TestCase):
         self.sub_input_file_path = None
 
     @retry(
-        stop=stop_after_attempt(3),
+        stop=stop_after_attempt(5),
         wait=wait_fixed(30),
         retry=retry_if_exception_type(Exception),
     )
