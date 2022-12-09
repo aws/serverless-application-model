@@ -38,6 +38,8 @@ lint:
 	mypy --strict samtranslator bin
 	# Linter performs static analysis to catch latent bugs
 	pylint --rcfile .pylintrc samtranslator
+	# cfn-lint to make sure generated CloudFormation makes sense
+	bin/run_cfn_lint.sh
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
