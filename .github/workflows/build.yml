@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - "feat-*"
   pull_request:
   workflow_dispatch:
 
