@@ -7,10 +7,10 @@
 ### Checklist
 
 - [ ] Adheres to the [development guidelines](https://github.com/aws/serverless-application-model/blob/develop/DEVELOPMENT_GUIDE.md#development-guidelines)
-- [ ] Add [transform tests](https://github.com/aws/serverless-application-model/blob/develop/DEVELOPMENT_GUIDE.md#unit-testing-with-multiple-python-versions)
+- [ ] Add/update [transform tests](https://github.com/aws/serverless-application-model/blob/develop/DEVELOPMENT_GUIDE.md#unit-testing-with-multiple-python-versions)
     - [ ] Using correct values
     - [ ] Using wrong values
-- [ ] Add [integration tests](https://github.com/aws/serverless-application-model/blob/develop/INTEGRATION_TESTS.md)
+- [ ] Add/update [integration tests](https://github.com/aws/serverless-application-model/blob/develop/INTEGRATION_TESTS.md)
 
 ### Examples?
 
