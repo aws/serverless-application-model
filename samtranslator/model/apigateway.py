@@ -164,8 +164,12 @@ class ApiGatewayResponse(object):
         prefixed_parameters = Py27Dict()
 
         parameter_prefix_pairs = [("Headers", "header."), ("Paths", "path."), ("QueryStrings", "querystring.")]
-        for parameter, prefix in parameter_prefix_pairs:
-            for key, value in response_parameters.get(parameter, {}).items():
+        for parameter_property_name, prefix in parameter_prefix_pairs:
+            parameter_property_value = response_parameters.get(parameter_property_name, {})
+            sam_expect(
+                parameter_property_value, self.api_logical_id, f"ResponseParameters.{parameter_property_name}"
+            ).to_be_a_map()
+            for key, value in parameter_property_value.items():
                 param_key = GATEWAY_RESPONSE_PREFIX + prefix + key
                 if isinstance(key, Py27UniStr):
                     # if key is from template, we need to convert param_key to Py27UniStr
