@@ -226,6 +226,7 @@ class HttpApiGenerator(object):
         self.definition_body = editor.openapi
 
     def _update_default_path(self) -> None:
+        # Only do the following if FailOnWarnings is enabled for backward compatibility.
         if not self.fail_on_warnings or not self.definition_body:
             return
 
