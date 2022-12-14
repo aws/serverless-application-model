@@ -8,7 +8,18 @@ This is designed for compatibility not performance.
 import ctypes
 import math
 
-from functools import lru_cache
+# See https://github.com/python/mypy/issues/5107
+from typing import TYPE_CHECKING, TypeVar, Callable, Any
+
+if TYPE_CHECKING:
+    F = TypeVar("F", bound=Callable[[Any], Any])
+
+    def lru_cache(maxsize: int = 128, typed: bool = False) -> Callable[[F], F]:
+        pass
+
+
+else:
+    from functools import lru_cache
 
 
 def hash27(value):  # type: ignore[no-untyped-def]
