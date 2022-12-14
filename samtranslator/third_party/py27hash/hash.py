@@ -2,10 +2,13 @@
 Compatibility methods to support Python 2.7 style hashing in Python 3.X+
 
 This is designed for compatibility not performance.
+
 """
 
 import ctypes
 import math
+
+from functools import lru_cache
 
 
 def hash27(value):  # type: ignore[no-untyped-def]
@@ -28,6 +31,7 @@ class Hash(object):
     """
 
     @staticmethod
+    @lru_cache(maxsize=2048)
     def hash(value):  # type: ignore[no-untyped-def]
         """
         Returns a Python 2.7 hash for a value.
