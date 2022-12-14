@@ -7,19 +7,7 @@ This is designed for compatibility not performance.
 
 import ctypes
 import math
-
-# See https://github.com/python/mypy/issues/5107
-from typing import TYPE_CHECKING, TypeVar, Callable, Any
-
-if TYPE_CHECKING:
-    F = TypeVar("F", bound=Callable[[Any], Any])
-
-    def lru_cache(maxsize: int = 128, typed: bool = False) -> Callable[[F], F]:
-        pass
-
-
-else:
-    from functools import lru_cache
+from functools import lru_cache
 
 
 def hash27(value):  # type: ignore[no-untyped-def]
@@ -33,7 +21,7 @@ def hash27(value):  # type: ignore[no-untyped-def]
         Python 2.7 hash
     """
 
-    return Hash.hash(value)  # type: ignore[no-untyped-call]
+    return Hash.hash(value)
 
 
 class Hash(object):
@@ -88,7 +76,7 @@ class Hash(object):
         for y in value:
             length -= 1
 
-            y = Hash.hash(y)  # type: ignore[no-untyped-call]
+            y = Hash.hash(y)
             x = (x ^ y) * mult
             mult += 82520 + length + length
 
