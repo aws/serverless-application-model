@@ -1,6 +1,6 @@
 ﻿""" SAM macro definitions """
 import copy
-from typing import Any, cast, Dict, List, Optional, Union
+from typing import Any, cast, Dict, List, Optional, Tuple, Union
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.model.connector.connector import (
@@ -312,27 +312,24 @@ class SamFunction(SamResourceMacro):
 
         dest_config = {}
         input_dest_config = resolved_event_invoke_config.get("DestinationConfig")
-        if input_dest_config and input_dest_config.get("OnSuccess") is not None:
-            resource, on_success, policy = self._validate_and_inject_resource(  # type: ignore[no-untyped-call]
-                input_dest_config.get("OnSuccess"), "OnSuccess", logical_id, conditions
-            )
-            dest_config["OnSuccess"] = on_success
-            event_invoke_config["DestinationConfig"]["OnSuccess"]["Destination"] = on_success.get("Destination")
-            if resource is not None:
-                resources.extend([resource])
-            if policy is not None:
-                policy_document.append(policy)
+        if input_dest_config:
+            sam_expect(input_dest_config, self.logical_id, "EventInvokeConfig.DestinationConfig").to_be_a_map()
 
-        if input_dest_config and input_dest_config.get("OnFailure") is not None:
-            resource, on_failure, policy = self._validate_and_inject_resource(  # type: ignore[no-untyped-call]
-                input_dest_config.get("OnFailure"), "OnFailure", logical_id, conditions
-            )
-            dest_config["OnFailure"] = on_failure
-            event_invoke_config["DestinationConfig"]["OnFailure"]["Destination"] = on_failure.get("Destination")
-            if resource is not None:
-                resources.extend([resource])
-            if policy is not None:
-                policy_document.append(policy)
+            for config_name in ["OnSuccess", "OnFailure"]:
+                config_value = input_dest_config.get(config_name)
+                if config_value is not None:
+                    sam_expect(
+                        config_value, self.logical_id, f"EventInvokeConfig.DestinationConfig.{config_name}"
+                    ).to_be_a_map()
+                    resource, destination, policy = self._validate_and_inject_resource(
+                        config_value, config_name, logical_id, conditions
+                    )
+                    dest_config[config_name] = {"Destination": destination}
+                    event_invoke_config["DestinationConfig"][config_name]["Destination"] = destination
+                    if resource is not None:
+                        resources.extend([resource])
+                    if policy is not None:
+                        policy_document.append(policy)
 
         lambda_event_invoke_config.FunctionName = ref(function_name)
         if alias_name:
@@ -348,7 +345,9 @@ class SamFunction(SamResourceMacro):
 
         return resources, policy_document
 
-    def _validate_and_inject_resource(self, dest_config, event, logical_id, conditions):  # type: ignore[no-untyped-def]
+    def _validate_and_inject_resource(
+        self, dest_config: Dict[str, Any], event: str, logical_id: str, conditions: Dict[str, Any]
+    ) -> Tuple[Optional[Resource], Optional[Any], Dict[str, Any]]:
         """
         For Event Invoke Config, if the user has not specified a destination ARN for SQS/SNS, SAM
         auto creates a SQS and SNS resource with defaults. Intrinsics are supported in the Destination
@@ -359,8 +358,7 @@ class SamFunction(SamResourceMacro):
         auto_inject_list = ["SQS", "SNS"]
         resource = None
         policy = {}
-        destination = {}
-        destination["Destination"] = dest_config.get("Destination")
+        destination = dest_config.get("Destination")
 
         resource_logical_id = logical_id + event
         if dest_config.get("Type") is None or dest_config.get("Type") not in accepted_types_list:
@@ -387,13 +385,13 @@ class SamFunction(SamResourceMacro):
                 if combined_condition:
                     resource.set_resource_attribute("Condition", combined_condition)  # type: ignore[union-attr]
                 if property_condition:
-                    destination["Destination"] = make_conditional(
+                    destination = make_conditional(
                         property_condition, resource.get_runtime_attr("arn"), dest_arn  # type: ignore[union-attr]
                     )
                 else:
-                    destination["Destination"] = resource.get_runtime_attr("arn")  # type: ignore[union-attr]
+                    destination = resource.get_runtime_attr("arn")  # type: ignore[union-attr]
                 policy = self._add_event_invoke_managed_policy(  # type: ignore[no-untyped-call]
-                    dest_config, resource_logical_id, property_condition, destination["Destination"]
+                    dest_config, resource_logical_id, property_condition, destination
                 )
             else:
                 raise InvalidResourceException(
