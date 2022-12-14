@@ -120,6 +120,7 @@ class HttpApiGenerator(object):
 
         self._add_title()
         self._add_description()
+        self._update_paths()
 
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict(self.definition_uri)
@@ -223,6 +224,19 @@ class HttpApiGenerator(object):
 
         # Assign the OpenApi back to template
         self.definition_body = editor.openapi
+
+    def _update_paths(self):
+        if not self.fail_on_warnings:
+            return
+
+        # Using default stage name generate warning during deployment
+        #   Warnings found during import: Parse issue: attribute paths. 
+        #   Resource $default should start with / (Service: AmazonApiGatewayV2; Status Code: 400; 
+        # Deployment fails when FailOnWarnings is true
+        paths: Optional[Dict[str, Any]] = self.definition_body.get("paths")
+        if DefaultStageName in paths:
+            paths[f"/{DefaultStageName}"] = paths.pop(DefaultStageName)
+
 
     def _construct_api_domain(
         self, http_api: ApiGatewayV2HttpApi, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
