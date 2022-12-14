@@ -42,14 +42,14 @@ class Hash(object):
             Python 2.7 hash
         """
 
+        if isinstance(value, ("".__class__, bytes)) or type(value).__name__ == "buffer":
+            return Hash.shash(value)  # type: ignore[no-untyped-call]
         if isinstance(value, tuple):
             return Hash.thash(value)  # type: ignore[no-untyped-call]
         if isinstance(value, float):
             return Hash.fhash(value)  # type: ignore[no-untyped-call]
         if isinstance(value, int):
             return hash(value)
-        if isinstance(value, ("".__class__, bytes)) or type(value).__name__ == "buffer":
-            return Hash.shash(value)  # type: ignore[no-untyped-call]
 
         raise TypeError("unhashable type: '%s'" % (type(value).__name__))
 
