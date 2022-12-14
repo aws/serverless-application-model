@@ -1128,7 +1128,7 @@ class HttpApi(PushEventSource):
 
         explicit_api = resources[api_id].get("Properties", {})
 
-        return {"explicit_api": explicit_api}
+        return {"explicit_api": explicit_api, "api_id": api_id}
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -1152,7 +1152,8 @@ class HttpApi(PushEventSource):
         resources.extend(self._get_permissions(kwargs))  # type: ignore[no-untyped-call]
 
         explicit_api = kwargs["explicit_api"]
-        self._add_openapi_integration(explicit_api, function, explicit_api.get("__MANAGE_SWAGGER"))  # type: ignore[no-untyped-call]
+        api_id = kwargs["api_id"]
+        self._add_openapi_integration(explicit_api, api_id, function, explicit_api.get("__MANAGE_SWAGGER"))  # type: ignore[no-untyped-call]
 
         return resources
 
@@ -1218,10 +1219,9 @@ class HttpApi(PushEventSource):
 
         return self._construct_permission(resources_to_link["function"], source_arn=source_arn)  # type: ignore[no-untyped-call]
 
-    def _add_openapi_integration(self, api, function, manage_swagger=False):  # type: ignore[no-untyped-def]
-        """Adds the path and method for this Api event source to the OpenApi body for the provided RestApi.
-
-        :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
+    def _add_openapi_integration(self, api, api_id, function, manage_swagger=False):  # type: ignore[no-untyped-def]
+        """
+        Adds the path and method for this Api event source to the OpenApi body for the provided RestApi.
         """
         open_api_body = api.get("DefinitionBody")
         if open_api_body is None:
@@ -1246,7 +1246,7 @@ class HttpApi(PushEventSource):
 
         editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
         if self.Auth:  # type: ignore[attr-defined]
-            self._add_auth_to_openapi_integration(api, editor)  # type: ignore[no-untyped-call]
+            self._add_auth_to_openapi_integration(api, api_id, editor)
         if self.TimeoutInMillis:  # type: ignore[attr-defined]
             editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
         path_parameters = re.findall("{(.*?)}", self.Path)  # type: ignore[attr-defined]
@@ -1261,13 +1261,15 @@ class HttpApi(PushEventSource):
             )
         api["DefinitionBody"] = editor.openapi
 
-    def _add_auth_to_openapi_integration(self, api, editor):  # type: ignore[no-untyped-def]
+    def _add_auth_to_openapi_integration(self, api: Dict[str, Any], api_id: str, editor: OpenApiEditor) -> None:
         """Adds authorization to the lambda integration
         :param api: api object
+        :param api_id: api logical id
         :param editor: OpenApiEditor object that contains the OpenApi definition
         """
         method_authorizer = self.Auth.get("Authorizer")  # type: ignore[attr-defined]
         api_auth = api.get("Auth", {})
+        sam_expect(api_auth, api_id, "Auth").to_be_a_map()
         if not method_authorizer:
             if api_auth.get("DefaultAuthorizer"):
                 self.Auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")  # type: ignore[attr-defined]
@@ -1328,7 +1330,7 @@ class HttpApi(PushEventSource):
                 "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),  # type: ignore[attr-defined]
             )
 
-        editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)  # type: ignore[attr-defined, attr-defined]
+        editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)  # type: ignore[no-untyped-call, attr-defined, attr-defined]
 
 
 def _build_apigw_integration_uri(function, partition):  # type: ignore[no-untyped-def]
