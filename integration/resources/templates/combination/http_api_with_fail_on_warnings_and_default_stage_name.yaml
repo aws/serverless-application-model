@@ -18,7 +18,7 @@ Resources:
           print("Hello, world!")
       Runtime: python3.8
       Architectures:
-        - x86_64
+      - x86_64
       Events:
         AppHandler:
           Type: HttpApi

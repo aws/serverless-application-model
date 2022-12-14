@@ -11,7 +11,7 @@ class TestHttpApiWithFailOnWarnings(BaseTest):
     @parameterized.expand(
         [
             ("combination/http_api_with_fail_on_warnings_and_default_stage_name", True),
-            ("combination/http_api_with_fail_on_warnings_and_default_stage_name", False)
+            ("combination/http_api_with_fail_on_warnings_and_default_stage_name", False),
         ]
     )
     def test_http_api_with_fail_on_warnings(self, file_name, disable_value):
