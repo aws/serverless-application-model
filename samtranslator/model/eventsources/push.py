@@ -417,10 +417,9 @@ class S3(PushEventSource):
                 lambda_event = make_conditional(function.resource_attributes[CONDITION], lambda_event)
             event_mappings.append(lambda_event)
 
-        properties = bucket.get("Properties", None)
-        if properties is None:
-            properties = {}
-            bucket["Properties"] = properties
+        properties = bucket.get("Properties", {})
+        sam_expect(properties, bucket_id, "").to_be_a_map("Properties should be a map.")
+        bucket["Properties"] = properties
 
         notification_config = properties.get("NotificationConfiguration", None)
         if notification_config is None:
