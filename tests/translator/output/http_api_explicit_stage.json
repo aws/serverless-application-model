@@ -95,7 +95,7 @@
           },
           "openapi": "3.0.1",
           "paths": {
-            "$default": {
+            "/$default": {
               "x-amazon-apigateway-any-method": {
                 "isDefaultRoute": true,
                 "responses": {},
