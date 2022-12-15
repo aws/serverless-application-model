@@ -383,16 +383,17 @@ class SamFunction(SamResourceMacro):
                     resource = SNSTopic(  # type: ignore[assignment]
                         resource_logical_id + "Topic", attributes=self.get_passthrough_resource_attributes()
                     )
-                if combined_condition:
-                    resource.set_resource_attribute("Condition", combined_condition)  # type: ignore[union-attr]
-                if property_condition:
-                    destination = make_conditional(
-                        property_condition, resource.get_runtime_attr("arn"), dest_arn  # type: ignore[union-attr]
-                    )
-                else:
-                    destination = resource.get_runtime_attr("arn")  # type: ignore[union-attr]
-                policy = self._add_event_invoke_managed_policy(  # type: ignore[no-untyped-call]
-                    dest_config, resource_logical_id, property_condition, destination
+                if resource:
+                    if combined_condition:
+                        resource.set_resource_attribute("Condition", combined_condition)
+                    if property_condition:
+                        destination = make_conditional(
+                            property_condition, resource.get_runtime_attr("arn"), dest_arn
+                        )
+                    else:
+                        destination = resource.get_runtime_attr("arn")
+                policy = self._add_event_invoke_managed_policy(
+                    dest_config, resource_logical_id, destination
                 )
             else:
                 raise InvalidResourceException(
