@@ -640,7 +640,7 @@ class Api(PushEventSource):
                     "RestApiId property of Api event must reference a valid resource in the same template.",
                 )
 
-        return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
+        return {"explicit_api": explicit_api, "api_id": rest_api_id, "explicit_api_stage": {"suffix": stage_suffix}}
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -668,8 +668,9 @@ class Api(PushEventSource):
         resources.extend(self._get_permissions(kwargs))  # type: ignore[no-untyped-call]
 
         explicit_api = kwargs["explicit_api"]
+        api_id = kwargs["api_id"]
         if explicit_api.get("__MANAGE_SWAGGER"):
-            self._add_swagger_integration(explicit_api, function, intrinsics_resolver)  # type: ignore[no-untyped-call]
+            self._add_swagger_integration(explicit_api, api_id, function, intrinsics_resolver)  # type: ignore[no-untyped-call]
 
         return resources
 
@@ -712,7 +713,7 @@ class Api(PushEventSource):
 
         return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)  # type: ignore[no-untyped-call]
 
-    def _add_swagger_integration(self, api, function, intrinsics_resolver):  # type: ignore[no-untyped-def]
+    def _add_swagger_integration(self, api, api_id, function, intrinsics_resolver):  # type: ignore[no-untyped-def]
         # pylint: disable=duplicate-code
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
@@ -740,10 +741,13 @@ class Api(PushEventSource):
         if CONDITION in function.resource_attributes:
             condition = function.resource_attributes[CONDITION]
 
-        editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
+        method_auth = self.Auth or Py27Dict()  # type: ignore[attr-defined]
+        sam_expect(method_auth, self.relative_id, "Auth", is_sam_event=True).to_be_a_map()
+        api_auth = api.get("Auth") or Py27Dict()
+        sam_expect(api_auth, api_id, "Auth").to_be_a_map()
+        editor.add_lambda_integration(self.Path, self.Method, uri, method_auth, api_auth, condition=condition)  # type: ignore[attr-defined, attr-defined]
 
         if self.Auth:  # type: ignore[attr-defined]
-            sam_expect(self.Auth, self.relative_id, "Auth", is_sam_event=True).to_be_a_map()  # type: ignore[attr-defined]
             method_authorizer = self.Auth.get("Authorizer")  # type: ignore[attr-defined]
             api_auth = api.get("Auth")
             api_auth = intrinsics_resolver.resolve_parameter_refs(api_auth)
