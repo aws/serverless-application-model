@@ -93,15 +93,17 @@ class SwaggerEditor(BaseEditor):
         else:
             SwaggerEditor._update_dict(self._doc, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
 
-    def add_lambda_integration(  # type: ignore[no-untyped-def]
-        self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
-    ):
+    def add_lambda_integration(
+        self,
+        path: str,
+        method: str,
+        integration_uri: str,
+        method_auth_config: Dict[str, Any],
+        api_auth_config: Dict[str, Any],
+        condition: Optional[str] = None,
+    ) -> None:
         """
         Adds aws_proxy APIGW integration to the given path+method.
-
-        :param string path: Path name
-        :param string method: HTTP Method
-        :param string integration_uri: URI for the integration.
         """
 
         method = self._normalize_method_name(method)
@@ -118,8 +120,7 @@ class SwaggerEditor(BaseEditor):
 
         # Wrap the integration_uri in a Condition if one exists on that function
         # This is necessary so CFN doesn't try to resolve the integration reference.
-        if condition:
-            integration_uri = make_conditional(condition, integration_uri)
+        _integration_uri = make_conditional(condition, integration_uri) if condition else integration_uri
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
             BaseEditor.validate_path_item_is_dict(path_item, path)
@@ -127,10 +128,8 @@ class SwaggerEditor(BaseEditor):
             # insert key one by one to preserce input order
             path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
             path_item[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
-            path_item[method][self._X_APIGW_INTEGRATION]["uri"] = integration_uri
+            path_item[method][self._X_APIGW_INTEGRATION]["uri"] = _integration_uri
 
-            method_auth_config = method_auth_config or Py27Dict()
-            api_auth_config = api_auth_config or Py27Dict()
             if (
                 method_auth_config.get("Authorizer") == "AWS_IAM"
                 or api_auth_config.get("DefaultAuthorizer") == "AWS_IAM"
