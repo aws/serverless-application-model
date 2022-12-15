@@ -1,6 +1,8 @@
+from typing import Optional, Dict, Any, List
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import is_type, one_of, is_str, list_of, any_type
 from samtranslator.model.intrinsics import fnGetAtt, ref
+from samtranslator.utils.types import Intrinsicable
 
 
 class LambdaFunction(Resource):
@@ -30,6 +32,30 @@ class LambdaFunction(Resource):
         "SnapStart": PropertyType(False, is_type(dict)),
         "EphemeralStorage": PropertyType(False, is_type(dict)),
     }
+
+    Code: Dict[str, Any]
+    PackageType: Optional[str]
+    DeadLetterConfig: Optional[Dict[str, Any]]
+    Description: Optional[Intrinsicable[str]]
+    FunctionName: Optional[Intrinsicable[str]]
+    Handler: Optional[str]
+    MemorySize: Optional[Intrinsicable[int]]
+    Role: Optional[Intrinsicable[str]]
+    Runtime: Optional[str]
+    Timeout: Optional[Intrinsicable[int]]
+    VpcConfig: Optional[Dict[str, Any]]
+    Environment: Optional[Dict[str, Any]]
+    Tags: Optional[List[Dict[str, Any]]]
+    TracingConfig: Optional[Dict[str, Any]]
+    KmsKeyArn: Optional[Intrinsicable[str]]
+    Layers: Optional[List[Any]]
+    ReservedConcurrentExecutions: Optional[Any]
+    FileSystemConfigs: Optional[Dict[str, Any]]
+    CodeSigningConfigArn: Optional[Intrinsicable[str]]
+    ImageConfig: Optional[Dict[str, Any]]
+    Architectures: Optional[List[Any]]
+    SnapStart: Optional[Dict[str, Any]]
+    EphemeralStorage: Optional[Dict[str, Any]]
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
