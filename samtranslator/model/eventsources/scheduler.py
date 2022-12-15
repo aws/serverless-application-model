@@ -99,7 +99,7 @@ class SchedulerEventSource(ResourceMacro):
         else:
             raise TypeError("Missing required keyword argument: function/resource")
 
-        passthrough_resource_attributes = target.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
+        passthrough_resource_attributes = target.get_passthrough_resource_attributes()
 
         resources: List[Resource] = []
 
