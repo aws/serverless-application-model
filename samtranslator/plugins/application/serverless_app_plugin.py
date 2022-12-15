@@ -1,3 +1,5 @@
+from typing import Any, Tuple
+
 import boto3
 import json
 from botocore.config import Config
@@ -73,6 +75,11 @@ class ServerlessAppPlugin(BasePlugin):
             message = "Cannot set both validate_only and wait_for_template_active_status flags to True."
             raise InvalidPluginException(ServerlessAppPlugin.__name__, message)  # type: ignore[no-untyped-call]
 
+    @staticmethod
+    def _make_app_key(app_id: Any, semver: Any) -> Tuple[str, str]:
+        """Generate a key that is always hashable."""
+        return json.dumps(app_id, default=str), json.dumps(semver, default=str)
+
     @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """
@@ -106,15 +113,18 @@ class ServerlessAppPlugin(BasePlugin):
                 app.properties[self.LOCATION_KEY], self.SEMANTIC_VERSION_KEY, intrinsic_resolvers
             )
 
+            key = self._make_app_key(app_id, semver)
+
             if isinstance(app_id, dict) or isinstance(semver, dict):
-                key = (json.dumps(app_id), json.dumps(semver))
                 self._applications[key] = False
                 continue
 
-            key = (app_id, semver)
-
             if key not in self._applications:
                 try:
+                    # Examine the type of ApplicationId and SemanticVersion
+                    # before calling SAR API.
+                    sam_expect(app_id, logical_id, "Location.ApplicationId").to_be_a_string()
+                    sam_expect(semver, logical_id, "Location.SemanticVersion").to_be_a_string()
                     if not RegionConfiguration.is_service_supported("serverlessrepo"):  # type: ignore[no-untyped-call]
                         raise InvalidResourceException(
                             logical_id, "Serverless Application Repository is not available in this region."
@@ -286,7 +296,7 @@ class ServerlessAppPlugin(BasePlugin):
                 "and Ref intrinsic functions are supported.",
             )
 
-        key = (app_id, semver)
+        key = self._make_app_key(app_id, semver)
 
         # Throw any resource exceptions saved from the before_transform_template event
         if isinstance(self._applications[key], InvalidResourceException):
