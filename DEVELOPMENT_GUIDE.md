@@ -26,7 +26,7 @@ Environment setup
 -----------------
 ### 1. Install Python versions
 
-Our officially supported Python versions are 3.6, 3.7 and 3.8. 
+Our officially supported Python versions are 3.7, 3.8, 3.9 and 3.10. 
 Our CI/CD pipeline is setup to run unit tests against Python 3 versions. Make sure you test it before sending a Pull Request.
 See [Unit testing with multiple Python versions](#unit-testing-with-multiple-python-versions).
 
@@ -40,11 +40,12 @@ easily setup multiple Python versions. For
 1.  Install PyEnv -
     `curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash`
 1. Restart shell so the path changes take effect - `exec $SHELL`
-1.  `pyenv install 3.6.12`
-1.  `pyenv install 3.7.9`
-1.  `pyenv install 3.8.6`
-1.  Make Python versions available in the project:
-    `pyenv local 3.6.12 3.7.9 3.8.6`
+1.  `pyenv install 3.7.16`
+1.  `pyenv install 3.8.16`
+1.  `pyenv install 3.9.16`
+1.  `pyenv install 3.10.9`
+3.  Make Python versions available in the project:
+    `pyenv local 3.7.16 3.8.16 3.9.16 3.10.9`
 
 Note: also make sure the following lines were written into your `.bashrc` (or `.zshrc`, depending on which shell you are using):
 ```
@@ -120,10 +121,10 @@ Run `make test` or `make test-fast`. Once all tests pass make sure to run
 
 ### Unit testing with multiple Python versions
 
-Currently, our officially supported Python versions are 3.6, 3.7 and 3.8. For the most
-part, code that works in Python3.6 will work in Python3.7 and Python3.8. You only run into problems if you are
-trying to use features released in a higher version (for example features introduced into Python3.7
-will not work in Python3.6). If you want to test in many versions, you can create a virtualenv for
+Currently, our officially supported Python versions are 3.7, 3.8, 3.9 and 3.10. For the most
+part, code that works in Python3.7 will work in Pythons 3.8, 3.9 and 3.10. You only run into problems if you are
+trying to use features released in a higher version (for example features introduced into Python3.10
+will not work in Python3.9). If you want to test in many versions, you can create a virtualenv for
 each version and flip between them (sourcing the activate script). Typically, we run all tests in
 one python version locally and then have our ci (appveyor) run all supported versions.
 
