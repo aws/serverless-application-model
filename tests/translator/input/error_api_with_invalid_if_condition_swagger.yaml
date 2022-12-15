@@ -1,0 +1,22 @@
+Resources:
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: index.handler
+      Runtime: nodejs12.x
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Auth:
+        ApiKeyRequired: true
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: !Sub ${AWS::StackName}-Api
+        paths:
+          /post:
+            Fn::If:
+              This: should not be a dict
