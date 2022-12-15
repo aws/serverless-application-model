@@ -6,6 +6,7 @@ from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.utils.py27hash_fix import Py27Dict
 from tests.translator.test_translator import deep_sort_lists
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
@@ -206,7 +207,7 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
             _X_INTEGRATION: {"type": "aws_proxy", "httpMethod": "POST", "uri": integration_uri},
         }
 
-        self.editor.add_lambda_integration(path, method, integration_uri)
+        self.editor.add_lambda_integration(path, method, integration_uri, Py27Dict(), Py27Dict())
 
         self.assertTrue(self.editor.has_path(path, method))
         actual = self.editor.swagger["paths"][path][method]
@@ -232,7 +233,7 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
             ]
         }
 
-        self.editor.add_lambda_integration(path, method, integration_uri, condition=condition)
+        self.editor.add_lambda_integration(path, method, integration_uri, Py27Dict(), Py27Dict(), condition=condition)
 
         self.assertTrue(self.editor.has_path(path, method))
         actual = self.editor.swagger["paths"][path][method]
@@ -254,7 +255,7 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
         # Just make sure test is working on an existing path
         self.assertTrue(self.editor.has_path(path, method))
 
-        self.editor.add_lambda_integration(path, method, integration_uri)
+        self.editor.add_lambda_integration(path, method, integration_uri, Py27Dict(), Py27Dict())
 
         actual = self.editor.swagger["paths"][path][method]
         self.assertEqual(expected, actual)
@@ -262,7 +263,7 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
     def test_must_raise_on_existing_integration(self):
 
         with self.assertRaises(InvalidDocumentException):
-            self.editor.add_lambda_integration("/bar", "get", "integrationUri")
+            self.editor.add_lambda_integration("/bar", "get", "integrationUri", Py27Dict(), Py27Dict())
 
     def test_must_add_credentials_to_the_integration(self):
         path = "/newpath"
@@ -271,7 +272,7 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
         expected = "arn:aws:iam::*:user/*"
         api_auth_config = {"DefaultAuthorizer": "AWS_IAM", "InvokeRole": "CALLER_CREDENTIALS"}
 
-        self.editor.add_lambda_integration(path, method, integration_uri, None, api_auth_config)
+        self.editor.add_lambda_integration(path, method, integration_uri, Py27Dict(), api_auth_config)
         actual = self.editor.swagger["paths"][path][method][_X_INTEGRATION]["credentials"]
         self.assertEqual(expected, actual)
 

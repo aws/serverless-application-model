@@ -34,7 +34,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-cn:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -52,7 +52,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-cn:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -100,9 +100,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithAwsIamAuthDeploymentfbe9aee08e": {
+    "MyApiWithAwsIamAuthDeploymenta388b99c2b": {
       "Properties": {
-        "Description": "RestApi deployment id: fbe9aee08eb164bd4de9a7a7c91782c10b86d7df",
+        "Description": "RestApi deployment id: a388b99c2b4ca0be2559b61649bdffa5c5fcddcc",
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuth"
         },
@@ -113,7 +113,7 @@
     "MyApiWithAwsIamAuthProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthDeploymentfbe9aee08e"
+          "Ref": "MyApiWithAwsIamAuthDeploymenta388b99c2b"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuth"

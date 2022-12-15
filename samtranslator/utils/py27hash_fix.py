@@ -141,7 +141,7 @@ class Py27UniStr(unicode_string_type):
     def _get_py27_hash(self):  # type: ignore[no-untyped-def]
         h = getattr(self, "_py27_hash", None)
         if h is None:
-            self._py27_hash = h = ctypes.c_size_t(Hash.hash(self)).value  # type: ignore[no-untyped-call]
+            self._py27_hash = h = ctypes.c_size_t(Hash.hash(self)).value
         return h
 
 
@@ -198,7 +198,7 @@ class Py27Keys(object):
         if isinstance(k, Py27UniStr):
             h = k._get_py27_hash()  # type: ignore[no-untyped-call]
         else:
-            h = ctypes.c_size_t(Hash.hash(k)).value  # type: ignore[no-untyped-call]
+            h = ctypes.c_size_t(Hash.hash(k)).value
 
         i = h & self.mask
 
