@@ -19,7 +19,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-cn:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -72,9 +72,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "HtmlApiDeploymentda1577e1dd": {
+    "HtmlApiDeployment874ee11bea": {
       "Properties": {
-        "Description": "RestApi deployment id: da1577e1ddadc82fbcc104e2477852594eeb133c",
+        "Description": "RestApi deployment id: 874ee11bea39ab234d0bfbcc481f76e58c4d2195",
         "RestApiId": {
           "Ref": "HtmlApi"
         },
@@ -85,7 +85,7 @@
     "HtmlApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeploymentda1577e1dd"
+          "Ref": "HtmlApiDeployment874ee11bea"
         },
         "RestApiId": {
           "Ref": "HtmlApi"

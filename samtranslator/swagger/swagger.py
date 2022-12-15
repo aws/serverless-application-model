@@ -6,6 +6,7 @@ from samtranslator.model.apigateway import ApiGatewayAuthorizer
 from samtranslator.model.intrinsics import ref, make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.open_api.base_editor import BaseEditor
+from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 
 
@@ -223,7 +224,7 @@ class SwaggerEditor(BaseEditor):
 
     @staticmethod
     def _get_invoke_role(invoke_role):  # type: ignore[no-untyped-def]
-        CALLER_CREDENTIALS_ARN = "arn:aws:iam::*:user/*"
+        CALLER_CREDENTIALS_ARN = f"arn:{ArnGenerator.get_partition_name()}:iam::*:user/*"  # type: ignore[no-untyped-call]
         return invoke_role if invoke_role and invoke_role != "CALLER_CREDENTIALS" else CALLER_CREDENTIALS_ARN
 
     def iter_on_all_methods_for_path(self, path_name, skip_methods_without_apigw_integration=True):  # type: ignore[no-untyped-def]
