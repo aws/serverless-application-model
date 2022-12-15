@@ -334,7 +334,7 @@ class Resource(object):
 
         self.resource_attributes[attr] = value
 
-    def get_resource_attribute(self, attr):  # type: ignore[no-untyped-def]
+    def get_resource_attribute(self, attr: str) -> Any:
         """Gets the resource attribute if available
 
         :param attr: Name of the attribute
@@ -369,7 +369,7 @@ class Resource(object):
             return self.runtime_attrs[attr_name](self)
         raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
 
-    def get_passthrough_resource_attributes(self):  # type: ignore[no-untyped-def]
+    def get_passthrough_resource_attributes(self) -> Dict[str, Any]:
         """
         Returns a dictionary of resource attributes of the ResourceMacro that should be passed through from the main
         vanilla CloudFormation resource to its children. Currently only Condition is copied.

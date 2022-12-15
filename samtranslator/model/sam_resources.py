@@ -164,6 +164,7 @@ class SamFunction(SamResourceMacro):
     ImageConfig: Optional[Dict[str, Any]]
     CodeSigningConfigArn: Optional[Intrinsicable[str]]
     Architectures: Optional[List[Any]]
+    SnapStart: Optional[Dict[str, Any]]
     FunctionUrlConfig: Optional[Dict[str, Any]]
 
     event_resolver = ResourceTypeResolver(  # type: ignore[no-untyped-call]
@@ -205,7 +206,7 @@ class SamFunction(SamResourceMacro):
         :returns: a list of vanilla CloudFormation Resources, to which this Function expands
         :rtype: list
         """
-        resources = []
+        resources: List[Any] = []
         intrinsics_resolver: IntrinsicsResolver = kwargs["intrinsics_resolver"]
         mappings_resolver: Optional[IntrinsicsResolver] = kwargs.get("mappings_resolver")
         conditions = kwargs.get("conditions", {})
@@ -214,7 +215,7 @@ class SamFunction(SamResourceMacro):
         if self.DeadLetterQueue:
             self._validate_dlq(self.DeadLetterQueue)
 
-        lambda_function = self._construct_lambda_function()  # type: ignore[no-untyped-call]
+        lambda_function = self._construct_lambda_function()
         resources.append(lambda_function)
 
         if self.ProvisionedConcurrencyConfig:
@@ -255,7 +256,7 @@ class SamFunction(SamResourceMacro):
             lambda_alias,
             intrinsics_resolver,
             cast(IntrinsicsResolver, mappings_resolver),  # TODO: better handle mappings_resolver's Optional
-            self.get_passthrough_resource_attributes(),  # type: ignore[no-untyped-call]
+            self.get_passthrough_resource_attributes(),
             feature_toggle,
         )
 
@@ -371,35 +372,32 @@ class SamFunction(SamResourceMacro):
         )
         if dest_config.get("Destination") is None or property_condition is not None:
             combined_condition = self._make_and_conditions(  # type: ignore[no-untyped-call]
-                self.get_passthrough_resource_attributes().get("Condition"), property_condition, conditions  # type: ignore[no-untyped-call]
+                self.get_passthrough_resource_attributes().get("Condition"), property_condition, conditions
             )
             if dest_config.get("Type") in auto_inject_list:
                 if dest_config.get("Type") == "SQS":
                     resource = SQSQueue(
-                        resource_logical_id + "Queue", attributes=self.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
+                        resource_logical_id + "Queue", attributes=self.get_passthrough_resource_attributes()
                     )
                 if dest_config.get("Type") == "SNS":
                     resource = SNSTopic(  # type: ignore[assignment]
-                        resource_logical_id + "Topic", attributes=self.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
+                        resource_logical_id + "Topic", attributes=self.get_passthrough_resource_attributes()
                     )
-                if combined_condition:
-                    resource.set_resource_attribute("Condition", combined_condition)  # type: ignore[union-attr]
-                if property_condition:
-                    destination = make_conditional(
-                        property_condition, resource.get_runtime_attr("arn"), dest_arn  # type: ignore[union-attr]
-                    )
-                else:
-                    destination = resource.get_runtime_attr("arn")  # type: ignore[union-attr]
-                policy = self._add_event_invoke_managed_policy(  # type: ignore[no-untyped-call]
-                    dest_config, resource_logical_id, property_condition, destination
-                )
+                if resource:
+                    if combined_condition:
+                        resource.set_resource_attribute("Condition", combined_condition)
+                    if property_condition:
+                        destination = make_conditional(property_condition, resource.get_runtime_attr("arn"), dest_arn)
+                    else:
+                        destination = resource.get_runtime_attr("arn")
+                policy = self._add_event_invoke_managed_policy(dest_config, resource_logical_id, destination)
             else:
                 raise InvalidResourceException(
                     self.logical_id, "Destination is required if Type is not {}".format(auto_inject_list)
                 )
         if dest_config.get("Destination") is not None and property_condition is None:
-            policy = self._add_event_invoke_managed_policy(  # type: ignore[no-untyped-call]
-                dest_config, resource_logical_id, None, dest_config.get("Destination")
+            policy = self._add_event_invoke_managed_policy(
+                dest_config, resource_logical_id, dest_config.get("Destination")
             )
 
         return resource, destination, policy
@@ -483,7 +481,7 @@ class SamFunction(SamResourceMacro):
 
         return resolved_alias_name
 
-    def _construct_lambda_function(self):  # type: ignore[no-untyped-def]
+    def _construct_lambda_function(self) -> LambdaFunction:
         """Constructs and returns the Lambda function.
 
         :returns: a list containing the Lambda function and execution role resources
@@ -513,7 +511,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.ImageConfig = self.ImageConfig
         lambda_function.PackageType = self.PackageType
         lambda_function.Architectures = self.Architectures
-        lambda_function.SnapStart = self.SnapStart  # type: ignore[attr-defined]
+        lambda_function.SnapStart = self.SnapStart
         lambda_function.EphemeralStorage = self.EphemeralStorage
 
         if self.Tracing:
@@ -524,11 +522,13 @@ class SamFunction(SamResourceMacro):
 
         lambda_function.CodeSigningConfigArn = self.CodeSigningConfigArn
 
-        self._validate_package_type(lambda_function)  # type: ignore[no-untyped-call]
-        self._validate_architectures(lambda_function)  # type: ignore[no-untyped-call]
+        self._validate_package_type(lambda_function)
+        self._validate_architectures(lambda_function)
         return lambda_function
 
-    def _add_event_invoke_managed_policy(self, dest_config, logical_id, condition, dest_arn):  # type: ignore[no-untyped-def]
+    def _add_event_invoke_managed_policy(
+        self, dest_config: Dict[str, Any], logical_id: str, dest_arn: Any
+    ) -> Dict[str, Any]:
         policy = {}
         if dest_config and dest_config.get("Type"):
             if dest_config.get("Type") == "SQS":
@@ -548,7 +548,7 @@ class SamFunction(SamResourceMacro):
         :returns: the generated IAM Role
         :rtype: model.iam.IAMRole
         """
-        role_attributes = self.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
+        role_attributes = self.get_passthrough_resource_attributes()
 
         if self.AssumeRolePolicyDocument is not None:
             assume_role_policy_document = self.AssumeRolePolicyDocument
@@ -597,7 +597,7 @@ class SamFunction(SamResourceMacro):
         )
         return execution_role
 
-    def _validate_package_type(self, lambda_function):  # type: ignore[no-untyped-def]
+    def _validate_package_type(self, lambda_function: LambdaFunction) -> None:
         """
         Validates Function based on the existence of Package type
         """
@@ -609,7 +609,7 @@ class SamFunction(SamResourceMacro):
                 "PackageType needs to be `{zip}` or `{image}`".format(zip=ZIP, image=IMAGE),
             )
 
-        def _validate_package_type_zip():  # type: ignore[no-untyped-def]
+        def _validate_package_type_zip() -> None:
             if not all([lambda_function.Runtime, lambda_function.Handler]):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
@@ -622,7 +622,7 @@ class SamFunction(SamResourceMacro):
                     "ImageUri or ImageConfig cannot be present when PackageType is of type `{zip}`".format(zip=ZIP),
                 )
 
-        def _validate_package_type_image():  # type: ignore[no-untyped-def]
+        def _validate_package_type_image() -> None:
             if any([lambda_function.Handler, lambda_function.Runtime, lambda_function.Layers]):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
@@ -639,9 +639,9 @@ class SamFunction(SamResourceMacro):
         _validate_per_package_type = {ZIP: _validate_package_type_zip, IMAGE: _validate_package_type_image}
 
         # Call appropriate validation function based on the package type.
-        return _validate_per_package_type[packagetype]()  # type: ignore[no-untyped-call]
+        return _validate_per_package_type[packagetype]()
 
-    def _validate_architectures(self, lambda_function):  # type: ignore[no-untyped-def]
+    def _validate_architectures(self, lambda_function: LambdaFunction) -> None:
         """
         Validates Function based on the existence of architecture type
 
@@ -869,9 +869,7 @@ class SamFunction(SamResourceMacro):
                 logical_dict.update({"SnapStart": function.SnapStart})
         logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()
 
-        attributes = self.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
-        if attributes is None:
-            attributes = {}
+        attributes = self.get_passthrough_resource_attributes()
         if "DeletionPolicy" not in attributes:
             attributes["DeletionPolicy"] = "Retain"
 
@@ -895,7 +893,7 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(self.logical_id, "Alias name is required to create an alias")
 
         logical_id = "{id}Alias{suffix}".format(id=function.logical_id, suffix=name)
-        alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())  # type: ignore[no-untyped-call, no-untyped-call]
+        alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())
         alias.Name = name
         alias.FunctionName = function.get_runtime_attr("name")
         alias.FunctionVersion = version.get_runtime_attr("version")
@@ -1017,7 +1015,7 @@ class SamFunction(SamResourceMacro):
         self._validate_function_url_params(lambda_function, function_url_config)
 
         logical_id = f"{lambda_function.logical_id}Url"
-        lambda_url_attributes = self.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
+        lambda_url_attributes = self.get_passthrough_resource_attributes()
         lambda_url = LambdaUrl(logical_id=logical_id, attributes=lambda_url_attributes)
 
         cors = function_url_config.get("Cors")
@@ -1086,7 +1084,7 @@ class SamFunction(SamResourceMacro):
                 )
 
     def _construct_url_permission(
-        self, lambda_function: "SamFunction", lambda_alias: Optional[LambdaAlias], function_url_config: Dict[str, Any]
+        self, lambda_function: LambdaFunction, lambda_alias: Optional[LambdaAlias], function_url_config: Dict[str, Any]
     ) -> Optional[LambdaPermission]:
         """
         Construct the lambda permission associated with the function url resource in a case
@@ -1111,7 +1109,7 @@ class SamFunction(SamResourceMacro):
             return None
 
         logical_id = f"{lambda_function.logical_id}UrlPublicPermissions"
-        lambda_permission_attributes = self.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
+        lambda_permission_attributes = self.get_passthrough_resource_attributes()
         lambda_permission = LambdaPermission(logical_id=logical_id, attributes=lambda_permission_attributes)
         lambda_permission.Action = "lambda:InvokeFunctionUrl"
         lambda_permission.FunctionName = (
@@ -1242,7 +1240,7 @@ class SamApi(SamResourceMacro):
             canary_setting=self.CanarySetting,
             tracing_enabled=self.TracingEnabled,
             resource_attributes=self.resource_attributes,
-            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),  # type: ignore[no-untyped-call]
+            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             open_api_version=self.OpenApiVersion,
             models=self.Models,
             domain=self.Domain,
@@ -1355,7 +1353,7 @@ class SamHttpApi(SamResourceMacro):
             route_settings=self.RouteSettings,
             default_route_settings=self.DefaultRouteSettings,
             resource_attributes=self.resource_attributes,
-            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),  # type: ignore[no-untyped-call]
+            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             domain=self.Domain,
             fail_on_warnings=self.FailOnWarnings,
             description=self.Description,
@@ -1488,7 +1486,7 @@ class SamApplication(SamResourceMacro):
     def _construct_nested_stack(self) -> NestedStack:
         """Constructs a AWS::CloudFormation::Stack resource"""
         nested_stack = NestedStack(
-            self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
+            self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes()
         )
         nested_stack.Parameters = self.Parameters
         nested_stack.NotificationARNs = self.NotificationARNs
@@ -1573,9 +1571,7 @@ class SamLayerVersion(SamResourceMacro):
         # If nothing defined, this will be set to Retain
         retention_policy_value = self._get_retention_policy_value()
 
-        attributes = self.get_passthrough_resource_attributes()  # type: ignore[no-untyped-call]
-        if attributes is None:
-            attributes = {}
+        attributes = self.get_passthrough_resource_attributes()
         if "DeletionPolicy" not in attributes:
             attributes["DeletionPolicy"] = self.RETAIN
         if retention_policy_value is not None:
@@ -1746,7 +1742,7 @@ class SamStateMachine(SamResourceMacro):
             event_resolver=self.event_resolver,
             tags=self.Tags,
             resource_attributes=self.resource_attributes,
-            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),  # type: ignore[no-untyped-call]
+            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
         )
 
         resources = state_machine_generator.to_cloudformation()
@@ -2039,7 +2035,7 @@ class SamConnector(SamResourceMacro):
             # Although as today the generated resources do not have any existing metadata,
             # To make it future proof, we still does a merge to avoid overwriting.
             try:
-                original_metadata = resource.get_resource_attribute("Metadata")  # type: ignore[no-untyped-call]
+                original_metadata = resource.get_resource_attribute("Metadata")
             except KeyError:
                 original_metadata = {}
             resource.set_resource_attribute("Metadata", {**original_metadata, **metadata})
