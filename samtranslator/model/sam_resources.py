@@ -387,14 +387,10 @@ class SamFunction(SamResourceMacro):
                     if combined_condition:
                         resource.set_resource_attribute("Condition", combined_condition)
                     if property_condition:
-                        destination = make_conditional(
-                            property_condition, resource.get_runtime_attr("arn"), dest_arn
-                        )
+                        destination = make_conditional(property_condition, resource.get_runtime_attr("arn"), dest_arn)
                     else:
                         destination = resource.get_runtime_attr("arn")
-                policy = self._add_event_invoke_managed_policy(
-                    dest_config, resource_logical_id, destination
-                )
+                policy = self._add_event_invoke_managed_policy(dest_config, resource_logical_id, destination)
             else:
                 raise InvalidResourceException(
                     self.logical_id, "Destination is required if Type is not {}".format(auto_inject_list)
