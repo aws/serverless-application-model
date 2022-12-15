@@ -121,7 +121,7 @@ Run `make test` or `make test-fast`. Once all tests pass make sure to run
 
 ### Unit testing with multiple Python versions
 
-Currently, our officially supported Python versions are 3.7, 3.9, 3.9 and 3.10. For the most
+Currently, our officially supported Python versions are 3.7, 3.8, 3.9 and 3.10. For the most
 part, code that works in Python3.7 will work in Pythons 3.8, 3.9 and 3.10. You only run into problems if you are
 trying to use features released in a higher version (for example features introduced into Python3.10
 will not work in Python3.9). If you want to test in many versions, you can create a virtualenv for
