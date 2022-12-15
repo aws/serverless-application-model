@@ -62,9 +62,9 @@ Resources:
             - scope
             IdentitySource: $request.header.Authorization
             JwtConfiguration:
-              audience:
+              Audience:
               - audience1
               - audience2
-              issuer: https://www.example.com/v1/connect/oidc
+              Issuer: https://www.example.com/v1/connect/oidc
         DefaultAuthorizer: LambdaAuth
         EnableIamAuthorizer: true

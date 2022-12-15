@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import is_type, one_of, is_str, list_of
@@ -69,6 +69,11 @@ class ApiGatewayV2ApiMapping(Resource):
     }
 
 
+# https://docs.aws.amazon.com/apigatewayv2/latest/api-reference/apis-apiid-authorizers-authorizerid.html#apis-apiid-authorizers-authorizerid-model-jwtconfiguration
+# Change to TypedDict when we don't have to support Python 3.7
+JwtConfiguration = Dict[str, Union[str, List[str]]]
+
+
 class ApiGatewayV2Authorizer(object):
     def __init__(  # type: ignore[no-untyped-def]
         self,
@@ -90,7 +95,7 @@ class ApiGatewayV2Authorizer(object):
         self.api_logical_id = api_logical_id
         self.name = name
         self.authorization_scopes = authorization_scopes
-        self.jwt_configuration = jwt_configuration
+        self.jwt_configuration: Optional[JwtConfiguration] = self._get_jwt_configuration(jwt_configuration)
         self.id_source = id_source
         self.function_arn = function_arn
         self.function_invoke_role = function_invoke_role
@@ -299,3 +304,9 @@ class ApiGatewayV2Authorizer(object):
             return None
 
         return self.identity.get("ReauthorizeEvery")
+
+    @staticmethod
+    def _get_jwt_configuration(props: Optional[Dict[str, Union[str, List[str]]]]) -> Optional[JwtConfiguration]:
+        if not props:
+            return None
+        return {k.lower(): v for k, v in props.items()}
