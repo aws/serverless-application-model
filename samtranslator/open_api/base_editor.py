@@ -36,7 +36,12 @@ class BaseEditor(object):
         """
         contents = [item]
         if isinstance(item, dict) and BaseEditor._CONDITIONAL_IF in item:
-            contents = item[BaseEditor._CONDITIONAL_IF][1:]
+            if_parameters = item[BaseEditor._CONDITIONAL_IF]
+            if not isinstance(if_parameters, list):
+                raise InvalidDocumentException(
+                    [InvalidTemplateException(f"Value of {BaseEditor._CONDITIONAL_IF} must be a list.")]
+                )
+            contents = if_parameters[1:]
             contents = [content for content in contents if not is_intrinsic_no_value(content)]
         return contents
 
