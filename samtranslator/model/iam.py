@@ -1,19 +1,19 @@
 from typing import Any, Dict
 
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import is_type, is_str, list_of
+from samtranslator.model.types import IS_DICT, is_type, IS_STR, list_of
 from samtranslator.model.intrinsics import ref, fnGetAtt
 
 
 class IAMRole(Resource):
     resource_type = "AWS::IAM::Role"
     property_types = {
-        "AssumeRolePolicyDocument": PropertyType(True, is_type(dict)),
+        "AssumeRolePolicyDocument": PropertyType(True, IS_DICT),
         "ManagedPolicyArns": PropertyType(False, is_type(list)),
-        "Path": PropertyType(False, is_str()),
+        "Path": PropertyType(False, IS_STR),
         "Policies": PropertyType(False, is_type(list)),
-        "PermissionsBoundary": PropertyType(False, is_str()),
-        "Tags": PropertyType(False, list_of(is_type(dict))),
+        "PermissionsBoundary": PropertyType(False, IS_STR),
+        "Tags": PropertyType(False, list_of(IS_DICT)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
@@ -22,13 +22,13 @@ class IAMRole(Resource):
 class IAMManagedPolicy(Resource):
     resource_type = "AWS::IAM::ManagedPolicy"
     property_types = {
-        "Description": PropertyType(False, is_str()),
-        "Groups": PropertyType(False, is_str()),
-        "PolicyDocument": PropertyType(True, is_type(dict)),
-        "ManagedPolicyName": PropertyType(False, is_str()),
-        "Path": PropertyType(False, is_str()),
+        "Description": PropertyType(False, IS_STR),
+        "Groups": PropertyType(False, IS_STR),
+        "PolicyDocument": PropertyType(True, IS_DICT),
+        "ManagedPolicyName": PropertyType(False, IS_STR),
+        "Path": PropertyType(False, IS_STR),
         "Roles": PropertyType(False, is_type(list)),
-        "Users": PropertyType(False, list_of(is_str())),
+        "Users": PropertyType(False, list_of(IS_STR)),
     }
 
 

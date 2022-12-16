@@ -5,7 +5,7 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, Resource, ResourceMacro
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.sqs import SQSQueue
-from samtranslator.model.types import is_str, is_type
+from samtranslator.model.types import IS_DICT, IS_STR
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.model.exceptions import InvalidEventException
@@ -35,21 +35,21 @@ class SchedulerEventSource(ResourceMacro):
     # same as the original "Schedule" event.
     # See class "Schedule" in samtranslator.model.eventsources.push and samtranslator.model.stepfunctions.events.
     property_types = {
-        "PermissionsBoundary": PropertyType(False, is_str()),
-        "ScheduleExpression": PropertyType(True, is_str()),
-        "FlexibleTimeWindow": PropertyType(False, is_type(dict)),
-        "Name": PropertyType(False, is_str()),
-        "State": PropertyType(False, is_str()),
-        "Description": PropertyType(False, is_str()),
-        "StartDate": PropertyType(False, is_str()),
-        "EndDate": PropertyType(False, is_str()),
-        "ScheduleExpressionTimezone": PropertyType(False, is_str()),
-        "GroupName": PropertyType(False, is_str()),
-        "KmsKeyArn": PropertyType(False, is_str()),
-        "Input": PropertyType(False, is_str()),
-        "RoleArn": PropertyType(False, is_str()),
-        "DeadLetterConfig": PropertyType(False, is_type(dict)),
-        "RetryPolicy": PropertyType(False, is_type(dict)),
+        "PermissionsBoundary": PropertyType(False, IS_STR),
+        "ScheduleExpression": PropertyType(True, IS_STR),
+        "FlexibleTimeWindow": PropertyType(False, IS_DICT),
+        "Name": PropertyType(False, IS_STR),
+        "State": PropertyType(False, IS_STR),
+        "Description": PropertyType(False, IS_STR),
+        "StartDate": PropertyType(False, IS_STR),
+        "EndDate": PropertyType(False, IS_STR),
+        "ScheduleExpressionTimezone": PropertyType(False, IS_STR),
+        "GroupName": PropertyType(False, IS_STR),
+        "KmsKeyArn": PropertyType(False, IS_STR),
+        "Input": PropertyType(False, IS_STR),
+        "RoleArn": PropertyType(False, IS_STR),
+        "DeadLetterConfig": PropertyType(False, IS_DICT),
+        "RetryPolicy": PropertyType(False, IS_DICT),
     }
 
     # Below are type hints, must maintain consistent with properties_types
