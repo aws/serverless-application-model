@@ -10,4 +10,4 @@ if [ ! -d "${VENV}" ]; then
     "${VENV}/bin/python" -m pip install cfn-lint==0.72.2
 fi
 
-"${VENV}/bin/cfn-lint"
+"${VENV}/bin/cfn-lint" --format parseable
