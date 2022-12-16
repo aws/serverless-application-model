@@ -1,16 +1,12 @@
 """A plug-able validator to help raise exception when some value is unexpected."""
-from enum import Enum
 from typing import Generic, Optional, TypeVar
 
-from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
-
-
-class ExpectedType(Enum):
-    MAP = ("map", dict)
-    LIST = ("list", list)
-    STRING = ("string", str)
-    INTEGER = ("integer", int)
-
+from samtranslator.model.exceptions import (
+    ExpectedType,
+    InvalidEventException,
+    InvalidResourceException,
+    InvalidResourcePropertyTypeException,
+)
 
 T = TypeVar("T")
 
@@ -40,12 +36,14 @@ class _ResourcePropertyValueValidator(Generic[T]):
         """
         type_description, type_class = expected_type.value
         if not isinstance(self.value, type_class):
-            if not message:
-                message = f"Property '{self.property_identifier}' should be a {type_description}."
             if self.event_id:
-                raise InvalidEventException(self.event_id, message)
+                raise InvalidEventException(
+                    self.event_id, message or f"Property '{self.property_identifier}' should be a {type_description}."
+                )
             if self.resource_logical_id:
-                raise InvalidResourceException(self.resource_logical_id, message)
+                raise InvalidResourcePropertyTypeException(
+                    self.resource_logical_id, self.property_identifier, expected_type, message
+                )
             raise RuntimeError("event_id and resource_logical_id are both None")
         # mypy is not smart to derive class from expected_type.value[1], ignore types:
         return self.value  # type: ignore
