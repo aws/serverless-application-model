@@ -13,7 +13,7 @@ from samtranslator.model.tags.resource_tagging import get_tag_list
 class PropertyType(object):
     """Stores validation information for a CloudFormation resource property.
 
-    The arribute "expected_type" is only used by InvalidResourcePropertyTypeException
+    The attribute "expected_type" is only used by InvalidResourcePropertyTypeException
     to generate an error message. When it is not found,
     customers will see "Type of property 'xxx' is invalid."
     If it is provided, customers will see "Property 'xxx' should be a yyy."
