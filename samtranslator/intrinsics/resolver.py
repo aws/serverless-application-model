@@ -93,12 +93,12 @@ class IntrinsicsResolver(object):
         """
         return self._traverse(input, supported_resource_id_refs, self._try_resolve_sam_resource_id_refs)  # type: ignore[no-untyped-call]
 
-    def _traverse(self, input, resolution_data, resolver_method):  # type: ignore[no-untyped-def]
+    def _traverse(self, input_value, resolution_data, resolver_method):  # type: ignore[no-untyped-def]
         """
         Driver method that performs the actual traversal of input and calls the appropriate `resolver_method` when
         to perform the resolution.
 
-        :param input: Any primitive type  (dict, array, string etc) whose value might contain an intrinsic function
+        :param input_value: Any primitive type  (dict, array, string etc) whose value might contain an intrinsic function
         :param resolution_data: Data that will help with resolution. For example, when resolving parameter references,
             this object will contain a dictionary of parameter names and their values.
         :param resolver_method: Method that will be called to actually resolve an intrinsic function. This method
@@ -108,7 +108,7 @@ class IntrinsicsResolver(object):
 
         # There is data to help with resolution. Skip the traversal altogether
         if len(resolution_data) == 0:
-            return input
+            return input_value
 
         #
         # Traversal Algorithm:
@@ -126,15 +126,14 @@ class IntrinsicsResolver(object):
         # to handle nested intrinsics. All of these cases lend well towards a Pre-Order traversal where we try and
         # process the intrinsic, which results in a modified sub-tree to traverse.
         #
-
-        input = resolver_method(input, resolution_data)
-
-        if isinstance(input, dict):
-            return self._traverse_dict(input, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
-        if isinstance(input, list):
-            return self._traverse_list(input, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
+        input_value = resolver_method(input_value, resolution_data)
+        if isinstance(input_value, dict):
+            return self._traverse_dict(input_value, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
+        if isinstance(input_value, list):
+            return self._traverse_list(input_value, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
         # We can iterate only over dict or list types. Primitive types are terminals
-        return input
+
+        return input_value
 
     def _traverse_dict(self, input_dict, resolution_data, resolver_method):  # type: ignore[no-untyped-def]
         """
