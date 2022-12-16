@@ -506,7 +506,7 @@ class ApiGenerator(object):
         if self.domain.get("BasePath") and isinstance(basepath_value, str):
             basepaths = [basepath_value]
         elif self.domain.get("BasePath") and isinstance(basepath_value, list):
-            basepaths = cast(Optional[List[str]], basepath_value)
+            basepaths = cast(Optional[List[Any]], basepath_value)
         else:
             basepaths = None
 
@@ -839,17 +839,9 @@ class ApiGenerator(object):
             api_key = self._construct_api_key(usage_plan_logical_id, create_usage_plan, rest_api_stage)
             usage_plan_key = self._construct_usage_plan_key(usage_plan_logical_id, create_usage_plan, api_key)
 
-        if usage_plan:
-            if usage_plan_properties.get("UsagePlanName"):
-                usage_plan.UsagePlanName = usage_plan_properties.get("UsagePlanName")
-            if usage_plan_properties.get("Description"):
-                usage_plan.Description = usage_plan_properties.get("Description")
-            if usage_plan_properties.get("Quota"):
-                usage_plan.Quota = usage_plan_properties.get("Quota")
-            if usage_plan_properties.get("Tags"):
-                usage_plan.Tags = usage_plan_properties.get("Tags")
-            if usage_plan_properties.get("Throttle"):
-                usage_plan.Throttle = usage_plan_properties.get("Throttle")
+        for name in ["UsagePlanName", "Description", "Quota", "Tags", "Throttle"]:
+            if usage_plan and usage_plan_properties.get(name):
+                setattr(usage_plan, name, usage_plan_properties.get(name))
         return usage_plan, api_key, usage_plan_key
 
     def _construct_api_key(
