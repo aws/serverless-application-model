@@ -1000,7 +1000,9 @@ class SamFunction(SamResourceMacro):
             )
         raise InvalidResourceException(self.logical_id, f"Invalid value for property {property_name}.")
 
-    def _construct_function_url(self, lambda_function, lambda_alias, function_url_config: Dict[str, Any]):  # type: ignore[no-untyped-def]
+    def _construct_function_url(
+        self, lambda_function: LambdaFunction, lambda_alias: Optional[LambdaAlias], function_url_config: Dict[str, Any]
+    ) -> LambdaUrl:
         """
         This method is used to construct a lambda url resource
 
@@ -1032,7 +1034,7 @@ class SamFunction(SamResourceMacro):
         return lambda_url
 
     def _validate_function_url_params(
-        self, lambda_function: "SamFunction", function_url_config: Dict[str, Any]
+        self, lambda_function: LambdaFunction, function_url_config: Dict[str, Any]
     ) -> None:
         """
         Validate parameters provided to configure Lambda Urls
@@ -1040,7 +1042,7 @@ class SamFunction(SamResourceMacro):
         self._validate_url_auth_type(lambda_function, function_url_config)
         self._validate_cors_config_parameter(lambda_function, function_url_config)
 
-    def _validate_url_auth_type(self, lambda_function: "SamFunction", function_url_config: Dict[str, Any]) -> None:
+    def _validate_url_auth_type(self, lambda_function: LambdaFunction, function_url_config: Dict[str, Any]) -> None:
         if is_intrinsic(function_url_config):
             return
 
@@ -1054,7 +1056,9 @@ class SamFunction(SamResourceMacro):
                 "AuthType is required to configure function property `FunctionUrlConfig`. Please provide either AWS_IAM or NONE.",
             )
 
-    def _validate_cors_config_parameter(self, lambda_function: "SamFunction", function_url_config: Dict[str, Any]):  # type: ignore[no-untyped-def]
+    def _validate_cors_config_parameter(
+        self, lambda_function: LambdaFunction, function_url_config: Dict[str, Any]
+    ) -> None:
         if is_intrinsic(function_url_config):
             return
 
@@ -1080,8 +1084,8 @@ class SamFunction(SamResourceMacro):
                     lambda_function.logical_id,
                     "{} is not a valid property for configuring Cors.".format(prop_name),
                 )
-            prop_type = cors_property_data_type.get(prop_name)
-            if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):  # type: ignore[arg-type]
+            prop_type = cors_property_data_type.get(prop_name, list)
+            if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
                     "{} must be of type {}.".format(prop_name, str(prop_type).split("'")[1]),
@@ -1219,7 +1223,7 @@ class SamApi(SamResourceMacro):
         template_conditions = kwargs.get("conditions")
         route53_record_set_groups = kwargs.get("route53_record_set_groups", {})
 
-        api_generator = ApiGenerator(  # type: ignore[no-untyped-call]
+        api_generator = ApiGenerator(
             self.logical_id,
             self.CacheClusterEnabled,
             self.CacheClusterSize,
