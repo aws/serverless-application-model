@@ -46,7 +46,7 @@ class SamPlugins(object):
     set by the plugin. SAM translator will convert this into a nice error message and display to the user.
     """
 
-    def __init__(self, initial_plugins: Optional[Any] = None) -> None:
+    def __init__(self, initial_plugins: Optional[Union[BasePlugin, List[BasePlugin]]] = None) -> None:
         """
         Initialize the plugins class with an optional list of plugins
 
