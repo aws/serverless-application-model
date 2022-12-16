@@ -2,7 +2,7 @@ import copy
 
 from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
-
+from typing import Dict, Any, Optional, List
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
     FeatureToggleDefaultConfigProvider,
@@ -55,7 +55,9 @@ class Translator:
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
 
-    def _get_function_names(self, resource_dict, intrinsics_resolver):  # type: ignore[no-untyped-def]
+    def _get_function_names(
+        self, resource_dict: Dict[str, Any], intrinsics_resolver: IntrinsicsResolver
+    ) -> Dict[str, str]:
         """
         :param resource_dict: AWS::Serverless::Function resource is provided as input
         :param intrinsics_resolver: to resolve intrinsics for function_name
@@ -71,11 +73,11 @@ class Translator:
                 item_properties = item.get("Properties", {})
                 if item.get("Type") == "Api" and item_properties.get("RestApiId"):
                     rest_api = item_properties.get("RestApiId")
-                    api_name = Api.get_rest_api_id_string(rest_api)  # type: ignore[no-untyped-call]
+                    api_name = Api.get_rest_api_id_string(rest_api)
                     if isinstance(api_name, str):
                         resource_dict_copy = copy.deepcopy(resource_dict)
                         function_name = intrinsics_resolver.resolve_parameter_refs(
-                            resource_dict_copy.get("Properties").get("FunctionName")
+                            resource_dict_copy.get("Properties", {}).get("FunctionName")
                         )
                         if function_name:
                             self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
@@ -83,7 +85,13 @@ class Translator:
                             )
         return self.function_names
 
-    def translate(self, sam_template, parameter_values, feature_toggle=None, passthrough_metadata=False):  # type: ignore[no-untyped-def]
+    def translate(
+        self,
+        sam_template: Dict[str, Any],
+        parameter_values: Dict[Any, Any],
+        feature_toggle: Optional[FeatureToggle] = None,
+        passthrough_metadata: Optional[bool] = False,
+    ) -> Dict[str, Any]:
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
@@ -103,10 +111,10 @@ class Translator:
             if feature_toggle
             else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)  # type: ignore[no-untyped-call, no-untyped-call]
         )
-        self.function_names = {}
+        self.function_names: Dict[Any, Any] = {}
         self.redeploy_restapi_parameters = {}
-        sam_parameter_values = SamParameterValues(parameter_values)  # type: ignore[no-untyped-call]
-        sam_parameter_values.add_default_parameter_values(sam_template)  # type: ignore[no-untyped-call]
+        sam_parameter_values = SamParameterValues(parameter_values)
+        sam_parameter_values.add_default_parameter_values(sam_template)
         sam_parameter_values.add_pseudo_parameter_values(self.boto_session)  # type: ignore[no-untyped-call]
         parameter_values = sam_parameter_values.parameter_values
         # Create & Install plugins
@@ -130,10 +138,10 @@ class Translator:
         shared_api_usage_plan = SharedApiUsagePlan()
         document_errors = []
         changed_logical_ids = {}
-        route53_record_set_groups = {}  # type: ignore[var-annotated]
-        for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):  # type: ignore[no-untyped-call]
+        route53_record_set_groups: Dict[Any, Any] = {}
+        for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
-                macro = macro_resolver.resolve_resource_type(resource_dict).from_dict(  # type: ignore[no-untyped-call]
+                macro = macro_resolver.resolve_resource_type(resource_dict).from_dict(
                     logical_id, resource_dict, sam_plugins=sam_plugins
                 )
 
@@ -146,7 +154,7 @@ class Translator:
                 kwargs["resource_resolver"] = resource_resolver
                 kwargs["original_template"] = sam_template
                 # add the value of FunctionName property if the function is referenced with the api resource
-                self.redeploy_restapi_parameters["function_names"] = self._get_function_names(  # type: ignore[no-untyped-call]
+                self.redeploy_restapi_parameters["function_names"] = self._get_function_names(
                     resource_dict, intrinsics_resolver
                 )
                 kwargs["redeploy_restapi_parameters"] = self.redeploy_restapi_parameters
@@ -181,7 +189,7 @@ class Translator:
             if deployment_preference_collection.needs_resource_condition():  # type: ignore[no-untyped-call]
                 new_conditions = deployment_preference_collection.create_aggregate_deployment_condition()  # type: ignore[no-untyped-call]
                 if new_conditions:
-                    template.get("Conditions").update(new_conditions)
+                    template.get("Conditions", {}).update(new_conditions)
 
             if not deployment_preference_collection.can_skip_service_role():  # type: ignore[no-untyped-call]
                 template["Resources"].update(deployment_preference_collection.get_codedeploy_iam_role().to_dict())  # type: ignore[no-untyped-call]
@@ -211,7 +219,9 @@ class Translator:
         raise InvalidDocumentException(document_errors)
 
     # private methods
-    def _get_resources_to_iterate(self, sam_template, macro_resolver):  # type: ignore[no-untyped-def]
+    def _get_resources_to_iterate(
+        self, sam_template: Dict[str, Any], macro_resolver: ResourceTypeResolver
+    ) -> List[Any]:
         """
         Returns a list of resources to iterate, order them based on the following order:
 

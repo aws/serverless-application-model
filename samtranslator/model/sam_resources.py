@@ -699,7 +699,7 @@ class SamFunction(SamResourceMacro):
         if self.Events:
             for logical_id, event_dict in self.Events.items():
                 try:
-                    event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(  # type: ignore[no-untyped-call]
+                    event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
                         self.logical_id + logical_id, event_dict, logical_id
                     )
                 except (TypeError, AttributeError) as e:
@@ -742,7 +742,7 @@ class SamFunction(SamResourceMacro):
         if self.Events:
             for logical_id, event_dict in sorted(self.Events.items(), key=SamFunction.order_events):
                 try:
-                    eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(  # type: ignore[no-untyped-call]
+                    eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
                         lambda_function.logical_id + logical_id, event_dict, logical_id
                     )
                 except TypeError as e:
@@ -1763,7 +1763,7 @@ class SamStateMachine(SamResourceMacro):
         if self.Events:
             for logical_id, event_dict in self.Events.items():
                 try:
-                    event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(  # type: ignore[no-untyped-call]
+                    event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
                         self.logical_id + logical_id, event_dict, logical_id
                     )
                 except (TypeError, AttributeError) as e:
