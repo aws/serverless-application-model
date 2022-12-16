@@ -307,6 +307,27 @@ class ApiGatewayV2Authorizer(object):
 
     @staticmethod
     def _get_jwt_configuration(props: Optional[Dict[str, Union[str, List[str]]]]) -> Optional[JwtConfiguration]:
+        """Make sure that JWT configuration dict keys are lower case.
+
+        ApiGatewayV2Authorizer doesn't create `AWS::ApiGatewayV2::Authorizer` but generates
+        Open Api which will be appended to the API's Open Api definition body.
+        For Open Api JWT configuration keys should be in lower case.
+        But for `AWS::ApiGatewayV2::Authorizer` the same keys are capitalized,
+        the way it's usually done in CloudFormation resources.
+        Users get often confused when passing capitalized key to `AWS::Serverless::HttpApi` doesn't work.
+        There exist a comment about that in the documentation
+        https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-httpapi-oauth2authorizer.html#sam-httpapi-oauth2authorizer-jwtconfiguration
+        but the comment doesn't prevent users from making the error.
+
+        Parameters
+        ----------
+        props
+            jwt configuration dict with the keys either lower case or capitalized
+
+        Returns
+        -------
+            jwt configuration dict with low case keys
+        """
         if not props:
             return None
         return {k.lower(): v for k, v in props.items()}
