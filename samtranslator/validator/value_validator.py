@@ -13,20 +13,25 @@ T = TypeVar("T")
 
 class _ResourcePropertyValueValidator(Generic[T]):
     value: Optional[T]
-    resource_logical_id: Optional[str]
-    event_id: Optional[str]
+    resource_id: str
     property_identifier: str
+    is_sam_event: bool
 
     def __init__(
         self, value: Optional[T], resource_id: str, property_identifier: str, is_sam_event: bool = False
     ) -> None:
         self.value = value
+        self.resource_id = resource_id
         self.property_identifier = property_identifier
-        self.resource_logical_id, self.event_id = (None, None)
-        if is_sam_event:
-            self.event_id = resource_id
-        else:
-            self.resource_logical_id = resource_id
+        self.is_sam_event = is_sam_event
+
+    @property
+    def resource_logical_id(self) -> Optional[str]:
+        return None if self.is_sam_event else self.resource_id
+
+    @property
+    def event_id(self) -> Optional[str]:
+        return self.resource_id if self.is_sam_event else None
 
     def to_be_a(self, expected_type: ExpectedType, message: Optional[str] = "") -> T:
         """
@@ -72,6 +77,14 @@ class _ResourcePropertyValueValidator(Generic[T]):
 
     def to_be_a_list(self, message: Optional[str] = "") -> T:
         return self.to_be_a(ExpectedType.LIST, message)
+
+    def to_be_a_list_of(self, expected_type: ExpectedType, message: Optional[str] = "") -> T:
+        value = self.to_be_a(ExpectedType.LIST, message)
+        for index, item in enumerate(value):  # type: ignore
+            sam_expect(
+                item, self.resource_id, f"{self.property_identifier}[{index}]", is_sam_event=self.is_sam_event
+            ).to_be_a(expected_type, message)
+        return value
 
     def to_be_a_string(self, message: Optional[str] = "") -> T:
         return self.to_be_a(ExpectedType.STRING, message)
