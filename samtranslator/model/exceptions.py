@@ -1,5 +1,13 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import List, Optional, Sequence, Union
+
+
+class ExpectedType(Enum):
+    MAP = ("map", dict)
+    LIST = ("list", list)
+    STRING = ("string", str)
+    INTEGER = ("integer", int)
 
 
 class ExceptionWithMessage(ABC, Exception):
@@ -18,7 +26,10 @@ class InvalidDocumentException(ExceptionWithMessage):
     """
 
     def __init__(self, causes: Sequence[ExceptionWithMessage]):
-        self._causes = causes
+        self._causes = list(causes)
+        # Sometimes, the same error could be raised from different plugins,
+        # so here we do a deduplicate based on the message:
+        self._causes = list({cause.message: cause for cause in self._causes}.values())
 
     @property
     def message(self) -> str:
@@ -85,6 +96,27 @@ class InvalidResourceException(ExceptionWithMessage):
     @property
     def message(self) -> str:
         return "Resource with id [{}] is invalid. {}".format(self._logical_id, self._message)
+
+
+class InvalidResourcePropertyTypeException(InvalidResourceException):
+    def __init__(
+        self,
+        logical_id: str,
+        property_identifier: str,
+        expected_type: Optional[ExpectedType],
+        message: Optional[str] = None,
+    ) -> None:
+        message = message or self._default_message(property_identifier, expected_type)
+        super().__init__(logical_id, message)
+
+        self.property_identifier = property_identifier
+
+    @staticmethod
+    def _default_message(property_identifier: str, expected_type: Optional[ExpectedType]) -> str:
+        if expected_type:
+            type_description, _ = expected_type.value
+            return f"Property '{property_identifier}' should be a {type_description}."
+        return f"Type of property '{property_identifier}' is invalid."
 
 
 class InvalidEventException(ExceptionWithMessage):
