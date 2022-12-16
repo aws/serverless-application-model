@@ -2,7 +2,7 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType
 from samtranslator.model.intrinsics import fnSub
 from samtranslator.model.log import SubscriptionFilter
-from samtranslator.model.types import is_str
+from samtranslator.model.types import IS_STR
 from samtranslator.translator.arn_generator import ArnGenerator
 from . import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from .push import PushEventSource
@@ -13,7 +13,7 @@ class CloudWatchLogs(PushEventSource):
 
     resource_type = "CloudWatchLogs"
     principal = "logs.amazonaws.com"
-    property_types = {"LogGroupName": PropertyType(True, is_str()), "FilterPattern": PropertyType(True, is_str())}
+    property_types = {"LogGroupName": PropertyType(True, IS_STR), "FilterPattern": PropertyType(True, IS_STR)}
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]

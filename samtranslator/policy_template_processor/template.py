@@ -1,8 +1,11 @@
-import copy
+from typing import Any
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import RefAction
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
+
+
+POLICY_PARAMETER_DISAMBIGUATE_PREFIX = "___SAM_POLICY_PARAMETER_"
 
 
 class Template(object):
@@ -50,16 +53,52 @@ class Template(object):
         # injection of values for parameters not intended in the template. This is important because "Ref" resolution
         # will substitute any references for which a value is provided.
         necessary_parameter_values = {
-            name: value for name, value in parameter_values.items() if name in self.parameters
+            POLICY_PARAMETER_DISAMBIGUATE_PREFIX + name: value
+            for name, value in parameter_values.items()
+            if name in self.parameters
         }
 
         # Only "Ref" is supported
         supported_intrinsics = {RefAction.intrinsic_name: RefAction()}
 
         resolver = IntrinsicsResolver(necessary_parameter_values, supported_intrinsics)  # type: ignore[no-untyped-call]
-        definition_copy = copy.deepcopy(self.definition)
+        definition_copy = self._disambiguate_policy_parameter(self.definition)
 
         return resolver.resolve_parameter_refs(definition_copy)
+
+    @staticmethod
+    def _disambiguate_policy_parameter(policy_definition: Any) -> Any:
+        """
+        Return a deepcopy of policy definition where all parameters are
+        renamed to avoid naming collision of normal CFN parameters.
+        This is to avoid IntrinsicResolver.resolve_parameter_refs()
+        will make infinitely recursion on this:
+        ```
+        - DynamoDBCrudPolicy:
+          TableName:  <- this is the policy parameter
+            Fn::ImportValue:
+              Fn::Join:
+              - '-'
+              - - Ref: TableName <- this is the CFN parameter
+                - hello
+                - Ref: EnvironmentType
+        ```
+        Once IntrinsicResolver.resolve_parameter_refs() replace the "Ref: TableName"
+        with "TableName: .... Ref: TableName - hello ---"
+        There are "Ref: TableName" in it again (indefinitely).
+        """
+
+        def _traverse(node: Any) -> Any:
+            if isinstance(node, dict):
+                copy = {key: _traverse(value) for key, value in node.items()}
+                if "Ref" in copy and isinstance(copy["Ref"], str):
+                    copy["Ref"] = POLICY_PARAMETER_DISAMBIGUATE_PREFIX + copy["Ref"]
+                return copy
+            if isinstance(node, list):
+                return [_traverse(item) for item in node]
+            return node
+
+        return _traverse(policy_definition)
 
     def missing_parameter_values(self, parameter_values):  # type: ignore[no-untyped-def]
         """
