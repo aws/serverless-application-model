@@ -289,7 +289,7 @@ class Api(EventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)  # type: ignore[attr-defined, no-untyped-call]
+        rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)  # type: ignore[attr-defined]
         if isinstance(rest_api_id, str):
 
             if (
