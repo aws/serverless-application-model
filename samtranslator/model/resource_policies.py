@@ -1,5 +1,6 @@
 from enum import Enum
 from collections import namedtuple
+from typing import Dict, Any, List
 
 from samtranslator.model.intrinsics import (
     is_intrinsic,
@@ -28,7 +29,7 @@ class ResourcePolicies(object):
 
     POLICIES_PROPERTY_NAME = "Policies"
 
-    def __init__(self, resource_properties, policy_template_processor=None):  # type: ignore[no-untyped-def]
+    def __init__(self, resource_properties: Dict[str, Any], policy_template_processor: Any = None):
         """
         Initialize with policies data from resource's properties
 
@@ -41,7 +42,7 @@ class ResourcePolicies(object):
         self._policy_template_processor = policy_template_processor
 
         # Build the list of policies upon construction.
-        self.policies = self._get_policies(resource_properties)  # type: ignore[no-untyped-call]
+        self.policies = self._get_policies(resource_properties)
 
     def get(self):  # type: ignore[no-untyped-def]
         """
@@ -56,7 +57,7 @@ class ResourcePolicies(object):
     def __len__(self):  # type: ignore[no-untyped-def]
         return len(self.policies)
 
-    def _get_policies(self, resource_properties):  # type: ignore[no-untyped-def]
+    def _get_policies(self, resource_properties: Dict[str, Any]) -> List[Any]:
         """
         Returns a list of policies from the resource properties. This method knows how to interpret and handle
         polymorphic nature of the policies property.

@@ -329,7 +329,7 @@ class ApiGatewayAuthorizer(object):
 
         elif authorizer_type == "LAMBDA":
             swagger[APIGATEWAY_AUTHORIZER_KEY] = Py27Dict({"type": self._get_swagger_authorizer_type()})  # type: ignore[no-untyped-call, no-untyped-call]
-            partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+            partition = ArnGenerator.get_partition_name()
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
             authorizer_uri = fnSub(
                 ArnGenerator.generate_arn(  # type: ignore[no-untyped-call]
