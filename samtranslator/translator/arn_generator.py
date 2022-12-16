@@ -1,6 +1,6 @@
 import boto3
 
-from typing import Literal
+from typing import Optional
 
 
 class NoRegionFound(Exception):
@@ -36,7 +36,7 @@ class ArnGenerator(object):
         return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)
 
     @classmethod
-    def get_partition_name(cls, region=None) -> str:  # type: ignore[no-untyped-def]
+    def get_partition_name(cls, region: Optional[str] = None) -> str:
         """
         Gets the name of the partition given the region name. If region name is not provided, this method will
         use Boto3 to get name of the region where this code is running.
