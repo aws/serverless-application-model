@@ -251,7 +251,7 @@ class ApiGatewayV2Authorizer(object):
                 "authorizerPayloadFormatVersion"
             ] = self.authorizer_payload_format_version
 
-            # Set authorizerPayloadFormatVersion. It's a required parameter
+            # Set enableSimpleResponses if present
             if self.enable_simple_responses:
                 openapi[APIGATEWAY_AUTHORIZER_KEY]["enableSimpleResponses"] = self.enable_simple_responses
 
