@@ -70,7 +70,7 @@ class Template(object):
     def _disambiguate_policy_parameter(policy_definition: Any) -> Any:
         """
         Return a deepcopy of policy definition where all parameters are
-        renamed to avoid naming collusion of normal CFN parameters.
+        renamed to avoid naming collision of normal CFN parameters.
         This is to avoid IntrinsicResolver.resolve_parameter_refs()
         will make infinitely recursion on this:
         ```
