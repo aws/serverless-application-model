@@ -128,7 +128,7 @@ class TestTemplateObject(TestCase):
         result = template.to_statement(parameter_values)
 
         self.assertEqual(expected, result)
-        intrinsics_resolver_mock.assert_called_once_with(parameter_values, {"Ref": ANY})
+        intrinsics_resolver_mock.assert_called_once_with({"___SAM_POLICY_PARAMETER_param1": "b"}, {"Ref": ANY})
         resolver_instance_mock.resolve_parameter_refs.assert_called_once_with({"Statement": {"key": "value"}})
 
     @patch("samtranslator.policy_template_processor.template.IntrinsicsResolver")
@@ -145,7 +145,7 @@ class TestTemplateObject(TestCase):
         template.to_statement(parameter_values)
 
         # Intrinsics resolver must be called only with the parameters declared in the template
-        expected_parameter_values = {"param1": "b"}
+        expected_parameter_values = {"___SAM_POLICY_PARAMETER_param1": "b"}
         intrinsics_resolver_mock.assert_called_once_with(expected_parameter_values, ANY)
 
     @patch("samtranslator.policy_template_processor.template.IntrinsicsResolver")
