@@ -334,7 +334,7 @@ class Resource(object):
 
         self.resource_attributes[attr] = value
 
-    def get_resource_attribute(self, attr):  # type: ignore[no-untyped-def]
+    def get_resource_attribute(self, attr: str) -> Any:
         """Gets the resource attribute if available
 
         :param attr: Name of the attribute
@@ -369,7 +369,7 @@ class Resource(object):
             return self.runtime_attrs[attr_name](self)
         raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
 
-    def get_passthrough_resource_attributes(self):  # type: ignore[no-untyped-def]
+    def get_passthrough_resource_attributes(self) -> Dict[str, Any]:
         """
         Returns a dictionary of resource attributes of the ResourceMacro that should be passed through from the main
         vanilla CloudFormation resource to its children. Currently only Condition is copied.
@@ -533,20 +533,20 @@ class ResourceTypeResolver(object):
             ):
                 self.resource_types[resource_class.resource_type] = resource_class
 
-    def can_resolve(self, resource_dict):  # type: ignore[no-untyped-def]
+    def can_resolve(self, resource_dict: Dict[str, Any]) -> bool:
         if not isinstance(resource_dict, dict) or not isinstance(resource_dict.get("Type"), str):
             return False
 
         return resource_dict["Type"] in self.resource_types
 
-    def resolve_resource_type(self, resource_dict):  # type: ignore[no-untyped-def]
+    def resolve_resource_type(self, resource_dict: Dict[str, Any]) -> Any:
         """Returns the Resource class corresponding to the 'Type' key in the given resource dict.
 
         :param dict resource_dict: the resource dict to resolve
         :returns: the resolved Resource class
         :rtype: class
         """
-        if not self.can_resolve(resource_dict):  # type: ignore[no-untyped-call]
+        if not self.can_resolve(resource_dict):
             raise TypeError(
                 "Resource dict has missing or invalid value for key Type. Event Type is: {}.".format(
                     resource_dict.get("Type")

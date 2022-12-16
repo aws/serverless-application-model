@@ -318,7 +318,7 @@ class S3(PushEventSource):
         source_account = ref("AWS::AccountId")
         permission = self._construct_permission(function, source_account=source_account)  # type: ignore[no-untyped-call]
         if CONDITION in permission.resource_attributes:
-            self._depend_on_lambda_permissions_using_tag(bucket, permission)  # type: ignore[no-untyped-call]
+            self._depend_on_lambda_permissions_using_tag(bucket, bucket_id, permission)
         else:
             self._depend_on_lambda_permissions(bucket, permission)  # type: ignore[no-untyped-call]
         resources.append(permission)
@@ -370,7 +370,9 @@ class S3(PushEventSource):
 
         return bucket
 
-    def _depend_on_lambda_permissions_using_tag(self, bucket, permission):  # type: ignore[no-untyped-def]
+    def _depend_on_lambda_permissions_using_tag(
+        self, bucket: Dict[str, Any], bucket_id: str, permission: LambdaPermission
+    ) -> Dict[str, Any]:
         """
         Since conditional DependsOn is not supported this undocumented way of
         implicitely  making dependency through tags is used.
@@ -389,6 +391,7 @@ class S3(PushEventSource):
         if tags is None:
             tags = []
             properties["Tags"] = tags
+        sam_expect(tags, bucket_id, "Tags").to_be_a_list()
         dep_tag = {
             "sam:ConditionalDependsOn:"
             + permission.logical_id: {
@@ -613,7 +616,7 @@ class Api(PushEventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        rest_api_id = self.get_rest_api_id_string(self.RestApiId)  # type: ignore[attr-defined, no-untyped-call]
+        rest_api_id = self.get_rest_api_id_string(self.RestApiId)  # type: ignore[attr-defined]
         if isinstance(rest_api_id, str):
 
             if (
@@ -705,7 +708,7 @@ class Api(PushEventSource):
 
         # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
         resource = "${__ApiId__}/" + "${__Stage__}/" + method + path
-        partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+        partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
             {"__ApiId__": api_id, "__Stage__": stage},
@@ -723,7 +726,7 @@ class Api(PushEventSource):
         if swagger_body is None:
             return
 
-        partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+        partition = ArnGenerator.get_partition_name()
         uri = _build_apigw_integration_uri(function, partition)  # type: ignore[no-untyped-call]
 
         editor = SwaggerEditor(swagger_body)
@@ -949,7 +952,7 @@ class Api(PushEventSource):
         api["DefinitionBody"] = editor.swagger
 
     @staticmethod
-    def get_rest_api_id_string(rest_api_id):  # type: ignore[no-untyped-def]
+    def get_rest_api_id_string(rest_api_id: Any) -> Any:
         """
         rest_api_id can be either a string or a dictionary where the actual api id is the value at key "Ref".
         If rest_api_id is a dictionary with key "Ref", returns value at key "Ref". Otherwise, return rest_api_id.
@@ -996,7 +999,7 @@ class IoTRule(PushEventSource):
 
         resource = "rule/${RuleName}"
 
-        partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+        partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="iot", resource=resource),  # type: ignore[no-untyped-call]
             {"RuleName": ref(self.logical_id)},
