@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.types import is_type, one_of, is_str, list_of
+from samtranslator.model.types import IS_DICT, is_type, one_of, IS_STR, list_of
 from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.schema.common import PassThrough
 from samtranslator.translator import logical_id_generator
@@ -16,18 +16,18 @@ from samtranslator.validator.value_validator import sam_expect
 class ApiGatewayRestApi(Resource):
     resource_type = "AWS::ApiGateway::RestApi"
     property_types = {
-        "Body": PropertyType(False, is_type(dict)),
-        "BodyS3Location": PropertyType(False, is_type(dict)),
-        "CloneFrom": PropertyType(False, is_str()),
-        "Description": PropertyType(False, is_str()),
+        "Body": PropertyType(False, IS_DICT),
+        "BodyS3Location": PropertyType(False, IS_DICT),
+        "CloneFrom": PropertyType(False, IS_STR),
+        "Description": PropertyType(False, IS_STR),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
-        "Name": PropertyType(False, is_str()),
-        "Parameters": PropertyType(False, is_type(dict)),
-        "EndpointConfiguration": PropertyType(False, is_type(dict)),
+        "Name": PropertyType(False, IS_STR),
+        "Parameters": PropertyType(False, IS_DICT),
+        "EndpointConfiguration": PropertyType(False, IS_DICT),
         "BinaryMediaTypes": PropertyType(False, is_type(list)),
         "MinimumCompressionSize": PropertyType(False, is_type(int)),
-        "Mode": PropertyType(False, is_str()),
-        "ApiKeySourceType": PropertyType(False, is_str()),
+        "Mode": PropertyType(False, IS_STR),
+        "ApiKeySourceType": PropertyType(False, IS_STR),
     }
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
@@ -36,18 +36,18 @@ class ApiGatewayRestApi(Resource):
 class ApiGatewayStage(Resource):
     resource_type = "AWS::ApiGateway::Stage"
     property_types = {
-        "AccessLogSetting": PropertyType(False, is_type(dict)),
+        "AccessLogSetting": PropertyType(False, IS_DICT),
         "CacheClusterEnabled": PropertyType(False, is_type(bool)),
-        "CacheClusterSize": PropertyType(False, is_str()),
-        "CanarySetting": PropertyType(False, is_type(dict)),
-        "ClientCertificateId": PropertyType(False, is_str()),
-        "DeploymentId": PropertyType(True, is_str()),
-        "Description": PropertyType(False, is_str()),
-        "RestApiId": PropertyType(True, is_str()),
-        "StageName": PropertyType(True, one_of(is_str(), is_type(dict))),
-        "Tags": PropertyType(False, list_of(is_type(dict))),
+        "CacheClusterSize": PropertyType(False, IS_STR),
+        "CanarySetting": PropertyType(False, IS_DICT),
+        "ClientCertificateId": PropertyType(False, IS_STR),
+        "DeploymentId": PropertyType(True, IS_STR),
+        "Description": PropertyType(False, IS_STR),
+        "RestApiId": PropertyType(True, IS_STR),
+        "StageName": PropertyType(True, one_of(IS_STR, IS_DICT)),
+        "Tags": PropertyType(False, list_of(IS_DICT)),
         "TracingEnabled": PropertyType(False, is_type(bool)),
-        "Variables": PropertyType(False, is_type(dict)),
+        "Variables": PropertyType(False, IS_DICT),
         "MethodSettings": PropertyType(False, is_type(list)),
     }
 
@@ -59,7 +59,7 @@ class ApiGatewayStage(Resource):
 
 class ApiGatewayAccount(Resource):
     resource_type = "AWS::ApiGateway::Account"
-    property_types = {"CloudWatchRoleArn": PropertyType(False, one_of(is_str(), is_type(dict)))}
+    property_types = {"CloudWatchRoleArn": PropertyType(False, one_of(IS_STR, IS_DICT))}
 
 
 class ApiGatewayDeployment(Resource):
@@ -67,10 +67,10 @@ class ApiGatewayDeployment(Resource):
 
     resource_type = "AWS::ApiGateway::Deployment"
     property_types = {
-        "Description": PropertyType(False, is_str()),
-        "RestApiId": PropertyType(True, is_str()),
-        "StageDescription": PropertyType(False, is_type(dict)),
-        "StageName": PropertyType(False, is_str()),
+        "Description": PropertyType(False, IS_STR),
+        "RestApiId": PropertyType(True, IS_STR),
+        "StageDescription": PropertyType(False, IS_DICT),
+        "StageName": PropertyType(False, IS_STR),
     }
 
     runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}
@@ -185,23 +185,23 @@ class ApiGatewayResponse(object):
 class ApiGatewayDomainName(Resource):
     resource_type = "AWS::ApiGateway::DomainName"
     property_types = {
-        "RegionalCertificateArn": PropertyType(False, is_str()),
-        "DomainName": PropertyType(True, is_str()),
-        "EndpointConfiguration": PropertyType(False, is_type(dict)),
-        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
-        "SecurityPolicy": PropertyType(False, is_str()),
-        "CertificateArn": PropertyType(False, is_str()),
-        "OwnershipVerificationCertificateArn": PropertyType(False, is_str()),
+        "RegionalCertificateArn": PropertyType(False, IS_STR),
+        "DomainName": PropertyType(True, IS_STR),
+        "EndpointConfiguration": PropertyType(False, IS_DICT),
+        "MutualTlsAuthentication": PropertyType(False, IS_DICT),
+        "SecurityPolicy": PropertyType(False, IS_STR),
+        "CertificateArn": PropertyType(False, IS_STR),
+        "OwnershipVerificationCertificateArn": PropertyType(False, IS_STR),
     }
 
 
 class ApiGatewayBasePathMapping(Resource):
     resource_type = "AWS::ApiGateway::BasePathMapping"
     property_types = {
-        "BasePath": PropertyType(False, is_str()),
-        "DomainName": PropertyType(True, is_str()),
-        "RestApiId": PropertyType(False, is_str()),
-        "Stage": PropertyType(False, is_str()),
+        "BasePath": PropertyType(False, IS_STR),
+        "DomainName": PropertyType(True, IS_STR),
+        "RestApiId": PropertyType(False, IS_STR),
+        "Stage": PropertyType(False, IS_STR),
     }
 
 
@@ -209,11 +209,11 @@ class ApiGatewayUsagePlan(Resource):
     resource_type = "AWS::ApiGateway::UsagePlan"
     property_types = {
         "ApiStages": PropertyType(False, is_type(list)),
-        "Description": PropertyType(False, is_str()),
-        "Quota": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, IS_STR),
+        "Quota": PropertyType(False, IS_DICT),
         "Tags": PropertyType(False, list_of(dict)),
-        "Throttle": PropertyType(False, is_type(dict)),
-        "UsagePlanName": PropertyType(False, is_str()),
+        "Throttle": PropertyType(False, IS_DICT),
+        "UsagePlanName": PropertyType(False, IS_STR),
     }
     runtime_attrs = {"usage_plan_id": lambda self: ref(self.logical_id)}
 
@@ -221,22 +221,22 @@ class ApiGatewayUsagePlan(Resource):
 class ApiGatewayUsagePlanKey(Resource):
     resource_type = "AWS::ApiGateway::UsagePlanKey"
     property_types = {
-        "KeyId": PropertyType(True, is_str()),
-        "KeyType": PropertyType(True, is_str()),
-        "UsagePlanId": PropertyType(True, is_str()),
+        "KeyId": PropertyType(True, IS_STR),
+        "KeyType": PropertyType(True, IS_STR),
+        "UsagePlanId": PropertyType(True, IS_STR),
     }
 
 
 class ApiGatewayApiKey(Resource):
     resource_type = "AWS::ApiGateway::ApiKey"
     property_types = {
-        "CustomerId": PropertyType(False, is_str()),
-        "Description": PropertyType(False, is_str()),
+        "CustomerId": PropertyType(False, IS_STR),
+        "Description": PropertyType(False, IS_STR),
         "Enabled": PropertyType(False, is_type(bool)),
         "GenerateDistinctId": PropertyType(False, is_type(bool)),
-        "Name": PropertyType(False, is_str()),
+        "Name": PropertyType(False, IS_STR),
         "StageKeys": PropertyType(False, is_type(list)),
-        "Value": PropertyType(False, is_str()),
+        "Value": PropertyType(False, IS_STR),
     }
 
     runtime_attrs = {"api_key_id": lambda self: ref(self.logical_id)}

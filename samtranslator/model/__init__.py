@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
-from samtranslator.model.types import Validator, any_type, is_type
+from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
@@ -13,8 +13,8 @@ from samtranslator.model.tags.resource_tagging import get_tag_list
 class PropertyType(object):
     """Stores validation information for a CloudFormation resource property.
 
-    The argument "expected_type" is only used by InvalidResourcePropertyTypeException
-    to generate an error message. When it is not provided,
+    The attribute "expected_type" is only used by InvalidResourcePropertyTypeException
+    to generate an error message. When it is not found,
     customers will see "Type of property 'xxx' is invalid."
     If it is provided, customers will see "Property 'xxx' should be a yyy."
 
@@ -27,21 +27,18 @@ class PropertyType(object):
         raise an error when intrinsic function dictionary is supplied as value
     """
 
+    EXPECTED_TYPE_BY_VALIDATOR = {IS_DICT: ExpectedType.MAP, IS_STR: ExpectedType.STRING}
+
     def __init__(
         self,
         required: bool,
         validate: Validator = lambda value: True,
         supports_intrinsics: bool = True,
-        expected_type: Optional[ExpectedType] = None,
     ) -> None:
         self.required = required
         self.validate = validate
         self.supports_intrinsics = supports_intrinsics
-        self.expected_type = expected_type
-
-    @classmethod
-    def optional_dict(cls) -> "PropertyType":
-        return PropertyType(False, is_type(dict), expected_type=ExpectedType.MAP)
+        self.expected_type = self.EXPECTED_TYPE_BY_VALIDATOR.get(validate)
 
 
 class Property(PropertyType):

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import is_type, is_str
+from samtranslator.model.types import IS_DICT, is_type, IS_STR
 from samtranslator.model.intrinsics import is_intrinsic
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
@@ -34,27 +34,27 @@ class PullEventSource(ResourceMacro):
     requires_stream_queue_broker = True
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
     property_types = {
-        "Stream": PropertyType(False, is_str()),
-        "Queue": PropertyType(False, is_str()),
+        "Stream": PropertyType(False, IS_STR),
+        "Queue": PropertyType(False, IS_STR),
         "BatchSize": PropertyType(False, is_type(int)),
-        "StartingPosition": PropertyType(False, is_str()),
+        "StartingPosition": PropertyType(False, IS_STR),
         "Enabled": PropertyType(False, is_type(bool)),
         "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
         "MaximumRetryAttempts": PropertyType(False, is_type(int)),
         "BisectBatchOnFunctionError": PropertyType(False, is_type(bool)),
         "MaximumRecordAgeInSeconds": PropertyType(False, is_type(int)),
-        "DestinationConfig": PropertyType(False, is_type(dict)),
+        "DestinationConfig": PropertyType(False, IS_DICT),
         "ParallelizationFactor": PropertyType(False, is_type(int)),
         "Topics": PropertyType(False, is_type(list)),
-        "Broker": PropertyType(False, is_str()),
+        "Broker": PropertyType(False, IS_STR),
         "Queues": PropertyType(False, is_type(list)),
         "SourceAccessConfigurations": PropertyType(False, is_type(list)),
-        "SecretsManagerKmsKeyId": PropertyType(False, is_str()),
+        "SecretsManagerKmsKeyId": PropertyType(False, IS_STR),
         "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
         "KafkaBootstrapServers": PropertyType(False, is_type(list)),
-        "FilterCriteria": PropertyType(False, is_type(dict)),
-        "ConsumerGroupId": PropertyType(False, is_str()),
+        "FilterCriteria": PropertyType(False, IS_DICT),
+        "ConsumerGroupId": PropertyType(False, IS_STR),
     }
 
     Stream: Optional[Intrinsicable[str]]
