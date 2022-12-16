@@ -4,14 +4,19 @@ import inspect
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
-from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.types import Validator, any_type
+from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
+from samtranslator.model.types import Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 
 class PropertyType(object):
     """Stores validation information for a CloudFormation resource property.
+
+    The argument "expected_type" is only used by InvalidResourcePropertyTypeException
+    to generate an error message. When it is not provided,
+    customers will see "Type of property 'xxx' is invalid."
+    If it is provided, customers will see "Property 'xxx' should be a yyy."
 
     DEPRECATED: Use `Property` instead.
 
@@ -27,10 +32,16 @@ class PropertyType(object):
         required: bool,
         validate: Validator = lambda value: True,
         supports_intrinsics: bool = True,
+        expected_type: Optional[ExpectedType] = None,
     ) -> None:
         self.required = required
         self.validate = validate
         self.supports_intrinsics = supports_intrinsics
+        self.expected_type = expected_type
+
+    @classmethod
+    def optional_dict(cls) -> "PropertyType":
+        return PropertyType(False, is_type(dict), expected_type=ExpectedType.MAP)
 
 
 class Property(PropertyType):
@@ -315,9 +326,7 @@ class Resource(object):
                     )
             # Otherwise, validate the value of the property.
             elif not property_type.validate(value, should_raise=False):
-                raise InvalidResourceException(
-                    self.logical_id, "Type of property '{property_name}' is invalid.".format(property_name=name)
-                )
+                raise InvalidResourcePropertyTypeException(self.logical_id, name, property_type.expected_type)
 
     def set_resource_attribute(self, attr: str, value: Any) -> None:
         """Sets attributes on resource. Resource attributes are top-level entries of a CloudFormation resource
