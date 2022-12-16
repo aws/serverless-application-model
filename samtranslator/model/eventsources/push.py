@@ -318,7 +318,7 @@ class S3(PushEventSource):
         source_account = ref("AWS::AccountId")
         permission = self._construct_permission(function, source_account=source_account)  # type: ignore[no-untyped-call]
         if CONDITION in permission.resource_attributes:
-            self._depend_on_lambda_permissions_using_tag(bucket, permission)  # type: ignore[no-untyped-call]
+            self._depend_on_lambda_permissions_using_tag(bucket, bucket_id, permission)
         else:
             self._depend_on_lambda_permissions(bucket, permission)  # type: ignore[no-untyped-call]
         resources.append(permission)
@@ -370,7 +370,9 @@ class S3(PushEventSource):
 
         return bucket
 
-    def _depend_on_lambda_permissions_using_tag(self, bucket, permission):  # type: ignore[no-untyped-def]
+    def _depend_on_lambda_permissions_using_tag(
+        self, bucket: Dict[str, Any], bucket_id: str, permission: LambdaPermission
+    ) -> Dict[str, Any]:
         """
         Since conditional DependsOn is not supported this undocumented way of
         implicitely  making dependency through tags is used.
@@ -389,6 +391,7 @@ class S3(PushEventSource):
         if tags is None:
             tags = []
             properties["Tags"] = tags
+        sam_expect(tags, bucket_id, "Tags").to_be_a_list()
         dep_tag = {
             "sam:ConditionalDependsOn:"
             + permission.logical_id: {
