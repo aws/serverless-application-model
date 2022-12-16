@@ -222,7 +222,7 @@ class ApiGatewayV2Authorizer(object):
             openapi[APIGATEWAY_AUTHORIZER_KEY] = {"type": "request"}  # type: ignore[assignment]
 
             # Generate the lambda arn
-            partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+            partition = ArnGenerator.get_partition_name()
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
             authorizer_uri = fnSub(
                 ArnGenerator.generate_arn(  # type: ignore[no-untyped-call]

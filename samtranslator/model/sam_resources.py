@@ -52,7 +52,7 @@ from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
 from samtranslator.model.resource_policies import ResourcePolicies
-from samtranslator.model.iam import IAMManagedPolicy, IAMRolePolicies
+from samtranslator.model.iam import IAMManagedPolicy, IAMRolePolicies, IAMRole
 from samtranslator.model.lambda_ import (
     LambdaFunction,
     LambdaVersion,
@@ -237,10 +237,10 @@ class SamFunction(SamResourceMacro):
                         self.logical_id,
                         "AutoPublishCodeSha256 must be a string",
                     )
-            lambda_version = self._construct_version(  # type: ignore[no-untyped-call]
+            lambda_version = self._construct_version(
                 lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
             )
-            lambda_alias = self._construct_alias(alias_name, lambda_function, lambda_version)  # type: ignore[no-untyped-call]
+            lambda_alias = self._construct_alias(alias_name, lambda_function, lambda_version)
             resources.append(lambda_version)
             resources.append(lambda_alias)
 
@@ -274,7 +274,7 @@ class SamFunction(SamResourceMacro):
 
         execution_role = None
         if lambda_function.Role is None:
-            execution_role = self._construct_role(managed_policy_map, event_invoke_policies)  # type: ignore[no-untyped-call]
+            execution_role = self._construct_role(managed_policy_map, event_invoke_policies)
             lambda_function.Role = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
 
@@ -357,7 +357,7 @@ class SamFunction(SamResourceMacro):
         """
         accepted_types_list = ["SQS", "SNS", "EventBridge", "Lambda"]
         auto_inject_list = ["SQS", "SNS"]
-        resource = None
+        resource: Optional[Union[SNSTopic, SQSQueue]] = None
         policy = {}
         destination = dest_config.get("Destination")
 
@@ -367,11 +367,11 @@ class SamFunction(SamResourceMacro):
                 self.logical_id, "'Type: {}' must be one of {}".format(dest_config.get("Type"), accepted_types_list)
             )
 
-        property_condition, dest_arn = self._get_or_make_condition(  # type: ignore[no-untyped-call]
+        property_condition, dest_arn = self._get_or_make_condition(
             dest_config.get("Destination"), logical_id, conditions
         )
         if dest_config.get("Destination") is None or property_condition is not None:
-            combined_condition = self._make_and_conditions(  # type: ignore[no-untyped-call]
+            combined_condition = self._make_and_conditions(
                 self.get_passthrough_resource_attributes().get("Condition"), property_condition, conditions
             )
             if dest_config.get("Type") in auto_inject_list:
@@ -380,7 +380,7 @@ class SamFunction(SamResourceMacro):
                         resource_logical_id + "Queue", attributes=self.get_passthrough_resource_attributes()
                     )
                 if dest_config.get("Type") == "SNS":
-                    resource = SNSTopic(  # type: ignore[assignment]
+                    resource = SNSTopic(
                         resource_logical_id + "Topic", attributes=self.get_passthrough_resource_attributes()
                     )
                 if resource:
@@ -402,7 +402,7 @@ class SamFunction(SamResourceMacro):
 
         return resource, destination, policy
 
-    def _make_and_conditions(self, resource_condition, property_condition, conditions):  # type: ignore[no-untyped-def]
+    def _make_and_conditions(self, resource_condition: Any, property_condition: Any, conditions: Dict[str, Any]) -> Any:
         if resource_condition is None:
             return property_condition
 
@@ -415,7 +415,7 @@ class SamFunction(SamResourceMacro):
 
         return condition_name
 
-    def _get_or_make_condition(self, destination, logical_id, conditions):  # type: ignore[no-untyped-def]
+    def _get_or_make_condition(self, destination: Any, logical_id: str, conditions: Dict[str, Any]) -> Tuple[Any, Any]:
         """
         This method checks if there is an If condition on Destination property. Since we auto create
         SQS and SNS if the destination ARN is not provided, we need to make sure that If condition
@@ -542,7 +542,9 @@ class SamFunction(SamResourceMacro):
                 policy = IAMRolePolicies.lambda_invoke_function_role_policy(dest_arn, logical_id)
         return policy
 
-    def _construct_role(self, managed_policy_map, event_invoke_policies):  # type: ignore[no-untyped-def]
+    def _construct_role(
+        self, managed_policy_map: Dict[str, Any], event_invoke_policies: List[Dict[str, Any]]
+    ) -> IAMRole:
         """Constructs a Lambda execution role based on this SAM function's Policies property.
 
         :returns: the generated IAM Role
@@ -553,18 +555,18 @@ class SamFunction(SamResourceMacro):
         if self.AssumeRolePolicyDocument is not None:
             assume_role_policy_document = self.AssumeRolePolicyDocument
         else:
-            assume_role_policy_document = IAMRolePolicies.lambda_assume_role_policy()  # type: ignore[no-untyped-call]
+            assume_role_policy_document = IAMRolePolicies.lambda_assume_role_policy()
 
-        managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]  # type: ignore[no-untyped-call]
+        managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
-            managed_policy_name = get_xray_managed_policy_name()  # type: ignore[no-untyped-call]
-            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))  # type: ignore[no-untyped-call]
+            managed_policy_name = get_xray_managed_policy_name()
+            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
         if self.VpcConfig:
             managed_policy_arns.append(
-                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")  # type: ignore[no-untyped-call]
+                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
             )
 
-        function_policies = ResourcePolicies(  # type: ignore[no-untyped-call]
+        function_policies = ResourcePolicies(
             {"Policies": self.Policies},
             # No support for policy templates in the "core"
             policy_template_processor=None,
@@ -573,7 +575,7 @@ class SamFunction(SamResourceMacro):
 
         if self.DeadLetterQueue:
             policy_documents.append(
-                IAMRolePolicies.dead_letter_queue_policy(  # type: ignore[no-untyped-call]
+                IAMRolePolicies.dead_letter_queue_policy(
                     self.dead_letter_queue_policy_actions[self.DeadLetterQueue["Type"]],
                     self.DeadLetterQueue["TargetArn"],
                 )
@@ -814,7 +816,9 @@ class SamFunction(SamResourceMacro):
         dispatch_function = artifact_dispatch[filtered_key]
         return dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)  # type: ignore[operator]
 
-    def _construct_version(self, function, intrinsics_resolver, code_sha256=None):  # type: ignore[no-untyped-def]
+    def _construct_version(
+        self, function: LambdaFunction, intrinsics_resolver: IntrinsicsResolver, code_sha256: Optional[str] = None
+    ) -> LambdaVersion:
         """Constructs a Lambda Version resource that will be auto-published when CodeUri of the function changes.
         Old versions will not be deleted without a direct reference from the CloudFormation template.
 
@@ -879,7 +883,7 @@ class SamFunction(SamResourceMacro):
 
         return lambda_version
 
-    def _construct_alias(self, name, function, version):  # type: ignore[no-untyped-def]
+    def _construct_alias(self, name: str, function: LambdaFunction, version: LambdaVersion) -> LambdaAlias:
         """Constructs a Lambda Alias for the given function and pointing to the given version
 
         :param string name: Name of the alias

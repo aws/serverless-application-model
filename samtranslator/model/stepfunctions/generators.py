@@ -213,9 +213,9 @@ class StateMachineGenerator(object):
         """
         policies = self.policies[:]
         if self.tracing and self.tracing.get("Enabled") is True:
-            policies.append(get_xray_managed_policy_name())  # type: ignore[no-untyped-call]
+            policies.append(get_xray_managed_policy_name())
 
-        state_machine_policies = ResourcePolicies(  # type: ignore[no-untyped-call]
+        state_machine_policies = ResourcePolicies(
             {"Policies": policies},
             # No support for policy templates in the "core"
             policy_template_processor=None,

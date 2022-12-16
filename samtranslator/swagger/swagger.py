@@ -223,7 +223,7 @@ class SwaggerEditor(BaseEditor):
 
     @staticmethod
     def _get_invoke_role(invoke_role):  # type: ignore[no-untyped-def]
-        CALLER_CREDENTIALS_ARN = f"arn:{ArnGenerator.get_partition_name()}:iam::*:user/*"  # type: ignore[no-untyped-call]
+        CALLER_CREDENTIALS_ARN = f"arn:{ArnGenerator.get_partition_name()}:iam::*:user/*"
         return invoke_role if invoke_role and invoke_role != "CALLER_CREDENTIALS" else CALLER_CREDENTIALS_ARN
 
     def iter_on_all_methods_for_path(self, path_name, skip_methods_without_apigw_integration=True):  # type: ignore[no-untyped-def]

@@ -1143,7 +1143,7 @@ class ApiGenerator(object):
         rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         api_id = rest_api.get_runtime_attr("rest_api_id")
 
-        partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+        partition = ArnGenerator.get_partition_name()
         resource = "${__ApiId__}/authorizers/*"
         source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
