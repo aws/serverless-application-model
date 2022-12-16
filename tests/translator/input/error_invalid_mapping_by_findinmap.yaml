@@ -1,0 +1,31 @@
+Parameters:
+  ApplicationIdParam:
+    Type: String
+    Default: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
+  VersionParam:
+    Type: String
+    Default: 1.0.0
+
+Mappings:
+  InvaliMapping:
+    ap-southeast-1:
+    - Version: this should not be a list
+    cn-north-1:
+    - Version: this should not be a list
+    us-gov-west-1:
+    - Version: this should not be a list
+
+Resources:
+
+  ApplicationFindInInvalidMap:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId: !FindInMap
+        - InvaliMapping
+        - !Ref 'AWS::Region'
+        - Version
+        SemanticVersion: !FindInMap
+        - InvaliMapping
+        - !Ref 'AWS::Region'
+        - Version
