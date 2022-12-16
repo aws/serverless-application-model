@@ -5,7 +5,7 @@ from samtranslator.intrinsics.actions import RefAction
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 
 
-POLICY_PARAMETER_DUSAMBIGUATE_PREFIX = "___SAM_POLICY_PARAMETER_"
+POLICY_PARAMETER_DISAMBIGUATE_PREFIX = "___SAM_POLICY_PARAMETER_"
 
 
 class Template(object):
@@ -53,7 +53,7 @@ class Template(object):
         # injection of values for parameters not intended in the template. This is important because "Ref" resolution
         # will substitute any references for which a value is provided.
         necessary_parameter_values = {
-            POLICY_PARAMETER_DUSAMBIGUATE_PREFIX + name: value
+            POLICY_PARAMETER_DISAMBIGUATE_PREFIX + name: value
             for name, value in parameter_values.items()
             if name in self.parameters
         }
@@ -92,7 +92,7 @@ class Template(object):
             if isinstance(node, dict):
                 copy = {key: _traverse(value) for key, value in node.items()}
                 if "Ref" in copy and isinstance(copy["Ref"], str):
-                    copy["Ref"] = POLICY_PARAMETER_DUSAMBIGUATE_PREFIX + copy["Ref"]
+                    copy["Ref"] = POLICY_PARAMETER_DISAMBIGUATE_PREFIX + copy["Ref"]
                 return copy
             if isinstance(node, list):
                 return [_traverse(item) for item in node]
