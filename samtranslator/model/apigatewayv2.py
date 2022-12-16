@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import is_type, one_of, is_str, list_of
 from samtranslator.model.intrinsics import ref, fnSub
-from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.exceptions import ExpectedType, InvalidResourceException
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect
@@ -186,21 +186,12 @@ class ApiGatewayV2Authorizer(object):
                 self.api_logical_id, f"{self.name} Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
             )
 
-        if self.identity:
-            sam_expect(self.identity, self.api_logical_id, f"Authorizer.{self.name}.Identity").to_be_a_map()
-            headers = self.identity.get("Headers")
-            if headers:
-                sam_expect(headers, self.api_logical_id, f"Authorizer.{self.name}.Identity.Headers").to_be_a_list()
-                for index, header in enumerate(headers):
-                    sam_expect(
-                        header, self.api_logical_id, f"Authorizer.{self.name}.Identity.Headers[{index}]"
-                    ).to_be_a_string()
-
     def generate_openapi(self) -> Dict[str, Any]:
         """
         Generates OAS for the securitySchemes section
         """
         authorizer_type = self._get_auth_type()  # type: ignore[no-untyped-call]
+        openapi: Dict[str, Any]
 
         if authorizer_type == "AWS_IAM":
             openapi = {
@@ -210,21 +201,23 @@ class ApiGatewayV2Authorizer(object):
                 "x-amazon-apigateway-authtype": "awsSigv4",
             }
 
-        if authorizer_type == "JWT":
-            openapi = {"type": "oauth2"}
-            openapi[APIGATEWAY_AUTHORIZER_KEY] = {  # type: ignore[assignment]
-                "jwtConfiguration": self.jwt_configuration,
-                "identitySource": self.id_source,
-                "type": "jwt",
+        elif authorizer_type == "JWT":
+            openapi = {
+                "type": "oauth2",
+                APIGATEWAY_AUTHORIZER_KEY: {
+                    "jwtConfiguration": self.jwt_configuration,
+                    "identitySource": self.id_source,
+                    "type": "jwt",
+                },
             }
 
-        if authorizer_type == "REQUEST":
+        elif authorizer_type == "REQUEST":
             openapi = {
                 "type": "apiKey",
                 "name": "Unused",
                 "in": "header",
+                APIGATEWAY_AUTHORIZER_KEY: {"type": "request"},
             }
-            openapi[APIGATEWAY_AUTHORIZER_KEY] = {"type": "request"}  # type: ignore[assignment]
 
             # Generate the lambda arn
             partition = ArnGenerator.get_partition_name()
@@ -235,31 +228,35 @@ class ApiGatewayV2Authorizer(object):
                 ),
                 {"__FunctionArn__": self.function_arn},
             )
-            openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerUri"] = authorizer_uri  # type: ignore[index]
+            openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerUri"] = authorizer_uri
 
             # Set authorizerCredentials if present
             function_invoke_role = self._get_function_invoke_role()  # type: ignore[no-untyped-call]
             if function_invoke_role:
-                openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerCredentials"] = function_invoke_role  # type: ignore[index]
-
-            # Set authorizerResultTtlInSeconds if present
-            reauthorize_every = self._get_reauthorize_every()  # type: ignore[no-untyped-call]
-            if reauthorize_every is not None:
-                openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerResultTtlInSeconds"] = reauthorize_every  # type: ignore[index]
+                openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerCredentials"] = function_invoke_role
 
             # Set identitySource if present
             if self.identity:
-                openapi[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()  # type: ignore[no-untyped-call, index]
+                sam_expect(self.identity, self.api_logical_id, f"Auth.Authorizers.{self.name}.Identity").to_be_a_map()
+                # Set authorizerResultTtlInSeconds if present
+                reauthorize_every = self.identity.get("ReauthorizeEvery")
+                if reauthorize_every is not None:
+                    openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerResultTtlInSeconds"] = reauthorize_every
+
+                # Set identitySource if present
+                openapi[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source(self.identity)
 
             # Set authorizerPayloadFormatVersion. It's a required parameter
-            openapi[APIGATEWAY_AUTHORIZER_KEY][  # type: ignore[index]
+            openapi[APIGATEWAY_AUTHORIZER_KEY][
                 "authorizerPayloadFormatVersion"
             ] = self.authorizer_payload_format_version
 
-            # Set authorizerPayloadFormatVersion. It's a required parameter
+            # Set enableSimpleResponses if present
             if self.enable_simple_responses:
-                openapi[APIGATEWAY_AUTHORIZER_KEY]["enableSimpleResponses"] = self.enable_simple_responses  # type: ignore[index]
+                openapi[APIGATEWAY_AUTHORIZER_KEY]["enableSimpleResponses"] = self.enable_simple_responses
 
+        else:
+            raise ValueError(f"Unexpected authorizer_type: {authorizer_type}")
         return openapi
 
     def _get_function_invoke_role(self):  # type: ignore[no-untyped-def]
@@ -268,42 +265,36 @@ class ApiGatewayV2Authorizer(object):
 
         return self.function_invoke_role
 
-    def _get_identity_source(self):  # type: ignore[no-untyped-def]
-        identity_source_headers = []
-        identity_source_query_strings = []
-        identity_source_stage_variables = []
-        identity_source_context = []
+    def _get_identity_source(self, auth_identity: Dict[str, Any]) -> List[str]:
+        """
+        Generate the list of identitySource using authorizer's Identity config by flatting them.
+        For the format of identitySource, see:
+        https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-authorizer.html
 
-        if self.identity.get("Headers"):
-            identity_source_headers = list(map(lambda h: "$request.header." + h, self.identity.get("Headers")))  # type: ignore[no-any-return]
+        It will add API GW prefix to each item:
+        - prefix "$request.header." to all values in "Headers"
+        - prefix "$request.querystring." to all values in "QueryStrings"
+        - prefix "$stageVariables." to all values in "StageVariables"
+        - prefix "$context." to all values in "Context"
+        """
+        identity_source: List[str] = []
 
-        if self.identity.get("QueryStrings"):
-            identity_source_query_strings = list(
-                map(lambda qs: "$request.querystring." + qs, self.identity.get("QueryStrings"))  # type: ignore[no-any-return]
-            )
+        identity_property_path = f"Authorizers.{self.name}.Identity"
 
-        if self.identity.get("StageVariables"):
-            identity_source_stage_variables = list(
-                map(lambda sv: "$stageVariables." + sv, self.identity.get("StageVariables"))  # type: ignore[no-any-return]
-            )
-
-        if self.identity.get("Context"):
-            identity_source_context = list(map(lambda c: "$context." + c, self.identity.get("Context")))  # type: ignore[no-any-return]
-
-        identity_source = (
-            identity_source_headers
-            + identity_source_query_strings
-            + identity_source_stage_variables
-            + identity_source_context
-        )
+        for prefix, property_name in [
+            ("$request.header.", "Headers"),
+            ("$request.querystring.", "QueryStrings"),
+            ("$stageVariables.", "StageVariables"),
+            ("$context.", "Context"),
+        ]:
+            property_values = auth_identity.get(property_name)
+            if property_values:
+                sam_expect(
+                    property_values, self.api_logical_id, f"{identity_property_path}.{property_name}"
+                ).to_be_a_list_of(ExpectedType.STRING)
+                identity_source += [prefix + value for value in property_values]
 
         return identity_source
-
-    def _get_reauthorize_every(self):  # type: ignore[no-untyped-def]
-        if not self.identity:
-            return None
-
-        return self.identity.get("ReauthorizeEvery")
 
     @staticmethod
     def _get_jwt_configuration(props: Optional[Dict[str, Union[str, List[str]]]]) -> Optional[JwtConfiguration]:
