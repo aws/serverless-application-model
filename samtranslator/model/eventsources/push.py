@@ -616,7 +616,7 @@ class Api(PushEventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        rest_api_id = self.get_rest_api_id_string(self.RestApiId)  # type: ignore[attr-defined, no-untyped-call]
+        rest_api_id = self.get_rest_api_id_string(self.RestApiId)  # type: ignore[attr-defined]
         if isinstance(rest_api_id, str):
 
             if (
@@ -952,7 +952,7 @@ class Api(PushEventSource):
         api["DefinitionBody"] = editor.swagger
 
     @staticmethod
-    def get_rest_api_id_string(rest_api_id):  # type: ignore[no-untyped-def]
+    def get_rest_api_id_string(rest_api_id: Any) -> Any:
         """
         rest_api_id can be either a string or a dictionary where the actual api id is the value at key "Ref".
         If rest_api_id is a dictionary with key "Ref", returns value at key "Ref". Otherwise, return rest_api_id.
