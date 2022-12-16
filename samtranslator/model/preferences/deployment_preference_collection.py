@@ -154,13 +154,13 @@ class DeploymentPreferenceCollection(object):
 
         # CodeDeploy has a new managed policy. We cannot update any existing partitions, without customer reach out
         # that support AWSCodeDeployRoleForLambda since this could regress stacks that are currently deployed.
-        if ArnGenerator.get_partition_name() in ["aws-iso", "aws-iso-b"]:  # type: ignore[no-untyped-call]
+        if ArnGenerator.get_partition_name() in ["aws-iso", "aws-iso-b"]:
             iam_role.ManagedPolicyArns = [
-                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambdaLimited")  # type: ignore[no-untyped-call]
+                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambdaLimited")
             ]
         else:
             iam_role.ManagedPolicyArns = [
-                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambda")  # type: ignore[no-untyped-call]
+                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambda")
             ]
 
         if self.needs_resource_condition():  # type: ignore[no-untyped-call]

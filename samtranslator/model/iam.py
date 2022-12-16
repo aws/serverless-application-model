@@ -96,7 +96,7 @@ class IAMRolePolicies:
         return document
 
     @classmethod
-    def lambda_assume_role_policy(cls):  # type: ignore[no-untyped-def]
+    def lambda_assume_role_policy(cls) -> Dict[str, Any]:
         document = {
             "Version": "2012-10-17",
             "Statement": [
@@ -106,7 +106,7 @@ class IAMRolePolicies:
         return document
 
     @classmethod
-    def dead_letter_queue_policy(cls, action, resource):  # type: ignore[no-untyped-def]
+    def dead_letter_queue_policy(cls, action: Any, resource: Any) -> Dict[str, Any]:
         """Return the DeadLetterQueue Policy to be added to the LambdaRole
         :returns: Policy for the DeadLetterQueue
         :rtype: Dict

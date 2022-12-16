@@ -18,7 +18,7 @@ class RegionConfiguration(object):
         :return: True, if API Gateway does not support Edge configuration
         """
 
-        return ArnGenerator.get_partition_name() not in [  # type: ignore[no-untyped-call]
+        return ArnGenerator.get_partition_name() not in [
             "aws-us-gov",
             "aws-iso",
             "aws-iso-b",
