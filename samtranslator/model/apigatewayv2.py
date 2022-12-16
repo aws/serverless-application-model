@@ -3,10 +3,10 @@ from typing import Any, Dict, List, Optional, Union
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import is_type, one_of, is_str, list_of
 from samtranslator.model.intrinsics import ref, fnSub
-from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.exceptions import ExpectedType, InvalidResourceException
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
-from samtranslator.validator.value_validator import ExpectedType, sam_expect
+from samtranslator.validator.value_validator import sam_expect
 
 APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
 
