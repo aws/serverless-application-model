@@ -708,7 +708,7 @@ class Api(PushEventSource):
 
         # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
         resource = "${__ApiId__}/" + "${__Stage__}/" + method + path
-        partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+        partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
             {"__ApiId__": api_id, "__Stage__": stage},
@@ -726,7 +726,7 @@ class Api(PushEventSource):
         if swagger_body is None:
             return
 
-        partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+        partition = ArnGenerator.get_partition_name()
         uri = _build_apigw_integration_uri(function, partition)  # type: ignore[no-untyped-call]
 
         editor = SwaggerEditor(swagger_body)
@@ -999,7 +999,7 @@ class IoTRule(PushEventSource):
 
         resource = "rule/${RuleName}"
 
-        partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+        partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="iot", resource=resource),  # type: ignore[no-untyped-call]
             {"RuleName": ref(self.logical_id)},

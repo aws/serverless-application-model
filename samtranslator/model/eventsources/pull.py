@@ -248,7 +248,7 @@ class Kinesis(PullEventSource):
     resource_type = "Kinesis"
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")  # type: ignore[no-untyped-call]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")
 
     def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
@@ -260,7 +260,7 @@ class DynamoDB(PullEventSource):
     resource_type = "DynamoDB"
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")  # type: ignore[no-untyped-call]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")
 
     def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
@@ -272,7 +272,7 @@ class SQS(PullEventSource):
     resource_type = "SQS"
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")  # type: ignore[no-untyped-call]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")
 
     def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None
@@ -284,7 +284,7 @@ class MSK(PullEventSource):
     resource_type = "MSK"
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")  # type: ignore[no-untyped-call]
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
 
     def get_policy_statements(self):  # type: ignore[no-untyped-def]
         return None

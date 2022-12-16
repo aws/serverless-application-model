@@ -76,4 +76,4 @@ class SamParameterValues(object):
             self.parameter_values["AWS::Region"] = session.region_name
 
         if "AWS::Partition" not in self.parameter_values:
-            self.parameter_values["AWS::Partition"] = ArnGenerator.get_partition_name(session.region_name)  # type: ignore[no-untyped-call]
+            self.parameter_values["AWS::Partition"] = ArnGenerator.get_partition_name(session.region_name)

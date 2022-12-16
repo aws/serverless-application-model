@@ -1,5 +1,7 @@
 import boto3
 
+from typing import Optional
+
 
 class NoRegionFound(Exception):
     pass
@@ -23,7 +25,7 @@ class ArnGenerator(object):
         return arn.format(partition, service, resource)
 
     @classmethod
-    def generate_aws_managed_policy_arn(cls, policy_name):  # type: ignore[no-untyped-def]
+    def generate_aws_managed_policy_arn(cls, policy_name: str) -> str:
         """
         Method to create an ARN of AWS Owned Managed Policy. This uses the right partition name to construct
         the ARN
@@ -31,10 +33,10 @@ class ArnGenerator(object):
         :param policy_name: Name of the policy
         :return: ARN Of the managed policy
         """
-        return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)  # type: ignore[no-untyped-call]
+        return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)
 
     @classmethod
-    def get_partition_name(cls, region=None):  # type: ignore[no-untyped-def]
+    def get_partition_name(cls, region: Optional[str] = None) -> str:
         """
         Gets the name of the partition given the region name. If region name is not provided, this method will
         use Boto3 to get name of the region where this code is running.
