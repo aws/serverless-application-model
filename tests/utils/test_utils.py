@@ -31,8 +31,8 @@ class TestUtils(TestCase):
         d = {"a": {"b": {"c": "hi"}}}
         dict_deep_update(d, {"a.b.d.hello": "world"})
         self.assertEqual(d, {"a": {"b": {"c": "hi", "d": {"hello": "world"}}}})
-        dict_deep_update(d, {"a.b.hello": "world"})
-        self.assertEqual(d, {"a": {"b": {"hello": "world", "c": "hi", "d": {"hello": "world"}}}})
+        dict_deep_update(d, {"a.b.hello": "world", "a.hello": "world1"})
+        self.assertEqual(d, {"a": {"hello": "world1", "b": {"hello": "world", "c": "hi", "d": {"hello": "world"}}}})
 
     def test_dict_deep_update_invalid_type(self):
         d = {"a": {"b": {"c": "hi"}}}

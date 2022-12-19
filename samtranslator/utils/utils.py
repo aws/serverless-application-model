@@ -63,12 +63,13 @@ def dict_deep_update(d: Any, dict_to_merge: Dict[str, Any]) -> None:
     If any parent node exists but is not a dict, raise InvalidValueType.
     """
     for path, value in dict_to_merge.items():
+        current_dict = d
         relative_path = ""
         _path_nodes = path.split(".")
         while len(_path_nodes) > 1:
             relative_path = (relative_path + f".{_path_nodes[0]}").lstrip(".")
-            d = d.setdefault(_path_nodes[0], {})
-            if not isinstance(d, dict):
+            current_dict = current_dict.setdefault(_path_nodes[0], {})
+            if not isinstance(current_dict, dict):
                 raise InvalidValueType(relative_path)
             _path_nodes = _path_nodes[1:]
-        d[_path_nodes[0]] = value
+        current_dict[_path_nodes[0]] = value
