@@ -75,7 +75,9 @@ class SwaggerEditor(BaseEditor):
         https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
         :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
         """
-        set_disable_api_endpoint = {self._DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
+        set_disable_api_endpoint = {
+            f"{self._X_ENDPOINT_CONFIG}.{self._DISABLE_EXECUTE_API_ENDPOINT}": disable_execute_api_endpoint
+        }
 
         # Check if the OpenAPI version is 3.0, if it is then the extension needs to added to the Servers field,
         # if not then it gets added to the top level (same level as "paths" and "info")
@@ -84,7 +86,7 @@ class SwaggerEditor(BaseEditor):
             servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
             for index, config in enumerate(servers_configurations):
                 try:
-                    dict_deep_update(config, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
+                    dict_deep_update(config, set_disable_api_endpoint)
                 except InvalidValueType as ex:
                     raise InvalidDocumentException(
                         [
@@ -97,7 +99,7 @@ class SwaggerEditor(BaseEditor):
             self._doc[self._SERVERS] = servers_configurations
         else:
             try:
-                dict_deep_update(self._doc, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
+                dict_deep_update(self._doc, set_disable_api_endpoint)
             except InvalidValueType as ex:
                 raise InvalidDocumentException(
                     [InvalidTemplateException(f"Invalid OpenAPI definition: {str(ex)}.")]

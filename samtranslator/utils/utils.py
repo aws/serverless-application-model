@@ -51,19 +51,24 @@ def dict_deep_get(d: Any, path: str) -> Optional[Any]:
     return d
 
 
-def dict_deep_update(d: Any, path: str, dict_to_merge: Dict[str, Any]) -> None:
+def dict_deep_update(d: Any, dict_to_merge: Dict[str, Any]) -> None:
     """
-    Update the value deep in the dict.
+    Update the value deep in the dict. The dict_to_merge looks like
+    {
+      "a.b.c": <value>
+    }
+    it will make d["a"]["b"]["c"] = <value>.
 
     If any value along the path doesn't exist, create empty dict along the way.
     If any parent node exists but is not a dict, raise InvalidValueType.
     """
-    relative_path = ""
-    _path_nodes = path.split(".")
-    while _path_nodes:
-        relative_path = (relative_path + f".{_path_nodes[0]}").lstrip(".")
-        d = d.setdefault(_path_nodes[0], {})
-        if not isinstance(d, dict):
-            raise InvalidValueType(relative_path)
-        _path_nodes = _path_nodes[1:]
-    d.update(dict_to_merge)
+    for path, value in dict_to_merge.items():
+        relative_path = ""
+        _path_nodes = path.split(".")
+        while len(_path_nodes) > 1:
+            relative_path = (relative_path + f".{_path_nodes[0]}").lstrip(".")
+            d = d.setdefault(_path_nodes[0], {})
+            if not isinstance(d, dict):
+                raise InvalidValueType(relative_path)
+            _path_nodes = _path_nodes[1:]
+        d[_path_nodes[0]] = value

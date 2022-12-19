@@ -29,12 +29,12 @@ class TestUtils(TestCase):
 
     def test_dict_deep_update(self):
         d = {"a": {"b": {"c": "hi"}}}
-        dict_deep_update(d, "a.b.d", {"hello": "world"})
+        dict_deep_update(d, {"a.b.d.hello": "world"})
         self.assertEqual(d, {"a": {"b": {"c": "hi", "d": {"hello": "world"}}}})
-        dict_deep_update(d, "a.b", {"hello": "world"})
+        dict_deep_update(d, {"a.b.hello": "world"})
         self.assertEqual(d, {"a": {"b": {"hello": "world", "c": "hi", "d": {"hello": "world"}}}})
 
     def test_dict_deep_update_invalid_type(self):
         d = {"a": {"b": {"c": "hi"}}}
         with self.assertRaisesRegex(InvalidValueType, r"The value of 'a\.b\.c' should be a map"):
-            dict_deep_update(d, "a.b.c", {"hello": "world"})
+            dict_deep_update(d, {"a.b.c.hello": "world"})
