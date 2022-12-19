@@ -62,7 +62,7 @@ from samtranslator.model.lambda_ import (
     LambdaUrl,
     LambdaPermission,
 )
-from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
+from samtranslator.model.types import dict_of, IS_STR, is_type, IS_DICT, list_of, one_of, any_type
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.intrinsics import (
@@ -89,44 +89,44 @@ class SamFunction(SamResourceMacro):
 
     resource_type = "AWS::Serverless::Function"
     property_types = {
-        "FunctionName": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Handler": PropertyType(False, is_str()),
-        "Runtime": PropertyType(False, is_str()),
-        "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "ImageUri": PropertyType(False, is_str()),
-        "PackageType": PropertyType(False, is_str()),
-        "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "DeadLetterQueue": PropertyType.optional_dict(),
-        "Description": PropertyType(False, is_str()),
+        "FunctionName": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "Handler": PropertyType(False, IS_STR),
+        "Runtime": PropertyType(False, IS_STR),
+        "CodeUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "ImageUri": PropertyType(False, IS_STR),
+        "PackageType": PropertyType(False, IS_STR),
+        "InlineCode": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "DeadLetterQueue": PropertyType(False, IS_DICT),
+        "Description": PropertyType(False, IS_STR),
         "MemorySize": PropertyType(False, is_type(int)),
         "Timeout": PropertyType(False, is_type(int)),
-        "VpcConfig": PropertyType.optional_dict(),
-        "Role": PropertyType(False, is_str()),
-        "AssumeRolePolicyDocument": PropertyType.optional_dict(),
-        "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
+        "VpcConfig": PropertyType(False, IS_DICT),
+        "Role": PropertyType(False, IS_STR),
+        "AssumeRolePolicyDocument": PropertyType(False, IS_DICT),
+        "Policies": PropertyType(False, one_of(IS_STR, IS_DICT, list_of(one_of(IS_STR, IS_DICT)))),
         "RolePath": PassThroughProperty(False),
-        "PermissionsBoundary": PropertyType(False, is_str()),
-        "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
-        "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
-        "Tags": PropertyType.optional_dict(),
-        "Tracing": PropertyType(False, one_of(is_type(dict), is_str())),
-        "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),
-        "DeploymentPreference": PropertyType.optional_dict(),
+        "PermissionsBoundary": PropertyType(False, IS_STR),
+        "Environment": PropertyType(False, dict_of(IS_STR, IS_DICT)),
+        "Events": PropertyType(False, dict_of(IS_STR, IS_DICT)),
+        "Tags": PropertyType(False, IS_DICT),
+        "Tracing": PropertyType(False, one_of(IS_DICT, IS_STR)),
+        "KmsKeyArn": PropertyType(False, one_of(IS_DICT, IS_STR)),
+        "DeploymentPreference": PropertyType(False, IS_DICT),
         "ReservedConcurrentExecutions": PropertyType(False, any_type()),
-        "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-        "EventInvokeConfig": PropertyType.optional_dict(),
-        "EphemeralStorage": PropertyType.optional_dict(),
+        "Layers": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
+        "EventInvokeConfig": PropertyType(False, IS_DICT),
+        "EphemeralStorage": PropertyType(False, IS_DICT),
         # Intrinsic functions in value of Alias property are not supported, yet
-        "AutoPublishAlias": PropertyType(False, one_of(is_str())),
-        "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),
-        "VersionDescription": PropertyType(False, is_str()),
-        "ProvisionedConcurrencyConfig": PropertyType.optional_dict(),
-        "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
-        "ImageConfig": PropertyType.optional_dict(),
-        "CodeSigningConfigArn": PropertyType(False, is_str()),
-        "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-        "SnapStart": PropertyType.optional_dict(),
-        "FunctionUrlConfig": PropertyType.optional_dict(),
+        "AutoPublishAlias": PropertyType(False, one_of(IS_STR)),
+        "AutoPublishCodeSha256": PropertyType(False, one_of(IS_STR)),
+        "VersionDescription": PropertyType(False, IS_STR),
+        "ProvisionedConcurrencyConfig": PropertyType(False, IS_DICT),
+        "FileSystemConfigs": PropertyType(False, list_of(IS_DICT)),
+        "ImageConfig": PropertyType(False, IS_DICT),
+        "CodeSigningConfigArn": PropertyType(False, IS_STR),
+        "Architectures": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
+        "SnapStart": PropertyType(False, IS_DICT),
+        "FunctionUrlConfig": PropertyType(False, IS_DICT),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -1000,7 +1000,9 @@ class SamFunction(SamResourceMacro):
             )
         raise InvalidResourceException(self.logical_id, f"Invalid value for property {property_name}.")
 
-    def _construct_function_url(self, lambda_function, lambda_alias, function_url_config: Dict[str, Any]):  # type: ignore[no-untyped-def]
+    def _construct_function_url(
+        self, lambda_function: LambdaFunction, lambda_alias: Optional[LambdaAlias], function_url_config: Dict[str, Any]
+    ) -> LambdaUrl:
         """
         This method is used to construct a lambda url resource
 
@@ -1032,7 +1034,7 @@ class SamFunction(SamResourceMacro):
         return lambda_url
 
     def _validate_function_url_params(
-        self, lambda_function: "SamFunction", function_url_config: Dict[str, Any]
+        self, lambda_function: LambdaFunction, function_url_config: Dict[str, Any]
     ) -> None:
         """
         Validate parameters provided to configure Lambda Urls
@@ -1040,7 +1042,7 @@ class SamFunction(SamResourceMacro):
         self._validate_url_auth_type(lambda_function, function_url_config)
         self._validate_cors_config_parameter(lambda_function, function_url_config)
 
-    def _validate_url_auth_type(self, lambda_function: "SamFunction", function_url_config: Dict[str, Any]) -> None:
+    def _validate_url_auth_type(self, lambda_function: LambdaFunction, function_url_config: Dict[str, Any]) -> None:
         if is_intrinsic(function_url_config):
             return
 
@@ -1054,7 +1056,9 @@ class SamFunction(SamResourceMacro):
                 "AuthType is required to configure function property `FunctionUrlConfig`. Please provide either AWS_IAM or NONE.",
             )
 
-    def _validate_cors_config_parameter(self, lambda_function: "SamFunction", function_url_config: Dict[str, Any]):  # type: ignore[no-untyped-def]
+    def _validate_cors_config_parameter(
+        self, lambda_function: LambdaFunction, function_url_config: Dict[str, Any]
+    ) -> None:
         if is_intrinsic(function_url_config):
             return
 
@@ -1080,8 +1084,8 @@ class SamFunction(SamResourceMacro):
                     lambda_function.logical_id,
                     "{} is not a valid property for configuring Cors.".format(prop_name),
                 )
-            prop_type = cors_property_data_type.get(prop_name)
-            if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):  # type: ignore[arg-type]
+            prop_type = cors_property_data_type.get(prop_name, list)
+            if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
                     "{} must be of type {}.".format(prop_name, str(prop_type).split("'")[1]),
@@ -1135,32 +1139,32 @@ class SamApi(SamResourceMacro):
         # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
         # Swagger.
         "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
-        "Name": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "StageName": PropertyType(True, one_of(is_str(), is_type(dict))),
-        "Tags": PropertyType.optional_dict(),
-        "DefinitionBody": PropertyType.optional_dict(),
-        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Name": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "StageName": PropertyType(True, one_of(IS_STR, IS_DICT)),
+        "Tags": PropertyType(False, IS_DICT),
+        "DefinitionBody": PropertyType(False, IS_DICT),
+        "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "CacheClusterEnabled": PropertyType(False, is_type(bool)),
-        "CacheClusterSize": PropertyType(False, is_str()),
-        "Variables": PropertyType.optional_dict(),
-        "EndpointConfiguration": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "CacheClusterSize": PropertyType(False, IS_STR),
+        "Variables": PropertyType(False, IS_DICT),
+        "EndpointConfiguration": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "MethodSettings": PropertyType(False, is_type(list)),
         "BinaryMediaTypes": PropertyType(False, is_type(list)),
         "MinimumCompressionSize": PropertyType(False, is_type(int)),
-        "Cors": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Auth": PropertyType.optional_dict(),
-        "GatewayResponses": PropertyType.optional_dict(),
-        "AccessLogSetting": PropertyType.optional_dict(),
-        "CanarySetting": PropertyType.optional_dict(),
+        "Cors": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "Auth": PropertyType(False, IS_DICT),
+        "GatewayResponses": PropertyType(False, IS_DICT),
+        "AccessLogSetting": PropertyType(False, IS_DICT),
+        "CanarySetting": PropertyType(False, IS_DICT),
         "TracingEnabled": PropertyType(False, is_type(bool)),
-        "OpenApiVersion": PropertyType(False, is_str()),
-        "Models": PropertyType.optional_dict(),
-        "Domain": PropertyType.optional_dict(),
+        "OpenApiVersion": PropertyType(False, IS_STR),
+        "Models": PropertyType(False, IS_DICT),
+        "Domain": PropertyType(False, IS_DICT),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
-        "Description": PropertyType(False, is_str()),
-        "Mode": PropertyType(False, is_str()),
+        "Description": PropertyType(False, IS_STR),
+        "Mode": PropertyType(False, IS_STR),
         "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
-        "ApiKeySourceType": PropertyType(False, is_str()),
+        "ApiKeySourceType": PropertyType(False, IS_STR),
     }
 
     Name: Optional[Intrinsicable[str]]
@@ -1219,7 +1223,7 @@ class SamApi(SamResourceMacro):
         template_conditions = kwargs.get("conditions")
         route53_record_set_groups = kwargs.get("route53_record_set_groups", {})
 
-        api_generator = ApiGenerator(  # type: ignore[no-untyped-call]
+        api_generator = ApiGenerator(
             self.logical_id,
             self.CacheClusterEnabled,
             self.CacheClusterSize,
@@ -1291,19 +1295,19 @@ class SamHttpApi(SamResourceMacro):
         # Swagger.
         "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
         "Name": PassThroughProperty(False),
-        "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Tags": PropertyType.optional_dict(),
-        "DefinitionBody": PropertyType.optional_dict(),
-        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "StageVariables": PropertyType.optional_dict(),
-        "CorsConfiguration": PropertyType(False, one_of(is_type(bool), is_type(dict))),
-        "AccessLogSettings": PropertyType.optional_dict(),
-        "DefaultRouteSettings": PropertyType.optional_dict(),
-        "Auth": PropertyType.optional_dict(),
-        "RouteSettings": PropertyType.optional_dict(),
-        "Domain": PropertyType.optional_dict(),
+        "StageName": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "Tags": PropertyType(False, IS_DICT),
+        "DefinitionBody": PropertyType(False, IS_DICT),
+        "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "StageVariables": PropertyType(False, IS_DICT),
+        "CorsConfiguration": PropertyType(False, one_of(is_type(bool), IS_DICT)),
+        "AccessLogSettings": PropertyType(False, IS_DICT),
+        "DefaultRouteSettings": PropertyType(False, IS_DICT),
+        "Auth": PropertyType(False, IS_DICT),
+        "RouteSettings": PropertyType(False, IS_DICT),
+        "Domain": PropertyType(False, IS_DICT),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
-        "Description": PropertyType(False, is_str()),
+        "Description": PropertyType(False, IS_STR),
         "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
     }
 
@@ -1392,11 +1396,11 @@ class SamSimpleTable(SamResourceMacro):
 
     resource_type = "AWS::Serverless::SimpleTable"
     property_types = {
-        "PrimaryKey": PropertyType(False, dict_of(is_str(), is_str())),
-        "ProvisionedThroughput": PropertyType(False, dict_of(is_str(), one_of(is_type(int), is_type(dict)))),
-        "TableName": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Tags": PropertyType.optional_dict(),
-        "SSESpecification": PropertyType.optional_dict(),
+        "PrimaryKey": PropertyType(False, dict_of(IS_STR, IS_STR)),
+        "ProvisionedThroughput": PropertyType(False, dict_of(IS_STR, one_of(is_type(int), IS_DICT))),
+        "TableName": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "Tags": PropertyType(False, IS_DICT),
+        "SSESpecification": PropertyType(False, IS_DICT),
     }
 
     PrimaryKey: Optional[Dict[str, str]]
@@ -1466,11 +1470,11 @@ class SamApplication(SamResourceMacro):
 
     # The plugin will always insert the TemplateUrl parameter
     property_types = {
-        "Location": PropertyType(True, one_of(is_str(), is_type(dict))),
-        "TemplateUrl": PropertyType(False, is_str()),
-        "Parameters": PropertyType.optional_dict(),
-        "NotificationARNs": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-        "Tags": PropertyType.optional_dict(),
+        "Location": PropertyType(True, one_of(IS_STR, IS_DICT)),
+        "TemplateUrl": PropertyType(False, IS_STR),
+        "Parameters": PropertyType(False, IS_DICT),
+        "NotificationARNs": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
+        "Tags": PropertyType(False, IS_DICT),
         "TimeoutInMinutes": PropertyType(False, is_type(int)),
     }
 
@@ -1520,13 +1524,13 @@ class SamLayerVersion(SamResourceMacro):
 
     resource_type = "AWS::Serverless::LayerVersion"
     property_types = {
-        "LayerName": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Description": PropertyType(False, is_str()),
-        "ContentUri": PropertyType(True, one_of(is_str(), is_type(dict))),
-        "CompatibleArchitectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-        "LicenseInfo": PropertyType(False, is_str()),
-        "RetentionPolicy": PropertyType(False, is_str()),
+        "LayerName": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "Description": PropertyType(False, IS_STR),
+        "ContentUri": PropertyType(True, one_of(IS_STR, IS_DICT)),
+        "CompatibleArchitectures": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
+        "CompatibleRuntimes": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
+        "LicenseInfo": PropertyType(False, IS_STR),
+        "RetentionPolicy": PropertyType(False, IS_STR),
     }
 
     LayerName: Optional[Intrinsicable[str]]
@@ -1685,19 +1689,19 @@ class SamStateMachine(SamResourceMacro):
 
     resource_type = "AWS::Serverless::StateMachine"
     property_types = {
-        "Definition": PropertyType.optional_dict(),
-        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Logging": PropertyType.optional_dict(),
-        "Role": PropertyType(False, is_str()),
+        "Definition": PropertyType(False, IS_DICT),
+        "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "Logging": PropertyType(False, IS_DICT),
+        "Role": PropertyType(False, IS_STR),
         "RolePath": PassThroughProperty(False),
-        "DefinitionSubstitutions": PropertyType.optional_dict(),
-        "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
-        "Name": PropertyType(False, is_str()),
-        "Type": PropertyType(False, is_str()),
-        "Tags": PropertyType.optional_dict(),
-        "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
-        "Tracing": PropertyType.optional_dict(),
-        "PermissionsBoundary": PropertyType(False, is_str()),
+        "DefinitionSubstitutions": PropertyType(False, IS_DICT),
+        "Events": PropertyType(False, dict_of(IS_STR, IS_DICT)),
+        "Name": PropertyType(False, IS_STR),
+        "Type": PropertyType(False, IS_STR),
+        "Tags": PropertyType(False, IS_DICT),
+        "Policies": PropertyType(False, one_of(IS_STR, list_of(one_of(IS_STR, IS_DICT, IS_DICT)))),
+        "Tracing": PropertyType(False, IS_DICT),
+        "PermissionsBoundary": PropertyType(False, IS_STR),
     }
 
     Definition: Optional[Dict[str, Any]]
@@ -1785,9 +1789,9 @@ class SamConnector(SamResourceMacro):
 
     resource_type = "AWS::Serverless::Connector"
     property_types = {
-        "Source": PropertyType(True, dict_of(is_str(), any_type())),
-        "Destination": PropertyType(True, dict_of(is_str(), any_type())),
-        "Permissions": PropertyType(True, list_of(is_str())),
+        "Source": PropertyType(True, dict_of(IS_STR, any_type())),
+        "Destination": PropertyType(True, dict_of(IS_STR, any_type())),
+        "Permissions": PropertyType(True, list_of(IS_STR)),
     }
 
     @cw_timer

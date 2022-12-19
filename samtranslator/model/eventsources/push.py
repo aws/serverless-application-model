@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
+from samtranslator.model.types import IS_DICT, is_type, list_of, dict_of, one_of, IS_STR
 from samtranslator.model.intrinsics import is_intrinsic, ref, fnGetAtt, fnSub, make_shorthand, make_conditional
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
@@ -99,15 +99,15 @@ class Schedule(PushEventSource):
     resource_type = "Schedule"
     principal = "events.amazonaws.com"
     property_types = {
-        "Schedule": PropertyType(True, is_str()),
-        "RuleName": PropertyType(False, is_str()),
-        "Input": PropertyType(False, is_str()),
+        "Schedule": PropertyType(True, IS_STR),
+        "RuleName": PropertyType(False, IS_STR),
+        "Input": PropertyType(False, IS_STR),
         "Enabled": PropertyType(False, is_type(bool)),
-        "State": PropertyType(False, is_str()),
-        "Name": PropertyType(False, is_str()),
-        "Description": PropertyType(False, is_str()),
-        "DeadLetterConfig": PropertyType(False, is_type(dict)),
-        "RetryPolicy": PropertyType(False, is_type(dict)),
+        "State": PropertyType(False, IS_STR),
+        "Name": PropertyType(False, IS_STR),
+        "Description": PropertyType(False, IS_STR),
+        "DeadLetterConfig": PropertyType(False, IS_DICT),
+        "RetryPolicy": PropertyType(False, IS_DICT),
     }
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
@@ -183,16 +183,16 @@ class CloudWatchEvent(PushEventSource):
     resource_type = "CloudWatchEvent"
     principal = "events.amazonaws.com"
     property_types = {
-        "EventBusName": PropertyType(False, is_str()),
-        "RuleName": PropertyType(False, is_str()),
-        "Pattern": PropertyType(False, is_type(dict)),
-        "DeadLetterConfig": PropertyType(False, is_type(dict)),
-        "RetryPolicy": PropertyType(False, is_type(dict)),
-        "Input": PropertyType(False, is_str()),
-        "InputPath": PropertyType(False, is_str()),
-        "Target": PropertyType(False, is_type(dict)),
+        "EventBusName": PropertyType(False, IS_STR),
+        "RuleName": PropertyType(False, IS_STR),
+        "Pattern": PropertyType(False, IS_DICT),
+        "DeadLetterConfig": PropertyType(False, IS_DICT),
+        "RetryPolicy": PropertyType(False, IS_DICT),
+        "Input": PropertyType(False, IS_STR),
+        "InputPath": PropertyType(False, IS_STR),
+        "Target": PropertyType(False, IS_DICT),
         "Enabled": PropertyType(False, is_type(bool)),
-        "State": PropertyType(False, is_str()),
+        "State": PropertyType(False, IS_STR),
     }
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
@@ -277,9 +277,9 @@ class S3(PushEventSource):
     resource_type = "S3"
     principal = "s3.amazonaws.com"
     property_types = {
-        "Bucket": PropertyType(True, is_str()),
-        "Events": PropertyType(True, one_of(is_str(), list_of(is_str())), False),
-        "Filter": PropertyType(False, dict_of(is_str(), is_str())),
+        "Bucket": PropertyType(True, IS_STR),
+        "Events": PropertyType(True, one_of(IS_STR, list_of(IS_STR)), False),
+        "Filter": PropertyType(False, dict_of(IS_STR, IS_STR)),
     }
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
@@ -451,11 +451,11 @@ class SNS(PushEventSource):
     resource_type = "SNS"
     principal = "sns.amazonaws.com"
     property_types = {
-        "Topic": PropertyType(True, is_str()),
-        "Region": PropertyType(False, is_str()),
-        "FilterPolicy": PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict))))),
-        "SqsSubscription": PropertyType(False, one_of(is_type(bool), is_type(dict))),
-        "RedrivePolicy": PropertyType(False, is_type(dict)),
+        "Topic": PropertyType(True, IS_STR),
+        "Region": PropertyType(False, IS_STR),
+        "FilterPolicy": PropertyType(False, dict_of(IS_STR, list_of(one_of(IS_STR, IS_DICT)))),
+        "SqsSubscription": PropertyType(False, one_of(is_type(bool), IS_DICT)),
+        "RedrivePolicy": PropertyType(False, IS_DICT),
     }
 
     Topic: str
@@ -591,13 +591,13 @@ class Api(PushEventSource):
     resource_type = "Api"
     principal = "apigateway.amazonaws.com"
     property_types = {
-        "Path": PropertyType(True, is_str()),
-        "Method": PropertyType(True, is_str()),
+        "Path": PropertyType(True, IS_STR),
+        "Method": PropertyType(True, IS_STR),
         # Api Event sources must "always" be paired with a Serverless::Api
-        "RestApiId": PropertyType(True, is_str()),
-        "Stage": PropertyType(False, is_str()),
-        "Auth": PropertyType(False, is_type(dict)),
-        "RequestModel": PropertyType(False, is_type(dict)),
+        "RestApiId": PropertyType(True, IS_STR),
+        "Stage": PropertyType(False, IS_STR),
+        "Auth": PropertyType(False, IS_DICT),
+        "RequestModel": PropertyType(False, IS_DICT),
         "RequestParameters": PropertyType(False, is_type(list)),
     }
 
@@ -967,7 +967,7 @@ class AlexaSkill(PushEventSource):
     resource_type = "AlexaSkill"
     principal = "alexa-appkit.amazon.com"
 
-    property_types = {"SkillId": PropertyType(False, is_str())}
+    property_types = {"SkillId": PropertyType(False, IS_STR)}
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -986,7 +986,7 @@ class IoTRule(PushEventSource):
     resource_type = "IoTRule"
     principal = "iot.amazonaws.com"
 
-    property_types = {"Sql": PropertyType(True, is_str()), "AwsIotSqlVersion": PropertyType(False, is_str())}
+    property_types = {"Sql": PropertyType(True, IS_STR), "AwsIotSqlVersion": PropertyType(False, IS_STR)}
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -1033,8 +1033,8 @@ class Cognito(PushEventSource):
     principal = "cognito-idp.amazonaws.com"
 
     property_types = {
-        "UserPool": PropertyType(True, is_str()),
-        "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str())), False),
+        "UserPool": PropertyType(True, IS_STR),
+        "Trigger": PropertyType(True, one_of(IS_STR, list_of(IS_STR)), False),
     }
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
@@ -1113,14 +1113,14 @@ class HttpApi(PushEventSource):
     resource_type = "HttpApi"
     principal = "apigateway.amazonaws.com"
     property_types = {
-        "Path": PropertyType(False, is_str()),
-        "Method": PropertyType(False, is_str()),
-        "ApiId": PropertyType(False, is_str()),
-        "Stage": PropertyType(False, is_str()),
-        "Auth": PropertyType(False, is_type(dict)),
+        "Path": PropertyType(False, IS_STR),
+        "Method": PropertyType(False, IS_STR),
+        "ApiId": PropertyType(False, IS_STR),
+        "Stage": PropertyType(False, IS_STR),
+        "Auth": PropertyType(False, IS_DICT),
         "TimeoutInMillis": PropertyType(False, is_type(int)),
-        "RouteSettings": PropertyType(False, is_type(dict)),
-        "PayloadFormatVersion": PropertyType(False, is_str()),
+        "RouteSettings": PropertyType(False, IS_DICT),
+        "PayloadFormatVersion": PropertyType(False, IS_STR),
     }
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]

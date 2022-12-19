@@ -5,7 +5,7 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Property, PropertyType, ResourceMacro, Resource
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
-from samtranslator.model.types import is_str, is_type
+from samtranslator.model.types import IS_DICT, IS_STR, is_type
 from samtranslator.model.intrinsics import fnSub
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.exceptions import InvalidEventException
@@ -83,15 +83,15 @@ class Schedule(EventSource):
     resource_type = "Schedule"
     principal = "events.amazonaws.com"
     property_types = {
-        "Schedule": PropertyType(True, is_str()),
-        "Input": PropertyType(False, is_str()),
+        "Schedule": PropertyType(True, IS_STR),
+        "Input": PropertyType(False, IS_STR),
         "Enabled": PropertyType(False, is_type(bool)),
-        "State": PropertyType(False, is_str()),
-        "Name": PropertyType(False, is_str()),
-        "Description": PropertyType(False, is_str()),
-        "DeadLetterConfig": PropertyType(False, is_type(dict)),
-        "RetryPolicy": PropertyType(False, is_type(dict)),
-        "Target": Property(False, is_type(dict)),
+        "State": PropertyType(False, IS_STR),
+        "Name": PropertyType(False, IS_STR),
+        "Description": PropertyType(False, IS_STR),
+        "DeadLetterConfig": PropertyType(False, IS_DICT),
+        "RetryPolicy": PropertyType(False, IS_DICT),
+        "Target": Property(False, IS_DICT),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
@@ -171,15 +171,15 @@ class CloudWatchEvent(EventSource):
     resource_type = "CloudWatchEvent"
     principal = "events.amazonaws.com"
     property_types = {
-        "EventBusName": PropertyType(False, is_str()),
-        "RuleName": PropertyType(False, is_str()),
-        "Pattern": PropertyType(False, is_type(dict)),
-        "Input": PropertyType(False, is_str()),
-        "InputPath": PropertyType(False, is_str()),
-        "DeadLetterConfig": PropertyType(False, is_type(dict)),
-        "RetryPolicy": PropertyType(False, is_type(dict)),
-        "State": PropertyType(False, is_str()),
-        "Target": Property(False, is_type(dict)),
+        "EventBusName": PropertyType(False, IS_STR),
+        "RuleName": PropertyType(False, IS_STR),
+        "Pattern": PropertyType(False, IS_DICT),
+        "Input": PropertyType(False, IS_STR),
+        "InputPath": PropertyType(False, IS_STR),
+        "DeadLetterConfig": PropertyType(False, IS_DICT),
+        "RetryPolicy": PropertyType(False, IS_DICT),
+        "State": PropertyType(False, IS_STR),
+        "Target": Property(False, IS_DICT),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
@@ -263,12 +263,12 @@ class Api(EventSource):
     resource_type = "Api"
     principal = "apigateway.amazonaws.com"
     property_types = {
-        "Path": PropertyType(True, is_str()),
-        "Method": PropertyType(True, is_str()),
+        "Path": PropertyType(True, IS_STR),
+        "Method": PropertyType(True, IS_STR),
         # Api Event sources must "always" be paired with a Serverless::Api
-        "RestApiId": PropertyType(True, is_str()),
-        "Stage": PropertyType(False, is_str()),
-        "Auth": PropertyType(False, is_type(dict)),
+        "RestApiId": PropertyType(True, IS_STR),
+        "Stage": PropertyType(False, IS_STR),
+        "Auth": PropertyType(False, IS_DICT),
         "UnescapeMappingTemplate": Property(False, is_type(bool)),
     }
 

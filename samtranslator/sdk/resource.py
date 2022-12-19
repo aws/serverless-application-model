@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Dict
 
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
-from samtranslator.model.types import is_str
+from samtranslator.model.types import IS_STR
 
 
 class SamResource(object):
@@ -42,19 +42,19 @@ class SamResource(object):
 
         if self.condition:
 
-            if not is_str()(self.condition, should_raise=False):
+            if not IS_STR(self.condition, should_raise=False):
                 raise InvalidDocumentException([InvalidTemplateException("Every Condition member must be a string.")])
 
         if self.deletion_policy:
 
-            if not is_str()(self.deletion_policy, should_raise=False):
+            if not IS_STR(self.deletion_policy, should_raise=False):
                 raise InvalidDocumentException(
                     [InvalidTemplateException("Every DeletionPolicy member must be a string.")]
                 )
 
         if self.update_replace_policy:
 
-            if not is_str()(self.update_replace_policy, should_raise=False):
+            if not IS_STR(self.update_replace_policy, should_raise=False):
                 raise InvalidDocumentException(
                     [InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")]
                 )
