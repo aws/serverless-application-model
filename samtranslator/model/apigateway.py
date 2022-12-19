@@ -30,6 +30,10 @@ class ApiGatewayRestApi(Resource):
         "ApiKeySourceType": PropertyType(False, IS_STR),
     }
 
+    Body: Optional[Dict[str, Any]]
+    BodyS3Location: Optional[Dict[str, Any]]
+    EndpointConfiguration: Optional[Dict[str, Any]]
+
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
 
 
