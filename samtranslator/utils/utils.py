@@ -53,7 +53,7 @@ def dict_deep_get(d: Any, path: str) -> Optional[Any]:
 
 def dict_deep_set(d: Any, path: str, value: Any) -> None:
     """
-    Get the value deep in the dict.
+    Set the value deep in the dict.
 
     If any value along the path doesn't exist, set to {}.
     If any parent node exists but is not a dict, raise InvalidValueType.
