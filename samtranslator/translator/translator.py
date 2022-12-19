@@ -2,7 +2,7 @@ import copy
 
 from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
     FeatureToggleDefaultConfigProvider,
@@ -221,7 +221,7 @@ class Translator:
     # private methods
     def _get_resources_to_iterate(
         self, sam_template: Dict[str, Any], macro_resolver: ResourceTypeResolver
-    ) -> List[Any]:
+    ) -> List[Tuple[str, Dict[str, Any]]]:
         """
         Returns a list of resources to iterate, order them based on the following order:
 
