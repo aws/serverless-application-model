@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 
 from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAttAction
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
+from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 
 # All intrinsics are supported by default
 DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}
@@ -46,7 +47,9 @@ class IntrinsicsResolver(object):
         """
         return self._traverse(_input, self.parameters, self._try_resolve_parameter_refs)  # type: ignore[no-untyped-call]
 
-    def resolve_sam_resource_refs(self, input: Dict[str, Any], supported_resource_refs: Any) -> Any:
+    def resolve_sam_resource_refs(
+        self, input: Dict[str, Any], supported_resource_refs: SupportedResourceReferences
+    ) -> Any:
         """
         Customers can provide a reference to a "derived" SAM resource such as Alias of a Function or Stage of an API
         resource. This method recursively walks the tree, converting all derived references to the real resource name,
