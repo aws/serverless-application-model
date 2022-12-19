@@ -244,7 +244,7 @@ class ApiGenerator(object):
         self.mode = mode
         self.api_key_source_type = api_key_source_type
 
-    def _construct_rest_api(self):  # type: ignore[no-untyped-def]
+    def _construct_rest_api(self) -> ApiGatewayRestApi:
         """Constructs and returns the ApiGateway RestApi.
 
         :returns: the RestApi to which this SAM Api corresponds
@@ -287,7 +287,7 @@ class ApiGenerator(object):
             rest_api.FailOnWarnings = self.fail_on_warnings
 
         if self.disable_execute_api_endpoint is not None:
-            self._add_endpoint_extension()  # type: ignore[no-untyped-call]
+            self._add_endpoint_extension()
 
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()  # type: ignore[no-untyped-call]
@@ -310,7 +310,7 @@ class ApiGenerator(object):
 
         return rest_api
 
-    def _add_endpoint_extension(self):  # type: ignore[no-untyped-def]
+    def _add_endpoint_extension(self) -> None:
         """Add disableExecuteApiEndpoint if it is set in SAM
         Note:
         If neither DefinitionUri nor DefinitionBody are specified,
@@ -323,7 +323,7 @@ class ApiGenerator(object):
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
         editor = SwaggerEditor(self.definition_body)
-        editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)  # type: ignore[no-untyped-call]
+        editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)
         self.definition_body = editor.swagger
 
     def _construct_body_s3_dict(self):  # type: ignore[no-untyped-def]
@@ -605,7 +605,7 @@ class ApiGenerator(object):
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
         :rtype: tuple
         """
-        rest_api = self._construct_rest_api()  # type: ignore[no-untyped-call]
+        rest_api = self._construct_rest_api()
         domain, basepath_mapping, route53 = self._construct_api_domain(rest_api, route53_record_set_groups)  # type: ignore[no-untyped-call]
         deployment = self._construct_deployment(rest_api)  # type: ignore[no-untyped-call]
 

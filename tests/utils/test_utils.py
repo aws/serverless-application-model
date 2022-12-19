@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from samtranslator.utils.utils import as_array, insert_unique
+from samtranslator.utils.utils import InvalidValueType, as_array, dict_deep_update, insert_unique
 
 
 class TestUtils(TestCase):
@@ -26,3 +26,15 @@ class TestUtils(TestCase):
         ret = insert_unique(xs, vs)
         self.assertFalse(ret is xs)
         self.assertFalse(ret is vs)
+
+    def test_dict_deep_update(self):
+        d = {"a": {"b": {"c": "hi"}}}
+        dict_deep_update(d, "a.b.d", {"hello": "world"})
+        self.assertEqual(d, {"a": {"b": {"c": "hi", "d": {"hello": "world"}}}})
+        dict_deep_update(d, "a.b", {"hello": "world"})
+        self.assertEqual(d, {"a": {"b": {"hello": "world", "c": "hi", "d": {"hello": "world"}}}})
+
+    def test_dict_deep_update_invalid_type(self):
+        d = {"a": {"b": {"c": "hi"}}}
+        with self.assertRaisesRegex(InvalidValueType, r"The value of 'a\.b\.c' should be a map"):
+            dict_deep_update(d, "a.b.c", {"hello": "world"})
