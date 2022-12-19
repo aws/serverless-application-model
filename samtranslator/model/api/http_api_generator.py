@@ -563,14 +563,10 @@ class HttpApiGenerator(object):
         if not authorizers_config:
             return authorizers
 
-        if not isinstance(authorizers_config, dict):
-            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")
+        sam_expect(authorizers_config, self.logical_id, "Auth.Authorizers").to_be_a_map()
 
         for authorizer_name, authorizer in authorizers_config.items():
-            if not isinstance(authorizer, dict):
-                raise InvalidResourceException(
-                    self.logical_id, "Authorizer %s must be a dictionary." % (authorizer_name)
-                )
+            sam_expect(authorizer, self.logical_id, f"Auth.Authorizers.{authorizer_name}").to_be_a_map()
 
             if "OpenIdConnectUrl" in authorizer:
                 raise InvalidResourceException(

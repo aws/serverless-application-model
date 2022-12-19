@@ -666,7 +666,7 @@ class SwaggerEditor(BaseEditor):
             if security != existing_security:
                 method_definition["security"] = security
 
-    def add_auth_to_method(self, path, method_name, auth, api):  # type: ignore[no-untyped-def]
+    def add_auth_to_method(self, path: str, method_name: str, auth: Dict[str, Any], api: Dict[str, Any]) -> None:
         """
         Adds auth settings for this path/method. Auth settings currently consist of Authorizers and ApiKeyRequired
         but this method will eventually include setting other auth settings such as Resource Policy, etc.
@@ -872,7 +872,7 @@ class SwaggerEditor(BaseEditor):
 
             self.definitions[model_name.lower()] = schema
 
-    def add_resource_policy(self, resource_policy, path, stage):  # type: ignore[no-untyped-def]
+    def add_resource_policy(self, resource_policy: Optional[Dict[str, Any]], path: str, stage: PassThrough) -> None:
         """
         Add resource policy definition to Swagger.
 
