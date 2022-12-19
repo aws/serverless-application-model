@@ -34,7 +34,7 @@ class ApiGatewayRestApi(Resource):
     BodyS3Location: Optional[Dict[str, Any]]
     CloneFrom: Optional[PassThrough]
     Description: Optional[PassThrough]
-    FailOnWarnings: Optional[bool]
+    FailOnWarnings: Optional[PassThrough]
     Name: Optional[PassThrough]
     Parameters: Optional[Dict[str, Any]]
     EndpointConfiguration: Optional[Dict[str, Any]]
