@@ -324,7 +324,7 @@ class ApiGenerator(object):
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
         editor = SwaggerEditor(self.definition_body)
-        editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)  # type: ignore[no-untyped-call]
+        editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)
         self.definition_body = editor.swagger
 
     def _construct_body_s3_dict(self) -> Dict[str, Any]:

@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.types import IS_DICT, is_type, one_of, IS_STR, list_of
-from samtranslator.model.intrinsics import ref, fnSub
+from samtranslator.model.intrinsics import fnSub, ref
+from samtranslator.model.types import IS_DICT, IS_STR, is_type, list_of, one_of
 from samtranslator.schema.common import PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -32,7 +32,16 @@ class ApiGatewayRestApi(Resource):
 
     Body: Optional[Dict[str, Any]]
     BodyS3Location: Optional[Dict[str, Any]]
+    CloneFrom: Optional[PassThrough]
+    Description: Optional[PassThrough]
+    FailOnWarnings: Optional[PassThrough]
+    Name: Optional[PassThrough]
+    Parameters: Optional[Dict[str, Any]]
     EndpointConfiguration: Optional[Dict[str, Any]]
+    BinaryMediaTypes: Optional[List[Any]]
+    MinimumCompressionSize: Optional[PassThrough]
+    Mode: Optional[PassThrough]
+    ApiKeySourceType: Optional[PassThrough]
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
 

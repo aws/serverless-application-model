@@ -6,8 +6,10 @@ from samtranslator.model.apigateway import ApiGatewayAuthorizer
 from samtranslator.model.intrinsics import ref, make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.open_api.base_editor import BaseEditor
+from samtranslator.schema.common import PassThrough
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.utils.utils import InvalidValueType, dict_deep_set
 
 
 class SwaggerEditor(BaseEditor):
@@ -37,6 +39,7 @@ class SwaggerEditor(BaseEditor):
     _POLICY_TYPE_IAM = "Iam"
     _POLICY_TYPE_IP = "Ip"
     _POLICY_TYPE_VPC = "Vpc"
+    _DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
 
     def __init__(self, doc: Optional[Dict[str, Any]]) -> None:
         """
@@ -66,32 +69,40 @@ class SwaggerEditor(BaseEditor):
             for path_item in self.get_conditional_contents(self.paths.get(path)):
                 SwaggerEditor.validate_path_item_is_dict(path_item, path)
 
-    @staticmethod
-    def _update_dict(obj: Dict[Any, Any], k: str, v: Dict[Any, Any]) -> None:
-        if not obj.get(k):
-            obj[k] = {}
-        obj[k].update(v)
-
-    def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint):  # type: ignore[no-untyped-def]
+    def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint: PassThrough) -> None:
         """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG in open api definition as extension
         Following this guide:
         https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
         :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
         """
-        DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
-        set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
+
+        disable_execute_api_endpoint_path = f"{self._X_ENDPOINT_CONFIG}.{self._DISABLE_EXECUTE_API_ENDPOINT}"
 
         # Check if the OpenAPI version is 3.0, if it is then the extension needs to added to the Servers field,
         # if not then it gets added to the top level (same level as "paths" and "info")
         if self._doc.get("openapi") and self.validate_open_api_version_3(self._doc["openapi"]):
             # Add the x-amazon-apigateway-endpoint-configuration extension to the Servers objects
             servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
-            for config in servers_configurations:
-                SwaggerEditor._update_dict(config, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
+            for index, config in enumerate(servers_configurations):
+                try:
+                    dict_deep_set(config, disable_execute_api_endpoint_path, disable_execute_api_endpoint)
+                except InvalidValueType as ex:
+                    raise InvalidDocumentException(
+                        [
+                            InvalidTemplateException(
+                                f"Invalid OpenAPI definition of '{self._SERVERS}[{index}]': {str(ex)}."
+                            )
+                        ]
+                    ) from ex
 
             self._doc[self._SERVERS] = servers_configurations
         else:
-            SwaggerEditor._update_dict(self._doc, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
+            try:
+                dict_deep_set(self._doc, disable_execute_api_endpoint_path, disable_execute_api_endpoint)
+            except InvalidValueType as ex:
+                raise InvalidDocumentException(
+                    [InvalidTemplateException(f"Invalid OpenAPI definition: {str(ex)}.")]
+                ) from ex
 
     def add_lambda_integration(
         self,
