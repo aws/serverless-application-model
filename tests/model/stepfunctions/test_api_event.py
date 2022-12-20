@@ -22,7 +22,9 @@ class ApiEventSource(TestCase):
         self.state_machine.get_passthrough_resource_attributes.return_value = {}
 
     def test_to_cloudformation_returns_role_resource(self):
-        resources = self.api_event_source.to_cloudformation(resource=self.state_machine, explicit_api={})
+        resources = self.api_event_source.to_cloudformation(
+            resource=self.state_machine, explicit_api={}, api_id="MyRestApi"
+        )
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0].resource_type, "AWS::IAM::Role")
 
@@ -63,7 +65,12 @@ class ApiEventSource(TestCase):
         self.api_event_source.RestApiId = {"Ref": "MyExplicitApi"}
         resources_to_link = self.api_event_source.resources_to_link(resources)
         self.assertEqual(
-            resources_to_link, {"explicit_api": {"StageName": "Prod"}, "explicit_api_stage": {"suffix": "Prod"}}
+            resources_to_link,
+            {
+                "explicit_api": {"StageName": "Prod"},
+                "api_id": "MyExplicitApi",
+                "explicit_api_stage": {"suffix": "Prod"},
+            },
         )
 
     def test_resources_to_link_with_undefined_explicit_api(self):
@@ -75,7 +82,9 @@ class ApiEventSource(TestCase):
     def test_resources_to_link_without_explicit_api(self):
         resources = {}
         resources_to_link = self.api_event_source.resources_to_link(resources)
-        self.assertEqual(resources_to_link, {"explicit_api": None, "explicit_api_stage": {"suffix": "AllStages"}})
+        self.assertEqual(
+            resources_to_link, {"explicit_api": None, "api_id": None, "explicit_api_stage": {"suffix": "AllStages"}}
+        )
 
     def test_to_cloudformation_throws_when_no_resource(self):
         self.assertRaises(TypeError, self.api_event_source.to_cloudformation)
