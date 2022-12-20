@@ -723,7 +723,7 @@ class SamFunction(SamResourceMacro):
         This is mainly used for HttpApi Events, where we need to evaluate the "$default" path (if any)
             before we evaluate any of the other paths ("/", etc), so we can make sure we don't create any
             redundant permissions. This sort places "$" before "/" or any alphanumeric characters.
-        :param event: tuple of (logicale_id, event_dictionary) that contains event information
+        :param event: tuple of (logical_id, event_dictionary) that contains event information
         """
         logical_id, event_dict = event
         if not isinstance(event_dict, dict):
