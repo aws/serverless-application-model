@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Property, PropertyType, ResourceMacro, Resource
@@ -27,6 +27,7 @@ class EventSource(ResourceMacro):
     # line to avoid any potential behavior change.
     # TODO: Make `EventSource` an abstract class and not giving `principal` initial value.
     principal: str = None  # type: ignore
+    relative_id: str  # overriding the Optional[str]: for event, relative id is not None
 
     Target: Optional[Dict[str, str]]
 
@@ -272,6 +273,11 @@ class Api(EventSource):
         "UnescapeMappingTemplate": Property(False, is_type(bool)),
     }
 
+    Path: str
+    Method: str
+    RestApiId: str
+    Stage: Optional[str]
+    Auth: Optional[Dict[str, Any]]
     UnescapeMappingTemplate: Optional[bool]
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
@@ -289,7 +295,7 @@ class Api(EventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)  # type: ignore[attr-defined]
+        rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)
         if isinstance(rest_api_id, str):
 
             if (
@@ -314,7 +320,7 @@ class Api(EventSource):
                     "RestApiId property of Api event must reference a valid resource in the same template.",
                 )
 
-        return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
+        return {"explicit_api": explicit_api, "api_id": rest_api_id, "explicit_api_stage": {"suffix": stage_suffix}}
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
@@ -336,20 +342,21 @@ class Api(EventSource):
         intrinsics_resolver = kwargs.get("intrinsics_resolver")
         permissions_boundary = kwargs.get("permissions_boundary")
 
-        if self.Method is not None:  # type: ignore[has-type]
+        if self.Method is not None:
             # Convert to lower case so that user can specify either GET or get
-            self.Method = self.Method.lower()  # type: ignore[has-type]
+            self.Method = self.Method.lower()
 
         role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
         resources.append(role)
 
         explicit_api = kwargs["explicit_api"]
+        api_id = kwargs["api_id"]
         if explicit_api.get("__MANAGE_SWAGGER"):
-            self._add_swagger_integration(explicit_api, resource, role, intrinsics_resolver)  # type: ignore[no-untyped-call]
+            self._add_swagger_integration(explicit_api, api_id, resource, role, intrinsics_resolver)  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _add_swagger_integration(self, api, resource, role, intrinsics_resolver):  # type: ignore[no-untyped-def]
+    def _add_swagger_integration(self, api, api_id, resource, role, intrinsics_resolver):  # type: ignore[no-untyped-def]
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
@@ -362,12 +369,12 @@ class Api(EventSource):
 
         editor = SwaggerEditor(swagger_body)
 
-        if editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined]
+        if editor.has_integration(self.Path, self.Method):
             # Cannot add the integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
                 'API method "{method}" defined multiple times for path "{path}".'.format(
-                    method=self.Method, path=self.Path  # type: ignore[attr-defined]
+                    method=self.Method, path=self.Path
                 ),
             )
 
@@ -382,7 +389,7 @@ class Api(EventSource):
         )
 
         editor.add_state_machine_integration(  # type: ignore[no-untyped-call]
-            self.Path,  # type: ignore[attr-defined]
+            self.Path,
             self.Method,
             integration_uri,
             role.get_runtime_attr("arn"),
@@ -390,70 +397,15 @@ class Api(EventSource):
             condition=condition,
         )
 
-        # Note: Refactor and combine the section below with the Api eventsource for functions
-        if self.Auth:  # type: ignore[attr-defined]
-            method_authorizer = self.Auth.get("Authorizer")  # type: ignore[attr-defined]
-            api_auth = api.get("Auth")
-            api_auth = intrinsics_resolver.resolve_parameter_refs(api_auth)
+        # self.Stage is not None as it is set in _get_permissions()
+        # before calling this method.
+        # TODO: refactor to remove this cast
+        stage = cast(str, self.Stage)
 
-            if method_authorizer:
-                api_authorizers = api_auth and api_auth.get("Authorizers")
-
-                if method_authorizer != "AWS_IAM":
-                    if method_authorizer != "NONE" and not api_authorizers:
-                        raise InvalidEventException(
-                            self.relative_id,
-                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                            "because the related API does not define any Authorizers.".format(
-                                authorizer=method_authorizer, method=self.Method, path=self.Path  # type: ignore[attr-defined]
-                            ),
-                        )
-
-                    if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
-                        raise InvalidEventException(
-                            self.relative_id,
-                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                            "because it wasn't defined in the API's Authorizers.".format(
-                                authorizer=method_authorizer, method=self.Method, path=self.Path  # type: ignore[attr-defined]
-                            ),
-                        )
-
-                    if method_authorizer == "NONE":
-                        if not api_auth or not api_auth.get("DefaultAuthorizer"):
-                            raise InvalidEventException(
-                                self.relative_id,
-                                "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
-                                "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                                    method=self.Method, path=self.Path  # type: ignore[attr-defined]
-                                ),
-                            )
-
-            if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):  # type: ignore[attr-defined]
-                raise InvalidEventException(
-                    self.relative_id,
-                    "Unable to set Authorizer on API method [{method}] for path [{path}] because "
-                    "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),  # type: ignore[attr-defined]
-                )
-
-            apikey_required_setting = self.Auth.get("ApiKeyRequired")  # type: ignore[attr-defined]
-            apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
-            if apikey_required_setting_is_false and (not api_auth or not api_auth.get("ApiKeyRequired")):
-                raise InvalidEventException(
-                    self.relative_id,
-                    "Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] "
-                    "because the related API does not specify any ApiKeyRequired.".format(
-                        method=self.Method, path=self.Path  # type: ignore[attr-defined]
-                    ),
-                )
-
-            if method_authorizer or apikey_required_setting is not None:
-                editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
-
-            if self.Auth.get("ResourcePolicy"):  # type: ignore[attr-defined]
-                resource_policy = self.Auth.get("ResourcePolicy")  # type: ignore[attr-defined]
-                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
-                if resource_policy.get("CustomStatements"):
-                    editor.add_custom_statements(resource_policy.get("CustomStatements"))  # type: ignore[no-untyped-call]
+        if self.Auth:
+            PushApi.add_auth_to_swagger(
+                self.Auth, api, api_id, self.relative_id, self.Method, self.Path, stage, editor, intrinsics_resolver
+            )
 
         api["DefinitionBody"] = editor.swagger
 

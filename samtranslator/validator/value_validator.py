@@ -1,5 +1,5 @@
 """A plug-able validator to help raise exception when some value is unexpected."""
-from typing import Generic, Optional, TypeVar
+from typing import Any, Dict, Generic, Optional, TypeVar, cast
 
 from samtranslator.model.exceptions import (
     ExpectedType,
@@ -72,8 +72,8 @@ class _ResourcePropertyValueValidator(Generic[T]):
     #
     # alias methods:
     #
-    def to_be_a_map(self, message: Optional[str] = "") -> T:
-        return self.to_be_a(ExpectedType.MAP, message)
+    def to_be_a_map(self, message: Optional[str] = "") -> Dict[str, Any]:
+        return cast(Dict[str, Any], self.to_be_a(ExpectedType.MAP, message))
 
     def to_be_a_list(self, message: Optional[str] = "") -> T:
         return self.to_be_a(ExpectedType.LIST, message)

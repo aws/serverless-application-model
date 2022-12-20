@@ -753,7 +753,7 @@ class ApiGenerator(object):
                 auth_properties.ResourcePolicy, "ResourcePolicy must be a map (ResourcePolicyStatement)."
             )
             for path in swagger_editor.iter_on_path():
-                swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)  # type: ignore[no-untyped-call]
+                swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)
             if auth_properties.ResourcePolicy.get("CustomStatements"):
                 swagger_editor.add_custom_statements(auth_properties.ResourcePolicy.get("CustomStatements"))  # type: ignore[no-untyped-call]
 
@@ -1120,14 +1120,10 @@ class ApiGenerator(object):
                 return authorizers
             return None
 
-        if not isinstance(authorizers_config, dict):
-            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")
+        sam_expect(authorizers_config, self.logical_id, "Auth.Authorizers").to_be_a_map()
 
         for authorizer_name, authorizer in authorizers_config.items():
-            if not isinstance(authorizer, dict):
-                raise InvalidResourceException(
-                    self.logical_id, "Authorizer %s must be a dictionary." % (authorizer_name)
-                )
+            sam_expect(authorizer, self.logical_id, f"Auth.Authorizers.{authorizer_name}").to_be_a_map()
 
             authorizers[authorizer_name] = ApiGatewayAuthorizer(  # type: ignore[no-untyped-call]
                 api_logical_id=self.logical_id,
