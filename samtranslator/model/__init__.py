@@ -193,7 +193,7 @@ class Resource(object):
             if attr in resource_dict:
                 resource.set_resource_attribute(attr, resource_dict[attr])
 
-        resource.validate_properties()  # type: ignore[no-untyped-call]
+        resource.validate_properties()
         return resource
 
     @classmethod
@@ -231,7 +231,7 @@ class Resource(object):
         if "Properties" in resource_dict and not isinstance(resource_dict["Properties"], dict):
             raise InvalidResourceException(logical_id, "Properties of a resource must be an object.")
 
-    def to_dict(self):  # type: ignore[no-untyped-def]
+    def to_dict(self) -> Dict[str, Dict[str, Any]]:
         """Validates that the required properties for this Resource have been provided, then returns a dict
         corresponding to the given Resource object. This dict will take the format of a single entry in the Resources
         section of a CloudFormation template, and will take the following format. ::
@@ -252,7 +252,7 @@ class Resource(object):
         :rtype: dict
         :raises TypeError: if a required property is missing from this Resource
         """
-        self.validate_properties()  # type: ignore[no-untyped-call]
+        self.validate_properties()
 
         resource_dict = self._generate_resource_dict()  # type: ignore[no-untyped-call]
 
@@ -300,7 +300,7 @@ class Resource(object):
             ),
         )
 
-    def validate_properties(self):  # type: ignore[no-untyped-def]
+    def validate_properties(self) -> None:
         """Validates that the required properties for this Resource have been populated, and that all properties have
         valid values.
 
@@ -523,7 +523,7 @@ class ResourceTypeResolver(object):
     """ResourceTypeResolver maps Resource Types to Resource classes, e.g. AWS::Serverless::Function to
     samtranslator.model.sam_resources.SamFunction."""
 
-    def __init__(self, *modules):  # type: ignore[no-untyped-def]
+    def __init__(self, *modules: Any):
         """Initializes the ResourceTypeResolver from the given modules.
 
         :param modules: one or more Python modules containing Resource definitions
