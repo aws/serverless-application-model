@@ -17,7 +17,12 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, InvalidTemplateException
+from samtranslator.model.exceptions import (
+    ExpectedType,
+    InvalidDocumentException,
+    InvalidResourceException,
+    InvalidTemplateException,
+)
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.schema.common import PassThrough
@@ -524,6 +529,7 @@ class ApiGenerator(object):
             basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
             basepath_resource_list.extend([basepath_mapping])
         else:
+            sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
             for basepath in basepaths:
                 # Remove possible leading and trailing '/' because a base path may only
                 # contain letters, numbers, and one of "$-_.+!*'()"
