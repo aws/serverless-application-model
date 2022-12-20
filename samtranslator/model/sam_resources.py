@@ -191,7 +191,7 @@ class SamFunction(SamResourceMacro):
         "DestinationQueue": SQSQueue.resource_type,
     }
 
-    def resources_to_link(self, resources: Any) -> Dict[str, Any]:
+    def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
             return {"event_resources": self._event_resources_to_link(resources)}
         except InvalidEventException as e:
@@ -702,7 +702,7 @@ class SamFunction(SamResourceMacro):
                 self.logical_id, "'DeadLetterQueue' requires Type of {}".format(valid_dlq_types)
             )
 
-    def _event_resources_to_link(self, resources: Any) -> Dict[str, Any]:
+    def _event_resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         event_resources = {}
         if self.Events:
             for logical_id, event_dict in self.Events.items():
@@ -1769,13 +1769,13 @@ class SamStateMachine(SamResourceMacro):
         resources = state_machine_generator.to_cloudformation()
         return resources
 
-    def resources_to_link(self, resources: Any) -> Dict[str, Any]:
+    def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
             return {"event_resources": self._event_resources_to_link(resources)}
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
-    def _event_resources_to_link(self, resources: Any) -> Dict[str, Any]:
+    def _event_resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         event_resources = {}
         if self.Events:
             for logical_id, event_dict in self.Events.items():
