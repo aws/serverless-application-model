@@ -1,15 +1,16 @@
 # Help resolve intrinsic functions
-from typing import Any
+from typing import Any, Dict, Optional
 
 from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAttAction
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
+from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 
 # All intrinsics are supported by default
 DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}
 
 
 class IntrinsicsResolver(object):
-    def __init__(self, parameters, supported_intrinsics=None):  # type: ignore[no-untyped-def]
+    def __init__(self, parameters: Dict[str, Any], supported_intrinsics: Optional[Dict[str, Any]] = None) -> None:
         """
         Instantiate the resolver
         :param dict parameters: Map of parameter names to their values
@@ -46,7 +47,9 @@ class IntrinsicsResolver(object):
         """
         return self._traverse(_input, self.parameters, self._try_resolve_parameter_refs)  # type: ignore[no-untyped-call]
 
-    def resolve_sam_resource_refs(self, input, supported_resource_refs):  # type: ignore[no-untyped-def]
+    def resolve_sam_resource_refs(
+        self, input: Dict[str, Any], supported_resource_refs: SupportedResourceReferences
+    ) -> Any:
         """
         Customers can provide a reference to a "derived" SAM resource such as Alias of a Function or Stage of an API
         resource. This method recursively walks the tree, converting all derived references to the real resource name,
@@ -70,7 +73,7 @@ class IntrinsicsResolver(object):
         """
         return self._traverse(input, supported_resource_refs, self._try_resolve_sam_resource_refs)  # type: ignore[no-untyped-call]
 
-    def resolve_sam_resource_id_refs(self, input, supported_resource_id_refs):  # type: ignore[no-untyped-def]
+    def resolve_sam_resource_id_refs(self, input: Dict[str, Any], supported_resource_id_refs: Dict[str, str]) -> Any:
         """
         Some SAM resources have their logical ids mutated from the original id that the customer writes in the
         template. This method recursively walks the tree and updates these logical ids from the old value
@@ -93,12 +96,12 @@ class IntrinsicsResolver(object):
         """
         return self._traverse(input, supported_resource_id_refs, self._try_resolve_sam_resource_id_refs)  # type: ignore[no-untyped-call]
 
-    def _traverse(self, input, resolution_data, resolver_method):  # type: ignore[no-untyped-def]
+    def _traverse(self, input_value, resolution_data, resolver_method):  # type: ignore[no-untyped-def]
         """
         Driver method that performs the actual traversal of input and calls the appropriate `resolver_method` when
         to perform the resolution.
 
-        :param input: Any primitive type  (dict, array, string etc) whose value might contain an intrinsic function
+        :param input_value: Any primitive type  (dict, array, string etc) whose value might contain an intrinsic function
         :param resolution_data: Data that will help with resolution. For example, when resolving parameter references,
             this object will contain a dictionary of parameter names and their values.
         :param resolver_method: Method that will be called to actually resolve an intrinsic function. This method
@@ -108,7 +111,7 @@ class IntrinsicsResolver(object):
 
         # There is data to help with resolution. Skip the traversal altogether
         if len(resolution_data) == 0:
-            return input
+            return input_value
 
         #
         # Traversal Algorithm:
@@ -126,15 +129,14 @@ class IntrinsicsResolver(object):
         # to handle nested intrinsics. All of these cases lend well towards a Pre-Order traversal where we try and
         # process the intrinsic, which results in a modified sub-tree to traverse.
         #
-
-        input = resolver_method(input, resolution_data)
-
-        if isinstance(input, dict):
-            return self._traverse_dict(input, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
-        if isinstance(input, list):
-            return self._traverse_list(input, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
+        input_value = resolver_method(input_value, resolution_data)
+        if isinstance(input_value, dict):
+            return self._traverse_dict(input_value, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
+        if isinstance(input_value, list):
+            return self._traverse_list(input_value, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
         # We can iterate only over dict or list types. Primitive types are terminals
-        return input
+
+        return input_value
 
     def _traverse_dict(self, input_dict, resolution_data, resolver_method):  # type: ignore[no-untyped-def]
         """

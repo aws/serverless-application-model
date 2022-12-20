@@ -1,0 +1,77 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Resources": {
+    "MyBasicStateMachine": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",",
+              "    \"StartAt\": \"Hello\",",
+              "    \"States\": {",
+              "        \"Hello\": {",
+              "            \"Next\": \"World\",",
+              "            \"Result\": \"Hello\",",
+              "            \"Type\": \"Pass\"",
+              "        },",
+              "        \"World\": {",
+              "            \"End\": true,",
+              "            \"Result\": \"World\",",
+              "            \"Type\": \"Pass\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MyBasicStateMachineRole",
+            "Arn"
+          ]
+        },
+        "StateMachineType": "STANDARD",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "MyBasicStateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
+        "Path": "/foo/bar/",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

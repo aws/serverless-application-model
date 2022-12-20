@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - develop
+      - "feat-*"
   pull_request:
-    branches:
-      - develop
   workflow_dispatch:
 
 jobs:

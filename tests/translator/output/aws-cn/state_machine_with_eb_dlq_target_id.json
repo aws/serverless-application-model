@@ -1,0 +1,86 @@
+{
+  "Resources": {
+    "StateMachine": {
+      "Properties": {
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "my_state_machine.asl.json"
+        },
+        "RoleArn": "arn:${AWS::Partition}:iam::123456123456:role/service-role/SampleRole",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "StateMachineCWEvent": {
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "state": [
+              "terminated"
+            ]
+          }
+        },
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "StateMachine"
+            },
+            "DeadLetterConfig": {
+              "Arn": "TestDlqArn"
+            },
+            "Id": "MyTargetID",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "StateMachineCWEventRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "StateMachineCWEventRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineCWEventRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

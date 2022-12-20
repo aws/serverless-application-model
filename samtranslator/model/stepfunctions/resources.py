@@ -1,23 +1,23 @@
 from typing import Any, Dict, List, Optional
 
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import is_type, list_of, is_str
+from samtranslator.model.types import IS_DICT, list_of, IS_STR
 from samtranslator.model.intrinsics import fnGetAtt, ref
 
 
 class StepFunctionsStateMachine(Resource):
     resource_type = "AWS::StepFunctions::StateMachine"
     property_types = {
-        "Definition": PropertyType(False, is_type(dict)),
-        "DefinitionString": PropertyType(False, is_str()),
-        "DefinitionS3Location": PropertyType(False, is_type(dict)),
-        "LoggingConfiguration": PropertyType(False, is_type(dict)),
-        "RoleArn": PropertyType(True, is_str()),
-        "StateMachineName": PropertyType(False, is_str()),
-        "StateMachineType": PropertyType(False, is_str()),
-        "Tags": PropertyType(False, list_of(is_type(dict))),
-        "DefinitionSubstitutions": PropertyType(False, is_type(dict)),
-        "TracingConfiguration": PropertyType(False, is_type(dict)),
+        "Definition": PropertyType(False, IS_DICT),
+        "DefinitionString": PropertyType(False, IS_STR),
+        "DefinitionS3Location": PropertyType(False, IS_DICT),
+        "LoggingConfiguration": PropertyType(False, IS_DICT),
+        "RoleArn": PropertyType(True, IS_STR),
+        "StateMachineName": PropertyType(False, IS_STR),
+        "StateMachineType": PropertyType(False, IS_STR),
+        "Tags": PropertyType(False, list_of(IS_DICT)),
+        "DefinitionSubstitutions": PropertyType(False, IS_DICT),
+        "TracingConfiguration": PropertyType(False, IS_DICT),
     }
 
     Definition: Optional[Dict[str, Any]]

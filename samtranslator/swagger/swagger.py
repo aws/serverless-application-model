@@ -6,7 +6,10 @@ from samtranslator.model.apigateway import ApiGatewayAuthorizer
 from samtranslator.model.intrinsics import ref, make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.open_api.base_editor import BaseEditor
+from samtranslator.schema.common import PassThrough
+from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.utils.utils import InvalidValueType, dict_deep_set
 
 
 class SwaggerEditor(BaseEditor):
@@ -36,6 +39,7 @@ class SwaggerEditor(BaseEditor):
     _POLICY_TYPE_IAM = "Iam"
     _POLICY_TYPE_IP = "Ip"
     _POLICY_TYPE_VPC = "Vpc"
+    _DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
 
     def __init__(self, doc: Optional[Dict[str, Any]]) -> None:
         """
@@ -65,42 +69,52 @@ class SwaggerEditor(BaseEditor):
             for path_item in self.get_conditional_contents(self.paths.get(path)):
                 SwaggerEditor.validate_path_item_is_dict(path_item, path)
 
-    @staticmethod
-    def _update_dict(obj: Dict[Any, Any], k: str, v: Dict[Any, Any]) -> None:
-        if not obj.get(k):
-            obj[k] = {}
-        obj[k].update(v)
-
-    def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint):  # type: ignore[no-untyped-def]
+    def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint: PassThrough) -> None:
         """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG in open api definition as extension
         Following this guide:
         https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
         :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
         """
-        DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
-        set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
+
+        disable_execute_api_endpoint_path = f"{self._X_ENDPOINT_CONFIG}.{self._DISABLE_EXECUTE_API_ENDPOINT}"
 
         # Check if the OpenAPI version is 3.0, if it is then the extension needs to added to the Servers field,
         # if not then it gets added to the top level (same level as "paths" and "info")
         if self._doc.get("openapi") and self.validate_open_api_version_3(self._doc["openapi"]):
             # Add the x-amazon-apigateway-endpoint-configuration extension to the Servers objects
             servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
-            for config in servers_configurations:
-                SwaggerEditor._update_dict(config, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
+            for index, config in enumerate(servers_configurations):
+                try:
+                    dict_deep_set(config, disable_execute_api_endpoint_path, disable_execute_api_endpoint)
+                except InvalidValueType as ex:
+                    raise InvalidDocumentException(
+                        [
+                            InvalidTemplateException(
+                                f"Invalid OpenAPI definition of '{self._SERVERS}[{index}]': {str(ex)}."
+                            )
+                        ]
+                    ) from ex
 
             self._doc[self._SERVERS] = servers_configurations
         else:
-            SwaggerEditor._update_dict(self._doc, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
+            try:
+                dict_deep_set(self._doc, disable_execute_api_endpoint_path, disable_execute_api_endpoint)
+            except InvalidValueType as ex:
+                raise InvalidDocumentException(
+                    [InvalidTemplateException(f"Invalid OpenAPI definition: {str(ex)}.")]
+                ) from ex
 
-    def add_lambda_integration(  # type: ignore[no-untyped-def]
-        self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
-    ):
+    def add_lambda_integration(
+        self,
+        path: str,
+        method: str,
+        integration_uri: str,
+        method_auth_config: Dict[str, Any],
+        api_auth_config: Dict[str, Any],
+        condition: Optional[str] = None,
+    ) -> None:
         """
         Adds aws_proxy APIGW integration to the given path+method.
-
-        :param string path: Path name
-        :param string method: HTTP Method
-        :param string integration_uri: URI for the integration.
         """
 
         method = self._normalize_method_name(method)
@@ -117,18 +131,16 @@ class SwaggerEditor(BaseEditor):
 
         # Wrap the integration_uri in a Condition if one exists on that function
         # This is necessary so CFN doesn't try to resolve the integration reference.
-        if condition:
-            integration_uri = make_conditional(condition, integration_uri)
+        _integration_uri = make_conditional(condition, integration_uri) if condition else integration_uri
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
             # insert key one by one to preserce input order
             path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
             path_item[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
-            path_item[method][self._X_APIGW_INTEGRATION]["uri"] = integration_uri
+            path_item[method][self._X_APIGW_INTEGRATION]["uri"] = _integration_uri
 
-            method_auth_config = method_auth_config or Py27Dict()
-            api_auth_config = api_auth_config or Py27Dict()
             if (
                 method_auth_config.get("Authorizer") == "AWS_IAM"
                 or api_auth_config.get("DefaultAuthorizer") == "AWS_IAM"
@@ -187,6 +199,7 @@ class SwaggerEditor(BaseEditor):
             integration_uri = make_conditional(condition, integration_uri)
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             # Responses
             integration_responses = Py27Dict()
             # insert key one by one to preserce input order
@@ -221,7 +234,7 @@ class SwaggerEditor(BaseEditor):
 
     @staticmethod
     def _get_invoke_role(invoke_role):  # type: ignore[no-untyped-def]
-        CALLER_CREDENTIALS_ARN = "arn:aws:iam::*:user/*"
+        CALLER_CREDENTIALS_ARN = f"arn:{ArnGenerator.get_partition_name()}:iam::*:user/*"
         return invoke_role if invoke_role and invoke_role != "CALLER_CREDENTIALS" else CALLER_CREDENTIALS_ARN
 
     def iter_on_all_methods_for_path(self, path_name, skip_methods_without_apigw_integration=True):  # type: ignore[no-untyped-def]
@@ -233,18 +246,14 @@ class SwaggerEditor(BaseEditor):
         :yields list of (method name, method definition) tuples
         """
         for path_item in self.get_conditional_contents(self.paths.get(path_name)):
+            BaseEditor.validate_path_item_is_dict(path_item, path_name)
             for method_name, method in path_item.items():
                 # Excluding non-method sections
                 if method_name in SwaggerEditor._EXCLUDED_PATHS_FIELDS:
                     continue
 
                 for method_definition in self.get_conditional_contents(method):
-                    SwaggerEditor.validate_is_dict(
-                        method_definition,
-                        'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(
-                            method_name, method_definition, path_name
-                        ),
-                    )
+                    BaseEditor.validate_method_definition_is_dict(method_definition, path_name, method_name)
                     if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
                         method_definition
                     ):
@@ -280,6 +289,7 @@ class SwaggerEditor(BaseEditor):
         """
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             # Skip if Options is already present
             method = self._normalize_method_name(self._OPTIONS_METHOD)
             if method in path_item:
@@ -290,7 +300,7 @@ class SwaggerEditor(BaseEditor):
 
             if not allowed_methods:
                 # AllowMethods is not given. Let's try to generate the list from the given Swagger.
-                allowed_methods = self._make_cors_allowed_methods_for_path_item(path_item)  # type: ignore[no-untyped-call]
+                allowed_methods = self._make_cors_allowed_methods_for_path_item(path_item)
 
                 # APIGW expects the value to be a "string expression". Hence wrap in another quote. Ex: "'GET,POST,DELETE'"
                 allowed_methods = "'{}'".format(allowed_methods)
@@ -412,7 +422,7 @@ class SwaggerEditor(BaseEditor):
         to_return["responses"]["200"]["headers"] = response_headers
         return to_return
 
-    def _make_cors_allowed_methods_for_path_item(self, path_item):  # type: ignore[no-untyped-def]
+    def _make_cors_allowed_methods_for_path_item(self, path_item: Dict[str, Any]) -> str:
         """
         Creates the value for Access-Control-Allow-Methods header for given path item. All HTTP methods defined for this
         path item will be included in the result. If the path item contains "ANY" method, then *all available* HTTP methods will
@@ -656,7 +666,7 @@ class SwaggerEditor(BaseEditor):
             if security != existing_security:
                 method_definition["security"] = security
 
-    def add_auth_to_method(self, path, method_name, auth, api):  # type: ignore[no-untyped-def]
+    def add_auth_to_method(self, path: str, method_name: str, auth: Dict[str, Any], api: Dict[str, Any]) -> None:
         """
         Adds auth settings for this path/method. Auth settings currently consist of Authorizers and ApiKeyRequired
         but this method will eventually include setting other auth settings such as Resource Policy, etc.
@@ -856,17 +866,13 @@ class SwaggerEditor(BaseEditor):
         for model_name, schema in models.items():
 
             model_type = schema.get("type")
-            model_properties = schema.get("properties")
 
             if not model_type:
                 raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'type'.")])
 
-            if not model_properties:
-                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'properties'.")])
-
             self.definitions[model_name.lower()] = schema
 
-    def add_resource_policy(self, resource_policy, path, stage):  # type: ignore[no-untyped-def]
+    def add_resource_policy(self, resource_policy: Optional[Dict[str, Any]], path: str, stage: PassThrough) -> None:
         """
         Add resource policy definition to Swagger.
 
@@ -993,6 +999,7 @@ class SwaggerEditor(BaseEditor):
         """
         methods = []
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             methods += list(path_item.keys())
 
         uri_list = []

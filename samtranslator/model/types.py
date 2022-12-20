@@ -43,6 +43,10 @@ def is_type(valid_type: Type[Any]) -> Validator:
     return validate
 
 
+IS_DICT = is_type(dict)
+IS_STR = is_type(str)
+
+
 def list_of(validate_item: Union[Type[Any], Validator]) -> Validator:
     """Returns a validator function that succeeds only if the input is a list, and each item in the list passes as input
     to the provided validator validate_item.
@@ -81,7 +85,7 @@ def dict_of(validate_key: Validator, validate_item: Validator) -> Validator:
     """
 
     def validate(value: Any, should_raise: bool = True) -> bool:
-        validate_type = is_type(dict)
+        validate_type = IS_DICT
         if not validate_type(value, should_raise=should_raise):
             return False
 
@@ -124,15 +128,6 @@ def one_of(*validators: Validator) -> Validator:
         return False
 
     return validate
-
-
-def is_str() -> Validator:
-    """Returns a validator function that succeeds for input of type str or unicode.
-
-    :returns: a string validator
-    :rtype: callable
-    """
-    return is_type(str)
 
 
 def any_type() -> Validator:

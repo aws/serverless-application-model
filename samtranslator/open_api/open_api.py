@@ -127,6 +127,7 @@ class OpenApiEditor(BaseEditor):
             integration_uri = make_conditional(condition, integration_uri)
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             # create as Py27Dict and insert key one by one to preserve input order
             if path_item[method] is None:
                 path_item[method] = Py27Dict()
@@ -155,8 +156,10 @@ class OpenApiEditor(BaseEditor):
         :yields list of (method name, method definition) tuples
         """
         for path_item in self.get_conditional_contents(self.paths.get(path_name)):
+            BaseEditor.validate_path_item_is_dict(path_item, path_name)
             for method_name, method in path_item.items():
                 for method_definition in self.get_conditional_contents(method):
+                    BaseEditor.validate_method_definition_is_dict(method_definition, path_name, method_name)
                     if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
                         method_definition
                     ):
@@ -253,6 +256,7 @@ class OpenApiEditor(BaseEditor):
         :param dict authorizers: Dict of Authorizer configurations defined on the related Api.
         """
         for path_item in self.get_conditional_contents(self.paths.get(path)):
+            BaseEditor.validate_path_item_is_dict(path_item, path)
             for method_name, method in path_item.items():
                 normalized_method_name = self._normalize_method_name(method_name)
                 # Excluding parameters section
@@ -270,16 +274,8 @@ class OpenApiEditor(BaseEditor):
                             ]
                         )
                     for method_definition in self.get_conditional_contents(method):
-                        # check if there is any method_definition given by customer
-                        if not method_definition:
-                            raise InvalidDocumentException(
-                                [
-                                    InvalidTemplateException(
-                                        f"Invalid method definition ({normalized_method_name}) for path: {path}"
-                                    )
-                                ]
-                            )
                         # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                        BaseEditor.validate_method_definition_is_dict(method_definition, path, method_name)
                         if not self.method_definition_has_integration(method_definition):
                             continue
                         existing_security = method_definition.get("security")

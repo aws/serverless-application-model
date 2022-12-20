@@ -34,6 +34,18 @@ class TestBasicLayerVersion(BaseTest):
         self._verify_tag_presence(tags, "TagOne", "ValueOne")
         self._verify_tag_presence(tags, "TagTwo", "ValueTwo")
 
+    def test_state_machine_with_role_path(self):
+        """
+        Creates a State machine with a Role Path
+        """
+        self.create_and_verify_stack("single/state_machine_with_role_path")
+
+        role_name = self.get_physical_id_by_type("AWS::IAM::Role")
+        iam_client = self.client_provider.iam_client
+        response = iam_client.get_role(RoleName=role_name)
+
+        self.assertEqual(response["Role"]["Path"], "/foo/bar/")
+
     def _verify_tag_presence(self, tags, key, value):
         """
         Verifies the presence of a tag and its value

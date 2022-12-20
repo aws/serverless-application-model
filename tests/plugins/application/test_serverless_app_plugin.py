@@ -246,7 +246,7 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
 
         self.plugin.on_before_transform_template({})
         self.assertEqual(
-            self.plugin._applications.get(("id1", "1.0.0")).message,
+            self.plugin._applications.get(ServerlessAppPlugin._make_app_key("id1", "1.0.0")).message,
             "Resource with id [id1] is invalid. Failed to call SAR, timeout limit exceeded.",
         )
         # confirm we had at least two attempts to call SAR and that we executed a sleep
