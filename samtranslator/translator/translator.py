@@ -123,7 +123,7 @@ class Translator:
         self.sam_parser.parse(sam_template=sam_template, parameter_values=parameter_values, sam_plugins=sam_plugins)
 
         template = copy.deepcopy(sam_template)
-        macro_resolver = ResourceTypeResolver(sam_resources)  # type: ignore[no-untyped-call]
+        macro_resolver = ResourceTypeResolver(sam_resources)
         intrinsics_resolver = IntrinsicsResolver(parameter_values)
 
         # ResourceResolver is used by connector, its "resources" will be
@@ -197,7 +197,7 @@ class Translator:
             for logical_id in deployment_preference_collection.enabled_logical_ids():
                 try:
                     template["Resources"].update(
-                        deployment_preference_collection.deployment_group(logical_id).to_dict()  # type: ignore[no-untyped-call]
+                        deployment_preference_collection.deployment_group(logical_id).to_dict()
                     )
                 except InvalidResourceException as e:
                     document_errors.append(e)  # type: ignore[arg-type]

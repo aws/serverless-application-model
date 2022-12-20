@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import IS_DICT, is_type, one_of, IS_STR, list_of, any_type
 from samtranslator.model.intrinsics import fnGetAtt, ref
@@ -151,6 +151,13 @@ class LambdaLayerVersion(Resource):
         "CompatibleRuntimes": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
         "LicenseInfo": PropertyType(False, IS_STR),
     }
+
+    Content: Dict[str, Any]
+    Description: Optional[Intrinsicable[str]]
+    LayerName: Optional[Intrinsicable[str]]
+    CompatibleArchitectures: Optional[List[Union[str, Dict[str, Any]]]]
+    CompatibleRuntimes: Optional[List[Union[str, Dict[str, Any]]]]
+    LicenseInfo: Optional[Intrinsicable[str]]
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
