@@ -2,7 +2,7 @@ import copy
 
 from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
     FeatureToggleDefaultConfigProvider,
@@ -118,19 +118,19 @@ class Translator:
         sam_parameter_values.add_pseudo_parameter_values(self.boto_session)  # type: ignore[no-untyped-call]
         parameter_values = sam_parameter_values.parameter_values
         # Create & Install plugins
-        sam_plugins = prepare_plugins(self.plugins, parameter_values)  # type: ignore[no-untyped-call]
+        sam_plugins = prepare_plugins(self.plugins, parameter_values)
 
         self.sam_parser.parse(sam_template=sam_template, parameter_values=parameter_values, sam_plugins=sam_plugins)
 
         template = copy.deepcopy(sam_template)
         macro_resolver = ResourceTypeResolver(sam_resources)  # type: ignore[no-untyped-call]
-        intrinsics_resolver = IntrinsicsResolver(parameter_values)  # type: ignore[no-untyped-call]
+        intrinsics_resolver = IntrinsicsResolver(parameter_values)
 
         # ResourceResolver is used by connector, its "resources" will be
         # updated in-place by other transforms so connector transform
         # can see the transformed resources.
         resource_resolver = ResourceResolver(template.get("Resources", {}))
-        mappings_resolver = IntrinsicsResolver(  # type: ignore[no-untyped-call]
+        mappings_resolver = IntrinsicsResolver(
             template.get("Mappings", {}), {FindInMapAction.intrinsic_name: FindInMapAction()}
         )
         deployment_preference_collection = DeploymentPreferenceCollection()
@@ -179,22 +179,22 @@ class Translator:
                         template["Resources"].update(_r)
                     else:
                         document_errors.append(
-                            DuplicateLogicalIdException(logical_id, resource.logical_id, resource.resource_type)  # type: ignore[no-untyped-call]
+                            DuplicateLogicalIdException(logical_id, resource.logical_id, resource.resource_type)
                         )
             except (InvalidResourceException, InvalidEventException, InvalidTemplateException) as e:
                 document_errors.append(e)  # type: ignore[arg-type]
 
         if deployment_preference_collection.any_enabled():  # type: ignore[no-untyped-call]
             template["Resources"].update(deployment_preference_collection.get_codedeploy_application().to_dict())  # type: ignore[no-untyped-call]
-            if deployment_preference_collection.needs_resource_condition():  # type: ignore[no-untyped-call]
-                new_conditions = deployment_preference_collection.create_aggregate_deployment_condition()  # type: ignore[no-untyped-call]
+            if deployment_preference_collection.needs_resource_condition():
+                new_conditions = deployment_preference_collection.create_aggregate_deployment_condition()
                 if new_conditions:
                     template.get("Conditions", {}).update(new_conditions)
 
             if not deployment_preference_collection.can_skip_service_role():  # type: ignore[no-untyped-call]
                 template["Resources"].update(deployment_preference_collection.get_codedeploy_iam_role().to_dict())  # type: ignore[no-untyped-call]
 
-            for logical_id in deployment_preference_collection.enabled_logical_ids():  # type: ignore[no-untyped-call]
+            for logical_id in deployment_preference_collection.enabled_logical_ids():
                 try:
                     template["Resources"].update(
                         deployment_preference_collection.deployment_group(logical_id).to_dict()  # type: ignore[no-untyped-call]
@@ -213,15 +213,15 @@ class Translator:
             del template["Transform"]
 
         if len(document_errors) == 0:
-            template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)  # type: ignore[no-untyped-call]
-            template = intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)  # type: ignore[no-untyped-call]
+            template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)
+            template = intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)
             return template
         raise InvalidDocumentException(document_errors)
 
     # private methods
     def _get_resources_to_iterate(
         self, sam_template: Dict[str, Any], macro_resolver: ResourceTypeResolver
-    ) -> List[Any]:
+    ) -> List[Tuple[str, Dict[str, Any]]]:
         """
         Returns a list of resources to iterate, order them based on the following order:
 
@@ -267,7 +267,7 @@ class Translator:
         return functions + statemachines + apis + others + connectors
 
 
-def prepare_plugins(plugins, parameters=None):  # type: ignore[no-untyped-def]
+def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
     we will also install a few "required" plugins that are necessary to provide complete support for SAM template spec.
@@ -284,7 +284,7 @@ def prepare_plugins(plugins, parameters=None):  # type: ignore[no-untyped-def]
         make_implicit_rest_api_plugin(),  # type: ignore[no-untyped-call]
         make_implicit_http_api_plugin(),  # type: ignore[no-untyped-call]
         GlobalsPlugin(),
-        make_policy_template_for_function_plugin(),  # type: ignore[no-untyped-call]
+        make_policy_template_for_function_plugin(),
     ]
 
     plugins = [] if not plugins else plugins
@@ -295,7 +295,7 @@ def prepare_plugins(plugins, parameters=None):  # type: ignore[no-untyped-def]
 
     # Execute customer's plugins first before running SAM plugins. It is very important to retain this order because
     # other plugins will be dependent on this ordering.
-    return SamPlugins(plugins + required_plugins)  # type: ignore[no-untyped-call]
+    return SamPlugins(plugins + required_plugins)
 
 
 def make_implicit_rest_api_plugin():  # type: ignore[no-untyped-def]
@@ -312,13 +312,13 @@ def make_implicit_http_api_plugin():  # type: ignore[no-untyped-def]
     return ImplicitHttpApiPlugin()
 
 
-def make_policy_template_for_function_plugin():  # type: ignore[no-untyped-def]
+def make_policy_template_for_function_plugin() -> PolicyTemplatesForResourcePlugin:
     """
     Constructs an instance of policy templates processing plugin using default policy templates JSON data
 
     :return plugins.policies.policy_templates_plugin.PolicyTemplatesForResourcePlugin: Instance of the plugin
     """
 
-    policy_templates = PolicyTemplatesProcessor.get_default_policy_templates_json()  # type: ignore[no-untyped-call]
-    processor = PolicyTemplatesProcessor(policy_templates)  # type: ignore[no-untyped-call]
+    policy_templates = PolicyTemplatesProcessor.get_default_policy_templates_json()
+    processor = PolicyTemplatesProcessor(policy_templates)
     return PolicyTemplatesForResourcePlugin(processor)  # type: ignore[no-untyped-call]

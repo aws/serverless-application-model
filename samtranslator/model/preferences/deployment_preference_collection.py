@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, Optional, cast, List, Union
 
 from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
@@ -94,7 +94,7 @@ class DeploymentPreferenceCollection(object):
         """
         return all(preference.role or not preference.enabled for preference in self._resource_preferences.values())
 
-    def needs_resource_condition(self):  # type: ignore[no-untyped-def]
+    def needs_resource_condition(self) -> Union[Dict[str, Any], bool]:
         """
         If all preferences have a condition, all code deploy resources need to be conditionally created
         :return: True, if a condition needs to be created
@@ -104,7 +104,7 @@ class DeploymentPreferenceCollection(object):
             not preference.condition and preference.enabled for preference in self._resource_preferences.values()
         )
 
-    def get_all_deployment_conditions(self):  # type: ignore[no-untyped-def]
+    def get_all_deployment_conditions(self) -> List[str]:
         """
         Returns a list of all conditions associated with the deployment preference resources
         :return: List of condition names
@@ -115,14 +115,14 @@ class DeploymentPreferenceCollection(object):
             conditions_set.remove(None)
         return list(conditions_set)
 
-    def create_aggregate_deployment_condition(self):  # type: ignore[no-untyped-def]
+    def create_aggregate_deployment_condition(self) -> Union[None, Dict[str, Dict[str, List[Dict[str, Any]]]]]:
         """
         Creates an aggregate deployment condition if necessary
         :return: None if <2 conditions are found, otherwise a dictionary of new conditions to add to template
         """
-        return make_combined_condition(self.get_all_deployment_conditions(), CODE_DEPLOY_CONDITION_NAME)  # type: ignore[no-untyped-call, no-untyped-call]
+        return make_combined_condition(self.get_all_deployment_conditions(), CODE_DEPLOY_CONDITION_NAME)
 
-    def enabled_logical_ids(self):  # type: ignore[no-untyped-def]
+    def enabled_logical_ids(self) -> List[str]:
         """
         :return: only the logical id's for the deployment preferences in this collection which are enabled
         """
@@ -131,8 +131,8 @@ class DeploymentPreferenceCollection(object):
     def get_codedeploy_application(self):  # type: ignore[no-untyped-def]
         codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         codedeploy_application_resource.ComputePlatform = "Lambda"
-        if self.needs_resource_condition():  # type: ignore[no-untyped-call]
-            conditions = self.get_all_deployment_conditions()  # type: ignore[no-untyped-call]
+        if self.needs_resource_condition():
+            conditions = self.get_all_deployment_conditions()
             condition_name = CODE_DEPLOY_CONDITION_NAME
             if len(conditions) <= 1:
                 condition_name = conditions.pop()
@@ -163,8 +163,8 @@ class DeploymentPreferenceCollection(object):
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambda")
             ]
 
-        if self.needs_resource_condition():  # type: ignore[no-untyped-call]
-            conditions = self.get_all_deployment_conditions()  # type: ignore[no-untyped-call]
+        if self.needs_resource_condition():
+            conditions = self.get_all_deployment_conditions()
             condition_name = CODE_DEPLOY_CONDITION_NAME
             if len(conditions) <= 1:
                 condition_name = conditions.pop()

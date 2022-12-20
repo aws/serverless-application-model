@@ -48,7 +48,7 @@ class DuplicateLogicalIdException(ExceptionWithMessage):
         message -- explanation of the error
     """
 
-    def __init__(self, logical_id, duplicate_id, type):  # type: ignore[no-untyped-def]
+    def __init__(self, logical_id: str, duplicate_id: str, type: str) -> None:
         self._logical_id = logical_id
         self._duplicate_id = duplicate_id
         self._type = type
