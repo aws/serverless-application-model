@@ -165,8 +165,8 @@ class ServerlessAppPlugin(BasePlugin):
 
     def _get_intrinsic_resolvers(self, mappings):  # type: ignore[no-untyped-def]
         return [
-            IntrinsicsResolver(self._parameters),  # type: ignore[no-untyped-call]
-            IntrinsicsResolver(mappings, {FindInMapAction.intrinsic_name: FindInMapAction()}),  # type: ignore[no-untyped-call, no-untyped-call]
+            IntrinsicsResolver(self._parameters),
+            IntrinsicsResolver(mappings, {FindInMapAction.intrinsic_name: FindInMapAction()}),
         ]
 
     def _resolve_location_value(self, value, intrinsic_resolvers):  # type: ignore[no-untyped-def]

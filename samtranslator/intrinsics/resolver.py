@@ -1,15 +1,16 @@
 # Help resolve intrinsic functions
-from typing import Any
+from typing import Any, Dict, Optional
 
 from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAttAction
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
+from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 
 # All intrinsics are supported by default
 DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}
 
 
 class IntrinsicsResolver(object):
-    def __init__(self, parameters, supported_intrinsics=None):  # type: ignore[no-untyped-def]
+    def __init__(self, parameters: Dict[str, Any], supported_intrinsics: Optional[Dict[str, Any]] = None) -> None:
         """
         Instantiate the resolver
         :param dict parameters: Map of parameter names to their values
@@ -46,7 +47,9 @@ class IntrinsicsResolver(object):
         """
         return self._traverse(_input, self.parameters, self._try_resolve_parameter_refs)  # type: ignore[no-untyped-call]
 
-    def resolve_sam_resource_refs(self, input, supported_resource_refs):  # type: ignore[no-untyped-def]
+    def resolve_sam_resource_refs(
+        self, input: Dict[str, Any], supported_resource_refs: SupportedResourceReferences
+    ) -> Any:
         """
         Customers can provide a reference to a "derived" SAM resource such as Alias of a Function or Stage of an API
         resource. This method recursively walks the tree, converting all derived references to the real resource name,
@@ -70,7 +73,7 @@ class IntrinsicsResolver(object):
         """
         return self._traverse(input, supported_resource_refs, self._try_resolve_sam_resource_refs)  # type: ignore[no-untyped-call]
 
-    def resolve_sam_resource_id_refs(self, input, supported_resource_id_refs):  # type: ignore[no-untyped-def]
+    def resolve_sam_resource_id_refs(self, input: Dict[str, Any], supported_resource_id_refs: Dict[str, str]) -> Any:
         """
         Some SAM resources have their logical ids mutated from the original id that the customer writes in the
         template. This method recursively walks the tree and updates these logical ids from the old value
