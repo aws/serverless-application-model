@@ -2118,6 +2118,9 @@
           "description": "The position in a stream from which to start reading\\.  \n*Valid values*: `TRIM_HORIZON` or `LATEST`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "markdownDescription": "The position in a stream from which to start reading\\.  \n*Valid values*: `TRIM_HORIZON` or `LATEST`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\."
         },
+        "StartingPositionTimestamp": {
+          "title": "Startingpositiontimestamp"
+        },
         "Stream": {
           "title": "Stream",
           "description": "The Amazon Resource Name \\(ARN\\) of the data stream or a stream consumer\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventSourceArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-eventsourcearn) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
@@ -2219,6 +2222,9 @@
           "title": "StartingPosition",
           "description": "The position in a stream from which to start reading\\.  \n*Valid values*: `TRIM_HORIZON` or `LATEST`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "markdownDescription": "The position in a stream from which to start reading\\.  \n*Valid values*: `TRIM_HORIZON` or `LATEST`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\."
+        },
+        "StartingPositionTimestamp": {
+          "title": "Startingpositiontimestamp"
         },
         "Stream": {
           "title": "Stream",
@@ -3453,6 +3459,9 @@
           "title": "StartingPosition",
           "description": "The position in a stream from which to start reading\\.  \n*Valid values*: `TRIM_HORIZON` or `LATEST`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "markdownDescription": "The position in a stream from which to start reading\\.  \n*Valid values*: `TRIM_HORIZON` or `LATEST`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\."
+        },
+        "StartingPositionTimestamp": {
+          "title": "Startingpositiontimestamp"
         },
         "Stream": {
           "title": "Stream",
