@@ -79,9 +79,7 @@
     },
     "CloudWatchPutMetricPolicy": {
       "Description": "Gives permissions to put metrics to CloudWatch",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -96,9 +94,7 @@
     },
     "EC2DescribePolicy": {
       "Description": "Gives permission to describe EC2 instances",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -468,9 +464,7 @@
     },
     "AMIDescribePolicy": {
       "Description": "Gives permissions to describe AMIs",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -485,9 +479,7 @@
     },
     "CloudFormationDescribeStacksPolicy": {
       "Description": "Gives permission to describe CloudFormation stacks",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -504,9 +496,7 @@
     },
     "RekognitionDetectOnlyPolicy": {
       "Description": "Gives permission to detect faces, labels and text",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -671,9 +661,7 @@
     },
     "VPCAccessPolicy": {
       "Description": "Gives access to create, delete, describe and detach ENIs",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1001,12 +989,12 @@
               "s3:PutObject",
               "s3:PutObjectAcl",
               "s3:DeleteObject",
-	      "s3:DeleteObjectTagging",
-	      "s3:DeleteObjectVersionTagging",
-	      "s3:GetObjectTagging",
-	      "s3:GetObjectVersionTagging",
-	      "s3:PutObjectTagging",
-	      "s3:PutObjectVersionTagging"
+              "s3:DeleteObjectTagging",
+              "s3:DeleteObjectVersionTagging",
+              "s3:GetObjectTagging",
+              "s3:GetObjectVersionTagging",
+              "s3:PutObjectTagging",
+              "s3:PutObjectVersionTagging"
             ],
             "Resource": [
               {
@@ -1047,9 +1035,7 @@
     },
     "CodePipelineLambdaExecutionPolicy": {
       "Description": "Gives permission for a Lambda function invoked by AWS CodePipeline to report back status of the job",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1065,9 +1051,7 @@
     },
     "ServerlessRepoReadWriteAccessPolicy": {
       "Description": "Gives access permissions to create and list applications in the AWS Serverless Application Repository service",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1148,9 +1132,7 @@
     },
     "CloudWatchDashboardPolicy": {
       "Description": "Gives permissions to put metrics to operate on CloudWatch Dashboards",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1174,33 +1156,33 @@
         }
       },
       "Definition": {
-        "Statement": [{
-          "Effect": "Allow",
-          "Action": [
-            "rekognition:IndexFaces",
-            "rekognition:DeleteFaces",
-            "rekognition:SearchFaces",
-            "rekognition:SearchFacesByImage",
-            "rekognition:ListFaces"
-          ],
-          "Resource": {
-            "Fn::Sub": [
-              "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
-              {
-                "collectionId": {
-                  "Ref": "CollectionId"
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "rekognition:IndexFaces",
+              "rekognition:DeleteFaces",
+              "rekognition:SearchFaces",
+              "rekognition:SearchFacesByImage",
+              "rekognition:ListFaces"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
+                {
+                  "collectionId": {
+                    "Ref": "CollectionId"
+                  }
                 }
-              }
-            ]
+              ]
+            }
           }
-        }]
+        ]
       }
     },
     "RekognitionFacesPolicy": {
       "Description": "Gives permission to compare and detect faces and labels",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1216,9 +1198,7 @@
     },
     "RekognitionLabelsPolicy": {
       "Description": "Gives permission to detect object and moderation labels",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1331,9 +1311,7 @@
     },
     "ComprehendBasicAccessPolicy": {
       "Description": "Gives access to Amazon Comprehend APIs for detecting entities, key phrases, languages and sentiments",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1428,9 +1406,7 @@
     },
     "MobileAnalyticsWriteOnlyAccessPolicy": {
       "Description": "Gives write only permissions to put event data for all application resources",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1537,8 +1513,7 @@
     },
     "EKSDescribePolicy": {
       "Description": "Gives permission to describe or list Amazon EKS clusters",
-      "Parameters": {
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1556,31 +1531,35 @@
       "Description": "Gives access to the readonly Cost Explorer APIs for billing history",
       "Parameters": {},
       "Definition": {
-        "Statement": [{
-          "Effect": "Allow",
-          "Action": [
-            "ce:GetCostAndUsage",
-            "ce:GetDimensionValues",
-            "ce:GetReservationCoverage",
-            "ce:GetReservationPurchaseRecommendation",
-            "ce:GetReservationUtilization",
-            "ce:GetTags"
-          ],
-          "Resource": "*"
-        }]
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ce:GetCostAndUsage",
+              "ce:GetDimensionValues",
+              "ce:GetReservationCoverage",
+              "ce:GetReservationPurchaseRecommendation",
+              "ce:GetReservationUtilization",
+              "ce:GetTags"
+            ],
+            "Resource": "*"
+          }
+        ]
       }
     },
     "OrganizationsListAccountsPolicy": {
       "Description": "Gives readonly permission to list child account names and ids",
       "Parameters": {},
       "Definition": {
-        "Statement": [{
-          "Effect": "Allow",
-          "Action": [
-            "organizations:ListAccounts"
-          ],
-          "Resource": "*"
-        }]
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "organizations:ListAccounts"
+            ],
+            "Resource": "*"
+          }
+        ]
       }
     },
     "SESBulkTemplatedCrudPolicy": {
@@ -1618,22 +1597,22 @@
     },
     "SESEmailTemplateCrudPolicy": {
       "Description": "Gives permission to create, get, list, update and delete SES Email Templates",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
-        "Statement": [{
-          "Effect": "Allow",
-          "Action": [
-            "ses:CreateTemplate",
-            "ses:GetTemplate",
-            "ses:ListTemplates",
-            "ses:UpdateTemplate",
-            "ses:DeleteTemplate",
-            "ses:TestRenderTemplate"
-          ],
-          "Resource": "*"
-        }]
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ses:CreateTemplate",
+              "ses:GetTemplate",
+              "ses:ListTemplates",
+              "ses:UpdateTemplate",
+              "ses:DeleteTemplate",
+              "ses:TestRenderTemplate"
+            ],
+            "Resource": "*"
+          }
+        ]
       }
     },
     "FilterLogEventsPolicy": {
@@ -1668,7 +1647,7 @@
       "Description": "Gives access to a parameter to load secrets in this account. If not using default key, KMSDecryptPolicy will also be needed.",
       "Parameters": {
         "ParameterName": {
-          "Description":"The name of the secret stored in SSM in your account."
+          "Description": "The name of the secret stored in SSM in your account."
         }
       },
       "Definition": {
@@ -1705,7 +1684,7 @@
       "Description": "Gives permission to start a Step Functions state machine execution",
       "Parameters": {
         "StateMachineName": {
-          "Description":"The name of the state machine to execute."
+          "Description": "The name of the state machine to execute."
         }
       },
       "Definition": {
@@ -1934,9 +1913,7 @@
     },
     "TextractPolicy": {
       "Description": "Gives full access to Textract",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1951,9 +1928,7 @@
     },
     "TextractDetectAnalyzePolicy": {
       "Description": "Gives access to detect and analyze documents with Textract",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
@@ -1971,9 +1946,7 @@
     },
     "TextractGetResultPolicy": {
       "Description": "Gives access to get detected and analyzed documents from Textract",
-      "Parameters": {
-
-      },
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
