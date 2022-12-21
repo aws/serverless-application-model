@@ -348,7 +348,8 @@
               "s3:ListBucket",
               "s3:GetBucketLocation",
               "s3:GetObjectVersion",
-              "s3:GetLifecycleConfiguration"
+              "s3:GetLifecycleConfiguration",
+              "s3:GetObjectTagging"
             ],
             "Resource": [
               {
@@ -390,7 +391,8 @@
             "Action": [
               "s3:PutObject",
               "s3:PutObjectAcl",
-              "s3:PutLifecycleConfiguration"
+              "s3:PutLifecycleConfiguration",
+              "s3:PutObjectTagging"
             ],
             "Resource": [
               {
