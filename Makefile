@@ -30,6 +30,7 @@ black-check:
 	rm .tmp_schema.json
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
 	bin/json-format.py --check tests integration
+	bin/json-format.py --check samtranslator/policy_templates_data/policy_templates.json
 	bin/yaml-format.py --check tests
 	bin/yaml-format.py --check integration --add-test-metadata
 
