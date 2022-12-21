@@ -124,9 +124,6 @@ class PullEventSource(ResourceMacro):
         if self.Stream and not self.StartingPosition:
             raise InvalidEventException(self.relative_id, "StartingPosition is required for Kinesis, DynamoDB and MSK.")
 
-        if self.StartingPositionTimestamp:
-            self.StartingPositionTimestamp = float(self.StartingPositionTimestamp)
-
         lambda_eventsourcemapping.FunctionName = function_name_or_arn
         lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue or self.Broker
         lambda_eventsourcemapping.StartingPosition = self.StartingPosition

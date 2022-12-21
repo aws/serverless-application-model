@@ -1,5 +1,5 @@
 from typing import Optional, Dict, Any, List, Union
-from samtranslator.model import PropertyType, Resource
+from samtranslator.model import PropertyType, Resource, PassThroughProperty
 from samtranslator.model.types import IS_DICT, is_type, one_of, IS_STR, list_of, any_type
 from samtranslator.model.intrinsics import fnGetAtt, ref
 from samtranslator.utils.types import Intrinsicable
@@ -101,7 +101,7 @@ class LambdaEventSourceMapping(Resource):
         "DestinationConfig": PropertyType(False, IS_DICT),
         "ParallelizationFactor": PropertyType(False, is_type(int)),
         "StartingPosition": PropertyType(False, IS_STR),
-        "StartingPositionTimestamp": PropertyType(False, is_type(float)),
+        "StartingPositionTimestamp": PassThroughProperty(False),
         "Topics": PropertyType(False, is_type(list)),
         "Queues": PropertyType(False, is_type(list)),
         "SourceAccessConfigurations": PropertyType(False, is_type(list)),

@@ -141,7 +141,7 @@
         "MaximumRetryAttempts": 1000,
         "ParallelizationFactor": 1,
         "StartingPosition": "AT_TIMESTAMP",
-        "StartingPositionTimestamp": 1671489395.0
+        "StartingPositionTimestamp": 1671489395
       },
       "Type": "AWS::Lambda::EventSourceMapping"
     },
