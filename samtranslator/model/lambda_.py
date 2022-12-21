@@ -101,6 +101,7 @@ class LambdaEventSourceMapping(Resource):
         "DestinationConfig": PropertyType(False, IS_DICT),
         "ParallelizationFactor": PropertyType(False, is_type(int)),
         "StartingPosition": PropertyType(False, IS_STR),
+        "StartingPositionTimestamp": PropertyType(False, is_type(float)),
         "Topics": PropertyType(False, is_type(list)),
         "Queues": PropertyType(False, is_type(list)),
         "SourceAccessConfigurations": PropertyType(False, is_type(list)),

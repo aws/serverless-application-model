@@ -8,8 +8,20 @@
     "ResourceType": "AWS::IAM::Role"
   },
   {
+    "LogicalResourceId": "MyLambdaFunction2",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunction2Role",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
     "LogicalResourceId": "MyStream",
     "ResourceType": "AWS::Kinesis::Stream"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunction2KinesisStream",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
   },
   {
     "LogicalResourceId": "MyLambdaFunctionKinesisStream",
