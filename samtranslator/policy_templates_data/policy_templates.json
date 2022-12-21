@@ -440,7 +440,10 @@
               "s3:PutObjectAcl",
               "s3:GetLifecycleConfiguration",
               "s3:PutLifecycleConfiguration",
-              "s3:DeleteObject"
+              "s3:DeleteObject",
+              "s3:PutObjectTagging",
+              "s3:GetObjectTagging",
+              "s3:DeleteObjectTagging"
             ],
             "Resource": [
               {
