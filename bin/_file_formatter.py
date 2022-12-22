@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 from abc import ABC, abstractmethod
-from typing import Type
+from typing import List, Type
 
 
 class FileFormatter(ABC):
@@ -37,8 +37,8 @@ class FileFormatter(ABC):
 
     @staticmethod
     @abstractmethod
-    def file_extension() -> str:
-        """Return file extension of files to format."""
+    def file_extensions() -> List[str]:
+        """Return list file extensions of files to format."""
 
     @classmethod
     def config_additional_args(cls) -> None:
@@ -69,7 +69,7 @@ class FileFormatter(ABC):
             for file in files:
                 file_path = os.path.join(root, file)
                 _, extension = os.path.splitext(file_path)
-                if extension != self.file_extension():
+                if extension not in self.file_extensions():
                     continue
                 self.process_file(file_path)
 
@@ -118,7 +118,7 @@ class FileFormatter(ABC):
                 raise ValueError(f"{path}: No such file or directory")
             if os.path.isfile(path):
                 _, extension = os.path.splitext(path)
-                if extension != cls.file_extension():
+                if extension not in cls.file_extensions():
                     raise ValueError(f"{path}: Not a format-able file")
                 formatter.process_file(path)
             elif os.path.isdir(path):

@@ -20,7 +20,7 @@ integ-test:
 black:
 	black setup.py samtranslator/* tests/* integration/* bin/*.py
 	bin/json-format.py --write tests integration
-	bin/yaml-format.py --write tests
+	bin/yaml-format.py --write tests .pre-commit-config.yaml .cfnlintrc.yaml
 	bin/yaml-format.py --write integration --add-test-metadata
 
 black-check:
@@ -30,7 +30,8 @@ black-check:
 	rm .tmp_schema.json
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
 	bin/json-format.py --check tests integration
-	bin/yaml-format.py --check tests
+	bin/json-format.py --check samtranslator/policy_templates_data/policy_templates.json
+	bin/yaml-format.py --check tests .pre-commit-config.yaml .cfnlintrc.yaml
 	bin/yaml-format.py --check integration --add-test-metadata
 
 lint:

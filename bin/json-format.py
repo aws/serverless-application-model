@@ -7,7 +7,7 @@ my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
 
 import json
-from typing import Type
+from typing import List, Type
 
 from bin._file_formatter import FileFormatter
 
@@ -27,8 +27,8 @@ class JSONFormatter(FileFormatter):
         return json.JSONDecodeError
 
     @staticmethod
-    def file_extension() -> str:
-        return ".json"
+    def file_extensions() -> List[str]:
+        return [".json"]
 
 
 if __name__ == "__main__":

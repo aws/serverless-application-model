@@ -9,7 +9,7 @@ sys.path.insert(0, my_path + "/..")
 
 import re
 from io import StringIO
-from typing import Any, Dict, Type
+from typing import Any, Dict, List, Type
 
 # We use ruamel.yaml for parsing yaml files because it can preserve comments
 from ruamel.yaml import YAML
@@ -67,8 +67,8 @@ class YAMLFormatter(FileFormatter):
         return YAMLError
 
     @staticmethod
-    def file_extension() -> str:
-        return ".yaml"
+    def file_extensions() -> List[str]:
+        return [".yaml", ".yml"]
 
     @classmethod
     def config_additional_args(cls) -> None:
