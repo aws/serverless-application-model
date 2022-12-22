@@ -1,9 +1,10 @@
 from typing import Any, Dict, List, Optional
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import ResourceMacro, PropertyType
+from samtranslator.model import ResourceMacro, PropertyType, PassThroughProperty
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.types import IS_DICT, is_type, IS_STR
+from samtranslator.schema.common import PassThrough
 from samtranslator.model.intrinsics import is_intrinsic
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
@@ -37,7 +38,8 @@ class PullEventSource(ResourceMacro):
         "Stream": PropertyType(False, IS_STR),
         "Queue": PropertyType(False, IS_STR),
         "BatchSize": PropertyType(False, is_type(int)),
-        "StartingPosition": PropertyType(False, IS_STR),
+        "StartingPosition": PassThroughProperty(False),
+        "StartingPositionTimestamp": PassThroughProperty(False),
         "Enabled": PropertyType(False, is_type(bool)),
         "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
         "MaximumRetryAttempts": PropertyType(False, is_type(int)),
@@ -60,7 +62,8 @@ class PullEventSource(ResourceMacro):
     Stream: Optional[Intrinsicable[str]]
     Queue: Optional[Intrinsicable[str]]
     BatchSize: Optional[Intrinsicable[int]]
-    StartingPosition: Optional[Intrinsicable[str]]
+    StartingPosition: Optional[PassThrough]
+    StartingPositionTimestamp: Optional[PassThrough]
     Enabled: Optional[bool]
     MaximumBatchingWindowInSeconds: Optional[Intrinsicable[int]]
     MaximumRetryAttempts: Optional[Intrinsicable[int]]
@@ -124,6 +127,7 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.FunctionName = function_name_or_arn
         lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue or self.Broker
         lambda_eventsourcemapping.StartingPosition = self.StartingPosition
+        lambda_eventsourcemapping.StartingPositionTimestamp = self.StartingPositionTimestamp
         lambda_eventsourcemapping.BatchSize = self.BatchSize
         lambda_eventsourcemapping.Enabled = self.Enabled
         lambda_eventsourcemapping.MaximumBatchingWindowInSeconds = self.MaximumBatchingWindowInSeconds

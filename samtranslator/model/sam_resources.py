@@ -1,6 +1,6 @@
 ﻿""" SAM macro definitions """
 import copy
-from typing import Any, cast, Dict, List, Optional, Tuple, Union
+from typing import Any, cast, Dict, List, Optional, Tuple, Union, Callable
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.model.connector.connector import (
@@ -167,7 +167,7 @@ class SamFunction(SamResourceMacro):
     SnapStart: Optional[Dict[str, Any]]
     FunctionUrlConfig: Optional[Dict[str, Any]]
 
-    event_resolver = ResourceTypeResolver(  # type: ignore[no-untyped-call]
+    event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
         samtranslator.model.eventsources.pull,
         samtranslator.model.eventsources.push,
@@ -191,9 +191,9 @@ class SamFunction(SamResourceMacro):
         "DestinationQueue": SQSQueue.resource_type,
     }
 
-    def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
+    def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
-            return {"event_resources": self._event_resources_to_link(resources)}  # type: ignore[no-untyped-call]
+            return {"event_resources": self._event_resources_to_link(resources)}
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
@@ -260,7 +260,7 @@ class SamFunction(SamResourceMacro):
             feature_toggle,
         )
 
-        event_invoke_policies = []
+        event_invoke_policies: List[Dict[str, Any]] = []
         if self.EventInvokeConfig:
             function_name = lambda_function.logical_id
             event_invoke_resources, event_invoke_policies = self._construct_event_invoke_config(
@@ -279,7 +279,7 @@ class SamFunction(SamResourceMacro):
             resources.append(execution_role)
 
         try:
-            resources += self._generate_event_resources(  # type: ignore[no-untyped-call]
+            resources += self._generate_event_resources(
                 lambda_function,
                 execution_role,
                 kwargs["event_resources"],
@@ -291,7 +291,15 @@ class SamFunction(SamResourceMacro):
 
         return resources
 
-    def _construct_event_invoke_config(self, function_name, alias_name, lambda_alias, intrinsics_resolver, conditions, event_invoke_config: Dict[str, Any]):  # type: ignore[no-untyped-def]
+    def _construct_event_invoke_config(
+        self,
+        function_name: str,
+        alias_name: str,
+        lambda_alias: Optional[LambdaAlias],
+        intrinsics_resolver: IntrinsicsResolver,
+        conditions: Any,
+        event_invoke_config: Dict[str, Any],
+    ) -> Tuple[List[Any], List[Dict[str, Any]]]:
         """
         Create a `AWS::Lambda::EventInvokeConfig` based on the input dict `EventInvokeConfig`
         """
@@ -502,7 +510,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.VpcConfig = self.VpcConfig
         lambda_function.Role = self.Role
         lambda_function.Environment = self.Environment
-        lambda_function.Code = self._construct_code_dict()  # type: ignore[no-untyped-call]
+        lambda_function.Code = self._construct_code_dict()
         lambda_function.KmsKeyArn = self.KmsKeyArn
         lambda_function.ReservedConcurrentExecutions = self.ReservedConcurrentExecutions
         lambda_function.Tags = self._construct_tag_list(self.Tags)
@@ -694,7 +702,7 @@ class SamFunction(SamResourceMacro):
                 self.logical_id, "'DeadLetterQueue' requires Type of {}".format(valid_dlq_types)
             )
 
-    def _event_resources_to_link(self, resources):  # type: ignore[no-untyped-def]
+    def _event_resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         event_resources = {}
         if self.Events:
             for logical_id, event_dict in self.Events.items():
@@ -708,7 +716,7 @@ class SamFunction(SamResourceMacro):
         return event_resources
 
     @staticmethod
-    def order_events(event):  # type: ignore[no-untyped-def]
+    def order_events(event: Tuple[str, Any]) -> Any:
         """
         Helper method for sorting Function Events. Returns a key to use in sorting this event
 
@@ -722,9 +730,14 @@ class SamFunction(SamResourceMacro):
             return logical_id
         return event_dict.get("Properties", {}).get("Path", logical_id)
 
-    def _generate_event_resources(  # type: ignore[no-untyped-def]
-        self, lambda_function, execution_role, event_resources, intrinsics_resolver, lambda_alias=None
-    ):
+    def _generate_event_resources(
+        self,
+        lambda_function: LambdaFunction,
+        execution_role: Optional[IAMRole],
+        event_resources: Any,
+        intrinsics_resolver: IntrinsicsResolver,
+        lambda_alias: Optional[LambdaAlias] = None,
+    ) -> List[Any]:
         """Generates and returns the resources associated with this function's events.
 
         :param model.lambda_.LambdaFunction lambda_function: generated Lambda function
@@ -761,7 +774,7 @@ class SamFunction(SamResourceMacro):
 
         return resources
 
-    def _construct_code_dict(self):  # type: ignore[no-untyped-def]
+    def _construct_code_dict(self) -> Dict[str, Any]:
         """Constructs Lambda Code Dictionary based on the accepted SAM artifact properties such
         as `InlineCode`, `CodeUri` and `ImageUri` and also raises errors if more than one of them is
         defined. `PackageType` determines which artifacts are considered.
@@ -782,11 +795,11 @@ class SamFunction(SamResourceMacro):
 
         # Inline function for transformation of inline code.
         # It accepts arbitrary argumemnts, because the arguments do not matter for the result.
-        def _construct_inline_code(*args, **kwargs):  # type: ignore[no-untyped-def]
+        def _construct_inline_code(*args: Any, **kwargs: Dict[str, Any]) -> Dict[str, Any]:
             return {"ZipFile": self.InlineCode}
 
         # dispatch mechanism per artifact on how it needs to be transformed.
-        artifact_dispatch = {
+        artifact_dispatch: Dict[str, Callable[..., Dict[str, Any]]] = {
             "InlineCode": _construct_inline_code,
             "CodeUri": construct_s3_location_object,
             "ImageUri": construct_image_code_object,
@@ -813,8 +826,8 @@ class SamFunction(SamResourceMacro):
             filtered_key = "ImageUri"
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
-        dispatch_function = artifact_dispatch[filtered_key]
-        return dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)  # type: ignore[operator]
+        dispatch_function: Callable[..., Dict[str, Any]] = artifact_dispatch[filtered_key]
+        return dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
 
     def _construct_version(
         self, function: LambdaFunction, intrinsics_resolver: IntrinsicsResolver, code_sha256: Optional[str] = None
@@ -969,7 +982,7 @@ class SamFunction(SamResourceMacro):
 
     def _resolve_property_to_boolean(
         self,
-        property_value: Union[bool, str, dict],  # type: ignore[type-arg]
+        property_value: Union[bool, str, Dict[str, Any]],
         property_name: str,
         intrinsics_resolver: IntrinsicsResolver,
         mappings_resolver: IntrinsicsResolver,
@@ -1557,12 +1570,12 @@ class SamLayerVersion(SamResourceMacro):
         resources = []
 
         # Append any CFN resources:
-        intrinsics_resolver = kwargs["intrinsics_resolver"]
-        resources.append(self._construct_lambda_layer(intrinsics_resolver))  # type: ignore[no-untyped-call]
+        intrinsics_resolver: IntrinsicsResolver = kwargs["intrinsics_resolver"]
+        resources.append(self._construct_lambda_layer(intrinsics_resolver))
 
         return resources
 
-    def _construct_lambda_layer(self, intrinsics_resolver):  # type: ignore[no-untyped-def]
+    def _construct_lambda_layer(self, intrinsics_resolver: IntrinsicsResolver) -> LambdaLayerVersion:
         """Constructs and returns the Lambda function.
 
         :returns: a list containing the Lambda function and execution role resources
@@ -1588,12 +1601,12 @@ class SamLayerVersion(SamResourceMacro):
         old_logical_id = self.logical_id
 
         # This is to prevent the passthrough resource attributes to be included for hashing
-        hash_dict = copy.deepcopy(self.to_dict())  # type: ignore[no-untyped-call]
-        if "DeletionPolicy" in hash_dict.get(old_logical_id):
+        hash_dict = copy.deepcopy(self.to_dict())
+        if "DeletionPolicy" in hash_dict.get(old_logical_id, {}):
             del hash_dict[old_logical_id]["DeletionPolicy"]
-        if "UpdateReplacePolicy" in hash_dict.get(old_logical_id):
+        if "UpdateReplacePolicy" in hash_dict.get(old_logical_id, {}):
             del hash_dict[old_logical_id]["UpdateReplacePolicy"]
-        if "Metadata" in hash_dict.get(old_logical_id):
+        if "Metadata" in hash_dict.get(old_logical_id, {}):
             del hash_dict[old_logical_id]["Metadata"]
 
         new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, hash_dict).gen()
@@ -1615,10 +1628,10 @@ class SamLayerVersion(SamResourceMacro):
 
         lambda_layer.LayerName = self.LayerName
         lambda_layer.Description = self.Description
-        lambda_layer.Content = construct_s3_location_object(self.ContentUri, self.logical_id, "ContentUri")  # type: ignore[no-untyped-call]
+        lambda_layer.Content = construct_s3_location_object(self.ContentUri, self.logical_id, "ContentUri")
 
         lambda_layer.CompatibleArchitectures = self.CompatibleArchitectures
-        self._validate_architectures(lambda_layer)  # type: ignore[no-untyped-call]
+        self._validate_architectures(lambda_layer)
         lambda_layer.CompatibleRuntimes = self.CompatibleRuntimes
         lambda_layer.LicenseInfo = self.LicenseInfo
 
@@ -1658,7 +1671,7 @@ class SamLayerVersion(SamResourceMacro):
             "'RetentionPolicy' must be one of the following options: {}.".format([self.RETAIN, self.DELETE]),
         )
 
-    def _validate_architectures(self, lambda_layer):  # type: ignore[no-untyped-def]
+    def _validate_architectures(self, lambda_layer: LambdaLayerVersion) -> None:
         """Validate the values inside the CompatibleArchitectures field of a layer
 
         Parameters
@@ -1718,7 +1731,7 @@ class SamStateMachine(SamResourceMacro):
     Tracing: Optional[Dict[str, Any]]
     PermissionsBoundary: Optional[Intrinsicable[str]]
 
-    event_resolver = ResourceTypeResolver(  # type: ignore[no-untyped-call]
+    event_resolver = ResourceTypeResolver(
         samtranslator.model.stepfunctions.events,
         samtranslator.model.eventsources.scheduler,
     )
@@ -1756,13 +1769,13 @@ class SamStateMachine(SamResourceMacro):
         resources = state_machine_generator.to_cloudformation()
         return resources
 
-    def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
+    def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
-            return {"event_resources": self._event_resources_to_link(resources)}  # type: ignore[no-untyped-call]
+            return {"event_resources": self._event_resources_to_link(resources)}
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
-    def _event_resources_to_link(self, resources):  # type: ignore[no-untyped-def]
+    def _event_resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         event_resources = {}
         if self.Events:
             for logical_id, event_dict in self.Events.items():
