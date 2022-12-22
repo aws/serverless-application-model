@@ -3472,6 +3472,9 @@
           "title": "Topics",
           "description": "The name of the Kafka topic\\.  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Topics`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-topics) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "markdownDescription": "The name of the Kafka topic\\.  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Topics`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-topics) property of an `AWS::Lambda::EventSourceMapping` resource\\."
+        },
+        "SourceAccessConfigurations": {
+          "title": "Sourceaccessconfigurations"
         }
       },
       "additionalProperties": false
