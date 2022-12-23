@@ -358,6 +358,7 @@ class MSKEventProperties(BaseModel):
     StartingPositionTimestamp: PassThrough  # TODO: add documentation
     Stream: PassThrough = mskeventproperties("Stream")
     Topics: PassThrough = mskeventproperties("Topics")
+    SourceAccessConfigurations: Optional[PassThrough]  # TODO: update docs when live
 
 
 class MSKEvent(BaseModel):

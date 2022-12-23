@@ -291,7 +291,28 @@ class MSK(PullEventSource):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
 
     def get_policy_statements(self):  # type: ignore[no-untyped-def]
-        return None
+        if self.SourceAccessConfigurations:
+            for conf in self.SourceAccessConfigurations:
+                # Lambda does not support multiple CLIENT_CERTIFICATE_TLS_AUTH configurations
+                if isinstance(conf, dict) and conf.get("Type") == "CLIENT_CERTIFICATE_TLS_AUTH" and conf.get("URI"):
+                    return [
+                        {
+                            "PolicyName": "MSKExecutionRolePolicy",
+                            "PolicyDocument": {
+                                "Statement": [
+                                    {
+                                        "Action": [
+                                            "secretsmanager:GetSecretValue",
+                                        ],
+                                        "Effect": "Allow",
+                                        "Resource": conf.get("URI"),
+                                    }
+                                ]
+                            },
+                        }
+                    ]
+
+            return None
 
 
 class MQ(PullEventSource):
@@ -384,7 +405,13 @@ class SelfManagedKafka(PullEventSource):
 
     resource_type = "SelfManagedKafka"
     requires_stream_queue_broker = False
-    AUTH_MECHANISM = ["SASL_SCRAM_256_AUTH", "SASL_SCRAM_512_AUTH", "BASIC_AUTH"]
+    AUTH_MECHANISM = [
+        "SASL_SCRAM_256_AUTH",
+        "SASL_SCRAM_512_AUTH",
+        "BASIC_AUTH",
+        "CLIENT_CERTIFICATE_TLS_AUTH",
+        "SERVER_ROOT_CA_CERTIFICATE",
+    ]
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
         return None
