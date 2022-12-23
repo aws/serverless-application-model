@@ -1,7 +1,8 @@
 import copy
 import re
-from typing import Any, Dict, Optional
+from typing import Callable, Any, Dict, Optional, TypeVar
 
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Authorizer
 from samtranslator.model.intrinsics import ref, make_conditional, is_intrinsic
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
@@ -10,6 +11,13 @@ from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.utils.utils import dict_deep_get, InvalidValueType
 import json
+
+
+T = TypeVar("T")
+
+
+# Wrap around copy.deepcopy to isolate time cost to deepcopy the doc.
+_deepcopy: Callable[[T], T] = cw_timer(prefix="OpenApiEditor")(copy.deepcopy)
 
 
 class OpenApiEditor(BaseEditor):
@@ -32,6 +40,9 @@ class OpenApiEditor(BaseEditor):
     _DEFAULT_PATH = "$default"
     _DEFAULT_OPENAPI_TITLE = ref("AWS::StackName")
 
+    # Attributes:
+    _doc: Dict[str, Any]
+
     def __init__(self, doc: Optional[Dict[str, Any]]) -> None:
         """
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
@@ -49,7 +60,7 @@ class OpenApiEditor(BaseEditor):
                 ]
             )
 
-        self._doc = copy.deepcopy(doc)
+        self._doc = _deepcopy(doc)
         self.paths = self._doc["paths"]
         try:
             self.security_schemes = dict_deep_get(self._doc, "components.securitySchemes") or Py27Dict()
@@ -527,7 +538,7 @@ class OpenApiEditor(BaseEditor):
         if self.info:
             self._doc["info"] = self.info
 
-        return copy.deepcopy(self._doc)
+        return _deepcopy(self._doc)
 
     @staticmethod
     def is_valid(data: Any) -> bool:

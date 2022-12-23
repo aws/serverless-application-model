@@ -1,7 +1,8 @@
 ﻿import copy
 import re
-from typing import Dict, Any, Optional
+from typing import Callable, Dict, Any, Optional, TypeVar
 
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigateway import ApiGatewayAuthorizer
 from samtranslator.model.intrinsics import ref, make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
@@ -10,6 +11,12 @@ from samtranslator.schema.common import PassThrough
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.utils.utils import InvalidValueType, dict_deep_set
+
+T = TypeVar("T")
+
+
+# Wrap around copy.deepcopy to isolate time cost to deepcopy the doc.
+_deepcopy: Callable[[T], T] = cw_timer(prefix="SwaggerEditor")(copy.deepcopy)
 
 
 class SwaggerEditor(BaseEditor):
@@ -41,6 +48,9 @@ class SwaggerEditor(BaseEditor):
     _POLICY_TYPE_VPC = "Vpc"
     _DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
 
+    # Attributes:
+    _doc: Dict[str, Any]
+
     def __init__(self, doc: Optional[Dict[str, Any]]) -> None:
         """
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
@@ -53,7 +63,7 @@ class SwaggerEditor(BaseEditor):
         if not doc or not SwaggerEditor.is_valid(doc):
             raise InvalidDocumentException([InvalidTemplateException("Invalid Swagger document")])
 
-        self._doc = copy.deepcopy(doc)
+        self._doc = _deepcopy(doc)
         self.paths = self._doc["paths"]
         self.security_definitions = self._doc.get("securityDefinitions", Py27Dict())
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())
@@ -1206,7 +1216,7 @@ class SwaggerEditor(BaseEditor):
         if self.definitions:
             self._doc["definitions"] = self.definitions
 
-        return copy.deepcopy(self._doc)
+        return _deepcopy(self._doc)
 
     @staticmethod
     def is_valid(data: Any) -> bool:
