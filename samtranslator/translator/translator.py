@@ -74,15 +74,16 @@ class Translator:
                 if item.get("Type") == "Api" and item_properties.get("RestApiId"):
                     rest_api = item_properties.get("RestApiId")
                     api_name = Api.get_rest_api_id_string(rest_api)
-                    if isinstance(api_name, str):
-                        resource_dict_copy = copy.deepcopy(resource_dict)
-                        function_name = intrinsics_resolver.resolve_parameter_refs(
-                            resource_dict_copy.get("Properties", {}).get("FunctionName")
-                        )
-                        if function_name:
-                            self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
-                                function_name
-                            )
+                    if not isinstance(api_name, str):
+                        continue
+                    raw_function_name = resource_dict.get("Properties", {}).get("FunctionName")
+                    resolved_function_name = intrinsics_resolver.resolve_parameter_refs(
+                        copy.deepcopy(raw_function_name)
+                    )
+                    if not resolved_function_name:
+                        continue
+                    self.function_names.setdefault(api_name, "")
+                    self.function_names[api_name] += str(resolved_function_name)
         return self.function_names
 
     def translate(
