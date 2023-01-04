@@ -123,6 +123,9 @@ class Translator:
 
         self.sam_parser.parse(sam_template=sam_template, parameter_values=parameter_values, sam_plugins=sam_plugins)
 
+        updated_resources = add_embedded_connectors(sam_template=sam_template)
+        sam_template["Resources"].update(updated_resources)
+
         template = copy.deepcopy(sam_template)
         macro_resolver = ResourceTypeResolver(sam_resources)
         intrinsics_resolver = IntrinsicsResolver(parameter_values)
@@ -266,6 +269,57 @@ class Translator:
                 others.append(data)
 
         return functions + statemachines + apis + others + connectors
+
+
+def add_embedded_connectors(sam_template: Dict[str, Any]) -> Any:
+    resources = sam_template.get("Resources", {})
+    connectors_list = []
+
+    # Loop through the resources in the template and see if any connectors have been attached
+    for source_logicalId, resource in resources.items():
+        if "Connectors" in resource:
+            if not isinstance(resource["Connectors"], dict):
+                raise InvalidDocumentException([InvalidTemplateException("'Connectors' must be a dict")])
+
+            # Go through each of the connectors that have been attached and create a Serverless Connector resource
+            for connector_logicalId, connector_dict in resource["Connectors"].items():
+                if not isinstance(connector_dict, dict):
+                    raise InvalidResourceException(source_logicalId, "Invalid 'Connectors' type. Must be a dict.")
+
+                data = get_generated_connector(source_logicalId, connector_logicalId, connector_dict)
+                # add to the list of generated connectors
+                connectors_list.append(data)
+
+            # delete connectors key, so it doesn't show up in the transformed template
+            del resource["Connectors"]
+
+    # go through the list of generated connectors and add it to resources dict
+    for connector_logicalId, connector_dict in connectors_list:
+        if connector_logicalId in resources:
+            raise InvalidResourceException(
+                connector_logicalId,
+                f"A resource with the id {connector_logicalId} already exists in the "
+                f"resource. Please use a different id for that resource.",
+            )
+        resources[connector_logicalId] = connector_dict
+
+    return resources
+
+
+def get_generated_connector(
+    source_logicalId: str, connector_logicalId: str, connector_dict: Dict[str, Any]
+) -> Tuple[str, Dict[str, Any]]:
+    connector = connector_dict
+    connector["Type"] = "AWS::Serverless::Connector"
+    if isinstance(connector["Properties"], dict):
+        connector["Properties"]["Source"] = {"Id": source_logicalId}
+
+        # TODO: Fix the bug that doesn't allow id to be combined with any other ResourceReference property
+        if "SourceReference" in connector["Properties"]:
+            connector["Properties"]["Source"].update(connector["Properties"]["SourceReference"])
+            del connector["Properties"]["SourceReference"]
+
+    return connector_logicalId, connector
 
 
 def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:
