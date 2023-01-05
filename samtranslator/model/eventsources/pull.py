@@ -1,3 +1,4 @@
+from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Optional
 
 from samtranslator.metrics.method_decorator import cw_timer
@@ -15,7 +16,7 @@ from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect
 
 
-class PullEventSource(ResourceMacro):
+class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     """Base class for pull event sources for SAM Functions.
 
     The pull events are Kinesis Streams, DynamoDB Streams, Kafka Topics, Amazon MQ Queues and SQS Queues. All of these correspond to an
@@ -75,14 +76,17 @@ class PullEventSource(ResourceMacro):
     FilterCriteria: Optional[Dict[str, Any]]
     ConsumerGroupId: Optional[Intrinsicable[str]]
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
-        raise NotImplementedError("Subclass must implement this method")
+    @abstractmethod
+    def get_policy_arn(self) -> Optional[str]:
+        """Policy to be added to the role (if a role applies)."""
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
-        raise NotImplementedError("Subclass must implement this method")
+    @abstractmethod
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
+        """Inline policy statements to be added to the role (if a role applies)."""
 
+    @abstractmethod
     def get_event_source_arn(self) -> Optional[PassThrough]:
-        return None
+        """Return the value to assign to lambda event source mapping's EventSourceArn."""
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -189,8 +193,8 @@ class PullEventSource(ResourceMacro):
 
         :param model.iam.IAMRole role: the execution role generated for the function
         """
-        policy_arn = self.get_policy_arn()  # type: ignore[no-untyped-call]
-        policy_statements = self.get_policy_statements()  # type: ignore[no-untyped-call]
+        policy_arn = self.get_policy_arn()
+        policy_statements = self.get_policy_statements()
         if role is not None:
             if policy_arn is not None and policy_arn not in role.ManagedPolicyArns:
                 role.ManagedPolicyArns.append(policy_arn)
@@ -248,10 +252,10 @@ class Kinesis(PullEventSource):
     def get_event_source_arn(self) -> Optional[PassThrough]:
         return self.Stream
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+    def get_policy_arn(self) -> Optional[str]:
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         return None
 
 
@@ -270,10 +274,10 @@ class DynamoDB(PullEventSource):
     def get_event_source_arn(self) -> Optional[PassThrough]:
         return self.Stream
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+    def get_policy_arn(self) -> Optional[str]:
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         return None
 
 
@@ -291,10 +295,10 @@ class SQS(PullEventSource):
     def get_event_source_arn(self) -> Optional[PassThrough]:
         return self.Queue
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+    def get_policy_arn(self) -> Optional[str]:
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         return None
 
 
@@ -313,10 +317,10 @@ class MSK(PullEventSource):
     def get_event_source_arn(self) -> Optional[PassThrough]:
         return self.Stream
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+    def get_policy_arn(self) -> Optional[str]:
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         if self.SourceAccessConfigurations:
             for conf in self.SourceAccessConfigurations:
                 # Lambda does not support multiple CLIENT_CERTIFICATE_TLS_AUTH configurations
@@ -338,7 +342,7 @@ class MSK(PullEventSource):
                         }
                     ]
 
-            return None
+        return None
 
 
 class MQ(PullEventSource):
@@ -355,10 +359,10 @@ class MQ(PullEventSource):
     def get_event_source_arn(self) -> Optional[PassThrough]:
         return self.Broker
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+    def get_policy_arn(self) -> Optional[str]:
         return None
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         if not self.SourceAccessConfigurations:
             raise InvalidEventException(
                 self.relative_id,
@@ -447,10 +451,13 @@ class SelfManagedKafka(PullEventSource):
         "SERVER_ROOT_CA_CERTIFICATE",
     ]
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+    def get_event_source_arn(self) -> Optional[PassThrough]:
         return None
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_policy_arn(self) -> Optional[str]:
+        return None
+
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         if not self.KafkaBootstrapServers:
             raise InvalidEventException(
                 self.relative_id,
