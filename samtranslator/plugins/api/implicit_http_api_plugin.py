@@ -1,9 +1,13 @@
+from typing import Any, Dict, Optional, cast
+
 from samtranslator.model.intrinsics import make_conditional
 from samtranslator.model.naming import GeneratedLogicalId
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
 from samtranslator.public.open_api import OpenApiEditor
 from samtranslator.public.exceptions import InvalidEventException
 from samtranslator.public.sdk.resource import SamResourceType, SamResource
+from samtranslator.sdk.template import SamTemplate
+from samtranslator.validator.value_validator import sam_expect
 
 
 class ImplicitHttpApiPlugin(ImplicitApiPlugin):
@@ -103,7 +107,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
 
             self._add_api_to_swagger(logicalId, event_properties, template)  # type: ignore[no-untyped-call]
             if "RouteSettings" in event_properties:
-                self._add_route_settings_to_api(logicalId, event_properties, template, condition)  # type: ignore[no-untyped-call]
+                self._add_route_settings_to_api(logicalId, event_properties, template, condition)
             api_events[logicalId] = event
 
         # We could have made changes to the Events structure. Write it back to function
@@ -120,25 +124,27 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         if "ApiId" not in event_properties:
             event_properties["ApiId"] = {"Ref": self.implicit_api_logical_id}
 
-    def _generate_implicit_api_resource(self):  # type: ignore[no-untyped-def]
+    def _generate_implicit_api_resource(self) -> Dict[str, Any]:
         """
         Uses the implicit API in this file to generate an Implicit API resource
         """
-        return ImplicitHttpApiResource().to_dict()  # type: ignore[no-untyped-call]
+        return ImplicitHttpApiResource().to_dict()
 
-    def _get_api_definition_from_editor(self, editor):  # type: ignore[no-untyped-def]
+    def _get_api_definition_from_editor(self, editor: OpenApiEditor) -> Dict[str, Any]:
         """
         Helper function to return the OAS definition from the editor
         """
         return editor.openapi
 
-    def _get_api_resource_type_name(self):  # type: ignore[no-untyped-def]
+    def _get_api_resource_type_name(self) -> str:
         """
         Returns the type of API resource
         """
         return "AWS::Serverless::HttpApi"
 
-    def _add_route_settings_to_api(self, event_id, event_properties, template, condition):  # type: ignore[no-untyped-def]
+    def _add_route_settings_to_api(
+        self, event_id: str, event_properties: Dict[str, Any], template: SamTemplate, condition: Optional[str]
+    ) -> None:
         """
         Adds the RouteSettings for this path/method from the given event to the RouteSettings configuration
         on the AWS::Serverless::HttpApi that this refers to.
@@ -150,7 +156,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         """
 
         api_id = self._get_api_id(event_properties)  # type: ignore[no-untyped-call]
-        resource = template.get(api_id)
+        resource = cast(SamResource, template.get(api_id))  # TODO: make this not an assumption
 
         path = event_properties["Path"]
         method = event_properties["Method"]
@@ -165,6 +171,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         event_route_settings = event_properties.get("RouteSettings", {})
         if condition:
             event_route_settings = make_conditional(condition, event_properties.get("RouteSettings", {}))
+        sam_expect(event_route_settings, event_id, "RouteSettings", is_sam_event=True).to_be_a_map()
 
         # Merge event-level and api-level RouteSettings properties
         api_route_settings.setdefault(route, {})

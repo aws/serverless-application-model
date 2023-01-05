@@ -1,4 +1,3 @@
-
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
@@ -9,7 +8,9 @@ Resources:
       DeadLetterQueue:
         Type: SQS
         TargetArn:
-          Fn::GetAtt: ["MyQueue", "Arn"]
+          Fn::GetAtt: [MyQueue, Arn]
 
   MyQueue:
     Type: AWS::SQS::Queue
+Metadata:
+  SamTransformTest: true

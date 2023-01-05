@@ -1,3 +1,6 @@
 [
-  { "LogicalResourceId":"MyLayerVersion", "ResourceType":"AWS::Lambda::LayerVersion"}
+  {
+    "LogicalResourceId": "MyLayerVersion",
+    "ResourceType": "AWS::Lambda::LayerVersion"
+  }
 ]

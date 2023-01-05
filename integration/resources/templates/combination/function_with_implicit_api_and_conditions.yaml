@@ -3,52 +3,52 @@ Description: A template to test for implicit API condition handling.
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
   Cond:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
   Cond1:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
   Cond2:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
   Cond3:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
   Cond4:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
   Cond5:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
   Cond6:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
   Cond7:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
   Cond8:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
   Cond9:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   hello:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: MyCondition
     Properties:
       Handler: index.handler
@@ -64,7 +64,7 @@ Resources:
             Path: /sub
             Method: get
   helloworld:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Cond
     Properties:
       Handler: index.handler
@@ -80,7 +80,7 @@ Resources:
             Path: /sub
             Method: post
   helloworld1:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Cond1
     Properties:
       Handler: index.handler
@@ -96,7 +96,7 @@ Resources:
             Path: /sub1
             Method: post
   helloworld2:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Cond2
     Properties:
       Handler: index.handler
@@ -112,7 +112,7 @@ Resources:
             Path: /sub2
             Method: post
   helloworld3:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Cond3
     Properties:
       Handler: index.handler
@@ -128,7 +128,7 @@ Resources:
             Path: /sub3
             Method: post
   helloworld4:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Cond4
     Properties:
       Handler: index.handler
@@ -144,7 +144,7 @@ Resources:
             Path: /sub4
             Method: post
   helloworld5:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Cond5
     Properties:
       Handler: index.handler
@@ -160,7 +160,7 @@ Resources:
             Path: /sub5
             Method: post
   helloworld6:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Cond6
     Properties:
       Handler: index.handler
@@ -176,7 +176,7 @@ Resources:
             Path: /sub6
             Method: post
   helloworld7:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Cond7
     Properties:
       Handler: index.handler
@@ -192,7 +192,7 @@ Resources:
             Path: /sub7
             Method: post
   helloworld8:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Cond8
     Properties:
       Handler: index.handler
@@ -208,7 +208,7 @@ Resources:
             Path: /sub8
             Method: post
   helloworld9:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Condition: Cond9
     Properties:
       Handler: index.handler
@@ -223,3 +223,5 @@ Resources:
           Properties:
             Path: /sub9
             Method: post
+Metadata:
+  SamTransformTest: true

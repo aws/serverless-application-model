@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A Step Functions Standard Workflow sending payloads to an SQS queue. This pattern
+  will not wait for a callback
+  from SQS
+
+Resources:
+
+##########################################################################
+#   SQS                                                                  #
+##########################################################################
+  MyQueue:
+    Type: AWS::SQS::Queue
+
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+
+  StateMachinetoSQS:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        StartAt: SendToMyQueue
+        States:
+          SendToMyQueue:
+            Type: Task
+            Resource: someresource
+            Parameters:
+              QueueUrl: !Ref MyQueue
+              MessageBody.$: $.message
+            End: true
+      Role: !GetAtt [MyStateMachineExecutionRole, Arn]
+
+##########################################################################
+#   Roles                                                               #
+##########################################################################
+
+  MyStateMachineExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - !Sub states.${AWS::Region}.amazonaws.com
+          Action: sts:AssumeRole
+      Path: /
+
+
+  SFNToSQS:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: StateMachinetoSQS
+      Destination:
+        Id: MyQueue
+      Permissions:
+      - Write
+
+##########################################################################
+#   Outputs                                                              #
+##########################################################################
+Outputs:
+  StateMachinetoSQSArn:
+    Value: !Ref StateMachinetoSQS
+    Description: StateMachinetoSQS Arn
+  MyQueueURL:
+    Value: !Ref MyQueue
+    Description: MyQueue URL

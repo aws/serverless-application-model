@@ -1,5 +1,3 @@
-%YAML 1.1
----
 # Test to verify that resource references available on the Function are properly resolved
 # Currently supported references are:
 #    - Alias

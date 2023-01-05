@@ -1,10 +1,12 @@
-%YAML 1.1
----
 transformId: AWS::Serverless-2016-10-31
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:
   AuthFunction:
     Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: ''
+      Handler: index
+      Runtime: python3.9
   AccessingPartyAPI:
     Type: AWS::Serverless::Api
     Properties:
@@ -49,7 +51,8 @@ Resources:
                       - status
                       type: object
               security:
-                CustomAuthorizer: []
+              # each item should be a dict
+              - CustomAuthorizer
 
         openapi: 3.0.3
         components:
@@ -62,6 +65,9 @@ Resources:
   AccessingPartyAPIFunction:
     Type: AWS::Serverless::Function
     Properties:
+      InlineCode: ''
+      Handler: index
+      Runtime: python3.9
       Events:
         PutReservation:
           Type: Api

@@ -18,6 +18,8 @@ from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.utils.types import Intrinsicable
+from samtranslator.utils.utils import InvalidValueType, dict_deep_get
+from samtranslator.validator.value_validator import sam_expect
 
 _CORS_WILDCARD = "*"
 CorsProperties = namedtuple(
@@ -35,11 +37,12 @@ class HttpApiGenerator(object):
     def __init__(
         self,
         logical_id: str,
-        stage_variables: Dict[str, Intrinsicable[str]],
+        stage_variables: Optional[Dict[str, Intrinsicable[str]]],
         depends_on: Optional[List[str]],
-        definition_body: Dict[str, Any],
-        definition_uri: Intrinsicable[str],
-        stage_name: Intrinsicable[str],
+        definition_body: Optional[Dict[str, Any]],
+        definition_uri: Optional[Intrinsicable[str]],
+        name: Optional[Any],
+        stage_name: Optional[Intrinsicable[str]],
         tags: Optional[Dict[str, Intrinsicable[str]]] = None,
         auth: Optional[Dict[str, Intrinsicable[str]]] = None,
         cors_configuration: Optional[Union[bool, Dict[str, Any]]] = None,
@@ -60,6 +63,7 @@ class HttpApiGenerator(object):
         :param depends_on: Any resources that need to be depended on
         :param definition_body: API definition
         :param definition_uri: URI to API definition
+        :param name: Name of the API Gateway resource
         :param stage_name: Name of the Stage
         :param tags: Stage and API Tags
         :param access_log_settings: Whether to send access logs and where for Stage
@@ -73,6 +77,7 @@ class HttpApiGenerator(object):
         self.definition_body = definition_body
         self.definition_uri = definition_uri
         self.stage_name = stage_name
+        self.name = name
         if not self.stage_name:
             self.stage_name = DefaultStageName
         self.auth = auth
@@ -113,6 +118,7 @@ class HttpApiGenerator(object):
         if self.disable_execute_api_endpoint is not None:
             self._add_endpoint_configuration()
 
+        self._add_title()
         self._add_description()
 
         if self.definition_uri:
@@ -327,12 +333,7 @@ class HttpApiGenerator(object):
         route53_config = custom_domain_config.get("Route53")
         if route53_config is None:
             return None
-        if not isinstance(route53_config, dict):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Invalid property type '{}' for Route53. "
-                "Expected a map defines an Amazon Route 53 configuration'.".format(type(route53_config).__name__),
-            )
+        sam_expect(route53_config, self.logical_id, "Domain.Route53").to_be_a_map()
         if route53_config.get("HostedZoneId") is None and route53_config.get("HostedZoneName") is None:
             raise InvalidResourceException(
                 self.logical_id,
@@ -466,9 +467,7 @@ class HttpApiGenerator(object):
 
         # authorizers is guaranteed to return a value or raise an exception
         open_api_editor.add_authorizers_security_definitions(authorizers)
-        self._set_default_authorizer(
-            open_api_editor, authorizers, auth_properties.DefaultAuthorizer, auth_properties.Authorizers
-        )
+        self._set_default_authorizer(open_api_editor, authorizers, auth_properties.DefaultAuthorizer)
         self.definition_body = open_api_editor.openapi
 
     def _add_tags(self) -> None:
@@ -505,8 +504,7 @@ class HttpApiGenerator(object):
         self,
         open_api_editor: OpenApiEditor,
         authorizers: Dict[str, ApiGatewayV2Authorizer],
-        default_authorizer: str,
-        api_authorizers: Dict[str, Any],
+        default_authorizer: Optional[Any],
     ) -> None:
         """
         Sets the default authorizer if one is given in the template
@@ -521,11 +519,7 @@ class HttpApiGenerator(object):
         if is_intrinsic_no_value(default_authorizer):
             return
 
-        if is_intrinsic(default_authorizer):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Unable to set DefaultAuthorizer because intrinsic functions are not supported for this field.",
-            )
+        sam_expect(default_authorizer, self.logical_id, "Auth.DefaultAuthorizer").to_be_a_string()
 
         if not authorizers.get(default_authorizer):
             raise InvalidResourceException(
@@ -536,7 +530,7 @@ class HttpApiGenerator(object):
             )
 
         for path in open_api_editor.iter_on_path():
-            open_api_editor.set_path_default_authorizer(path, default_authorizer, authorizers, api_authorizers)
+            open_api_editor.set_path_default_authorizer(path, default_authorizer, authorizers)
 
     def _get_authorizers(
         self, authorizers_config: Any, enable_iam_authorizer: bool = False
@@ -663,7 +657,14 @@ class HttpApiGenerator(object):
                 self.logical_id,
                 "Description works only with inline OpenApi specified in the 'DefinitionBody' property.",
             )
-        if self.definition_body.get("info", {}).get("description"):
+        try:
+            description_in_definition_body = dict_deep_get(self.definition_body, "info.description")
+        except InvalidValueType as ex:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"Invalid 'DefinitionBody': {str(ex)}'.",
+            )
+        if description_in_definition_body:
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to set Description because it is already defined within inline OpenAPI specified in the "
@@ -672,6 +673,34 @@ class HttpApiGenerator(object):
 
         open_api_editor = OpenApiEditor(self.definition_body)
         open_api_editor.add_description(self.description)
+        self.definition_body = open_api_editor.openapi
+
+    def _add_title(self) -> None:
+        if not self.name:
+            return
+
+        if not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Name works only with inline OpenApi specified in the 'DefinitionBody' property.",
+            )
+
+        try:
+            title_in_definition_body = dict_deep_get(self.definition_body, "info.title")
+        except InvalidValueType as ex:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"Invalid 'DefinitionBody': {str(ex)}.",
+            )
+        if title_in_definition_body != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to set Name because it is already defined within inline OpenAPI specified in the "
+                "'DefinitionBody' property.",
+            )
+
+        open_api_editor = OpenApiEditor(self.definition_body)
+        open_api_editor.add_title(self.name)
         self.definition_body = open_api_editor.openapi
 
     @cw_timer(prefix="Generator", name="HttpApi")  # type: ignore[misc]

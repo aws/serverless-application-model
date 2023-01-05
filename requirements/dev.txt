@@ -19,7 +19,7 @@ boto3>=1.23,<2
 tenacity~=7.0.0
 
 # Requirements for examples
-requests~=2.24.0
+requests~=2.25.0
 
 # CLI requirements
 docopt~=0.6.2

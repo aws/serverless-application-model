@@ -1,5 +1,3 @@
-%YAML 1.1
----
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Template with preference that does not require a new CodeDeploy Service
@@ -23,12 +21,12 @@ Resources:
         Hooks:
           PreTraffic:
             Ref: preTrafficHook
-        Events:
-          Api:
-            Type: Api
-            Properties:
-              Path: /test
-              Method: get
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /test
+            Method: get
 
   preTrafficHook:
     Type: AWS::Serverless::Function

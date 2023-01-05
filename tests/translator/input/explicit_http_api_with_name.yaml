@@ -1,0 +1,26 @@
+Resources:
+  HttpApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        SimpleCase:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+        SimpleCase2:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApiWithIntrinsicName
+
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: MyHttpApi
+
+  MyApiWithIntrinsicName:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: !Sub "${HttpApiFunction}-HttpApi"

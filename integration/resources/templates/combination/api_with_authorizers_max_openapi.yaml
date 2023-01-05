@@ -11,8 +11,8 @@ Resources:
         Authorizers:
           MyCognitoAuthorizer:
             UserPoolArn:
-              - Fn::GetAtt: MyCognitoUserPool.Arn
-              - Fn::GetAtt: MyCognitoUserPoolTwo.Arn
+            - Fn::GetAtt: MyCognitoUserPool.Arn
+            - Fn::GetAtt: MyCognitoUserPoolTwo.Arn
             Identity:
               Header: MyAuthorizationHeader
               ValidationExpression: myauthvalidationexpression
@@ -36,10 +36,10 @@ Resources:
               Fn::GetAtt: LambdaAuthInvokeRole.Arn
             Identity:
               Headers:
-                - authorizationHeader
+              - authorizationHeader
               QueryStrings:
-                - authorization
-                - authorizationQueryString1
+              - authorization
+              - authorizationQueryString1
               ReauthorizeEvery: 0
 
   MyFunction:
@@ -172,7 +172,7 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: MyCognitoUserPoolTwo
-  
+
   MyCognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -184,25 +184,25 @@ Resources:
   MyFirstApiKey:
     Type: AWS::ApiGateway::ApiKey
     DependsOn:
-      - MyUsagePlan
+    - MyUsagePlan
     Properties:
       Enabled: true
       StageKeys:
-        - RestApiId:
-            Ref: MyApi
-          StageName:
-            Ref: MyApi.Stage
+      - RestApiId:
+          Ref: MyApi
+        StageName:
+          Ref: MyApi.Stage
 
   MyUsagePlan:
     Type: AWS::ApiGateway::UsagePlan
     DependsOn:
-      - MyApi
+    - MyApi
     Properties:
       ApiStages:
-        - ApiId:
-            Ref: MyApi
-          Stage:
-            Ref: MyApi.Stage
+      - ApiId:
+          Ref: MyApi
+        Stage:
+          Ref: MyApi.Stage
 
   MyUsagePlanKey:
     Type: AWS::ApiGateway::UsagePlanKey
@@ -214,32 +214,34 @@ Resources:
       KeyType: API_KEY
 
 Outputs:
-    ApiUrl:
-      Description: "API endpoint URL for Prod environment"
-      Value:
-        Fn::Sub: 'https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+  ApiUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/
 
-    AuthorizerFunctionArn:
-      Description: "Authorizer Function Arn"
-      Value:
-        Fn::GetAtt: MyLambdaAuthFunction.Arn
+  AuthorizerFunctionArn:
+    Description: Authorizer Function Arn
+    Value:
+      Fn::GetAtt: MyLambdaAuthFunction.Arn
 
-    CognitoUserPoolArn:
-      Description: "Cognito User Pool Arn"
-      Value:
-        Fn::GetAtt: MyCognitoUserPool.Arn
+  CognitoUserPoolArn:
+    Description: Cognito User Pool Arn
+    Value:
+      Fn::GetAtt: MyCognitoUserPool.Arn
 
-    CognitoUserPoolTwoArn:
-      Description: "Cognito User Pool Arn"
-      Value:
-        Fn::GetAtt: MyCognitoUserPoolTwo.Arn
+  CognitoUserPoolTwoArn:
+    Description: Cognito User Pool Arn
+    Value:
+      Fn::GetAtt: MyCognitoUserPoolTwo.Arn
 
-    LambdaAuthInvokeRoleArn:
-      Description: "Authorizer Function Arn"
-      Value:
-        Fn::GetAtt: LambdaAuthInvokeRole.Arn
+  LambdaAuthInvokeRoleArn:
+    Description: Authorizer Function Arn
+    Value:
+      Fn::GetAtt: LambdaAuthInvokeRole.Arn
 
-    ApiKeyId:
-      Description: "ID of the API Key"
-      Value:
-        Ref: MyFirstApiKey
+  ApiKeyId:
+    Description: ID of the API Key
+    Value:
+      Ref: MyFirstApiKey
+Metadata:
+  SamTransformTest: true

@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   MQFunction:
     Type: AWS::Serverless::Function

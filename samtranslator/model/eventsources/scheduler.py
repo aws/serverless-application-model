@@ -124,7 +124,7 @@ class SchedulerEventSource(ResourceMacro):
                 target, target_type, passthrough_resource_attributes, dlq_queue_arn, self.PermissionsBoundary
             )
             resources.append(execution_role)
-            execution_role_arn = execution_role.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
+            execution_role_arn = execution_role.get_runtime_attr("arn")
 
         scheduler_schedule.Target = self._construct_scheduler_schedule_target(target, execution_role_arn, dlq_queue_arn)
 
@@ -163,10 +163,10 @@ class SchedulerEventSource(ResourceMacro):
     ) -> IAMRole:
         """Constructs the execution role for Scheduler Schedule."""
         if target_type == _SchedulerScheduleTargetType.FUNCTION:
-            policy = IAMRolePolicies.lambda_invoke_function_role_policy(target.get_runtime_attr("arn"), self.logical_id)  # type: ignore[no-untyped-call, no-untyped-call]
+            policy = IAMRolePolicies.lambda_invoke_function_role_policy(target.get_runtime_attr("arn"), self.logical_id)
         elif target_type == _SchedulerScheduleTargetType.STATE_MACHINE:
             policy = IAMRolePolicies.step_functions_start_execution_role_policy(  # type: ignore[no-untyped-call]
-                target.get_runtime_attr("arn"), self.logical_id  # type: ignore[no-untyped-call]
+                target.get_runtime_attr("arn"), self.logical_id
             )
         else:
             raise RuntimeError(f"Unexpected target type {target_type.name}")
@@ -195,7 +195,7 @@ class SchedulerEventSource(ResourceMacro):
         Inspired by https://github.com/aws/serverless-application-model/blob/a25933379e1cad3d0df4b35729ee2ec335402fdf/samtranslator/model/eventsources/push.py#L157
         """
         target_dict: Dict[str, Any] = {
-            "Arn": target.get_runtime_attr("arn"),  # type: ignore[no-untyped-call]
+            "Arn": target.get_runtime_attr("arn"),
             "RoleArn": execution_role_arn,
         }
         if self.Input is not None:
@@ -230,5 +230,5 @@ class SchedulerEventSource(ResourceMacro):
         queue = SQSQueue(queue_logical_id or self.logical_id + "Queue", attributes=passthrough_resource_attributes)
         dlq_resources.append(queue)
 
-        dlq_queue_arn = queue.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
+        dlq_queue_arn = queue.get_runtime_attr("arn")
         return dlq_queue_arn, dlq_resources

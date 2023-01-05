@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  MyBatchingWindowParam:
+    Type: Number
+    Default: 45
+    Description: parameter for batching window in seconds
+
+Resources:
+  MyFunctionWithMissingOnFailure:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = async (event) => {
+            return {
+            statusCode: 200,
+            body: JSON.stringify(event),
+            headers: {}
+            }
+        }
+      Runtime: nodejs12.x
+      Policies:
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt MySqsQueue.QueueName
+      Events:
+        StreamEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream.Arn
+            MaximumBatchingWindowInSeconds: !Ref MyBatchingWindowParam
+            StartingPosition: LATEST
+            DestinationConfig:
+              InvalidConfig:
+                Type: SNS
+                Destination: !Ref MySnsTopic
+
+  MyFunctionWithInvalidOnFailureType:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = async (event) => {
+            return {
+            statusCode: 200,
+            body: JSON.stringify(event),
+            headers: {}
+            }
+        }
+      Runtime: nodejs12.x
+      Policies:
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt MySqsQueue.QueueName
+      Events:
+        StreamEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream.Arn
+            MaximumBatchingWindowInSeconds: !Ref MyBatchingWindowParam
+            StartingPosition: LATEST
+            DestinationConfig:
+              InvalidConfig:
+                Type: SNS
+                Destination: !Ref MySnsTopic
+              OnFailure: this should be a dict
+
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 1
+
+  MySnsTopic:
+    Type: AWS::SNS::Topic

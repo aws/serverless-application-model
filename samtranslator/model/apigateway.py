@@ -1,15 +1,16 @@
 import json
 from re import match
-from functools import reduce
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.types import is_type, one_of, is_str, list_of
 from samtranslator.model.intrinsics import ref, fnSub
+from samtranslator.schema.common import PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.validator.value_validator import sam_expect
 
 
 class ApiGatewayRestApi(Resource):
@@ -123,10 +124,11 @@ class ApiGatewayResponse(object):
         self,
         api_logical_id: str,
         response_parameters: Optional[Dict[str, Any]] = None,
-        response_templates: Optional[Dict[str, Any]] = None,
+        response_templates: Optional[PassThrough] = None,
         status_code: Optional[str] = None,
     ) -> None:
         if response_parameters:
+            # response_parameters has been validated in ApiGenerator._add_gateway_responses()
             for response_parameter_key in response_parameters.keys():
                 if response_parameter_key not in ApiGatewayResponse.ResponseParameterProperties:
                     raise InvalidResourceException(
@@ -253,21 +255,6 @@ class ApiGatewayAuthorizer(object):
     ):
         if authorization_scopes is None:
             authorization_scopes = []
-        if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
-            raise InvalidResourceException(
-                api_logical_id,
-                f"{name} Authorizer has invalid 'FunctionPayloadType': {function_payload_type}.",
-            )
-
-        if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):  # type: ignore[no-untyped-call]
-            raise InvalidResourceException(
-                api_logical_id,
-                f"{name} Authorizer must specify Identity with at least one "
-                "of Headers, QueryStrings, StageVariables, or Context.",
-            )
-
-        if authorization_scopes is not None and not isinstance(authorization_scopes, list):
-            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
 
         self.api_logical_id = api_logical_id
         self.name = name
@@ -279,9 +266,27 @@ class ApiGatewayAuthorizer(object):
         self.is_aws_iam_authorizer = is_aws_iam_authorizer
         self.authorization_scopes = authorization_scopes
 
-    def _is_missing_identity_source(self, identity):  # type: ignore[no-untyped-def]
+        if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
+            raise InvalidResourceException(
+                api_logical_id,
+                f"{name} Authorizer has invalid 'FunctionPayloadType': {function_payload_type}.",
+            )
+
+        if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):
+            raise InvalidResourceException(
+                api_logical_id,
+                f"{name} Authorizer must specify Identity with at least one "
+                "of Headers, QueryStrings, StageVariables, or Context.",
+            )
+
+        if authorization_scopes is not None and not isinstance(authorization_scopes, list):
+            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
+
+    def _is_missing_identity_source(self, identity: Dict[str, Any]) -> bool:
         if not identity:
             return True
+
+        sam_expect(identity, self.api_logical_id, f"Authorizer.{self.name}.Identity").to_be_a_map()
 
         headers = identity.get("Headers")
         query_strings = identity.get("QueryStrings")
@@ -291,9 +296,11 @@ class ApiGatewayAuthorizer(object):
 
         required_properties_missing = not headers and not query_strings and not stage_variables and not context
 
+        if ttl is None:
+            return required_properties_missing
         try:
             ttl_int = int(ttl)
-        # this will catch if ttl is None and not convertable to an int
+        # this will catch if and not convertable to an int
         except (TypeError, ValueError):
             # previous behavior before trying to read ttl
             return required_properties_missing
@@ -338,9 +345,9 @@ class ApiGatewayAuthorizer(object):
                 swagger[APIGATEWAY_AUTHORIZER_KEY]["authorizerCredentials"] = function_invoke_role
 
             if self._get_function_payload_type() == "REQUEST":  # type: ignore[no-untyped-call]
-                identity_source = self._get_identity_source()  # type: ignore[no-untyped-call]
+                identity_source = self._get_identity_source()
                 if identity_source:
-                    swagger[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()  # type: ignore[no-untyped-call]
+                    swagger[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()
 
         # Authorizer Validation Expression is only allowed on COGNITO_USER_POOLS and LAMBDA_TOKEN
         is_lambda_token_authorizer = authorizer_type == "LAMBDA" and self._get_function_payload_type() == "TOKEN"  # type: ignore[no-untyped-call]
@@ -356,21 +363,25 @@ class ApiGatewayAuthorizer(object):
     def _get_identity_validation_expression(self):  # type: ignore[no-untyped-def]
         return self.identity and self.identity.get("ValidationExpression")
 
-    def _build_identity_source_item(self, item_prefix, prop_value):  # type: ignore[no-untyped-def]
+    @staticmethod
+    def _build_identity_source_item(item_prefix: str, prop_value: str) -> str:
         item = item_prefix + prop_value
         if isinstance(prop_value, Py27UniStr):
             item = Py27UniStr(item)
         return item
 
-    def _build_identity_source_item_array(self, prop_key, item_prefix):  # type: ignore[no-untyped-def]
-        arr = []
-        if self.identity.get(prop_key):
-            arr = [
-                self._build_identity_source_item(item_prefix, prop_value) for prop_value in self.identity.get(prop_key)  # type: ignore[no-untyped-call]
-            ]
+    def _build_identity_source_item_array(self, prop_key: str, item_prefix: str) -> List[str]:
+        arr: List[str] = []
+        prop_value_list = self.identity.get(prop_key)
+        if prop_value_list:
+            prop_path = f"Auth.Authorizers.{self.name}.Identity.{prop_key}"
+            sam_expect(prop_value_list, self.api_logical_id, prop_path).to_be_a_list()
+            for index, prop_value in enumerate(prop_value_list):
+                sam_expect(prop_value, self.api_logical_id, f"{prop_path}[{index}]").to_be_a_string()
+                arr.append(self._build_identity_source_item(item_prefix, prop_value))
         return arr
 
-    def _get_identity_source(self):  # type: ignore[no-untyped-def]
+    def _get_identity_source(self) -> str:
         key_prefix_pairs = [
             ("Headers", "method.request.header."),
             ("QueryStrings", "method.request.querystring."),
@@ -378,12 +389,9 @@ class ApiGatewayAuthorizer(object):
             ("Context", "context."),
         ]
 
-        identity_source_array = reduce(  # type: ignore[var-annotated]
-            lambda accumulator, key_prefix_pair: accumulator  # type: ignore[no-any-return]
-            + self._build_identity_source_item_array(key_prefix_pair[0], key_prefix_pair[1]),  # type: ignore[no-untyped-call]
-            key_prefix_pairs,
-            [],
-        )
+        identity_source_array = []
+        for prop_key, item_prefix in key_prefix_pairs:
+            identity_source_array.extend(self._build_identity_source_item_array(prop_key, item_prefix))
 
         identity_source = ", ".join(identity_source_array)
         if any(isinstance(i, Py27UniStr) for i in identity_source_array):

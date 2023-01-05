@@ -1,12 +1,13 @@
 {
-  "swagger": "2.0",
-  "info": {
-    "title": "PetStore",
-    "description": "Your first API with Amazon API Gateway. This is a sample API that integrates via HTTP with our demo Pet Store endpoints"
+  "definitions": {
+    "Empty": {
+      "type": "object"
+    }
   },
-  "schemes": [
-    "https"
-  ],
+  "info": {
+    "description": "Your first API with Amazon API Gateway. This is a sample API that integrates via HTTP with our demo Pet Store endpoints",
+    "title": "PetStore"
+  },
   "paths": {
     "/": {
       "get": {
@@ -27,19 +28,62 @@
           }
         },
         "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
           "responses": {
             "default": {
-              "statusCode": "200",
               "responseParameters": {
                 "method.response.header.Content-Type": "'text/html'"
               },
               "responseTemplates": {
                 "text/html": "<html>\n    <head>\n        <style>\n        body {\n            color: #333;\n            font-family: Sans-serif;\n            max-width: 800px;\n            margin: auto;\n        }\n        </style>\n    </head>\n    <body>\n        <h1>Welcome to your Pet Store API</h1>\n        <p>\n            You have succesfully deployed your first API. You are seeing this HTML page because the <code>GET</code> method to the root resource of your API returns this content as a Mock integration.\n        </p>\n        <p>\n            The Pet Store API contains the <code>/pets</code> and <code>/pets/{petId}</code> resources. By making a <a href=\"/$context.stage/pets/\" target=\"_blank\"><code>GET</code> request</a> to <code>/pets</code> you can retrieve a list of Pets in your API. If you are looking for a specific pet, for example the pet with ID 1, you can make a <a href=\"/$context.stage/pets/1\" target=\"_blank\"><code>GET</code> request</a> to <code>/pets/1</code>.\n        </p>\n        <p>\n            You can use a REST client such as <a href=\"https://www.getpostman.com/\" target=\"_blank\">Postman</a> to test the <code>POST</code> methods in your API to create a new pet. Use the sample body below to send the <code>POST</code> request:\n        </p>\n        <pre>\n{\n    \"type\" : \"cat\",\n    \"price\" : 123.11\n}\n        </pre>\n    </body>\n</html>"
-              }
+              },
+              "statusCode": "200"
             }
           },
+          "type": "mock"
+        }
+      },
+      "options": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Headers": {
+                "type": "string"
+              },
+              "Access-Control-Allow-Methods": {
+                "type": "string"
+              },
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Empty"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
           "requestTemplates": {
             "application/json": "{\"statusCode\": 200}"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+                "method.response.header.Access-Control-Allow-Methods": "'POST,OPTIONS'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "statusCode": "200"
+            }
           },
           "type": "mock"
         }
@@ -51,115 +95,72 @@
         "responses": {
           "200": {
             "description": "200 response",
-            "schema": {
-              "$ref": "#/definitions/Empty"
-            },
             "headers": {
               "Access-Control-Allow-Origin": {
                 "type": "string"
               }
+            },
+            "schema": {
+              "$ref": "#/definitions/Empty"
             }
           }
         },
         "x-amazon-apigateway-integration": {
-          "responses": {
-            "default": {
-              "statusCode": "200",
-              "responseParameters": {
-                "method.response.header.Access-Control-Allow-Origin": "'*'"
-              }
-            }
-          },
-          "uri": "http://petstore-demo-endpoint.execute-api.com/petstore/pets",
           "httpMethod": "POST",
-          "type": "http"
-        }
-      },
-      "options": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "200 response",
-            "schema": {
-              "$ref": "#/definitions/Empty"
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "type": "string"
-              },
-              "Access-Control-Allow-Methods": {
-                "type": "string"
-              },
-              "Access-Control-Allow-Headers": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration": {
           "responses": {
             "default": {
-              "statusCode": "200",
               "responseParameters": {
-                "method.response.header.Access-Control-Allow-Methods": "'POST,OPTIONS'",
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
                 "method.response.header.Access-Control-Allow-Origin": "'*'"
-              }
+              },
+              "statusCode": "200"
             }
           },
-          "requestTemplates": {
-            "application/json": "{\"statusCode\": 200}"
-          },
-          "type": "mock"
+          "type": "http",
+          "uri": "http://petstore-demo-endpoint.execute-api.com/petstore/pets"
         }
       }
     },
     "/pets/{petId}": {
       "get": {
-        "produces": [
-          "application/json"
-        ],
         "parameters": [
           {
-            "name": "petId",
             "in": "path",
+            "name": "petId",
             "required": true,
             "type": "string"
           }
         ],
+        "produces": [
+          "application/json"
+        ],
         "responses": {
           "200": {
             "description": "200 response",
-            "schema": {
-              "$ref": "#/definitions/Empty"
-            },
             "headers": {
               "Access-Control-Allow-Origin": {
                 "type": "string"
               }
+            },
+            "schema": {
+              "$ref": "#/definitions/Empty"
             }
           }
         },
         "x-amazon-apigateway-integration": {
-          "responses": {
-            "default": {
-              "statusCode": "200",
-              "responseParameters": {
-                "method.response.header.Access-Control-Allow-Origin": "'*'"
-              }
-            }
-          },
-          "uri": "http://petstore-demo-endpoint.execute-api.com/petstore/pets/{petId}",
           "httpMethod": "GET",
           "requestParameters": {
             "integration.request.path.petId": "method.request.path.petId"
           },
-          "type": "http"
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "http",
+          "uri": "http://petstore-demo-endpoint.execute-api.com/petstore/pets/{petId}"
         }
       },
       "options": {
@@ -172,44 +173,43 @@
         "responses": {
           "200": {
             "description": "200 response",
-            "schema": {
-              "$ref": "#/definitions/Empty"
-            },
             "headers": {
-              "Access-Control-Allow-Origin": {
+              "Access-Control-Allow-Headers": {
                 "type": "string"
               },
               "Access-Control-Allow-Methods": {
                 "type": "string"
               },
-              "Access-Control-Allow-Headers": {
+              "Access-Control-Allow-Origin": {
                 "type": "string"
               }
+            },
+            "schema": {
+              "$ref": "#/definitions/Empty"
             }
           }
         },
         "x-amazon-apigateway-integration": {
-          "responses": {
-            "default": {
-              "statusCode": "200",
-              "responseParameters": {
-                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
-                "method.response.header.Access-Control-Allow-Origin": "'*'"
-              }
-            }
-          },
           "requestTemplates": {
             "application/json": "{\"statusCode\": 200}"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "statusCode": "200"
+            }
           },
           "type": "mock"
         }
       }
     }
   },
-  "definitions": {
-    "Empty": {
-      "type": "object"
-    }
-  }
+  "schemes": [
+    "https"
+  ],
+  "swagger": "2.0"
 }

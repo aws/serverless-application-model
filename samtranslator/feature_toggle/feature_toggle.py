@@ -9,6 +9,7 @@ from samtranslator.feature_toggle.dialup import (
     SimpleAccountPercentileDialup,
 )
 from samtranslator.metrics.method_decorator import cw_timer
+from samtranslator.utils.constants import BOTO3_CONNECT_TIMEOUT
 
 LOG = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ class FeatureToggle:
         LOG.warning("Dialup type '{}' is None or is not supported.".format(dialup_type))
         return DisabledDialup(region_config)  # type: ignore[no-untyped-call]
 
-    def is_enabled(self, feature_name):  # type: ignore[no-untyped-def]
+    def is_enabled(self, feature_name: str) -> bool:
         """
         To check if feature is available
 
@@ -80,7 +81,7 @@ class FeatureToggle:
 
         dialup = self._get_dialup(region_config, feature_name=feature_name)  # type: ignore[no-untyped-call]
         LOG.info("Using Dialip {}".format(dialup))
-        is_enabled = dialup.is_enabled()
+        is_enabled: bool = dialup.is_enabled()
 
         LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
         return is_enabled
@@ -133,7 +134,9 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
             # Lambda function has 120 seconds limit
             # (5 + 5) * 2, 20 seconds maximum timeout duration
             # In case of high latency from AppConfig, we can always fall back to use an empty config and continue transform
-            client_config = Config(connect_timeout=5, read_timeout=5, retries={"total_max_attempts": 2})
+            client_config = Config(
+                connect_timeout=BOTO3_CONNECT_TIMEOUT, read_timeout=5, retries={"total_max_attempts": 2}
+            )
             self.app_config_client = (
                 boto3.client("appconfig", config=client_config) if not app_config_client else app_config_client
             )

@@ -7,7 +7,7 @@ Resources:
       Timeout: 10  # in case eb has delay
       InlineCode: |
         const AWS = require('aws-sdk');
-        
+
         exports.handler = async (event) => {
           const eb = new AWS.EventBridge();
           const response = await eb.putEvents({
@@ -33,10 +33,10 @@ Resources:
           QUEUE_URL: !Ref VerificationQueue
           EVENT_SOURCE: !Sub '${AWS::StackName}-test-event'
       Policies:
-        - EventBridgePutEventsPolicy:
-            EventBusName: default
-        - SQSPollerPolicy:
-            QueueName: !GetAtt VerificationQueue.QueueName
+      - EventBridgePutEventsPolicy:
+          EventBusName: default
+      - SQSPollerPolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
 
   EventRule:
     Type: AWS::Events::Rule
@@ -44,10 +44,10 @@ Resources:
       Description: !Sub 'EventRule-${AWS::StackName}'
       EventPattern:
         source:
-          - !Sub '${AWS::StackName}-test-event'
+        - !Sub '${AWS::StackName}-test-event'
       Targets:
-        - Arn: !Ref Topic
-          Id: "Target"
+      - Arn: !Ref Topic
+        Id: Target
 
   Topic:
     Type: AWS::SNS::Topic
@@ -70,7 +70,7 @@ Resources:
       Destination:
         Id: Topic
       Permissions:
-        - Write
+      - Write
 
   ConnectorNotBeingTested:
     Type: AWS::Serverless::Connector
@@ -80,4 +80,6 @@ Resources:
       Destination:
         Id: VerificationQueue
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true

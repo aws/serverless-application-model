@@ -20,13 +20,13 @@ Resources:
           Type: SelfManagedKafka
           Properties:
             KafkaBootstrapServers:
-              - Ref: KafkaBootstrapServersValue
+            - Ref: KafkaBootstrapServersValue
             Topics:
               Ref: TopicsValue
             SourceAccessConfigurations:
-              - Type: BASIC_AUTH
-                URI:
-                  Ref: KafkaUserSecret
+            - Type: BASIC_AUTH
+              URI:
+                Ref: KafkaUserSecret
 
   KafkaUserSecret:
     Type: AWS::SecretsManager::Secret
@@ -35,3 +35,5 @@ Resources:
       SecretString:
         Fn::Sub: '{"username":"testBrokerUserWithInstrinsic","password":"testBrokerPasswordWithInstrinsic"}'
 
+Metadata:
+  SamTransformTest: true

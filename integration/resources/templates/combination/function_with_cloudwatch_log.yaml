@@ -1,6 +1,6 @@
 Resources:
   MyLambdaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
       Runtime: nodejs14.x
@@ -13,8 +13,10 @@ Resources:
             LogGroupName:
               Ref: CloudWatchLambdaLogsGroup
             FilterPattern: My filter pattern
-            
+
   CloudWatchLambdaLogsGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       RetentionInDays: 7
+Metadata:
+  SamTransformTest: true

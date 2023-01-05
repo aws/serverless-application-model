@@ -8,11 +8,11 @@ Globals:
       Type:
         Ref: TypeParam
       Role:
-        Fn::GetAtt: [ DeploymentRole, Arn ]
+        Fn::GetAtt: [DeploymentRole, Arn]
 
 Resources:
   MyLambdaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ${codeuri}
       Handler: index.handler
@@ -33,18 +33,18 @@ Resources:
             - codedeploy.amazonaws.com
 
       Policies:
-        -
-          PolicyName: "root"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Effect: "Allow"
-                Resource: "*"
-                Action:
-                  - "cloudwatch:DescribeAlarms"
-                  - "lambda:UpdateAlias"
-                  - "lambda:GetAlias"
-                  - "lambda:InvokeFunction"
-                  - "s3:Get*"
-                  - "sns:Publish"
+      - PolicyName: root
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Resource: '*'
+            Action:
+            - cloudwatch:DescribeAlarms
+            - lambda:UpdateAlias
+            - lambda:GetAlias
+            - lambda:InvokeFunction
+            - s3:Get*
+            - sns:Publish
+Metadata:
+  SamTransformTest: true

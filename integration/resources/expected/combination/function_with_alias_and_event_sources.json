@@ -1,27 +1,102 @@
 [
-  { "LogicalResourceId":"MyAwesomeFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyAwesomeFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyAwesomeFunctionAliasLive", "ResourceType":"AWS::Lambda::Alias" },
-  { "LogicalResourceId":"MyAwesomeFunctionVersion", "ResourceType":"AWS::Lambda::Version" },
-  { "LogicalResourceId":"MyAwesomeFunctionDDBStream", "ResourceType":"AWS::Lambda::EventSourceMapping" },
-  { "LogicalResourceId":"MyAwesomeFunctionExplicitApiPermissionDev", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyAwesomeFunctionKinesisStream", "ResourceType":"AWS::Lambda::EventSourceMapping" },
-  { "LogicalResourceId":"ServerlessRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"MyAwesomeFunctionCWSchedule", "ResourceType":"AWS::Events::Rule" },
-  { "LogicalResourceId":"Stream", "ResourceType":"AWS::Kinesis::Stream" },
-  { "LogicalResourceId":"MyAwesomeFunctionS3TriggerPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"ExistingRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-  { "LogicalResourceId":"MyAwesomeFunctionNotificationTopic", "ResourceType":"AWS::SNS::Subscription" },
-  { "LogicalResourceId":"ServerlessRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
-  { "LogicalResourceId":"ExistingRestApiDevStage", "ResourceType":"AWS::ApiGateway::Stage" },
-  { "LogicalResourceId":"MyAwesomeFunctionCWSchedulePermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyTable", "ResourceType":"AWS::DynamoDB::Table" },
-  { "LogicalResourceId":"Images", "ResourceType":"AWS::S3::Bucket" },
-  { "LogicalResourceId":"ExistingRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"MyAwesomeFunctionCWEvent", "ResourceType":"AWS::Events::Rule" },
-  { "LogicalResourceId":"ServerlessRestApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
-  { "LogicalResourceId":"MyAwesomeFunctionCWEventPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"MyAwesomeFunctionNotificationTopicPermission", "ResourceType":"AWS::Lambda::Permission" },
-  { "LogicalResourceId":"Notifications", "ResourceType":"AWS::SNS::Topic" },
-  { "LogicalResourceId":"MyAwesomeFunctionImplicitApiPermissionProd", "ResourceType":"AWS::Lambda::Permission" }
+  {
+    "LogicalResourceId": "MyAwesomeFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionAliasLive",
+    "ResourceType": "AWS::Lambda::Alias"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionVersion",
+    "ResourceType": "AWS::Lambda::Version"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionDDBStream",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionExplicitApiPermissionDev",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionKinesisStream",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionCWSchedule",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "Stream",
+    "ResourceType": "AWS::Kinesis::Stream"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionS3TriggerPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "ExistingRestApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionNotificationTopic",
+    "ResourceType": "AWS::SNS::Subscription"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "ExistingRestApiDevStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionCWSchedulePermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyTable",
+    "ResourceType": "AWS::DynamoDB::Table"
+  },
+  {
+    "LogicalResourceId": "Images",
+    "ResourceType": "AWS::S3::Bucket"
+  },
+  {
+    "LogicalResourceId": "ExistingRestApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionCWEvent",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionCWEventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionNotificationTopicPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "Notifications",
+    "ResourceType": "AWS::SNS::Topic"
+  },
+  {
+    "LogicalResourceId": "MyAwesomeFunctionImplicitApiPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  }
 ]

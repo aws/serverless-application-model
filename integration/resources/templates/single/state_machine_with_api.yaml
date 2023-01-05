@@ -1,0 +1,41 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        def handler(event, context):
+            print(event)
+            return "do nothing"
+      Handler: index.handler
+      Runtime: python3.8
+  Post:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Policies:
+      - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+      Definition:
+        StartAt: One
+        States:
+          One:
+            Type: Task
+            Resource: !GetAtt HelloWorldFunction.Arn
+            End: true
+      Events:
+        PostEcho:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /echo
+            Method: POST
+            UnescapeMappingTemplate: true
+
+Outputs:
+  ApiEndpoint:
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/echo"
+Metadata:
+  SamTransformTest: true

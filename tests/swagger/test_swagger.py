@@ -692,12 +692,6 @@ class TestSwaggerEditor_add_models(TestCase):
         with self.assertRaises(InvalidDocumentException):
             self.editor.add_models(models)
 
-    def test_must_fail_without_properties_in_model(self):
-        models = {"User": {"type": "object"}}
-
-        with self.assertRaises(InvalidDocumentException):
-            self.editor.add_models(models)
-
 
 class TestSwaggerEditor_add_request_model_to_method(TestCase):
     def setUp(self):

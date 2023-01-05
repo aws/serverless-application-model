@@ -1,5 +1,6 @@
 import boto3
 import json
+from botocore.config import Config
 from botocore.exceptions import ClientError, EndpointConnectionError
 import logging
 from time import sleep
@@ -14,6 +15,8 @@ from samtranslator.public.sdk.template import SamTemplate
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.region_configuration import RegionConfiguration
+from samtranslator.utils.constants import BOTO3_CONNECT_TIMEOUT
+from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)
 
@@ -118,7 +121,9 @@ class ServerlessAppPlugin(BasePlugin):
                         )
                     # Lazy initialization of the client- create it when it is needed
                     if not self._sar_client:
-                        self._sar_client = boto3.client("serverlessrepo")
+                        # a SAR call could take a while to finish, leaving the read_timeout default (60s).
+                        client_config = Config(connect_timeout=BOTO3_CONNECT_TIMEOUT)
+                        self._sar_client = boto3.client("serverlessrepo", config=client_config)
                     self._make_service_call_with_retry(service_call, app_id, semver, key, logical_id)  # type: ignore[no-untyped-call]
                 except InvalidResourceException as e:
                     # Catch all InvalidResourceExceptions, raise those in the before_resource_transform target.
@@ -260,9 +265,7 @@ class ServerlessAppPlugin(BasePlugin):
         )
 
         app_id = resource_properties[self.LOCATION_KEY].get(self.APPLICATION_ID_KEY)
-
-        if not app_id:
-            raise InvalidResourceException(logical_id, "Property 'ApplicationId' cannot be blank.")
+        app_id = sam_expect(app_id, logical_id, "ApplicationId").to_not_be_none()
 
         if isinstance(app_id, dict):
             raise InvalidResourceException(

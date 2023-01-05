@@ -19,13 +19,19 @@ integ-test:
 
 black:
 	black setup.py samtranslator/* tests/* integration/* bin/*.py
-	bin/json-format.py --write tests
+	bin/json-format.py --write tests integration
 	bin/yaml-format.py --write tests
+	bin/yaml-format.py --write integration --add-test-metadata
 
 black-check:
+	# Checking latest schema was generated (run `make schema` if this fails)
+	python samtranslator/schema/schema.py > .tmp_schema.json
+	diff -u samtranslator/schema/schema.json .tmp_schema.json
+	rm .tmp_schema.json
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
-	bin/json-format.py --check tests
+	bin/json-format.py --check tests integration
 	bin/yaml-format.py --check tests
+	bin/yaml-format.py --check integration --add-test-metadata
 
 lint:
 	# mypy performs type check
@@ -35,6 +41,9 @@ lint:
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
+
+schema:
+	python samtranslator/schema/schema.py > samtranslator/schema/schema.json
 
 # Command to run everytime you make changes to verify everything works
 dev: test

@@ -1,7 +1,8 @@
 import json
+from typing import Any, Dict, Optional
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import PropertyType, ResourceMacro
+from samtranslator.model import Property, PropertyType, ResourceMacro, Resource
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.types import is_str, is_type
@@ -26,6 +27,8 @@ class EventSource(ResourceMacro):
     # line to avoid any potential behavior change.
     # TODO: Make `EventSource` an abstract class and not giving `principal` initial value.
     principal: str = None  # type: ignore
+
+    Target: Optional[Dict[str, str]]
 
     def _generate_logical_id(self, prefix, suffix, resource_type):  # type: ignore[no-untyped-def]
         """Helper utility to generate a logicial ID for a new resource
@@ -88,6 +91,7 @@ class Schedule(EventSource):
         "Description": PropertyType(False, is_str()),
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "RetryPolicy": PropertyType(False, is_type(dict)),
+        "Target": Property(False, is_type(dict)),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
@@ -123,7 +127,7 @@ class Schedule(EventSource):
         role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
         resources.append(role)
 
-        source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
+        source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
@@ -141,9 +145,12 @@ class Schedule(EventSource):
         :returns: the Target property
         :rtype: dict
         """
+        target_id = (
+            self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "StepFunctionsTarget"
+        )
         target = {
             "Arn": resource.get_runtime_attr("arn"),
-            "Id": self.logical_id + "StepFunctionsTarget",
+            "Id": target_id,
             "RoleArn": role.get_runtime_attr("arn"),
         }
         if self.Input is not None:  # type: ignore[attr-defined]
@@ -172,6 +179,7 @@ class CloudWatchEvent(EventSource):
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "RetryPolicy": PropertyType(False, is_type(dict)),
         "State": PropertyType(False, is_str()),
+        "Target": Property(False, is_type(dict)),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
@@ -201,7 +209,7 @@ class CloudWatchEvent(EventSource):
         role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
         resources.append(role)
 
-        source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
+        source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
@@ -220,9 +228,12 @@ class CloudWatchEvent(EventSource):
         :returns: the Target property
         :rtype: dict
         """
+        target_id = (
+            self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "StepFunctionsTarget"
+        )
         target = {
             "Arn": resource.get_runtime_attr("arn"),
-            "Id": self.logical_id + "StepFunctionsTarget",
+            "Id": target_id,
             "RoleArn": role.get_runtime_attr("arn"),
         }
         if self.Input is not None:  # type: ignore[attr-defined]
@@ -258,7 +269,10 @@ class Api(EventSource):
         "RestApiId": PropertyType(True, is_str()),
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
+        "UnescapeMappingTemplate": Property(False, is_type(bool)),
     }
+
+    UnescapeMappingTemplate: Optional[bool]
 
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
         """
@@ -346,9 +360,9 @@ class Api(EventSource):
 
         integration_uri = fnSub("arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution")
 
-        editor = SwaggerEditor(swagger_body)  # type: ignore[no-untyped-call]
+        editor = SwaggerEditor(swagger_body)
 
-        if editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined, no-untyped-call]
+        if editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined]
             # Cannot add the integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
@@ -361,12 +375,18 @@ class Api(EventSource):
         if CONDITION in resource.resource_attributes:
             condition = resource.resource_attributes[CONDITION]
 
+        request_template = (
+            self._generate_request_template_unescaped(resource)
+            if self.UnescapeMappingTemplate
+            else self._generate_request_template(resource)
+        )
+
         editor.add_state_machine_integration(  # type: ignore[no-untyped-call]
             self.Path,  # type: ignore[attr-defined]
             self.Method,
             integration_uri,
             role.get_runtime_attr("arn"),
-            self._generate_request_template(resource),  # type: ignore[no-untyped-call]
+            request_template,
             condition=condition,
         )
 
@@ -437,7 +457,7 @@ class Api(EventSource):
 
         api["DefinitionBody"] = editor.swagger
 
-    def _generate_request_template(self, resource):  # type: ignore[no-untyped-def]
+    def _generate_request_template(self, resource: Resource) -> Dict[str, Any]:
         """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
 
@@ -455,6 +475,30 @@ class Api(EventSource):
                         "stateMachineArn": "${" + resource.logical_id + "}",
                     }
                 )
+            )
+        }
+        return request_templates
+
+    def _generate_request_template_unescaped(self, resource: Resource) -> Dict[str, Any]:
+        """Generates the Body mapping request template for the Api. This allows for the input
+        request to the Api to be passed as the execution input to the associated state machine resource.
+
+        Unescapes single quotes such that it's valid JSON.
+
+        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine
+                resource to which the Api event source must be associated
+
+        :returns: a body mapping request which passes the Api input to the state machine execution
+        :rtype: dict
+        """
+        request_templates = {
+            "application/json": fnSub(
+                # Need to unescape single quotes escaped by escapeJavaScript.
+                # Also the mapping template isn't valid JSON, so can't use json.dumps().
+                # See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#util-template-reference
+                """{"input": "$util.escapeJavaScript($input.json('$')).replaceAll("\\\\'","'")", "stateMachineArn": "${"""
+                + resource.logical_id
+                + """}"}"""
             )
         }
         return request_templates

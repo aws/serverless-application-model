@@ -143,6 +143,11 @@ To disable this feature, run the following command instead.
 python3 bin/add_transform_test.py --template-file template.yaml --disable-api-configuration
 ```
 
+The script automatically updates hardcoded ARN partitions to match the output partition. To disable this, use:
+```bash
+python3 bin/add_transform_test.py --template-file template.yaml --disable-update-partition
+```
+
 Note that please always check the generated output is as expected. This tool does not guarantee correct output.
 
 
@@ -152,7 +157,7 @@ Integration tests are covered in detail in the [INTEGRATION_TESTS.md file](INTEG
 
 ## Development guidelines
 
-1. **Do not resolve [intrinsic functions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html).** Adding [`AWS::LanguageExtensions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-languageextension-transform.html) before the `AWS::Serverless-2016-10-31` transform resolves most of them. See https://github.com/aws/serverless-application-model/issues/2533.
+1. **Do not resolve [intrinsic functions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html).** Adding [`AWS::LanguageExtensions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-languageextension-transform.html) before the `AWS::Serverless-2016-10-31` transform resolves most of them (see https://github.com/aws/serverless-application-model/issues/2533). For new properties, use [`Property`](https://github.com/aws/serverless-application-model/blob/c5830b63857f52e540fec13b29f029458edc539a/samtranslator/model/__init__.py#L36-L45) or [`PassThroughProperty`](https://github.com/aws/serverless-application-model/blob/dd79f535500158baa8e367f081d6a12113497e45/samtranslator/model/__init__.py#L48-L56) instead of [`PropertyType`](https://github.com/aws/serverless-application-model/blob/c39c2807bbf327255de8abed8b8150b18c60f053/samtranslator/model/__init__.py#L13-L33).
 2. **Do not break backward compatibility.** As rule of thumb, a specific SAM template should always transform into the same CloudFormation template. Do not change logical IDs. Add opt-in properties for breaking changes. There are some exceptions, such as changes that do not impact resources (e.g. [`Metadata`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)) or abstractions that can by design change over time.
 3. **Stick as close as possible to the underlying CloudFormation properties.** This includes both property names and values. This ensures we can pass values to CloudFormation and let it handle any intrinsic functions. In some cases, it also allows us to pass all properties as-is to a resource, which means customers can always use the newest properties, and we don’t spend effort maintaining a duplicate set of properties.
 4. **Only validate what’s necessary.** Do not validate properties if they’re passed directly to the underlying CloudFormation resource.
@@ -183,6 +188,22 @@ conventions are best practices that we have learnt over time.
 -   Do not catch the broader `Exception`, unless you have a really
     strong reason to do. You must explain the reason in great detail in
     comments.
+
+## Making schema changes
+
+The AWS SAM specification includes a JSON schema (see https://github.com/aws/serverless-application-model/discussions/2645). All test templates must validate against it.
+
+To add new properties, do the following:
+
+1. Add the property to the relevant resource schema under [`samtranslator/schema`](https://github.com/aws/serverless-application-model/tree/develop/samtranslator/schema) (e.g. [`samtranslator/schema/aws_serverless_function.py`](https://github.com/aws/serverless-application-model/blob/develop/samtranslator/schema/aws_serverless_function.py) for `AWS::Serverless::Function`).
+2. You can leave out the assignement part; it adds documentation to the schema properties. The team will take care of documentation updates. Typically we update documentation by running:
+
+    ```bash
+    git clone https://github.com/awsdocs/aws-sam-developer-guide.git
+    bin/parse_docs.py aws-sam-developer-guide/doc_source > samtranslator/schema/docs.json
+    ```
+
+3. Run `make schema`.
 
 Profiling
 ---------

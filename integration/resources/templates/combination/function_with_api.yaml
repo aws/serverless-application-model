@@ -4,7 +4,7 @@ Resources:
   ExistingRestApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: "Dev"
+      StageName: Dev
       DefinitionUri: ${definitionuri}
 
   MyLambdaFunction:
@@ -31,3 +31,5 @@ Resources:
             Method: post
             RestApiId:
               Ref: ExistingRestApi
+Metadata:
+  SamTransformTest: true

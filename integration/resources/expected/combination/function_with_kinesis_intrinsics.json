@@ -1,6 +1,18 @@
 [
-  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyStream", "ResourceType":"AWS::Kinesis::Stream" },
-  { "LogicalResourceId":"MyLambdaFunctionKinesisStream", "ResourceType":"AWS::Lambda::EventSourceMapping" }
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyStream",
+    "ResourceType": "AWS::Kinesis::Stream"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionKinesisStream",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  }
 ]

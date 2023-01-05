@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Parameters:
   MyDomainName:
     Type: String
@@ -41,6 +39,12 @@ Resources:
             RestApiId: !Ref MyApi
             Method: Post
             Path: /fetch
+        Fetch2:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiMissingCertificateArn
+            Method: Post
+            Path: /fetch
         ImplicitGet:
           Type: Api
           Properties:
@@ -57,3 +61,19 @@ Resources:
         CertificateArn: my-api-cert-arn
         EndpointConfiguration: Invalid
         BasePath: [/get, /fetch]
+
+  MyApiMissingCertificateArn:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: Prod
+      Domain:
+        DomainName: api-example.com
+        CertificateArn:
+
+  MyApiInvalidDomainType:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: Prod
+      Domain: !Ref MyDomainName  # this should be a map after solution

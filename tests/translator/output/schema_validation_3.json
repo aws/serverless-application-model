@@ -1,0 +1,25 @@
+{
+  "Resources": {
+    "UnknownType1": {
+      "Type": "AWS::Foo::Bar"
+    },
+    "UnknownType2": {
+      "Properties": {
+        "Turtle": "Train"
+      },
+      "Type": "AWS::Foo::Bar"
+    },
+    "UnknownType3": {
+      "Properties": {
+        "Turtle": "Train"
+      },
+      "Type": "Foo::Bar::Egg"
+    },
+    "UnknownType4": {
+      "Type": "Foo::Bar::Egg"
+    },
+    "UnknownType5": {
+      "Type": "Foo::Serverless::Egg"
+    }
+  }
+}

@@ -18,14 +18,14 @@ Resources:
           Properties:
             Method: Get
             Path: /get
-            ApiId: 
+            ApiId:
               Ref: MyApi
         ImplicitPost:
           Type: HttpApi
           Properties:
             Method: Post
             Path: /post
-            ApiId: 
+            ApiId:
               Ref: MyApi
   MyApi:
     Type: AWS::Serverless::HttpApi
@@ -36,4 +36,6 @@ Resources:
 Outputs:
   ApiId:
     Value:
-      Ref: MyApi  
+      Ref: MyApi
+Metadata:
+  SamTransformTest: true

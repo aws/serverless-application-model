@@ -12,7 +12,7 @@ Resources:
         GetApi:
           Type: HttpApi
           Properties:
-            ApiId: 
+            ApiId:
               Ref: MyApi
             Method: GET
             Path: /some/path
@@ -26,12 +26,14 @@ Resources:
           title:
             Ref: AWS::StackName
         paths:
-          "/some/path": {}
-          "/other": {}
+          /some/path: {}
+          /other: {}
         openapi: 3.0.1
 
 Outputs:
   ApiUrl:
-    Description: "API endpoint URL for Prod environment"
+    Description: API endpoint URL for Prod environment
     Value:
-      Fn::Sub: "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"
+      Fn::Sub: https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/
+Metadata:
+  SamTransformTest: true

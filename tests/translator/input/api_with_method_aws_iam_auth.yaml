@@ -1,5 +1,3 @@
-%YAML 1.1
----
 Resources:
   MyApiWithoutAuth:
     Type: AWS::Serverless::Api
@@ -29,7 +27,7 @@ Resources:
             Method: post
             Auth:
               Authorizer: AWS_IAM
-              InvokeRole: rn:aws:iam::123:role/AUTH_AWS_IAM
+              InvokeRole: !Sub arn:${AWS::Partition}:iam::123:role/AUTH_AWS_IAM
         MyApiWithAwsIamAuthAndDefaultInvokeRole:
           Type: Api
           Properties:
@@ -47,21 +45,21 @@ Resources:
             Method: any
             Auth:
               Authorizer: AWS_IAM
-          MyApiWithAwsIamAuthAndCustomInvokeRoleAnyMethod:
-            Type: Api
-            Properties:
-              RestApiId: !Ref MyApiWithoutAuth
-              Path: /any/two
-              Method: any
-              Auth:
-                Authorizer: AWS_IAM
-                InvokeRole: rn:aws:iam::123:role/AUTH_AWS_IAM
-          MyApiWithAwsIamAuthAndDefaultInvokeRoleAnyMethod:
-            Type: Api
-            Properties:
-              RestApiId: !Ref MyApiWithoutAuth
-              Path: /any/three
-              Method: any
-              Auth:
-                Authorizer: AWS_IAM
-                InvokeRole: CALLER_CREDENTIALS
+        MyApiWithAwsIamAuthAndCustomInvokeRoleAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithoutAuth
+            Path: /any/two
+            Method: any
+            Auth:
+              Authorizer: AWS_IAM
+              InvokeRole: !Sub arn:${AWS::Partition}:iam::123:role/AUTH_AWS_IAM
+        MyApiWithAwsIamAuthAndDefaultInvokeRoleAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithoutAuth
+            Path: /any/three
+            Method: any
+            Auth:
+              Authorizer: AWS_IAM
+              InvokeRole: CALLER_CREDENTIALS

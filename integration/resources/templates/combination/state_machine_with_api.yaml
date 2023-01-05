@@ -4,7 +4,7 @@ Resources:
   ExistingRestApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: "Dev"
+      StageName: Dev
 
   MyStateMachine:
     Type: AWS::Serverless::StateMachine
@@ -22,11 +22,11 @@ Resources:
             Result: World
             End: true
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Deny
-              Action: "*"
-              Resource: "*"
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
 
       Events:
         GetApi:
@@ -45,30 +45,32 @@ Resources:
 
 Outputs:
   Region:
-    Description: "Region"
+    Description: Region
     Value:
       Ref: AWS::Region
   Partition:
-    Description: "Partition"
+    Description: Partition
     Value:
       Ref: AWS::Partition
   MyStateMachineArn:
-    Description: "ARN of the State Machine"
+    Description: ARN of the State Machine
     Value:
       Ref: MyStateMachine
   MyImplicitApiRoleName:
-    Description: "Name of the role created for the implicit Api method"
+    Description: Name of the role created for the implicit Api method
     Value:
       Ref: MyStateMachinePostApiRole
   MyImplicitApiRoleArn:
-    Description: "ARN of the role created for the implicit Api method"
+    Description: ARN of the role created for the implicit Api method
     Value:
       Fn::GetAtt: MyStateMachinePostApiRole.Arn
   MyExplicitApiRoleName:
-    Description: "Name of the role created for the explicit Api method"
+    Description: Name of the role created for the explicit Api method
     Value:
       Ref: MyStateMachineGetApiRole
   MyExplicitApiRoleArn:
-    Description: "ARN of the role created for the explicit Api method"
+    Description: ARN of the role created for the explicit Api method
     Value:
       Fn::GetAtt: MyStateMachineGetApiRole.Arn
+Metadata:
+  SamTransformTest: true

@@ -1,6 +1,8 @@
 Resources:
-    MyLayerVersion:
-        Type: AWS::Serverless::LayerVersion
-        Properties:
-            ContentUri: ${contenturi}
-            RetentionPolicy: Delete
+  MyLayerVersion:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: ${contenturi}
+      RetentionPolicy: Delete
+Metadata:
+  SamTransformTest: true

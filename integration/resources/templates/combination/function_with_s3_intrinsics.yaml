@@ -1,8 +1,8 @@
 Conditions:
   MyCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   MyLambdaFunction:
@@ -22,15 +22,17 @@ Resources:
             Events: s3:ObjectCreated:*
             Filter:
               Fn::If:
-                - MyCondition
-                - S3Key:
-                    Rules:
-                      - Name: prefix
-                        Value: object_prefix
-                - S3Key:
-                    Rules:
-                      - Name: suffix
-                        Value: object_suffix
+              - MyCondition
+              - S3Key:
+                  Rules:
+                  - Name: prefix
+                    Value: object_prefix
+              - S3Key:
+                  Rules:
+                  - Name: suffix
+                    Value: object_suffix
 
   MyBucket:
     Type: AWS::S3::Bucket
+Metadata:
+  SamTransformTest: true

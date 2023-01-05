@@ -4,10 +4,7 @@ Resources:
     Properties:
       StageName: Prod
       DefinitionUri: ${definitionuri}
-      MethodSettings: [{
-        "LoggingLevel": "INFO",
-        "MetricsEnabled": True,
-        "DataTraceEnabled": True,
-        "ResourcePath": "/*",
-        "HttpMethod": "*"
-    }]
+      MethodSettings: [{LoggingLevel: INFO, MetricsEnabled: true, DataTraceEnabled: true,
+          ResourcePath: /*, HttpMethod: '*'}]
+Metadata:
+  SamTransformTest: true

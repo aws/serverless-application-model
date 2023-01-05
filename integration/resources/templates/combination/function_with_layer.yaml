@@ -1,12 +1,12 @@
 Conditions:
   TrueCondition:
     Fn::Equals:
-      - true
-      - true
+    - true
+    - true
   FalseCondition:
     Fn::Equals:
-      - true
-      - false
+    - true
+    - false
 
 Resources:
   MyLambdaFunctionWithLayer:
@@ -16,8 +16,7 @@ Resources:
       Runtime: nodejs14.x
       CodeUri: ${codeuri}
       Layers:
-        - 
-          Ref: MyLambdaLayer
+      - Ref: MyLambdaLayer
 
   MyLambdaLayer:
     Type: AWS::Serverless::LayerVersion
@@ -35,5 +34,7 @@ Resources:
 
 Outputs:
   MyLambdaLayerArn:
-    Value: 
+    Value:
       Ref: MyLambdaLayer
+Metadata:
+  SamTransformTest: true

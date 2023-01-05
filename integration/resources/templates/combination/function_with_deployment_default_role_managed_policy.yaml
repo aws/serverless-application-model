@@ -1,6 +1,6 @@
 Resources:
   MyLambdaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ${codeuri}
       Handler: index.handler
@@ -8,3 +8,5 @@ Resources:
       AutoPublishAlias: Live
       DeploymentPreference:
         Type: Canary10Percent5Minutes
+Metadata:
+  SamTransformTest: true

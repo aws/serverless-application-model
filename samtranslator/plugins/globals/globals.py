@@ -37,6 +37,7 @@ class Globals(object):
             "AutoPublishAlias",
             "Layers",
             "DeploymentPreference",
+            "RolePath",
             "PermissionsBoundary",
             "ReservedConcurrentExecutions",
             "ProvisionedConcurrencyConfig",
@@ -87,7 +88,7 @@ class Globals(object):
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {
-        SamResourceType.Function.value: ["SnapStart"],
+        SamResourceType.Function.value: [],
     }
 
     def __init__(self, template):  # type: ignore[no-untyped-def]
@@ -162,7 +163,7 @@ class Globals(object):
                     (cls._OPENAPIVERSION in properties)
                     and (cls._MANAGE_SWAGGER in properties)
                     and SwaggerEditor.safe_compare_regex_with_string(
-                        SwaggerEditor.get_openapi_version_3_regex(), properties[cls._OPENAPIVERSION]
+                        SwaggerEditor._OPENAPI_VERSION_3_REGEX, properties[cls._OPENAPIVERSION]
                     )
                 ):
                     if not isinstance(properties[cls._OPENAPIVERSION], str):

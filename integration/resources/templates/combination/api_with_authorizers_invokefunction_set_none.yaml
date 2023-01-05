@@ -62,7 +62,7 @@ Resources:
         MyApiWithNoAuth:
           Type: Api
           Properties:
-            RestApiId: 
+            RestApiId:
               Ref: MyApiWithAwsIamAuthNoCallerCredentials
             Path: /api/without-auth
             Method: get
@@ -70,7 +70,9 @@ Resources:
               Authorizer: NONE
 
 Outputs:
-    ApiUrl:
-      Description: "API endpoint URL for Prod environment"
-      Value:
-        Fn::Sub: 'https://${MyApiWithAwsIamAuthNoCallerCredentials}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+  ApiUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApiWithAwsIamAuthNoCallerCredentials}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/
+Metadata:
+  SamTransformTest: true

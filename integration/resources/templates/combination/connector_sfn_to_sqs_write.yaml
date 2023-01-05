@@ -12,10 +12,10 @@ Resources:
             Parameters:
               QueueUrl: !Ref MyQueue
               MessageBody: hello
-            End: True
+            End: true
       Policies:
-        - LambdaInvokePolicy:
-            FunctionName: "SomethingDoesNotMatter"
+      - LambdaInvokePolicy:
+          FunctionName: SomethingDoesNotMatter
 
   MyQueue:
     Type: AWS::SQS::Queue
@@ -28,4 +28,6 @@ Resources:
       Destination:
         Id: MyQueue
       Permissions:
-        - Write
+      - Write
+Metadata:
+  SamTransformTest: true
