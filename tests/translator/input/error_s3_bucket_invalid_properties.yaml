@@ -1,0 +1,49 @@
+Conditions:
+  Condition:
+    Fn::Equals:
+    - 1
+    - 1
+
+
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.generate_thumbails
+      Runtime: nodejs12.x
+      Events:
+        ImageBucket:
+          Type: S3
+          Properties:
+            Bucket: !Ref Bucket
+            Events: s3:ObjectCreated:*
+
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties: This should be a dict
+
+
+  Function2:
+    Condition: Condition
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.generate_thumbails
+      Runtime: nodejs12.x
+      Events:
+        ImageBucket:
+          Type: S3
+          Properties:
+            Bucket: !Ref Bucket2
+            Events: s3:ObjectCreated:*
+      Tags:
+        Key: Value
+
+  Bucket2:
+    Condition: Condition
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+        # This validation is triggered when the function has tags and condition
+        This: should be a list
