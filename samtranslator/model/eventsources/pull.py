@@ -32,11 +32,8 @@ class PullEventSource(ResourceMacro):
     # line to avoid any potential behavior change.
     # TODO: Make `PullEventSource` an abstract class and not giving `resource_type` initial value.
     resource_type: str = None  # type: ignore
-    requires_stream_queue_broker = True
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
-    property_types = {
-        "Stream": PropertyType(False, IS_STR),
-        "Queue": PropertyType(False, IS_STR),
+    property_types: Dict[str, PropertyType] = {
         "BatchSize": PropertyType(False, is_type(int)),
         "StartingPosition": PassThroughProperty(False),
         "StartingPositionTimestamp": PassThroughProperty(False),
@@ -48,7 +45,6 @@ class PullEventSource(ResourceMacro):
         "DestinationConfig": PropertyType(False, IS_DICT),
         "ParallelizationFactor": PropertyType(False, is_type(int)),
         "Topics": PropertyType(False, is_type(list)),
-        "Broker": PropertyType(False, IS_STR),
         "Queues": PropertyType(False, is_type(list)),
         "SourceAccessConfigurations": PropertyType(False, is_type(list)),
         "SecretsManagerKmsKeyId": PropertyType(False, IS_STR),
@@ -59,8 +55,6 @@ class PullEventSource(ResourceMacro):
         "ConsumerGroupId": PropertyType(False, IS_STR),
     }
 
-    Stream: Optional[Intrinsicable[str]]
-    Queue: Optional[Intrinsicable[str]]
     BatchSize: Optional[Intrinsicable[int]]
     StartingPosition: Optional[PassThrough]
     StartingPositionTimestamp: Optional[PassThrough]
@@ -72,7 +66,6 @@ class PullEventSource(ResourceMacro):
     DestinationConfig: Optional[Dict[str, Any]]
     ParallelizationFactor: Optional[Intrinsicable[int]]
     Topics: Optional[List[Any]]
-    Broker: Optional[Intrinsicable[str]]
     Queues: Optional[List[Any]]
     SourceAccessConfigurations: Optional[List[Any]]
     SecretsManagerKmsKeyId: Optional[str]
@@ -87,6 +80,9 @@ class PullEventSource(ResourceMacro):
 
     def get_policy_statements(self):  # type: ignore[no-untyped-def]
         raise NotImplementedError("Subclass must implement this method")
+
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return None
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -115,17 +111,8 @@ class PullEventSource(ResourceMacro):
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
-        if self.requires_stream_queue_broker and not self.Stream and not self.Queue and not self.Broker:
-            raise InvalidEventException(
-                self.relative_id,
-                "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided.",
-            )
-
-        if self.Stream and not self.StartingPosition:
-            raise InvalidEventException(self.relative_id, "StartingPosition is required for Kinesis, DynamoDB and MSK.")
-
         lambda_eventsourcemapping.FunctionName = function_name_or_arn
-        lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue or self.Broker
+        lambda_eventsourcemapping.EventSourceArn = self.get_event_source_arn()
         lambda_eventsourcemapping.StartingPosition = self.StartingPosition
         lambda_eventsourcemapping.StartingPositionTimestamp = self.StartingPositionTimestamp
         lambda_eventsourcemapping.BatchSize = self.BatchSize
@@ -250,6 +237,16 @@ class Kinesis(PullEventSource):
     """Kinesis event source."""
 
     resource_type = "Kinesis"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Stream": PassThroughProperty(True),
+        "StartingPosition": PassThroughProperty(True),
+    }
+
+    Stream: PassThrough
+
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Stream
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")
@@ -262,6 +259,16 @@ class DynamoDB(PullEventSource):
     """DynamoDB Streams event source."""
 
     resource_type = "DynamoDB"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Stream": PassThroughProperty(True),
+        "StartingPosition": PassThroughProperty(True),
+    }
+
+    Stream: PassThrough
+
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Stream
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")
@@ -274,6 +281,15 @@ class SQS(PullEventSource):
     """SQS Queue event source."""
 
     resource_type = "SQS"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Queue": PassThroughProperty(True),
+    }
+
+    Queue: PassThrough
+
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Queue
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")
@@ -286,6 +302,16 @@ class MSK(PullEventSource):
     """MSK event source."""
 
     resource_type = "MSK"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Stream": PassThroughProperty(True),
+        "StartingPosition": PassThroughProperty(True),
+    }
+
+    Stream: PassThrough
+
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Stream
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
@@ -319,6 +345,15 @@ class MQ(PullEventSource):
     """MQ event source."""
 
     resource_type = "MQ"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Broker": PassThroughProperty(True),
+    }
+
+    Broker: PassThrough
+
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Broker
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
         return None
@@ -404,7 +439,6 @@ class SelfManagedKafka(PullEventSource):
     """
 
     resource_type = "SelfManagedKafka"
-    requires_stream_queue_broker = False
     AUTH_MECHANISM = [
         "SASL_SCRAM_256_AUTH",
         "SASL_SCRAM_512_AUTH",
