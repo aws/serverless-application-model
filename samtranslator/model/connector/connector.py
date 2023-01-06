@@ -81,7 +81,7 @@ def get_event_source_mappings(event_source_id: str, function_id: str, resource_r
 def _is_valid_resource_reference(obj: Dict[str, Any]) -> bool:
     id_provided = "Id" in obj
     non_id_provided = len([k for k in obj.keys() if k not in ["Id", "Qualifier"]]) > 0
-    # Must provide either Id (with optional Qualifier), or a combination of other properties, but not both
+    # Must provide Id (with optional Qualifier) or a supported combination of other properties.
     return id_provided != non_id_provided
 
 
@@ -90,12 +90,12 @@ def get_resource_reference(
 ) -> ConnectorResourceReference:
     if not _is_valid_resource_reference(obj):
         raise ConnectorResourceError(
-            "Must provide either 'Id' (with optional 'Qualifier') or a combination of the other properties, not both."
+            "Must provide 'Id' (with optional 'Qualifier') or a supported combination of other properties."
         )
 
     logical_id = obj.get("Id")
 
-    # Must either provide Id (with optional Qualifier) or a combination of the other properties (not both).
+    # Must provide Id (with optional Qualifier) or a supported combination of other properties
     # If Id is not provided, all values must come from overrides.
     if not logical_id:
         resource_type = obj.get("Type")
