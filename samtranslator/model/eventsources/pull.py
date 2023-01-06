@@ -132,7 +132,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds
         lambda_eventsourcemapping.FunctionResponseTypes = self.FunctionResponseTypes
         lambda_eventsourcemapping.FilterCriteria = self.FilterCriteria
-        self._validate_filter_criteria()  # type: ignore[no-untyped-call]
+        self._validate_filter_criteria()
 
         if self.KafkaBootstrapServers:
             lambda_eventsourcemapping.SelfManagedEventSource = {
@@ -215,7 +215,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                 if not destination_config_policy.get("PolicyDocument") in [d["PolicyDocument"] for d in role.Policies]:
                     role.Policies.append(destination_config_policy)
 
-    def _validate_filter_criteria(self):  # type: ignore[no-untyped-def]
+    def _validate_filter_criteria(self) -> None:
         if not self.FilterCriteria or is_intrinsic(self.FilterCriteria):
             return
         if self.resource_type not in self.RESOURCE_TYPES_WITH_EVENT_FILTERING:
@@ -492,7 +492,7 @@ class SelfManagedKafka(PullEventSource):
             statements.append(secret_manager)
 
         if has_vpc_config:
-            vpc_permissions = self.get_vpc_permission()  # type: ignore[no-untyped-call]
+            vpc_permissions = self.get_vpc_permission()
             statements.append(vpc_permissions)
 
         if self.SecretsManagerKmsKeyId:
@@ -574,7 +574,7 @@ class SelfManagedKafka(PullEventSource):
             "Resource": authentication_uri,
         }
 
-    def get_vpc_permission(self):  # type: ignore[no-untyped-def]
+    def get_vpc_permission(self) -> Dict[str, Any]:
         return {
             "Action": [
                 "ec2:CreateNetworkInterface",

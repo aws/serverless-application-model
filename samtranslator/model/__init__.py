@@ -1,7 +1,7 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
 import re
 import inspect
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
@@ -138,7 +138,7 @@ class Resource(object):
         return tuple(cls._supported_resource_attributes)
 
     @classmethod
-    def get_pass_through_attributes(cls):  # type: ignore[no-untyped-def]
+    def get_pass_through_attributes(cls) -> Tuple[str, ...]:
         """
         A getter method for the resource attributes to be passed to auto-generated resources
         returns: a tuple that contains the name of all pass through attributes
@@ -254,11 +254,11 @@ class Resource(object):
         """
         self.validate_properties()
 
-        resource_dict = self._generate_resource_dict()  # type: ignore[no-untyped-call]
+        resource_dict = self._generate_resource_dict()
 
         return {self.logical_id: resource_dict}
 
-    def _generate_resource_dict(self):  # type: ignore[no-untyped-def]
+    def _generate_resource_dict(self) -> Dict[str, Any]:
         """Generates the resource dict for this Resource, the value associated with the logical id in a CloudFormation
         template's Resources section.
 
@@ -383,7 +383,7 @@ class Resource(object):
         :return: Dictionary of resource attributes.
         """
         attributes = {}
-        for resource_attribute in self.get_pass_through_attributes():  # type: ignore[no-untyped-call]
+        for resource_attribute in self.get_pass_through_attributes():
             if resource_attribute in self.resource_attributes:
                 attributes[resource_attribute] = self.resource_attributes.get(resource_attribute)
         return attributes

@@ -34,11 +34,11 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         """
         super(ImplicitHttpApiPlugin, self).__init__(ImplicitHttpApiPlugin.__name__)
 
-    def _setup_api_properties(self):  # type: ignore[no-untyped-def]
+    def _setup_api_properties(self) -> None:
         """
         Sets up properties that are distinct to this plugin
         """
-        self.implicit_api_logical_id = GeneratedLogicalId.implicit_http_api()  # type: ignore[no-untyped-call]
+        self.implicit_api_logical_id = GeneratedLogicalId.implicit_http_api()
         self.implicit_api_condition = "ServerlessHttpApiCondition"
         self.api_event_type = "HttpApi"
         self.api_type = SamResourceType.HttpApi.value

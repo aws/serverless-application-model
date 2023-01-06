@@ -4,18 +4,16 @@ from parameterized import parameterized, param
 from samtranslator.feature_toggle.dialup import *
 
 
-class TestBaseDialup(TestCase):
-    def test___str__(self):
-        region_config = {}
-        dialup = BaseDialup(region_config)
-        self.assertEqual(str(dialup), "BaseDialup")
-
-
 class TestDisabledDialup(TestCase):
     def test_is_enabled(self):
         region_config = {}
         dialup = DisabledDialup(region_config)
         self.assertFalse(dialup.is_enabled())
+
+    def test___str__(self):
+        region_config = {}
+        dialup = DisabledDialup(region_config)
+        self.assertEqual(str(dialup), "DisabledDialup")
 
 
 class TestToggleDialUp(TestCase):
@@ -29,6 +27,10 @@ class TestToggleDialUp(TestCase):
     def test_is_enabled(self, region_config, expected):
         dialup = ToggleDialup(region_config)
         self.assertEqual(dialup.is_enabled(), expected)
+
+    def test___str__(self):
+        dialup = ToggleDialup({})
+        self.assertEqual(str(dialup), "ToggleDialup")
 
 
 class TestSimpleAccountPercentileDialup(TestCase):
@@ -63,3 +65,11 @@ class TestSimpleAccountPercentileDialup(TestCase):
             feature_name=feature_name,
         )
         self.assertTrue(0 <= dialup._get_account_percentile() < 100)
+
+    def test___str__(self):
+        dialup = SimpleAccountPercentileDialup(
+            region_config={},
+            account_id="123456789012",
+            feature_name="feat",
+        )
+        self.assertEqual(str(dialup), "SimpleAccountPercentileDialup")

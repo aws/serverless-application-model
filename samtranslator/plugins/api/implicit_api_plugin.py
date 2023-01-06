@@ -1,5 +1,6 @@
 import copy
 
+from abc import ABCMeta
 from typing import Any, Dict, Optional, Type, Union
 
 from samtranslator.metrics.method_decorator import cw_timer
@@ -14,7 +15,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.utils.py27hash_fix import Py27Dict
 
 
-class ImplicitApiPlugin(BasePlugin):
+class ImplicitApiPlugin(BasePlugin, metaclass=ABCMeta):
     """
     This plugin provides Implicit API shorthand syntax in the SAM Spec.
     https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -83,7 +84,7 @@ class ImplicitApiPlugin(BasePlugin):
         # removing the "ServerlessRestApi" resource, we just restore what the author defined.
         self.existing_implicit_api_resource = copy.deepcopy(template.get(self.implicit_api_logical_id))
 
-        template.set(self.implicit_api_logical_id, self._generate_implicit_api_resource())  # type: ignore[no-untyped-call]
+        template.set(self.implicit_api_logical_id, self._generate_implicit_api_resource())
 
         errors = []
         for logicalId, resource in template.iterate(
@@ -200,7 +201,7 @@ class ImplicitApiPlugin(BasePlugin):
         if isinstance(api_id, dict) or is_referencing_http_from_api_event:
             raise InvalidEventException(
                 event_id,
-                f"{self.api_id_property} must be a valid reference to an '{self._get_api_resource_type_name()}'"  # type: ignore[no-untyped-call]
+                f"{self.api_id_property} must be a valid reference to an '{self._get_api_resource_type_name()}'"
                 " resource in same template.",
             )
 
@@ -441,18 +442,12 @@ class ImplicitApiPlugin(BasePlugin):
             else:
                 template.delete(self.implicit_api_logical_id)
 
-    def _generate_implicit_api_resource(self):  # type: ignore[no-untyped-def]
+    def _generate_implicit_api_resource(self) -> Dict[str, Any]:
         """
         Helper function implemented by child classes that create a new implicit API resource
         """
-        raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
-        )
 
-    def _get_api_resource_type_name(self):  # type: ignore[no-untyped-def]
+    def _get_api_resource_type_name(self) -> str:
         """
         Returns the type of API resource
         """
-        raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
-        )

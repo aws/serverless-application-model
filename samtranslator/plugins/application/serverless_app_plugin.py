@@ -1,4 +1,4 @@
-from typing import Any, Tuple
+from typing import Any, Dict, Tuple
 
 import boto3
 import json
@@ -73,7 +73,7 @@ class ServerlessAppPlugin(BasePlugin):
         # make sure the flag combination makes sense
         if self._validate_only is True and self._wait_for_template_active_status is True:
             message = "Cannot set both validate_only and wait_for_template_active_status flags to True."
-            raise InvalidPluginException(ServerlessAppPlugin.__name__, message)  # type: ignore[no-untyped-call]
+            raise InvalidPluginException(ServerlessAppPlugin.__name__, message)
 
     @staticmethod
     def _make_app_key(app_id: Any, semver: Any) -> Tuple[str, str]:
@@ -148,7 +148,7 @@ class ServerlessAppPlugin(BasePlugin):
                 error_code = e.response["Error"]["Code"]
                 if error_code == "TooManyRequestsException":
                     LOG.debug("SAR call timed out for application id {}".format(app_id))
-                    sleep_time = self._get_sleep_time_sec()  # type: ignore[no-untyped-call]
+                    sleep_time = self._get_sleep_time_sec()
                     sleep(sleep_time)
                     self._total_wait_time += sleep_time
                     continue
@@ -350,7 +350,7 @@ class ServerlessAppPlugin(BasePlugin):
                         break  # We were throttled by SAR, break out to a sleep
                     raise e
 
-                if self._is_template_active(response, application_id, template_id):  # type: ignore[no-untyped-call]
+                if self._is_template_active(response, application_id, template_id):
                     self._in_progress_templates.remove((application_id, template_id))
                 else:
                     idx += 1  # check next template
@@ -362,7 +362,7 @@ class ServerlessAppPlugin(BasePlugin):
                 break
 
             # Sleep a little so we don't spam service calls
-            sleep_time = self._get_sleep_time_sec()  # type: ignore[no-untyped-call]
+            sleep_time = self._get_sleep_time_sec()
             sleep(sleep_time)
             self._total_wait_time += sleep_time
 
@@ -373,10 +373,10 @@ class ServerlessAppPlugin(BasePlugin):
                 application_ids, "Timed out waiting for nested stack templates to reach ACTIVE status."
             )
 
-    def _get_sleep_time_sec(self):  # type: ignore[no-untyped-def]
+    def _get_sleep_time_sec(self) -> int:
         return self.SLEEP_TIME_SECONDS
 
-    def _is_template_active(self, response, application_id, template_id):  # type: ignore[no-untyped-def]
+    def _is_template_active(self, response: Dict[str, Any], application_id: str, template_id: str) -> bool:
         """
         Checks the response from a SAR service call; returns True if the template is active,
         throws an exception if the request expired and returns False in all other cases.
@@ -385,10 +385,13 @@ class ServerlessAppPlugin(BasePlugin):
         :param string application_id: the ApplicationId
         :param string template_id: the unique TemplateId for this application
         """
-        status = response["Status"]  # options: PREPARING, EXPIRED or ACTIVE
+        status: str = response["Status"]  # options: PREPARING, EXPIRED or ACTIVE
 
         if status == "EXPIRED":
-            message = f"Template for {application_id} with id {template_id} returned status: {status}. Cannot access an expired template."
+            message = (
+                f"Template for {application_id} with id {template_id} returned status: {status}. "
+                "Cannot access an expired template."
+            )
             raise InvalidResourceException(application_id, message)
 
         return status == "ACTIVE"
