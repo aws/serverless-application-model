@@ -4,10 +4,9 @@
 import ctypes
 import copy
 import json
-import sys
 import logging
 
-from typing import Any, Dict, List
+from typing import Any, Dict, Iterator, List, cast
 
 from samtranslator.parser.parser import Parser
 from samtranslator.third_party.py27hash.hash import Hash
@@ -114,17 +113,13 @@ class Py27UniStr(unicode_string_type):
     def __add__(self, other):  # type: ignore[no-untyped-def]
         return Py27UniStr(super(Py27UniStr, self).__add__(other))
 
-    def __repr__(self):  # type: ignore[no-untyped-def]
-        if sys.version_info.major >= 3:
-            return "u" + super(Py27UniStr, self).encode("unicode_escape").decode("ascii").__repr__().replace(
-                "\\\\", "\\"
-            )
-        return super(Py27UniStr, self).__repr__()
+    def __repr__(self) -> str:
+        return "u" + super(Py27UniStr, self).encode("unicode_escape").decode("ascii").__repr__().replace("\\\\", "\\")
 
-    def upper(self):  # type: ignore[no-untyped-def]
+    def upper(self) -> "Py27UniStr":
         return Py27UniStr(super(Py27UniStr, self).upper())
 
-    def lower(self):  # type: ignore[no-untyped-def]
+    def lower(self) -> "Py27UniStr":
         return Py27UniStr(super(Py27UniStr, self).lower())
 
     def replace(self, __old, __new, __count=None):  # type: ignore[no-untyped-def]
@@ -153,8 +148,8 @@ class Py27LongInt(long_int_type):
 
     PY2_MAX_INT = 9223372036854775807  # sys.maxint from Python2.7 Lambda runtime
 
-    def __repr__(self):  # type: ignore[no-untyped-def]
-        if sys.version_info.major >= 3 and self > Py27LongInt.PY2_MAX_INT:
+    def __repr__(self) -> str:
+        if self > Py27LongInt.PY2_MAX_INT:
             return super(Py27LongInt, self).__repr__() + "L"
         return super(Py27LongInt, self).__repr__()
 
@@ -171,12 +166,14 @@ class Py27Keys(object):
     in determining the iteration order.
     """
 
-    DUMMY = ["dummy"]  # marker for deleted keys
+    # marker for deleted keys
+    # we use DUMMY for a dummy key, force it to be treated as a str to avoid mypy unhappy
+    DUMMY: str = cast(str, ["dummy"])
 
     def __init__(self) -> None:
         super(Py27Keys, self).__init__()
         self.debug = False
-        self.keyorder: Dict[int, List[str]] = {}
+        self.keyorder: Dict[int, str] = {}
         self.size = 0  # current size of the keys, equivalent to ma_used in dictobject.c
         self.fill = 0  # increment count when a key is added, equivalent to ma_fill in dictobject.c
         self.mask = MINSIZE - 1  # Python2 default dict size
@@ -185,7 +182,7 @@ class Py27Keys(object):
         # add keys in the py2 order -- we can't do a straigh-up deep copy of keyorder because
         # in py2 copy.deepcopy of a dict may result in reordering of the keys
         ret = Py27Keys()
-        for k in self.keys():  # type: ignore[no-untyped-call]
+        for k in self.keys():
             if k is self.DUMMY:
                 continue
             ret.add(copy.deepcopy(k, memo))  # type: ignore[no-untyped-call]
@@ -273,7 +270,7 @@ class Py27Keys(object):
             # Python2 dict increases size by a factor of 4 for small dict, and 2 for large dict
             self._resize(self.size * (2 if self.size > 50000 else 4))  # type: ignore[no-untyped-call]
 
-    def keys(self):  # type: ignore[no-untyped-def]
+    def keys(self) -> List[str]:
         """Return keys in Python2 order"""
         return [self.keyorder[key] for key in sorted(self.keyorder.keys()) if self.keyorder[key] is not self.DUMMY]
 
@@ -284,7 +281,7 @@ class Py27Keys(object):
         :param state: input state
         """
         self.__dict__ = state
-        keys = self.keys()  # type: ignore[no-untyped-call]
+        keys = self.keys()
 
         # Clear keys and re-add to match deserialization logic
         self.__init__()  # type: ignore[misc]
@@ -294,21 +291,21 @@ class Py27Keys(object):
                 continue
             self.add(k)  # type: ignore[no-untyped-call]
 
-    def __iter__(self):  # type: ignore[no-untyped-def]
+    def __iter__(self) -> Iterator[str]:
         """
         Default iterator
         """
-        return iter(self.keys())  # type: ignore[no-untyped-call]
+        return iter(self.keys())
 
     def __eq__(self, other):  # type: ignore[no-untyped-def]
         if isinstance(other, Py27Keys):
-            return self.keys() == other.keys()  # type: ignore[no-untyped-call]
+            return self.keys() == other.keys()
         if isinstance(other, list):
-            return self.keys() == other  # type: ignore[no-untyped-call]
+            return self.keys() == other
         return False
 
-    def __len__(self):  # type: ignore[no-untyped-def]
-        return len(self.keys())  # type: ignore[no-untyped-call]
+    def __len__(self) -> int:
+        return len(self.keys())
 
     def merge(self, other):  # type: ignore[no-untyped-def]
         """
@@ -329,7 +326,7 @@ class Py27Keys(object):
         for k in other:
             self.add(k)  # type: ignore[no-untyped-call]
 
-    def copy(self):  # type: ignore[no-untyped-def]
+    def copy(self) -> "Py27Keys":
         """
         Makes a copy of self
         """
@@ -343,7 +340,7 @@ class Py27Keys(object):
         Pops the top element from the sorted keys if it exists. Returns None otherwise.
         """
         if self.keyorder:
-            value = self.keys()[0]  # type: ignore[no-untyped-call]
+            value = self.keys()[0]
             self.remove(value)  # type: ignore[no-untyped-call]
             return value
         return None
@@ -429,14 +426,14 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         for k, v in dict(**kwargs).items():
             self[k] = v
 
-    def clear(self):  # type: ignore[no-untyped-def]
+    def clear(self) -> None:
         """
         Clears the dict along with its backing Python2.7 keylist.
         """
         super(Py27Dict, self).clear()
         self.keylist = Py27Keys()
 
-    def copy(self):  # type: ignore[no-untyped-def]
+    def copy(self) -> "Py27Dict":
         """
         Copies the dict along with its backing Python2.7 keylist.
 
@@ -448,7 +445,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         new = Py27Dict()
 
         # First copy the keylist to the new object
-        new.keylist = self.keylist.copy()  # type: ignore[no-untyped-call]
+        new.keylist = self.keylist.copy()
 
         # Copy keys into backing dict
         for k, v in self.items():  # type: ignore[no-untyped-call]
@@ -494,7 +491,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
 
         return None
 
-    def __iter__(self):  # type: ignore[no-untyped-def]
+    def __iter__(self) -> Iterator[str]:
         """
         Default iterator
 
@@ -502,9 +499,9 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         -------
         iterator
         """
-        return self.keylist.__iter__()  # type: ignore[no-untyped-call]
+        return self.keylist.__iter__()
 
-    def __str__(self):  # type: ignore[no-untyped-def]
+    def __str__(self) -> str:
         """
         Override to minic exact Python2.7 str(dict_obj)
 
@@ -529,7 +526,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         string += "}"
         return string
 
-    def __repr__(self):  # type: ignore[no-untyped-def]
+    def __repr__(self) -> str:
         """
         Create a string version of this Dict
 
@@ -537,7 +534,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         -------
         str
         """
-        return self.__str__()  # type: ignore[no-untyped-call]
+        return self.__str__()
 
     def keys(self):  # type: ignore[no-untyped-def]
         """
@@ -548,7 +545,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         list
             list of keys
         """
-        return self.keylist.keys()  # type: ignore[no-untyped-call]
+        return self.keylist.keys()
 
     def values(self):  # type: ignore[no-untyped-def]
         """

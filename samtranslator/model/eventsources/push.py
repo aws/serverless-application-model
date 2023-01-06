@@ -19,6 +19,7 @@ from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.model.iot import IotTopicRule
 from samtranslator.model.cognito import CognitoUserPool
+from samtranslator.schema.common import PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException
@@ -111,6 +112,16 @@ class Schedule(PushEventSource):
         "RetryPolicy": PropertyType(False, IS_DICT),
     }
 
+    Schedule: PassThrough
+    RuleName: Optional[PassThrough]
+    Input: Optional[PassThrough]
+    Enabled: Optional[bool]
+    State: Optional[PassThrough]
+    Name: Optional[PassThrough]
+    Description: Optional[PassThrough]
+    DeadLetterConfig: Optional[Dict[str, Any]]
+    RetryPolicy: Optional[PassThrough]
+
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the EventBridge Rule and Lambda Permission to which this Schedule event source corresponds.
@@ -130,24 +141,24 @@ class Schedule(PushEventSource):
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         resources.append(events_rule)
 
-        events_rule.ScheduleExpression = self.Schedule  # type: ignore[attr-defined]
+        events_rule.ScheduleExpression = self.Schedule
 
-        if self.State and self.Enabled is not None:  # type: ignore[attr-defined, attr-defined]
+        if self.State and self.Enabled is not None:
             raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
 
-        if self.State:  # type: ignore[attr-defined]
-            events_rule.State = self.State  # type: ignore[attr-defined]
+        if self.State:
+            events_rule.State = self.State
 
-        if self.Enabled is not None:  # type: ignore[attr-defined]
-            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"  # type: ignore[attr-defined]
+        if self.Enabled is not None:
+            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
 
-        events_rule.Name = self.Name  # type: ignore[attr-defined]
-        events_rule.Description = self.Description  # type: ignore[attr-defined]
+        events_rule.Name = self.Name
+        events_rule.Description = self.Description
 
         source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
-        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
-            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[no-untyped-call]
             dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(  # type: ignore[no-untyped-call]
                 self, source_arn, passthrough_resource_attributes
             )
@@ -166,14 +177,14 @@ class Schedule(PushEventSource):
         :rtype: dict
         """
         target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
-        if self.Input is not None:  # type: ignore[attr-defined]
-            target["Input"] = self.Input  # type: ignore[attr-defined]
+        if self.Input is not None:
+            target["Input"] = self.Input
 
-        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
+        if self.DeadLetterConfig is not None:
             target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
 
-        if self.RetryPolicy is not None:  # type: ignore[attr-defined]
-            target["RetryPolicy"] = self.RetryPolicy  # type: ignore[attr-defined]
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
 
         return target
 

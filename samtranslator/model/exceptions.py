@@ -54,7 +54,7 @@ class DuplicateLogicalIdException(ExceptionWithMessage):
         self._type = type
 
     @property
-    def message(self):  # type: ignore[no-untyped-def]
+    def message(self) -> str:
         return (
             "Transforming resource with id [{logical_id}] attempts to create a new"
             ' resource with id [{duplicate_id}] and type "{type}". A resource with that id already'

@@ -4,6 +4,7 @@ from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import IS_DICT, is_type, one_of, IS_STR, list_of
 from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException
+from samtranslator.schema.common import PassThrough
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect
@@ -104,26 +105,26 @@ class ApiGatewayV2Authorizer(object):
         self.enable_simple_responses = enable_simple_responses
         self.is_aws_iam_authorizer = is_aws_iam_authorizer
 
-        self._validate_input_parameters()  # type: ignore[no-untyped-call]
+        self._validate_input_parameters()
 
-        authorizer_type = self._get_auth_type()  # type: ignore[no-untyped-call]
+        authorizer_type = self._get_auth_type()
 
         # Validate necessary parameters exist
         if authorizer_type == "JWT":
             self._validate_jwt_authorizer()
 
         if authorizer_type == "REQUEST":
-            self._validate_lambda_authorizer()  # type: ignore[no-untyped-call]
+            self._validate_lambda_authorizer()
 
-    def _get_auth_type(self):  # type: ignore[no-untyped-def]
+    def _get_auth_type(self) -> str:
         if self.is_aws_iam_authorizer:
             return "AWS_IAM"
         if self.jwt_configuration:
             return "JWT"
         return "REQUEST"
 
-    def _validate_input_parameters(self):  # type: ignore[no-untyped-def]
-        authorizer_type = self._get_auth_type()  # type: ignore[no-untyped-call]
+    def _validate_input_parameters(self) -> None:
+        authorizer_type = self._get_auth_type()
 
         if self.authorization_scopes is not None and not isinstance(self.authorization_scopes, list):
             raise InvalidResourceException(self.api_logical_id, "AuthorizationScopes must be a list.")
@@ -176,7 +177,7 @@ class ApiGatewayV2Authorizer(object):
                 self.api_logical_id, f"{self.name} OAuth2 Authorizer must define 'IdentitySource'."
             )
 
-    def _validate_lambda_authorizer(self):  # type: ignore[no-untyped-def]
+    def _validate_lambda_authorizer(self) -> None:
         if not self.function_arn:
             raise InvalidResourceException(
                 self.api_logical_id, f"{self.name} Lambda Authorizer must define 'FunctionArn'."
@@ -190,7 +191,7 @@ class ApiGatewayV2Authorizer(object):
         """
         Generates OAS for the securitySchemes section
         """
-        authorizer_type = self._get_auth_type()  # type: ignore[no-untyped-call]
+        authorizer_type = self._get_auth_type()
         openapi: Dict[str, Any]
 
         if authorizer_type == "AWS_IAM":
@@ -231,7 +232,7 @@ class ApiGatewayV2Authorizer(object):
             openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerUri"] = authorizer_uri
 
             # Set authorizerCredentials if present
-            function_invoke_role = self._get_function_invoke_role()  # type: ignore[no-untyped-call]
+            function_invoke_role = self._get_function_invoke_role()
             if function_invoke_role:
                 openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerCredentials"] = function_invoke_role
 
@@ -259,7 +260,7 @@ class ApiGatewayV2Authorizer(object):
             raise ValueError(f"Unexpected authorizer_type: {authorizer_type}")
         return openapi
 
-    def _get_function_invoke_role(self):  # type: ignore[no-untyped-def]
+    def _get_function_invoke_role(self) -> Optional[PassThrough]:
         if not self.function_invoke_role or self.function_invoke_role == "NONE":
             return None
 

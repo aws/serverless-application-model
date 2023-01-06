@@ -62,12 +62,8 @@ def deep_sort_lists(value):
     if isinstance(value, dict):
         return {k: deep_sort_lists(v) for k, v in value.items()}
     if isinstance(value, list):
-        if sys.version_info.major < 3:
-            # Py2 can sort lists with complex types like dictionaries
-            return sorted((deep_sort_lists(x) for x in value))
-        else:
-            # Py3 cannot sort lists with complex types. Hence a custom comparator function
-            return sorted((deep_sort_lists(x) for x in value), key=cmp_to_key(custom_list_data_comparator))
+        # Py3 cannot sort lists with complex types. Hence a custom comparator function
+        return sorted((deep_sort_lists(x) for x in value), key=cmp_to_key(custom_list_data_comparator))
     else:
         return value
 
