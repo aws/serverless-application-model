@@ -272,6 +272,10 @@ class Translator:
         return functions + statemachines + apis + others + connectors
 
 
+def make_error(msg: str) -> Exception:
+    return InvalidDocumentException([InvalidTemplateException(msg)])
+
+
 def add_embedded_connectors(sam_template: Dict[str, Any]) -> Any:
     resources = sam_template.get("Resources", {})
     connectors_list = []
@@ -280,12 +284,12 @@ def add_embedded_connectors(sam_template: Dict[str, Any]) -> Any:
     for source_logicalId, resource in resources.items():
         if "Connectors" in resource:
             if not isinstance(resource["Connectors"], dict):
-                raise InvalidDocumentException([InvalidTemplateException("'Connectors' must be a dict")])
+                raise make_error("'Connectors' must be a dict")
 
             # Go through each of the connectors that have been attached and create a Serverless Connector resource
             for connector_logicalId, connector_dict in resource["Connectors"].items():
                 if not isinstance(connector_dict, dict):
-                    raise InvalidResourceException(source_logicalId, "Invalid 'Connectors' type. Must be a dict.")
+                    raise make_error("Invalid 'Connectors' type. Must be a dict.")
 
                 data = get_generated_connector(source_logicalId, connector_logicalId, connector_dict)
                 # add to the list of generated connectors
@@ -297,8 +301,7 @@ def add_embedded_connectors(sam_template: Dict[str, Any]) -> Any:
     # go through the list of generated connectors and add it to resources dict
     for connector_logicalId, connector_dict in connectors_list:
         if connector_logicalId in resources:
-            raise InvalidResourceException(
-                connector_logicalId,
+            raise make_error(
                 f"A resource with the id {connector_logicalId} already exists in the "
                 f"resource. Please use a different id for that resource.",
             )
@@ -312,11 +315,15 @@ def get_generated_connector(
 ) -> Tuple[str, Dict[str, Any]]:
     connector = connector_dict
     connector["Type"] = "AWS::Serverless::Connector"
+
+    # No need to raise an error for this instance as the error will be caught by the parser
     if isinstance(connector["Properties"], dict):
         connector["Properties"]["Source"] = {"Id": source_logicalId}
 
-        # TODO: Fix the bug that doesn't allow id to be combined with any other ResourceReference property
         if "SourceReference" in connector["Properties"]:
+            if not isinstance(connector["Properties"]["SourceReference"], dict):
+                raise make_error(f"The SourceReference property for {connector_logicalId} must be a dict")
+
             connector["Properties"]["Source"].update(connector["Properties"]["SourceReference"])
             del connector["Properties"]["SourceReference"]
 
