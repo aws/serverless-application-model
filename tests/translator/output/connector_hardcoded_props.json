@@ -1,5 +1,41 @@
 {
   "Resources": {
+    "ApiV1ToLambdaWithIdWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "ApiV1ToLambdaWithId": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::ApiGateway::RestApi"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceQualifier": "Prod/GET/foobar",
+              "SourceResourceId": {
+                "Ref": "MyApiV1"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
     "ApiV1ToLambdaWriteLambdaPermission": {
       "Metadata": {
         "aws:sam:connectors": {
@@ -29,6 +65,42 @@
               "SourceQualifier": "Prod/GET/foobar",
               "SourceResourceId": {
                 "Ref": "MyApiV1"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "ApiV2ToLambdaWithIdWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "ApiV2ToLambdaWithId": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::ApiGatewayV2::Api"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceQualifier": "*",
+              "SourceResourceId": {
+                "Ref": "MyApiV2"
               }
             }
           ]
