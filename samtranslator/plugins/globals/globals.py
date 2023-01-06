@@ -475,5 +475,5 @@ class InvalidGlobalsSectionException(ExceptionWithMessage):
         self._message = message
 
     @property
-    def message(self):  # type: ignore[no-untyped-def]
+    def message(self) -> str:
         return "'{}' section is invalid. {}".format(self._logical_id, self._message)

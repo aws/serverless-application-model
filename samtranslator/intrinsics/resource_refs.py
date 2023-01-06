@@ -67,12 +67,12 @@ class SupportedResourceReferences(object):
         """
         return self._refs.get(logical_id, None)
 
-    def __len__(self):  # type: ignore[no-untyped-def]
+    def __len__(self) -> int:
         """
         To make len(this_object) work
         :return: Number of resource references available
         """
         return len(self._refs)
 
-    def __str__(self):  # type: ignore[no-untyped-def]
+    def __str__(self) -> str:
         return str(self._refs)
