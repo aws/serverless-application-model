@@ -313,7 +313,8 @@
               "Statement": [
                 {
                   "Action": [
-                    "states:StartExecution"
+                    "states:StartExecution",
+                    "states:StartSyncExecution"
                   ],
                   "Effect": "Allow",
                   "Resource": {
