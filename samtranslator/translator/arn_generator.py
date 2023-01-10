@@ -9,6 +9,29 @@ class NoRegionFound(Exception):
     pass
 
 
+@lru_cache(maxsize=1)  # Only need to cache one as once deployed, it is not gonna deal with another region.
+def _get_region_from_session() -> str:
+    return boto3.session.Session().region_name
+
+
+@lru_cache(maxsize=1)  # Only need to cache one as once deployed, it is not gonna deal with another region.
+def _region_to_partition(region: str) -> str:
+    # setting default partition to aws, this will be overwritten by checking the region below
+    partition = "aws"
+
+    region_string = region.lower()
+    if region_string.startswith("cn-"):
+        partition = "aws-cn"
+    elif region_string.startswith("us-iso-"):
+        partition = "aws-iso"
+    elif region_string.startswith("us-isob"):
+        partition = "aws-iso-b"
+    elif region_string.startswith("us-gov"):
+        partition = "aws-us-gov"
+
+    return partition
+
+
 class ArnGenerator(object):
     BOTO_SESSION_REGION_NAME = None
 
@@ -38,10 +61,6 @@ class ArnGenerator(object):
         return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)
 
     @classmethod
-    # Once the translator is initialized, the region doesn't change.
-    # After examining all the usage of get_partition_name(), the input region is either None or the current region.
-    # TODO: Make this function run during initialization.
-    @lru_cache(maxsize=2)
     def get_partition_name(cls, region: Optional[str] = None) -> str:
         """
         Gets the name of the partition given the region name. If region name is not provided, this method will
@@ -59,7 +78,7 @@ class ArnGenerator(object):
             # mechanism, starting from AWS_DEFAULT_REGION environment variable.
 
             if ArnGenerator.BOTO_SESSION_REGION_NAME is None:
-                region = boto3.session.Session().region_name
+                region = _get_region_from_session()
             else:
                 region = ArnGenerator.BOTO_SESSION_REGION_NAME  # type: ignore[unreachable]
 
@@ -69,17 +88,4 @@ class ArnGenerator(object):
         if region is None:
             raise NoRegionFound("AWS Region cannot be found")
 
-        # setting default partition to aws, this will be overwritten by checking the region below
-        partition = "aws"
-
-        region_string = region.lower()
-        if region_string.startswith("cn-"):
-            partition = "aws-cn"
-        elif region_string.startswith("us-iso-"):
-            partition = "aws-iso"
-        elif region_string.startswith("us-isob"):
-            partition = "aws-iso-b"
-        elif region_string.startswith("us-gov"):
-            partition = "aws-us-gov"
-
-        return partition
+        return _region_to_partition(region)

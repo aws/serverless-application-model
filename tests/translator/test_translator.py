@@ -268,10 +268,11 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
     )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success(self, testcase, partition_with_region):
+    @patch("samtranslator.translator.arn_generator._get_region_from_session")
+    def test_transform_success(self, testcase, partition_with_region, mock_get_region_from_session):
         partition = partition_with_region[0]
         region = partition_with_region[1]
+        mock_get_region_from_session.return_value = region
 
         manifest = self._read_input(testcase)
         expected = self._read_expected_output(testcase, partition)
@@ -338,10 +339,11 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
     )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success_openapi3(self, testcase, partition_with_region):
+    @patch("samtranslator.translator.arn_generator._get_region_from_session")
+    def test_transform_success_openapi3(self, testcase, partition_with_region, mock_get_region_from_session):
         partition = partition_with_region[0]
         region = partition_with_region[1]
+        mock_get_region_from_session.return_value = region
 
         manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
@@ -393,10 +395,11 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
     )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success_resource_policy(self, testcase, partition_with_region):
+    @patch("samtranslator.translator.arn_generator._get_region_from_session")
+    def test_transform_success_resource_policy(self, testcase, partition_with_region, mock_get_region_from_session):
         partition = partition_with_region[0]
         region = partition_with_region[1]
+        mock_get_region_from_session.return_value = region
 
         manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
@@ -441,8 +444,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
     )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success_no_side_effect(self, testcase, partition_with_region):
+    @patch("samtranslator.translator.arn_generator._get_region_from_session")
+    def test_transform_success_no_side_effect(self, testcase, partition_with_region, mock_get_region_from_session):
         """
         Tests that the transform does not leak/leave data in shared caches/lists between executions
         Performs the transform of the templates in a row without reinitialization
@@ -457,6 +460,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         """
         partition = partition_with_region[0]
         region = partition_with_region[1]
+        mock_get_region_from_session.return_value = region
 
         for template in testcase[1]:
             print(template, partition, region)
