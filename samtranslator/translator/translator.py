@@ -287,47 +287,47 @@ def add_embedded_connectors(sam_template: Dict[str, Any]) -> None:
     connectors = {}
 
     # Loop through the resources in the template and see if any connectors have been attached
-    for source_logicalId, resource in resources.items():
+    for source_logical_id, resource in resources.items():
         if "Connectors" in resource:
             if not isinstance(resource["Connectors"], dict):
                 raise_error("'Connectors' must be a dict")
 
             # Go through each of the connectors that have been attached and create a Serverless Connector resource
-            for connector_logicalId, connector_dict in resource["Connectors"].items():
+            for connector_logical_id, connector_dict in resource["Connectors"].items():
                 if not isinstance(connector_dict, dict):
-                    raise_error(f"Invalid resource type. '{connector_logicalId}' be a dict.")
+                    raise_error(f"Invalid resource type. '{connector_logical_id}' be a dict.")
 
                 # Make sure there are no other embedded connectors with the same logical id
-                if connector_logicalId in connectors:
+                if connector_logical_id in connectors:
                     raise_error(
-                        f"Another connector with the logical id {connector_logicalId} exists in the "
+                        f"Another connector with the logical id {connector_logical_id} exists in the "
                         f"template. Please rename either of them."
                     )
 
                 # mutates the connector_dict to make it a connector resource
-                get_generated_connector(source_logicalId, connector_logicalId, connector_dict)
-                connectors[connector_logicalId] = connector_dict
+                get_generated_connector(source_logical_id, connector_logical_id, connector_dict)
+                connectors[connector_logical_id] = connector_dict
 
             # delete connectors key, so it doesn't show up in the transformed template
             del resource["Connectors"]
 
     # go through the list of generated connectors and add it to resources dict
-    for connector_logicalId, connector_dict in connectors.items():
-        if connector_logicalId in resources:
+    for connector_logical_id, connector_dict in connectors.items():
+        if connector_logical_id in resources:
             raise_error(
-                f"The logical ID of the generated connector {connector_logicalId} has a conflict with "
-                f"{connector_logicalId} of type '{resources[connector_logicalId]['Type']}', "
+                f"The logical ID of the generated connector {connector_logical_id} has a conflict with "
+                f"{connector_logical_id} of type '{resources[connector_logical_id]['Type']}', "
                 f"please rename either of them "
             )
-        resources[connector_logicalId] = connector_dict
+        resources[connector_logical_id] = connector_dict
 
 
-def get_generated_connector(source_logical_id: str, connector_logicalId: str, connector: Dict[str, Any]) -> None:
+def get_generated_connector(source_logical_id: str, connector_logical_id: str, connector: Dict[str, Any]) -> None:
     """
     Adds the type, source id and any ResourceReference properties to the connector
 
     :param str source_logical_id: Logical id of the resource the connector is attached to
-    :param str connector_logicalId: Logical id of the connector
+    :param str connector_logical_id: Logical id of the connector
     :param dict connector: the properties of the connector including the Destination, Permissions and SourceReference [Optional]
     """
     connector_class = SamConnector(logical_id="SamConnector")
@@ -340,7 +340,7 @@ def get_generated_connector(source_logical_id: str, connector_logicalId: str, co
 
         if "SourceReference" in properties:
             if not isinstance(properties["SourceReference"], dict):
-                raise_error(f"The 'SourceReference' property for resource '{connector_logicalId}' must be a dict")
+                raise_error(f"The 'SourceReference' property for resource '{connector_logical_id}' must be a dict")
 
             properties["Source"].update(properties["SourceReference"])
             del properties["SourceReference"]
