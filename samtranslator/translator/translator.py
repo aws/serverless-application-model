@@ -32,6 +32,7 @@ from samtranslator.policy_template_processor.processor import PolicyTemplatesPro
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.eventsources.push import Api
+from samtranslator.model.sam_resources import SamConnector
 
 
 class Translator:
@@ -124,8 +125,7 @@ class Translator:
 
         self.sam_parser.parse(sam_template=sam_template, parameter_values=parameter_values, sam_plugins=sam_plugins)
 
-        updated_resources = add_embedded_connectors(sam_template=sam_template)
-        sam_template["Resources"].update(updated_resources)
+        add_embedded_connectors(sam_template=sam_template)
 
         template = copy.deepcopy(sam_template)
         macro_resolver = ResourceTypeResolver(sam_resources)
@@ -272,62 +272,78 @@ class Translator:
         return functions + statemachines + apis + others + connectors
 
 
-def make_error(msg: str) -> Exception:
-    return InvalidDocumentException([InvalidTemplateException(msg)])
+def raise_error(msg: str) -> None:
+    raise InvalidDocumentException([InvalidTemplateException(msg)])
 
 
-def add_embedded_connectors(sam_template: Dict[str, Any]) -> Any:
+def add_embedded_connectors(sam_template: Dict[str, Any]) -> None:
+    """
+    Loops through the SAM Template resources to find any connectors that have been attached to the resources.
+    Adds those attached connectors as Connector resources to the list of resources
+
+    :param dict sam_template: SAM template
+    """
     resources = sam_template.get("Resources", {})
-    connectors_list = []
+    connectors = {}
 
     # Loop through the resources in the template and see if any connectors have been attached
     for source_logicalId, resource in resources.items():
         if "Connectors" in resource:
             if not isinstance(resource["Connectors"], dict):
-                raise make_error("'Connectors' must be a dict")
+                raise_error("'Connectors' must be a dict")
 
             # Go through each of the connectors that have been attached and create a Serverless Connector resource
             for connector_logicalId, connector_dict in resource["Connectors"].items():
                 if not isinstance(connector_dict, dict):
-                    raise make_error("Invalid 'Connectors' type. Must be a dict.")
+                    raise_error(f"Invalid resource type. '{connector_logicalId}' be a dict.")
 
-                data = get_generated_connector(source_logicalId, connector_logicalId, connector_dict)
-                # add to the list of generated connectors
-                connectors_list.append(data)
+                # Make sure there are no other embedded connectors with the same logical id
+                if connector_logicalId in connectors:
+                    raise_error(
+                        f"Another connector with the logical id {connector_logicalId} exists in the "
+                        f"template. Please rename either of them."
+                    )
+
+                # mutates the connector_dict to make it a connector resource
+                get_generated_connector(source_logicalId, connector_logicalId, connector_dict)
+                connectors[connector_logicalId] = connector_dict
 
             # delete connectors key, so it doesn't show up in the transformed template
             del resource["Connectors"]
 
     # go through the list of generated connectors and add it to resources dict
-    for connector_logicalId, connector_dict in connectors_list:
+    for connector_logicalId, connector_dict in connectors.items():
         if connector_logicalId in resources:
-            raise make_error(
-                f"A resource with the id {connector_logicalId} already exists in the "
-                f"resource. Please use a different id for that resource.",
+            raise_error(
+                f"The logical ID of the generated connector {connector_logicalId} has a conflict with "
+                f"{connector_logicalId} of type '{resources[connector_logicalId]['Type']}', "
+                f"please rename either of them "
             )
         resources[connector_logicalId] = connector_dict
 
-    return resources
 
+def get_generated_connector(source_logical_id: str, connector_logicalId: str, connector: Dict[str, Any]) -> None:
+    """
+    Adds the type, source id and any ResourceReference properties to the connector
 
-def get_generated_connector(
-    source_logicalId: str, connector_logicalId: str, connector_dict: Dict[str, Any]
-) -> Tuple[str, Dict[str, Any]]:
-    connector = connector_dict
-    connector["Type"] = "AWS::Serverless::Connector"
+    :param str source_logical_id: Logical id of the resource the connector is attached to
+    :param str connector_logicalId: Logical id of the connector
+    :param dict connector: the properties of the connector including the Destination, Permissions and SourceReference [Optional]
+    """
+    connector_class = SamConnector(logical_id="SamConnector")
+    connector["Type"] = connector_class.resource_type
+    properties = connector["Properties"]
 
     # No need to raise an error for this instance as the error will be caught by the parser
-    if isinstance(connector["Properties"], dict):
-        connector["Properties"]["Source"] = {"Id": source_logicalId}
+    if isinstance(properties, dict):
+        properties["Source"] = {"Id": source_logical_id}
 
-        if "SourceReference" in connector["Properties"]:
-            if not isinstance(connector["Properties"]["SourceReference"], dict):
-                raise make_error(f"The SourceReference property for {connector_logicalId} must be a dict")
+        if "SourceReference" in properties:
+            if not isinstance(properties["SourceReference"], dict):
+                raise_error(f"The 'SourceReference' property for resource '{connector_logicalId}' must be a dict")
 
-            connector["Properties"]["Source"].update(connector["Properties"]["SourceReference"])
-            del connector["Properties"]["SourceReference"]
-
-    return connector_logicalId, connector
+            properties["Source"].update(properties["SourceReference"])
+            del properties["SourceReference"]
 
 
 def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:
