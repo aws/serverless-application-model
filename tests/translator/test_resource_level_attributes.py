@@ -64,10 +64,13 @@ class TestResourceLevelAttributes(AbstractTestTranslator):
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
     )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_with_additional_resource_level_attributes(self, testcase, partition_with_region):
+    @patch("samtranslator.translator.arn_generator._get_region_from_session")
+    def test_transform_with_additional_resource_level_attributes(
+        self, testcase, partition_with_region, mock_get_region_from_session
+    ):
         partition = partition_with_region[0]
         region = partition_with_region[1]
+        mock_get_region_from_session.return_value = region
 
         # add resource level attributes to input resources
         manifest = self._read_input(testcase)
