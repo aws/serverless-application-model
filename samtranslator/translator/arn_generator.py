@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import boto3
 
 from typing import Optional
@@ -36,6 +38,10 @@ class ArnGenerator(object):
         return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)
 
     @classmethod
+    # Once the translator is initialized, the region doesn't change.
+    # After examining all the usage of get_partition_name(), the input region is either None or the current region.
+    # TODO: Make this function run during initialization.
+    @lru_cache(maxsize=2)
     def get_partition_name(cls, region: Optional[str] = None) -> str:
         """
         Gets the name of the partition given the region name. If region name is not provided, this method will
