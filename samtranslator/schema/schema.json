@@ -487,7 +487,9 @@
           ]
         },
         "RolePath": {
-          "title": "Rolepath"
+          "title": "RolePath",
+          "description": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
+          "markdownDescription": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\."
         },
         "PermissionsBoundary": {
           "title": "PermissionsBoundary",
@@ -531,7 +533,9 @@
           "markdownDescription": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\."
         },
         "SnapStart": {
-          "title": "Snapstart"
+          "title": "SnapStart",
+          "description": "Create a snapshot of any new Lambda function version\\. A snapshot is a cached state of your initialized function, including all of its dependencies\\. The function is initialized just once and the cached state is reused for all future invocations, improving application performance by reducing the number of times your function must be initialized\\. To learn more, see [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/API_SnapStart.html) in the *AWS Lambda API Reference*\\.  \n*Type*: [SnapStart](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-snapstart.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SnapStart`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-snapstart) property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "Create a snapshot of any new Lambda function version\\. A snapshot is a cached state of your initialized function, including all of its dependencies\\. The function is initialized just once and the cached state is reused for all future invocations, improving application performance by reducing the number of times your function must be initialized\\. To learn more, see [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/API_SnapStart.html) in the *AWS Lambda API Reference*\\.  \n*Type*: [SnapStart](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-snapstart.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SnapStart`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-snapstart) property of an `AWS::Lambda::Function` resource\\."
         }
       },
       "additionalProperties": false
@@ -635,6 +639,8 @@
         },
         "Header": {
           "title": "Header",
+          "description": "Specify the header name for Authorization in the OpenApi definition\\.  \n*Type*: String  \n*Required*: No  \n*Default*: Authorization  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specify the header name for Authorization in the OpenApi definition\\.  \n*Type*: String  \n*Required*: No  \n*Default*: Authorization  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "string"
         }
       },
@@ -1199,7 +1205,9 @@
           "markdownDescription": "A list of the basepaths to configure with the Amazon API Gateway domain name\\.  \n*Type*: List  \n*Required*: No  \n*Default*: /  \n*AWS CloudFormation compatibility*: This property is similar to the [`BasePath`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-basepathmapping.html#cfn-apigateway-basepathmapping-basepath) property of an `AWS::ApiGateway::BasePathMapping` resource\\. AWS SAM creates multiple `AWS::ApiGateway::BasePathMapping` resources, one per `BasePath` specified in this property\\."
         },
         "NormalizeBasePath": {
-          "title": "Normalizebasepath",
+          "title": "NormalizeBasePath",
+          "description": "Indicates whether non\\-alphanumeric characters are allowed in basepaths defined by the `BasePath` property\\. When set to `True`, non\\-alphanumeric characters are removed from basepaths\\.  \nUse `NormalizeBasePath` with the `BasePath` property\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: True  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Indicates whether non\\-alphanumeric characters are allowed in basepaths defined by the `BasePath` property\\. When set to `True`, non\\-alphanumeric characters are removed from basepaths\\.  \nUse `NormalizeBasePath` with the `BasePath` property\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: True  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "type": "boolean"
         },
         "CertificateArn": {
@@ -2119,7 +2127,9 @@
           "markdownDescription": "The position in a stream from which to start reading\\.  \n+ `AT_TIMESTAMP` \u2013 Specify a time from which to start reading records\\.\n+ `LATEST` \u2013 Read only new records\\.\n+ `TRIM_HORIZON` \u2013 Process all available records\\.\n*Valid values*: `AT_TIMESTAMP` \\| `LATEST` \\| `TRIM_HORIZON`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\."
         },
         "StartingPositionTimestamp": {
-          "title": "Startingpositiontimestamp"
+          "title": "StartingPositionTimestamp",
+          "description": "The time from which to start reading, in Unix time seconds\\. Define `StartingPositionTimestamp` when `StartingPosition` is specified as `AT_TIMESTAMP`\\.  \n*Type*: Double  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPositionTimestamp`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingpositiontimestamp) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "The time from which to start reading, in Unix time seconds\\. Define `StartingPositionTimestamp` when `StartingPosition` is specified as `AT_TIMESTAMP`\\.  \n*Type*: Double  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPositionTimestamp`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingpositiontimestamp) property of an `AWS::Lambda::EventSourceMapping` resource\\."
         },
         "Stream": {
           "title": "Stream",
@@ -2224,7 +2234,9 @@
           "markdownDescription": "The position in a stream from which to start reading\\.  \n+ `AT_TIMESTAMP` \u2013 Specify a time from which to start reading records\\.\n+ `LATEST` \u2013 Read only new records\\.\n+ `TRIM_HORIZON` \u2013 Process all available records\\.\n*Valid values*: `AT_TIMESTAMP` \\| `LATEST` \\| `TRIM_HORIZON`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\."
         },
         "StartingPositionTimestamp": {
-          "title": "Startingpositiontimestamp"
+          "title": "StartingPositionTimestamp",
+          "description": "The time from which to start reading, in Unix time seconds\\. Define `StartingPositionTimestamp` when `StartingPosition` is specified as `AT_TIMESTAMP`\\.  \n*Type*: Double  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPositionTimestamp`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingpositiontimestamp) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "The time from which to start reading, in Unix time seconds\\. Define `StartingPositionTimestamp` when `StartingPosition` is specified as `AT_TIMESTAMP`\\.  \n*Type*: Double  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPositionTimestamp`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingpositiontimestamp) property of an `AWS::Lambda::EventSourceMapping` resource\\."
         },
         "Stream": {
           "title": "Stream",
@@ -2901,7 +2913,9 @@
           "markdownDescription": "A RetryPolicy object that includes information about the retry policy settings\\.  \n*Type*: [RetryPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-retrypolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RetryPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-retrypolicy) property of the `AWS::Scheduler::Schedule` `Target` data type\\."
         },
         "RoleArn": {
-          "title": "Rolearn"
+          "title": "RoleArn",
+          "description": "The ARN of the IAM role that EventBridge Scheduler will use for the target when the schedule is invoked\\.  \n*Type*: [RoleArn](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-rolearn)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RoleArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-rolearn) property of the `AWS::Scheduler::Schedule` `Target` data type\\.",
+          "markdownDescription": "The ARN of the IAM role that EventBridge Scheduler will use for the target when the schedule is invoked\\.  \n*Type*: [RoleArn](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-rolearn)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RoleArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-rolearn) property of the `AWS::Scheduler::Schedule` `Target` data type\\."
         },
         "ScheduleExpression": {
           "title": "ScheduleExpression",
@@ -3461,7 +3475,9 @@
           "markdownDescription": "The position in a stream from which to start reading\\.  \n+ `AT_TIMESTAMP` \u2013 Specify a time from which to start reading records\\.\n+ `LATEST` \u2013 Read only new records\\.\n+ `TRIM_HORIZON` \u2013 Process all available records\\.\n*Valid values*: `AT_TIMESTAMP` \\| `LATEST` \\| `TRIM_HORIZON`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\."
         },
         "StartingPositionTimestamp": {
-          "title": "Startingpositiontimestamp"
+          "title": "StartingPositionTimestamp",
+          "description": "The time from which to start reading, in Unix time seconds\\. Define `StartingPositionTimestamp` when `StartingPosition` is specified as `AT_TIMESTAMP`\\.  \n*Type*: Double  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPositionTimestamp`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingpositiontimestamp) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "The time from which to start reading, in Unix time seconds\\. Define `StartingPositionTimestamp` when `StartingPosition` is specified as `AT_TIMESTAMP`\\.  \n*Type*: Double  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPositionTimestamp`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingpositiontimestamp) property of an `AWS::Lambda::EventSourceMapping` resource\\."
         },
         "Stream": {
           "title": "Stream",
@@ -3938,7 +3954,9 @@
           "markdownDescription": "The deployment package type of the Lambda function\\. For more information, see [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) in the *AWS Lambda Developer Guide*\\.  \n**Notes**:  \n1\\. If this property is set to `Zip` \\(default\\), then either `CodeUri` or `InlineCode` applies, and `ImageUri` is ignored\\.  \n2\\. If this property is set to `Image`, then only `ImageUri` applies, and both `CodeUri` and `InlineCode` are ignored\\. The Amazon ECR repository required to store the functionsl container image can be auto created by the AWS SAM CLI\\. For more information, see [sam deploy](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html)\\.  \n*Valid values*: `Zip` or `Image`  \n*Type*: String  \n*Required*: No  \n*Default*: `Zip`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PackageType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-packagetype) property of an `AWS::Lambda::Function` resource\\."
         },
         "RolePath": {
-          "title": "Rolepath"
+          "title": "RolePath",
+          "description": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
+          "markdownDescription": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\."
         },
         "PermissionsBoundary": {
           "title": "PermissionsBoundary",
@@ -4000,7 +4018,9 @@
           "markdownDescription": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\."
         },
         "SnapStart": {
-          "title": "Snapstart"
+          "title": "SnapStart",
+          "description": "Create a snapshot of any new Lambda function version\\. A snapshot is a cached state of your initialized function, including all of its dependencies\\. The function is initialized just once and the cached state is reused for all future invocations, improving application performance by reducing the number of times your function must be initialized\\. To learn more, see [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/API_SnapStart.html) in the *AWS Lambda API Reference*\\.  \n*Type*: [SnapStart](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-snapstart.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SnapStart`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-snapstart) property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "Create a snapshot of any new Lambda function version\\. A snapshot is a cached state of your initialized function, including all of its dependencies\\. The function is initialized just once and the cached state is reused for all future invocations, improving application performance by reducing the number of times your function must be initialized\\. To learn more, see [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/API_SnapStart.html) in the *AWS Lambda API Reference*\\.  \n*Type*: [SnapStart](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-snapstart.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SnapStart`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-snapstart) property of an `AWS::Lambda::Function` resource\\."
         },
         "Tags": {
           "title": "Tags",
@@ -4336,7 +4356,9 @@
           "markdownDescription": "A `RetryPolicy` object that includes information about the retry policy settings\\.  \n*Type*: [RetryPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-retrypolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RetryPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-retrypolicy) property of the `AWS::Scheduler::Schedule` `Target` data type\\."
         },
         "RoleArn": {
-          "title": "Rolearn"
+          "title": "RoleArn",
+          "description": "The ARN of the IAM role that EventBridge Scheduler will use for the target when the schedule is invoked\\.  \n*Type*: [RoleArn](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-rolearn)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RoleArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-rolearn) property of the `AWS::Scheduler::Schedule` `Target` data type\\.",
+          "markdownDescription": "The ARN of the IAM role that EventBridge Scheduler will use for the target when the schedule is invoked\\.  \n*Type*: [RoleArn](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-rolearn)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RoleArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-rolearn) property of the `AWS::Scheduler::Schedule` `Target` data type\\."
         },
         "ScheduleExpression": {
           "title": "ScheduleExpression",

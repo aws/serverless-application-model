@@ -157,7 +157,7 @@ class KinesisEventProperties(BaseModel):
     MaximumRetryAttempts: Optional[PassThrough] = kinesiseventproperties("MaximumRetryAttempts")
     ParallelizationFactor: Optional[PassThrough] = kinesiseventproperties("ParallelizationFactor")
     StartingPosition: PassThrough = kinesiseventproperties("StartingPosition")
-    StartingPositionTimestamp: PassThrough  # TODO: add documentation
+    StartingPositionTimestamp: PassThrough = kinesiseventproperties("StartingPositionTimestamp")
     Stream: PassThrough = kinesiseventproperties("Stream")
     TumblingWindowInSeconds: Optional[PassThrough] = kinesiseventproperties("TumblingWindowInSeconds")
 
@@ -179,7 +179,7 @@ class DynamoDBEventProperties(BaseModel):
     MaximumRetryAttempts: Optional[PassThrough] = dynamodbeventproperties("MaximumRetryAttempts")
     ParallelizationFactor: Optional[PassThrough] = dynamodbeventproperties("ParallelizationFactor")
     StartingPosition: PassThrough = dynamodbeventproperties("StartingPosition")
-    StartingPositionTimestamp: PassThrough  # TODO: add documentation
+    StartingPositionTimestamp: PassThrough = dynamodbeventproperties("StartingPositionTimestamp")
     Stream: PassThrough = dynamodbeventproperties("Stream")
     TumblingWindowInSeconds: Optional[PassThrough] = dynamodbeventproperties("TumblingWindowInSeconds")
 
@@ -355,7 +355,7 @@ class MSKEventProperties(BaseModel):
     FilterCriteria: Optional[PassThrough] = mskeventproperties("FilterCriteria")
     MaximumBatchingWindowInSeconds: Optional[PassThrough] = mskeventproperties("MaximumBatchingWindowInSeconds")
     StartingPosition: PassThrough = mskeventproperties("StartingPosition")
-    StartingPositionTimestamp: PassThrough  # TODO: add documentation
+    StartingPositionTimestamp: PassThrough = mskeventproperties("StartingPositionTimestamp")
     Stream: PassThrough = mskeventproperties("Stream")
     Topics: PassThrough = mskeventproperties("Topics")
     SourceAccessConfigurations: Optional[PassThrough]  # TODO: update docs when live
@@ -411,7 +411,7 @@ class ScheduleV2EventProperties(BaseModel):
     Name: Optional[PassThrough] = schedulev2eventproperties("Name")
     PermissionsBoundary: Optional[PassThrough] = schedulev2eventproperties("PermissionsBoundary")
     RetryPolicy: Optional[PassThrough] = schedulev2eventproperties("RetryPolicy")
-    RoleArn: Optional[PassThrough]  # TODO: Add to docs
+    RoleArn: Optional[PassThrough] = schedulev2eventproperties("RoleArn")
     ScheduleExpression: Optional[PassThrough] = schedulev2eventproperties("ScheduleExpression")
     ScheduleExpressionTimezone: Optional[PassThrough] = schedulev2eventproperties("ScheduleExpressionTimezone")
     StartDate: Optional[PassThrough] = schedulev2eventproperties("StartDate")
@@ -437,7 +437,7 @@ Tracing = Optional[SamIntrinsicable[Literal["Active", "PassThrough"]]]
 KmsKeyArn = Optional[PassThrough]
 Layers = Optional[PassThrough]
 AutoPublishAlias = Optional[SamIntrinsicable[str]]
-RolePath = Optional[PassThrough]  # TODO: update docs when live
+RolePath = Optional[PassThrough]
 PermissionsBoundary = Optional[PassThrough]
 ReservedConcurrentExecutions = Optional[PassThrough]
 ProvisionedConcurrencyConfig = Optional[PassThrough]
@@ -496,14 +496,14 @@ class Properties(BaseModel):
     Layers: Optional[Layers] = prop("Layers")
     MemorySize: Optional[MemorySize] = prop("MemorySize")
     PackageType: Optional[PassThrough] = prop("PackageType")
-    RolePath: Optional[RolePath]  # TODO: Add to docs
+    RolePath: Optional[RolePath] = prop("RolePath")
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = prop("Policies")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
     Runtime: Optional[Runtime] = prop("Runtime")
-    SnapStart: Optional[SnapStart]  # TODO: add prop and types
+    SnapStart: Optional[SnapStart] = prop("SnapStart")
     Tags: Optional[Tags] = prop("Tags")
     Timeout: Optional[Timeout] = prop("Timeout")
     Tracing: Optional[Tracing] = prop("Tracing")
@@ -527,7 +527,7 @@ class Globals(BaseModel):
     Layers: Optional[Layers] = prop("Layers")
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
-    RolePath: Optional[RolePath]
+    RolePath: Optional[RolePath] = prop("RolePath")
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
@@ -535,7 +535,7 @@ class Globals(BaseModel):
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Architectures: Optional[Architectures] = prop("Architectures")
     EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
-    SnapStart: Optional[SnapStart]  # TODO: add prop
+    SnapStart: Optional[SnapStart] = prop("SnapStart")
 
 
 class Resource(BaseModel):

@@ -57,7 +57,7 @@ class ScheduleV2EventProperties(BaseModel):
     Name: Optional[PassThrough] = scheduleeventv2properties("Name")
     PermissionsBoundary: Optional[PassThrough] = scheduleeventv2properties("PermissionsBoundary")
     RetryPolicy: Optional[PassThrough] = scheduleeventv2properties("RetryPolicy")
-    RoleArn: Optional[PassThrough]  # TODO: Add to docs
+    RoleArn: Optional[PassThrough] = scheduleeventv2properties("RoleArn")
     ScheduleExpression: Optional[PassThrough] = scheduleeventv2properties("ScheduleExpression")
     ScheduleExpressionTimezone: Optional[PassThrough] = scheduleeventv2properties("ScheduleExpressionTimezone")
     StartDate: Optional[PassThrough] = scheduleeventv2properties("StartDate")
