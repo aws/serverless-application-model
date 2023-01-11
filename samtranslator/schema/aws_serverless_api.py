@@ -52,9 +52,7 @@ class CognitoAuthorizer(BaseModel):
 class LambdaTokenAuthorizerIdentity(BaseModel):
     ReauthorizeEvery: Optional[SamIntrinsicable[int]] = lambdatokenauthorizeridentity("ReauthorizeEvery")
     ValidationExpression: Optional[str] = lambdatokenauthorizeridentity("ValidationExpression")
-    Header: Optional[
-        str
-    ]  # TODO: This doesn't exist in docs: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-lambdatokenauthorizationidentity.html
+    Header: Optional[str] = lambdatokenauthorizeridentity("Header")
 
 
 class LambdaRequestAuthorizerIdentity(BaseModel):
@@ -127,7 +125,7 @@ class Route53(BaseModel):
 
 class Domain(BaseModel):
     BasePath: Optional[PassThrough] = domain("BasePath")
-    NormalizeBasePath: Optional[bool]  # TODO: Add documentation for this property
+    NormalizeBasePath: Optional[bool] = domain("NormalizeBasePath")
     CertificateArn: PassThrough = domain("CertificateArn")
     DomainName: PassThrough = domain("DomainName")
     EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE"]]] = domain("EndpointConfiguration")
