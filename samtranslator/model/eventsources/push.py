@@ -82,7 +82,7 @@ class PushEventSource(ResourceMacro):
         try:
             # Name will not be available for Alias resources
             function_name_or_arn = function.get_runtime_attr("name")
-        except NotImplementedError:
+        except KeyError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
         lambda_permission.Action = "lambda:InvokeFunction"

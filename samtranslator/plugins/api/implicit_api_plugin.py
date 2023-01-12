@@ -1,6 +1,6 @@
 import copy
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, Optional, Type, Union
 
 from samtranslator.metrics.method_decorator import cw_timer
@@ -58,10 +58,11 @@ class ImplicitApiPlugin(BasePlugin, metaclass=ABCMeta):
         self.api_update_replace_policies: Dict[str, Any] = {}
         self._setup_api_properties()
 
+    @abstractmethod
     def _setup_api_properties(self) -> None:
-        raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
-        )
+        """
+        Abatract method to set up properties that are distinct to this plugin
+        """
 
     @cw_timer(prefix="Plugin-ImplicitApi")
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
@@ -145,6 +146,7 @@ class ImplicitApiPlugin(BasePlugin, metaclass=ABCMeta):
 
         return api_events
 
+    @abstractmethod
     def _process_api_events(  # type: ignore[no-untyped-def]
         self, function, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
     ):
@@ -157,10 +159,8 @@ class ImplicitApiPlugin(BasePlugin, metaclass=ABCMeta):
         :param SamTemplate template: SAM Template where Serverless::Api resources can be found
         :param str condition: optional; this is the condition that is on the resource with the API event
         """
-        raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
-        )
 
+    @abstractmethod
     def _add_implicit_api_id_if_necessary(self, event_properties):  # type: ignore[no-untyped-def]
         """
         Events for implicit APIs will *not* have the RestApiId property. Absence of this property means this event
@@ -169,9 +169,6 @@ class ImplicitApiPlugin(BasePlugin, metaclass=ABCMeta):
 
         :param dict event_properties: Dictionary of event properties
         """
-        raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
-        )
 
     def _add_api_to_swagger(self, event_id, event_properties, template):  # type: ignore[no-untyped-def]
         """
@@ -404,13 +401,11 @@ class ImplicitApiPlugin(BasePlugin, metaclass=ABCMeta):
             api.properties["DefinitionBody"] = self._get_api_definition_from_editor(editor)  # type: ignore[no-untyped-call] # TODO make static method
             template.set(api_id, api)
 
+    @abstractmethod
     def _get_api_definition_from_editor(self, editor):  # type: ignore[no-untyped-def]
         """
         Required function that returns the api body from the respective editor
         """
-        raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
-        )
 
     def _path_condition_name(self, api_id, path):  # type: ignore[no-untyped-def]
         """
