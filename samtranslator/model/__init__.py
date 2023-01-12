@@ -2,7 +2,7 @@
 import re
 import inspect
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-
+from abc import ABCMeta, abstractmethod
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
 from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
@@ -64,7 +64,7 @@ class PassThroughProperty(PropertyType):
         super().__init__(required, any_type(), False)
 
 
-class Resource(object):
+class Resource(object, metaclass=ABCMeta):
     """A Resource object represents an abstract entity that contains a Type and a Properties object. They map well to
     CloudFormation resources as well sub-types like AWS::Lambda::Function or `Events` section of
     AWS::Serverless::Function.
@@ -336,7 +336,7 @@ class Resource(object):
         """
 
         if attr not in self._supported_resource_attributes:
-            raise KeyError("Unsupported resource attribute specified: %s" % attr)
+            raise KeyError(f"Unsupported resource attribute specified: {attr}")
 
         self.resource_attributes[attr] = value
 
@@ -347,7 +347,7 @@ class Resource(object):
         :return: Value of the attribute, if set in the resource. None otherwise
         """
         if attr not in self.resource_attributes:
-            raise KeyError("%s is not in resource attributes" % attr)
+            raise KeyError(f"{attr} is not in resource attributes")
 
         return self.resource_attributes[attr]
 
@@ -370,10 +370,10 @@ class Resource(object):
 
         :return: Dictionary that will resolve to value of the attribute when CloudFormation stack update is executed
         """
+        if attr_name not in self.runtime_attrs:
+            raise KeyError(f"{attr_name} attribute is not supported for resource {self.resource_type}")
 
-        if attr_name in self.runtime_attrs:
-            return self.runtime_attrs[attr_name](self)
-        raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
+        return self.runtime_attrs[attr_name](self)
 
     def get_passthrough_resource_attributes(self) -> Dict[str, Any]:
         """
@@ -389,7 +389,7 @@ class Resource(object):
         return attributes
 
 
-class ResourceMacro(Resource):
+class ResourceMacro(Resource, metaclass=ABCMeta):
     """A ResourceMacro object represents a CloudFormation macro. A macro appears in the CloudFormation template in the
     "Resources" mapping, but must be expanded into one or more vanilla CloudFormation resources before a stack can be
     created from it.
@@ -416,7 +416,6 @@ class ResourceMacro(Resource):
         :param dict kwargs
         :returns: a list of vanilla CloudFormation Resource instances, to which this macro expands
         """
-        raise NotImplementedError("Method to_cloudformation() must be implemented in a subclass of ResourceMacro")
 
 
 class SamResourceMacro(ResourceMacro):
