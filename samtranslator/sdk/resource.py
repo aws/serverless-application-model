@@ -39,7 +39,7 @@ class SamResource(object):
         """
         # As long as the type is valid and type string.
         # validate the condition should be string
-
+        # TODO Use sam_expect for these resource attributes?
         if self.condition:
 
             if not IS_STR(self.condition, should_raise=False):

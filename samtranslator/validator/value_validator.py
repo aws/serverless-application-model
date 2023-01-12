@@ -4,8 +4,10 @@ from typing import Any, Dict, Generic, Optional, TypeVar, cast
 from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidEventException,
+    InvalidDocumentException,
     InvalidResourceException,
     InvalidResourcePropertyTypeException,
+    InvalidResourceAttributeTypeException,
 )
 
 T = TypeVar("T")
@@ -18,12 +20,18 @@ class _ResourcePropertyValueValidator(Generic[T]):
     is_sam_event: bool
 
     def __init__(
-        self, value: Optional[T], resource_id: str, property_identifier: str, is_sam_event: bool = False
+        self,
+        value: Optional[T],
+        resource_id: str,
+        property_identifier: str,
+        is_sam_event: bool = False,
+        is_resource_attribute: bool = False,
     ) -> None:
         self.value = value
         self.resource_id = resource_id
         self.property_identifier = property_identifier
         self.is_sam_event = is_sam_event
+        self.is_resource_attribute = is_resource_attribute
 
     @property
     def resource_logical_id(self) -> Optional[str]:
@@ -46,6 +54,14 @@ class _ResourcePropertyValueValidator(Generic[T]):
                     self.event_id, message or f"Property '{self.property_identifier}' should be a {type_description}."
                 )
             if self.resource_logical_id:
+                if self.is_resource_attribute:
+                    raise InvalidDocumentException(
+                        [
+                            InvalidResourceAttributeTypeException(
+                                self.resource_logical_id, self.property_identifier, expected_type, message
+                            )
+                        ]
+                    )
                 raise InvalidResourcePropertyTypeException(
                     self.resource_logical_id, self.property_identifier, expected_type, message
                 )

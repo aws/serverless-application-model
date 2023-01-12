@@ -119,6 +119,25 @@ class InvalidResourcePropertyTypeException(InvalidResourceException):
         return f"Type of property '{property_identifier}' is invalid."
 
 
+class InvalidResourceAttributeTypeException(InvalidResourceException):
+    def __init__(
+        self,
+        logical_id: str,
+        property_identifier: str,
+        expected_type: Optional[ExpectedType],
+        message: Optional[str] = None,
+    ) -> None:
+        message = message or self._default_message(logical_id, property_identifier, expected_type)
+        super().__init__(logical_id, message)
+
+    @staticmethod
+    def _default_message(logical_id: str, property_identifier: str, expected_type: Optional[ExpectedType]) -> str:
+        if expected_type:
+            type_description, _ = expected_type.value
+            return f"Attribute '{property_identifier}' for resource '{logical_id}' should be a {type_description}."
+        return f"Type of attribute '{property_identifier}' for resource '{logical_id}'is invalid."
+
+
 class InvalidEventException(ExceptionWithMessage):
     """Exception raised when an event is invalid.
 
