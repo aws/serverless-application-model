@@ -2309,6 +2309,9 @@
           "title": "Queue",
           "description": "The ARN of the queue\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventSourceArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-eventsourcearn) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "markdownDescription": "The ARN of the queue\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventSourceArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-eventsourcearn) property of an `AWS::Lambda::EventSourceMapping` resource\\."
+        },
+        "ScalingConfig": {
+          "title": "Scalingconfig"
         }
       },
       "additionalProperties": false
