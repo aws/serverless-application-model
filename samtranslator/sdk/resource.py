@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Dict
 
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
-from samtranslator.model.types import is_str
+from samtranslator.model.types import IS_STR
 
 
 class SamResource(object):
@@ -31,7 +31,7 @@ class SamResource(object):
         # Properties is *not* required. Ex: SimpleTable resource has no required properties
         self.properties = resource_dict.get("Properties", {})
 
-    def valid(self):  # type: ignore[no-untyped-def]
+    def valid(self) -> bool:
         """
         Checks if the resource data is valid
 
@@ -42,28 +42,29 @@ class SamResource(object):
 
         if self.condition:
 
-            if not is_str()(self.condition, should_raise=False):
+            if not IS_STR(self.condition, should_raise=False):
                 raise InvalidDocumentException([InvalidTemplateException("Every Condition member must be a string.")])
 
         if self.deletion_policy:
 
-            if not is_str()(self.deletion_policy, should_raise=False):
+            if not IS_STR(self.deletion_policy, should_raise=False):
                 raise InvalidDocumentException(
                     [InvalidTemplateException("Every DeletionPolicy member must be a string.")]
                 )
 
         if self.update_replace_policy:
 
-            if not is_str()(self.update_replace_policy, should_raise=False):
+            if not IS_STR(self.update_replace_policy, should_raise=False):
                 raise InvalidDocumentException(
                     [InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")]
                 )
 
-        return SamResourceType.has_value(self.type)  # type: ignore[no-untyped-call]
+        # TODO: should we raise exception if `self.type` is not a string?
+        return isinstance(self.type, str) and SamResourceType.has_value(self.type)
 
     def to_dict(self) -> Dict[str, Any]:
 
-        if self.valid():  # type: ignore[no-untyped-call]
+        if self.valid():
             # Touch a resource dictionary ONLY if it is valid
             # Modify only Type & Properties section to preserve CloudFormation properties like DependsOn, Conditions etc
             self.resource_dict["Type"] = self.type
@@ -86,7 +87,7 @@ class SamResourceType(Enum):
     StateMachine = "AWS::Serverless::StateMachine"
 
     @classmethod
-    def has_value(cls, value):  # type: ignore[no-untyped-def]
+    def has_value(cls, value: str) -> bool:
         """
         Checks if the given value belongs to the Enum
 

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, Optional, cast, List, Union
 
 from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
@@ -80,13 +80,13 @@ class DeploymentPreferenceCollection(object):
         # TODO: find a way to deal with this implicit assumption
         return cast(DeploymentPreference, self._resource_preferences.get(logical_id))
 
-    def any_enabled(self):  # type: ignore[no-untyped-def]
+    def any_enabled(self) -> bool:
         """
         :return: boolean whether any deployment preferences in the collection are enabled
         """
         return any(preference.enabled for preference in self._resource_preferences.values())
 
-    def can_skip_service_role(self):  # type: ignore[no-untyped-def]
+    def can_skip_service_role(self) -> bool:
         """
         If every one of the deployment preferences have a custom IAM role provided, we can skip creating the
         service role altogether.
@@ -94,7 +94,7 @@ class DeploymentPreferenceCollection(object):
         """
         return all(preference.role or not preference.enabled for preference in self._resource_preferences.values())
 
-    def needs_resource_condition(self):  # type: ignore[no-untyped-def]
+    def needs_resource_condition(self) -> Union[Dict[str, Any], bool]:
         """
         If all preferences have a condition, all code deploy resources need to be conditionally created
         :return: True, if a condition needs to be created
@@ -104,7 +104,7 @@ class DeploymentPreferenceCollection(object):
             not preference.condition and preference.enabled for preference in self._resource_preferences.values()
         )
 
-    def get_all_deployment_conditions(self):  # type: ignore[no-untyped-def]
+    def get_all_deployment_conditions(self) -> List[str]:
         """
         Returns a list of all conditions associated with the deployment preference resources
         :return: List of condition names
@@ -115,31 +115,31 @@ class DeploymentPreferenceCollection(object):
             conditions_set.remove(None)
         return list(conditions_set)
 
-    def create_aggregate_deployment_condition(self):  # type: ignore[no-untyped-def]
+    def create_aggregate_deployment_condition(self) -> Union[None, Dict[str, Dict[str, List[Dict[str, Any]]]]]:
         """
         Creates an aggregate deployment condition if necessary
         :return: None if <2 conditions are found, otherwise a dictionary of new conditions to add to template
         """
-        return make_combined_condition(self.get_all_deployment_conditions(), CODE_DEPLOY_CONDITION_NAME)  # type: ignore[no-untyped-call, no-untyped-call]
+        return make_combined_condition(self.get_all_deployment_conditions(), CODE_DEPLOY_CONDITION_NAME)
 
-    def enabled_logical_ids(self):  # type: ignore[no-untyped-def]
+    def enabled_logical_ids(self) -> List[str]:
         """
         :return: only the logical id's for the deployment preferences in this collection which are enabled
         """
         return [logical_id for logical_id, preference in self._resource_preferences.items() if preference.enabled]
 
-    def get_codedeploy_application(self):  # type: ignore[no-untyped-def]
+    def get_codedeploy_application(self) -> CodeDeployApplication:
         codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         codedeploy_application_resource.ComputePlatform = "Lambda"
-        if self.needs_resource_condition():  # type: ignore[no-untyped-call]
-            conditions = self.get_all_deployment_conditions()  # type: ignore[no-untyped-call]
+        if self.needs_resource_condition():
+            conditions = self.get_all_deployment_conditions()
             condition_name = CODE_DEPLOY_CONDITION_NAME
             if len(conditions) <= 1:
                 condition_name = conditions.pop()
             codedeploy_application_resource.set_resource_attribute("Condition", condition_name)
         return codedeploy_application_resource
 
-    def get_codedeploy_iam_role(self):  # type: ignore[no-untyped-def]
+    def get_codedeploy_iam_role(self) -> IAMRole:
         iam_role = IAMRole(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID)
         iam_role.AssumeRolePolicyDocument = {
             "Version": "2012-10-17",
@@ -154,17 +154,17 @@ class DeploymentPreferenceCollection(object):
 
         # CodeDeploy has a new managed policy. We cannot update any existing partitions, without customer reach out
         # that support AWSCodeDeployRoleForLambda since this could regress stacks that are currently deployed.
-        if ArnGenerator.get_partition_name() in ["aws-iso", "aws-iso-b"]:  # type: ignore[no-untyped-call]
+        if ArnGenerator.get_partition_name() in ["aws-iso", "aws-iso-b"]:
             iam_role.ManagedPolicyArns = [
-                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambdaLimited")  # type: ignore[no-untyped-call]
+                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambdaLimited")
             ]
         else:
             iam_role.ManagedPolicyArns = [
-                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambda")  # type: ignore[no-untyped-call]
+                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambda")
             ]
 
-        if self.needs_resource_condition():  # type: ignore[no-untyped-call]
-            conditions = self.get_all_deployment_conditions()  # type: ignore[no-untyped-call]
+        if self.needs_resource_condition():
+            conditions = self.get_all_deployment_conditions()
             condition_name = CODE_DEPLOY_CONDITION_NAME
             if len(conditions) <= 1:
                 condition_name = conditions.pop()
@@ -310,5 +310,5 @@ class DeploymentPreferenceCollection(object):
             return not self.__eq__(other)  # type: ignore[no-untyped-call]
         return NotImplemented
 
-    def __hash__(self):  # type: ignore[no-untyped-def]
+    def __hash__(self) -> int:
         return hash(tuple(sorted(self.__dict__.items())))

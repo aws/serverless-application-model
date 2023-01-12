@@ -54,3 +54,23 @@ Resources:
               - Ref: AuthKeyName
             AuthorizerPayloadFormatVersion: 1.0
         DefaultAuthorizer: MyLambdaAuthUpdated
+
+  MyApi2:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          MyLambdaAuthUpdated:
+            FunctionArn:
+              Fn::GetAtt:
+              - MyAuthFn
+              - Arn
+            FunctionInvokeRole:
+              Fn::GetAtt:
+              - MyAuthFnRole
+              - Arn
+            Identity:
+              QueryStrings:
+                This: should be a list
+            AuthorizerPayloadFormatVersion: 1.0
+        DefaultAuthorizer: MyLambdaAuthUpdated

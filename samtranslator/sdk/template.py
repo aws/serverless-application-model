@@ -33,7 +33,7 @@ class SamTemplate(object):
         for logicalId, resource_dict in self.resources.items():
 
             resource = SamResource(resource_dict)
-            needs_filter = resource.valid()  # type: ignore[no-untyped-call]
+            needs_filter = resource.valid()
             if resource_types:
                 needs_filter = needs_filter and resource.type in resource_types
 
@@ -76,7 +76,7 @@ class SamTemplate(object):
         if logicalId in self.resources:
             del self.resources[logicalId]
 
-    def to_dict(self):  # type: ignore[no-untyped-def]
+    def to_dict(self) -> Dict[str, Any]:
         """
         Returns the template as a dictionary
 

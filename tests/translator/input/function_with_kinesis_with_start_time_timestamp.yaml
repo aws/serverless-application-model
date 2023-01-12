@@ -1,0 +1,43 @@
+Resources:
+  KinesisTriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 5
+      Runtime: nodejs12.x
+      MemorySize: 128
+      Tracing: Active
+      AutoPublishAlias: live
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Handler: trigger.handler
+      Description: >
+        This function triggered when a file is uploaded in a stream (Kinesis)
+      Events:
+        Stream:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream.Arn
+            BatchSize: 500
+            StartingPosition: AT_TIMESTAMP
+            StartingPositionTimestamp: 1671489395
+            ParallelizationFactor: 1
+            MaximumRetryAttempts: 1000
+            BisectBatchOnFunctionError: true
+      Policies:
+      - KinesisStreamReadPolicy:
+          StreamName: !Ref KinesisStream
+
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: KinesisStream
+      RetentionPeriodHours: 24
+      ShardCount: 1
+      StreamEncryption:
+        EncryptionType: KMS
+        KeyId: alias/aws/kinesis

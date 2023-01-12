@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from parameterized import parameterized
 
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -31,5 +31,5 @@ class TestArnGenerator(TestCase):
         ]
     )
     def test_get_partition_name_when_region_not_provided(self, region, expected_partition):
-        with patch("boto3.session.Session.region_name", region):
+        with patch("samtranslator.translator.arn_generator._get_region_from_session", Mock(return_value=region)):
             self.assertEqual(expected_partition, ArnGenerator.get_partition_name())

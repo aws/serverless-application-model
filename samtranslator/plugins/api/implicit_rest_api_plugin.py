@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from samtranslator.model.naming import GeneratedLogicalId
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
 from samtranslator.public.swagger import SwaggerEditor
@@ -33,11 +35,11 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
         """
         super(ImplicitRestApiPlugin, self).__init__(ImplicitRestApiPlugin.__name__)
 
-    def _setup_api_properties(self):  # type: ignore[no-untyped-def]
+    def _setup_api_properties(self) -> None:
         """
         Sets up properties that are distinct to this plugin
         """
-        self.implicit_api_logical_id = GeneratedLogicalId.implicit_api()  # type: ignore[no-untyped-call]
+        self.implicit_api_logical_id = GeneratedLogicalId.implicit_api()
         self.implicit_api_condition = "ServerlessRestApiCondition"
         self.api_event_type = "Api"
         self.api_type = SamResourceType.Api.value
@@ -117,7 +119,7 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
         if "RestApiId" not in event_properties:
             event_properties["RestApiId"] = {"Ref": self.implicit_api_logical_id}
 
-    def _generate_implicit_api_resource(self):  # type: ignore[no-untyped-def]
+    def _generate_implicit_api_resource(self) -> Dict[str, Any]:
         """
         Uses the implicit API in this file to generate an Implicit API resource
         """
@@ -129,7 +131,7 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
         """
         return editor.swagger
 
-    def _get_api_resource_type_name(self):  # type: ignore[no-untyped-def]
+    def _get_api_resource_type_name(self) -> str:
         """
         Returns the type of API resource
         """

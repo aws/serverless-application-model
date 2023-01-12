@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.types import is_type, one_of, is_str, list_of
-from samtranslator.model.intrinsics import ref, fnSub
+from samtranslator.model.intrinsics import fnSub, ref
+from samtranslator.model.types import IS_DICT, IS_STR, is_type, list_of, one_of
 from samtranslator.schema.common import PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -16,19 +16,32 @@ from samtranslator.validator.value_validator import sam_expect
 class ApiGatewayRestApi(Resource):
     resource_type = "AWS::ApiGateway::RestApi"
     property_types = {
-        "Body": PropertyType(False, is_type(dict)),
-        "BodyS3Location": PropertyType(False, is_type(dict)),
-        "CloneFrom": PropertyType(False, is_str()),
-        "Description": PropertyType(False, is_str()),
+        "Body": PropertyType(False, IS_DICT),
+        "BodyS3Location": PropertyType(False, IS_DICT),
+        "CloneFrom": PropertyType(False, IS_STR),
+        "Description": PropertyType(False, IS_STR),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
-        "Name": PropertyType(False, is_str()),
-        "Parameters": PropertyType(False, is_type(dict)),
-        "EndpointConfiguration": PropertyType(False, is_type(dict)),
+        "Name": PropertyType(False, IS_STR),
+        "Parameters": PropertyType(False, IS_DICT),
+        "EndpointConfiguration": PropertyType(False, IS_DICT),
         "BinaryMediaTypes": PropertyType(False, is_type(list)),
         "MinimumCompressionSize": PropertyType(False, is_type(int)),
-        "Mode": PropertyType(False, is_str()),
-        "ApiKeySourceType": PropertyType(False, is_str()),
+        "Mode": PropertyType(False, IS_STR),
+        "ApiKeySourceType": PropertyType(False, IS_STR),
     }
+
+    Body: Optional[Dict[str, Any]]
+    BodyS3Location: Optional[Dict[str, Any]]
+    CloneFrom: Optional[PassThrough]
+    Description: Optional[PassThrough]
+    FailOnWarnings: Optional[PassThrough]
+    Name: Optional[PassThrough]
+    Parameters: Optional[Dict[str, Any]]
+    EndpointConfiguration: Optional[Dict[str, Any]]
+    BinaryMediaTypes: Optional[List[Any]]
+    MinimumCompressionSize: Optional[PassThrough]
+    Mode: Optional[PassThrough]
+    ApiKeySourceType: Optional[PassThrough]
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
 
@@ -36,18 +49,18 @@ class ApiGatewayRestApi(Resource):
 class ApiGatewayStage(Resource):
     resource_type = "AWS::ApiGateway::Stage"
     property_types = {
-        "AccessLogSetting": PropertyType(False, is_type(dict)),
+        "AccessLogSetting": PropertyType(False, IS_DICT),
         "CacheClusterEnabled": PropertyType(False, is_type(bool)),
-        "CacheClusterSize": PropertyType(False, is_str()),
-        "CanarySetting": PropertyType(False, is_type(dict)),
-        "ClientCertificateId": PropertyType(False, is_str()),
-        "DeploymentId": PropertyType(True, is_str()),
-        "Description": PropertyType(False, is_str()),
-        "RestApiId": PropertyType(True, is_str()),
-        "StageName": PropertyType(True, one_of(is_str(), is_type(dict))),
-        "Tags": PropertyType(False, list_of(is_type(dict))),
+        "CacheClusterSize": PropertyType(False, IS_STR),
+        "CanarySetting": PropertyType(False, IS_DICT),
+        "ClientCertificateId": PropertyType(False, IS_STR),
+        "DeploymentId": PropertyType(True, IS_STR),
+        "Description": PropertyType(False, IS_STR),
+        "RestApiId": PropertyType(True, IS_STR),
+        "StageName": PropertyType(True, one_of(IS_STR, IS_DICT)),
+        "Tags": PropertyType(False, list_of(IS_DICT)),
         "TracingEnabled": PropertyType(False, is_type(bool)),
-        "Variables": PropertyType(False, is_type(dict)),
+        "Variables": PropertyType(False, IS_DICT),
         "MethodSettings": PropertyType(False, is_type(list)),
     }
 
@@ -59,7 +72,7 @@ class ApiGatewayStage(Resource):
 
 class ApiGatewayAccount(Resource):
     resource_type = "AWS::ApiGateway::Account"
-    property_types = {"CloudWatchRoleArn": PropertyType(False, one_of(is_str(), is_type(dict)))}
+    property_types = {"CloudWatchRoleArn": PropertyType(False, one_of(IS_STR, IS_DICT))}
 
 
 class ApiGatewayDeployment(Resource):
@@ -67,10 +80,10 @@ class ApiGatewayDeployment(Resource):
 
     resource_type = "AWS::ApiGateway::Deployment"
     property_types = {
-        "Description": PropertyType(False, is_str()),
-        "RestApiId": PropertyType(True, is_str()),
-        "StageDescription": PropertyType(False, is_type(dict)),
-        "StageName": PropertyType(False, is_str()),
+        "Description": PropertyType(False, IS_STR),
+        "RestApiId": PropertyType(True, IS_STR),
+        "StageDescription": PropertyType(False, IS_DICT),
+        "StageName": PropertyType(False, IS_STR),
     }
 
     runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}
@@ -112,7 +125,7 @@ class ApiGatewayDeployment(Resource):
         data = self._X_HASH_DELIMITER.join(hash_input)
         generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)
         self.logical_id = generator.gen()
-        digest = generator.get_hash(length=40)  # type: ignore[no-untyped-call] # Get the full hash
+        digest = generator.get_hash(length=40)
         self.Description = "RestApi deployment id: {}".format(digest)
         stage.update_deployment_ref(self.logical_id)
 
@@ -146,7 +159,7 @@ class ApiGatewayResponse(object):
         self.response_templates = response_templates or Py27Dict()
         self.status_code = status_code_str
 
-    def generate_swagger(self):  # type: ignore[no-untyped-def]
+    def generate_swagger(self) -> Py27Dict:
         # Applying Py27Dict here as this goes into swagger
         swagger = Py27Dict()
         swagger["responseParameters"] = self._add_prefixes(self.response_parameters)  # type: ignore[no-untyped-call]
@@ -164,8 +177,12 @@ class ApiGatewayResponse(object):
         prefixed_parameters = Py27Dict()
 
         parameter_prefix_pairs = [("Headers", "header."), ("Paths", "path."), ("QueryStrings", "querystring.")]
-        for parameter, prefix in parameter_prefix_pairs:
-            for key, value in response_parameters.get(parameter, {}).items():
+        for parameter_property_name, prefix in parameter_prefix_pairs:
+            parameter_property_value = response_parameters.get(parameter_property_name, {})
+            sam_expect(
+                parameter_property_value, self.api_logical_id, f"ResponseParameters.{parameter_property_name}"
+            ).to_be_a_map()
+            for key, value in parameter_property_value.items():
                 param_key = GATEWAY_RESPONSE_PREFIX + prefix + key
                 if isinstance(key, Py27UniStr):
                     # if key is from template, we need to convert param_key to Py27UniStr
@@ -181,23 +198,23 @@ class ApiGatewayResponse(object):
 class ApiGatewayDomainName(Resource):
     resource_type = "AWS::ApiGateway::DomainName"
     property_types = {
-        "RegionalCertificateArn": PropertyType(False, is_str()),
-        "DomainName": PropertyType(True, is_str()),
-        "EndpointConfiguration": PropertyType(False, is_type(dict)),
-        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
-        "SecurityPolicy": PropertyType(False, is_str()),
-        "CertificateArn": PropertyType(False, is_str()),
-        "OwnershipVerificationCertificateArn": PropertyType(False, is_str()),
+        "RegionalCertificateArn": PropertyType(False, IS_STR),
+        "DomainName": PropertyType(True, IS_STR),
+        "EndpointConfiguration": PropertyType(False, IS_DICT),
+        "MutualTlsAuthentication": PropertyType(False, IS_DICT),
+        "SecurityPolicy": PropertyType(False, IS_STR),
+        "CertificateArn": PropertyType(False, IS_STR),
+        "OwnershipVerificationCertificateArn": PropertyType(False, IS_STR),
     }
 
 
 class ApiGatewayBasePathMapping(Resource):
     resource_type = "AWS::ApiGateway::BasePathMapping"
     property_types = {
-        "BasePath": PropertyType(False, is_str()),
-        "DomainName": PropertyType(True, is_str()),
-        "RestApiId": PropertyType(False, is_str()),
-        "Stage": PropertyType(False, is_str()),
+        "BasePath": PropertyType(False, IS_STR),
+        "DomainName": PropertyType(True, IS_STR),
+        "RestApiId": PropertyType(False, IS_STR),
+        "Stage": PropertyType(False, IS_STR),
     }
 
 
@@ -205,11 +222,11 @@ class ApiGatewayUsagePlan(Resource):
     resource_type = "AWS::ApiGateway::UsagePlan"
     property_types = {
         "ApiStages": PropertyType(False, is_type(list)),
-        "Description": PropertyType(False, is_str()),
-        "Quota": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, IS_STR),
+        "Quota": PropertyType(False, IS_DICT),
         "Tags": PropertyType(False, list_of(dict)),
-        "Throttle": PropertyType(False, is_type(dict)),
-        "UsagePlanName": PropertyType(False, is_str()),
+        "Throttle": PropertyType(False, IS_DICT),
+        "UsagePlanName": PropertyType(False, IS_STR),
     }
     runtime_attrs = {"usage_plan_id": lambda self: ref(self.logical_id)}
 
@@ -217,22 +234,22 @@ class ApiGatewayUsagePlan(Resource):
 class ApiGatewayUsagePlanKey(Resource):
     resource_type = "AWS::ApiGateway::UsagePlanKey"
     property_types = {
-        "KeyId": PropertyType(True, is_str()),
-        "KeyType": PropertyType(True, is_str()),
-        "UsagePlanId": PropertyType(True, is_str()),
+        "KeyId": PropertyType(True, IS_STR),
+        "KeyType": PropertyType(True, IS_STR),
+        "UsagePlanId": PropertyType(True, IS_STR),
     }
 
 
 class ApiGatewayApiKey(Resource):
     resource_type = "AWS::ApiGateway::ApiKey"
     property_types = {
-        "CustomerId": PropertyType(False, is_str()),
-        "Description": PropertyType(False, is_str()),
+        "CustomerId": PropertyType(False, IS_STR),
+        "Description": PropertyType(False, IS_STR),
         "Enabled": PropertyType(False, is_type(bool)),
         "GenerateDistinctId": PropertyType(False, is_type(bool)),
-        "Name": PropertyType(False, is_str()),
+        "Name": PropertyType(False, IS_STR),
         "StageKeys": PropertyType(False, is_type(list)),
-        "Value": PropertyType(False, is_str()),
+        "Value": PropertyType(False, IS_STR),
     }
 
     runtime_attrs = {"api_key_id": lambda self: ref(self.logical_id)}
@@ -248,7 +265,7 @@ class ApiGatewayAuthorizer(object):
         user_pool_arn=None,
         function_arn=None,
         identity=None,
-        function_payload_type=None,
+        function_payload_type: Optional[str] = None,
         function_invoke_role=None,
         is_aws_iam_authorizer=False,
         authorization_scopes=None,
@@ -308,24 +325,24 @@ class ApiGatewayAuthorizer(object):
         # If we can resolve ttl, attempt to see if things are valid
         return ttl_int > 0 and required_properties_missing
 
-    def generate_swagger(self):  # type: ignore[no-untyped-def]
-        authorizer_type = self._get_type()  # type: ignore[no-untyped-call]
+    def generate_swagger(self) -> Py27Dict:
+        authorizer_type = self._get_type()
         APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
         swagger = Py27Dict()
         swagger["type"] = "apiKey"
-        swagger["name"] = self._get_swagger_header_name()  # type: ignore[no-untyped-call]
+        swagger["name"] = self._get_swagger_header_name()
         swagger["in"] = "header"
-        swagger["x-amazon-apigateway-authtype"] = self._get_swagger_authtype()  # type: ignore[no-untyped-call]
+        swagger["x-amazon-apigateway-authtype"] = self._get_swagger_authtype()
 
         if authorizer_type == "COGNITO_USER_POOLS":
             authorizer_dict = Py27Dict()
-            authorizer_dict["type"] = self._get_swagger_authorizer_type()  # type: ignore[no-untyped-call]
-            authorizer_dict["providerARNs"] = self._get_user_pool_arn_array()  # type: ignore[no-untyped-call]
+            authorizer_dict["type"] = self._get_swagger_authorizer_type()
+            authorizer_dict["providerARNs"] = self._get_user_pool_arn_array()
             swagger[APIGATEWAY_AUTHORIZER_KEY] = authorizer_dict
 
         elif authorizer_type == "LAMBDA":
-            swagger[APIGATEWAY_AUTHORIZER_KEY] = Py27Dict({"type": self._get_swagger_authorizer_type()})  # type: ignore[no-untyped-call, no-untyped-call]
-            partition = ArnGenerator.get_partition_name()  # type: ignore[no-untyped-call]
+            swagger[APIGATEWAY_AUTHORIZER_KEY] = Py27Dict({"type": self._get_swagger_authorizer_type()})
+            partition = ArnGenerator.get_partition_name()
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
             authorizer_uri = fnSub(
                 ArnGenerator.generate_arn(  # type: ignore[no-untyped-call]
@@ -335,8 +352,8 @@ class ApiGatewayAuthorizer(object):
             )
 
             swagger[APIGATEWAY_AUTHORIZER_KEY]["authorizerUri"] = authorizer_uri
-            reauthorize_every = self._get_reauthorize_every()  # type: ignore[no-untyped-call]
-            function_invoke_role = self._get_function_invoke_role()  # type: ignore[no-untyped-call]
+            reauthorize_every = self._get_reauthorize_every()
+            function_invoke_role = self._get_function_invoke_role()
 
             if reauthorize_every is not None:
                 swagger[APIGATEWAY_AUTHORIZER_KEY]["authorizerResultTtlInSeconds"] = reauthorize_every
@@ -344,23 +361,23 @@ class ApiGatewayAuthorizer(object):
             if function_invoke_role:
                 swagger[APIGATEWAY_AUTHORIZER_KEY]["authorizerCredentials"] = function_invoke_role
 
-            if self._get_function_payload_type() == "REQUEST":  # type: ignore[no-untyped-call]
+            if self._get_function_payload_type() == "REQUEST":
                 identity_source = self._get_identity_source()
                 if identity_source:
                     swagger[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()
 
         # Authorizer Validation Expression is only allowed on COGNITO_USER_POOLS and LAMBDA_TOKEN
-        is_lambda_token_authorizer = authorizer_type == "LAMBDA" and self._get_function_payload_type() == "TOKEN"  # type: ignore[no-untyped-call]
+        is_lambda_token_authorizer = authorizer_type == "LAMBDA" and self._get_function_payload_type() == "TOKEN"
 
         if authorizer_type == "COGNITO_USER_POOLS" or is_lambda_token_authorizer:
-            identity_validation_expression = self._get_identity_validation_expression()  # type: ignore[no-untyped-call]
+            identity_validation_expression = self._get_identity_validation_expression()
 
             if identity_validation_expression:
                 swagger[APIGATEWAY_AUTHORIZER_KEY]["identityValidationExpression"] = identity_validation_expression
 
         return swagger
 
-    def _get_identity_validation_expression(self):  # type: ignore[no-untyped-def]
+    def _get_identity_validation_expression(self) -> Optional[PassThrough]:
         return self.identity and self.identity.get("ValidationExpression")
 
     @staticmethod
@@ -400,19 +417,19 @@ class ApiGatewayAuthorizer(object):
 
         return identity_source
 
-    def _get_user_pool_arn_array(self):  # type: ignore[no-untyped-def]
+    def _get_user_pool_arn_array(self) -> List[PassThrough]:
         return self.user_pool_arn if isinstance(self.user_pool_arn, list) else [self.user_pool_arn]
 
-    def _get_swagger_header_name(self):  # type: ignore[no-untyped-def]
-        authorizer_type = self._get_type()  # type: ignore[no-untyped-call]
-        payload_type = self._get_function_payload_type()  # type: ignore[no-untyped-call]
+    def _get_swagger_header_name(self) -> Optional[str]:
+        authorizer_type = self._get_type()
+        payload_type = self._get_function_payload_type()
 
         if authorizer_type == "LAMBDA" and payload_type == "REQUEST":
             return "Unused"
 
-        return self._get_identity_header()  # type: ignore[no-untyped-call]
+        return self._get_identity_header()
 
-    def _get_type(self):  # type: ignore[no-untyped-def]
+    def _get_type(self) -> str:
         if self.is_aws_iam_authorizer:
             return "AWS_IAM"
 
@@ -421,7 +438,7 @@ class ApiGatewayAuthorizer(object):
 
         return "LAMBDA"
 
-    def _get_identity_header(self):  # type: ignore[no-untyped-def]
+    def _get_identity_header(self) -> Optional[str]:
         if self.identity and not isinstance(self.identity, dict):
             raise InvalidResourceException(
                 self.api_logical_id,
@@ -434,20 +451,20 @@ class ApiGatewayAuthorizer(object):
 
         return self.identity.get("Header")
 
-    def _get_reauthorize_every(self):  # type: ignore[no-untyped-def]
+    def _get_reauthorize_every(self) -> Optional[PassThrough]:
         if not self.identity:
             return None
 
         return self.identity.get("ReauthorizeEvery")
 
-    def _get_function_invoke_role(self):  # type: ignore[no-untyped-def]
+    def _get_function_invoke_role(self) -> Optional[PassThrough]:
         if not self.function_invoke_role or self.function_invoke_role == "NONE":
             return None
 
         return self.function_invoke_role
 
-    def _get_swagger_authtype(self):  # type: ignore[no-untyped-def]
-        authorizer_type = self._get_type()  # type: ignore[no-untyped-call]
+    def _get_swagger_authtype(self) -> str:
+        authorizer_type = self._get_type()
         if authorizer_type == "AWS_IAM":
             return "awsSigv4"
 
@@ -456,19 +473,21 @@ class ApiGatewayAuthorizer(object):
 
         return "custom"
 
-    def _get_function_payload_type(self):  # type: ignore[no-untyped-def]
+    def _get_function_payload_type(self) -> str:
         return "TOKEN" if not self.function_payload_type else self.function_payload_type
 
-    def _get_swagger_authorizer_type(self):  # type: ignore[no-untyped-def]
-        authorizer_type = self._get_type()  # type: ignore[no-untyped-call]
+    def _get_swagger_authorizer_type(self) -> Optional[str]:
+        authorizer_type = self._get_type()
 
         if authorizer_type == "COGNITO_USER_POOLS":
             return "cognito_user_pools"
 
-        payload_type = self._get_function_payload_type()  # type: ignore[no-untyped-call]
+        payload_type = self._get_function_payload_type()
 
         if payload_type == "REQUEST":
             return "request"
 
         if payload_type == "TOKEN":
             return "token"
+
+        return None  # should we raise validation error here?

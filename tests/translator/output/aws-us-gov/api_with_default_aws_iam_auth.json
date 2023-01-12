@@ -19,7 +19,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-us-gov:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -141,7 +141,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-us-gov:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -172,9 +172,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeploymentce2dead7de": {
+    "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeployment0db5d3724d": {
       "Properties": {
-        "Description": "RestApi deployment id: ce2dead7ded0bb502db5bd0c105948c27bc96729",
+        "Description": "RestApi deployment id: 0db5d3724d1d43ad53aabfbc5feb5203d9250e1e",
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRole"
         },
@@ -185,7 +185,7 @@
     "MyApiWithAwsIamAuthAndDefaultInvokeRoleProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeploymentce2dead7de"
+          "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeployment0db5d3724d"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRole"
@@ -194,9 +194,9 @@
       },
       "Type": "AWS::ApiGateway::Stage"
     },
-    "MyApiWithAwsIamAuthDeploymentf9a4964a7d": {
+    "MyApiWithAwsIamAuthDeploymentff4d7da889": {
       "Properties": {
-        "Description": "RestApi deployment id: f9a4964a7df5021874e5a094662f1a2443982e0a",
+        "Description": "RestApi deployment id: ff4d7da889cc91390c6618d14459f4ea400e1197",
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuth"
         },
@@ -207,7 +207,7 @@
     "MyApiWithAwsIamAuthProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthDeploymentf9a4964a7d"
+          "Ref": "MyApiWithAwsIamAuthDeploymentff4d7da889"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuth"
