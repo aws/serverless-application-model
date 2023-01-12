@@ -193,6 +193,7 @@ class SQSEventProperties(BaseModel):
     FilterCriteria: Optional[PassThrough] = sqseventproperties("FilterCriteria")
     MaximumBatchingWindowInSeconds: Optional[PassThrough] = sqseventproperties("MaximumBatchingWindowInSeconds")
     Queue: PassThrough = sqseventproperties("Queue")
+    ScalingConfig: Optional[PassThrough]  # Update docs when live
 
 
 class SQSEvent(BaseModel):
