@@ -371,7 +371,7 @@ class Resource(object, metaclass=ABCMeta):
         :return: Dictionary that will resolve to value of the attribute when CloudFormation stack update is executed
         """
         if attr_name not in self.runtime_attrs:
-            raise KeyError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
+            raise KeyError(f"{attr_name} attribute is not supported for resource {self.resource_type}")
 
         return self.runtime_attrs[attr_name](self)
 
