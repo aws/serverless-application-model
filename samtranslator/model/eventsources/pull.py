@@ -55,6 +55,7 @@ class PullEventSource(ResourceMacro):
         "KafkaBootstrapServers": PropertyType(False, is_type(list)),
         "FilterCriteria": PropertyType(False, is_type(dict)),
         "ConsumerGroupId": PropertyType(False, is_str()),
+        "ScalingConfig": PropertyType(False, is_type(dict)),
     }
 
     Stream: Optional[Intrinsicable[str]]
@@ -78,6 +79,7 @@ class PullEventSource(ResourceMacro):
     KafkaBootstrapServers: Optional[List[Any]]
     FilterCriteria: Optional[Dict[str, Any]]
     ConsumerGroupId: Optional[Intrinsicable[str]]
+    ScalingConfig: Optional[Dict[str, Any]]
 
     def get_policy_arn(self):  # type: ignore[no-untyped-def]
         raise NotImplementedError("Subclass must implement this method")
@@ -137,6 +139,7 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds
         lambda_eventsourcemapping.FunctionResponseTypes = self.FunctionResponseTypes
         lambda_eventsourcemapping.FilterCriteria = self.FilterCriteria
+        lambda_eventsourcemapping.ScalingConfig = self.ScalingConfig
         self._validate_filter_criteria()  # type: ignore[no-untyped-call]
 
         if self.KafkaBootstrapServers:
