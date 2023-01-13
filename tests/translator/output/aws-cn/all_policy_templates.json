@@ -1609,6 +1609,28 @@
               ]
             },
             "PolicyName": "KitchenSinkFunctionRolePolicy59"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "geo:SearchPlaceIndexForPosition",
+                    "geo:SearchPlaceIndexForText"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:geo:${AWS::Region}:${AWS::AccountId}:place-index/${placeIndex}",
+                      {
+                        "placeIndex": "test"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "KitchenSinkFunctionRolePolicy60"
           }
         ],
         "Tags": [
