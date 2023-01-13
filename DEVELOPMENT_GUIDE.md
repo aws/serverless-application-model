@@ -26,12 +26,12 @@ Environment setup
 -----------------
 ### 1. Install Python versions
 
-Our officially supported Python versions are 3.7, 3.8, 3.9 and 3.10. 
+Our officially supported Python versions are 3.7, 3.8, 3.9 and 3.10.
 Our CI/CD pipeline is setup to run unit tests against Python 3 versions. Make sure you test it before sending a Pull Request.
 See [Unit testing with multiple Python versions](#unit-testing-with-multiple-python-versions).
 
 [pyenv](https://github.com/pyenv/pyenv) is a great tool to
-easily setup multiple Python versions. For 
+easily setup multiple Python versions. For
 
 > Note: For Windows, type
 > `export PATH="/c/Users/<user>/.pyenv/libexec:$PATH"` to add pyenv to
@@ -61,7 +61,7 @@ during PR checks. Black will be installed automatically with `make init`.
 
 After installing, you can run our formatting through our Makefile by `make black` or integrating Black directly in your favorite IDE (instructions
 can be found [here](https://black.readthedocs.io/en/stable/editor_integration.html))
- 
+
 ##### (Workaround) Integrating Black directly in your favorite IDE
 Since black is installed in virtualenv, when you follow [this instruction](https://black.readthedocs.io/en/stable/editor_integration.html), `which black` might give you this
 
@@ -70,7 +70,7 @@ Since black is installed in virtualenv, when you follow [this instruction](https
 /Users/<username>/.pyenv/shims/black
 ```
 
-However, IDEs such PyChaim (using FileWatcher) will have a hard time invoking `/Users/<username>/.pyenv/shims/black` 
+However, IDEs such PyChaim (using FileWatcher) will have a hard time invoking `/Users/<username>/.pyenv/shims/black`
 and this will happen:
 
 ```
@@ -79,9 +79,9 @@ pyenv: black: command not found
 The `black' command exists in these Python versions:
   3.7.9/envs/sam37
   sam37
-``` 
+```
 
-A simple workaround is to use `/Users/<username>/.pyenv/versions/sam37/bin/black` 
+A simple workaround is to use `/Users/<username>/.pyenv/versions/sam37/bin/black`
 instead of `/Users/<username>/.pyenv/shims/black`.
 
 #### Pre-commit
@@ -99,7 +99,7 @@ handy plugin that can create virtualenv.
 Depending on the python version, the following commands would change to
 be the appropriate python version.
 
-1.  Create Virtualenv `sam37` for Python3.7: `pyenv virtualenv 3.7.9 sam37`
+1.  Create Virtualenv `sam37` for Python3.7: `pyenv virtualenv 3.7.16 sam37`
 1.  Activate Virtualenv: `pyenv activate sam37`
 
 ### 4. Install dev version of SAM transform
@@ -129,14 +129,14 @@ each version and flip between them (sourcing the activate script). Typically, we
 one python version locally and then have our ci (appveyor) run all supported versions.
 
 ### Transform tests
-When adding new transform tests, we have provided a script to help generate the transform test input 
+When adding new transform tests, we have provided a script to help generate the transform test input
 and output files in the correct directory given a template.yaml file.
 ```bash
 python3 bin/add_transform_test.py --template-file template.yaml
 ```
 
 This script will automatically generate the input and output files. It will guarantee that the output
-files have the correct AWS partition (e.g. aws-cn, aws-us-gov). 
+files have the correct AWS partition (e.g. aws-cn, aws-us-gov).
 
 For `AWS::ApiGateway::RestApi`, the script will automatically append `REGIONAL` EndpointConfiguration.
 To disable this feature, run the following command instead.
