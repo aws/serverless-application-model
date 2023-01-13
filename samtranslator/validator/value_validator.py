@@ -86,11 +86,11 @@ class _ResourcePropertyValueValidator(Generic[T]):
             ).to_be_a(expected_type, message)
         return value
 
-    def to_be_a_string(self, message: Optional[str] = "") -> T:
-        return self.to_be_a(ExpectedType.STRING, message)
+    def to_be_a_string(self, message: Optional[str] = "") -> str:
+        return cast(str, self.to_be_a(ExpectedType.STRING, message))
 
-    def to_be_an_integer(self, message: Optional[str] = "") -> T:
-        return self.to_be_a(ExpectedType.INTEGER, message)
+    def to_be_an_integer(self, message: Optional[str] = "") -> str:
+        return cast(str, self.to_be_a(ExpectedType.INTEGER, message))
 
 
 sam_expect = _ResourcePropertyValueValidator
