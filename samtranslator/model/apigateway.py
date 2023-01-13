@@ -207,6 +207,14 @@ class ApiGatewayDomainName(Resource):
         "OwnershipVerificationCertificateArn": PropertyType(False, IS_STR),
     }
 
+    RegionalCertificateArn: Optional[PassThrough]
+    DomainName: PassThrough
+    EndpointConfiguration: Optional[PassThrough]
+    MutualTlsAuthentication: Optional[Dict[str, Any]]
+    SecurityPolicy: Optional[PassThrough]
+    CertificateArn: Optional[PassThrough]
+    OwnershipVerificationCertificateArn: Optional[PassThrough]
+
 
 class ApiGatewayBasePathMapping(Resource):
     resource_type = "AWS::ApiGateway::BasePathMapping"

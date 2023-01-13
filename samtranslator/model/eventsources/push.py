@@ -1,6 +1,6 @@
 import copy
 import re
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Union, cast
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
@@ -207,6 +207,17 @@ class CloudWatchEvent(PushEventSource):
         "State": PropertyType(False, IS_STR),
     }
 
+    EventBusName: Optional[PassThrough]
+    RuleName: Optional[PassThrough]
+    Pattern: Optional[PassThrough]
+    DeadLetterConfig: Optional[Dict[str, Any]]
+    RetryPolicy: Optional[PassThrough]
+    Input: Optional[PassThrough]
+    InputPath: Optional[PassThrough]
+    Target: Optional[PassThrough]
+    Enabled: Optional[bool]
+    State: Optional[PassThrough]
+
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the CloudWatch Events/EventBridge Rule and Lambda Permission to which
@@ -225,27 +236,27 @@ class CloudWatchEvent(PushEventSource):
 
         passthrough_resource_attributes = function.get_passthrough_resource_attributes()
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
-        events_rule.EventBusName = self.EventBusName  # type: ignore[attr-defined]
-        events_rule.EventPattern = self.Pattern  # type: ignore[attr-defined]
-        events_rule.Name = self.RuleName  # type: ignore[attr-defined]
+        events_rule.EventBusName = self.EventBusName
+        events_rule.EventPattern = self.Pattern
+        events_rule.Name = self.RuleName
         source_arn = events_rule.get_runtime_attr("arn")
 
         dlq_queue_arn = None
-        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
-            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[no-untyped-call]
             dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(  # type: ignore[no-untyped-call]
                 self, source_arn, passthrough_resource_attributes
             )
             resources.extend(dlq_resources)
 
-        if self.State and self.Enabled is not None:  # type: ignore[attr-defined, attr-defined]
+        if self.State and self.Enabled is not None:
             raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
 
-        if self.State:  # type: ignore[attr-defined]
-            events_rule.State = self.State  # type: ignore[attr-defined]
+        if self.State:
+            events_rule.State = self.State
 
-        if self.Enabled is not None:  # type: ignore[attr-defined]
-            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"  # type: ignore[attr-defined]
+        if self.Enabled is not None:
+            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
 
         events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]  # type: ignore[no-untyped-call]
 
@@ -260,19 +271,19 @@ class CloudWatchEvent(PushEventSource):
         :returns: the Target property
         :rtype: dict
         """
-        target_id = self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "LambdaTarget"  # type: ignore[attr-defined]
+        target_id = self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "LambdaTarget"
         target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
-        if self.Input is not None:  # type: ignore[attr-defined]
-            target["Input"] = self.Input  # type: ignore[attr-defined]
+        if self.Input is not None:
+            target["Input"] = self.Input
 
-        if self.InputPath is not None:  # type: ignore[attr-defined]
-            target["InputPath"] = self.InputPath  # type: ignore[attr-defined]
+        if self.InputPath is not None:
+            target["InputPath"] = self.InputPath
 
-        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
+        if self.DeadLetterConfig is not None:
             target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
 
-        if self.RetryPolicy is not None:  # type: ignore[attr-defined]
-            target["RetryPolicy"] = self.RetryPolicy  # type: ignore[attr-defined]
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
 
         return target
 
@@ -294,9 +305,13 @@ class S3(PushEventSource):
         "Filter": PropertyType(False, dict_of(IS_STR, IS_STR)),
     }
 
+    Bucket: Dict[str, Any]
+    Events: Union[str, List[str]]
+    Filter: Optional[Dict[str, str]]
+
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
-        if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:  # type: ignore[attr-defined]
-            bucket_id = self.Bucket["Ref"]  # type: ignore[attr-defined]
+        if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:
+            bucket_id = self.Bucket["Ref"]
             if not isinstance(bucket_id, str):
                 raise InvalidEventException(self.relative_id, "'Ref' value in S3 events is not a valid string.")
             if bucket_id in resources:
@@ -416,12 +431,12 @@ class S3(PushEventSource):
     def _inject_notification_configuration(self, function, bucket, bucket_id):  # type: ignore[no-untyped-def]
         base_event_mapping = {"Function": function.get_runtime_attr("arn")}
 
-        if self.Filter is not None:  # type: ignore[attr-defined]
-            base_event_mapping["Filter"] = self.Filter  # type: ignore[attr-defined]
+        if self.Filter is not None:
+            base_event_mapping["Filter"] = self.Filter
 
-        event_types = self.Events  # type: ignore[attr-defined]
-        if isinstance(self.Events, str):  # type: ignore[attr-defined]
-            event_types = [self.Events]  # type: ignore[attr-defined]
+        event_types = self.Events
+        if isinstance(self.Events, str):
+            event_types = [self.Events]
 
         event_mappings = []
         for event_type in event_types:
@@ -1010,6 +1025,8 @@ class AlexaSkill(PushEventSource):
 
     property_types = {"SkillId": PropertyType(False, IS_STR)}
 
+    SkillId: Optional[PassThrough]
+
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         function = kwargs.get("function")
@@ -1018,7 +1035,7 @@ class AlexaSkill(PushEventSource):
             raise TypeError("Missing required keyword argument: function")
 
         resources = []
-        resources.append(self._construct_permission(function, event_source_token=self.SkillId))  # type: ignore[attr-defined, no-untyped-call]
+        resources.append(self._construct_permission(function, event_source_token=self.SkillId))  # type: ignore[no-untyped-call]
 
         return resources
 
@@ -1028,6 +1045,9 @@ class IoTRule(PushEventSource):
     principal = "iot.amazonaws.com"
 
     property_types = {"Sql": PropertyType(True, IS_STR), "AwsIotSqlVersion": PropertyType(False, IS_STR)}
+
+    Sql: PassThrough
+    AwsIotSqlVersion: Optional[PassThrough]
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -1056,13 +1076,13 @@ class IoTRule(PushEventSource):
         rule = IotTopicRule(self.logical_id, attributes=function.get_passthrough_resource_attributes())
 
         payload = {
-            "Sql": self.Sql,  # type: ignore[attr-defined]
+            "Sql": self.Sql,
             "RuleDisabled": False,
             "Actions": [{"Lambda": {"FunctionArn": function.get_runtime_attr("arn")}}],
         }
 
-        if self.AwsIotSqlVersion:  # type: ignore[attr-defined]
-            payload["AwsIotSqlVersion"] = self.AwsIotSqlVersion  # type: ignore[attr-defined]
+        if self.AwsIotSqlVersion:
+            payload["AwsIotSqlVersion"] = self.AwsIotSqlVersion
 
         rule.TopicRulePayload = payload
 
@@ -1078,9 +1098,12 @@ class Cognito(PushEventSource):
         "Trigger": PropertyType(True, one_of(IS_STR, list_of(IS_STR)), False),
     }
 
+    UserPool: Any
+    Trigger: Union[str, List[str]]
+
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
-        if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:  # type: ignore[attr-defined]
-            userpool_id = self.UserPool["Ref"]  # type: ignore[attr-defined]
+        if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:
+            userpool_id = self.UserPool["Ref"]
             if not isinstance(userpool_id, str):
                 raise InvalidEventException(
                     self.logical_id,
@@ -1122,9 +1145,9 @@ class Cognito(PushEventSource):
         return resources
 
     def _inject_lambda_config(self, function, userpool):  # type: ignore[no-untyped-def]
-        event_triggers = self.Trigger  # type: ignore[attr-defined]
-        if isinstance(self.Trigger, str):  # type: ignore[attr-defined]
-            event_triggers = [self.Trigger]  # type: ignore[attr-defined]
+        event_triggers = self.Trigger
+        if isinstance(self.Trigger, str):
+            event_triggers = [self.Trigger]
 
         # TODO can these be conditional?
 
@@ -1143,7 +1166,7 @@ class Cognito(PushEventSource):
                 lambda_config[event_trigger] = function.get_runtime_attr("arn")
             else:
                 raise InvalidEventException(
-                    self.relative_id, 'Cognito trigger "{trigger}" defined multiple times.'.format(trigger=self.Trigger)  # type: ignore[attr-defined]
+                    self.relative_id, 'Cognito trigger "{trigger}" defined multiple times.'.format(trigger=self.Trigger)
                 )
         return userpool
 
@@ -1164,13 +1187,38 @@ class HttpApi(PushEventSource):
         "PayloadFormatVersion": PropertyType(False, IS_STR),
     }
 
+    Path: Optional[str]
+    Method: Optional[str]
+    ApiId: Optional[Union[str, Dict[str, str]]]
+    Stage: Optional[PassThrough]
+    Auth: Optional[PassThrough]
+    TimeoutInMillis: Optional[PassThrough]
+    RouteSettings: Optional[PassThrough]
+    PayloadFormatVersion: Optional[PassThrough]
+
+    @property
+    def _method(self) -> str:
+        """
+        Despite Method is optional, it will be set before entering here
+        in ImplicitHttpApiPlugin._process_api_events().
+        """
+        return cast(str, self.Method)
+
+    @property
+    def _path(self) -> str:
+        """
+        Despite Method is optional, it will be set before entering here
+        in ImplicitHttpApiPlugin._process_api_events().
+        """
+        return cast(str, self.Path)
+
     def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
         """
         If this API Event Source refers to an explicit API resource, resolve the reference and grab
         necessary data from the explicit API
         """
 
-        api_id = self.ApiId  # type: ignore[attr-defined]
+        api_id = self.ApiId
         if isinstance(api_id, dict) and "Ref" in api_id:
             api_id = api_id["Ref"]
 
@@ -1193,9 +1241,8 @@ class HttpApi(PushEventSource):
 
         function = kwargs.get("function")
 
-        if self.Method is not None:  # type: ignore[has-type]
-            # Convert to lower case so that user can specify either GET or get
-            self.Method = self.Method.lower()  # type: ignore[has-type]
+        # Convert to lower case so that user can specify either GET or get
+        self.Method = self._method.lower()
 
         resources.extend(self._get_permissions(kwargs))  # type: ignore[no-untyped-call]
 
@@ -1220,15 +1267,16 @@ class HttpApi(PushEventSource):
         # It turns out that APIGW doesn't like trailing slashes in paths (#665)
         # and removes as a part of their behaviour, but this isn't documented.
         # The regex removes the tailing slash to ensure the permission works as intended
-        path = re.sub(r"^(.+)/$", r"\1", self.Path)  # type: ignore[attr-defined]
+        path = re.sub(r"^(.+)/$", r"\1", self._path)
 
         editor = None
         if resources_to_link["explicit_api"].get("DefinitionBody"):
             try:
                 editor = OpenApiEditor(resources_to_link["explicit_api"].get("DefinitionBody"))
             except InvalidDocumentException as e:
-                api_logical_id = self.ApiId.get("Ref") if isinstance(self.ApiId, dict) else self.ApiId  # type: ignore[attr-defined]
-                raise InvalidResourceException(api_logical_id, " ".join(ex.message for ex in e.causes))
+                api_logical_id = self.ApiId.get("Ref") if isinstance(self.ApiId, dict) else self.ApiId
+                # TODO: api_logical_id is never None, try to make it consistent with what mypy thinks
+                raise InvalidResourceException(cast(str, api_logical_id), " ".join(ex.message for ex in e.causes))
 
         # If this is using the new $default path, keep path blank and add a * permission
         if path == OpenApiEditor._DEFAULT_PATH:
@@ -1243,18 +1291,18 @@ class HttpApi(PushEventSource):
             path = OpenApiEditor.get_path_without_trailing_slash(path)  # type: ignore[no-untyped-call]
 
         # Handle case where Method is already the ANY ApiGateway extension
-        if self.Method.lower() == "any" or self.Method.lower() == OpenApiEditor._X_ANY_METHOD:
+        if self._method.lower() == "any" or self._method.lower() == OpenApiEditor._X_ANY_METHOD:
             method = "*"
         else:
-            method = self.Method.upper()
+            method = self._method.upper()
 
-        api_id = self.ApiId  # type: ignore[attr-defined]
+        api_id = self.ApiId
 
         # when the Method is "ANY" and the path is '/$default' it adds an extra "*" which causes a bug
         # the generated ARN for permissions ends with /*/*/$default which causes the path to be invalid
         # see this issue: https://github.com/aws/serverless-application-model/issues/1860
         resource = "${__ApiId__}/${__Stage__}"
-        if self.Method.lower() == "any" and path == f"/{OpenApiEditor._DEFAULT_PATH}":
+        if self._method.lower() == "any" and path == f"/{OpenApiEditor._DEFAULT_PATH}":
             resource += path
         else:
             resource += f"/{method}{path}"
@@ -1279,12 +1327,12 @@ class HttpApi(PushEventSource):
 
         editor = OpenApiEditor(open_api_body)
 
-        if manage_swagger and editor.has_integration(self.Path, self.Method):  # type: ignore[attr-defined]
+        if manage_swagger and editor.has_integration(self._path, self._method):
             # Cannot add the Lambda Integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
                 "API method '{method}' defined multiple times for path '{path}'.".format(
-                    method=self.Method, path=self.Path  # type: ignore[attr-defined]
+                    method=self._method, path=self._path
                 ),
             )
 
@@ -1292,35 +1340,37 @@ class HttpApi(PushEventSource):
         if CONDITION in function.resource_attributes:
             condition = function.resource_attributes[CONDITION]
 
-        editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
-        if self.Auth:  # type: ignore[attr-defined]
-            self._add_auth_to_openapi_integration(api, api_id, editor)
-        if self.TimeoutInMillis:  # type: ignore[attr-defined]
-            editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)  # type: ignore[attr-defined, attr-defined, no-untyped-call]
-        path_parameters = re.findall("{(.*?)}", self.Path)  # type: ignore[attr-defined]
+        editor.add_lambda_integration(self._path, self._method, uri, self.Auth, api.get("Auth"), condition=condition)  # type: ignore[no-untyped-call]
+        if self.Auth:
+            self._add_auth_to_openapi_integration(api, api_id, editor, self.Auth)
+        if self.TimeoutInMillis:
+            editor.add_timeout_to_method(api=api, path=self._path, method_name=self._method, timeout=self.TimeoutInMillis)  # type: ignore[no-untyped-call]
+        path_parameters = re.findall("{(.*?)}", self._path)
         if path_parameters:
             editor.add_path_parameters_to_method(  # type: ignore[no-untyped-call]
-                api=api, path=self.Path, method_name=self.Method, path_parameters=path_parameters  # type: ignore[attr-defined]
+                api=api, path=self._path, method_name=self._method, path_parameters=path_parameters
             )
 
-        if self.PayloadFormatVersion:  # type: ignore[attr-defined]
+        if self.PayloadFormatVersion:
             editor.add_payload_format_version_to_method(  # type: ignore[no-untyped-call]
-                api=api, path=self.Path, method_name=self.Method, payload_format_version=self.PayloadFormatVersion  # type: ignore[attr-defined, attr-defined]
+                api=api, path=self._path, method_name=self._method, payload_format_version=self.PayloadFormatVersion
             )
         api["DefinitionBody"] = editor.openapi
 
-    def _add_auth_to_openapi_integration(self, api: Dict[str, Any], api_id: str, editor: OpenApiEditor) -> None:
+    def _add_auth_to_openapi_integration(
+        self, api: Dict[str, Any], api_id: str, editor: OpenApiEditor, auth: Dict[str, Any]
+    ) -> None:
         """Adds authorization to the lambda integration
         :param api: api object
         :param api_id: api logical id
         :param editor: OpenApiEditor object that contains the OpenApi definition
         """
-        method_authorizer = self.Auth.get("Authorizer")  # type: ignore[attr-defined]
+        method_authorizer = auth.get("Authorizer")
         api_auth = api.get("Auth", {})
         sam_expect(api_auth, api_id, "Auth").to_be_a_map()
         if not method_authorizer:
             if api_auth.get("DefaultAuthorizer"):
-                self.Auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")  # type: ignore[attr-defined]
+                auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")
             else:
                 # currently, we require either a default auth or auth in the method
                 raise InvalidEventException(
@@ -1337,7 +1387,7 @@ class HttpApi(PushEventSource):
         iam_authorizer_enabled = api_auth and api_auth.get("EnableIamAuthorizer", False) is True
 
         _check_valid_authorizer_types(  # type: ignore[no-untyped-call]
-            self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers, iam_authorizer_enabled  # type: ignore[attr-defined]
+            self.relative_id, self._method, self._path, method_authorizer, api_authorizers, iam_authorizer_enabled
         )
 
         if method_authorizer == "NONE":
@@ -1346,7 +1396,7 @@ class HttpApi(PushEventSource):
                     self.relative_id,
                     "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
                     "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                        method=self.Method, path=self.Path  # type: ignore[attr-defined]
+                        method=self._method, path=self._path
                     ),
                 )
         # If the method authorizer is "AWS_IAM" but it's not enabled it's possible that's a custom authorizer, not the "official" one.
@@ -1358,7 +1408,7 @@ class HttpApi(PushEventSource):
                     self.relative_id,
                     "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
                     "because the related API does not define any Authorizers.".format(
-                        authorizer=method_authorizer, method=self.Method, path=self.Path  # type: ignore[attr-defined]
+                        authorizer=method_authorizer, method=self._method, path=self._path
                     ),
                 )
 
@@ -1367,18 +1417,18 @@ class HttpApi(PushEventSource):
                     self.relative_id,
                     "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
                     "because it wasn't defined in the API's Authorizers.".format(
-                        authorizer=method_authorizer, method=self.Method, path=self.Path  # type: ignore[attr-defined]
+                        authorizer=method_authorizer, method=self._method, path=self._path
                     ),
                 )
 
-        if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):  # type: ignore[attr-defined]
+        if auth.get("AuthorizationScopes") and not isinstance(auth.get("AuthorizationScopes"), list):
             raise InvalidEventException(
                 self.relative_id,
                 "Unable to set Authorizer on API method [{method}] for path [{path}] because "
-                "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),  # type: ignore[attr-defined]
+                "'AuthorizationScopes' must be a list of strings.".format(method=self._method, path=self._path),
             )
 
-        editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)  # type: ignore[no-untyped-call, attr-defined, attr-defined]
+        editor.add_auth_to_method(api=api, path=self._path, method_name=self._method, auth=self.Auth)  # type: ignore[no-untyped-call]
 
 
 def _build_apigw_integration_uri(function, partition):  # type: ignore[no-untyped-def]
