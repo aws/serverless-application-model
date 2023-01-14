@@ -55,13 +55,9 @@ class _ResourcePropertyValueValidator(Generic[T]):
                 )
             if self.resource_logical_id:
                 if self.is_resource_attribute:
-                    raise InvalidDocumentException(
-                        [
-                            InvalidResourceAttributeTypeException(
+                    raise InvalidResourceAttributeTypeException(
                                 self.resource_logical_id, self.key_path, expected_type, message
                             )
-                        ]
-                    )
                 raise InvalidResourcePropertyTypeException(
                     self.resource_logical_id, self.key_path, expected_type, message
                 )
