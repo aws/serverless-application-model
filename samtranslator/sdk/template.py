@@ -1,13 +1,13 @@
-from typing import Any, Dict, Iterator, Optional, Set, Tuple, Union
-
-from samtranslator.sdk.resource import SamResource
-
 """
 Classes representing SAM template and resources.
 """
 
+from typing import Any, Dict, Iterator, Optional, Set, Tuple, Union
 
-class SamTemplate(object):
+from samtranslator.sdk.resource import SamResource
+
+
+class SamTemplate:
     """
     Class representing the SAM template
     """

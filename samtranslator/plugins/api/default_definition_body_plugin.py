@@ -14,13 +14,6 @@ class DefaultDefinitionBodyPlugin(BasePlugin):
     to a minimum Swagger definition and sets `__MANAGE_SWAGGER: true`.
     """
 
-    def __init__(self) -> None:
-        """
-        Initialize the plugin.
-        """
-
-        super(DefaultDefinitionBodyPlugin, self).__init__(DefaultDefinitionBodyPlugin.__name__)
-
     @cw_timer(prefix="Plugin-DefaultDefinitionBody")
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """

@@ -1,4 +1,5 @@
 import json
+from abc import ABCMeta
 from typing import Any, Dict, Optional, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
@@ -18,7 +19,7 @@ CONDITION = "Condition"
 SFN_EVETSOURCE_METRIC_PREFIX = "SFNEventSource"
 
 
-class EventSource(ResourceMacro):
+class EventSource(ResourceMacro, metaclass=ABCMeta):
     """Base class for event sources for SAM State Machine.
 
     :cvar str principal: The AWS service principal of the source service.

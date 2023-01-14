@@ -135,36 +135,36 @@ def make_shorthand(intrinsic_dict: Dict[str, Any]) -> str:
     raise NotImplementedError("Shorthanding is only supported for Ref and Fn::GetAtt")
 
 
-def is_intrinsic(input: Any) -> bool:
+def is_intrinsic(_input: Any) -> bool:
     """
-    Checks if the given input is an intrinsic function dictionary. Intrinsic function is a dictionary with single
+    Checks if the given _input is an intrinsic function dictionary. Intrinsic function is a dictionary with single
     key that is the name of the intrinsics.
 
-    :param input: Input value to check if it is an intrinsic
+    :param _input: Input value to check if it is an intrinsic
     :return: True, if yes
     """
 
-    if input is not None and isinstance(input, dict) and len(input) == 1:
+    if _input is not None and isinstance(_input, dict) and len(_input) == 1:
 
-        key: str = list(input.keys())[0]
+        key: str = list(_input.keys())[0]
         return key == "Ref" or key == "Condition" or key.startswith("Fn::")
 
     return False
 
 
-def is_intrinsic_if(input: Any) -> bool:
+def is_intrinsic_if(_input: Any) -> bool:
     """
     Is the given input an intrinsic if? Intrinsic function 'if' is a dictionary with single
     key - if
 
-    :param input: Input value to check if it is an intrinsic if
+    :param _input: Input value to check if it is an intrinsic if
     :return: True, if yes
     """
 
-    if not is_intrinsic(input):
+    if not is_intrinsic(_input):
         return False
 
-    key: str = list(input.keys())[0]
+    key: str = list(_input.keys())[0]
     return key == "Fn::If"
 
 
@@ -186,39 +186,39 @@ def validate_intrinsic_if_items(items: Any) -> None:
         raise ValueError("Fn::If requires 3 arguments")
 
 
-def is_intrinsic_no_value(input: Any) -> bool:
+def is_intrinsic_no_value(_input: Any) -> bool:
     """
     Is the given input an intrinsic Ref: AWS::NoValue? Intrinsic function is a dictionary with single
     key - Ref and value - AWS::NoValue
 
-    :param input: Input value to check if it is an intrinsic if
+    :param _input: Input value to check if it is an intrinsic if
     :return: True, if yes
     """
 
-    if not is_intrinsic(input):
+    if not is_intrinsic(_input):
         return False
 
-    key: str = list(input.keys())[0]
-    return key == "Ref" and input["Ref"] == "AWS::NoValue"
+    key: str = list(_input.keys())[0]
+    return key == "Ref" and _input["Ref"] == "AWS::NoValue"
 
 
-def get_logical_id_from_intrinsic(input: Any) -> Optional[str]:
+def get_logical_id_from_intrinsic(_input: Any) -> Optional[str]:
     """
     Verify if input is an Fn:GetAtt or Ref intrinsic
 
-    :param input: Input value to check if it is an intrinsic
+    :param _input: Input value to check if it is an intrinsic
     :return: logical id if yes, return input for any other intrinsic function
     """
-    if not is_intrinsic(input):
+    if not is_intrinsic(_input):
         return None
 
     # !Ref <logical-id>
-    v = input.get("Ref")
+    v = _input.get("Ref")
     if isinstance(v, str):
         return v
 
     # Fn::GetAtt: [<logical-id>, <attribute>]
-    v = input.get("Fn::GetAtt")
+    v = _input.get("Fn::GetAtt")
     if isinstance(v, list) and len(v) == 2 and isinstance(v[0], str):
         return v[0]
 

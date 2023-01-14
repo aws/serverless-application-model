@@ -153,4 +153,4 @@ class ImplicitHttpApiResource(SamResource):
             },
         }
 
-        super(ImplicitHttpApiResource, self).__init__(resource)
+        super().__init__(resource)
