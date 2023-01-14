@@ -101,12 +101,12 @@ class _ResourcePropertyValueValidator(Generic[T]):
         """
         return cast(str, self.to_be_a(ExpectedType.STRING, message))
 
-    def to_be_an_integer(self, message: Optional[str] = "") -> str:
+    def to_be_an_integer(self, message: Optional[str] = "") -> int:
         """
         Return the value with type hint "int".
         Raise InvalidResourceException/InvalidEventException if the value is not.
         """
-        return cast(str, self.to_be_a(ExpectedType.INTEGER, message))
+        return cast(int, self.to_be_a(ExpectedType.INTEGER, message))
 
 
 sam_expect = _ResourcePropertyValueValidator
