@@ -1,8 +1,3 @@
 {
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [WrongTruststoreUri] is invalid. Available MutualTlsAuthentication fields are ['TruststoreUri', 'TruststoreVersion'].",
-  "errors": [
-    {
-      "errorMessage": "Resource with id [WrongTruststoreUri] is invalid. MutualTlsAuthentication must contains one of the following fields ['TruststoreUri', 'TruststoreVersion']."
-    }
-  ]
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApi] is invalid. Available Domain.MutualTlsAuthentication fields are ['TruststoreUri', 'TruststoreVersion']."
 }

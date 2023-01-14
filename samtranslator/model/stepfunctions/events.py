@@ -7,6 +7,7 @@ from samtranslator.model.events import EventsRule
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.types import IS_DICT, IS_STR, is_type
 from samtranslator.model.intrinsics import fnSub
+from samtranslator.schema.common import PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
@@ -95,6 +96,16 @@ class Schedule(EventSource):
         "Target": Property(False, IS_DICT),
     }
 
+    Schedule: PassThrough
+    Input: Optional[PassThrough]
+    Enabled: Optional[bool]
+    State: Optional[PassThrough]
+    Name: Optional[PassThrough]
+    Description: Optional[PassThrough]
+    DeadLetterConfig: Optional[Dict[str, Any]]
+    RetryPolicy: Optional[PassThrough]
+    Target: Optional[PassThrough]
+
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the EventBridge Rule and IAM Role to which this Schedule event source corresponds.
@@ -111,27 +122,27 @@ class Schedule(EventSource):
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         resources.append(events_rule)
 
-        events_rule.ScheduleExpression = self.Schedule  # type: ignore[attr-defined]
+        events_rule.ScheduleExpression = self.Schedule
 
-        if self.State and self.Enabled is not None:  # type: ignore[attr-defined, attr-defined]
+        if self.State and self.Enabled is not None:
             raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
 
-        if self.State:  # type: ignore[attr-defined]
-            events_rule.State = self.State  # type: ignore[attr-defined]
+        if self.State:
+            events_rule.State = self.State
 
-        if self.Enabled is not None:  # type: ignore[attr-defined]
-            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"  # type: ignore[attr-defined]
+        if self.Enabled is not None:
+            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
 
-        events_rule.Name = self.Name  # type: ignore[attr-defined]
-        events_rule.Description = self.Description  # type: ignore[attr-defined]
+        events_rule.Name = self.Name
+        events_rule.Description = self.Description
 
         role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
         resources.append(role)
 
         source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
-        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
-            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[no-untyped-call]
             dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(  # type: ignore[no-untyped-call]
                 self, source_arn, passthrough_resource_attributes
             )
@@ -154,14 +165,14 @@ class Schedule(EventSource):
             "Id": target_id,
             "RoleArn": role.get_runtime_attr("arn"),
         }
-        if self.Input is not None:  # type: ignore[attr-defined]
-            target["Input"] = self.Input  # type: ignore[attr-defined]
+        if self.Input is not None:
+            target["Input"] = self.Input
 
-        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
+        if self.DeadLetterConfig is not None:
             target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
 
-        if self.RetryPolicy is not None:  # type: ignore[attr-defined]
-            target["RetryPolicy"] = self.RetryPolicy  # type: ignore[attr-defined]
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
 
         return target
 
@@ -183,6 +194,16 @@ class CloudWatchEvent(EventSource):
         "Target": Property(False, IS_DICT),
     }
 
+    EventBusName: Optional[PassThrough]
+    RuleName: Optional[PassThrough]
+    Pattern: Optional[PassThrough]
+    Input: Optional[PassThrough]
+    InputPath: Optional[PassThrough]
+    DeadLetterConfig: Optional[Dict[str, Any]]
+    RetryPolicy: Optional[PassThrough]
+    State: Optional[PassThrough]
+    Target: Optional[PassThrough]
+
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
         """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this
@@ -198,12 +219,12 @@ class CloudWatchEvent(EventSource):
 
         passthrough_resource_attributes = resource.get_passthrough_resource_attributes()
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
-        events_rule.EventBusName = self.EventBusName  # type: ignore[attr-defined]
-        events_rule.EventPattern = self.Pattern  # type: ignore[attr-defined]
-        events_rule.Name = self.RuleName  # type: ignore[attr-defined]
+        events_rule.EventBusName = self.EventBusName
+        events_rule.EventPattern = self.Pattern
+        events_rule.Name = self.RuleName
 
-        if self.State:  # type: ignore[attr-defined]
-            events_rule.State = self.State  # type: ignore[attr-defined]
+        if self.State:
+            events_rule.State = self.State
 
         resources.append(events_rule)
 
@@ -212,8 +233,8 @@ class CloudWatchEvent(EventSource):
 
         source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
-        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
-            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[attr-defined, no-untyped-call]
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)  # type: ignore[no-untyped-call]
             dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(  # type: ignore[no-untyped-call]
                 self, source_arn, passthrough_resource_attributes
             )
@@ -237,17 +258,17 @@ class CloudWatchEvent(EventSource):
             "Id": target_id,
             "RoleArn": role.get_runtime_attr("arn"),
         }
-        if self.Input is not None:  # type: ignore[attr-defined]
-            target["Input"] = self.Input  # type: ignore[attr-defined]
+        if self.Input is not None:
+            target["Input"] = self.Input
 
-        if self.InputPath is not None:  # type: ignore[attr-defined]
-            target["InputPath"] = self.InputPath  # type: ignore[attr-defined]
+        if self.InputPath is not None:
+            target["InputPath"] = self.InputPath
 
-        if self.DeadLetterConfig is not None:  # type: ignore[attr-defined]
+        if self.DeadLetterConfig is not None:
             target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
 
-        if self.RetryPolicy is not None:  # type: ignore[attr-defined]
-            target["RetryPolicy"] = self.RetryPolicy  # type: ignore[attr-defined]
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
 
         return target
 

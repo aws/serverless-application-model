@@ -473,31 +473,24 @@ class ApiGenerator(object):
 
         mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
         if mutual_tls_auth:
-            if isinstance(mutual_tls_auth, dict):
-                if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
-                    invalid_keys = []
-                    for key in mutual_tls_auth.keys():
-                        if not key in {"TruststoreUri", "TruststoreVersion"}:
-                            invalid_keys.append(key)
-                    invalid_keys.sort()
-                    raise InvalidResourceException(
-                        ",".join(invalid_keys),
-                        "Available MutualTlsAuthentication fields are {}.".format(
-                            ["TruststoreUri", "TruststoreVersion"]
-                        ),
-                    )
-                domain.MutualTlsAuthentication = {}
-                if mutual_tls_auth.get("TruststoreUri", None):
-                    domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]  # type: ignore[attr-defined]
-                if mutual_tls_auth.get("TruststoreVersion", None):
-                    domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]  # type: ignore[attr-defined]
-            else:
+            sam_expect(mutual_tls_auth, self.logical_id, "Domain.MutualTlsAuthentication").to_be_a_map()
+            if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
+                invalid_keys = []
+                for key in mutual_tls_auth.keys():
+                    if not key in {"TruststoreUri", "TruststoreVersion"}:
+                        invalid_keys.append(key)
+                invalid_keys.sort()
                 raise InvalidResourceException(
-                    mutual_tls_auth,
-                    "MutualTlsAuthentication must be a map with at least one of the following fields {}.".format(
+                    self.logical_id,
+                    "Available Domain.MutualTlsAuthentication fields are {}.".format(
                         ["TruststoreUri", "TruststoreVersion"]
                     ),
                 )
+            domain.MutualTlsAuthentication = {}
+            if mutual_tls_auth.get("TruststoreUri", None):
+                domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
+            if mutual_tls_auth.get("TruststoreVersion", None):
+                domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
 
         if self.domain.get("SecurityPolicy", None):
             domain.SecurityPolicy = self.domain["SecurityPolicy"]
@@ -788,7 +781,7 @@ class ApiGenerator(object):
             raise InvalidResourceException(self.logical_id, "Invalid property for 'UsagePlan'")
 
         create_usage_plan = usage_plan_properties.get("CreateUsagePlan")
-        usage_plan = None
+        usage_plan: Optional[ApiGatewayUsagePlan] = None
         api_key = None
         usage_plan_key = None
 
