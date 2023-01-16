@@ -56,7 +56,7 @@ def main() -> None:
     obj["$schema"] = "http://json-schema.org/draft-04/schema#"
 
     cfn_schema = json.loads(Path("samtranslator/schema/cloudformation.schema.json").read_bytes())
-    # extend_with_cfn_schema(obj, cfn_schema)
+    extend_with_cfn_schema(obj, cfn_schema)
 
     print(json.dumps(obj, indent=2, sort_keys=True))
 
