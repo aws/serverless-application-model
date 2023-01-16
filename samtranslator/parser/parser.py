@@ -51,7 +51,7 @@ class Parser:
                     sam_resource.properties, resource_logical_id, "Properties", is_resource_attribute=True
                 ).to_be_a_map()
             except InvalidResourceAttributeTypeException as e:
-                raise InvalidDocumentException([e])
+                raise InvalidDocumentException([e]) from e
 
     # private methods
     def _validate(self, sam_template, parameter_values):  # type: ignore[no-untyped-def]
