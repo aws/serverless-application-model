@@ -355,8 +355,8 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
 
     def test_must_work_with_api_events(self):
         api_events = {
-            "Api1": {"Type": "Api", "Properties": {"Path": "/", "Method": "GET"}},
-            "Api2": {"Type": "Api", "Properties": {"Path": "/foo", "Method": "POST"}},
+            "Api1": {"Type": "Api", "Properties": {"Path": "/", "Method": "GET", "RestApiId": "RestApi"}},
+            "Api2": {"Type": "Api", "Properties": {"Path": "/foo", "Method": "POST", "RestApiId": "RestApi"}},
         }
 
         template = Mock()
@@ -367,13 +367,16 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         self.plugin._process_api_events(function, api_events, template)
 
         self.plugin._add_implicit_api_id_if_necessary.assert_has_calls(
-            [call({"Path": "/", "Method": "GET"}), call({"Path": "/foo", "Method": "POST"})]
+            [
+                call({"Path": "/", "Method": "GET", "RestApiId": "RestApi"}),
+                call({"Path": "/foo", "Method": "POST", "RestApiId": "RestApi"}),
+            ]
         )
 
         self.plugin._add_api_to_swagger.assert_has_calls(
             [
-                call("Api1", {"Path": "/", "Method": "GET"}, template),
-                call("Api2", {"Path": "/foo", "Method": "POST"}, template),
+                call("Api1", {"Path": "/", "Method": "GET", "RestApiId": "RestApi"}, template),
+                call("Api2", {"Path": "/foo", "Method": "POST", "RestApiId": "RestApi"}, template),
             ]
         )
 
@@ -435,16 +438,23 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
 
     def test_must_skip_events_without_properties(self):
 
-        api_events = {"Api1": {"Type": "Api"}, "Api2": {"Type": "Api", "Properties": {"Path": "/", "Method": "GET"}}}
+        api_events = {
+            "Api1": {"Type": "Api", "RestApiId": "RestApi"},
+            "Api2": {"Type": "Api", "Properties": {"RestApiId": "RestApi", "Path": "/", "Method": "GET"}},
+        }
 
         template = Mock()
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": {"Events": api_events}})
 
         self.plugin._process_api_events(function, api_events, template)
 
-        self.plugin._add_implicit_api_id_if_necessary.assert_has_calls([call({"Path": "/", "Method": "GET"})])
+        self.plugin._add_implicit_api_id_if_necessary.assert_has_calls(
+            [call({"Path": "/", "Method": "GET", "RestApiId": "RestApi"})]
+        )
 
-        self.plugin._add_api_to_swagger.assert_has_calls([call("Api2", {"Path": "/", "Method": "GET"}, template)])
+        self.plugin._add_api_to_swagger.assert_has_calls(
+            [call("Api2", {"Path": "/", "Method": "GET", "RestApiId": "RestApi"}, template)]
+        )
 
     def test_must_retain_side_effect_of_modifying_events(self):
         """
@@ -452,8 +462,22 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         """
 
         api_events = {
-            "Api1": {"Type": "Api", "Properties": {"Path": "/", "Method": "get"}},
-            "Api2": {"Type": "Api", "Properties": {"Path": "/foo", "Method": "post"}},
+            "Api1": {
+                "Type": "Api",
+                "Properties": {
+                    "Path": "/",
+                    "Method": "get",
+                    "RestApiId": "RestApi",
+                },
+            },
+            "Api2": {
+                "Type": "Api",
+                "Properties": {
+                    "Path": "/foo",
+                    "Method": "post",
+                    "RestApiId": "RestApi",
+                },
+            },
         }
 
         template = Mock()
@@ -465,7 +489,7 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
                         "Api1": "Intentionally setting this value to a string for testing. "
                         "This should be replaced by API Event after processing",
                         "Api2": "must be replaced",
-                    }
+                    },
                 },
             }
         )
@@ -479,15 +503,21 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         self.plugin._process_api_events(function, api_events, template)
 
         # Side effect must be visible after call returns on the input object
-        self.assertEqual(api_events["Api1"]["Properties"], {"Path": "/", "Method": "get", "Key": "Value"})
-        self.assertEqual(api_events["Api2"]["Properties"], {"Path": "/foo", "Method": "post", "Key": "Value"})
+        self.assertEqual(
+            api_events["Api1"]["Properties"], {"Path": "/", "Method": "get", "Key": "Value", "RestApiId": "RestApi"}
+        )
+        self.assertEqual(
+            api_events["Api2"]["Properties"], {"Path": "/foo", "Method": "post", "Key": "Value", "RestApiId": "RestApi"}
+        )
 
         # Every Event object inside the SamResource class must be entirely replaced by input api_events with side effect
         self.assertEqual(
-            function.properties["Events"]["Api1"]["Properties"], {"Path": "/", "Method": "get", "Key": "Value"}
+            function.properties["Events"]["Api1"]["Properties"],
+            {"Path": "/", "Method": "get", "Key": "Value", "RestApiId": "RestApi"},
         )
         self.assertEqual(
-            function.properties["Events"]["Api2"]["Properties"], {"Path": "/foo", "Method": "post", "Key": "Value"}
+            function.properties["Events"]["Api2"]["Properties"],
+            {"Path": "/foo", "Method": "post", "Key": "Value", "RestApiId": "RestApi"},
         )
 
         # Subsequent calls must be made with the side effect. This is important.
@@ -496,13 +526,13 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
                 call(
                     "Api1",
                     # Side effects should be visible here
-                    {"Path": "/", "Method": "get", "Key": "Value"},
+                    {"Path": "/", "Method": "get", "Key": "Value", "RestApiId": "RestApi"},
                     template,
                 ),
                 call(
                     "Api2",
                     # Side effects should be visible here
-                    {"Path": "/foo", "Method": "post", "Key": "Value"},
+                    {"Path": "/foo", "Method": "post", "Key": "Value", "RestApiId": "RestApi"},
                     template,
                 ),
             ]
@@ -554,7 +584,7 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
         editor_mock = Mock()
         SwaggerEditorMock.return_value = editor_mock
         editor_mock.swagger = updated_swagger
-        self.plugin.editor = SwaggerEditorMock
+        self.plugin.EDITOR_CLASS = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -592,7 +622,7 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
         editor_mock = Mock()
         SwaggerEditorMock.return_value = editor_mock
         editor_mock.swagger = updated_swagger
-        self.plugin.editor = SwaggerEditorMock
+        self.plugin.EDITOR_CLASS = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -645,7 +675,7 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
 
         SwaggerEditorMock.is_valid = Mock()
         SwaggerEditorMock.is_valid.return_value = False
-        self.plugin.editor = SwaggerEditorMock
+        self.plugin.EDITOR_CLASS = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -668,7 +698,7 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
 
         SwaggerEditorMock.is_valid = Mock()
         SwaggerEditorMock.is_valid.return_value = False
-        self.plugin.editor = SwaggerEditorMock
+        self.plugin.EDITOR_CLASS = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -690,7 +720,7 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
         mock_api = SamResource({"Type": "AWS::Serverless::Api", "Properties": "this is not a valid property"})
 
         SwaggerEditorMock.is_valid = Mock()
-        self.plugin.editor = SwaggerEditorMock
+        self.plugin.EDITOR_CLASS = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -723,7 +753,7 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
         )
 
         SwaggerEditorMock.is_valid = Mock()
-        self.plugin.editor = SwaggerEditorMock
+        self.plugin.EDITOR_CLASS = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -755,7 +785,7 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
         )
 
         SwaggerEditorMock.is_valid = Mock()
-        self.plugin.editor = SwaggerEditorMock
+        self.plugin.EDITOR_CLASS = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()

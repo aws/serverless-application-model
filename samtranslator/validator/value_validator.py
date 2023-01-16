@@ -73,12 +73,20 @@ class _ResourcePropertyValueValidator(Generic[T]):
     # alias methods:
     #
     def to_be_a_map(self, message: Optional[str] = "") -> Dict[str, Any]:
+        """
+        Return the value with type hint "Dict[str, Any]".
+        Raise InvalidResourceException/InvalidEventException if the value is not.
+        """
         return cast(Dict[str, Any], self.to_be_a(ExpectedType.MAP, message))
 
     def to_be_a_list(self, message: Optional[str] = "") -> T:
         return self.to_be_a(ExpectedType.LIST, message)
 
     def to_be_a_list_of(self, expected_type: ExpectedType, message: Optional[str] = "") -> T:
+        """
+        Return the value with type hint "List[T]".
+        Raise InvalidResourceException/InvalidEventException if the value is not.
+        """
         value = self.to_be_a(ExpectedType.LIST, message)
         for index, item in enumerate(value):  # type: ignore
             sam_expect(
@@ -86,11 +94,19 @@ class _ResourcePropertyValueValidator(Generic[T]):
             ).to_be_a(expected_type, message)
         return value
 
-    def to_be_a_string(self, message: Optional[str] = "") -> T:
-        return self.to_be_a(ExpectedType.STRING, message)
+    def to_be_a_string(self, message: Optional[str] = "") -> str:
+        """
+        Return the value with type hint "str".
+        Raise InvalidResourceException/InvalidEventException if the value is not.
+        """
+        return cast(str, self.to_be_a(ExpectedType.STRING, message))
 
-    def to_be_an_integer(self, message: Optional[str] = "") -> T:
-        return self.to_be_a(ExpectedType.INTEGER, message)
+    def to_be_an_integer(self, message: Optional[str] = "") -> int:
+        """
+        Return the value with type hint "int".
+        Raise InvalidResourceException/InvalidEventException if the value is not.
+        """
+        return cast(int, self.to_be_a(ExpectedType.INTEGER, message))
 
 
 sam_expect = _ResourcePropertyValueValidator
