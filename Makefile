@@ -44,6 +44,9 @@ lint:
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
 
+update-cfn-schema:
+	curl -o samtranslator/schema/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
+
 schema:
 	python samtranslator/schema/schema.py > samtranslator/schema/schema.json
 

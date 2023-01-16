@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 from typing import Dict, Optional, Union
 
@@ -15,7 +16,6 @@ from samtranslator.schema import (
     aws_serverless_layerversion,
     aws_serverless_api,
     aws_serverless_httpapi,
-    any_cfn_resource,
 )
 
 
@@ -39,9 +39,12 @@ class Model(LenientBaseModel):
             aws_serverless_api.Resource,
             aws_serverless_httpapi.Resource,
             aws_serverless_application.Resource,
-            any_cfn_resource.Resource,
         ],
     ]
+
+
+def extend_with_cfn_schema(sam_schema, cfn_schema) -> None:
+    sam_schema["definitions"].update(cfn_schema["definitions"])
 
 
 def main() -> None:
@@ -51,6 +54,9 @@ def main() -> None:
     # https://github.com/pydantic/pydantic/issues/1478
     # Validated in https://github.com/aws/serverless-application-model/blob/5c82f5d2ae95adabc9827398fba8ccfc3dbe101a/tests/schema/test_validate_schema.py#L91
     obj["$schema"] = "http://json-schema.org/draft-04/schema#"
+
+    cfn_schema = json.loads(Path("samtranslator/schema/cloudformation.schema.json").read_bytes())
+    # extend_with_cfn_schema(obj, cfn_schema)
 
     print(json.dumps(obj, indent=2, sort_keys=True))
 

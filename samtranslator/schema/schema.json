@@ -2285,20 +2285,6 @@
       "title": "Globals",
       "type": "object"
     },
-    "samtranslator__schema__any_cfn_resource__Resource": {
-      "properties": {
-        "Type": {
-          "pattern": "^(?!AWS::Serverless::).+$",
-          "title": "Type",
-          "type": "string"
-        }
-      },
-      "required": [
-        "Type"
-      ],
-      "title": "Resource",
-      "type": "object"
-    },
     "samtranslator__schema__aws_serverless_api__Auth": {
       "additionalProperties": false,
       "properties": {
@@ -5650,9 +5636,6 @@
           },
           {
             "$ref": "#/definitions/samtranslator__schema__aws_serverless_application__Resource"
-          },
-          {
-            "$ref": "#/definitions/samtranslator__schema__any_cfn_resource__Resource"
           }
         ]
       },
