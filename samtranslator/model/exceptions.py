@@ -48,10 +48,10 @@ class DuplicateLogicalIdException(ExceptionWithMessage):
         message -- explanation of the error
     """
 
-    def __init__(self, logical_id: str, duplicate_id: str, type: str) -> None:
+    def __init__(self, logical_id: str, duplicate_id: str, resource_type: str) -> None:
         self._logical_id = logical_id
         self._duplicate_id = duplicate_id
-        self._type = type
+        self._type = resource_type
 
     @property
     def message(self) -> str:

@@ -887,7 +887,6 @@ class SwaggerEditor(BaseEditor):
         Add resource policy definition to Swagger.
 
         :param dict resource_policy: Dictionary of resource_policy statements which gets translated
-        :return:
         """
         if resource_policy is None:
             return
@@ -1161,7 +1160,6 @@ class SwaggerEditor(BaseEditor):
         :param string path: Path name
         :param string method_name: Method name
         :param list request_parameters: Dictionary of Parameters
-        :return:
         """
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):

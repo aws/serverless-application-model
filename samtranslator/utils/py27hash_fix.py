@@ -36,10 +36,6 @@ def to_py27_compatible_template(template, parameter_values=None):  # type: ignor
     ----------
     template: dict
         input template
-
-    Returns
-    -------
-    None
     """
     # Passing to parser for a simple validation. Validation is normally done within translator.translate(...).
     # However, becuase this conversion is done before translate and also requires the template to be valid, we
@@ -111,24 +107,24 @@ class Py27UniStr(unicode_string_type):
     """
 
     def __add__(self, other):  # type: ignore[no-untyped-def]
-        return Py27UniStr(super(Py27UniStr, self).__add__(other))
+        return Py27UniStr(super().__add__(other))
 
     def __repr__(self) -> str:
-        return "u" + super(Py27UniStr, self).encode("unicode_escape").decode("ascii").__repr__().replace("\\\\", "\\")
+        return "u" + super().encode("unicode_escape").decode("ascii").__repr__().replace("\\\\", "\\")
 
     def upper(self) -> "Py27UniStr":
-        return Py27UniStr(super(Py27UniStr, self).upper())
+        return Py27UniStr(super().upper())
 
     def lower(self) -> "Py27UniStr":
-        return Py27UniStr(super(Py27UniStr, self).lower())
+        return Py27UniStr(super().lower())
 
     def replace(self, __old, __new, __count=None):  # type: ignore[no-untyped-def]
         if __count:
-            return Py27UniStr(super(Py27UniStr, self).replace(__old, __new, __count))
-        return Py27UniStr(super(Py27UniStr, self).replace(__old, __new))
+            return Py27UniStr(super().replace(__old, __new, __count))
+        return Py27UniStr(super().replace(__old, __new))
 
     def split(self, sep=None, maxsplit=-1):  # type: ignore[no-untyped-def]
-        return [Py27UniStr(s) for s in super(Py27UniStr, self).split(sep, maxsplit)]
+        return [Py27UniStr(s) for s in super().split(sep, maxsplit)]
 
     def __deepcopy__(self, memo):  # type: ignore[no-untyped-def]
         return self  # strings are immutable
@@ -150,14 +146,14 @@ class Py27LongInt(long_int_type):
 
     def __repr__(self) -> str:
         if self > Py27LongInt.PY2_MAX_INT:
-            return super(Py27LongInt, self).__repr__() + "L"
-        return super(Py27LongInt, self).__repr__()
+            return super().__repr__() + "L"
+        return super().__repr__()
 
     def __deepcopy__(self, memo):  # type: ignore[no-untyped-def]
         return self  # primitive types (ints) are immutable
 
 
-class Py27Keys(object):
+class Py27Keys:
     """
     A class for tracking keys based on based on Python 2.7 order.
     Based on https://github.com/python/cpython/blob/v2.7.18/Objects/dictobject.c.
@@ -171,7 +167,7 @@ class Py27Keys(object):
     DUMMY: str = cast(str, ["dummy"])
 
     def __init__(self) -> None:
-        super(Py27Keys, self).__init__()
+        super().__init__()
         self.debug = False
         self.keyorder: Dict[int, str] = {}
         self.size = 0  # current size of the keys, equivalent to ma_used in dictobject.c
@@ -355,7 +351,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         """
         Overrides dict logic to always call set item. This allows Python2.7 style iteration
         """
-        super(Py27Dict, self).__init__()
+        super().__init__()
 
         # Initialize iteration key list
         self.keylist = Py27Keys()
@@ -369,7 +365,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         for k, v in self.__dict__.items():
             setattr(result, k, copy.deepcopy(v, memo))
 
-        for key, value in super(Py27Dict, self).items():
+        for key, value in super().items():
             super(Py27Dict, result).__setitem__(copy.deepcopy(key, memo), copy.deepcopy(value, memo))
 
         return result
@@ -379,7 +375,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         Method necessary to fully pickle Python 3 subclassed dict objects with attribute fields.
         """
         # pylint: disable = W0235
-        return super(Py27Dict, self).__reduce__()
+        return super().__reduce__()
 
     def __setitem__(self, key, value):  # type: ignore[no-untyped-def]
         """
@@ -390,7 +386,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         key: hashable
         value: Any
         """
-        super(Py27Dict, self).__setitem__(key, value)
+        super().__setitem__(key, value)
         self.keylist.add(key)  # type: ignore[no-untyped-call]
 
     def __delitem__(self, key):  # type: ignore[no-untyped-def]
@@ -401,7 +397,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         ----------
         key: hashable
         """
-        super(Py27Dict, self).__delitem__(key)
+        super().__delitem__(key)
         self.keylist.remove(key)  # type: ignore[no-untyped-call]
 
     def update(self, *args, **kwargs):  # type: ignore[no-untyped-def]
@@ -430,7 +426,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         """
         Clears the dict along with its backing Python2.7 keylist.
         """
-        super(Py27Dict, self).clear()
+        super().clear()
         self.keylist = Py27Keys()
 
     def copy(self) -> "Py27Dict":
@@ -469,7 +465,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         Any
             value of key if found or default
         """
-        value = super(Py27Dict, self).pop(key, default)
+        value = super().pop(key, default)
         self.keylist.remove(key)  # type: ignore[no-untyped-call]
         return value
 
@@ -556,6 +552,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         list
             list of values
         """
+        # pylint: disable=consider-using-dict-items
         return [self[k] for k in self.keys()]  # type: ignore[no-untyped-call]
 
     def items(self):  # type: ignore[no-untyped-def]
@@ -567,6 +564,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         list
             list of items
         """
+        # pylint: disable=consider-using-dict-items
         return [(k, self[k]) for k in self.keys()]  # type: ignore[no-untyped-call]
 
     def setdefault(self, key, default):  # type: ignore[no-untyped-def]
