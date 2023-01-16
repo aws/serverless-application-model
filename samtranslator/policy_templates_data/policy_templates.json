@@ -1385,35 +1385,6 @@
         }
       }
     },
-    "LocationSearchPolicy": {
-      "Definition": {
-        "Statement": [
-          {
-            "Action": [
-              "geo:SearchPlaceIndexForPosition",
-              "geo:SearchPlaceIndexForText"
-            ],
-            "Effect": "Allow",
-            "Resource": {
-              "Fn::Sub": [
-                "arn:${AWS::Partition}:geo:${AWS::Region}:${AWS::AccountId}:place-index/${placeIndex}",
-                {
-                  "placeIndex": {
-                    "Ref": "PlaceIndex"
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "Description": "Gives permission to search on a place index resource",
-      "Parameters": {
-        "PlaceIndex": {
-          "Description": "The name of the place index resource"
-        }
-      }
-    },
     "MobileAnalyticsWriteOnlyAccessPolicy": {
       "Definition": {
         "Statement": [
