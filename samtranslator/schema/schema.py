@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 
 from samtranslator.schema.common import BaseModel, LenientBaseModel
@@ -43,7 +43,7 @@ class Model(LenientBaseModel):
     ]
 
 
-def extend_with_cfn_schema(sam_schema, cfn_schema) -> None:
+def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any]) -> None:
     # TODO: Ensure not overwriting
     sam_schema["definitions"].update(cfn_schema["definitions"])
 
