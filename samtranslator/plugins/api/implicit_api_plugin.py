@@ -54,7 +54,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         """
         Initialize the plugin.
         """
-        super().__init__(self._name())
+        super().__init__()
 
         self.existing_implicit_api_resource: Optional[SamResource] = None
         # dict containing condition (or None) for each resource path+method for all APIs. dict format:
@@ -62,10 +62,6 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         self.api_conditions: Dict[str, Any] = {}
         self.api_deletion_policies: Dict[str, Any] = {}
         self.api_update_replace_policies: Dict[str, Any] = {}
-
-    @classmethod
-    def _name(cls) -> str:
-        return cls.__name__
 
     @abstractmethod
     def _process_api_events(
@@ -106,7 +102,6 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         The template has pass the validation and is guaranteed to contain a non-empty "Resources" section.
 
         :param dict template_dict: Dictionary of the SAM template
-        :return: Nothing
         """
 
         template = SamTemplate(template_dict)

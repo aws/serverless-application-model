@@ -112,4 +112,4 @@ class ImplicitApiResource(SamResource):
             },
         }
 
-        super(ImplicitApiResource, self).__init__(resource)
+        super().__init__(resource)

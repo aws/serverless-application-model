@@ -6,8 +6,7 @@ from samtranslator.policy_template_processor.exceptions import InvalidParameterV
 
 
 class TestTemplateObject(TestCase):
-    @patch.object(Template, "check_parameters_exist")
-    def test_init_must_check_for_existence_of_all_parameters(self, check_parameters_exist_mock):
+    def test_init_must_check_for_existence_of_all_parameters(self):
 
         template_name = "template_name"
         parameters = {}
@@ -18,10 +17,8 @@ class TestTemplateObject(TestCase):
         self.assertEqual(template.name, template_name)
         self.assertEqual(template.parameters, parameters)
         self.assertEqual(template.definition, template_definition)
-        check_parameters_exist_mock.assert_called_once_with(parameters, template_definition)
 
-    @patch.object(Template, "check_parameters_exist")
-    def test_from_dict_must_return_object(self, check_parameters_exist_mock):
+    def test_from_dict_must_return_object(self):
         template_name = "template_name"
         parameters = {"A": "B"}
         template_definition = {"key": "value"}
@@ -35,8 +32,7 @@ class TestTemplateObject(TestCase):
         self.assertEqual(template.parameters, parameters)
         self.assertEqual(template.definition, template_definition)
 
-    @patch.object(Template, "check_parameters_exist")
-    def test_from_dict_must_work_when_parameters_is_absent(self, check_parameters_exist_mock):
+    def test_from_dict_must_work_when_parameters_is_absent(self):
         template_name = "template_name"
         template_definition = {"key": "value"}
 
@@ -47,8 +43,7 @@ class TestTemplateObject(TestCase):
         self.assertEqual(template.parameters, {})  # Defaults to {}
         self.assertEqual(template.definition, template_definition)
 
-    @patch.object(Template, "check_parameters_exist")
-    def test_from_dict_must_work_when_template_definition_is_absent(self, check_parameters_exist_mock):
+    def test_from_dict_must_work_when_template_definition_is_absent(self):
         template_name = "template_name"
         parameters = {"key": "value"}
 

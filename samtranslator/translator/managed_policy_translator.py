@@ -5,7 +5,7 @@ from samtranslator.metrics.method_decorator import cw_timer
 LOG = logging.getLogger(__name__)
 
 
-class ManagedPolicyLoader(object):
+class ManagedPolicyLoader:
     def __init__(self, iam_client):  # type: ignore[no-untyped-def]
         self._iam_client = iam_client
         self._policy_map = None

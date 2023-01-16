@@ -130,7 +130,7 @@ class ApiGatewayDeployment(Resource):
         stage.update_deployment_ref(self.logical_id)
 
 
-class ApiGatewayResponse(object):
+class ApiGatewayResponse:
     ResponseParameterProperties = ["Headers", "Paths", "QueryStrings"]
 
     def __init__(
@@ -263,7 +263,7 @@ class ApiGatewayApiKey(Resource):
     runtime_attrs = {"api_key_id": lambda self: ref(self.logical_id)}
 
 
-class ApiGatewayAuthorizer(object):
+class ApiGatewayAuthorizer:
     _VALID_FUNCTION_PAYLOAD_TYPES = [None, "TOKEN", "REQUEST"]
 
     def __init__(  # type: ignore[no-untyped-def]

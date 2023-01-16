@@ -17,7 +17,7 @@ from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.utils.cfn_dynamic_references import is_dynamic_reference
 
 
-class StateMachineGenerator(object):
+class StateMachineGenerator:
     _SAM_KEY = "stateMachine:createdBy"
     _SAM_VALUE = "SAM"
     _SUBSTITUTION_NAME_TEMPLATE = "definition_substitution_%s"
@@ -264,23 +264,23 @@ class StateMachineGenerator(object):
                     for name, resource in self.event_resources[logical_id].items():
                         kwargs[name] = resource
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, str(e))
+                    raise InvalidEventException(logical_id, str(e)) from e
                 resources += eventsource.to_cloudformation(resource=self.state_machine, **kwargs)
 
         return resources
 
-    def _replace_dynamic_values_with_substitutions(self, input):  # type: ignore[no-untyped-def]
+    def _replace_dynamic_values_with_substitutions(self, _input):  # type: ignore[no-untyped-def]
         """
         Replaces the CloudFormation instrinsic functions and dynamic references within the input with substitutions.
 
-        :param input: Input dictionary in which the dynamic values need to be replaced with substitutions
+        :param _input: Input dictionary in which the dynamic values need to be replaced with substitutions
 
         :returns: List of substitution to dynamic value mappings
         :rtype: dict
         """
         substitution_map = {}
-        for path in self._get_paths_to_intrinsics(input):  # type: ignore[no-untyped-call]
-            location = input
+        for path in self._get_paths_to_intrinsics(_input):  # type: ignore[no-untyped-call]
+            location = _input
             for step in path[:-1]:
                 location = location[step]
             sub_name, sub_key = self._generate_substitution()
@@ -288,26 +288,26 @@ class StateMachineGenerator(object):
             location[path[-1]] = sub_key
         return substitution_map
 
-    def _get_paths_to_intrinsics(self, input, path=None):  # type: ignore[no-untyped-def]
+    def _get_paths_to_intrinsics(self, _input, path=None):  # type: ignore[no-untyped-def]
         """
         Returns all paths to dynamic values within a dictionary
 
-        :param input: Input dictionary to find paths to dynamic values in
+        :param _input: Input dictionary to find paths to dynamic values in
         :param path: Optional list to keep track of the path to the input dictionary
         :returns list: List of keys that defines the path to a dynamic value within the input dictionary
         """
         if path is None:
             path = []
         dynamic_value_paths = []  # type: ignore[var-annotated]
-        if isinstance(input, dict):
-            iterator = input.items()
-        elif isinstance(input, list):
-            iterator = enumerate(input)  # type: ignore[assignment]
+        if isinstance(_input, dict):
+            iterator = _input.items()
+        elif isinstance(_input, list):
+            iterator = enumerate(_input)  # type: ignore[assignment]
         else:
             return dynamic_value_paths
 
         for key, value in sorted(iterator, key=lambda item: item[0]):  # type: ignore[no-any-return]
-            if is_intrinsic(value) or is_dynamic_reference(value):  # type: ignore[no-untyped-call, no-untyped-call]
+            if is_intrinsic(value) or is_dynamic_reference(value):
                 dynamic_value_paths.append(path + [key])
             elif isinstance(value, (dict, list)):
                 dynamic_value_paths.extend(self._get_paths_to_intrinsics(value, path + [key]))  # type: ignore[no-untyped-call]

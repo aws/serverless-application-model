@@ -195,7 +195,7 @@ class SamFunction(SamResourceMacro):
         try:
             return {"event_resources": self._event_resources_to_link(resources)}
         except InvalidEventException as e:
-            raise InvalidResourceException(self.logical_id, e.message)
+            raise InvalidResourceException(self.logical_id, e.message) from e
 
     @cw_timer
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -287,7 +287,7 @@ class SamFunction(SamResourceMacro):
                 lambda_alias=lambda_alias,
             )
         except InvalidEventException as e:
-            raise InvalidResourceException(self.logical_id, e.message)
+            raise InvalidResourceException(self.logical_id, e.message) from e
 
         return resources
 
@@ -711,7 +711,7 @@ class SamFunction(SamResourceMacro):
                         self.logical_id + logical_id, event_dict, logical_id
                     )
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, "{}".format(e))
+                    raise InvalidEventException(logical_id, "{}".format(e)) from e
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
 
@@ -759,7 +759,7 @@ class SamFunction(SamResourceMacro):
                         lambda_function.logical_id + logical_id, event_dict, logical_id
                     )
                 except TypeError as e:
-                    raise InvalidEventException(logical_id, "{}".format(e))
+                    raise InvalidEventException(logical_id, "{}".format(e)) from e
 
                 kwargs = {
                     # When Alias is provided, connect all event sources to the alias and *not* the function
@@ -1773,7 +1773,7 @@ class SamStateMachine(SamResourceMacro):
         try:
             return {"event_resources": self._event_resources_to_link(resources)}
         except InvalidEventException as e:
-            raise InvalidResourceException(self.logical_id, e.message)
+            raise InvalidResourceException(self.logical_id, e.message) from e
 
     def _event_resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         event_resources = {}
@@ -1784,7 +1784,7 @@ class SamStateMachine(SamResourceMacro):
                         self.logical_id + logical_id, event_dict, logical_id
                     )
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, "{}".format(e))
+                    raise InvalidEventException(logical_id, "{}".format(e)) from e
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
 
@@ -1816,7 +1816,7 @@ class SamConnector(SamResourceMacro):
             destination = get_resource_reference(self.Destination, resource_resolver, self.Source)
             source = get_resource_reference(self.Source, resource_resolver, self.Destination)
         except ConnectorResourceError as e:
-            raise InvalidResourceException(self.logical_id, str(e))
+            raise InvalidResourceException(self.logical_id, str(e)) from e
 
         profile = get_profile(source.resource_type, destination.resource_type)
         if not profile:
@@ -1870,7 +1870,7 @@ class SamConnector(SamResourceMacro):
         try:
             profile_properties = profile_replace(profile_properties, replacement)
         except ValueError as e:
-            raise InvalidResourceException(self.logical_id, str(e))
+            raise InvalidResourceException(self.logical_id, str(e)) from e
 
         verify_profile_variables_replaced(profile_properties)
 

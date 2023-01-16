@@ -76,30 +76,19 @@ disable=
     R0401, # Cyclic import
     C0411, # import ordering
     W9015, # missing parameter in doc strings
-    R0205, # useless-object-inheritanc
     C0301, # line to long
     C0114, # missing-module-docstring
     W1202, # Use lazy % formatting in logging functions (logging-format-interpolation)
-    E1101, # No member 
-    W0622, # Redefining built-in 'property' (redefined-builtin)
+    E1101, # No member
     W0212, # protected-access
     W0201, # attribute-defined-outside-init
-    R1725, # Consider using Python 3 style super() without arguments (super-with-arguments)
     C2001, # Avoid comparisons to zero (compare-to-zero)
     R0912, # too many branches
-    W0235, # Useless super delegation in method '__init__' (useless-super-delegation)
     C0412, # Imports from package samtranslator are not grouped (ungrouped-imports)
-    W0223, # abstract-method
-    W0107, # unnecessary-pass
-    W0707, # raise-missing-from
     E0203, # access-member-before-definition
     W0221, # arguments-differ
-    R1710, # inconsistent-return-statements
     R1702, # too-many-nested-blocks
-    C0123, # Use isinstance() rather than type() for a typecheck. (unidiomatic-typecheck)
     W0105, # String statement has no effect (pointless-string-statement)
-    C0206, # Consider iterating with .items() (consider-using-dict-items)
-    W9008, # Redundant returns documentation (redundant-returns-doc)
     C0112, # empty-docstring
     C0116, # missing-function-docstring
     W9017, # differing-param-doc

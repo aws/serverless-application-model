@@ -5,7 +5,7 @@ from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemp
 from samtranslator.model.types import IS_STR
 
 
-class SamResource(object):
+class SamResource:
     """
     Class representing a SAM resource. It is designed to make minimal assumptions about the resource structure.
     Any mutating methods also touch only "Properties" and "Type" attributes of the resource. This allows compatibility

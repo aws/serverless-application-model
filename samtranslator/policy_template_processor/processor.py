@@ -7,7 +7,7 @@ from samtranslator.policy_template_processor.template import Template
 from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
 
 
-class PolicyTemplatesProcessor(object):
+class PolicyTemplatesProcessor:
     """
     Policy templates are equivalents of managed policies that can be customized with specific resource name or ARNs.
     This class encapsulates reading, parsing and converting these templates into regular policy statements that
@@ -119,7 +119,7 @@ class PolicyTemplatesProcessor(object):
             jsonschema.validate(policy_templates_dict, schema)
         except ValidationError as ex:
             # Stringifying the exception will give us useful error message
-            raise ValueError(str(ex))
+            raise ValueError(str(ex)) from ex
 
         return True
 

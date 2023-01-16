@@ -59,7 +59,7 @@ class ServerlessAppPlugin(BasePlugin):
         :param bool wait_for_template_active_status: Flag to wait for all templates to become active
         :param bool validate_only: Flag to only validate application access (uses get_application API instead)
         """
-        super(ServerlessAppPlugin, self).__init__(ServerlessAppPlugin.__name__)
+        super().__init__()
         if parameters is None:
             parameters = {}
         self._applications = {}
@@ -90,7 +90,6 @@ class ServerlessAppPlugin(BasePlugin):
         This verifies that the user has access to all specified applications.
 
         :param dict template_dict: Dictionary of the SAM template
-        :return: Nothing
         """
         template = SamTemplate(template_dict)
         intrinsic_resolvers = self._get_intrinsic_resolvers(template_dict.get("Mappings", {}))  # type: ignore[no-untyped-call]
@@ -255,7 +254,6 @@ class ServerlessAppPlugin(BasePlugin):
         :param string logical_id: Logical ID of the resource being processed
         :param string resource_type: Type of the resource being processed
         :param dict resource_properties: Properties of the resource
-        :return: Nothing
         """
 
         if not self._resource_is_supported(resource_type):  # type: ignore[no-untyped-call]
@@ -327,7 +325,6 @@ class ServerlessAppPlugin(BasePlugin):
         Go through all the stored applications and make sure they're all ACTIVE.
 
         :param dict template: Dictionary of the SAM template
-        :return: Nothing
         """
         if not self._wait_for_template_active_status or self._validate_only:
             return
@@ -412,7 +409,7 @@ class ServerlessAppPlugin(BasePlugin):
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code in ("AccessDeniedException", "NotFoundException"):
-                raise InvalidResourceException(logical_id, e.response["Error"]["Message"])
+                raise InvalidResourceException(logical_id, e.response["Error"]["Message"]) from e
             raise e
 
     def _resource_is_supported(self, resource_type):  # type: ignore[no-untyped-def]
