@@ -17,6 +17,7 @@ class _ResourcePropertyValueValidator(Generic[T]):
     resource_id: str
     key_path: str
     is_sam_event: bool
+    is_resource_attribute: bool
 
     def __init__(
         self,
