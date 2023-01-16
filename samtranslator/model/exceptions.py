@@ -134,8 +134,8 @@ class InvalidResourceAttributeTypeException(InvalidResourceException):
     def _default_message(logical_id: str, key_path: str, expected_type: Optional[ExpectedType]) -> str:
         if expected_type:
             type_description, _ = expected_type.value
-            return f"Attribute '{key_path}' for resource '{logical_id}' should be a {type_description}."
-        return f"Type of attribute '{key_path}' for resource '{logical_id}' is invalid."
+            return f"Attribute '{key_path}' should be a {type_description}."
+        return f"Type of attribute '{key_path}' is invalid."
 
 
 class InvalidEventException(ExceptionWithMessage):
