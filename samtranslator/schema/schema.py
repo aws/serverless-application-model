@@ -51,13 +51,6 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
     sam_schema["properties"]["Resources"]["additionalProperties"]["anyOf"].extend(
         cfn_props["Resources"]["patternProperties"]["^[a-zA-Z0-9]+$"]["anyOf"]
     )
-    sam_schema["properties"].update(cfn_props["AWSTemplateFormatVersion"])
-    sam_schema["properties"].update(cfn_props["Conditions"])
-    sam_schema["properties"].update(cfn_props["Description"])
-    sam_schema["properties"].update(cfn_props["Mappings"])
-    sam_schema["properties"].update(cfn_props["Metadata"])
-    sam_schema["properties"].update(cfn_props["Outputs"])
-    sam_schema["properties"].update(cfn_props["Parameters"])
 
 
 def main() -> None:
