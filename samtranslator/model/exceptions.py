@@ -135,7 +135,7 @@ class InvalidResourceAttributeTypeException(InvalidResourceException):
         if expected_type:
             type_description, _ = expected_type.value
             return f"Attribute '{key_path}' for resource '{logical_id}' should be a {type_description}."
-        return f"Type of attribute '{key_path}' for resource '{logical_id}'is invalid."
+        return f"Type of attribute '{key_path}' for resource '{logical_id}' is invalid."
 
 
 class InvalidEventException(ExceptionWithMessage):
