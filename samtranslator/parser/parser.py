@@ -49,10 +49,7 @@ class Parser:
             try:
                 sam_expect(
                     sam_resource.properties, resource_logical_id, "Properties", is_resource_attribute=True
-                ).to_be_a_map(
-                    "All 'Resources' must be Objects and have a 'Properties' Object. If "
-                    "you're using YAML, this may be an indentation issue."
-                )
+                ).to_be_a_map()
             except InvalidResourceAttributeTypeException as e:
                 raise InvalidDocumentException([e])
 
