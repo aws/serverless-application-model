@@ -4,7 +4,6 @@ from typing import Any, Dict, Generic, Optional, TypeVar, cast
 from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidEventException,
-    InvalidDocumentException,
     InvalidResourceException,
     InvalidResourcePropertyTypeException,
     InvalidResourceAttributeTypeException,
@@ -56,8 +55,8 @@ class _ResourcePropertyValueValidator(Generic[T]):
             if self.resource_logical_id:
                 if self.is_resource_attribute:
                     raise InvalidResourceAttributeTypeException(
-                                self.resource_logical_id, self.key_path, expected_type, message
-                            )
+                        self.resource_logical_id, self.key_path, expected_type, message
+                    )
                 raise InvalidResourcePropertyTypeException(
                     self.resource_logical_id, self.key_path, expected_type, message
                 )

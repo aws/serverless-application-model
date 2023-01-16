@@ -1,6 +1,10 @@
 import logging
 
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceAttributeTypeException
+from samtranslator.model.exceptions import (
+    InvalidDocumentException,
+    InvalidTemplateException,
+    InvalidResourceAttributeTypeException,
+)
 from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.public.sdk.template import SamTemplate
