@@ -352,6 +352,47 @@
             }
           }
         }
+      },
+      "AWS::Location::PlaceIndex": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "geo:SearchPlaceIndexForText",
+                    "geo:DescribeMap",
+                    "geo:BatchGetDevicePosition",
+                    "geo:ListDevicePositions",
+                    "geo:GetMapGlyphs",
+                    "geo:ListTagsForResource",
+                    "geo:GetDevicePositionHistory",
+                    "geo:DescribeTracker",
+                    "geo:GetMapSprites",
+                    "geo:GetMapStyleDescriptor",
+                    "geo:ListGeofences",
+                    "geo:CalculateRouteMatrix",
+                    "geo:GetDevicePosition",
+                    "geo:CalculateRoute",
+                    "geo:GetGeofence",
+                    "geo:DescribePlaceIndex",
+                    "geo:SearchPlaceIndexForSuggestions",
+                    "geo:DescribeGeofenceCollection",
+                    "geo:SearchPlaceIndexForPosition",
+                    "geo:GetPlace",
+                    "geo:ListTrackerConsumers",
+                    "geo:DescribeRouteCalculator",
+                    "geo:GetMapTile"
+                  ],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
       }
     },
     "AWS::ApiGatewayV2::Api": {

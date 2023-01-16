@@ -47,6 +47,7 @@ ignore_templates:
   - tests/translator/output/**/connector_bucket_to_function.json
   - tests/translator/output/**/connector_dependson_replace.json
   - tests/translator/output/**/connector_esm_dependson.json
+  - tests/translator/output/**/connector_function_to_location.json
   - tests/translator/output/**/connector_function_to_sqs.json
   - tests/translator/output/**/connector_function_to_table.json
   - tests/translator/output/**/connector_hardcoded_lambda_arn.json
