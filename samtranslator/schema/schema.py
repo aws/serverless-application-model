@@ -44,7 +44,20 @@ class Model(LenientBaseModel):
 
 
 def extend_with_cfn_schema(sam_schema, cfn_schema) -> None:
+    # TODO: Ensure not overwriting
     sam_schema["definitions"].update(cfn_schema["definitions"])
+
+    cfn_props = cfn_schema["properties"]
+    sam_schema["properties"]["Resources"]["additionalProperties"]["anyOf"].extend(
+        cfn_props["Resources"]["patternProperties"]["^[a-zA-Z0-9]+$"]["anyOf"]
+    )
+    sam_schema["properties"].update(cfn_props["AWSTemplateFormatVersion"])
+    sam_schema["properties"].update(cfn_props["Conditions"])
+    sam_schema["properties"].update(cfn_props["Description"])
+    sam_schema["properties"].update(cfn_props["Mappings"])
+    sam_schema["properties"].update(cfn_props["Metadata"])
+    sam_schema["properties"].update(cfn_props["Outputs"])
+    sam_schema["properties"].update(cfn_props["Parameters"])
 
 
 def main() -> None:
