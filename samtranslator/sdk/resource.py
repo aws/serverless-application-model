@@ -39,7 +39,7 @@ class SamResource:
         """
         # As long as the type is valid and type string.
         # validate the condition should be string
-
+        # TODO Refactor this file so that it has logical id, can use sam_expect here after that
         if self.condition:
 
             if not IS_STR(self.condition, should_raise=False):

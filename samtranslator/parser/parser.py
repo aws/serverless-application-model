@@ -1,9 +1,14 @@
 import logging
 
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceException
+from samtranslator.model.exceptions import (
+    InvalidDocumentException,
+    InvalidTemplateException,
+    InvalidResourceAttributeTypeException,
+)
 from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)
 
@@ -41,16 +46,12 @@ class Parser:
             # NOTE: Properties isn't required for SimpleTable, so we can't check
             # `not isinstance(sam_resources.get("Properties"), dict)` as this would be a breaking change.
             # sam_resource.properties defaults to {} in SamTemplate init
-            if not isinstance(sam_resource.properties, dict):
-                raise InvalidDocumentException(
-                    [
-                        InvalidResourceException(
-                            resource_logical_id,
-                            "All 'Resources' must be Objects and have a 'Properties' Object. If "
-                            "you're using YAML, this may be an indentation issue.",
-                        )
-                    ]
-                )
+            try:
+                sam_expect(
+                    sam_resource.properties, resource_logical_id, "Properties", is_resource_attribute=True
+                ).to_be_a_map()
+            except InvalidResourceAttributeTypeException as e:
+                raise InvalidDocumentException([e]) from e
 
     # private methods
     def _validate(self, sam_template, parameter_values):  # type: ignore[no-untyped-def]
