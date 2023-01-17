@@ -4,7 +4,9 @@ import argparse
 import json
 from pathlib import Path
 
-from typing import Any, Dict, Optional, Union
+import pydantic
+
+from typing import Any, Dict, Type, Optional, Union
 
 
 from samtranslator.schema.common import BaseModel, LenientBaseModel
@@ -68,7 +70,7 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
     )
 
 
-def get_schema(model) -> Dict[str, Any]:
+def get_schema(model: Type[pydantic.BaseModel]) -> Dict[str, Any]:
     obj = Model.schema()
 
     # http://json-schema.org/understanding-json-schema/reference/schema.html#schema
