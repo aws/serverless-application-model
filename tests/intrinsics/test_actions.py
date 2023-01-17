@@ -6,15 +6,6 @@ from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocu
 
 
 class TestAction(TestCase):
-    def test_subclass_must_override_type(self):
-
-        # Subclass must override the intrinsic_name
-        class MyAction(Action):
-            pass
-
-        with self.assertRaises(TypeError):
-            MyAction()
-
     def test_can_handle_input(self):
         class MyAction(Action):
             intrinsic_name = "foo"

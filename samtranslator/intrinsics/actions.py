@@ -1,6 +1,6 @@
 import re
 from abc import ABC
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Callable, List
 
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
 
@@ -15,15 +15,7 @@ class Action(ABC):
     """
 
     _resource_ref_separator = "."
-
-    # Note(xinhol): `Action` should have been an abstract class. Disabling the type check for the next
-    # line to avoid any potential behavior change.
-    # TODO: Make `Action` an abstract class and not giving `intrinsic_name` initial value.
-    intrinsic_name: str = None  # type: ignore
-
-    def __init__(self) -> None:
-        if not self.intrinsic_name:
-            raise TypeError("Subclass must provide a intrinsic_name")
+    intrinsic_name: str
 
     def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
         """
@@ -185,7 +177,7 @@ class SubAction(Action):
         :return: Resolved
         """
 
-        def do_replacement(full_ref, prop_name):  # type: ignore[no-untyped-def]
+        def do_replacement(full_ref: str, prop_name: str) -> Any:
             """
             Replace parameter references with actual value. Return value of this method is directly replaces the
             reference structure
@@ -196,7 +188,7 @@ class SubAction(Action):
             """
             return parameters.get(prop_name, full_ref)
 
-        return self._handle_sub_action(input_dict, do_replacement)  # type: ignore[no-untyped-call]
+        return self._handle_sub_action(input_dict, do_replacement)
 
     def resolve_resource_refs(
         self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
@@ -226,7 +218,7 @@ class SubAction(Action):
         :return: Resolved dictionary
         """
 
-        def do_replacement(full_ref, ref_value):  # type: ignore[no-untyped-def]
+        def do_replacement(full_ref: str, ref_value: str) -> str:
             """
             Perform the appropriate replacement to handle ${LogicalId.Property} type references inside a Sub.
             This method is called to get the replacement string for each reference within Sub's value
@@ -257,7 +249,7 @@ class SubAction(Action):
             replacement = self._resource_ref_separator.join([logical_id, property_name])
             return full_ref.replace(replacement, resolved_value)
 
-        return self._handle_sub_action(input_dict, do_replacement)  # type: ignore[no-untyped-call]
+        return self._handle_sub_action(input_dict, do_replacement)
 
     def resolve_resource_id_refs(
         self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
@@ -286,7 +278,7 @@ class SubAction(Action):
         :return: Resolved dictionary
         """
 
-        def do_replacement(full_ref, ref_value):  # type: ignore[no-untyped-def]
+        def do_replacement(full_ref: str, ref_value: str) -> str:
             """
             Perform the appropriate replacement to handle ${LogicalId} type references inside a Sub.
             This method is called to get the replacement string for each reference within Sub's value
@@ -315,9 +307,11 @@ class SubAction(Action):
             # syntax and retain other attributes. Ex: ${LogicalId.Property.Arn} => ${SomeOtherLogicalId.Arn}
             return full_ref.replace(logical_id, resolved_value)
 
-        return self._handle_sub_action(input_dict, do_replacement)  # type: ignore[no-untyped-call]
+        return self._handle_sub_action(input_dict, do_replacement)
 
-    def _handle_sub_action(self, input_dict, handler):  # type: ignore[no-untyped-def]
+    def _handle_sub_action(
+        self, input_dict: Optional[Dict[Any, Any]], handler: Callable[[str, str], str]
+    ) -> Optional[Any]:
         """
         Handles resolving replacements in the Sub action based on the handler that is passed as an input.
 
@@ -333,11 +327,11 @@ class SubAction(Action):
         key = self.intrinsic_name
         sub_value = input_dict[key]
 
-        input_dict[key] = self._handle_sub_value(sub_value, handler)  # type: ignore[no-untyped-call]
+        input_dict[key] = self._handle_sub_value(sub_value, handler)
 
         return input_dict
 
-    def _handle_sub_value(self, sub_value, handler_method):  # type: ignore[no-untyped-def]
+    def _handle_sub_value(self, sub_value: Any, handler_method: Callable[[str, str], str]) -> Any:
         """
         Generic method to handle value to Fn::Sub key. We are interested in parsing the ${} syntaxes inside
         the string portion of the value.
@@ -352,15 +346,15 @@ class SubAction(Action):
         # because that's the best we can do here.
         if isinstance(sub_value, str):
             # Ex: {Fn::Sub: "some string"}
-            sub_value = self._sub_all_refs(sub_value, handler_method)  # type: ignore[no-untyped-call]
+            sub_value = self._sub_all_refs(sub_value, handler_method)
 
         elif isinstance(sub_value, list) and len(sub_value) > 0 and isinstance(sub_value[0], str):
             # Ex: {Fn::Sub: ["some string", {a:b}] }
-            sub_value[0] = self._sub_all_refs(sub_value[0], handler_method)  # type: ignore[no-untyped-call]
+            sub_value[0] = self._sub_all_refs(sub_value[0], handler_method)
 
         return sub_value
 
-    def _sub_all_refs(self, text, handler_method):  # type: ignore[no-untyped-def]
+    def _sub_all_refs(self, text: str, handler_method: Callable[[str, str], str]) -> str:
         """
         Substitute references within a string that is using ${key} syntax by calling the `handler_method` on every
         occurrence of this structure. The value returned by this method directly replaces the reference structure.
@@ -443,7 +437,7 @@ class GetAttAction(Action):
         key = self.intrinsic_name
         value = input_dict[key]
 
-        if not self._check_input_value(value):  # type: ignore[no-untyped-call]
+        if not self._check_input_value(value):
             return input_dict
 
         # Value of GetAtt is an array. It can contain any number of elements, with first being the LogicalId of
@@ -463,7 +457,7 @@ class GetAttAction(Action):
         remaining = splits[2:]  # if any
 
         resolved_value = supported_resource_refs.get(logical_id, property_name)
-        return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)  # type: ignore[no-untyped-call]
+        return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)
 
     def resolve_resource_id_refs(
         self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
@@ -497,7 +491,7 @@ class GetAttAction(Action):
         key = self.intrinsic_name
         value = input_dict[key]
 
-        if not self._check_input_value(value):  # type: ignore[no-untyped-call]
+        if not self._check_input_value(value):
             return input_dict
 
         value_str = self._resource_ref_separator.join(value)
@@ -506,9 +500,9 @@ class GetAttAction(Action):
         remaining = splits[1:]  # if any
 
         resolved_value = supported_resource_id_refs.get(logical_id)
-        return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)  # type: ignore[no-untyped-call]
+        return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)
 
-    def _check_input_value(self, value):  # type: ignore[no-untyped-def]
+    def _check_input_value(self, value: Any) -> bool:
         # Value must be an array with *at least* two elements. If not, this is invalid GetAtt syntax. We just pass along
         # the input to CFN for it to do the "official" validation.
         if not isinstance(value, list) or len(value) < 2:
@@ -522,7 +516,9 @@ class GetAttAction(Action):
 
         return True
 
-    def _get_resolved_dictionary(self, input_dict, key, resolved_value, remaining):  # type: ignore[no-untyped-def]
+    def _get_resolved_dictionary(
+        self, input_dict: Optional[Dict[str, Any]], key: str, resolved_value: Optional[str], remaining: List[str]
+    ) -> Optional[Any]:
         """
         Resolves the function and returns the updated dictionary
 
@@ -531,7 +527,7 @@ class GetAttAction(Action):
         :param resolved_value: Resolved or updated value for this action.
         :param remaining: Remaining sections for the GetAtt action.
         """
-        if resolved_value:
+        if input_dict and resolved_value:
             # We resolved to a new resource logicalId. Use this as the first element and keep remaining elements intact
             # This is the new value of Fn::GetAtt
             input_dict[key] = [resolved_value] + remaining

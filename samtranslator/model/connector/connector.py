@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Iterable
 
 from samtranslator.model import ResourceResolver
 from samtranslator.model.intrinsics import get_logical_id_from_intrinsic, ref, fnGetAtt
@@ -32,7 +32,7 @@ def _is_nonblank_str(s: Any) -> bool:
     return s and isinstance(s, str)
 
 
-def add_depends_on(logical_id: str, depends_on: str, resource_resolver: ResourceResolver):  # type: ignore[no-untyped-def]
+def add_depends_on(logical_id: str, depends_on: str, resource_resolver: ResourceResolver) -> None:
     """
     Add DependsOn attribute to resource.
     """
@@ -57,7 +57,9 @@ def replace_depends_on_logical_id(logical_id: str, replacement: List[str], resou
             resource["DependsOn"] = insert_unique(depends_on, replacement)
 
 
-def get_event_source_mappings(event_source_id: str, function_id: str, resource_resolver: ResourceResolver):  # type: ignore[no-untyped-def]
+def get_event_source_mappings(
+    event_source_id: str, function_id: str, resource_resolver: ResourceResolver
+) -> Iterable[str]:
     """
     Get logical IDs of `AWS::Lambda::EventSourceMapping`s between resource logical IDs.
     """
