@@ -15,6 +15,7 @@ from samtranslator.model.preferences.deployment_preference_collection import Dep
 from samtranslator.model.exceptions import (
     InvalidDocumentException,
     InvalidResourceException,
+    InvalidResourcePropertyTypeException,
     DuplicateLogicalIdException,
     InvalidEventException,
     InvalidTemplateException,
@@ -33,6 +34,7 @@ from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.eventsources.push import Api
 from samtranslator.model.sam_resources import SamConnector
+from samtranslator.validator.value_validator import sam_expect
 
 
 class Translator:
@@ -125,7 +127,8 @@ class Translator:
 
         self.sam_parser.parse(sam_template=sam_template, parameter_values=parameter_values, sam_plugins=sam_plugins)
 
-        add_embedded_connectors(sam_template=sam_template)
+        document_errors = []
+        add_embedded_connectors(sam_template=sam_template, document_errors=document_errors)
 
         template = copy.deepcopy(sam_template)
         macro_resolver = ResourceTypeResolver(sam_resources)
@@ -141,7 +144,6 @@ class Translator:
         deployment_preference_collection = DeploymentPreferenceCollection()
         supported_resource_refs = SupportedResourceReferences()
         shared_api_usage_plan = SharedApiUsagePlan()
-        document_errors = []
         changed_logical_ids = {}
         route53_record_set_groups: Dict[Any, Any] = {}
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
@@ -272,11 +274,7 @@ class Translator:
         return functions + statemachines + apis + others + connectors
 
 
-def raise_error(msg: str) -> None:
-    raise InvalidDocumentException([InvalidTemplateException(msg)])
-
-
-def add_embedded_connectors(sam_template: Dict[str, Any]) -> None:
+def add_embedded_connectors(sam_template: Dict[str, Any], document_errors: List[Exception]) -> None:
     """
     Loops through the SAM Template resources to find any connectors that have been attached to the resources.
     Adds those attached connectors as Connector resources to the list of resources
@@ -289,40 +287,49 @@ def add_embedded_connectors(sam_template: Dict[str, Any]) -> None:
     # Loop through the resources in the template and see if any connectors have been attached
     for source_logical_id, resource in resources.items():
         if "Connectors" in resource:
-            if not isinstance(resource["Connectors"], dict):
-                raise_error("'Connectors' must be a dict")
+            try:
+                sam_expect(
+                    resource["Connectors"], source_logical_id, "Connectors", is_resource_attribute=True
+                ).to_be_a_map()
 
-            # Go through each of the connectors that have been attached and create a Serverless Connector resource
-            for connector_logical_id, connector_dict in resource["Connectors"].items():
-                if not isinstance(connector_dict, dict):
-                    raise_error(f"Invalid resource type. '{connector_logical_id}' be a dict.")
+                # Go through each of the connectors that have been attached and create a Serverless Connector resource
+                for connector_logical_id, connector_dict in resource["Connectors"].items():
 
-                # Make sure there are no other embedded connectors with the same logical id
-                if connector_logical_id in connectors:
-                    raise_error(
-                        f"Another connector with the logical id {connector_logical_id} exists in the "
-                        f"template. Please rename either of them."
-                    )
+                    # can't use sam_expect since this is neither a property nor a resource attribute
+                    if not isinstance(connector_dict, dict):
+                        raise InvalidResourceException(connector_logical_id, f"{connector_logical_id} should be a map.")
 
-                # mutates the connector_dict to make it a connector resource
-                get_generated_connector(source_logical_id, connector_logical_id, connector_dict)
-                connectors[connector_logical_id] = connector_dict
+                    # mutates the connector_dict to make it a connector resource
+                    get_generated_connector(source_logical_id, connector_logical_id, connector_dict, document_errors)
 
-            # delete connectors key, so it doesn't show up in the transformed template
-            del resource["Connectors"]
+                    # Make sure there are no other embedded connectors with the same logical id
+                    if connector_logical_id in connectors:
+                        raise DuplicateLogicalIdException(
+                            connector_logical_id, connector_logical_id, connector_dict["Type"]
+                        )
+
+                    connectors[connector_logical_id] = connector_dict
+
+                # delete connectors key, so it doesn't show up in the transformed template
+                del resource["Connectors"]
+            except (InvalidResourceException, DuplicateLogicalIdException) as e:
+                document_errors.append(e)
 
     # go through the list of generated connectors and add it to resources dict
     for connector_logical_id, connector_dict in connectors.items():
         if connector_logical_id in resources:
-            raise_error(
-                f"The logical ID of the generated connector {connector_logical_id} has a conflict with "
-                f"{connector_logical_id} of type '{resources[connector_logical_id]['Type']}', "
-                f"please rename either of them "
+            document_errors.append(
+                DuplicateLogicalIdException(
+                    connector_logical_id, connector_logical_id, resources[connector_logical_id]["Type"]
+                )
             )
-        resources[connector_logical_id] = connector_dict
+        else:
+            resources[connector_logical_id] = connector_dict
 
 
-def get_generated_connector(source_logical_id: str, connector_logical_id: str, connector: Dict[str, Any]) -> None:
+def get_generated_connector(
+    source_logical_id: str, connector_logical_id: str, connector: Dict[str, Any], document_errors: List[Exception]
+) -> None:
     """
     Adds the type, source id and any ResourceReference properties to the connector
 
@@ -332,18 +339,19 @@ def get_generated_connector(source_logical_id: str, connector_logical_id: str, c
     """
     connector_class = SamConnector(logical_id="SamConnector")
     connector["Type"] = connector_class.resource_type
-    properties = connector["Properties"]
 
     # No need to raise an error for this instance as the error will be caught by the parser
-    if isinstance(properties, dict):
+    if "Properties" in connector and isinstance(connector["Properties"], dict):
+        properties = connector["Properties"]
         properties["Source"] = {"Id": source_logical_id}
-
         if "SourceReference" in properties:
-            if not isinstance(properties["SourceReference"], dict):
-                raise_error(f"The 'SourceReference' property for resource '{connector_logical_id}' must be a dict")
+            try:
+                sam_expect(properties["SourceReference"], connector_logical_id, "SourceReference").to_be_a_map()
 
-            properties["Source"].update(properties["SourceReference"])
-            del properties["SourceReference"]
+                properties["Source"].update(properties["SourceReference"])
+                del properties["SourceReference"]
+            except InvalidResourcePropertyTypeException as e:
+                document_errors.append(e)
 
 
 def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:
