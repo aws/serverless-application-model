@@ -1,3 +1,6 @@
+CFN_SCHEMA_VERSION = v7.2.1
+CFN_SCHEMA_PATH = .tmp/cloudformation-$(CFN_SCHEMA_VERSION).schema.json
+
 target:
 	$(info ${HELP_MESSAGE})
 	@exit 0
@@ -23,10 +26,10 @@ black:
 	bin/yaml-format.py --write tests
 	bin/yaml-format.py --write integration --add-test-metadata
 
-black-check:
+black-check: get-cfn-schema
 	# Checking latest schema was generated (run `make schema` if this fails)
 	mkdir -p .tmp
-	python samtranslator/schema/schema.py --sam-schema .tmp/sam.schema.json --cfn-schema .tmp/cloudformation.schema.json --unified-schema .tmp/unified.schema.json
+	python samtranslator/schema/schema.py --sam-schema .tmp/sam.schema.json --cfn-schema $(CFN_SCHEMA_PATH) --unified-schema .tmp/unified.schema.json
 	diff -u samtranslator/schema/schema.json .tmp/sam.schema.json
 	diff -u samtranslator/schema/unified.schema.json .tmp/unified.schema.json
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
@@ -45,11 +48,12 @@ lint:
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
 
-CFN_SCHEMA_VERSION = v7.2.1
-schema:
+get-cfn-schema:
 	mkdir -p .tmp
-	test -f .tmp/cloudformation.schema.json || curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/$(CFN_SCHEMA_VERSION)/schema/cloudformation.schema.json
-	python samtranslator/schema/schema.py --sam-schema samtranslator/schema/schema.json --cfn-schema .tmp/cloudformation.schema.json --unified-schema samtranslator/schema/unified.schema.json
+	test -f $(CFN_SCHEMA_PATH) || curl -o $(CFN_SCHEMA_PATH) https://raw.githubusercontent.com/awslabs/goformation/$(CFN_SCHEMA_VERSION)/schema/cloudformation.schema.json
+
+schema: get-cfn-schema
+	python samtranslator/schema/schema.py --sam-schema samtranslator/schema/schema.json --cfn-schema $(CFN_SCHEMA_PATH) --unified-schema samtranslator/schema/unified.schema.json
 
 # Command to run everytime you make changes to verify everything works
 dev: test

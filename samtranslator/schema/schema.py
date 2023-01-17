@@ -40,8 +40,11 @@ Resources = Union[
 ]
 
 
-class Model(LenientBaseModel):
+class _ModelWithoutResources(LenientBaseModel):
     Globals: Optional[Globals]
+
+
+class Model(_ModelWithoutResources):
     Resources: Dict[
         str,
         Union[
@@ -49,6 +52,10 @@ class Model(LenientBaseModel):
             any_cfn_resource.Resource,
         ],
     ]
+
+
+class ModelFoo(_ModelWithoutResources):
+    Resources: Dict[str, Resources]
 
 
 def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any]) -> None:
@@ -61,6 +68,17 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
     )
 
 
+def get_schema(model) -> Dict[str, Any]:
+    obj = Model.schema()
+
+    # http://json-schema.org/understanding-json-schema/reference/schema.html#schema
+    # https://github.com/pydantic/pydantic/issues/1478
+    # Validated in https://github.com/aws/serverless-application-model/blob/5c82f5d2ae95adabc9827398fba8ccfc3dbe101a/tests/schema/test_validate_schema.py#L91
+    obj["$schema"] = "http://json-schema.org/draft-04/schema#"
+
+    return obj
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--sam-schema", type=Path, required=True)
@@ -68,12 +86,7 @@ def main() -> None:
     parser.add_argument("--unified-schema", type=Path, required=True)
     args = parser.parse_args()
 
-    obj = Model.schema()
-
-    # http://json-schema.org/understanding-json-schema/reference/schema.html#schema
-    # https://github.com/pydantic/pydantic/issues/1478
-    # Validated in https://github.com/aws/serverless-application-model/blob/5c82f5d2ae95adabc9827398fba8ccfc3dbe101a/tests/schema/test_validate_schema.py#L91
-    obj["$schema"] = "http://json-schema.org/draft-04/schema#"
+    obj = get_schema(Model)
 
     def json_dumps(obj: Any) -> str:
         return json.dumps(obj, indent=2, sort_keys=True) + "\n"
@@ -82,11 +95,10 @@ def main() -> None:
 
     cfn_schema = json.loads(args.cfn_schema.read_text())
 
+    obj = get_schema(ModelFoo)
     extend_with_cfn_schema(obj, cfn_schema)
 
     args.unified_schema.write_text(json_dumps(obj))
-
-    # print(json.dumps(obj, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":
