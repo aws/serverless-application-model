@@ -26,7 +26,7 @@ black:
 black-check:
 	# Checking latest schema was generated (run `make schema` if this fails)
 	python samtranslator/schema/schema.py > .tmp_schema.json
-	diff -u samtranslator/schema/schema.json .tmp_schema.json
+	diff -u samtranslator/schema/sam.schema.json .tmp_schema.json
 	rm .tmp_schema.json
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
 	bin/json-format.py --check tests integration samtranslator/policy_templates_data
