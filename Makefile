@@ -50,8 +50,7 @@ get-cfn-schema:
 	test -f .tmp/cloudformation.schema.json || curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/$(CFN_SCHEMA_VERSION)/schema/cloudformation.schema.json
 
 schema: get-cfn-schema
-	python samtranslator/schema/schema.py > samtranslator/schema/schema.json
-	python samtranslator/schema/merge.py samtranslator/schema/schema.json .tmp/cloudformation.schema.json > samtranslator/schema/unified.schema.json
+	python samtranslator/schema/schema.py
 
 # Command to run everytime you make changes to verify everything works
 dev: test
