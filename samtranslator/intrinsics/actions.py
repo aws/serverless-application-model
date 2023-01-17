@@ -1,6 +1,6 @@
 import re
 from abc import ABC
-from typing import Any, Dict, Optional, Tuple, Callable, List
+from typing import Any, Dict, Optional, Tuple, Callable, List, Union
 
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
 
@@ -331,7 +331,7 @@ class SubAction(Action):
 
         return input_dict
 
-    def _handle_sub_value(self, sub_value: Any, handler_method: Callable[[str, str], str]) -> Any:
+    def _handle_sub_value(self, sub_value: Union[str, List[str]], handler_method: Callable[[str, str], str]) -> Any:
         """
         Generic method to handle value to Fn::Sub key. We are interested in parsing the ${} syntaxes inside
         the string portion of the value.
@@ -517,7 +517,7 @@ class GetAttAction(Action):
         return True
 
     def _get_resolved_dictionary(
-        self, input_dict: Optional[Dict[Any, Any]], key: str, resolved_value: Optional[Any], remaining: List[str]
+        self, input_dict: Optional[Dict[str, Any]], key: str, resolved_value: Optional[str], remaining: List[str]
     ) -> Optional[Any]:
         """
         Resolves the function and returns the updated dictionary
