@@ -52,7 +52,7 @@ def main() -> None:
     # Validated in https://github.com/aws/serverless-application-model/blob/5c82f5d2ae95adabc9827398fba8ccfc3dbe101a/tests/schema/test_validate_schema.py#L91
     obj["$schema"] = "http://json-schema.org/draft-04/schema#"
 
-    print(json.dumps(obj, indent=2))
+    print(json.dumps(obj, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

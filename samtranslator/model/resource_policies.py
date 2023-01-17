@@ -13,7 +13,7 @@ from samtranslator.model.exceptions import InvalidTemplateException
 PolicyEntry = namedtuple("PolicyEntry", "data type")
 
 
-class ResourcePolicies(object):
+class ResourcePolicies:
     """
     Class encapsulating the policies property of SAM resources. This class strictly encapsulates the data
     and does not take opinions on how to handle them.
@@ -172,7 +172,7 @@ class ResourcePolicies(object):
         try:
             validate_intrinsic_if_items(intrinsic_if_value)
         except ValueError as e:
-            raise InvalidTemplateException(str(e))
+            raise InvalidTemplateException(str(e)) from e
 
         if_data = intrinsic_if_value[1]
         else_data = intrinsic_if_value[2]

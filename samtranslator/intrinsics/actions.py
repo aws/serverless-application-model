@@ -129,13 +129,13 @@ class RefAction(Action):
             return input_dict
 
         ref_value = input_dict[self.intrinsic_name]
-        logical_id, property = self._parse_resource_reference(ref_value)
+        logical_id, property_name = self._parse_resource_reference(ref_value)
 
         # ref_value could not be parsed
         if not logical_id:
             return input_dict
 
-        resolved_value = supported_resource_refs.get(logical_id, property)
+        resolved_value = supported_resource_refs.get(logical_id, property_name)
         if not resolved_value:
             return input_dict
 
@@ -245,8 +245,8 @@ class SubAction(Action):
                 return full_ref
 
             logical_id = splits[0]
-            property = splits[1]
-            resolved_value = supported_resource_refs.get(logical_id, property)
+            property_name = splits[1]
+            resolved_value = supported_resource_refs.get(logical_id, property_name)
             if not resolved_value:
                 # This ID/property combination is not in the supported references
                 return full_ref
@@ -254,7 +254,7 @@ class SubAction(Action):
             # We found a LogicalId.Property combination that can be resolved. Construct the output by replacing
             # the part of the reference string and not constructing a new ref. This allows us to support GetAtt-like
             # syntax and retain other attributes. Ex: ${LogicalId.Property.Arn} => ${SomeOtherLogicalId.Arn}
-            replacement = self._resource_ref_separator.join([logical_id, property])
+            replacement = self._resource_ref_separator.join([logical_id, property_name])
             return full_ref.replace(replacement, resolved_value)
 
         return self._handle_sub_action(input_dict, do_replacement)  # type: ignore[no-untyped-call]
@@ -459,10 +459,10 @@ class GetAttAction(Action):
         value_str = self._resource_ref_separator.join(value)
         splits = value_str.split(self._resource_ref_separator)
         logical_id = splits[0]
-        property = splits[1]
+        property_name = splits[1]
         remaining = splits[2:]  # if any
 
-        resolved_value = supported_resource_refs.get(logical_id, property)
+        resolved_value = supported_resource_refs.get(logical_id, property_name)
         return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)  # type: ignore[no-untyped-call]
 
     def resolve_resource_id_refs(

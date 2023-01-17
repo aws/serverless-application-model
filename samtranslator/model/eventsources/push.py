@@ -1,5 +1,6 @@
 import copy
 import re
+from abc import ABCMeta
 from typing import Any, Dict, List, Optional, Union, cast
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
@@ -33,7 +34,7 @@ CONDITION = "Condition"
 REQUEST_PARAMETER_PROPERTIES = ["Required", "Caching"]
 
 
-class PushEventSource(ResourceMacro):
+class PushEventSource(ResourceMacro, metaclass=ABCMeta):
     """Base class for push event sources for SAM Functions.
 
     Push event sources correspond to services that call Lambda's Invoke API whenever an event occurs. Each Push event
@@ -386,11 +387,11 @@ class S3(PushEventSource):
 
         try:
             depends_on_set = set(depends_on)
-        except TypeError:
+        except TypeError as ex:
             raise InvalidResourceException(
                 self.logical_id,
                 "Invalid type for field 'DependsOn'. Expected a string or list of strings.",
-            )
+            ) from ex
 
         depends_on_set.add(permission.logical_id)
         bucket["DependsOn"] = list(depends_on_set)
@@ -1276,7 +1277,9 @@ class HttpApi(PushEventSource):
             except InvalidDocumentException as e:
                 api_logical_id = self.ApiId.get("Ref") if isinstance(self.ApiId, dict) else self.ApiId
                 # TODO: api_logical_id is never None, try to make it consistent with what mypy thinks
-                raise InvalidResourceException(cast(str, api_logical_id), " ".join(ex.message for ex in e.causes))
+                raise InvalidResourceException(
+                    cast(str, api_logical_id), " ".join(ex.message for ex in e.causes)
+                ) from e
 
         # If this is using the new $default path, keep path blank and add a * permission
         if path == OpenApiEditor._DEFAULT_PATH:
@@ -1286,7 +1289,7 @@ class HttpApi(PushEventSource):
         ):
             # Case where default exists for this function, and so the permissions for that will apply here as well
             # This can save us several CFN resources (not duplicating permissions)
-            return
+            return None
         else:
             path = OpenApiEditor.get_path_without_trailing_slash(path)  # type: ignore[no-untyped-call]
 

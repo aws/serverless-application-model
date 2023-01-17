@@ -1,8 +1,8 @@
 import hashlib
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 
-class BaseDialup(object, metaclass=ABCMeta):
+class BaseDialup(ABC):
     """BaseDialup class to provide an interface for all dialup classes"""
 
     def __init__(self, region_config, **kwargs):  # type: ignore[no-untyped-def]
@@ -24,7 +24,7 @@ class DisabledDialup(BaseDialup):
     """
 
     def __init__(self, region_config, **kwargs):  # type: ignore[no-untyped-def]
-        super(DisabledDialup, self).__init__(region_config)  # type: ignore[no-untyped-call]
+        super().__init__(region_config)  # type: ignore[no-untyped-call]
 
     def is_enabled(self) -> bool:
         return False
@@ -37,7 +37,7 @@ class ToggleDialup(BaseDialup):
     """
 
     def __init__(self, region_config, **kwargs):  # type: ignore[no-untyped-def]
-        super(ToggleDialup, self).__init__(region_config)  # type: ignore[no-untyped-call]
+        super().__init__(region_config)  # type: ignore[no-untyped-call]
         self.region_config = region_config
 
     def is_enabled(self):  # type: ignore[no-untyped-def]
@@ -51,7 +51,7 @@ class SimpleAccountPercentileDialup(BaseDialup):
     """
 
     def __init__(self, region_config, account_id, feature_name, **kwargs):  # type: ignore[no-untyped-def]
-        super(SimpleAccountPercentileDialup, self).__init__(region_config)  # type: ignore[no-untyped-call]
+        super().__init__(region_config)  # type: ignore[no-untyped-call]
         self.account_id = account_id
         self.feature_name = feature_name
 

@@ -1,8 +1,9 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
 import re
 import inspect
+from abc import ABC
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
 from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
@@ -10,7 +11,7 @@ from samtranslator.plugins import LifeCycleEvents
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 
-class PropertyType(object):
+class PropertyType:
     """Stores validation information for a CloudFormation resource property.
 
     The attribute "expected_type" is only used by InvalidResourcePropertyTypeException
@@ -64,7 +65,7 @@ class PassThroughProperty(PropertyType):
         super().__init__(required, any_type(), False)
 
 
-class Resource(object, metaclass=ABCMeta):
+class Resource(ABC):
     """A Resource object represents an abstract entity that contains a Type and a Properties object. They map well to
     CloudFormation resources as well sub-types like AWS::Lambda::Function or `Events` section of
     AWS::Serverless::Function.
@@ -291,7 +292,7 @@ class Resource(object, metaclass=ABCMeta):
         :raises InvalidResourceException: if an invalid property is provided
         """
         if name in self._keywords or name in self.property_types.keys():
-            return super(Resource, self).__setattr__(name, value)
+            return super().__setattr__(name, value)
 
         raise InvalidResourceException(
             self.logical_id,
@@ -418,7 +419,7 @@ class ResourceMacro(Resource, metaclass=ABCMeta):
         """
 
 
-class SamResourceMacro(ResourceMacro):
+class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
     """ResourceMacro that specifically refers to SAM (AWS::Serverless::*) resources."""
 
     # SAM resources can provide a list of properties that they expose. These properties usually resolve to
@@ -464,9 +465,9 @@ class SamResourceMacro(ResourceMacro):
         # Create a map of {ResourceType: LogicalId} for quick access
         resource_id_by_type = {resource.resource_type: resource.logical_id for resource in generated_cfn_resources}
 
-        for property, cfn_type in self.referable_properties.items():
+        for property_name, cfn_type in self.referable_properties.items():
             if cfn_type in resource_id_by_type:
-                supported_resource_refs.add(self.logical_id, property, resource_id_by_type[cfn_type])
+                supported_resource_refs.add(self.logical_id, property_name, resource_id_by_type[cfn_type])
 
         return supported_resource_refs
 
@@ -518,7 +519,7 @@ class SamResourceMacro(ResourceMacro):
         return value
 
 
-class ResourceTypeResolver(object):
+class ResourceTypeResolver:
     """ResourceTypeResolver maps Resource Types to Resource classes, e.g. AWS::Serverless::Function to
     samtranslator.model.sam_resources.SamFunction."""
 
@@ -578,16 +579,16 @@ class ResourceResolver:
         """Return a dictionary of all resources from the SAM template."""
         return self.resources
 
-    def get_resource_by_logical_id(self, input: str) -> Dict[str, Any]:
+    def get_resource_by_logical_id(self, _input: str) -> Dict[str, Any]:
         """
         Recursively find resource with matching Logical ID that are present in the template and returns the value.
         If it is not in template, this method simply returns the input unchanged.
 
-        :param input: Logical ID of a resource
+        :param _input: Logical ID of a resource
 
         :param resources: Dictionary of the resource from the SAM template
         """
-        if not isinstance(input, str):
-            raise TypeError("Invalid logical ID '{}'. Expected a string.".format(input))
+        if not isinstance(_input, str):
+            raise TypeError("Invalid logical ID '{}'. Expected a string.".format(_input))
 
-        return self.resources.get(input, None)
+        return self.resources.get(_input, None)
