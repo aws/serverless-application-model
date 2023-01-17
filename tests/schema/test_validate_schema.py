@@ -93,6 +93,13 @@ class TestValidateSchema(TestCase):
         with pytest.raises(ValidationError):
             validate(obj, schema=SCHEMA)
 
+
+class TestValidateUnifiedSchema(TestCase):
+    """
+    The unified schema includes SAM and CloudFormation schema. It's a lot larger, a lot
+    slower to validate, and doesn't support intrinsic functions.
+    """
+
     @parameterized.expand(
         [
             (PROJECT_ROOT.joinpath("tests/translator/input/schema_validation_4.yaml"),),

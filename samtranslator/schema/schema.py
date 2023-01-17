@@ -51,6 +51,7 @@ class SamModel(_ModelWithoutResources):
         str,
         Union[
             Resources,
+            # Ignore resources that are not AWS::Serverless::*
             any_cfn_resource.Resource,
         ],
     ]
@@ -58,16 +59,6 @@ class SamModel(_ModelWithoutResources):
 
 class Model(_ModelWithoutResources):
     Resources: Dict[str, Resources]
-
-
-def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any]) -> None:
-    # TODO: Ensure not overwriting
-    sam_schema["definitions"].update(cfn_schema["definitions"])
-
-    cfn_props = cfn_schema["properties"]
-    sam_schema["properties"]["Resources"]["additionalProperties"]["anyOf"].extend(
-        cfn_props["Resources"]["patternProperties"]["^[a-zA-Z0-9]+$"]["anyOf"]
-    )
 
 
 def get_schema(model: Type[pydantic.BaseModel]) -> Dict[str, Any]:
@@ -83,6 +74,33 @@ def get_schema(model: Type[pydantic.BaseModel]) -> Dict[str, Any]:
 
 def json_dumps(obj: Any) -> str:
     return json.dumps(obj, indent=2, sort_keys=True) + "\n"
+
+
+def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any]) -> None:
+    """
+    Add CloudFormation resources and template syntax to SAM schema.
+    """
+
+    sam_defs = sam_schema["definitions"]
+    cfn_defs = cfn_schema["definitions"]
+
+    # Add definitions from CloudFormation schema to SAM schema
+    for k in cfn_defs.keys():
+        if k in sam_defs:
+            raise Exception(f"Key {k} already in SAM schema definitions")
+        sam_defs[k] = cfn_defs[k]
+
+    sam_props = sam_schema["properties"]
+    cfn_props = cfn_schema["properties"]
+
+    # Add Resources from CloudFormation schema to SAM schema
+    cfn_resources = cfn_props["Resources"]["patternProperties"]["^[a-zA-Z0-9]+$"]["anyOf"]
+    sam_props["Resources"]["additionalProperties"]["anyOf"].extend(cfn_resources)
+
+    # Add any other top-level properties from CloudFormation schema to SAM schema
+    for k in cfn_props.keys():
+        if k not in sam_props:
+            sam_props[k] = cfn_props[k]
 
 
 def main() -> None:
