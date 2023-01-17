@@ -75,8 +75,6 @@ def get_all_test_templates():
 
 SCHEMA_VALIDATION_TESTS = [str(f) for f in get_all_test_templates() if not should_skip_test(str(f))]
 
-# add here positive and negative tests
-
 
 class TestValidateSchema(TestCase):
     @parameterized.expand(itertools.product(SCHEMA_VALIDATION_TESTS))

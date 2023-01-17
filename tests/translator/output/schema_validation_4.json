@@ -1,44 +1,44 @@
 {
- "Resources": {
-  "MyInstance": {
-   "Type": "AWS::EC2::Instance",
-   "Properties": {
-    "ImageId": "ami-79fd7eee",
-    "KeyName": "testkey",
-    "BlockDeviceMappings": [
-     {
-      "DeviceName": "/dev/sdm",
-      "Ebs": {
-       "VolumeType": "io1",
-       "Iops": 200,
-       "DeleteOnTermination": false,
-       "VolumeSize": 20
-      }
-     },
-     {
-      "DeviceName": "/dev/sdk",
-      "NoDevice": {}
-     }
-    ]
-   }
-  },
-  "MyTable": {
-   "Type": "AWS::DynamoDB::Table",
-   "Properties": {
-    "AttributeDefinitions": [
-     {
-      "AttributeName": "id",
-      "AttributeType": "S"
-     }
-    ],
-    "KeySchema": [
-     {
-      "AttributeName": "id",
-      "KeyType": "HASH"
-     }
-    ],
-    "BillingMode": "PAY_PER_REQUEST"
-   }
+  "Resources": {
+    "MyInstance": {
+      "Properties": {
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sdm",
+            "Ebs": {
+              "DeleteOnTermination": false,
+              "Iops": 200,
+              "VolumeSize": 20,
+              "VolumeType": "io1"
+            }
+          },
+          {
+            "DeviceName": "/dev/sdk",
+            "NoDevice": {}
+          }
+        ],
+        "ImageId": "ami-79fd7eee",
+        "KeyName": "testkey"
+      },
+      "Type": "AWS::EC2::Instance"
+    },
+    "MyTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ]
+      },
+      "Type": "AWS::DynamoDB::Table"
+    }
   }
- }
 }
