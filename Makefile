@@ -26,8 +26,9 @@ black:
 black-check:
 	# Checking latest schema was generated (run `make schema` if this fails)
 	mkdir -p .tmp
-	python samtranslator/schema/schema.py > .tmp/sam.schema.json
+	python samtranslator/schema/schema.py --sam-schema .tmp/sam.schema.json --cfn-schema .tmp/cloudformation.schema.json --unified-schema .tmp/unified.schema.json
 	diff -u samtranslator/schema/schema.json .tmp/sam.schema.json
+	diff -u samtranslator/schema/unified.schema.json .tmp/unified.schema.json
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
 	bin/json-format.py --check tests integration samtranslator/policy_templates_data
 	bin/yaml-format.py --check tests
@@ -48,7 +49,7 @@ CFN_SCHEMA_VERSION = v7.2.1
 schema:
 	mkdir -p .tmp
 	test -f .tmp/cloudformation.schema.json || curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/$(CFN_SCHEMA_VERSION)/schema/cloudformation.schema.json
-	python samtranslator/schema/schema.py
+	python samtranslator/schema/schema.py --sam-schema samtranslator/schema/schema.json --cfn-schema .tmp/cloudformation.schema.json --unified-schema samtranslator/schema/unified.schema.json
 
 # Command to run everytime you make changes to verify everything works
 dev: test
