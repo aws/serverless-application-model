@@ -111,7 +111,7 @@ class Translator:
         self.feature_toggle = (
             feature_toggle
             if feature_toggle
-            else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)  # type: ignore[no-untyped-call, no-untyped-call]
+            else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)
         )
         self.function_names: Dict[Any, Any] = {}
         self.redeploy_restapi_parameters = {}

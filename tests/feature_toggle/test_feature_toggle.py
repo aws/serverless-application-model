@@ -1,4 +1,9 @@
-from unittest.mock import patch, Mock
+import json
+from io import BytesIO
+from time import sleep
+from unittest.mock import call, patch, Mock
+
+from botocore.exceptions import ClientError
 from parameterized import parameterized, param
 from unittest import TestCase
 import os, sys
@@ -85,8 +90,15 @@ class TestFeatureToggleAppConfig(TestCase):
             }
         }
         """
-        self.app_config_mock = Mock()
-        self.app_config_mock.get_configuration.return_value = {"Content": self.content_stream_mock}
+        self.app_config_data_mock = Mock()
+        self.app_config_data_mock.start_configuration_session.return_value = {
+            "InitialConfigurationToken": "init-token",
+        }
+        self.app_config_data_mock.get_latest_configuration.return_value = {
+            "NextPollConfigurationToken": "next-token",
+            "NextPollIntervalInSeconds": 597,
+            "Configuration": self.content_stream_mock,
+        }
 
     @parameterized.expand(
         [
@@ -109,7 +121,7 @@ class TestFeatureToggleAppConfig(TestCase):
     def test_feature_toggle_with_appconfig_provider(
         self, feature_name, stage, region, account_id, expected, config_mock, boto3_mock
     ):
-        boto3_mock.client.return_value = self.app_config_mock
+        boto3_mock.client.return_value = self.app_config_data_mock
         config_object_mock = Mock()
         config_mock.return_value = config_object_mock
         feature_toggle_config_provider = FeatureToggleAppConfigConfigProvider(
@@ -118,7 +130,7 @@ class TestFeatureToggleAppConfig(TestCase):
         feature_toggle = FeatureToggle(
             feature_toggle_config_provider, stage=stage, region=region, account_id=account_id
         )
-        boto3_mock.client.assert_called_once_with("appconfig", config=config_object_mock)
+        boto3_mock.client.assert_called_once_with("appconfigdata", config=config_object_mock)
         self.assertEqual(feature_toggle.is_enabled(feature_name), expected)
 
     @parameterized.expand(
@@ -142,7 +154,7 @@ class TestFeatureToggleAppConfig(TestCase):
         self, feature_name, stage, region, account_id, expected, boto3_mock
     ):
         feature_toggle_config_provider = FeatureToggleAppConfigConfigProvider(
-            "test_app_id", "test_env_id", "test_conf_id", self.app_config_mock
+            "test_app_id", "test_env_id", "test_conf_id", self.app_config_data_mock
         )
         feature_toggle = FeatureToggle(
             feature_toggle_config_provider, stage=stage, region=region, account_id=account_id
@@ -159,3 +171,115 @@ class TestFeatureToggleAppConfigConfigProvider(TestCase):
             "test_app_id", "test_env_id", "test_conf_id"
         )
         self.assertEqual(feature_toggle_config_provider.config, {})
+
+    @patch("samtranslator.feature_toggle.feature_toggle.boto3.client")
+    def test_ignoring_empty_response(self, client_mock):
+        """AppConfig gives empty response when client is already up-to-date."""
+        appconfigdata_mock = client_mock.return_value = Mock()
+        appconfigdata_mock.start_configuration_session.return_value = {
+            "InitialConfigurationToken": "init-token",
+        }
+        appconfigdata_mock.get_latest_configuration.side_effect = [
+            {
+                "NextPollConfigurationToken": "next-token-1",
+                "NextPollIntervalInSeconds": -1,  # force to refresh
+                "Configuration": BytesIO(json.dumps({"hello": "world"}).encode("utf-8")),
+            },
+            {
+                "NextPollConfigurationToken": "next-token-2",
+                "NextPollIntervalInSeconds": -1,  # force to refresh
+                "Configuration": BytesIO(b""),
+            },
+        ]
+        feature_toggle_config_provider = FeatureToggleAppConfigConfigProvider(
+            "test_app_id",
+            "test_env_id",
+            "test_conf_id",
+        )
+        self.assertEqual(feature_toggle_config_provider.config, {"hello": "world"})
+
+        # Make sure it calls get_latest_configuration twice and ignore empty response indeed happened.
+        self.assertEqual(appconfigdata_mock.get_latest_configuration.call_count, 2)
+        appconfigdata_mock.get_latest_configuration.assert_has_calls(
+            [call(ConfigurationToken="init-token"), call(ConfigurationToken="next-token-1")]
+        )
+
+    @patch("samtranslator.feature_toggle.feature_toggle.boto3.client")
+    def test_reset_session_when_get_latest_configuration_failed(self, client_mock):
+        """AppConfig gives empty response when client is already up-to-date."""
+        appconfigdata_mock = client_mock.return_value = Mock()
+        appconfigdata_mock.start_configuration_session.side_effect = [
+            {
+                "InitialConfigurationToken": "init-token-1",
+            },
+            {
+                "InitialConfigurationToken": "init-token-2",
+            },
+        ]
+        appconfigdata_mock.get_latest_configuration.side_effect = [
+            ClientError({}, "GetLatestConfiguration"),
+            {
+                "NextPollConfigurationToken": "next-token-1",
+                "NextPollIntervalInSeconds": -1,  # force to refresh
+                "Configuration": BytesIO(json.dumps({"hello": "world"}).encode("utf-8")),
+            },
+            {
+                "NextPollConfigurationToken": "next-token-2",
+                "NextPollIntervalInSeconds": -1,  # force to refresh
+                "Configuration": BytesIO(json.dumps({"hello": "world"}).encode("utf-8")),
+            },
+        ]
+        feature_toggle_config_provider = FeatureToggleAppConfigConfigProvider(
+            "test_app_id",
+            "test_env_id",
+            "test_conf_id",
+        )
+        self.assertEqual(feature_toggle_config_provider.config, {"hello": "world"})
+
+        # Make sure it calls get_latest_configuration twice and ignore empty response indeed happened.
+        self.assertEqual(appconfigdata_mock.get_latest_configuration.call_count, 3)
+        appconfigdata_mock.get_latest_configuration.assert_has_calls(
+            [
+                call(ConfigurationToken="init-token-1"),
+                call(ConfigurationToken="init-token-2"),
+                call(ConfigurationToken="next-token-1"),
+            ]
+        )
+
+    @patch("samtranslator.feature_toggle.feature_toggle.boto3.client")
+    def test_only_refresh_when_past_due(self, client_mock):
+        """AppConfig gives empty response when client is already up-to-date."""
+        appconfigdata_mock = client_mock.return_value = Mock()
+        appconfigdata_mock.start_configuration_session.return_value = {
+            "InitialConfigurationToken": "init-token",
+        }
+        appconfigdata_mock.get_latest_configuration.side_effect = [
+            {
+                "NextPollConfigurationToken": "next-token-1",
+                "NextPollIntervalInSeconds": 5,  # force to refresh
+                "Configuration": BytesIO(json.dumps({"hello": "world"}).encode("utf-8")),
+            },
+            {
+                "NextPollConfigurationToken": "next-token-2",
+                "NextPollIntervalInSeconds": 500,  # force to refresh
+                "Configuration": BytesIO(json.dumps({"hello": "world??"}).encode("utf-8")),
+            },
+        ]
+        feature_toggle_config_provider = FeatureToggleAppConfigConfigProvider(
+            "test_app_id",
+            "test_env_id",
+            "test_conf_id",
+        )
+        self.assertEqual(feature_toggle_config_provider.config, {"hello": "world"})  # initial fetch
+        self.assertEqual(feature_toggle_config_provider.config, {"hello": "world"})  # refresh should be skipped
+        sleep(6)  # now it is due for another refresh
+        self.assertEqual(feature_toggle_config_provider.config, {"hello": "world??"})
+
+        # Make sure it calls get_latest_configuration twice and ignore empty response indeed happened.
+        self.assertEqual(appconfigdata_mock.get_latest_configuration.call_count, 2)
+        appconfigdata_mock.get_latest_configuration.assert_has_calls(
+            [
+                call(ConfigurationToken="init-token"),
+                call(ConfigurationToken="next-token-1"),
+            ]
+        )
