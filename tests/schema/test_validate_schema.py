@@ -15,6 +15,7 @@ from samtranslator.yaml_helper import yaml_parse
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 SCHEMA = json.loads(PROJECT_ROOT.joinpath("samtranslator/schema/schema.json").read_bytes())
+UNIFIED_SCHEMA = json.loads(PROJECT_ROOT.joinpath("samtranslator/schema/unified.schema.json").read_bytes())
 
 # TODO: Enable (most likely) everything but 'error_*' and 'basic_schema_validation_failure'
 SKIPPED_TESTS = [
@@ -74,6 +75,8 @@ def get_all_test_templates():
 
 SCHEMA_VALIDATION_TESTS = [str(f) for f in get_all_test_templates() if not should_skip_test(str(f))]
 
+# add here positive and negative tests
+
 
 class TestValidateSchema(TestCase):
     @parameterized.expand(itertools.product(SCHEMA_VALIDATION_TESTS))
@@ -91,3 +94,22 @@ class TestValidateSchema(TestCase):
         obj = yaml_parse(Path(testcase).read_bytes())
         with pytest.raises(ValidationError):
             validate(obj, schema=SCHEMA)
+
+    @parameterized.expand(
+        [
+            (PROJECT_ROOT.joinpath("tests/translator/input/schema_validation_4.yaml"),),
+        ]
+    )
+    def test_validate_unified_schema(self, testcase):
+        obj = yaml_parse(Path(testcase).read_bytes())
+        validate(obj, schema=UNIFIED_SCHEMA)
+
+    @parameterized.expand(
+        [
+            (PROJECT_ROOT.joinpath("tests/translator/input/schema_validation_ec2_not_valid.yaml"),),
+        ]
+    )
+    def test_validate_unified_schema_error(self, testcase):
+        obj = yaml_parse(Path(testcase).read_bytes())
+        with pytest.raises(ValidationError):
+            validate(obj, schema=UNIFIED_SCHEMA)
