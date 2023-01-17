@@ -1,62 +1,11 @@
 {
   "Resources": {
-    "MyConnectorPolicy": {
-      "Metadata": {
-        "aws:sam:connectors": {
-          "MyConnector": {
-            "Destination": {
-              "Type": "AWS::Location::PlaceIndex"
-            },
-            "Source": {
-              "Type": "AWS::Serverless::Function"
-            }
-          }
-        }
-      },
+    "MyPlace": {
+      "Type": "AWS::Location::PlaceIndex",
       "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "geo:SearchPlaceIndexForText",
-                "geo:DescribeMap",
-                "geo:BatchGetDevicePosition",
-                "geo:ListDevicePositions",
-                "geo:GetMapGlyphs",
-                "geo:ListTagsForResource",
-                "geo:GetDevicePositionHistory",
-                "geo:DescribeTracker",
-                "geo:GetMapSprites",
-                "geo:GetMapStyleDescriptor",
-                "geo:ListGeofences",
-                "geo:CalculateRouteMatrix",
-                "geo:GetDevicePosition",
-                "geo:CalculateRoute",
-                "geo:GetGeofence",
-                "geo:DescribePlaceIndex",
-                "geo:SearchPlaceIndexForSuggestions",
-                "geo:DescribeGeofenceCollection",
-                "geo:SearchPlaceIndexForPosition",
-                "geo:GetPlace",
-                "geo:ListTrackerConsumers",
-                "geo:DescribeRouteCalculator",
-                "geo:GetMapTile"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                "arn:aws:geo:us-east-1:123123123123:place-index/explore.place"
-              ]
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "Roles": [
-          {
-            "Ref": "MyFunctionRole"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::ManagedPolicy"
+        "DataSource": "Here",
+        "IndexName": "MyPlaceIndex"
+      }
     },
     "MyFunction": {
       "Properties": {
@@ -102,6 +51,127 @@
         ]
       },
       "Type": "AWS::IAM::Role"
+    },
+    "MyConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector": {
+            "Destination": {
+              "Type": "AWS::Location::PlaceIndex"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "geo:BatchGetDevicePosition",
+                "geo:CalculateRoute",
+                "geo:CalculateRouteMatrix",
+                "geo:DescribeGeofenceCollection",
+                "geo:DescribeMap",
+                "geo:DescribePlaceIndex",
+                "geo:DescribeRouteCalculator",
+                "geo:DescribeTracker",
+                "geo:GetDevicePosition",
+                "geo:GetDevicePositionHistory",
+                "geo:GetGeofence",
+                "geo:GetMapGlyphs",
+                "geo:GetMapSprites",
+                "geo:GetMapStyleDescriptor",
+                "geo:GetMapTile",
+                "geo:GetPlace",
+                "geo:ListDevicePositions",
+                "geo:ListGeofences",
+                "geo:ListTagsForResource",
+                "geo:ListTrackerConsumers",
+                "geo:SearchPlaceIndexForPosition",
+                "geo:SearchPlaceIndexForSuggestions",
+                "geo:SearchPlaceIndexForText"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:geo:us-east-1:123123123123:place-index/explore.place"
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyConnectorWithIdPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnectorWithId": {
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            },
+            "Destination": {
+              "Type": "AWS::Location::PlaceIndex"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "geo:BatchGetDevicePosition",
+                "geo:CalculateRoute",
+                "geo:CalculateRouteMatrix",
+                "geo:DescribeGeofenceCollection",
+                "geo:DescribeMap",
+                "geo:DescribePlaceIndex",
+                "geo:DescribeRouteCalculator",
+                "geo:DescribeTracker",
+                "geo:GetDevicePosition",
+                "geo:GetDevicePositionHistory",
+                "geo:GetGeofence",
+                "geo:GetMapGlyphs",
+                "geo:GetMapSprites",
+                "geo:GetMapStyleDescriptor",
+                "geo:GetMapTile",
+                "geo:GetPlace",
+                "geo:ListDevicePositions",
+                "geo:ListGeofences",
+                "geo:ListTagsForResource",
+                "geo:ListTrackerConsumers",
+                "geo:SearchPlaceIndexForPosition",
+                "geo:SearchPlaceIndexForSuggestions",
+                "geo:SearchPlaceIndexForText"
+              ],
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyPlace",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "MyFunctionRole"
+          }
+        ]
+      }
     }
   }
 }

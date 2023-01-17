@@ -10,6 +10,12 @@ Resources:
           console.log(JSON.stringify(event));
         };
 
+  MyPlace:
+    Type: AWS::Location::PlaceIndex
+    Properties:
+      DataSource: Here
+      IndexName: MyPlaceIndex
+
   MyConnector:
     Type: AWS::Serverless::Connector
     Properties:
@@ -19,4 +25,14 @@ Resources:
         Arn: arn:aws:geo:us-east-1:123123123123:place-index/explore.place
         Type: AWS::Location::PlaceIndex
       Permissions:
-      - Read
+        - Read
+
+  MyConnectorWithId:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination:
+        Id: MyPlace
+      Permissions:
+        - Read
