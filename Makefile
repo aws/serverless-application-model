@@ -45,11 +45,9 @@ prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
 
 CFN_SCHEMA_VERSION = v7.2.1
-get-cfn-schema:
+schema:
 	mkdir -p .tmp
 	test -f .tmp/cloudformation.schema.json || curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/$(CFN_SCHEMA_VERSION)/schema/cloudformation.schema.json
-
-schema: get-cfn-schema
 	python samtranslator/schema/schema.py
 
 # Command to run everytime you make changes to verify everything works
