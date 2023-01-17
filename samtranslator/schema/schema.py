@@ -46,7 +46,7 @@ class _ModelWithoutResources(LenientBaseModel):
     Globals: Optional[Globals]
 
 
-class Model(_ModelWithoutResources):
+class SamModel(_ModelWithoutResources):
     Resources: Dict[
         str,
         Union[
@@ -56,7 +56,7 @@ class Model(_ModelWithoutResources):
     ]
 
 
-class ModelFoo(_ModelWithoutResources):
+class Model(_ModelWithoutResources):
     Resources: Dict[str, Resources]
 
 
@@ -71,7 +71,7 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
 
 
 def get_schema(model: Type[pydantic.BaseModel]) -> Dict[str, Any]:
-    obj = Model.schema()
+    obj = model.schema()
 
     # http://json-schema.org/understanding-json-schema/reference/schema.html#schema
     # https://github.com/pydantic/pydantic/issues/1478
@@ -81,6 +81,10 @@ def get_schema(model: Type[pydantic.BaseModel]) -> Dict[str, Any]:
     return obj
 
 
+def json_dumps(obj: Any) -> str:
+    return json.dumps(obj, indent=2, sort_keys=True) + "\n"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--sam-schema", type=Path, required=True)
@@ -88,19 +92,13 @@ def main() -> None:
     parser.add_argument("--unified-schema", type=Path, required=True)
     args = parser.parse_args()
 
-    obj = get_schema(Model)
+    sam_schema = get_schema(SamModel)
+    args.sam_schema.write_text(json_dumps(sam_schema))
 
-    def json_dumps(obj: Any) -> str:
-        return json.dumps(obj, indent=2, sort_keys=True) + "\n"
-
-    args.sam_schema.write_text(json_dumps(obj))
-
+    unified_schema = get_schema(Model)
     cfn_schema = json.loads(args.cfn_schema.read_text())
-
-    obj = get_schema(ModelFoo)
-    extend_with_cfn_schema(obj, cfn_schema)
-
-    args.unified_schema.write_text(json_dumps(obj))
+    extend_with_cfn_schema(unified_schema, cfn_schema)
+    args.unified_schema.write_text(json_dumps(unified_schema))
 
 
 if __name__ == "__main__":
