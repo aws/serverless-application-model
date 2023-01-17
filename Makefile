@@ -48,7 +48,8 @@ update-cfn-schema:
 	curl -o samtranslator/schema/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
 
 schema:
-	python samtranslator/schema/schema.py > samtranslator/schema/schema.json
+	python samtranslator/schema/schema.py > samtranslator/schema/sam.schema.json
+	python samtranslator/schema/merge.py samtranslator/schema/sam.schema.json samtranslator/schema/cloudformation.schema.json > samtranslator/schema/schema.json
 
 # Command to run everytime you make changes to verify everything works
 dev: test

@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
-from typing import Any, Dict, Optional, Union
+from typing import Dict, Optional, Union
 
 
 from samtranslator.schema.common import BaseModel, LenientBaseModel
@@ -43,16 +42,6 @@ class Model(LenientBaseModel):
     ]
 
 
-def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any]) -> None:
-    # TODO: Ensure not overwriting
-    sam_schema["definitions"].update(cfn_schema["definitions"])
-
-    cfn_props = cfn_schema["properties"]
-    sam_schema["properties"]["Resources"]["additionalProperties"]["anyOf"].extend(
-        cfn_props["Resources"]["patternProperties"]["^[a-zA-Z0-9]+$"]["anyOf"]
-    )
-
-
 def main() -> None:
     obj = Model.schema()
 
@@ -60,9 +49,6 @@ def main() -> None:
     # https://github.com/pydantic/pydantic/issues/1478
     # Validated in https://github.com/aws/serverless-application-model/blob/5c82f5d2ae95adabc9827398fba8ccfc3dbe101a/tests/schema/test_validate_schema.py#L91
     obj["$schema"] = "http://json-schema.org/draft-04/schema#"
-
-    cfn_schema = json.loads(Path("samtranslator/schema/cloudformation.schema.json").read_bytes())
-    extend_with_cfn_schema(obj, cfn_schema)
 
     print(json.dumps(obj, indent=2, sort_keys=True))
 
