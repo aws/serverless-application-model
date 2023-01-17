@@ -5,7 +5,7 @@ import copy
 from samtranslator.translator.arn_generator import ArnGenerator, NoRegionFound
 
 
-class SamParameterValues(object):
+class SamParameterValues:
     """
     Class representing SAM parameter values.
     """
@@ -60,6 +60,8 @@ class SamParameterValues(object):
         for param_name, value in parameter_definition.items():
             if param_name not in self.parameter_values and isinstance(value, dict) and "Default" in value:
                 self.parameter_values[param_name] = value["Default"]
+
+        return None
 
     def add_pseudo_parameter_values(self, session=None):  # type: ignore[no-untyped-def]
         """

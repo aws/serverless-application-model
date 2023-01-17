@@ -13,12 +13,6 @@ class GlobalsPlugin(BasePlugin):
     Plugin to process Globals section of a SAM template before the template is translated to CloudFormation.
     """
 
-    def __init__(self) -> None:
-        """
-        Initialize the plugin
-        """
-        super(GlobalsPlugin, self).__init__(GlobalsPlugin.__name__)
-
     @cw_timer(prefix="Plugin-Globals")
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """
@@ -30,7 +24,7 @@ class GlobalsPlugin(BasePlugin):
         try:
             global_section = Globals(template_dict)  # type: ignore[no-untyped-call]
         except InvalidGlobalsSectionException as ex:
-            raise InvalidDocumentException([ex])
+            raise InvalidDocumentException([ex]) from ex
 
         # For each resource in template, try and merge with Globals if necessary
         template = SamTemplate(template_dict)
@@ -43,4 +37,4 @@ class GlobalsPlugin(BasePlugin):
 
         # If there was a global openApiVersion flag, check and convert swagger
         # to the right version
-        Globals.fix_openapi_definitions(template_dict)  # type: ignore[no-untyped-call]
+        Globals.fix_openapi_definitions(template_dict)

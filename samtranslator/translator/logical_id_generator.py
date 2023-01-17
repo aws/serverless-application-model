@@ -3,7 +3,7 @@ import json
 from typing import Any, Optional
 
 
-class LogicalIdGenerator(object):
+class LogicalIdGenerator:
 
     # NOTE: Changing the length of the hash will change backwards compatibility. This will break the stability contract
     #       given by this class

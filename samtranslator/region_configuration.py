@@ -3,7 +3,7 @@ import boto3
 from .translator.arn_generator import ArnGenerator, NoRegionFound
 
 
-class RegionConfiguration(object):
+class RegionConfiguration:
     """
     There are times when certain services, or certain configurations of a service are not supported in a region. This
     class abstracts all region/partition specific configuration.

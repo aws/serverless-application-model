@@ -184,25 +184,29 @@ def _get_resource_role_name(
     return ref(logical_id)
 
 
-def _get_resource_queue_url(logical_id: str, resource_type: str) -> Any:
+def _get_resource_queue_url(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
     if resource_type == "AWS::SQS::Queue":
         return ref(logical_id)
+    return None
 
 
-def _get_resource_id(logical_id: str, resource_type: str) -> Any:
+def _get_resource_id(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
     if resource_type in ["AWS::ApiGateway::RestApi", "AWS::ApiGatewayV2::Api"]:
         return ref(logical_id)
+    return None
 
 
-def _get_resource_name(logical_id: str, resource_type: str) -> Any:
+def _get_resource_name(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
     if resource_type == "AWS::StepFunctions::StateMachine":
         return fnGetAtt(logical_id, "Name")
+    return None
 
 
-def _get_resource_qualifier(resource_type: str) -> Any:
+def _get_resource_qualifier(resource_type: str) -> Optional[str]:
     # Qualifier is used as the execute-api ARN suffix; by default allow whole API
     if resource_type in ["AWS::ApiGateway::RestApi", "AWS::ApiGatewayV2::Api"]:
         return "*"
+    return None
 
 
 def _get_resource_arn(logical_id: str, resource_type: str) -> Any:

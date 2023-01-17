@@ -5,7 +5,7 @@ from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemp
 from samtranslator.model.types import IS_STR
 
 
-class SamResource(object):
+class SamResource:
     """
     Class representing a SAM resource. It is designed to make minimal assumptions about the resource structure.
     Any mutating methods also touch only "Properties" and "Type" attributes of the resource. This allows compatibility
@@ -39,7 +39,7 @@ class SamResource(object):
         """
         # As long as the type is valid and type string.
         # validate the condition should be string
-
+        # TODO Refactor this file so that it has logical id, can use sam_expect here after that
         if self.condition:
 
             if not IS_STR(self.condition, should_raise=False):

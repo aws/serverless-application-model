@@ -9,7 +9,7 @@ from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}
 
 
-class IntrinsicsResolver(object):
+class IntrinsicsResolver:
     def __init__(self, parameters: Dict[str, Any], supported_intrinsics: Optional[Dict[str, Any]] = None) -> None:
         """
         Instantiate the resolver
@@ -48,7 +48,7 @@ class IntrinsicsResolver(object):
         return self._traverse(_input, self.parameters, self._try_resolve_parameter_refs)  # type: ignore[no-untyped-call]
 
     def resolve_sam_resource_refs(
-        self, input: Dict[str, Any], supported_resource_refs: SupportedResourceReferences
+        self, _input: Dict[str, Any], supported_resource_refs: SupportedResourceReferences
     ) -> Any:
         """
         Customers can provide a reference to a "derived" SAM resource such as Alias of a Function or Stage of an API
@@ -71,9 +71,9 @@ class IntrinsicsResolver(object):
             references supported in this SAM template, along with the value they should resolve to.
         :return list errors: List of dictionary containing information about invalid reference. Empty list otherwise
         """
-        return self._traverse(input, supported_resource_refs, self._try_resolve_sam_resource_refs)  # type: ignore[no-untyped-call]
+        return self._traverse(_input, supported_resource_refs, self._try_resolve_sam_resource_refs)  # type: ignore[no-untyped-call]
 
-    def resolve_sam_resource_id_refs(self, input: Dict[str, Any], supported_resource_id_refs: Dict[str, str]) -> Any:
+    def resolve_sam_resource_id_refs(self, _input: Dict[str, Any], supported_resource_id_refs: Dict[str, str]) -> Any:
         """
         Some SAM resources have their logical ids mutated from the original id that the customer writes in the
         template. This method recursively walks the tree and updates these logical ids from the old value
@@ -94,7 +94,7 @@ class IntrinsicsResolver(object):
         :param dict supported_resource_id_refs: Dictionary that maps old logical ids to new ones.
         :return list errors: List of dictionary containing information about invalid reference. Empty list otherwise
         """
-        return self._traverse(input, supported_resource_id_refs, self._try_resolve_sam_resource_id_refs)  # type: ignore[no-untyped-call]
+        return self._traverse(_input, supported_resource_id_refs, self._try_resolve_sam_resource_id_refs)  # type: ignore[no-untyped-call]
 
     def _traverse(self, input_value, resolution_data, resolver_method):  # type: ignore[no-untyped-def]
         """
@@ -166,62 +166,62 @@ class IntrinsicsResolver(object):
 
         return input_list
 
-    def _try_resolve_parameter_refs(self, input, parameters):  # type: ignore[no-untyped-def]
+    def _try_resolve_parameter_refs(self, _input, parameters):  # type: ignore[no-untyped-def]
         """
         Try to resolve parameter references on the given input object. The object could be of any type.
         If the input is not in the format used by intrinsics (ie. dictionary with one key), input is returned
         unmodified. If the single key in dictionary is one of the supported intrinsic function types,
         go ahead and try to resolve it.
 
-        :param input: Input object to resolve
+        :param _input: Input object to resolve
         :param parameters: Parameter values used to for ref substitution
         :return:
         """
-        if not self._is_intrinsic_dict(input):  # type: ignore[no-untyped-call]
-            return input
+        if not self._is_intrinsic_dict(_input):  # type: ignore[no-untyped-call]
+            return _input
 
-        function_type = list(input.keys())[0]
-        return self.supported_intrinsics[function_type].resolve_parameter_refs(input, parameters)
+        function_type = list(_input.keys())[0]
+        return self.supported_intrinsics[function_type].resolve_parameter_refs(_input, parameters)
 
-    def _try_resolve_sam_resource_refs(self, input, supported_resource_refs):  # type: ignore[no-untyped-def]
+    def _try_resolve_sam_resource_refs(self, _input, supported_resource_refs):  # type: ignore[no-untyped-def]
         """
         Try to resolve SAM resource references on the given template. If the given object looks like one of the
         supported intrinsics, it calls the appropriate resolution on it. If not, this method returns the original input
         unmodified.
 
-        :param dict input: Dictionary that may represent an intrinsic function
+        :param dict _input: Dictionary that may represent an intrinsic function
         :param SupportedResourceReferences supported_resource_refs: Object containing information about available
             resource references and the values they resolve to.
         :return: Modified input dictionary with references resolved
         """
-        if not self._is_intrinsic_dict(input):  # type: ignore[no-untyped-call]
-            return input
+        if not self._is_intrinsic_dict(_input):  # type: ignore[no-untyped-call]
+            return _input
 
-        function_type = list(input.keys())[0]
-        return self.supported_intrinsics[function_type].resolve_resource_refs(input, supported_resource_refs)
+        function_type = list(_input.keys())[0]
+        return self.supported_intrinsics[function_type].resolve_resource_refs(_input, supported_resource_refs)
 
-    def _try_resolve_sam_resource_id_refs(self, input, supported_resource_id_refs):  # type: ignore[no-untyped-def]
+    def _try_resolve_sam_resource_id_refs(self, _input, supported_resource_id_refs):  # type: ignore[no-untyped-def]
         """
         Try to resolve SAM resource id references on the given template. If the given object looks like one of the
         supported intrinsics, it calls the appropriate resolution on it. If not, this method returns the original input
         unmodified.
 
-        :param dict input: Dictionary that may represent an intrinsic function
+        :param dict _input: Dictionary that may represent an intrinsic function
         :param dict supported_resource_id_refs: Dictionary that maps old logical ids to new ones.
         :return: Modified input dictionary with id references resolved
         """
-        if not self._is_intrinsic_dict(input):  # type: ignore[no-untyped-call]
-            return input
+        if not self._is_intrinsic_dict(_input):  # type: ignore[no-untyped-call]
+            return _input
 
-        function_type = list(input.keys())[0]
-        return self.supported_intrinsics[function_type].resolve_resource_id_refs(input, supported_resource_id_refs)
+        function_type = list(_input.keys())[0]
+        return self.supported_intrinsics[function_type].resolve_resource_id_refs(_input, supported_resource_id_refs)
 
-    def _is_intrinsic_dict(self, input):  # type: ignore[no-untyped-def]
+    def _is_intrinsic_dict(self, _input):  # type: ignore[no-untyped-def]
         """
-        Can the input represent an intrinsic function in it?
+        Can the _input represent an intrinsic function in it?
 
-        :param input: Object to be checked
-        :return: True, if the input contains a supported intrinsic function.  False otherwise
+        :param _input: Object to be checked
+        :return: True, if the _input contains a supported intrinsic function.  False otherwise
         """
         # All intrinsic functions are dictionaries with just one key
-        return isinstance(input, dict) and len(input) == 1 and list(input.keys())[0] in self.supported_intrinsics
+        return isinstance(_input, dict) and len(_input) == 1 and list(_input.keys())[0] in self.supported_intrinsics
