@@ -84,12 +84,6 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
     sam_defs = sam_schema["definitions"]
     cfn_defs = cfn_schema["definitions"]
 
-    # Add definitions from CloudFormation schema to SAM schema
-    for k in cfn_defs.keys():
-        if k in sam_defs:
-            raise Exception(f"Key {k} already in SAM schema definitions")
-        sam_defs[k] = cfn_defs[k]
-
     sam_props = sam_schema["properties"]
     cfn_props = cfn_schema["properties"]
 
@@ -101,6 +95,15 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
     for k in cfn_props.keys():
         if k not in sam_props:
             sam_props[k] = cfn_props[k]
+
+    # Add definitions from CloudFormation schema to SAM schema
+    for k in cfn_defs.keys():
+        if k in sam_defs:
+            raise Exception(f"Key {k} already in SAM schema definitions")
+        sam_defs[k] = cfn_defs[k]
+
+    # The unified schema should include all supported properties
+    sam_schema["additionalProperties"] = False
 
 
 def main() -> None:

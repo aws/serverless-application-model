@@ -1,4 +1,4 @@
-CFN_SCHEMA_VERSION = v7.2.1
+CFN_SCHEMA_VERSION = v7.2.3
 CFN_SCHEMA_PATH = .tmp/cloudformation-$(CFN_SCHEMA_VERSION).schema.json
 
 target:
