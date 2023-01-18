@@ -44,7 +44,7 @@
           "S3Key": "function.zip"
         },
         "Handler": "index.handler",
-        "Role": "arn:aws-us-gov:iam::123456789012:role/lambda-role",
+        "Role": "arn:aws:iam::123456789012:role/lambda-role",
         "Runtime": "nodejs12.x",
         "Timeout": 5,
         "TracingConfig": {
