@@ -15,6 +15,7 @@ from samtranslator.schema import (
     aws_serverless_layerversion,
     aws_serverless_api,
     aws_serverless_httpapi,
+    aws_serverless_graphqlapi,
     any_cfn_resource,
 )
 
@@ -40,6 +41,7 @@ class Model(LenientBaseModel):
             aws_serverless_httpapi.Resource,
             aws_serverless_application.Resource,
             any_cfn_resource.Resource,
+            aws_serverless_graphqlapi.Resource,
         ],
     ]
 

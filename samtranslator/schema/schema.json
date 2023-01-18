@@ -4346,6 +4346,52 @@
       "title": "ScheduleV2EventProperties",
       "type": "object"
     },
+    "samtranslator__schema__aws_serverless_graphqlapi__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "Auth": {
+          "title": "Auth",
+          "type": "object"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "Tags": {
+          "title": "Tags"
+        },
+        "XrayEnabled": {
+          "title": "Xrayenabled",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "Auth"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "samtranslator__schema__aws_serverless_graphqlapi__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_graphqlapi__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::GraphQLApi"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
     "samtranslator__schema__aws_serverless_httpapi__Auth": {
       "additionalProperties": false,
       "properties": {
@@ -5653,6 +5699,9 @@
           },
           {
             "$ref": "#/definitions/samtranslator__schema__any_cfn_resource__Resource"
+          },
+          {
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_graphqlapi__Resource"
           }
         ]
       },
