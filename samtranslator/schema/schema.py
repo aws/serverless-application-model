@@ -108,9 +108,9 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--sam-schema", type=Path, required=True)
-    parser.add_argument("--cfn-schema", type=Path, required=True)
-    parser.add_argument("--unified-schema", type=Path, required=True)
+    parser.add_argument("--cfn-schema", help="input CloudFormation schema", type=Path, required=True)
+    parser.add_argument("--sam-schema", help="output SAM schema", type=Path, required=True)
+    parser.add_argument("--unified-schema", help="output unified schema", type=Path, required=True)
     args = parser.parse_args()
 
     sam_schema = get_schema(SamModel)
