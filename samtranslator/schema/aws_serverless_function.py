@@ -542,6 +542,7 @@ class Globals(BaseModel):
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::Function"]
     Properties: Optional[Properties]
+    Connectors: Optional[PassThrough]
     DeletionPolicy: Optional[PassThrough]
     UpdateReplacePolicy: Optional[PassThrough]
     Condition: Optional[PassThrough]

@@ -2786,6 +2786,9 @@
         "Condition": {
           "title": "Condition"
         },
+        "Connectors": {
+          "title": "Connectors"
+        },
         "DeletionPolicy": {
           "title": "Deletionpolicy"
         },
@@ -3987,6 +3990,9 @@
         "Condition": {
           "title": "Condition"
         },
+        "Connectors": {
+          "title": "Connectors"
+        },
         "DeletionPolicy": {
           "title": "Deletionpolicy"
         },
@@ -4647,6 +4653,9 @@
         "Condition": {
           "title": "Condition"
         },
+        "Connectors": {
+          "title": "Connectors"
+        },
         "Metadata": {
           "title": "Metadata"
         },
@@ -4841,6 +4850,9 @@
     "samtranslator__schema__aws_serverless_simpletable__Resource": {
       "additionalProperties": false,
       "properties": {
+        "Connectors": {
+          "title": "Connectors"
+        },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_simpletable__Properties"
         },
@@ -5270,6 +5282,9 @@
       "properties": {
         "Condition": {
           "title": "Condition"
+        },
+        "Connectors": {
+          "title": "Connectors"
         },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__Properties"

@@ -217,6 +217,7 @@ class Resource(BaseModel):
     Properties: Properties
     Condition: Optional[PassThrough]
     DeletionPolicy: Optional[PassThrough]
+    Connectors: Optional[PassThrough]
     UpdatePolicy: Optional[PassThrough]
     UpdateReplacePolicy: Optional[PassThrough]
     DependsOn: Optional[PassThrough]

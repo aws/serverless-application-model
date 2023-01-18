@@ -165,3 +165,4 @@ class Resource(BaseModel):
     Type: Literal["AWS::Serverless::StateMachine"]
     Properties: Properties
     Condition: Optional[PassThrough]
+    Connectors: Optional[PassThrough]

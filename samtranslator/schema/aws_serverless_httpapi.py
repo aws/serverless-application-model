@@ -136,3 +136,4 @@ class Resource(BaseModel):
     Properties: Optional[Properties]
     Metadata: Optional[PassThrough]
     Condition: Optional[PassThrough]
+    Connectors: Optional[PassThrough]
