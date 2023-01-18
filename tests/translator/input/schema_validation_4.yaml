@@ -12,12 +12,12 @@ Parameters:
     Description: Enter t2.micro, m1.small, or m1.large. Default is t2.micro.
 Conditions:
   CreateProdResources: !Equals
-  - !Ref EnvType
+  - !Ref InstanceTypeParameter
   - prod
 Resources:
   Bucket:
     Type: AWS::S3::Bucket
-    Condition: CreateBucket
+    Condition: CreateProdResources
   MyTable:
     Type: AWS::Serverless::SimpleTable
 
@@ -58,8 +58,5 @@ Resources:
 Outputs:
   BackupLoadBalancerDNSName:
     Description: The DNSName of the backup load balancer
-    Value: !GetAtt BackupLoadBalancer.DNSName
+    Value: !Ref Function
     Condition: CreateProdResources
-  InstanceID:
-    Description: The Instance ID
-    Value: !Ref EC2Instance

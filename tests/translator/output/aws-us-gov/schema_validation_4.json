@@ -4,7 +4,7 @@
     "CreateProdResources": {
       "Fn::Equals": [
         {
-          "Ref": "EnvType"
+          "Ref": "InstanceTypeParameter"
         },
         "prod"
       ]
@@ -16,16 +16,7 @@
       "Condition": "CreateProdResources",
       "Description": "The DNSName of the backup load balancer",
       "Value": {
-        "Fn::GetAtt": [
-          "BackupLoadBalancer",
-          "DNSName"
-        ]
-      }
-    },
-    "InstanceID": {
-      "Description": "The Instance ID",
-      "Value": {
-        "Ref": "EC2Instance"
+        "Ref": "Function"
       }
     }
   },
@@ -43,7 +34,7 @@
   },
   "Resources": {
     "Bucket": {
-      "Condition": "CreateBucket",
+      "Condition": "CreateProdResources",
       "Type": "AWS::S3::Bucket"
     },
     "Function": {
