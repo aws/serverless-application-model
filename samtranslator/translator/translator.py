@@ -127,7 +127,7 @@ class Translator:
 
         self.sam_parser.parse(sam_template=sam_template, parameter_values=parameter_values, sam_plugins=sam_plugins)
 
-        document_errors = []
+        document_errors: List[Exception] = []
         add_embedded_connectors(sam_template=sam_template, document_errors=document_errors)
 
         template = copy.deepcopy(sam_template)
