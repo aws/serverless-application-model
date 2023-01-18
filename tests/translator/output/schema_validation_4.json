@@ -1,0 +1,106 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "CreateProdResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "InstanceTypeParameter"
+        },
+        "prod"
+      ]
+    }
+  },
+  "Description": "Some description",
+  "Outputs": {
+    "BackupLoadBalancerDNSName": {
+      "Condition": "CreateProdResources",
+      "Description": "The DNSName of the backup load balancer",
+      "Value": {
+        "Ref": "Function"
+      }
+    }
+  },
+  "Parameters": {
+    "InstanceTypeParameter": {
+      "AllowedValues": [
+        "t2.micro",
+        "m1.small",
+        "m1.large"
+      ],
+      "Default": "t2.micro",
+      "Description": "Enter t2.micro, m1.small, or m1.large. Default is t2.micro.",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "Bucket": {
+      "Condition": "CreateProdResources",
+      "Type": "AWS::S3::Bucket"
+    },
+    "Function": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "my-bucket",
+          "S3Key": "function.zip"
+        },
+        "Handler": "index.handler",
+        "Role": "arn:aws:iam::123456789012:role/lambda-role",
+        "Runtime": "nodejs12.x",
+        "Timeout": 5,
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-085912345678492fb"
+          ],
+          "SubnetIds": [
+            "subnet-071f712345678e7c8",
+            "subnet-07fd123456788a036"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyInstance": {
+      "Properties": {
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sdm",
+            "Ebs": {
+              "DeleteOnTermination": false,
+              "Iops": 200,
+              "VolumeSize": 20,
+              "VolumeType": "io1"
+            }
+          },
+          {
+            "DeviceName": "/dev/sdk",
+            "NoDevice": {}
+          }
+        ],
+        "ImageId": "ami-79fd7eee",
+        "KeyName": "testkey"
+      },
+      "Type": "AWS::EC2::Instance"
+    },
+    "MyTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ]
+      },
+      "Type": "AWS::DynamoDB::Table"
+    }
+  }
+}
