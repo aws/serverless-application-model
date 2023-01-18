@@ -1,5 +1,5 @@
 # Help resolve intrinsic functions
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Callable, List, Union
 
 from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAttAction
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
@@ -45,7 +45,7 @@ class IntrinsicsResolver:
         :param _input: Any primitive type (dict, array, string etc) whose values might contain intrinsic functions
         :return: A copy of a dictionary with parameter references replaced by actual value.
         """
-        return self._traverse(_input, self.parameters, self._try_resolve_parameter_refs)  # type: ignore[no-untyped-call]
+        return self._traverse(_input, self.parameters, self._try_resolve_parameter_refs)
 
     def resolve_sam_resource_refs(
         self, _input: Dict[str, Any], supported_resource_refs: SupportedResourceReferences
@@ -71,7 +71,7 @@ class IntrinsicsResolver:
             references supported in this SAM template, along with the value they should resolve to.
         :return list errors: List of dictionary containing information about invalid reference. Empty list otherwise
         """
-        return self._traverse(_input, supported_resource_refs, self._try_resolve_sam_resource_refs)  # type: ignore[no-untyped-call]
+        return self._traverse(_input, supported_resource_refs, self._try_resolve_sam_resource_refs)
 
     def resolve_sam_resource_id_refs(self, _input: Dict[str, Any], supported_resource_id_refs: Dict[str, str]) -> Any:
         """
@@ -94,9 +94,14 @@ class IntrinsicsResolver:
         :param dict supported_resource_id_refs: Dictionary that maps old logical ids to new ones.
         :return list errors: List of dictionary containing information about invalid reference. Empty list otherwise
         """
-        return self._traverse(_input, supported_resource_id_refs, self._try_resolve_sam_resource_id_refs)  # type: ignore[no-untyped-call]
+        return self._traverse(_input, supported_resource_id_refs, self._try_resolve_sam_resource_id_refs)
 
-    def _traverse(self, input_value, resolution_data, resolver_method):  # type: ignore[no-untyped-def]
+    def _traverse(
+        self,
+        input_value: Any,
+        resolution_data: Union[Dict[str, Any], SupportedResourceReferences],
+        resolver_method: Callable[[Dict[str, Any], Any], Any],
+    ) -> Any:
         """
         Driver method that performs the actual traversal of input and calls the appropriate `resolver_method` when
         to perform the resolution.
@@ -131,14 +136,19 @@ class IntrinsicsResolver:
         #
         input_value = resolver_method(input_value, resolution_data)
         if isinstance(input_value, dict):
-            return self._traverse_dict(input_value, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
+            return self._traverse_dict(input_value, resolution_data, resolver_method)
         if isinstance(input_value, list):
-            return self._traverse_list(input_value, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
+            return self._traverse_list(input_value, resolution_data, resolver_method)
         # We can iterate only over dict or list types. Primitive types are terminals
 
         return input_value
 
-    def _traverse_dict(self, input_dict, resolution_data, resolver_method):  # type: ignore[no-untyped-def]
+    def _traverse_dict(
+        self,
+        input_dict: Dict[str, Any],
+        resolution_data: Union[Dict[str, Any], SupportedResourceReferences],
+        resolver_method: Callable[[Dict[str, Any], Any], Any],
+    ) -> Any:
         """
         Traverse a dictionary to resolve intrinsic functions on every value
 
@@ -148,11 +158,16 @@ class IntrinsicsResolver:
         :return: Modified dictionary with values resolved
         """
         for key, value in input_dict.items():
-            input_dict[key] = self._traverse(value, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
+            input_dict[key] = self._traverse(value, resolution_data, resolver_method)
 
         return input_dict
 
-    def _traverse_list(self, input_list, resolution_data, resolver_method):  # type: ignore[no-untyped-def]
+    def _traverse_list(
+        self,
+        input_list: List[Any],
+        resolution_data: Union[Dict[str, Any], SupportedResourceReferences],
+        resolver_method: Callable[[Dict[str, Any], Any], Any],
+    ) -> Any:
         """
         Traverse a list to resolve intrinsic functions on every element
 
@@ -162,11 +177,11 @@ class IntrinsicsResolver:
         :return: Modified list with intrinsic functions resolved
         """
         for index, value in enumerate(input_list):
-            input_list[index] = self._traverse(value, resolution_data, resolver_method)  # type: ignore[no-untyped-call]
+            input_list[index] = self._traverse(value, resolution_data, resolver_method)
 
         return input_list
 
-    def _try_resolve_parameter_refs(self, _input, parameters):  # type: ignore[no-untyped-def]
+    def _try_resolve_parameter_refs(self, _input: Dict[str, Any], parameters: Dict[str, Any]) -> Any:
         """
         Try to resolve parameter references on the given input object. The object could be of any type.
         If the input is not in the format used by intrinsics (ie. dictionary with one key), input is returned
@@ -177,13 +192,15 @@ class IntrinsicsResolver:
         :param parameters: Parameter values used to for ref substitution
         :return:
         """
-        if not self._is_intrinsic_dict(_input):  # type: ignore[no-untyped-call]
+        if not self._is_intrinsic_dict(_input):
             return _input
 
         function_type = list(_input.keys())[0]
         return self.supported_intrinsics[function_type].resolve_parameter_refs(_input, parameters)
 
-    def _try_resolve_sam_resource_refs(self, _input, supported_resource_refs):  # type: ignore[no-untyped-def]
+    def _try_resolve_sam_resource_refs(
+        self, _input: Dict[str, Any], supported_resource_refs: SupportedResourceReferences
+    ) -> Any:
         """
         Try to resolve SAM resource references on the given template. If the given object looks like one of the
         supported intrinsics, it calls the appropriate resolution on it. If not, this method returns the original input
@@ -194,13 +211,15 @@ class IntrinsicsResolver:
             resource references and the values they resolve to.
         :return: Modified input dictionary with references resolved
         """
-        if not self._is_intrinsic_dict(_input):  # type: ignore[no-untyped-call]
+        if not self._is_intrinsic_dict(_input):
             return _input
 
         function_type = list(_input.keys())[0]
         return self.supported_intrinsics[function_type].resolve_resource_refs(_input, supported_resource_refs)
 
-    def _try_resolve_sam_resource_id_refs(self, _input, supported_resource_id_refs):  # type: ignore[no-untyped-def]
+    def _try_resolve_sam_resource_id_refs(
+        self, _input: Dict[str, Any], supported_resource_id_refs: Dict[str, str]
+    ) -> Any:
         """
         Try to resolve SAM resource id references on the given template. If the given object looks like one of the
         supported intrinsics, it calls the appropriate resolution on it. If not, this method returns the original input
@@ -210,13 +229,13 @@ class IntrinsicsResolver:
         :param dict supported_resource_id_refs: Dictionary that maps old logical ids to new ones.
         :return: Modified input dictionary with id references resolved
         """
-        if not self._is_intrinsic_dict(_input):  # type: ignore[no-untyped-call]
+        if not self._is_intrinsic_dict(_input):
             return _input
 
         function_type = list(_input.keys())[0]
         return self.supported_intrinsics[function_type].resolve_resource_id_refs(_input, supported_resource_id_refs)
 
-    def _is_intrinsic_dict(self, _input):  # type: ignore[no-untyped-def]
+    def _is_intrinsic_dict(self, _input: Dict[str, Any]) -> bool:
         """
         Can the _input represent an intrinsic function in it?
 
