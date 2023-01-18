@@ -127,7 +127,7 @@ class Translator:
 
         self.sam_parser.parse(sam_template=sam_template, parameter_values=parameter_values, sam_plugins=sam_plugins)
 
-        document_errors: List[Exception] = []
+        document_errors: List[Any] = []
         add_embedded_connectors(sam_template=sam_template, document_errors=document_errors)
 
         template = copy.deepcopy(sam_template)
@@ -189,7 +189,7 @@ class Translator:
                             DuplicateLogicalIdException(logical_id, resource.logical_id, resource.resource_type)
                         )
             except (InvalidResourceException, InvalidEventException, InvalidTemplateException) as e:
-                document_errors.append(e)  # type: ignore[arg-type]
+                document_errors.append(e)
 
         if deployment_preference_collection.any_enabled():
             template["Resources"].update(deployment_preference_collection.get_codedeploy_application().to_dict())
@@ -207,13 +207,13 @@ class Translator:
                         deployment_preference_collection.deployment_group(logical_id).to_dict()
                     )
                 except InvalidResourceException as e:
-                    document_errors.append(e)  # type: ignore[arg-type]
+                    document_errors.append(e)
 
         # Run the after-transform plugin target
         try:
             sam_plugins.act(LifeCycleEvents.after_transform_template, template)
         except (InvalidDocumentException, InvalidResourceException, InvalidTemplateException) as e:
-            document_errors.append(e)  # type: ignore[arg-type]
+            document_errors.append(e)
 
         # Cleanup
         if "Transform" in template:
