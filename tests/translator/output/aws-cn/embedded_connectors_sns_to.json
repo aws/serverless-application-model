@@ -58,10 +58,10 @@
     "MySNSTopic": {
       "Type": "AWS::SNS::Topic"
     },
-    "SnsToFunctionConnectorWriteLambdaPermission": {
+    "MySNSTopicSnsToFunctionConnectorWriteLambdaPermission": {
       "Metadata": {
         "aws:sam:connectors": {
-          "SnsToFunctionConnector": {
+          "MySNSTopicSnsToFunctionConnector": {
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
@@ -86,10 +86,10 @@
       },
       "Type": "AWS::Lambda::Permission"
     },
-    "SnsToQueueConnectorQueuePolicy": {
+    "MySNSTopicSnsToQueueConnectorQueuePolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "SnsToQueueConnector": {
+          "MySNSTopicSnsToQueueConnector": {
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },

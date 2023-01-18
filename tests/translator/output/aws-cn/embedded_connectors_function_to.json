@@ -1,9 +1,305 @@
 {
   "Resources": {
-    "BucketConnectorPolicy": {
+    "MyBucket": {
+      "Type": "AWS::S3::Bucket"
+    },
+    "MyLambdaFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "MyTable"
+            }
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x"
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyLambdaFunctionLambdaSQSConnectorPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "BucketConnector": {
+          "MyLambdaFunctionLambdaSQSConnector": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyLambdaFunctionLambdaTableConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyLambdaFunctionLambdaTableConnector": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyLambdaFunctionLambdaTableConnectorWithTableArnPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyLambdaFunctionLambdaTableConnectorWithTableArn": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MySNSTopic": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "MyServerlessFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyServerlessFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyServerlessFunctionBucketConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyServerlessFunctionBucketConnector": {
             "Destination": {
               "Type": "AWS::S3::Bucket"
             },
@@ -99,302 +395,6 @@
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
-    "LambdaSQSConnectorPolicy": {
-      "Metadata": {
-        "aws:sam:connectors": {
-          "LambdaSQSConnector": {
-            "Destination": {
-              "Type": "AWS::SQS::Queue"
-            },
-            "Source": {
-              "Type": "AWS::Lambda::Function"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sqs:ReceiveMessage",
-                "sqs:GetQueueAttributes"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "MyQueue",
-                    "Arn"
-                  ]
-                }
-              ]
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "Roles": [
-          {
-            "Ref": "MyRole"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::ManagedPolicy"
-    },
-    "LambdaTableConnectorPolicy": {
-      "Metadata": {
-        "aws:sam:connectors": {
-          "LambdaTableConnector": {
-            "Destination": {
-              "Type": "AWS::DynamoDB::Table"
-            },
-            "Source": {
-              "Type": "AWS::Lambda::Function"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "dynamodb:GetItem",
-                "dynamodb:Query",
-                "dynamodb:Scan",
-                "dynamodb:BatchGetItem",
-                "dynamodb:ConditionCheckItem",
-                "dynamodb:PartiQLSelect"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "MyTable",
-                    "Arn"
-                  ]
-                },
-                {
-                  "Fn::Sub": [
-                    "${DestinationArn}/index/*",
-                    {
-                      "DestinationArn": {
-                        "Fn::GetAtt": [
-                          "MyTable",
-                          "Arn"
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "Action": [
-                "dynamodb:PutItem",
-                "dynamodb:UpdateItem",
-                "dynamodb:DeleteItem",
-                "dynamodb:BatchWriteItem",
-                "dynamodb:PartiQLDelete",
-                "dynamodb:PartiQLInsert",
-                "dynamodb:PartiQLUpdate"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "MyTable",
-                    "Arn"
-                  ]
-                },
-                {
-                  "Fn::Sub": [
-                    "${DestinationArn}/index/*",
-                    {
-                      "DestinationArn": {
-                        "Fn::GetAtt": [
-                          "MyTable",
-                          "Arn"
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "Roles": [
-          {
-            "Ref": "MyRole"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::ManagedPolicy"
-    },
-    "LambdaTableConnectorWithTableArnPolicy": {
-      "Metadata": {
-        "aws:sam:connectors": {
-          "LambdaTableConnectorWithTableArn": {
-            "Destination": {
-              "Type": "AWS::DynamoDB::Table"
-            },
-            "Source": {
-              "Type": "AWS::Lambda::Function"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "dynamodb:GetItem",
-                "dynamodb:Query",
-                "dynamodb:Scan",
-                "dynamodb:BatchGetItem",
-                "dynamodb:ConditionCheckItem",
-                "dynamodb:PartiQLSelect"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "MyTable",
-                    "Arn"
-                  ]
-                },
-                {
-                  "Fn::Sub": [
-                    "${DestinationArn}/index/*",
-                    {
-                      "DestinationArn": {
-                        "Fn::GetAtt": [
-                          "MyTable",
-                          "Arn"
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "Action": [
-                "dynamodb:PutItem",
-                "dynamodb:UpdateItem",
-                "dynamodb:DeleteItem",
-                "dynamodb:BatchWriteItem",
-                "dynamodb:PartiQLDelete",
-                "dynamodb:PartiQLInsert",
-                "dynamodb:PartiQLUpdate"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "MyTable",
-                    "Arn"
-                  ]
-                },
-                {
-                  "Fn::Sub": [
-                    "${DestinationArn}/index/*",
-                    {
-                      "DestinationArn": {
-                        "Fn::GetAtt": [
-                          "MyTable",
-                          "Arn"
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "Roles": [
-          {
-            "Ref": "MyRole"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::ManagedPolicy"
-    },
-    "MyBucket": {
-      "Type": "AWS::S3::Bucket"
-    },
-    "MyLambdaFunction": {
-      "Properties": {
-        "Code": {
-          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
-        },
-        "Environment": {
-          "Variables": {
-            "TABLE_NAME": {
-              "Ref": "MyTable"
-            }
-          }
-        },
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "MyRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs14.x"
-      },
-      "Type": "AWS::Lambda::Function"
-    },
-    "MyQueue": {
-      "Type": "AWS::SQS::Queue"
-    },
-    "MyRole": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com"
-              }
-            }
-          ]
-        }
-      },
-      "Type": "AWS::IAM::Role"
-    },
-    "MySNSTopic": {
-      "Type": "AWS::SNS::Topic"
-    },
-    "MyServerlessFunction": {
-      "Properties": {
-        "Code": {
-          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
-        },
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "MyServerlessFunctionRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs14.x",
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::Lambda::Function"
-    },
     "MyServerlessFunctionRole": {
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -425,83 +425,10 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "MyStateMachine": {
-      "Properties": {
-        "DefinitionString": {
-          "Fn::Join": [
-            "\n",
-            [
-              "{",
-              "    \"StartAt\": \"MyLambdaState\"",
-              "}"
-            ]
-          ]
-        },
-        "RoleArn": {
-          "Fn::GetAtt": [
-            "MyStateMachineRole",
-            "Arn"
-          ]
-        },
-        "Tags": [
-          {
-            "Key": "stateMachine:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::StepFunctions::StateMachine"
-    },
-    "MyStateMachineRole": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "states.amazonaws.com"
-                ]
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "ManagedPolicyArns": [],
-        "Tags": [
-          {
-            "Key": "stateMachine:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::Role"
-    },
-    "MyTable": {
-      "Properties": {
-        "AttributeDefinitions": [
-          {
-            "AttributeName": "Id",
-            "AttributeType": "S"
-          }
-        ],
-        "BillingMode": "PAY_PER_REQUEST",
-        "KeySchema": [
-          {
-            "AttributeName": "Id",
-            "KeyType": "HASH"
-          }
-        ]
-      },
-      "Type": "AWS::DynamoDB::Table"
-    },
-    "SFNConnectorPolicy": {
+    "MyServerlessFunctionSFNConnectorPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "SFNConnector": {
+          "MyServerlessFunctionSFNConnector": {
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
@@ -593,10 +520,10 @@
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
-    "SNSConnectorPolicy": {
+    "MyServerlessFunctionSNSConnectorPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "SNSConnector": {
+          "MyServerlessFunctionSNSConnector": {
             "Destination": {
               "Type": "AWS::SNS::Topic"
             },
@@ -631,10 +558,10 @@
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
-    "SQSConnectorPolicy": {
+    "MyServerlessFunctionSQSConnectorPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "SQSConnector": {
+          "MyServerlessFunctionSQSConnector": {
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
@@ -690,10 +617,10 @@
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
-    "TableConnectorPolicy": {
+    "MyServerlessFunctionTableConnectorPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "TableConnector": {
+          "MyServerlessFunctionTableConnector": {
             "Destination": {
               "Type": "AWS::DynamoDB::Table"
             },
@@ -782,10 +709,10 @@
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
-    "TableConnectorWithTableArnPolicy": {
+    "MyServerlessFunctionTableConnectorWithTableArnPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "TableConnectorWithTableArn": {
+          "MyServerlessFunctionTableConnectorWithTableArn": {
             "Destination": {
               "Type": "AWS::DynamoDB::Table"
             },
@@ -873,6 +800,79 @@
         ]
       },
       "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyStateMachine": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"MyLambdaState\"",
+              "}"
+            ]
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MyStateMachineRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "MyStateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "Id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "Id",
+            "KeyType": "HASH"
+          }
+        ]
+      },
+      "Type": "AWS::DynamoDB::Table"
     }
   }
 }

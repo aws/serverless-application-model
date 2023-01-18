@@ -8,12 +8,41 @@
       },
       "Type": "AWS::Events::EventBus"
     },
-    "MyConnectorToDefaultBusPolicy": {
+    "MyEventsRule1": {
+      "Properties": {
+        "EventPattern": {
+          "source": [
+            "aws.ec2"
+          ]
+        },
+        "Name": "mynewabc",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "StateMachine",
+                "Arn"
+              ]
+            },
+            "Id": "StateMachine",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "MyRuleRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "MyEventsRule1SfnConnectorPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "MyConnectorToDefaultBus": {
+          "MyEventsRule1SfnConnector": {
             "Destination": {
-              "Type": "AWS::Events::EventBus"
+              "Type": "AWS::Serverless::StateMachine"
             },
             "Source": {
               "Type": "AWS::Events::Rule"
@@ -26,12 +55,12 @@
           "Statement": [
             {
               "Action": [
-                "events:PutEvents"
+                "states:StartExecution"
               ],
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default"
+                  "Ref": "StateMachine"
                 }
               ]
             }
@@ -46,10 +75,39 @@
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
-    "MyEVBusConnectorPolicy": {
+    "MyEventsRule2": {
+      "Properties": {
+        "EventPattern": {
+          "source": [
+            "aws.ec2"
+          ]
+        },
+        "Name": "mynewabc",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "EventBus",
+                "Arn"
+              ]
+            },
+            "Id": "EventBus",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "MyRuleRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "MyEventsRule2MyEVBusConnectorPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "MyEVBusConnector": {
+          "MyEventsRule2MyEVBusConnector": {
             "Destination": {
               "Type": "AWS::Events::EventBus"
             },
@@ -87,64 +145,6 @@
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
-    "MyEventsRule1": {
-      "Properties": {
-        "EventPattern": {
-          "source": [
-            "aws.ec2"
-          ]
-        },
-        "Name": "mynewabc",
-        "State": "ENABLED",
-        "Targets": [
-          {
-            "Arn": {
-              "Fn::GetAtt": [
-                "StateMachine",
-                "Arn"
-              ]
-            },
-            "Id": "StateMachine",
-            "RoleArn": {
-              "Fn::GetAtt": [
-                "MyRuleRole",
-                "Arn"
-              ]
-            }
-          }
-        ]
-      },
-      "Type": "AWS::Events::Rule"
-    },
-    "MyEventsRule2": {
-      "Properties": {
-        "EventPattern": {
-          "source": [
-            "aws.ec2"
-          ]
-        },
-        "Name": "mynewabc",
-        "State": "ENABLED",
-        "Targets": [
-          {
-            "Arn": {
-              "Fn::GetAtt": [
-                "EventBus",
-                "Arn"
-              ]
-            },
-            "Id": "EventBus",
-            "RoleArn": {
-              "Fn::GetAtt": [
-                "MyRuleRole",
-                "Arn"
-              ]
-            }
-          }
-        ]
-      },
-      "Type": "AWS::Events::Rule"
-    },
     "MyEventsRuleToDefaultBus": {
       "Properties": {
         "EventPattern": {
@@ -171,6 +171,44 @@
       },
       "Type": "AWS::Events::Rule"
     },
+    "MyEventsRuleToDefaultBusMyConnectorToDefaultBusPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyEventsRuleToDefaultBusMyConnectorToDefaultBus": {
+            "Destination": {
+              "Type": "AWS::Events::EventBus"
+            },
+            "Source": {
+              "Type": "AWS::Events::Rule"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "events:PutEvents"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRuleRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
     "MyRuleRole": {
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -186,44 +224,6 @@
         }
       },
       "Type": "AWS::IAM::Role"
-    },
-    "SfnConnectorPolicy": {
-      "Metadata": {
-        "aws:sam:connectors": {
-          "SfnConnector": {
-            "Destination": {
-              "Type": "AWS::Serverless::StateMachine"
-            },
-            "Source": {
-              "Type": "AWS::Events::Rule"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "states:StartExecution"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Ref": "StateMachine"
-                }
-              ]
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "Roles": [
-          {
-            "Ref": "MyRuleRole"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::ManagedPolicy"
     },
     "StateMachine": {
       "Properties": {

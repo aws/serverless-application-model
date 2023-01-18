@@ -1,9 +1,12 @@
 {
   "Resources": {
-    "ApiV1ToLambdaWriteLambdaPermission": {
+    "MyApiV1": {
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiV1ApiV1ToLambdaWriteLambdaPermission": {
       "Metadata": {
         "aws:sam:connectors": {
-          "ApiV1ToLambda": {
+          "MyApiV1ApiV1ToLambda": {
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
@@ -36,10 +39,13 @@
       },
       "Type": "AWS::Lambda::Permission"
     },
-    "ApiV2ToLambdaWriteLambdaPermission": {
+    "MyApiV2": {
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "MyApiV2ApiV2ToLambdaWriteLambdaPermission": {
       "Metadata": {
         "aws:sam:connectors": {
-          "ApiV2ToLambda": {
+          "MyApiV2ApiV2ToLambda": {
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
@@ -72,12 +78,6 @@
       },
       "Type": "AWS::Lambda::Permission"
     },
-    "MyApiV1": {
-      "Type": "AWS::ApiGateway::RestApi"
-    },
-    "MyApiV2": {
-      "Type": "AWS::ApiGatewayV2::Api"
-    },
     "MyFunction": {
       "Type": "AWS::Lambda::Function"
     },
@@ -90,16 +90,10 @@
     "MyRule": {
       "Type": "AWS::Events::Rule"
     },
-    "MySNSTopic": {
-      "Type": "AWS::SNS::Topic"
-    },
-    "MyTopic": {
-      "Type": "AWS::SNS::Topic"
-    },
-    "RuleToTopicTopicPolicy": {
+    "MyRuleRuleToTopicTopicPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "RuleToTopic": {
+          "MyRuleRuleToTopic": {
             "Destination": {
               "Type": "AWS::SNS::Topic"
             },
@@ -143,10 +137,13 @@
       },
       "Type": "AWS::SNS::TopicPolicy"
     },
-    "TopicToLambdaHardcodedWriteLambdaPermission": {
+    "MySNSTopic": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "MySNSTopicTopicToLambdaHardcodedWriteLambdaPermission": {
       "Metadata": {
         "aws:sam:connectors": {
-          "TopicToLambdaHardcoded": {
+          "MySNSTopicTopicToLambdaHardcoded": {
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
@@ -171,10 +168,13 @@
       },
       "Type": "AWS::Lambda::Permission"
     },
-    "TopicToQueueQueuePolicy": {
+    "MyTopic": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "MyTopicTopicToQueueQueuePolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "TopicToQueue": {
+          "MyTopicTopicToQueue": {
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },

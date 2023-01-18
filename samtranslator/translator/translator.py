@@ -274,7 +274,7 @@ class Translator:
         return functions + statemachines + apis + others + connectors
 
 
-def add_embedded_connectors(sam_template: Dict[str, Any], document_errors: List[Exception]) -> None:
+def add_embedded_connectors(sam_template: Dict[str, Any], document_errors: List[Any]) -> None:
     """
     Loops through the SAM Template resources to find any connectors that have been attached to the resources.
     Adds those attached connectors as Connector resources to the list of resources
@@ -295,6 +295,9 @@ def add_embedded_connectors(sam_template: Dict[str, Any], document_errors: List[
                 # Go through each of the connectors that have been attached and create a Serverless Connector resource
                 for connector_logical_id, connector_dict in resource["Connectors"].items():
 
+                    # The logical id for the transformed connector will be <source_logical_id> + <embedded_connector_logical_id>
+                    connector_logical_id = source_logical_id + connector_logical_id
+
                     # can't use sam_expect since this is neither a property nor a resource attribute
                     if not isinstance(connector_dict, dict):
                         raise InvalidResourceException(connector_logical_id, f"{connector_logical_id} should be a map.")
@@ -302,17 +305,11 @@ def add_embedded_connectors(sam_template: Dict[str, Any], document_errors: List[
                     # mutates the connector_dict to make it a connector resource
                     get_generated_connector(source_logical_id, connector_logical_id, connector_dict, document_errors)
 
-                    # Make sure there are no other embedded connectors with the same logical id
-                    if connector_logical_id in connectors:
-                        raise DuplicateLogicalIdException(
-                            connector_logical_id, connector_logical_id, connector_dict["Type"]
-                        )
-
                     connectors[connector_logical_id] = connector_dict
 
                 # delete connectors key, so it doesn't show up in the transformed template
                 del resource["Connectors"]
-            except (InvalidResourceException, DuplicateLogicalIdException) as e:
+            except InvalidResourceException as e:
                 document_errors.append(e)
 
     # go through the list of generated connectors and add it to resources dict
@@ -328,7 +325,7 @@ def add_embedded_connectors(sam_template: Dict[str, Any], document_errors: List[
 
 
 def get_generated_connector(
-    source_logical_id: str, connector_logical_id: str, connector: Dict[str, Any], document_errors: List[Exception]
+    source_logical_id: str, connector_logical_id: str, connector: Dict[str, Any], document_errors: List[Any]
 ) -> None:
     """
     Adds the type, source id and any ResourceReference properties to the connector

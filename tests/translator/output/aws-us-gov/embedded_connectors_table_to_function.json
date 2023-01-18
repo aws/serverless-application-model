@@ -112,10 +112,10 @@
       },
       "Type": "AWS::DynamoDB::Table"
     },
-    "TableConnectorLambdaFunctionPolicy": {
+    "MyTableTableConnectorLambdaFunctionPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "TableConnectorLambdaFunction": {
+          "MyTableTableConnectorLambdaFunction": {
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
@@ -163,10 +163,10 @@
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
-    "TableConnectorServerlessFunctionPolicy": {
+    "MyTableTableConnectorServerlessFunctionPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "TableConnectorServerlessFunction": {
+          "MyTableTableConnectorServerlessFunction": {
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },

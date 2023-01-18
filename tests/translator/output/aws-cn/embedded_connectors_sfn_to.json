@@ -54,7 +54,7 @@
     },
     "MyStateMachine": {
       "DependsOn": [
-        "SfnToSfnPolicy"
+        "MyStateMachineSfnToSfnPolicy"
       ],
       "Properties": {
         "DefinitionString": {
@@ -134,84 +134,10 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "MyStateMachineWithoutPolicy": {
-      "Properties": {
-        "DefinitionString": {
-          "Fn::Join": [
-            "\n",
-            [
-              "{",
-              "    \"StartAt\": \"TryDoSomething\",",
-              "    \"States\": {",
-              "        \"TryDoSomething\": {",
-              "            \"End\": true,",
-              "            \"Parameters\": {",
-              "                \"FunctionName\": \"${definition_substitution_1}\"",
-              "            },",
-              "            \"Resource\": \"${definition_substitution_2}\",",
-              "            \"Type\": \"Task\"",
-              "        }",
-              "    }",
-              "}"
-            ]
-          ]
-        },
-        "DefinitionSubstitutions": {
-          "definition_substitution_1": {
-            "Ref": "MyFunction"
-          },
-          "definition_substitution_2": {
-            "Fn::Sub": "arn:${AWS::Partition}:states:::lambda:invoke"
-          }
-        },
-        "RoleArn": {
-          "Fn::GetAtt": [
-            "MyStateMachineWithoutPolicyRole",
-            "Arn"
-          ]
-        },
-        "StateMachineType": "EXPRESS",
-        "Tags": [
-          {
-            "Key": "stateMachine:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::StepFunctions::StateMachine"
-    },
-    "MyStateMachineWithoutPolicyRole": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "states.amazonaws.com"
-                ]
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "ManagedPolicyArns": [],
-        "Tags": [
-          {
-            "Key": "stateMachine:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::Role"
-    },
-    "SfnToFunctionPolicy": {
+    "MyStateMachineSfnToFunctionPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "SfnToFunction": {
+          "MyStateMachineSfnToFunction": {
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
@@ -250,52 +176,10 @@
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
-    "SfnToFunctionWithoutPolicyPolicy": {
+    "MyStateMachineSfnToSfnPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "SfnToFunctionWithoutPolicy": {
-            "Destination": {
-              "Type": "AWS::Serverless::Function"
-            },
-            "Source": {
-              "Type": "AWS::Serverless::StateMachine"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "lambda:InvokeAsync",
-                "lambda:InvokeFunction"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "MyFunction",
-                    "Arn"
-                  ]
-                }
-              ]
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "Roles": [
-          {
-            "Ref": "MyStateMachineWithoutPolicyRole"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::ManagedPolicy"
-    },
-    "SfnToSfnPolicy": {
-      "Metadata": {
-        "aws:sam:connectors": {
-          "SfnToSfn": {
+          "MyStateMachineSfnToSfn": {
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
@@ -390,6 +274,122 @@
         "Roles": [
           {
             "Ref": "MyStateMachineRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyStateMachineWithoutPolicy": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"TryDoSomething\",",
+              "    \"States\": {",
+              "        \"TryDoSomething\": {",
+              "            \"End\": true,",
+              "            \"Parameters\": {",
+              "                \"FunctionName\": \"${definition_substitution_1}\"",
+              "            },",
+              "            \"Resource\": \"${definition_substitution_2}\",",
+              "            \"Type\": \"Task\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "DefinitionSubstitutions": {
+          "definition_substitution_1": {
+            "Ref": "MyFunction"
+          },
+          "definition_substitution_2": {
+            "Fn::Sub": "arn:${AWS::Partition}:states:::lambda:invoke"
+          }
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MyStateMachineWithoutPolicyRole",
+            "Arn"
+          ]
+        },
+        "StateMachineType": "EXPRESS",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "MyStateMachineWithoutPolicyRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyStateMachineWithoutPolicySfnToFunctionWithoutPolicyPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyStateMachineWithoutPolicySfnToFunctionWithoutPolicy": {
+            "Destination": {
+              "Type": "AWS::Serverless::Function"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::StateMachine"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "lambda:InvokeAsync",
+                "lambda:InvokeFunction"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyFunction",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyStateMachineWithoutPolicyRole"
           }
         ]
       },
