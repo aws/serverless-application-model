@@ -111,6 +111,8 @@ class TestValidateUnifiedSchema(TestCase):
 
     @parameterized.expand(
         [
+            (PROJECT_ROOT.joinpath("tests/translator/input/error_api_invalid_auth.yaml"),),
+            (PROJECT_ROOT.joinpath("tests/translator/input/error_function_invalid_event_type.yaml"),),
             (PROJECT_ROOT.joinpath("tests/translator/input/schema_validation_ec2_not_valid.yaml"),),
         ]
     )
