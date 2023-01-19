@@ -157,7 +157,7 @@ class KinesisEventProperties(BaseModel):
     MaximumRetryAttempts: Optional[PassThrough] = kinesiseventproperties("MaximumRetryAttempts")
     ParallelizationFactor: Optional[PassThrough] = kinesiseventproperties("ParallelizationFactor")
     StartingPosition: PassThrough = kinesiseventproperties("StartingPosition")
-    StartingPositionTimestamp: PassThrough = kinesiseventproperties("StartingPositionTimestamp")
+    StartingPositionTimestamp: Optional[PassThrough] = kinesiseventproperties("StartingPositionTimestamp")
     Stream: PassThrough = kinesiseventproperties("Stream")
     TumblingWindowInSeconds: Optional[PassThrough] = kinesiseventproperties("TumblingWindowInSeconds")
 
@@ -179,7 +179,7 @@ class DynamoDBEventProperties(BaseModel):
     MaximumRetryAttempts: Optional[PassThrough] = dynamodbeventproperties("MaximumRetryAttempts")
     ParallelizationFactor: Optional[PassThrough] = dynamodbeventproperties("ParallelizationFactor")
     StartingPosition: PassThrough = dynamodbeventproperties("StartingPosition")
-    StartingPositionTimestamp: PassThrough = dynamodbeventproperties("StartingPositionTimestamp")
+    StartingPositionTimestamp: Optional[PassThrough] = dynamodbeventproperties("StartingPositionTimestamp")
     Stream: PassThrough = dynamodbeventproperties("Stream")
     TumblingWindowInSeconds: Optional[PassThrough] = dynamodbeventproperties("TumblingWindowInSeconds")
 
@@ -356,7 +356,7 @@ class MSKEventProperties(BaseModel):
     FilterCriteria: Optional[PassThrough] = mskeventproperties("FilterCriteria")
     MaximumBatchingWindowInSeconds: Optional[PassThrough] = mskeventproperties("MaximumBatchingWindowInSeconds")
     StartingPosition: PassThrough = mskeventproperties("StartingPosition")
-    StartingPositionTimestamp: PassThrough = mskeventproperties("StartingPositionTimestamp")
+    StartingPositionTimestamp: Optional[PassThrough] = mskeventproperties("StartingPositionTimestamp")
     Stream: PassThrough = mskeventproperties("Stream")
     Topics: PassThrough = mskeventproperties("Topics")
     SourceAccessConfigurations: Optional[PassThrough]  # TODO: update docs when live

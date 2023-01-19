@@ -1,14 +1,26 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Union, TypeVar
+from typing import Any, Dict, List, Optional, Union, TypeVar
 from functools import partial
 
 import pydantic
 from pydantic import Extra, Field
 
 # Value passed directly to CloudFormation; not used by SAM
-PassThrough = Any  # TODO: Make it behave like typescript's unknown
+#
+# Need a type other than Any, otherwise value won't be required. See:
+#  - https://github.com/pydantic/pydantic/issues/990
+#  - https://github.com/pydantic/pydantic/issues/1223
+#
+# So we use "any CloudFormation type", and since CloudFormation doesn't support null
+# and uses JSON, we use all JSON types except null.
+#
+# Using a class to reduce schema size; makes it go to definitions instead of
+# inlining everywhere. See https://docs.pydantic.dev/usage/models/#custom-root-types
+class PassThrough(pydantic.BaseModel):
+    __root__: Union[Dict[Any, Any], List[Any], int, float, bool, str]
+
 
 # Intrinsic resolvable by the SAM transform
 T = TypeVar("T")
@@ -33,7 +45,6 @@ def get_prop(stem: str) -> Any:
 def _get_prop(stem: str, name: str) -> Any:
     docs = _DOCS["properties"][stem][name]
     return Field(
-        ...,
         title=name,
         description=docs,
         # https://code.visualstudio.com/docs/languages/json#_use-rich-formatting-in-hovers
