@@ -17,7 +17,7 @@ PassThrough = Any  # TODO: Make it behave like typescript's unknown
 # That isn't what we want; we want it to specify any type, but still required.
 # Using a class gets around it.
 class PassThroughProp(pydantic.BaseModel):
-    __root__: Any
+    __root__: PassThrough
 
 
 # Intrinsic resolvable by the SAM transform
