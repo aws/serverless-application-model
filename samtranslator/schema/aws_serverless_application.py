@@ -4,7 +4,7 @@ from typing import Optional, Any, Dict, Union
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop
+from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop
 
 location = get_prop("sam-property-application-applicationlocationobject")
 properties = get_prop("sam-resource-application")
@@ -17,13 +17,13 @@ class Location(BaseModel):
 
 class Properties(BaseModel):
     Location: Union[str, Location] = properties("Location")
-    NotificationARNs: Optional[PassThrough] = properties("NotificationARNs")
-    Parameters: Optional[PassThrough] = properties("Parameters")
+    NotificationARNs: Optional[PassThroughProp] = properties("NotificationARNs")
+    Parameters: Optional[PassThroughProp] = properties("Parameters")
     Tags: Optional[Dict[str, Any]] = properties("Tags")
-    TimeoutInMinutes: Optional[PassThrough] = properties("TimeoutInMinutes")
+    TimeoutInMinutes: Optional[PassThroughProp] = properties("TimeoutInMinutes")
 
 
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::Application"]
     Properties: Properties
-    Condition: Optional[PassThrough]
+    Condition: Optional[PassThroughProp]

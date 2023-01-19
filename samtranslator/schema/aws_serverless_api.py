@@ -4,7 +4,7 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop, DictStrAny
+from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, DictStrAny
 
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 cognitoauthorizeridentity = get_prop("sam-property-api-cognitoauthorizationidentity")
@@ -81,11 +81,11 @@ class LambdaRequestAuthorizer(BaseModel):
 
 class UsagePlan(BaseModel):
     CreateUsagePlan: SamIntrinsicable[Literal["PER_API", "SHARED", "NONE"]] = usageplan("CreateUsagePlan")
-    Description: Optional[PassThrough] = usageplan("Description")
-    Quota: Optional[PassThrough] = usageplan("Quota")
-    Tags: Optional[PassThrough] = usageplan("Tags")
-    Throttle: Optional[PassThrough] = usageplan("Throttle")
-    UsagePlanName: Optional[PassThrough] = usageplan("UsagePlanName")
+    Description: Optional[PassThroughProp] = usageplan("Description")
+    Quota: Optional[PassThroughProp] = usageplan("Quota")
+    Tags: Optional[PassThroughProp] = usageplan("Tags")
+    Throttle: Optional[PassThroughProp] = usageplan("Throttle")
+    UsagePlanName: Optional[PassThroughProp] = usageplan("UsagePlanName")
 
 
 class Auth(BaseModel):
@@ -116,56 +116,56 @@ class Cors(BaseModel):
 
 
 class Route53(BaseModel):
-    DistributionDomainName: Optional[PassThrough] = route53("DistributionDomainName")
-    EvaluateTargetHealth: Optional[PassThrough] = route53("EvaluateTargetHealth")
-    HostedZoneId: Optional[PassThrough] = route53("HostedZoneId")
-    HostedZoneName: Optional[PassThrough] = route53("HostedZoneName")
+    DistributionDomainName: Optional[PassThroughProp] = route53("DistributionDomainName")
+    EvaluateTargetHealth: Optional[PassThroughProp] = route53("EvaluateTargetHealth")
+    HostedZoneId: Optional[PassThroughProp] = route53("HostedZoneId")
+    HostedZoneName: Optional[PassThroughProp] = route53("HostedZoneName")
     IpV6: Optional[bool] = route53("IpV6")
 
 
 class Domain(BaseModel):
-    BasePath: Optional[PassThrough] = domain("BasePath")
+    BasePath: Optional[PassThroughProp] = domain("BasePath")
     NormalizeBasePath: Optional[bool] = domain("NormalizeBasePath")
-    CertificateArn: PassThrough = domain("CertificateArn")
-    DomainName: PassThrough = domain("DomainName")
+    CertificateArn: PassThroughProp = domain("CertificateArn")
+    DomainName: PassThroughProp = domain("DomainName")
     EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE"]]] = domain("EndpointConfiguration")
-    MutualTlsAuthentication: Optional[PassThrough] = domain("MutualTlsAuthentication")
-    OwnershipVerificationCertificateArn: Optional[PassThrough] = domain("OwnershipVerificationCertificateArn")
+    MutualTlsAuthentication: Optional[PassThroughProp] = domain("MutualTlsAuthentication")
+    OwnershipVerificationCertificateArn: Optional[PassThroughProp] = domain("OwnershipVerificationCertificateArn")
     Route53: Optional[Route53] = domain("Route53")
-    SecurityPolicy: Optional[PassThrough] = domain("SecurityPolicy")
+    SecurityPolicy: Optional[PassThroughProp] = domain("SecurityPolicy")
 
 
 class DefinitionUri(BaseModel):
-    Bucket: PassThrough = definitionuri("Bucket")
-    Key: PassThrough = definitionuri("Key")
-    Version: Optional[PassThrough] = definitionuri("Version")
+    Bucket: PassThroughProp = definitionuri("Bucket")
+    Key: PassThroughProp = definitionuri("Key")
+    Version: Optional[PassThroughProp] = definitionuri("Version")
 
 
 class EndpointConfiguration(BaseModel):
-    Type: Optional[PassThrough] = endpointconfiguration("Type")
-    VPCEndpointIds: Optional[PassThrough] = endpointconfiguration("VPCEndpointIds")
+    Type: Optional[PassThroughProp] = endpointconfiguration("Type")
+    VPCEndpointIds: Optional[PassThroughProp] = endpointconfiguration("VPCEndpointIds")
 
 
-Name = Optional[PassThrough]
+Name = Optional[PassThroughProp]
 DefinitionUriType = Optional[Union[str, DefinitionUri]]
-CacheClusterEnabled = Optional[PassThrough]
-CacheClusterSize = Optional[PassThrough]
-Variables = Optional[PassThrough]
+CacheClusterEnabled = Optional[PassThroughProp]
+CacheClusterSize = Optional[PassThroughProp]
+Variables = Optional[PassThroughProp]
 EndpointConfigurationType = Optional[SamIntrinsicable[EndpointConfiguration]]
-MethodSettings = Optional[PassThrough]
-BinaryMediaTypes = Optional[PassThrough]
-MinimumCompressionSize = Optional[PassThrough]
+MethodSettings = Optional[PassThroughProp]
+BinaryMediaTypes = Optional[PassThroughProp]
+MinimumCompressionSize = Optional[PassThroughProp]
 CorsType = Optional[SamIntrinsicable[Union[str, Cors]]]
 GatewayResponses = Optional[DictStrAny]
-AccessLogSetting = Optional[PassThrough]
-CanarySetting = Optional[PassThrough]
-TracingEnabled = Optional[PassThrough]
+AccessLogSetting = Optional[PassThroughProp]
+CanarySetting = Optional[PassThroughProp]
+TracingEnabled = Optional[PassThroughProp]
 OpenApiVersion = Optional[Union[float, str]]  # TODO: float doesn't exist in documentation
 
 
 class Properties(BaseModel):
     AccessLogSetting: Optional[AccessLogSetting] = properties("AccessLogSetting")
-    ApiKeySourceType: Optional[PassThrough] = properties("ApiKeySourceType")
+    ApiKeySourceType: Optional[PassThroughProp] = properties("ApiKeySourceType")
     Auth: Optional[Auth] = properties("Auth")
     BinaryMediaTypes: Optional[BinaryMediaTypes] = properties("BinaryMediaTypes")
     CacheClusterEnabled: Optional[CacheClusterEnabled] = properties("CacheClusterEnabled")
@@ -174,15 +174,15 @@ class Properties(BaseModel):
     Cors: Optional[CorsType] = properties("Cors")
     DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
     DefinitionUri: Optional[DefinitionUriType] = properties("DefinitionUri")
-    Description: Optional[PassThrough] = properties("Description")
-    DisableExecuteApiEndpoint: Optional[PassThrough] = properties("DisableExecuteApiEndpoint")
+    Description: Optional[PassThroughProp] = properties("Description")
+    DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
     Domain: Optional[Domain] = properties("Domain")
     EndpointConfiguration: Optional[EndpointConfigurationType] = properties("EndpointConfiguration")
-    FailOnWarnings: Optional[PassThrough] = properties("FailOnWarnings")
+    FailOnWarnings: Optional[PassThroughProp] = properties("FailOnWarnings")
     GatewayResponses: Optional[GatewayResponses] = properties("GatewayResponses")
     MethodSettings: Optional[MethodSettings] = properties("MethodSettings")
     MinimumCompressionSize: Optional[MinimumCompressionSize] = properties("MinimumCompressionSize")
-    Mode: Optional[PassThrough] = properties("Mode")
+    Mode: Optional[PassThroughProp] = properties("Mode")
     Models: Optional[DictStrAny] = properties("Models")
     Name: Optional[Name] = properties("Name")
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
@@ -195,11 +195,11 @@ class Properties(BaseModel):
 class Globals(BaseModel):
     Auth: Optional[Auth] = properties("Auth")
     Name: Optional[Name] = properties("Name")
-    DefinitionUri: Optional[PassThrough] = properties("DefinitionUri")
+    DefinitionUri: Optional[PassThroughProp] = properties("DefinitionUri")
     CacheClusterEnabled: Optional[CacheClusterEnabled] = properties("CacheClusterEnabled")
     CacheClusterSize: Optional[CacheClusterSize] = properties("CacheClusterSize")
     Variables: Optional[Variables] = properties("Variables")
-    EndpointConfiguration: Optional[PassThrough] = properties("EndpointConfiguration")
+    EndpointConfiguration: Optional[PassThroughProp] = properties("EndpointConfiguration")
     MethodSettings: Optional[MethodSettings] = properties("MethodSettings")
     BinaryMediaTypes: Optional[BinaryMediaTypes] = properties("BinaryMediaTypes")
     MinimumCompressionSize: Optional[MinimumCompressionSize] = properties("MinimumCompressionSize")
@@ -215,9 +215,9 @@ class Globals(BaseModel):
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::Api"]
     Properties: Properties
-    Condition: Optional[PassThrough]
-    DeletionPolicy: Optional[PassThrough]
-    UpdatePolicy: Optional[PassThrough]
-    UpdateReplacePolicy: Optional[PassThrough]
-    DependsOn: Optional[PassThrough]
-    Metadata: Optional[PassThrough]
+    Condition: Optional[PassThroughProp]
+    DeletionPolicy: Optional[PassThroughProp]
+    UpdatePolicy: Optional[PassThroughProp]
+    UpdateReplacePolicy: Optional[PassThroughProp]
+    DependsOn: Optional[PassThroughProp]
+    Metadata: Optional[PassThroughProp]
