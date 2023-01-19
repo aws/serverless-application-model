@@ -128,7 +128,7 @@ class Translator:
         self.sam_parser.parse(sam_template=sam_template, parameter_values=parameter_values, sam_plugins=sam_plugins)
 
         document_errors: List[Any] = []
-        add_embedded_connectors(sam_template=sam_template, document_errors=document_errors)
+        _add_embedded_connectors(sam_template=sam_template, document_errors=document_errors)
 
         template = copy.deepcopy(sam_template)
         macro_resolver = ResourceTypeResolver(sam_resources)
@@ -274,7 +274,7 @@ class Translator:
         return functions + statemachines + apis + others + connectors
 
 
-def add_embedded_connectors(sam_template: Dict[str, Any], document_errors: List[Any]) -> None:
+def _add_embedded_connectors(sam_template: Dict[str, Any], document_errors: List[Any]) -> None:
     """
     Loops through the SAM Template resources to find any connectors that have been attached to the resources.
     Adds those attached connectors as Connector resources to the list of resources
@@ -286,31 +286,31 @@ def add_embedded_connectors(sam_template: Dict[str, Any], document_errors: List[
 
     # Loop through the resources in the template and see if any connectors have been attached
     for source_logical_id, resource in resources.items():
-        if "Connectors" in resource:
-            try:
-                sam_expect(
-                    resource["Connectors"], source_logical_id, "Connectors", is_resource_attribute=True
-                ).to_be_a_map()
+        if "Connectors" not in resource:
+            continue
+        try:
+            sam_expect(
+                resource["Connectors"], source_logical_id, "Connectors", is_resource_attribute=True
+            ).to_be_a_map()
 
-                # Go through each of the connectors that have been attached and create a Serverless Connector resource
-                for connector_logical_id, connector_dict in resource["Connectors"].items():
+            for connector_logical_id, connector_dict in resource["Connectors"].items():
 
-                    # The logical id for the transformed connector will be <source_logical_id> + <embedded_connector_logical_id>
-                    connector_logical_id = source_logical_id + connector_logical_id
+                # The logical id for the transformed connector will be <source_logical_id> + <embedded_connector_logical_id>
+                connector_logical_id = source_logical_id + connector_logical_id
 
-                    # can't use sam_expect since this is neither a property nor a resource attribute
-                    if not isinstance(connector_dict, dict):
-                        raise InvalidResourceException(connector_logical_id, f"{connector_logical_id} should be a map.")
+                # can't use sam_expect since this is neither a property nor a resource attribute
+                if not isinstance(connector_dict, dict):
+                    raise InvalidResourceException(connector_logical_id, f"{connector_logical_id} should be a map.")
 
-                    # mutates the connector_dict to make it a connector resource
-                    get_generated_connector(source_logical_id, connector_logical_id, connector_dict, document_errors)
+                # mutates the connector_dict to make it a connector resource
+                _get_generated_connector(source_logical_id, connector_logical_id, connector_dict, document_errors)
 
-                    connectors[connector_logical_id] = connector_dict
+                connectors[connector_logical_id] = connector_dict
 
                 # delete connectors key, so it doesn't show up in the transformed template
-                del resource["Connectors"]
-            except InvalidResourceException as e:
-                document_errors.append(e)
+            del resource["Connectors"]
+        except InvalidResourceException as e:
+            document_errors.append(e)
 
     # go through the list of generated connectors and add it to resources dict
     for connector_logical_id, connector_dict in connectors.items():
@@ -324,7 +324,7 @@ def add_embedded_connectors(sam_template: Dict[str, Any], document_errors: List[
             resources[connector_logical_id] = connector_dict
 
 
-def get_generated_connector(
+def _get_generated_connector(
     source_logical_id: str, connector_logical_id: str, connector: Dict[str, Any], document_errors: List[Any]
 ) -> None:
     """

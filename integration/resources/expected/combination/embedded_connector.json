@@ -1,0 +1,22 @@
+[
+  {
+    "LogicalResourceId": "MyRole1",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyRole2",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunction2",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  }
+]
