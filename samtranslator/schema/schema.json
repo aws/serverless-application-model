@@ -5678,6 +5678,6 @@
   "required": [
     "Resources"
   ],
-  "title": "Model",
+  "title": "SamModel",
   "type": "object"
 }
