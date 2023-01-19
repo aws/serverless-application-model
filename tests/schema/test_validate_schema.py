@@ -8,6 +8,7 @@ from typing import Iterator
 from unittest import TestCase
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+from jsonschema.validators import Draft4Validator
 from parameterized import parameterized
 
 from samtranslator.yaml_helper import yaml_parse
@@ -120,3 +121,159 @@ class TestValidateUnifiedSchema(TestCase):
         obj = yaml_parse(Path(testcase).read_bytes())
         with pytest.raises(ValidationError):
             validate(obj, schema=UNIFIED_SCHEMA)
+
+    @parameterized.expand(
+        [
+            [
+                # Valid (SAM)
+                {
+                    "Transform": "AWS::Serverless-2016-10-31",
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::Serverless::SimpleTable",
+                        },
+                    },
+                }
+            ],
+            [
+                # Valid (CFN)
+                {
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::S3::Bucket",
+                        },
+                    },
+                },
+            ],
+        ],
+    )
+    def test_sanity_valid(self, template):
+        assert UNIFIED_SCHEMA["$schema"] == "http://json-schema.org/draft-04/schema#"
+        Draft4Validator(UNIFIED_SCHEMA).validate(template)
+        validate(template, schema=UNIFIED_SCHEMA)
+
+    @parameterized.expand(
+        [
+            [
+                # Unknown property (SAM)
+                {
+                    "Transform": "AWS::Serverless-2016-10-31",
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::Serverless::SimpleTable",
+                            "Properties": {
+                                "UnknownProperty": True,
+                            },
+                        },
+                    },
+                },
+            ],
+            [
+                # Missing property (SAM)
+                {
+                    "Transform": "AWS::Serverless-2016-10-31",
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::Serverless::SimpleTable",
+                            "Properties": {
+                                "PrimaryKey": {
+                                    "Name": "Foo",
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        ],
+    )
+    def test_sanity_invalid(self, template):
+        with pytest.raises(ValidationError):
+            validate(template, schema=UNIFIED_SCHEMA)
+
+    # Ensure no egregious gaps
+    def test_sanity(self):
+        assert UNIFIED_SCHEMA["$schema"] == "http://json-schema.org/draft-04/schema#"
+        validator = Draft4Validator(UNIFIED_SCHEMA)
+
+        VALID = [
+            {
+                "Transform": "AWS::Serverless-2016-10-31",
+                "Resources": {
+                    "Foo": {
+                        "Type": "AWS::Serverless::SimpleTable",
+                    },
+                },
+            },
+            {
+                "Resources": {
+                    "Foo": {
+                        "Type": "AWS::S3::Bucket",
+                    },
+                },
+            },
+        ]
+
+        INVALID = [
+            # Unknown property (SAM)
+            {
+                "Transform": "AWS::Serverless-2016-10-31",
+                "Resources": {
+                    "Foo": {
+                        "Type": "AWS::Serverless::SimpleTable",
+                        "Properties": {
+                            "UnknownProperty": True,
+                        },
+                    },
+                },
+            },
+            # Missing property (SAM)
+            {
+                "Transform": "AWS::Serverless-2016-10-31",
+                "Resources": {
+                    "Foo": {
+                        "Type": "AWS::Serverless::SimpleTable",
+                        "Properties": {
+                            "PrimaryKey": {
+                                "Name": "Foo",
+                            },
+                        },
+                    },
+                },
+            },
+            # Wrong value type (SAM)
+            {
+                "Transform": "AWS::Serverless-2016-10-31",
+                "Resources": {
+                    "Foo": {
+                        "Type": "AWS::Serverless::SimpleTable",
+                        "Properties": {
+                            "PrimaryKey": {
+                                "Name": 1337,
+                                "Type": "Number",
+                            },
+                        },
+                    },
+                },
+            },
+            # Unknown property (CFN)
+            {
+                "Resources": {
+                    "Foo": {
+                        "Type": "AWS::S3::Bucket",
+                        "Properties": {
+                            "UnknownProperty": True,
+                        },
+                    },
+                },
+            },
+        ]
+
+        for template in VALID:
+            validator.validate(template)
+            validate(template, schema=UNIFIED_SCHEMA)
+
+        for template in INVALID:
+            with pytest.raises(ValidationError):
+                validator.validate(template)
+            with pytest.raises(ValidationError):
+                validate(template, schema=UNIFIED_SCHEMA)
