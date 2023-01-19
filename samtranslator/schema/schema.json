@@ -2017,27 +2017,6 @@
       "type": "object"
     },
     "PassThroughProp": {
-      "anyOf": [
-        {
-          "type": "object"
-        },
-        {
-          "items": {},
-          "type": "array"
-        },
-        {
-          "type": "integer"
-        },
-        {
-          "type": "number"
-        },
-        {
-          "type": "boolean"
-        },
-        {
-          "type": "string"
-        }
-      ],
       "title": "PassThroughProp"
     },
     "PrimaryKey": {
