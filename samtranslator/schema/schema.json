@@ -25,7 +25,8 @@
         }
       },
       "required": [
-        "Type"
+        "Type",
+        "Properties"
       ],
       "title": "AlexaSkillEvent",
       "type": "object"
@@ -40,6 +41,9 @@
           "type": "string"
         }
       },
+      "required": [
+        "SkillId"
+      ],
       "title": "AlexaSkillEventProperties",
       "type": "object"
     },
@@ -91,6 +95,13 @@
           "title": "ResourcePolicy"
         }
       },
+      "required": [
+        "ApiKeyRequired",
+        "AuthorizationScopes",
+        "Authorizer",
+        "InvokeRole",
+        "ResourcePolicy"
+      ],
       "title": "ApiAuth",
       "type": "object"
     },
@@ -138,6 +149,10 @@
           "title": "LogGroupName"
         }
       },
+      "required": [
+        "FilterPattern",
+        "LogGroupName"
+      ],
       "title": "CloudWatchLogsEventProperties",
       "type": "object"
     },
@@ -186,7 +201,8 @@
       },
       "required": [
         "Bucket",
-        "Key"
+        "Key",
+        "Version"
       ],
       "title": "CodeUri",
       "type": "object"
@@ -228,6 +244,8 @@
         }
       },
       "required": [
+        "AuthorizationScopes",
+        "Identity",
         "UserPoolArn"
       ],
       "title": "CognitoAuthorizer",
@@ -262,6 +280,11 @@
           "type": "string"
         }
       },
+      "required": [
+        "Header",
+        "ReauthorizeEvery",
+        "ValidationExpression"
+      ],
       "title": "CognitoAuthorizerIdentity",
       "type": "object"
     },
@@ -318,6 +341,7 @@
         }
       },
       "required": [
+        "Trigger",
         "UserPool"
       ],
       "title": "CognitoEventProperties",
@@ -342,6 +366,11 @@
           "title": "Version"
         }
       },
+      "required": [
+        "Bucket",
+        "Key",
+        "Version"
+      ],
       "title": "ContentUri",
       "type": "object"
     },
@@ -380,7 +409,11 @@
         }
       },
       "required": [
-        "AllowOrigin"
+        "AllowCredentials",
+        "AllowHeaders",
+        "AllowMethods",
+        "AllowOrigin",
+        "MaxAge"
       ],
       "title": "Cors",
       "type": "object"
@@ -499,6 +532,15 @@
           "title": "Type"
         }
       },
+      "required": [
+        "Alarms",
+        "Enabled",
+        "Hooks",
+        "PassthroughCondition",
+        "Role",
+        "TriggerConfigurations",
+        "Type"
+      ],
       "title": "DeploymentPreference",
       "type": "object"
     },
@@ -606,6 +648,22 @@
           "title": "TumblingWindowInSeconds"
         }
       },
+      "required": [
+        "BatchSize",
+        "BisectBatchOnFunctionError",
+        "DestinationConfig",
+        "Enabled",
+        "FilterCriteria",
+        "FunctionResponseTypes",
+        "MaximumBatchingWindowInSeconds",
+        "MaximumRecordAgeInSeconds",
+        "MaximumRetryAttempts",
+        "ParallelizationFactor",
+        "StartingPosition",
+        "StartingPositionTimestamp",
+        "Stream",
+        "TumblingWindowInSeconds"
+      ],
       "title": "DynamoDBEventProperties",
       "type": "object"
     },
@@ -623,6 +681,10 @@
           "title": "VPCEndpointIds"
         }
       },
+      "required": [
+        "Type",
+        "VPCEndpointIds"
+      ],
       "title": "EndpointConfiguration",
       "type": "object"
     },
@@ -652,6 +714,11 @@
           "type": "integer"
         }
       },
+      "required": [
+        "DestinationConfig",
+        "MaximumEventAgeInSeconds",
+        "MaximumRetryAttempts"
+      ],
       "title": "EventInvokeConfig",
       "type": "object"
     },
@@ -679,6 +746,10 @@
           "title": "OnSuccess"
         }
       },
+      "required": [
+        "OnFailure",
+        "OnSuccess"
+      ],
       "title": "EventInvokeDestinationConfig",
       "type": "object"
     },
@@ -711,6 +782,10 @@
           "type": "string"
         }
       },
+      "required": [
+        "Destination",
+        "Type"
+      ],
       "title": "EventInvokeOnFailure",
       "type": "object"
     },
@@ -743,6 +818,10 @@
           "type": "string"
         }
       },
+      "required": [
+        "Destination",
+        "Type"
+      ],
       "title": "EventInvokeOnSuccess",
       "type": "object"
     },
@@ -796,6 +875,16 @@
           "title": "State"
         }
       },
+      "required": [
+        "DeadLetterConfig",
+        "Description",
+        "Enabled",
+        "Input",
+        "Name",
+        "RetryPolicy",
+        "Schedule",
+        "State"
+      ],
       "title": "EventsScheduleProperties",
       "type": "object"
     },
@@ -822,7 +911,8 @@
         }
       },
       "required": [
-        "AuthType"
+        "AuthType",
+        "Cors"
       ],
       "title": "FunctionUrlConfig",
       "type": "object"
@@ -857,6 +947,10 @@
           "title": "PreTraffic"
         }
       },
+      "required": [
+        "PostTraffic",
+        "PreTraffic"
+      ],
       "title": "Hooks",
       "type": "object"
     },
@@ -879,6 +973,10 @@
           "type": "string"
         }
       },
+      "required": [
+        "AuthorizationScopes",
+        "Authorizer"
+      ],
       "title": "HttpApiAuth",
       "type": "object"
     },
@@ -906,7 +1004,8 @@
         }
       },
       "required": [
-        "Type"
+        "Type",
+        "Properties"
       ],
       "title": "HttpApiEvent",
       "type": "object"
@@ -981,6 +1080,15 @@
           "title": "TimeoutInMillis"
         }
       },
+      "required": [
+        "ApiId",
+        "Auth",
+        "Method",
+        "Path",
+        "PayloadFormatVersion",
+        "RouteSettings",
+        "TimeoutInMillis"
+      ],
       "title": "HttpApiEventProperties",
       "type": "object"
     },
@@ -1028,6 +1136,10 @@
           "title": "Sql"
         }
       },
+      "required": [
+        "AwsIotSqlVersion",
+        "Sql"
+      ],
       "title": "IoTRuleEventProperties",
       "type": "object"
     },
@@ -1135,6 +1247,22 @@
           "title": "TumblingWindowInSeconds"
         }
       },
+      "required": [
+        "BatchSize",
+        "BisectBatchOnFunctionError",
+        "DestinationConfig",
+        "Enabled",
+        "FilterCriteria",
+        "FunctionResponseTypes",
+        "MaximumBatchingWindowInSeconds",
+        "MaximumRecordAgeInSeconds",
+        "MaximumRetryAttempts",
+        "ParallelizationFactor",
+        "StartingPosition",
+        "StartingPositionTimestamp",
+        "Stream",
+        "TumblingWindowInSeconds"
+      ],
       "title": "KinesisEventProperties",
       "type": "object"
     },
@@ -1203,7 +1331,10 @@
       },
       "required": [
         "AuthorizerPayloadFormatVersion",
-        "FunctionArn"
+        "EnableSimpleResponses",
+        "FunctionArn",
+        "FunctionInvokeRole",
+        "Identity"
       ],
       "title": "LambdaAuthorizer",
       "type": "object"
@@ -1254,6 +1385,13 @@
           "type": "array"
         }
       },
+      "required": [
+        "Context",
+        "Headers",
+        "QueryStrings",
+        "ReauthorizeEvery",
+        "StageVariables"
+      ],
       "title": "LambdaAuthorizerIdentity",
       "type": "object"
     },
@@ -1309,7 +1447,11 @@
         }
       },
       "required": [
-        "FunctionArn"
+        "AuthorizationScopes",
+        "FunctionArn",
+        "FunctionInvokeRole",
+        "FunctionPayloadType",
+        "Identity"
       ],
       "title": "LambdaRequestAuthorizer",
       "type": "object"
@@ -1367,6 +1509,13 @@
           "type": "array"
         }
       },
+      "required": [
+        "Context",
+        "Headers",
+        "QueryStrings",
+        "ReauthorizeEvery",
+        "StageVariables"
+      ],
       "title": "LambdaRequestAuthorizerIdentity",
       "type": "object"
     },
@@ -1422,7 +1571,11 @@
         }
       },
       "required": [
-        "FunctionArn"
+        "AuthorizationScopes",
+        "FunctionArn",
+        "FunctionInvokeRole",
+        "FunctionPayloadType",
+        "Identity"
       ],
       "title": "LambdaTokenAuthorizer",
       "type": "object"
@@ -1456,6 +1609,11 @@
           "type": "string"
         }
       },
+      "required": [
+        "ReauthorizeEvery",
+        "ValidationExpression",
+        "Header"
+      ],
       "title": "LambdaTokenAuthorizerIdentity",
       "type": "object"
     },
@@ -1571,6 +1729,16 @@
           "title": "SourceAccessConfigurations"
         }
       },
+      "required": [
+        "BatchSize",
+        "Broker",
+        "Enabled",
+        "FilterCriteria",
+        "MaximumBatchingWindowInSeconds",
+        "Queues",
+        "SecretsManagerKmsKeyId",
+        "SourceAccessConfigurations"
+      ],
       "title": "MQEventProperties",
       "type": "object"
     },
@@ -1646,6 +1814,15 @@
           "title": "Topics"
         }
       },
+      "required": [
+        "ConsumerGroupId",
+        "FilterCriteria",
+        "MaximumBatchingWindowInSeconds",
+        "StartingPosition",
+        "StartingPositionTimestamp",
+        "Stream",
+        "Topics"
+      ],
       "title": "MSKEventProperties",
       "type": "object"
     },
@@ -1673,6 +1850,11 @@
           "title": "JwtConfiguration"
         }
       },
+      "required": [
+        "AuthorizationScopes",
+        "IdentitySource",
+        "JwtConfiguration"
+      ],
       "title": "OAuth2Authorizer",
       "type": "object"
     },
@@ -1690,6 +1872,10 @@
           "title": "Type"
         }
       },
+      "required": [
+        "Name",
+        "Type"
+      ],
       "title": "PrimaryKey",
       "type": "object"
     },
@@ -1736,7 +1922,10 @@
         }
       },
       "required": [
-        "Model"
+        "Model",
+        "Required",
+        "ValidateBody",
+        "ValidateParameters"
       ],
       "title": "RequestModel",
       "type": "object"
@@ -1757,6 +1946,10 @@
           "type": "boolean"
         }
       },
+      "required": [
+        "Caching",
+        "Required"
+      ],
       "title": "RequestParameters",
       "type": "object"
     },
@@ -1806,6 +1999,16 @@
           "type": "string"
         }
       },
+      "required": [
+        "Id",
+        "Arn",
+        "Name",
+        "Qualifier",
+        "QueueUrl",
+        "ResourceId",
+        "RoleName",
+        "Type"
+      ],
       "title": "ResourceReference",
       "type": "object"
     },
@@ -1867,7 +2070,9 @@
         }
       },
       "required": [
-        "Bucket"
+        "Bucket",
+        "Events",
+        "Filter"
       ],
       "title": "S3EventProperties",
       "type": "object"
@@ -1934,6 +2139,12 @@
           "title": "Topic"
         }
       },
+      "required": [
+        "FilterPolicy",
+        "Region",
+        "SqsSubscription",
+        "Topic"
+      ],
       "title": "SNSEventProperties",
       "type": "object"
     },
@@ -1999,6 +2210,13 @@
           "title": "Scalingconfig"
         }
       },
+      "required": [
+        "BatchSize",
+        "Enabled",
+        "FilterCriteria",
+        "MaximumBatchingWindowInSeconds",
+        "Queue"
+      ],
       "title": "SQSEventProperties",
       "type": "object"
     },
@@ -2055,6 +2273,16 @@
           "$ref": "#/definitions/ScheduleTarget"
         }
       },
+      "required": [
+        "DeadLetterConfig",
+        "Description",
+        "Enabled",
+        "Input",
+        "Name",
+        "RetryPolicy",
+        "Schedule",
+        "State"
+      ],
       "title": "ScheduleEventProperties",
       "type": "object"
     },
@@ -2148,6 +2376,15 @@
           "title": "Topics"
         }
       },
+      "required": [
+        "BatchSize",
+        "ConsumerGroupId",
+        "Enabled",
+        "FilterCriteria",
+        "KafkaBootstrapServers",
+        "SourceAccessConfigurations",
+        "Topics"
+      ],
       "title": "SelfManagedKafkaEventProperties",
       "type": "object"
     },
@@ -2207,7 +2444,10 @@
         }
       },
       "required": [
+        "BatchSize",
+        "Enabled",
         "QueueArn",
+        "QueuePolicyLogicalId",
         "QueueUrl"
       ],
       "title": "SqsSubscription",
@@ -2261,7 +2501,12 @@
         }
       },
       "required": [
-        "CreateUsagePlan"
+        "CreateUsagePlan",
+        "Description",
+        "Quota",
+        "Tags",
+        "Throttle",
+        "UsagePlanName"
       ],
       "title": "UsagePlan",
       "type": "object"
@@ -2366,6 +2611,15 @@
           "title": "UsagePlan"
         }
       },
+      "required": [
+        "AddDefaultAuthorizerToCorsPreflight",
+        "ApiKeyRequired",
+        "Authorizers",
+        "DefaultAuthorizer",
+        "InvokeRole",
+        "ResourcePolicy",
+        "UsagePlan"
+      ],
       "title": "Auth",
       "type": "object"
     },
@@ -2388,6 +2642,11 @@
           "title": "Version"
         }
       },
+      "required": [
+        "Bucket",
+        "Key",
+        "Version"
+      ],
       "title": "DefinitionUri",
       "type": "object"
     },
@@ -2458,6 +2717,17 @@
           "title": "SecurityPolicy"
         }
       },
+      "required": [
+        "BasePath",
+        "NormalizeBasePath",
+        "CertificateArn",
+        "DomainName",
+        "EndpointConfiguration",
+        "MutualTlsAuthentication",
+        "OwnershipVerificationCertificateArn",
+        "Route53",
+        "SecurityPolicy"
+      ],
       "title": "Domain",
       "type": "object"
     },
@@ -2580,6 +2850,25 @@
           "title": "Variables"
         }
       },
+      "required": [
+        "Auth",
+        "Name",
+        "DefinitionUri",
+        "CacheClusterEnabled",
+        "CacheClusterSize",
+        "Variables",
+        "EndpointConfiguration",
+        "MethodSettings",
+        "BinaryMediaTypes",
+        "MinimumCompressionSize",
+        "Cors",
+        "GatewayResponses",
+        "AccessLogSetting",
+        "CanarySetting",
+        "TracingEnabled",
+        "OpenApiVersion",
+        "Domain"
+      ],
       "title": "Globals",
       "type": "object"
     },
@@ -2775,7 +3064,32 @@
         }
       },
       "required": [
-        "StageName"
+        "AccessLogSetting",
+        "ApiKeySourceType",
+        "Auth",
+        "BinaryMediaTypes",
+        "CacheClusterEnabled",
+        "CacheClusterSize",
+        "CanarySetting",
+        "Cors",
+        "DefinitionBody",
+        "DefinitionUri",
+        "Description",
+        "DisableExecuteApiEndpoint",
+        "Domain",
+        "EndpointConfiguration",
+        "FailOnWarnings",
+        "GatewayResponses",
+        "MethodSettings",
+        "MinimumCompressionSize",
+        "Mode",
+        "Models",
+        "Name",
+        "OpenApiVersion",
+        "StageName",
+        "Tags",
+        "TracingEnabled",
+        "Variables"
       ],
       "title": "Properties",
       "type": "object"
@@ -2999,6 +3313,19 @@
           "type": "array"
         }
       },
+      "required": [
+        "AwsAccountBlacklist",
+        "AwsAccountWhitelist",
+        "CustomStatements",
+        "IntrinsicVpcBlacklist",
+        "IntrinsicVpcWhitelist",
+        "IntrinsicVpceBlacklist",
+        "IntrinsicVpceWhitelist",
+        "IpRangeBlacklist",
+        "IpRangeWhitelist",
+        "SourceVpcBlacklist",
+        "SourceVpcWhitelist"
+      ],
       "title": "ResourcePolicy",
       "type": "object"
     },
@@ -3032,6 +3359,13 @@
           "type": "boolean"
         }
       },
+      "required": [
+        "DistributionDomainName",
+        "EvaluateTargetHealth",
+        "HostedZoneId",
+        "HostedZoneName",
+        "IpV6"
+      ],
       "title": "Route53",
       "type": "object"
     },
@@ -3074,7 +3408,11 @@
         }
       },
       "required": [
-        "Location"
+        "Location",
+        "NotificationARNs",
+        "Parameters",
+        "Tags",
+        "TimeoutInMinutes"
       ],
       "title": "Properties",
       "type": "object"
@@ -3262,8 +3600,12 @@
         }
       },
       "required": [
+        "Auth",
         "Method",
-        "Path"
+        "Path",
+        "RequestModel",
+        "RequestParameters",
+        "RestApiId"
       ],
       "title": "ApiEventProperties",
       "type": "object"
@@ -3333,6 +3675,14 @@
           "title": "State"
         }
       },
+      "required": [
+        "Enabled",
+        "EventBusName",
+        "Input",
+        "InputPath",
+        "Pattern",
+        "State"
+      ],
       "title": "CloudWatchEventProperties",
       "type": "object"
     },
@@ -3360,6 +3710,11 @@
           "type": "string"
         }
       },
+      "required": [
+        "Arn",
+        "QueueLogicalId",
+        "Type"
+      ],
       "title": "DeadLetterConfig",
       "type": "object"
     },
@@ -3442,6 +3797,15 @@
           "title": "Target"
         }
       },
+      "required": [
+        "DeadLetterConfig",
+        "EventBusName",
+        "Input",
+        "InputPath",
+        "Pattern",
+        "RetryPolicy",
+        "Target"
+      ],
       "title": "EventBridgeRuleEventProperties",
       "type": "object"
     },
@@ -3454,6 +3818,9 @@
           "title": "Id"
         }
       },
+      "required": [
+        "Id"
+      ],
       "title": "EventBridgeRuleTarget",
       "type": "object"
     },
@@ -3629,6 +3996,32 @@
           "title": "VpcConfig"
         }
       },
+      "required": [
+        "Handler",
+        "Runtime",
+        "CodeUri",
+        "DeadLetterQueue",
+        "Description",
+        "MemorySize",
+        "Timeout",
+        "VpcConfig",
+        "Environment",
+        "Tags",
+        "Tracing",
+        "KmsKeyArn",
+        "Layers",
+        "AutoPublishAlias",
+        "DeploymentPreference",
+        "RolePath",
+        "PermissionsBoundary",
+        "ReservedConcurrentExecutions",
+        "ProvisionedConcurrencyConfig",
+        "AssumeRolePolicyDocument",
+        "EventInvokeConfig",
+        "Architectures",
+        "EphemeralStorage",
+        "SnapStart"
+      ],
       "title": "Globals",
       "type": "object"
     },
@@ -3978,6 +4371,45 @@
           "title": "VpcConfig"
         }
       },
+      "required": [
+        "Architectures",
+        "AssumeRolePolicyDocument",
+        "AutoPublishAlias",
+        "AutoPublishCodeSha256",
+        "CodeSigningConfigArn",
+        "CodeUri",
+        "DeadLetterQueue",
+        "DeploymentPreference",
+        "Description",
+        "Environment",
+        "EphemeralStorage",
+        "EventInvokeConfig",
+        "Events",
+        "FileSystemConfigs",
+        "FunctionName",
+        "FunctionUrlConfig",
+        "Handler",
+        "ImageConfig",
+        "ImageUri",
+        "InlineCode",
+        "KmsKeyArn",
+        "Layers",
+        "MemorySize",
+        "PackageType",
+        "RolePath",
+        "PermissionsBoundary",
+        "Policies",
+        "ProvisionedConcurrencyConfig",
+        "ReservedConcurrentExecutions",
+        "Role",
+        "Runtime",
+        "SnapStart",
+        "Tags",
+        "Timeout",
+        "Tracing",
+        "VersionDescription",
+        "VpcConfig"
+      ],
       "title": "Properties",
       "type": "object"
     },
@@ -4196,6 +4628,19 @@
           "type": "array"
         }
       },
+      "required": [
+        "AwsAccountBlacklist",
+        "AwsAccountWhitelist",
+        "CustomStatements",
+        "IntrinsicVpcBlacklist",
+        "IntrinsicVpcWhitelist",
+        "IntrinsicVpceBlacklist",
+        "IntrinsicVpceWhitelist",
+        "IpRangeBlacklist",
+        "IpRangeWhitelist",
+        "SourceVpcBlacklist",
+        "SourceVpcWhitelist"
+      ],
       "title": "ResourcePolicy",
       "type": "object"
     },
@@ -4343,6 +4788,23 @@
           "title": "State"
         }
       },
+      "required": [
+        "DeadLetterConfig",
+        "Description",
+        "EndDate",
+        "FlexibleTimeWindow",
+        "GroupName",
+        "Input",
+        "KmsKeyArn",
+        "Name",
+        "PermissionsBoundary",
+        "RetryPolicy",
+        "RoleArn",
+        "ScheduleExpression",
+        "ScheduleExpressionTimezone",
+        "StartDate",
+        "State"
+      ],
       "title": "ScheduleV2EventProperties",
       "type": "object"
     },
@@ -4378,6 +4840,11 @@
           "type": "boolean"
         }
       },
+      "required": [
+        "Authorizers",
+        "DefaultAuthorizer",
+        "EnableIamAuthorizer"
+      ],
       "title": "Auth",
       "type": "object"
     },
@@ -4405,7 +4872,8 @@
       },
       "required": [
         "Bucket",
-        "Key"
+        "Key",
+        "Version"
       ],
       "title": "DefinitionUri",
       "type": "object"
@@ -4474,6 +4942,16 @@
           "title": "SecurityPolicy"
         }
       },
+      "required": [
+        "BasePath",
+        "CertificateArn",
+        "DomainName",
+        "EndpointConfiguration",
+        "MutualTlsAuthentication",
+        "OwnershipVerificationCertificateArn",
+        "Route53",
+        "SecurityPolicy"
+      ],
       "title": "Domain",
       "type": "object"
     },
@@ -4537,6 +5015,17 @@
           "type": "object"
         }
       },
+      "required": [
+        "Auth",
+        "AccessLogSettings",
+        "StageVariables",
+        "Tags",
+        "RouteSettings",
+        "FailOnWarnings",
+        "Domain",
+        "CorsConfiguration",
+        "DefaultRouteSettings"
+      ],
       "title": "Globals",
       "type": "object"
     },
@@ -4638,6 +5127,22 @@
           "type": "object"
         }
       },
+      "required": [
+        "AccessLogSettings",
+        "Auth",
+        "CorsConfiguration",
+        "DefaultRouteSettings",
+        "DefinitionBody",
+        "DefinitionUri",
+        "Description",
+        "DisableExecuteApiEndpoint",
+        "Domain",
+        "FailOnWarnings",
+        "RouteSettings",
+        "StageName",
+        "StageVariables",
+        "Tags"
+      ],
       "title": "Properties",
       "type": "object"
     },
@@ -4697,6 +5202,13 @@
           "type": "boolean"
         }
       },
+      "required": [
+        "DistributionDomainName",
+        "EvaluateTargetHealth",
+        "HostedZoneId",
+        "HostedZoneName",
+        "IpV6"
+      ],
       "title": "Route53",
       "type": "object"
     },
@@ -4756,7 +5268,13 @@
         }
       },
       "required": [
-        "ContentUri"
+        "CompatibleArchitectures",
+        "CompatibleRuntimes",
+        "ContentUri",
+        "Description",
+        "LayerName",
+        "LicenseInfo",
+        "RetentionPolicy"
       ],
       "title": "Properties",
       "type": "object"
@@ -4797,6 +5315,9 @@
           "title": "SSESpecification"
         }
       },
+      "required": [
+        "SSESpecification"
+      ],
       "title": "Globals",
       "type": "object"
     },
@@ -4835,6 +5356,13 @@
           "type": "object"
         }
       },
+      "required": [
+        "PrimaryKey",
+        "ProvisionedThroughput",
+        "SSESpecification",
+        "TableName",
+        "Tags"
+      ],
       "title": "Properties",
       "type": "object"
     },
@@ -4932,8 +5460,10 @@
         }
       },
       "required": [
+        "Auth",
         "Method",
-        "Path"
+        "Path",
+        "RestApiId"
       ],
       "title": "ApiEventProperties",
       "type": "object"
@@ -4973,6 +5503,12 @@
           "title": "ResourcePolicy"
         }
       },
+      "required": [
+        "ApiKeyRequired",
+        "AuthorizationScopes",
+        "Authorizer",
+        "ResourcePolicy"
+      ],
       "title": "Auth",
       "type": "object"
     },
@@ -5030,6 +5566,12 @@
           "title": "Pattern"
         }
       },
+      "required": [
+        "EventBusName",
+        "Input",
+        "InputPath",
+        "Pattern"
+      ],
       "title": "CloudWatchEventProperties",
       "type": "object"
     },
@@ -5057,6 +5599,11 @@
           "type": "string"
         }
       },
+      "required": [
+        "Arn",
+        "QueueLogicalId",
+        "Type"
+      ],
       "title": "DeadLetterConfig",
       "type": "object"
     },
@@ -5132,6 +5679,14 @@
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__EventBridgeRuleTarget"
         }
       },
+      "required": [
+        "DeadLetterConfig",
+        "EventBusName",
+        "Input",
+        "InputPath",
+        "Pattern",
+        "RetryPolicy"
+      ],
       "title": "EventBridgeRuleEventProperties",
       "type": "object"
     },
@@ -5262,6 +5817,20 @@
           "title": "Type"
         }
       },
+      "required": [
+        "Definition",
+        "DefinitionSubstitutions",
+        "DefinitionUri",
+        "Events",
+        "Logging",
+        "Name",
+        "PermissionsBoundary",
+        "Policies",
+        "Role",
+        "Tags",
+        "Tracing",
+        "Type"
+      ],
       "title": "Properties",
       "type": "object"
     },
@@ -5469,6 +6038,19 @@
           "type": "array"
         }
       },
+      "required": [
+        "AwsAccountBlacklist",
+        "AwsAccountWhitelist",
+        "CustomStatements",
+        "IntrinsicVpcBlacklist",
+        "IntrinsicVpcWhitelist",
+        "IntrinsicVpceBlacklist",
+        "IntrinsicVpceWhitelist",
+        "IpRangeBlacklist",
+        "IpRangeWhitelist",
+        "SourceVpcBlacklist",
+        "SourceVpcWhitelist"
+      ],
       "title": "ResourcePolicy",
       "type": "object"
     },
@@ -5616,6 +6198,23 @@
           "title": "State"
         }
       },
+      "required": [
+        "DeadLetterConfig",
+        "Description",
+        "EndDate",
+        "FlexibleTimeWindow",
+        "GroupName",
+        "Input",
+        "KmsKeyArn",
+        "Name",
+        "PermissionsBoundary",
+        "RetryPolicy",
+        "RoleArn",
+        "ScheduleExpression",
+        "ScheduleExpressionTimezone",
+        "StartDate",
+        "State"
+      ],
       "title": "ScheduleV2EventProperties",
       "type": "object"
     }
