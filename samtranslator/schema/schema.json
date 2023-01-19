@@ -4514,7 +4514,7 @@
             {
               "enum": [
                 "Active",
-                "PassThroughProp"
+                "PassThrough"
               ],
               "type": "string"
             }
@@ -4968,7 +4968,7 @@
             {
               "enum": [
                 "Active",
-                "PassThroughProp"
+                "PassThrough"
               ],
               "type": "string"
             }
