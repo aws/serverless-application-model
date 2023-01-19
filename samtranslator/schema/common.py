@@ -15,11 +15,13 @@ from pydantic import Extra, Field
 #
 # So we use "any CloudFormation type", and since CloudFormation doesn't support null
 # and uses JSON, we use all JSON types except null.
-#
+PassThrough = Union[Dict[Any, Any], List[Any], int, float, bool, str]
+
+
 # Using a class to reduce schema size; makes it go to definitions instead of
 # inlining everywhere. See https://docs.pydantic.dev/usage/models/#custom-root-types
-class PassThrough(pydantic.BaseModel):
-    __root__: Union[Dict[Any, Any], List[Any], int, float, bool, str]
+class PassThroughProp(pydantic.BaseModel):
+    __root__: PassThrough
 
 
 # Intrinsic resolvable by the SAM transform
