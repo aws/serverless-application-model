@@ -25,7 +25,7 @@ Resources:
         Arn: arn:aws:geo:us-east-1:123123123123:place-index/explore.place
         Type: AWS::Location::PlaceIndex
       Permissions:
-        - Read
+      - Read
 
   MyConnectorWithId:
     Type: AWS::Serverless::Connector
@@ -35,4 +35,4 @@ Resources:
       Destination:
         Id: MyPlace
       Permissions:
-        - Read
+      - Read

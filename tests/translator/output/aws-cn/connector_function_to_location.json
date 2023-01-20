@@ -1,57 +1,5 @@
 {
   "Resources": {
-    "MyPlace": {
-      "Type": "AWS::Location::PlaceIndex",
-      "Properties": {
-        "DataSource": "Here",
-        "IndexName": "MyPlaceIndex"
-      }
-    },
-    "MyFunction": {
-      "Properties": {
-        "Code": {
-          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
-        },
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": ["MyFunctionRole", "Arn"]
-        },
-        "Runtime": "nodejs14.x",
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::Lambda::Function"
-    },
-    "MyFunctionRole": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": ["sts:AssumeRole"],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": ["lambda.amazonaws.com"]
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::Role"
-    },
     "MyConnectorPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
@@ -111,25 +59,22 @@
       "Type": "AWS::IAM::ManagedPolicy"
     },
     "MyConnectorWithIdPolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
       "Metadata": {
         "aws:sam:connectors": {
           "MyConnectorWithId": {
-            "Source": {
-              "Type": "AWS::Serverless::Function"
-            },
             "Destination": {
               "Type": "AWS::Location::PlaceIndex"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
             }
           }
         }
       },
       "Properties": {
         "PolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
-              "Effect": "Allow",
               "Action": [
                 "geo:BatchGetDevicePosition",
                 "geo:CalculateRoute",
@@ -155,6 +100,7 @@
                 "geo:SearchPlaceIndexForSuggestions",
                 "geo:SearchPlaceIndexForText"
               ],
+              "Effect": "Allow",
               "Resource": [
                 {
                   "Fn::GetAtt": [
@@ -164,14 +110,75 @@
                 }
               ]
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "Roles": [
           {
             "Ref": "MyFunctionRole"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyPlace": {
+      "Properties": {
+        "DataSource": "Here",
+        "IndexName": "MyPlaceIndex"
+      },
+      "Type": "AWS::Location::PlaceIndex"
     }
   }
 }
