@@ -128,6 +128,22 @@ class TestValidateUnifiedSchema(TestCase):
         with pytest.raises(ValidationError):
             validate(obj, schema=UNIFIED_SCHEMA)
 
+    def test_structure(self):
+        assert UNIFIED_SCHEMA["$schema"] == "http://json-schema.org/draft-04/schema#"
+        assert {
+            "AWSTemplateFormatVersion",
+            "Conditions",
+            "Description",
+            "Globals",
+            "Mappings",
+            "Metadata",
+            "Outputs",
+            "Parameters",
+            "Resources",
+            "Transform",
+        } == set(UNIFIED_SCHEMA["properties"].keys())
+        assert len(UNIFIED_SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]) > 1000
+
     @parameterized.expand(
         [
             [
@@ -154,7 +170,6 @@ class TestValidateUnifiedSchema(TestCase):
         ],
     )
     def test_sanity_valid(self, template):
-        assert UNIFIED_SCHEMA["$schema"] == "http://json-schema.org/draft-04/schema#"
         Draft4Validator(UNIFIED_SCHEMA).validate(template)
         validate(template, schema=UNIFIED_SCHEMA)
 
