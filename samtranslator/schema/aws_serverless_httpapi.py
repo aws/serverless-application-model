@@ -4,7 +4,7 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop, DictStrAny
+from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, DictStrAny
 
 oauth2authorizer = get_prop("sam-property-httpapi-oauth2authorizer")
 lambdauthorizeridentity = get_prop("sam-property-httpapi-lambdaauthorizationidentity")
@@ -20,7 +20,7 @@ properties = get_prop("sam-resource-httpapi")
 class OAuth2Authorizer(BaseModel):
     AuthorizationScopes: Optional[List[str]] = oauth2authorizer("AuthorizationScopes")
     IdentitySource: Optional[str] = oauth2authorizer("IdentitySource")
-    JwtConfiguration: Optional[PassThrough] = oauth2authorizer("JwtConfiguration")
+    JwtConfiguration: Optional[PassThroughProp] = oauth2authorizer("JwtConfiguration")
 
 
 class LambdaAuthorizerIdentity(BaseModel):
@@ -73,31 +73,31 @@ class DefinitionUri(BaseModel):
 
 
 class Route53(BaseModel):
-    DistributionDomainName: Optional[PassThrough] = route53("DistributionDomainName")
-    EvaluateTargetHealth: Optional[PassThrough] = route53("EvaluateTargetHealth")
-    HostedZoneId: Optional[PassThrough] = route53("HostedZoneId")
-    HostedZoneName: Optional[PassThrough] = route53("HostedZoneName")
+    DistributionDomainName: Optional[PassThroughProp] = route53("DistributionDomainName")
+    EvaluateTargetHealth: Optional[PassThroughProp] = route53("EvaluateTargetHealth")
+    HostedZoneId: Optional[PassThroughProp] = route53("HostedZoneId")
+    HostedZoneName: Optional[PassThroughProp] = route53("HostedZoneName")
     IpV6: Optional[bool] = route53("IpV6")
 
 
 class Domain(BaseModel):
     BasePath: Optional[List[str]] = domain("BasePath")
-    CertificateArn: PassThrough = domain("CertificateArn")
-    DomainName: PassThrough = domain("DomainName")
+    CertificateArn: PassThroughProp = domain("CertificateArn")
+    DomainName: PassThroughProp = domain("DomainName")
     EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL"]]] = domain("EndpointConfiguration")
-    MutualTlsAuthentication: Optional[PassThrough] = domain("MutualTlsAuthentication")
-    OwnershipVerificationCertificateArn: Optional[PassThrough] = domain("OwnershipVerificationCertificateArn")
+    MutualTlsAuthentication: Optional[PassThroughProp] = domain("MutualTlsAuthentication")
+    OwnershipVerificationCertificateArn: Optional[PassThroughProp] = domain("OwnershipVerificationCertificateArn")
     Route53: Optional[Route53] = domain("Route53")
-    SecurityPolicy: Optional[PassThrough] = domain("SecurityPolicy")
+    SecurityPolicy: Optional[PassThroughProp] = domain("SecurityPolicy")
 
 
-AccessLogSettings = Optional[PassThrough]
-StageVariables = Optional[PassThrough]
+AccessLogSettings = Optional[PassThroughProp]
+StageVariables = Optional[PassThroughProp]
 Tags = Optional[DictStrAny]
-RouteSettings = Optional[PassThrough]
-FailOnWarnings = Optional[PassThrough]
-CorsConfigurationType = Optional[PassThrough]
-DefaultRouteSettings = Optional[PassThrough]
+RouteSettings = Optional[PassThroughProp]
+FailOnWarnings = Optional[PassThroughProp]
+CorsConfigurationType = Optional[PassThroughProp]
+DefaultRouteSettings = Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
@@ -109,14 +109,14 @@ class Properties(BaseModel):
     DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
     DefinitionUri: Optional[Union[str, DefinitionUri]] = properties("DefinitionUri")
     Description: Optional[str] = properties("Description")
-    DisableExecuteApiEndpoint: Optional[PassThrough] = properties("DisableExecuteApiEndpoint")
+    DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
     Domain: Optional[Domain] = properties("Domain")
     FailOnWarnings: Optional[FailOnWarnings] = properties("FailOnWarnings")
     RouteSettings: Optional[RouteSettings] = properties("RouteSettings")
-    StageName: Optional[PassThrough] = properties("StageName")
+    StageName: Optional[PassThroughProp] = properties("StageName")
     StageVariables: Optional[StageVariables] = properties("StageVariables")
     Tags: Optional[Tags] = properties("Tags")
-    Name: Optional[PassThrough]  # TODO: Add to docs
+    Name: Optional[PassThroughProp]  # TODO: Add to docs
 
 
 class Globals(BaseModel):
@@ -134,5 +134,5 @@ class Globals(BaseModel):
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::HttpApi"]
     Properties: Optional[Properties]
-    Metadata: Optional[PassThrough]
-    Condition: Optional[PassThrough]
+    Metadata: Optional[PassThroughProp]
+    Condition: Optional[PassThroughProp]
