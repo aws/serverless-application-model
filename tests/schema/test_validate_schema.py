@@ -8,6 +8,7 @@ from typing import Iterator
 from unittest import TestCase
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+from jsonschema.validators import Draft4Validator
 from parameterized import parameterized
 
 from samtranslator.yaml_helper import yaml_parse
@@ -117,6 +118,8 @@ class TestValidateUnifiedSchema(TestCase):
 
     @parameterized.expand(
         [
+            (PROJECT_ROOT.joinpath("tests/translator/input/error_api_invalid_auth.yaml"),),
+            (PROJECT_ROOT.joinpath("tests/translator/input/error_function_invalid_event_type.yaml"),),
             (PROJECT_ROOT.joinpath("tests/translator/input/schema_validation_ec2_not_valid.yaml"),),
         ]
     )
@@ -124,3 +127,124 @@ class TestValidateUnifiedSchema(TestCase):
         obj = yaml_parse(Path(testcase).read_bytes())
         with pytest.raises(ValidationError):
             validate(obj, schema=UNIFIED_SCHEMA)
+
+    @parameterized.expand(
+        [
+            [
+                # Valid (SAM)
+                {
+                    "Transform": "AWS::Serverless-2016-10-31",
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::Serverless::SimpleTable",
+                        },
+                    },
+                }
+            ],
+            [
+                # Valid (CFN)
+                {
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::S3::Bucket",
+                        },
+                    },
+                },
+            ],
+        ],
+    )
+    def test_sanity_valid(self, template):
+        assert UNIFIED_SCHEMA["$schema"] == "http://json-schema.org/draft-04/schema#"
+        Draft4Validator(UNIFIED_SCHEMA).validate(template)
+        validate(template, schema=UNIFIED_SCHEMA)
+
+    @parameterized.expand(
+        [
+            [
+                # Unknown property (SAM)
+                {
+                    "Transform": "AWS::Serverless-2016-10-31",
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::Serverless::SimpleTable",
+                            "Properties": {
+                                "UnknownProperty": True,
+                            },
+                        },
+                    },
+                },
+            ],
+            [
+                # Missing property (SAM)
+                {
+                    "Transform": "AWS::Serverless-2016-10-31",
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::Serverless::SimpleTable",
+                            "Properties": {
+                                "PrimaryKey": {
+                                    "Name": "Foo",
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            [
+                # Wrong value type (SAM)
+                {
+                    "Transform": "AWS::Serverless-2016-10-31",
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::Serverless::Function",
+                            "Properties": {
+                                "InlineCode": "foo",
+                                "Handler": "bar",
+                                "Runtime": "node16.x",
+                                "Events": 1337,
+                            },
+                        },
+                    },
+                },
+            ],
+            [
+                # Unknown property (CFN)
+                {
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::S3::Bucket",
+                            "Properties": {
+                                "UnknownProperty": True,
+                            },
+                        },
+                    },
+                },
+            ],
+            [
+                # Missing property (CFN)
+                {
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::ResourceGroups::Group",
+                        }
+                    }
+                }
+            ],
+            [
+                # Wrong value type (CFN)
+                {
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::ResourceGroups::Group",
+                            "Properties": {
+                                "Name": 1337,
+                            },
+                        }
+                    }
+                }
+            ],
+        ],
+    )
+    def test_sanity_invalid(self, template):
+        with pytest.raises(ValidationError):
+            validate(template, schema=UNIFIED_SCHEMA)
