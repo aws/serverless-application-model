@@ -105,6 +105,11 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
     # The unified schema should include all supported properties
     sam_schema["additionalProperties"] = False
 
+    # Pydantic automatically adds title to model (https://github.com/pydantic/pydantic/issues/1051),
+    # and the YAML extension for VS Code then shows 'PassThroughProp' as title for pass-through
+    # properties (instead of the title of the property itself)... so manually deleting it.
+    del sam_schema["definitions"]["PassThroughProp"]["title"]
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
