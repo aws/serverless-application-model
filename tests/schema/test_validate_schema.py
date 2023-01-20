@@ -15,8 +15,8 @@ from samtranslator.yaml_helper import yaml_parse
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-SCHEMA = json.loads(PROJECT_ROOT.joinpath("samtranslator/schema/schema.json").read_bytes())
-UNIFIED_SCHEMA = json.loads(PROJECT_ROOT.joinpath("samtranslator/schema/unified.schema.json").read_bytes())
+SCHEMA = json.loads(PROJECT_ROOT.joinpath("samtranslator/schema/sam.schema.json").read_bytes())
+UNIFIED_SCHEMA = json.loads(PROJECT_ROOT.joinpath("samtranslator/schema/schema.json").read_bytes())
 
 # TODO: Enable (most likely) everything but 'error_*' and 'basic_schema_validation_failure'
 SKIPPED_TESTS = [
