@@ -190,96 +190,61 @@ class TestValidateUnifiedSchema(TestCase):
                     },
                 },
             ],
+            [
+                # Wrong value type (SAM)
+                {
+                    "Transform": "AWS::Serverless-2016-10-31",
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::Serverless::Function",
+                            "Properties": {
+                                "InlineCode": "foo",
+                                "Handler": "bar",
+                                "Runtime": "node16.x",
+                                "Events": 1337,
+                            },
+                        },
+                    },
+                },
+            ],
+            [
+                # Unknown property (CFN)
+                {
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::S3::Bucket",
+                            "Properties": {
+                                "UnknownProperty": True,
+                            },
+                        },
+                    },
+                },
+            ],
+            [
+                # Missing property (CFN)
+                {
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::ResourceGroups::Group",
+                        }
+                    }
+                }
+            ],
+            [
+                # Wrong value type (CFN)
+                {
+                    "Resources": {
+                        "Foo": {
+                            "Type": "AWS::ResourceGroups::Group",
+                            "Properties": {
+                                "Name": 1337,
+                            },
+                        }
+                    }
+                }
+            ],
         ],
     )
     def test_sanity_invalid(self, template):
         with pytest.raises(ValidationError):
             validate(template, schema=UNIFIED_SCHEMA)
-
-    # Ensure no egregious gaps
-    def test_sanity(self):
-        assert UNIFIED_SCHEMA["$schema"] == "http://json-schema.org/draft-04/schema#"
-        validator = Draft4Validator(UNIFIED_SCHEMA)
-
-        VALID = [
-            {
-                "Transform": "AWS::Serverless-2016-10-31",
-                "Resources": {
-                    "Foo": {
-                        "Type": "AWS::Serverless::SimpleTable",
-                    },
-                },
-            },
-            {
-                "Resources": {
-                    "Foo": {
-                        "Type": "AWS::S3::Bucket",
-                    },
-                },
-            },
-        ]
-
-        INVALID = [
-            # Unknown property (SAM)
-            {
-                "Transform": "AWS::Serverless-2016-10-31",
-                "Resources": {
-                    "Foo": {
-                        "Type": "AWS::Serverless::SimpleTable",
-                        "Properties": {
-                            "UnknownProperty": True,
-                        },
-                    },
-                },
-            },
-            # Missing property (SAM)
-            {
-                "Transform": "AWS::Serverless-2016-10-31",
-                "Resources": {
-                    "Foo": {
-                        "Type": "AWS::Serverless::SimpleTable",
-                        "Properties": {
-                            "PrimaryKey": {
-                                "Name": "Foo",
-                            },
-                        },
-                    },
-                },
-            },
-            # Wrong value type (SAM)
-            {
-                "Transform": "AWS::Serverless-2016-10-31",
-                "Resources": {
-                    "Foo": {
-                        "Type": "AWS::Serverless::SimpleTable",
-                        "Properties": {
-                            "PrimaryKey": {
-                                "Name": 1337,
-                                "Type": "Number",
-                            },
-                        },
-                    },
-                },
-            },
-            # Unknown property (CFN)
-            {
-                "Resources": {
-                    "Foo": {
-                        "Type": "AWS::S3::Bucket",
-                        "Properties": {
-                            "UnknownProperty": True,
-                        },
-                    },
-                },
-            },
-        ]
-
-        for template in VALID:
-            validator.validate(template)
-            validate(template, schema=UNIFIED_SCHEMA)
-
-        for template in INVALID:
-            with pytest.raises(ValidationError):
-                validator.validate(template)
-            with pytest.raises(ValidationError):
-                validate(template, schema=UNIFIED_SCHEMA)
