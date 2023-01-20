@@ -1,3 +1,4 @@
+import copy
 import json
 import pytest
 import os
@@ -149,6 +150,17 @@ class TestValidateUnifiedSchema(TestCase):
                 "properties"
             ]["Properties"]["markdownDescription"]
         )
+
+        # Contains all definitions from SAM-only schema (except rule that ignores non-SAM)
+        sam_defs = copy.deepcopy(SCHEMA["definitions"])
+        del sam_defs["samtranslator__schema__any_cfn_resource__Resource"]
+        assert sam_defs.items() <= UNIFIED_SCHEMA["definitions"].items()
+
+        # Contains all resources from SAM-only schema (except rule that ignores non-SAM)
+        unified_resources = UNIFIED_SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]
+        for v in SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]:
+            if v["$ref"] != "#/definitions/samtranslator__schema__any_cfn_resource__Resource":
+                assert v in unified_resources
 
     @parameterized.expand(
         [
