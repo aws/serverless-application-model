@@ -143,6 +143,12 @@ class TestValidateUnifiedSchema(TestCase):
             "Transform",
         } == set(UNIFIED_SCHEMA["properties"].keys())
         assert len(UNIFIED_SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]) > 1000
+        assert (
+            "The set of properties must conform to the defined `Type`"
+            in UNIFIED_SCHEMA["definitions"]["samtranslator__schema__aws_serverless_statemachine__ApiEvent"][
+                "properties"
+            ]["Properties"]["markdownDescription"]
+        )
 
     @parameterized.expand(
         [
