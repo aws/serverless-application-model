@@ -2016,9 +2016,7 @@
       "title": "OAuth2Authorizer",
       "type": "object"
     },
-    "PassThroughProp": {
-      "title": "PassThroughProp"
-    },
+    "PassThroughProp": {},
     "PrimaryKey": {
       "additionalProperties": false,
       "properties": {

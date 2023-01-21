@@ -69,6 +69,11 @@ def get_schema(model: Type[pydantic.BaseModel]) -> Dict[str, Any]:
     # Validated in https://github.com/aws/serverless-application-model/blob/5c82f5d2ae95adabc9827398fba8ccfc3dbe101a/tests/schema/test_validate_schema.py#L91
     obj["$schema"] = "http://json-schema.org/draft-04/schema#"
 
+    # Pydantic automatically adds title to model (https://github.com/pydantic/pydantic/issues/1051),
+    # and the YAML extension for VS Code then shows 'PassThroughProp' as title for pass-through
+    # properties (instead of the title of the property itself)... so manually deleting it.
+    del obj["definitions"]["PassThroughProp"]["title"]
+
     return obj
 
 
