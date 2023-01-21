@@ -33,4 +33,4 @@ class Globals(BaseModel):
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::SimpleTable"]
     Properties: Optional[Properties]
-    Connectors: Optional[PassThrough]
+    Connectors: Optional[PassThroughProp]
