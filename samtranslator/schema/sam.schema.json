@@ -7147,10 +7147,10 @@
             "$ref": "#/definitions/samtranslator__schema__aws_serverless_application__Resource"
           },
           {
-            "$ref": "#/definitions/samtranslator__schema__any_cfn_resource__Resource"
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_graphqlapi__Resource"
           },
           {
-            "$ref": "#/definitions/samtranslator__schema__aws_serverless_graphqlapi__Resource"
+            "$ref": "#/definitions/samtranslator__schema__any_cfn_resource__Resource"
           }
         ]
       },

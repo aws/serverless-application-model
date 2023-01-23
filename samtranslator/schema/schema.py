@@ -40,6 +40,7 @@ Resources = Union[
     aws_serverless_api.Resource,
     aws_serverless_httpapi.Resource,
     aws_serverless_application.Resource,
+    aws_serverless_graphqlapi.Resource,
 ]
 
 
@@ -54,7 +55,6 @@ class SamModel(_ModelWithoutResources):
             Resources,
             # Ignore resources that are not AWS::Serverless::*
             any_cfn_resource.Resource,
-            aws_serverless_graphqlapi.Resource,
         ],
     ]
 
