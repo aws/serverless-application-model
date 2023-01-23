@@ -1,4 +1,5 @@
 import boto3
+from typing import Dict, Any
 import copy
 
 from samtranslator.translator.arn_generator import ArnGenerator, NoRegionFound
@@ -9,7 +10,7 @@ class SamParameterValues(object):
     Class representing SAM parameter values.
     """
 
-    def __init__(self, parameter_values):  # type: ignore[no-untyped-def]
+    def __init__(self, parameter_values: Dict[Any, Any]):
         """
         Initialize the object given the parameter values as a dictionary
 
@@ -18,7 +19,7 @@ class SamParameterValues(object):
 
         self.parameter_values = copy.deepcopy(parameter_values)
 
-    def add_default_parameter_values(self, sam_template):  # type: ignore[no-untyped-def]
+    def add_default_parameter_values(self, sam_template: Dict[str, Any]) -> Any:
         """
         Method to read default values for template parameters and merge with user supplied values.
 
@@ -76,4 +77,4 @@ class SamParameterValues(object):
             self.parameter_values["AWS::Region"] = session.region_name
 
         if "AWS::Partition" not in self.parameter_values:
-            self.parameter_values["AWS::Partition"] = ArnGenerator.get_partition_name(session.region_name)  # type: ignore[no-untyped-call]
+            self.parameter_values["AWS::Partition"] = ArnGenerator.get_partition_name(session.region_name)

@@ -43,3 +43,19 @@ Resources:
           Sub: foobar
         SemanticVersion:
           Fn::Sub: foobar
+
+  WrongTypeApplicationId:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId:
+        - this should not be a list
+        SemanticVersion: 2.0.0
+
+  WrongTypeSemanticVersion:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId: some-id
+        SemanticVersion:
+        - this should not be a list

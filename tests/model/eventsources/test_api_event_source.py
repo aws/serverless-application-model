@@ -24,7 +24,7 @@ class ApiEventSource(TestCase):
 
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_get_permission_without_trailing_slash(self):
-        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={})
+        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={}, api_id="RestApi")
 
         perm = cfn[0]
         self.assertIsInstance(perm, LambdaPermission)
@@ -39,7 +39,7 @@ class ApiEventSource(TestCase):
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_get_permission_with_trailing_slash(self):
         self.api_event_source.Path = "/foo/"
-        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={})
+        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={}, api_id="RestApi")
 
         perm = cfn[0]
         self.assertIsInstance(perm, LambdaPermission)
@@ -54,7 +54,7 @@ class ApiEventSource(TestCase):
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_get_permission_with_path_parameter_to_any_path(self):
         self.api_event_source.Path = "/foo/{userId+}"
-        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={})
+        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={}, api_id="RestApi")
 
         perm = cfn[0]
         self.assertIsInstance(perm, LambdaPermission)
@@ -71,7 +71,7 @@ class ApiEventSource(TestCase):
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_get_permission_with_path_parameter(self):
         self.api_event_source.Path = "/foo/{userId}/bar"
-        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={})
+        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={}, api_id="RestApi")
 
         perm = cfn[0]
         self.assertIsInstance(perm, LambdaPermission)
@@ -88,7 +88,7 @@ class ApiEventSource(TestCase):
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_get_permission_with_proxy_resource(self):
         self.api_event_source.Path = "/foo/{proxy+}"
-        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={})
+        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={}, api_id="RestApi")
 
         perm = cfn[0]
         self.assertIsInstance(perm, LambdaPermission)
@@ -105,7 +105,7 @@ class ApiEventSource(TestCase):
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_get_permission_with_just_slash(self):
         self.api_event_source.Path = "/"
-        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={})
+        cfn = self.api_event_source.to_cloudformation(function=self.func, explicit_api={}, api_id="RestApi")
 
         perm = cfn[0]
         self.assertIsInstance(perm, LambdaPermission)

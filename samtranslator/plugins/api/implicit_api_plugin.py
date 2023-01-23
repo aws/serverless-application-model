@@ -242,7 +242,7 @@ class ImplicitApiPlugin(BasePlugin):
         Handles case where API id is not specified or is a reference to a logical id.
         """
         api_id = event_properties.get(self.api_id_property)
-        return Api.get_rest_api_id_string(api_id)  # type: ignore[no-untyped-call]
+        return Api.get_rest_api_id_string(api_id)
 
     def _maybe_add_condition_to_implicit_api(self, template_dict):  # type: ignore[no-untyped-def]
         """

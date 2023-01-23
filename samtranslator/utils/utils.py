@@ -49,3 +49,25 @@ def dict_deep_get(d: Any, path: str) -> Optional[Any]:
         relative_path = (relative_path + f".{_path_nodes[0]}").lstrip(".")
         _path_nodes = _path_nodes[1:]
     return d
+
+
+def dict_deep_set(d: Any, path: str, value: Any) -> None:
+    """
+    Set the value deep in the dict.
+
+    If any value along the path doesn't exist, set to {}.
+    If any parent node exists but is not a dict, raise InvalidValueType.
+    """
+    relative_path = ""
+    if not path:
+        raise ValueError("path cannot be empty")
+    _path_nodes = path.split(".")
+    while len(_path_nodes) > 1:
+        if not isinstance(d, dict):
+            raise InvalidValueType(relative_path)
+        d = d.setdefault(_path_nodes[0], {})
+        relative_path = (relative_path + f".{_path_nodes[0]}").lstrip(".")
+        _path_nodes = _path_nodes[1:]
+    if not isinstance(d, dict):
+        raise InvalidValueType(relative_path)
+    d[_path_nodes[0]] = value

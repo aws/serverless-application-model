@@ -1,7 +1,7 @@
 import json
 import jsonschema
 from samtranslator import policy_templates_data
-
+from typing import Dict, Any, Optional
 from jsonschema.exceptions import ValidationError
 from samtranslator.policy_template_processor.template import Template
 from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
@@ -48,7 +48,7 @@ class PolicyTemplatesProcessor(object):
     # ./policy_templates.json
     DEFAULT_POLICY_TEMPLATES_FILE = policy_templates_data.POLICY_TEMPLATES_FILE
 
-    def __init__(self, policy_templates_dict, schema=None):  # type: ignore[no-untyped-def]
+    def __init__(self, policy_templates_dict: Dict[str, Any], schema: Optional[Dict[str, Any]] = None):
         """
         Initialize the class
 
@@ -56,7 +56,7 @@ class PolicyTemplatesProcessor(object):
         :param dict schema: Dictionary containing the JSON Schema of policy templates
         :raises ValueError: If policy templates does not match up with the schema
         """
-        PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict, schema)  # type: ignore[no-untyped-call]
+        PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict, schema)
 
         self.policy_templates = {}
         for template_name, template_value_dict in policy_templates_dict["Templates"].items():
@@ -81,7 +81,7 @@ class PolicyTemplatesProcessor(object):
         """
         return self.policy_templates.get(template_name, None)
 
-    def convert(self, template_name, parameter_values):  # type: ignore[no-untyped-def]
+    def convert(self, template_name: str, parameter_values: str) -> Any:
         """
         Converts the given template to IAM-ready policy statement by substituting template parameters with the given
         values.
@@ -100,7 +100,9 @@ class PolicyTemplatesProcessor(object):
         return template.to_statement(parameter_values)
 
     @staticmethod
-    def _is_valid_templates_dict(policy_templates_dict, schema=None):  # type: ignore[no-untyped-def]
+    def _is_valid_templates_dict(
+        policy_templates_dict: Dict[Any, Any], schema: Optional[Dict[Any, Any]] = None
+    ) -> bool:
         """
         Is this a valid policy template dictionary
 
@@ -111,7 +113,7 @@ class PolicyTemplatesProcessor(object):
         """
 
         if not schema:
-            schema = PolicyTemplatesProcessor._read_schema()  # type: ignore[no-untyped-call]
+            schema = PolicyTemplatesProcessor._read_schema()
 
         try:
             jsonschema.validate(policy_templates_dict, schema)
@@ -122,17 +124,17 @@ class PolicyTemplatesProcessor(object):
         return True
 
     @staticmethod
-    def get_default_policy_templates_json():  # type: ignore[no-untyped-def]
+    def get_default_policy_templates_json() -> Any:
         """
         Reads and returns the default policy templates JSON data from file.
 
         :return dict: Dictionary containing data read from default policy templates JSON file
         """
 
-        return PolicyTemplatesProcessor._read_json(PolicyTemplatesProcessor.DEFAULT_POLICY_TEMPLATES_FILE)  # type: ignore[no-untyped-call]
+        return PolicyTemplatesProcessor._read_json(PolicyTemplatesProcessor.DEFAULT_POLICY_TEMPLATES_FILE)
 
     @staticmethod
-    def _read_schema():  # type: ignore[no-untyped-def]
+    def _read_schema() -> Any:
         """
         Reads the JSON Schema at given file path
 
@@ -141,10 +143,10 @@ class PolicyTemplatesProcessor(object):
         :return dict: JSON Schema of the policy template
         """
 
-        return PolicyTemplatesProcessor._read_json(PolicyTemplatesProcessor.SCHEMA_LOCATION)  # type: ignore[no-untyped-call]
+        return PolicyTemplatesProcessor._read_json(PolicyTemplatesProcessor.SCHEMA_LOCATION)
 
     @staticmethod
-    def _read_json(filepath):  # type: ignore[no-untyped-def]
+    def _read_json(filepath: str) -> Any:
         """
         Helper method to read a JSON file
         :param filepath: Path to the file

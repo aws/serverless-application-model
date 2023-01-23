@@ -26,7 +26,7 @@ Environment setup
 -----------------
 ### 1. Install Python versions
 
-Our officially supported Python versions are 3.6, 3.7 and 3.8. 
+Our officially supported Python versions are 3.7, 3.8, 3.9 and 3.10. 
 Our CI/CD pipeline is setup to run unit tests against Python 3 versions. Make sure you test it before sending a Pull Request.
 See [Unit testing with multiple Python versions](#unit-testing-with-multiple-python-versions).
 
@@ -40,11 +40,12 @@ easily setup multiple Python versions. For
 1.  Install PyEnv -
     `curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash`
 1. Restart shell so the path changes take effect - `exec $SHELL`
-1.  `pyenv install 3.6.12`
-1.  `pyenv install 3.7.9`
-1.  `pyenv install 3.8.6`
-1.  Make Python versions available in the project:
-    `pyenv local 3.6.12 3.7.9 3.8.6`
+1.  `pyenv install 3.7.16`
+1.  `pyenv install 3.8.16`
+1.  `pyenv install 3.9.16`
+1.  `pyenv install 3.10.9`
+3.  Make Python versions available in the project:
+    `pyenv local 3.7.16 3.8.16 3.9.16 3.10.9`
 
 Note: also make sure the following lines were written into your `.bashrc` (or `.zshrc`, depending on which shell you are using):
 ```
@@ -120,10 +121,10 @@ Run `make test` or `make test-fast`. Once all tests pass make sure to run
 
 ### Unit testing with multiple Python versions
 
-Currently, our officially supported Python versions are 3.6, 3.7 and 3.8. For the most
-part, code that works in Python3.6 will work in Python3.7 and Python3.8. You only run into problems if you are
-trying to use features released in a higher version (for example features introduced into Python3.7
-will not work in Python3.6). If you want to test in many versions, you can create a virtualenv for
+Currently, our officially supported Python versions are 3.7, 3.8, 3.9 and 3.10. For the most
+part, code that works in Python3.7 will work in Pythons 3.8, 3.9 and 3.10. You only run into problems if you are
+trying to use features released in a higher version (for example features introduced into Python3.10
+will not work in Python3.9). If you want to test in many versions, you can create a virtualenv for
 each version and flip between them (sourcing the activate script). Typically, we run all tests in
 one python version locally and then have our ci (appveyor) run all supported versions.
 
@@ -158,7 +159,7 @@ Integration tests are covered in detail in the [INTEGRATION_TESTS.md file](INTEG
 ## Development guidelines
 
 1. **Do not resolve [intrinsic functions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html).** Adding [`AWS::LanguageExtensions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-languageextension-transform.html) before the `AWS::Serverless-2016-10-31` transform resolves most of them (see https://github.com/aws/serverless-application-model/issues/2533). For new properties, use [`Property`](https://github.com/aws/serverless-application-model/blob/c5830b63857f52e540fec13b29f029458edc539a/samtranslator/model/__init__.py#L36-L45) or [`PassThroughProperty`](https://github.com/aws/serverless-application-model/blob/dd79f535500158baa8e367f081d6a12113497e45/samtranslator/model/__init__.py#L48-L56) instead of [`PropertyType`](https://github.com/aws/serverless-application-model/blob/c39c2807bbf327255de8abed8b8150b18c60f053/samtranslator/model/__init__.py#L13-L33).
-2. **Do not break backward compatibility.** As rule of thumb, a specific SAM template should always transform into the same CloudFormation template. Do not change logical IDs. Add opt-in properties for breaking changes. There are some exceptions, such as changes that do not impact resources (e.g. [`Metadata`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)) or abstractions that can by design change over time.
+2. **Do not break backward compatibility.** A specific SAM template should always transform into the same CloudFormation template. A template that has previously deployed successfully should continue to do so. Do not change logical IDs. Add opt-in properties for breaking changes. There are some exceptions, such as changes that do not impact resources (e.g. [`Metadata`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)) or abstractions that can by design change over time.
 3. **Stick as close as possible to the underlying CloudFormation properties.** This includes both property names and values. This ensures we can pass values to CloudFormation and let it handle any intrinsic functions. In some cases, it also allows us to pass all properties as-is to a resource, which means customers can always use the newest properties, and we don’t spend effort maintaining a duplicate set of properties.
 4. **Only validate what’s necessary.** Do not validate properties if they’re passed directly to the underlying CloudFormation resource.
 5. **Add [type hints](https://peps.python.org/pep-0484/) to new code.** Strict typing was enabled in https://github.com/aws/serverless-application-model/pull/2558 by sprinkling [`# type: ignore`](https://peps.python.org/pep-0484/#compatibility-with-other-uses-of-function-annotations) across the existing code. Don't do that for new code. Avoid `# type: ignore`s at all cost. Instead, add types to new functions, and ideally add types to existing code it uses as well.

@@ -1,5 +1,5 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import is_type, is_str, any_type
+from samtranslator.model.types import IS_DICT, is_type, IS_STR, any_type
 from samtranslator.model.intrinsics import ref, fnGetAtt
 
 
@@ -10,18 +10,18 @@ class S3Bucket(Resource):
         "AccelerateConfiguration": PropertyType(False, any_type()),
         "AnalyticsConfigurations": PropertyType(False, any_type()),
         "BucketEncryption": PropertyType(False, any_type()),
-        "BucketName": PropertyType(False, is_str()),
+        "BucketName": PropertyType(False, IS_STR),
         "CorsConfiguration": PropertyType(False, any_type()),
         "IntelligentTieringConfigurations": PropertyType(False, any_type()),
         "InventoryConfigurations": PropertyType(False, any_type()),
         "LifecycleConfiguration": PropertyType(False, any_type()),
         "LoggingConfiguration": PropertyType(False, any_type()),
         "MetricsConfigurations": PropertyType(False, any_type()),
-        "NotificationConfiguration": PropertyType(False, is_type(dict)),
+        "NotificationConfiguration": PropertyType(False, IS_DICT),
         "ObjectLockConfiguration": PropertyType(False, any_type()),
         "ObjectLockEnabled": PropertyType(False, any_type()),
         "OwnershipControls": PropertyType(False, any_type()),
-        "PublicAccessBlockConfiguration": PropertyType(False, is_type(dict)),
+        "PublicAccessBlockConfiguration": PropertyType(False, IS_DICT),
         "ReplicationConfiguration": PropertyType(False, any_type()),
         "Tags": PropertyType(False, is_type(list)),
         "VersioningConfiguration": PropertyType(False, any_type()),

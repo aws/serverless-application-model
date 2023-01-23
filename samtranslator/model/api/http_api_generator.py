@@ -120,6 +120,7 @@ class HttpApiGenerator(object):
 
         self._add_title()
         self._add_description()
+        self._update_default_path()
 
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict(self.definition_uri)
@@ -223,6 +224,19 @@ class HttpApiGenerator(object):
 
         # Assign the OpenApi back to template
         self.definition_body = editor.openapi
+
+    def _update_default_path(self) -> None:
+        # Only do the following if FailOnWarnings is enabled for backward compatibility.
+        if not self.fail_on_warnings or not self.definition_body:
+            return
+
+        # Using default stage name generate warning during deployment
+        #   Warnings found during import: Parse issue: attribute paths.
+        #   Resource $default should start with / (Service: AmazonApiGatewayV2; Status Code: 400;
+        # Deployment fails when FailOnWarnings is true: https://github.com/aws/serverless-application-model/issues/2297
+        paths: Dict[str, Any] = self.definition_body.get("paths", {})
+        if DefaultStageName in paths:
+            paths[f"/{DefaultStageName}"] = paths.pop(DefaultStageName)
 
     def _construct_api_domain(
         self, http_api: ApiGatewayV2HttpApi, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
@@ -549,14 +563,10 @@ class HttpApiGenerator(object):
         if not authorizers_config:
             return authorizers
 
-        if not isinstance(authorizers_config, dict):
-            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")
+        sam_expect(authorizers_config, self.logical_id, "Auth.Authorizers").to_be_a_map()
 
         for authorizer_name, authorizer in authorizers_config.items():
-            if not isinstance(authorizer, dict):
-                raise InvalidResourceException(
-                    self.logical_id, "Authorizer %s must be a dictionary." % (authorizer_name)
-                )
+            sam_expect(authorizer, self.logical_id, f"Auth.Authorizers.{authorizer_name}").to_be_a_map()
 
             if "OpenIdConnectUrl" in authorizer:
                 raise InvalidResourceException(

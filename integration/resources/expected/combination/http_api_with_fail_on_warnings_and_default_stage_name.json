@@ -1,0 +1,22 @@
+[
+  {
+    "LogicalResourceId": "AppFunctionAppHandlerPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "AppApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "AppApiApiGatewayDefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  },
+  {
+    "LogicalResourceId": "AppFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "AppFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
+]

@@ -1,24 +1,24 @@
 from typing import Any, Dict, Optional
 
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import is_type, is_str
+from samtranslator.model.types import IS_DICT, IS_STR
 from samtranslator.model.intrinsics import fnGetAtt
 
 
 class SchedulerSchedule(Resource):
     resource_type = "AWS::Scheduler::Schedule"
     property_types = {
-        "ScheduleExpression": PropertyType(True, is_str()),
-        "FlexibleTimeWindow": PropertyType(True, is_type(dict)),
-        "Name": PropertyType(True, is_str()),
-        "State": PropertyType(False, is_str()),
-        "Description": PropertyType(False, is_str()),
-        "StartDate": PropertyType(False, is_str()),
-        "EndDate": PropertyType(False, is_str()),
-        "ScheduleExpressionTimezone": PropertyType(False, is_str()),
-        "GroupName": PropertyType(False, is_str()),
-        "KmsKeyArn": PropertyType(False, is_str()),
-        "Target": PropertyType(True, is_type(dict)),
+        "ScheduleExpression": PropertyType(True, IS_STR),
+        "FlexibleTimeWindow": PropertyType(True, IS_DICT),
+        "Name": PropertyType(True, IS_STR),
+        "State": PropertyType(False, IS_STR),
+        "Description": PropertyType(False, IS_STR),
+        "StartDate": PropertyType(False, IS_STR),
+        "EndDate": PropertyType(False, IS_STR),
+        "ScheduleExpressionTimezone": PropertyType(False, IS_STR),
+        "GroupName": PropertyType(False, IS_STR),
+        "KmsKeyArn": PropertyType(False, IS_STR),
+        "Target": PropertyType(True, IS_DICT),
     }
 
     ScheduleExpression: str

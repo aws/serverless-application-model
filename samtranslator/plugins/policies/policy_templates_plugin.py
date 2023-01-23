@@ -45,7 +45,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
         if not self._is_supported(resource_type):  # type: ignore[no-untyped-call]
             return
 
-        function_policies = ResourcePolicies(resource_properties, self._policy_template_processor)  # type: ignore[no-untyped-call]
+        function_policies = ResourcePolicies(resource_properties, self._policy_template_processor)
 
         if len(function_policies) == 0:
             # No policies to process

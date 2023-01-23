@@ -1,9 +1,11 @@
+from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Optional
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import ResourceMacro, PropertyType
+from samtranslator.model import ResourceMacro, PropertyType, PassThroughProperty
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import is_type, is_str
+from samtranslator.model.types import IS_DICT, is_type, IS_STR
+from samtranslator.schema.common import PassThrough
 from samtranslator.model.intrinsics import is_intrinsic
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
@@ -14,7 +16,7 @@ from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect
 
 
-class PullEventSource(ResourceMacro):
+class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     """Base class for pull event sources for SAM Functions.
 
     The pull events are Kinesis Streams, DynamoDB Streams, Kafka Topics, Amazon MQ Queues and SQS Queues. All of these correspond to an
@@ -31,37 +33,33 @@ class PullEventSource(ResourceMacro):
     # line to avoid any potential behavior change.
     # TODO: Make `PullEventSource` an abstract class and not giving `resource_type` initial value.
     resource_type: str = None  # type: ignore
-    requires_stream_queue_broker = True
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
-    property_types = {
-        "Stream": PropertyType(False, is_str()),
-        "Queue": PropertyType(False, is_str()),
+    property_types: Dict[str, PropertyType] = {
         "BatchSize": PropertyType(False, is_type(int)),
-        "StartingPosition": PropertyType(False, is_str()),
+        "StartingPosition": PassThroughProperty(False),
+        "StartingPositionTimestamp": PassThroughProperty(False),
         "Enabled": PropertyType(False, is_type(bool)),
         "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
         "MaximumRetryAttempts": PropertyType(False, is_type(int)),
         "BisectBatchOnFunctionError": PropertyType(False, is_type(bool)),
         "MaximumRecordAgeInSeconds": PropertyType(False, is_type(int)),
-        "DestinationConfig": PropertyType(False, is_type(dict)),
+        "DestinationConfig": PropertyType(False, IS_DICT),
         "ParallelizationFactor": PropertyType(False, is_type(int)),
         "Topics": PropertyType(False, is_type(list)),
-        "Broker": PropertyType(False, is_str()),
         "Queues": PropertyType(False, is_type(list)),
         "SourceAccessConfigurations": PropertyType(False, is_type(list)),
-        "SecretsManagerKmsKeyId": PropertyType(False, is_str()),
+        "SecretsManagerKmsKeyId": PropertyType(False, IS_STR),
         "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
         "KafkaBootstrapServers": PropertyType(False, is_type(list)),
-        "FilterCriteria": PropertyType(False, is_type(dict)),
-        "ConsumerGroupId": PropertyType(False, is_str()),
-        "ScalingConfig": PropertyType(False, is_type(dict)),
+        "FilterCriteria": PropertyType(False, IS_DICT),
+        "ConsumerGroupId": PropertyType(False, IS_STR),
+        "ScalingConfig": PropertyType(False, IS_DICT),
     }
 
-    Stream: Optional[Intrinsicable[str]]
-    Queue: Optional[Intrinsicable[str]]
     BatchSize: Optional[Intrinsicable[int]]
-    StartingPosition: Optional[Intrinsicable[str]]
+    StartingPosition: Optional[PassThrough]
+    StartingPositionTimestamp: Optional[PassThrough]
     Enabled: Optional[bool]
     MaximumBatchingWindowInSeconds: Optional[Intrinsicable[int]]
     MaximumRetryAttempts: Optional[Intrinsicable[int]]
@@ -70,7 +68,6 @@ class PullEventSource(ResourceMacro):
     DestinationConfig: Optional[Dict[str, Any]]
     ParallelizationFactor: Optional[Intrinsicable[int]]
     Topics: Optional[List[Any]]
-    Broker: Optional[Intrinsicable[str]]
     Queues: Optional[List[Any]]
     SourceAccessConfigurations: Optional[List[Any]]
     SecretsManagerKmsKeyId: Optional[str]
@@ -81,11 +78,17 @@ class PullEventSource(ResourceMacro):
     ConsumerGroupId: Optional[Intrinsicable[str]]
     ScalingConfig: Optional[Dict[str, Any]]
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
-        raise NotImplementedError("Subclass must implement this method")
+    @abstractmethod
+    def get_policy_arn(self) -> Optional[str]:
+        """Policy to be added to the role (if a role applies)."""
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
-        raise NotImplementedError("Subclass must implement this method")
+    @abstractmethod
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
+        """Inline policy statements to be added to the role (if a role applies)."""
+
+    @abstractmethod
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        """Return the value to assign to lambda event source mapping's EventSourceArn."""
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -114,18 +117,10 @@ class PullEventSource(ResourceMacro):
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
-        if self.requires_stream_queue_broker and not self.Stream and not self.Queue and not self.Broker:
-            raise InvalidEventException(
-                self.relative_id,
-                "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided.",
-            )
-
-        if self.Stream and not self.StartingPosition:
-            raise InvalidEventException(self.relative_id, "StartingPosition is required for Kinesis, DynamoDB and MSK.")
-
         lambda_eventsourcemapping.FunctionName = function_name_or_arn
-        lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue or self.Broker
+        lambda_eventsourcemapping.EventSourceArn = self.get_event_source_arn()
         lambda_eventsourcemapping.StartingPosition = self.StartingPosition
+        lambda_eventsourcemapping.StartingPositionTimestamp = self.StartingPositionTimestamp
         lambda_eventsourcemapping.BatchSize = self.BatchSize
         lambda_eventsourcemapping.Enabled = self.Enabled
         lambda_eventsourcemapping.MaximumBatchingWindowInSeconds = self.MaximumBatchingWindowInSeconds
@@ -201,8 +196,8 @@ class PullEventSource(ResourceMacro):
 
         :param model.iam.IAMRole role: the execution role generated for the function
         """
-        policy_arn = self.get_policy_arn()  # type: ignore[no-untyped-call]
-        policy_statements = self.get_policy_statements()  # type: ignore[no-untyped-call]
+        policy_arn = self.get_policy_arn()
+        policy_statements = self.get_policy_statements()
         if role is not None:
             if policy_arn is not None and policy_arn not in role.ManagedPolicyArns:
                 role.ManagedPolicyArns.append(policy_arn)
@@ -249,11 +244,21 @@ class Kinesis(PullEventSource):
     """Kinesis event source."""
 
     resource_type = "Kinesis"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Stream": PassThroughProperty(True),
+        "StartingPosition": PassThroughProperty(True),
+    }
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")  # type: ignore[no-untyped-call]
+    Stream: PassThrough
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Stream
+
+    def get_policy_arn(self) -> Optional[str]:
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")
+
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         return None
 
 
@@ -261,11 +266,21 @@ class DynamoDB(PullEventSource):
     """DynamoDB Streams event source."""
 
     resource_type = "DynamoDB"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Stream": PassThroughProperty(True),
+        "StartingPosition": PassThroughProperty(True),
+    }
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")  # type: ignore[no-untyped-call]
+    Stream: PassThrough
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Stream
+
+    def get_policy_arn(self) -> Optional[str]:
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")
+
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         return None
 
 
@@ -273,11 +288,20 @@ class SQS(PullEventSource):
     """SQS Queue event source."""
 
     resource_type = "SQS"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Queue": PassThroughProperty(True),
+    }
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")  # type: ignore[no-untyped-call]
+    Queue: PassThrough
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Queue
+
+    def get_policy_arn(self) -> Optional[str]:
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")
+
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         return None
 
 
@@ -285,11 +309,42 @@ class MSK(PullEventSource):
     """MSK event source."""
 
     resource_type = "MSK"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Stream": PassThroughProperty(True),
+        "StartingPosition": PassThroughProperty(True),
+    }
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")  # type: ignore[no-untyped-call]
+    Stream: PassThrough
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Stream
+
+    def get_policy_arn(self) -> Optional[str]:
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
+
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
+        if self.SourceAccessConfigurations:
+            for conf in self.SourceAccessConfigurations:
+                # Lambda does not support multiple CLIENT_CERTIFICATE_TLS_AUTH configurations
+                if isinstance(conf, dict) and conf.get("Type") == "CLIENT_CERTIFICATE_TLS_AUTH" and conf.get("URI"):
+                    return [
+                        {
+                            "PolicyName": "MSKExecutionRolePolicy",
+                            "PolicyDocument": {
+                                "Statement": [
+                                    {
+                                        "Action": [
+                                            "secretsmanager:GetSecretValue",
+                                        ],
+                                        "Effect": "Allow",
+                                        "Resource": conf.get("URI"),
+                                    }
+                                ]
+                            },
+                        }
+                    ]
+
         return None
 
 
@@ -297,11 +352,20 @@ class MQ(PullEventSource):
     """MQ event source."""
 
     resource_type = "MQ"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Broker": PassThroughProperty(True),
+    }
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+    Broker: PassThrough
+
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Broker
+
+    def get_policy_arn(self) -> Optional[str]:
         return None
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         if not self.SourceAccessConfigurations:
             raise InvalidEventException(
                 self.relative_id,
@@ -382,13 +446,21 @@ class SelfManagedKafka(PullEventSource):
     """
 
     resource_type = "SelfManagedKafka"
-    requires_stream_queue_broker = False
-    AUTH_MECHANISM = ["SASL_SCRAM_256_AUTH", "SASL_SCRAM_512_AUTH", "BASIC_AUTH"]
+    AUTH_MECHANISM = [
+        "SASL_SCRAM_256_AUTH",
+        "SASL_SCRAM_512_AUTH",
+        "BASIC_AUTH",
+        "CLIENT_CERTIFICATE_TLS_AUTH",
+        "SERVER_ROOT_CA_CERTIFICATE",
+    ]
 
-    def get_policy_arn(self):  # type: ignore[no-untyped-def]
+    def get_event_source_arn(self) -> Optional[PassThrough]:
         return None
 
-    def get_policy_statements(self):  # type: ignore[no-untyped-def]
+    def get_policy_arn(self) -> Optional[str]:
+        return None
+
+    def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
         if not self.KafkaBootstrapServers:
             raise InvalidEventException(
                 self.relative_id,

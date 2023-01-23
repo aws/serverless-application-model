@@ -1,34 +1,34 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import is_type, list_of, is_str
+from samtranslator.model.types import IS_DICT, list_of, IS_STR
 from samtranslator.model.intrinsics import fnGetAtt, ref
 
 
 class CognitoUserPool(Resource):
     resource_type = "AWS::Cognito::UserPool"
     property_types = {
-        "AccountRecoverySetting": PropertyType(False, is_type(dict)),
-        "AdminCreateUserConfig": PropertyType(False, is_type(dict)),
-        "AliasAttributes": PropertyType(False, list_of(is_str())),
-        "AutoVerifiedAttributes": PropertyType(False, list_of(is_str())),
-        "DeviceConfiguration": PropertyType(False, is_type(dict)),
-        "EmailConfiguration": PropertyType(False, is_type(dict)),
-        "EmailVerificationMessage": PropertyType(False, is_str()),
-        "EmailVerificationSubject": PropertyType(False, is_str()),
-        "EnabledMfas": PropertyType(False, list_of(is_str())),
-        "LambdaConfig": PropertyType(False, is_type(dict)),
-        "MfaConfiguration": PropertyType(False, is_str()),
-        "Policies": PropertyType(False, is_type(dict)),
+        "AccountRecoverySetting": PropertyType(False, IS_DICT),
+        "AdminCreateUserConfig": PropertyType(False, IS_DICT),
+        "AliasAttributes": PropertyType(False, list_of(IS_STR)),
+        "AutoVerifiedAttributes": PropertyType(False, list_of(IS_STR)),
+        "DeviceConfiguration": PropertyType(False, IS_DICT),
+        "EmailConfiguration": PropertyType(False, IS_DICT),
+        "EmailVerificationMessage": PropertyType(False, IS_STR),
+        "EmailVerificationSubject": PropertyType(False, IS_STR),
+        "EnabledMfas": PropertyType(False, list_of(IS_STR)),
+        "LambdaConfig": PropertyType(False, IS_DICT),
+        "MfaConfiguration": PropertyType(False, IS_STR),
+        "Policies": PropertyType(False, IS_DICT),
         "Schema": PropertyType(False, list_of(dict)),
-        "SmsAuthenticationMessage": PropertyType(False, is_str()),
-        "SmsConfiguration": PropertyType(False, is_type(dict)),
-        "SmsVerificationMessage": PropertyType(False, is_str()),
-        "UserAttributeUpdateSettings": PropertyType(False, is_type(dict)),
-        "UsernameAttributes": PropertyType(False, list_of(is_str())),
-        "UsernameConfiguration": PropertyType(False, is_type(dict)),
+        "SmsAuthenticationMessage": PropertyType(False, IS_STR),
+        "SmsConfiguration": PropertyType(False, IS_DICT),
+        "SmsVerificationMessage": PropertyType(False, IS_STR),
+        "UserAttributeUpdateSettings": PropertyType(False, IS_DICT),
+        "UsernameAttributes": PropertyType(False, list_of(IS_STR)),
+        "UsernameConfiguration": PropertyType(False, IS_DICT),
         "UserPoolAddOns": PropertyType(False, list_of(dict)),
-        "UserPoolName": PropertyType(False, is_str()),
-        "UserPoolTags": PropertyType(False, is_type(dict)),
-        "VerificationMessageTemplate": PropertyType(False, is_type(dict)),
+        "UserPoolName": PropertyType(False, IS_STR),
+        "UserPoolTags": PropertyType(False, IS_DICT),
+        "VerificationMessageTemplate": PropertyType(False, IS_DICT),
     }
 
     runtime_attrs = {

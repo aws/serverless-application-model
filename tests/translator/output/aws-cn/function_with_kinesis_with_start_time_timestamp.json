@@ -1,0 +1,158 @@
+{
+  "Resources": {
+    "KinesisStream": {
+      "Properties": {
+        "Name": "KinesisStream",
+        "RetentionPeriodHours": 24,
+        "ShardCount": 1,
+        "StreamEncryption": {
+          "EncryptionType": "KMS",
+          "KeyId": "alias/aws/kinesis"
+        }
+      },
+      "Type": "AWS::Kinesis::Stream"
+    },
+    "KinesisTriggerFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n  return {\n    statusCode: 200,\n    body: 'Success'\n  }\n}\n"
+        },
+        "Description": "This function triggered when a file is uploaded in a stream (Kinesis)\n",
+        "Handler": "trigger.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "KinesisTriggerFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 5,
+        "TracingConfig": {
+          "Mode": "Active"
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "KinesisTriggerFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "KinesisTriggerFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "KinesisTriggerFunctionVersion36dc1e06a1",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "KinesisTriggerFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "kinesis:ListStreams",
+                    "kinesis:DescribeLimits"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:kinesis:${AWS::Region}:${AWS::AccountId}:stream/*"
+                  }
+                },
+                {
+                  "Action": [
+                    "kinesis:DescribeStream",
+                    "kinesis:DescribeStreamSummary",
+                    "kinesis:GetRecords",
+                    "kinesis:GetShardIterator"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:kinesis:${AWS::Region}:${AWS::AccountId}:stream/${streamName}",
+                      {
+                        "streamName": {
+                          "Ref": "KinesisStream"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "KinesisTriggerFunctionRolePolicy0"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "KinesisTriggerFunctionStream": {
+      "Properties": {
+        "BatchSize": 500,
+        "BisectBatchOnFunctionError": true,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "KinesisStream",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "KinesisTriggerFunctionAliaslive"
+        },
+        "MaximumRetryAttempts": 1000,
+        "ParallelizationFactor": 1,
+        "StartingPosition": "AT_TIMESTAMP",
+        "StartingPositionTimestamp": 1671489395
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "KinesisTriggerFunctionVersion36dc1e06a1": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "KinesisTriggerFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    }
+  }
+}

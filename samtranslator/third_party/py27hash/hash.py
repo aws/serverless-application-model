@@ -2,10 +2,12 @@
 Compatibility methods to support Python 2.7 style hashing in Python 3.X+
 
 This is designed for compatibility not performance.
+
 """
 
 import ctypes
 import math
+from functools import lru_cache
 
 
 def hash27(value):  # type: ignore[no-untyped-def]
@@ -19,7 +21,7 @@ def hash27(value):  # type: ignore[no-untyped-def]
         Python 2.7 hash
     """
 
-    return Hash.hash(value)  # type: ignore[no-untyped-call]
+    return Hash.hash(value)
 
 
 class Hash(object):
@@ -28,6 +30,7 @@ class Hash(object):
     """
 
     @staticmethod
+    @lru_cache(maxsize=2048)
     def hash(value):  # type: ignore[no-untyped-def]
         """
         Returns a Python 2.7 hash for a value.
@@ -39,14 +42,14 @@ class Hash(object):
             Python 2.7 hash
         """
 
+        if isinstance(value, ("".__class__, bytes)) or type(value).__name__ == "buffer":
+            return Hash.shash(value)  # type: ignore[no-untyped-call]
         if isinstance(value, tuple):
             return Hash.thash(value)  # type: ignore[no-untyped-call]
         if isinstance(value, float):
             return Hash.fhash(value)  # type: ignore[no-untyped-call]
         if isinstance(value, int):
             return hash(value)
-        if isinstance(value, ("".__class__, bytes)) or type(value).__name__ == "buffer":
-            return Hash.shash(value)  # type: ignore[no-untyped-call]
 
         raise TypeError("unhashable type: '%s'" % (type(value).__name__))
 
@@ -73,7 +76,7 @@ class Hash(object):
         for y in value:
             length -= 1
 
-            y = Hash.hash(y)  # type: ignore[no-untyped-call]
+            y = Hash.hash(y)
             x = (x ^ y) * mult
             mult += 82520 + length + length
 

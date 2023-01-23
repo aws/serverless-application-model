@@ -1,0 +1,29 @@
+Parameters:
+  FailOnWarningsValue:
+    Type: String
+    AllowedValues: [true, false]
+
+Resources:
+  AppApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      FailOnWarnings: !Ref FailOnWarningsValue
+      StageName: $default
+  AppFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      InlineCode: |
+        def handler(event, context):
+          print("Hello, world!")
+      Runtime: python3.8
+      Architectures:
+      - x86_64
+      Events:
+        AppHandler:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppApi
+
+Metadata:
+  SamTransformTest: true

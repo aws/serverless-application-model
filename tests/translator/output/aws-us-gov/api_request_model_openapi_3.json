@@ -72,7 +72,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-us-gov:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -100,7 +100,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-us-gov:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -122,9 +122,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "HtmlApiDeployment2274fb58ae": {
+    "HtmlApiDeploymentd5a98edb8f": {
       "Properties": {
-        "Description": "RestApi deployment id: 2274fb58ae60fc2a69a3feb3b433d9bcf6947be5",
+        "Description": "RestApi deployment id: d5a98edb8f10f3d3a1c0b7693dd9c6afa4f2206b",
         "RestApiId": {
           "Ref": "HtmlApi"
         }
@@ -134,7 +134,7 @@
     "HtmlApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment2274fb58ae"
+          "Ref": "HtmlApiDeploymentd5a98edb8f"
         },
         "RestApiId": {
           "Ref": "HtmlApi"

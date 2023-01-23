@@ -15,19 +15,6 @@ class TestAction(TestCase):
         with self.assertRaises(TypeError):
             MyAction()
 
-    def test_subclass_must_implement_resolve_method(self):
-        class MyAction(Action):
-            intrinsic_name = "foo"
-
-        with self.assertRaises(NotImplementedError):
-            MyAction().resolve_parameter_refs({}, {})
-
-        with self.assertRaises(NotImplementedError):
-            MyAction().resolve_resource_refs({}, {})
-
-        with self.assertRaises(NotImplementedError):
-            MyAction().resolve_resource_id_refs({}, {})
-
     def test_can_handle_input(self):
         class MyAction(Action):
             intrinsic_name = "foo"

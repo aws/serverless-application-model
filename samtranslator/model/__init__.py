@@ -4,14 +4,19 @@ import inspect
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
-from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.types import Validator, any_type
+from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
+from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 
 class PropertyType(object):
     """Stores validation information for a CloudFormation resource property.
+
+    The attribute "expected_type" is only used by InvalidResourcePropertyTypeException
+    to generate an error message. When it is not found,
+    customers will see "Type of property 'xxx' is invalid."
+    If it is provided, customers will see "Property 'xxx' should be a yyy."
 
     DEPRECATED: Use `Property` instead.
 
@@ -22,6 +27,8 @@ class PropertyType(object):
         raise an error when intrinsic function dictionary is supplied as value
     """
 
+    EXPECTED_TYPE_BY_VALIDATOR = {IS_DICT: ExpectedType.MAP, IS_STR: ExpectedType.STRING}
+
     def __init__(
         self,
         required: bool,
@@ -31,6 +38,7 @@ class PropertyType(object):
         self.required = required
         self.validate = validate
         self.supports_intrinsics = supports_intrinsics
+        self.expected_type = self.EXPECTED_TYPE_BY_VALIDATOR.get(validate)
 
 
 class Property(PropertyType):
@@ -185,7 +193,7 @@ class Resource(object):
             if attr in resource_dict:
                 resource.set_resource_attribute(attr, resource_dict[attr])
 
-        resource.validate_properties()  # type: ignore[no-untyped-call]
+        resource.validate_properties()
         return resource
 
     @classmethod
@@ -223,7 +231,7 @@ class Resource(object):
         if "Properties" in resource_dict and not isinstance(resource_dict["Properties"], dict):
             raise InvalidResourceException(logical_id, "Properties of a resource must be an object.")
 
-    def to_dict(self):  # type: ignore[no-untyped-def]
+    def to_dict(self) -> Dict[str, Dict[str, Any]]:
         """Validates that the required properties for this Resource have been provided, then returns a dict
         corresponding to the given Resource object. This dict will take the format of a single entry in the Resources
         section of a CloudFormation template, and will take the following format. ::
@@ -244,7 +252,7 @@ class Resource(object):
         :rtype: dict
         :raises TypeError: if a required property is missing from this Resource
         """
-        self.validate_properties()  # type: ignore[no-untyped-call]
+        self.validate_properties()
 
         resource_dict = self._generate_resource_dict()  # type: ignore[no-untyped-call]
 
@@ -292,7 +300,7 @@ class Resource(object):
             ),
         )
 
-    def validate_properties(self):  # type: ignore[no-untyped-def]
+    def validate_properties(self) -> None:
         """Validates that the required properties for this Resource have been populated, and that all properties have
         valid values.
 
@@ -315,9 +323,7 @@ class Resource(object):
                     )
             # Otherwise, validate the value of the property.
             elif not property_type.validate(value, should_raise=False):
-                raise InvalidResourceException(
-                    self.logical_id, "Type of property '{property_name}' is invalid.".format(property_name=name)
-                )
+                raise InvalidResourcePropertyTypeException(self.logical_id, name, property_type.expected_type)
 
     def set_resource_attribute(self, attr: str, value: Any) -> None:
         """Sets attributes on resource. Resource attributes are top-level entries of a CloudFormation resource
@@ -334,7 +340,7 @@ class Resource(object):
 
         self.resource_attributes[attr] = value
 
-    def get_resource_attribute(self, attr):  # type: ignore[no-untyped-def]
+    def get_resource_attribute(self, attr: str) -> Any:
         """Gets the resource attribute if available
 
         :param attr: Name of the attribute
@@ -369,7 +375,7 @@ class Resource(object):
             return self.runtime_attrs[attr_name](self)
         raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
 
-    def get_passthrough_resource_attributes(self):  # type: ignore[no-untyped-def]
+    def get_passthrough_resource_attributes(self) -> Dict[str, Any]:
         """
         Returns a dictionary of resource attributes of the ResourceMacro that should be passed through from the main
         vanilla CloudFormation resource to its children. Currently only Condition is copied.
@@ -517,7 +523,7 @@ class ResourceTypeResolver(object):
     """ResourceTypeResolver maps Resource Types to Resource classes, e.g. AWS::Serverless::Function to
     samtranslator.model.sam_resources.SamFunction."""
 
-    def __init__(self, *modules):  # type: ignore[no-untyped-def]
+    def __init__(self, *modules: Any):
         """Initializes the ResourceTypeResolver from the given modules.
 
         :param modules: one or more Python modules containing Resource definitions
@@ -533,20 +539,20 @@ class ResourceTypeResolver(object):
             ):
                 self.resource_types[resource_class.resource_type] = resource_class
 
-    def can_resolve(self, resource_dict):  # type: ignore[no-untyped-def]
+    def can_resolve(self, resource_dict: Dict[str, Any]) -> bool:
         if not isinstance(resource_dict, dict) or not isinstance(resource_dict.get("Type"), str):
             return False
 
         return resource_dict["Type"] in self.resource_types
 
-    def resolve_resource_type(self, resource_dict):  # type: ignore[no-untyped-def]
+    def resolve_resource_type(self, resource_dict: Dict[str, Any]) -> Any:
         """Returns the Resource class corresponding to the 'Type' key in the given resource dict.
 
         :param dict resource_dict: the resource dict to resolve
         :returns: the resolved Resource class
         :rtype: class
         """
-        if not self.can_resolve(resource_dict):  # type: ignore[no-untyped-call]
+        if not self.can_resolve(resource_dict):
             raise TypeError(
                 "Resource dict has missing or invalid value for key Type. Event Type is: {}.".format(
                     resource_dict.get("Type")

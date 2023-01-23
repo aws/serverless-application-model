@@ -10,7 +10,7 @@ class RegionConfiguration(object):
     """
 
     @classmethod
-    def is_apigw_edge_configuration_supported(cls):  # type: ignore[no-untyped-def]
+    def is_apigw_edge_configuration_supported(cls) -> bool:
         """
         # API Gateway defaults to EDGE endpoint configuration in all regions in AWS partition. But for other partitions,
         # such as GovCloud, they don't support Edge.
@@ -18,7 +18,7 @@ class RegionConfiguration(object):
         :return: True, if API Gateway does not support Edge configuration
         """
 
-        return ArnGenerator.get_partition_name() not in [  # type: ignore[no-untyped-call]
+        return ArnGenerator.get_partition_name() not in [
             "aws-us-gov",
             "aws-iso",
             "aws-iso-b",

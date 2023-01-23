@@ -19,7 +19,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-cn:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -53,7 +53,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-cn:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -71,7 +71,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-cn:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -89,7 +89,7 @@
                   }
                 ],
                 "x-amazon-apigateway-integration": {
-                  "credentials": "arn:aws:iam::*:user/*",
+                  "credentials": "arn:aws-cn:iam::*:user/*",
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
@@ -140,9 +140,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithoutAuthDeployment3de35e9b3b": {
+    "MyApiWithoutAuthDeployment5cac94edbc": {
       "Properties": {
-        "Description": "RestApi deployment id: 3de35e9b3bf45c40811c36bd46b8e8513409c050",
+        "Description": "RestApi deployment id: 5cac94edbcf51122b60f1a122d953131665eccc8",
         "RestApiId": {
           "Ref": "MyApiWithoutAuth"
         },
@@ -153,7 +153,7 @@
     "MyApiWithoutAuthProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithoutAuthDeployment3de35e9b3b"
+          "Ref": "MyApiWithoutAuthDeployment5cac94edbc"
         },
         "RestApiId": {
           "Ref": "MyApiWithoutAuth"
