@@ -28,3 +28,21 @@ class Properties(BaseModel):
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::Connector"]
     Properties: Properties
+
+
+class SourceReference(BaseModel):
+    Qualifier: Optional[PassThroughProp] = resourcereference("Qualifier")
+
+
+class EmbeddedConnectorProperties(BaseModel):
+    SourceReference: Optional[SourceReference]  # TODO: add docs for SourceReference
+    Destination: ResourceReference = properties("Destination")
+    Permissions: List[Literal["Read", "Write"]] = properties("Permissions")
+
+
+class EmbeddedConnector(BaseModel):
+    Properties: EmbeddedConnectorProperties
+    DependsOn: Optional[PassThroughProp]
+    DeletionPolicy: Optional[PassThroughProp]
+    Metadata: Optional[PassThroughProp]
+    UpdatePolicy: Optional[PassThroughProp]

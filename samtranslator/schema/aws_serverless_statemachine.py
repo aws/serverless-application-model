@@ -10,8 +10,8 @@ from samtranslator.schema.common import (
     SamIntrinsicable,
     DictStrAny,
     get_prop,
-    EmbeddedConnector,
 )
+from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
 properties = get_prop("sam-resource-statemachine")
 deadletterconfig = get_prop("sam-property-statemachine-statemachinedeadletterconfig")

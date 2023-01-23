@@ -10,8 +10,8 @@ from samtranslator.schema.common import (
     SamIntrinsicable,
     get_prop,
     DictStrAny,
-    EmbeddedConnector,
 )
+from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 cognitoauthorizeridentity = get_prop("sam-property-api-cognitoauthorizationidentity")

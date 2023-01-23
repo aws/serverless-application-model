@@ -11,8 +11,8 @@ from samtranslator.schema.common import (
     get_prop,
     DictStrAny,
     Ref,
-    EmbeddedConnector,
 )
+from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")

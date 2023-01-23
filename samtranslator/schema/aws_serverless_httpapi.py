@@ -10,8 +10,8 @@ from samtranslator.schema.common import (
     SamIntrinsicable,
     get_prop,
     DictStrAny,
-    EmbeddedConnector,
 )
+from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
 oauth2authorizer = get_prop("sam-property-httpapi-oauth2authorizer")
 lambdauthorizeridentity = get_prop("sam-property-httpapi-lambdaauthorizationidentity")

@@ -1,10 +1,8 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Union, TypeVar, List
-from typing_extensions import Literal
+from typing import Any, Dict, Optional, Union, TypeVar
 from functools import partial
-
 import pydantic
 from pydantic import Extra, Field
 
@@ -60,36 +58,3 @@ class BaseModel(LenientBaseModel):
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html
 class Ref(BaseModel):
     Ref: str
-
-
-connector_properties = get_prop("sam-resource-connector")
-resourcereference = get_prop("sam-property-connector-resourcereference")
-
-
-class ResourceReference(BaseModel):
-    Id: Optional[str] = resourcereference("Id")
-    Arn: Optional[PassThroughProp] = resourcereference("Arn")
-    Name: Optional[PassThroughProp] = resourcereference("Name")
-    Qualifier: Optional[PassThroughProp] = resourcereference("Qualifier")
-    QueueUrl: Optional[PassThroughProp] = resourcereference("QueueUrl")
-    ResourceId: Optional[PassThroughProp] = resourcereference("ResourceId")
-    RoleName: Optional[PassThroughProp] = resourcereference("RoleName")
-    Type: Optional[str] = resourcereference("Type")
-
-
-class SourceReference(BaseModel):
-    Qualifier: Optional[PassThroughProp] = resourcereference("Qualifier")
-
-
-class EmbeddedConnectorProperties(BaseModel):
-    SourceReference: Optional[SourceReference]  #  TODO: add docs for SourceReference
-    Destination: ResourceReference = connector_properties("Destination")
-    Permissions: List[Literal["Read", "Write"]] = connector_properties("Permissions")
-
-
-class EmbeddedConnector(BaseModel):
-    Properties: EmbeddedConnectorProperties
-    DependsOn: Optional[PassThroughProp]
-    DeletionPolicy: Optional[PassThroughProp]
-    MetaData: Optional[PassThroughProp]
-    UpdatePolicy: Optional[PassThroughProp]
