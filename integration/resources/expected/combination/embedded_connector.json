@@ -16,7 +16,7 @@
     "ResourceType": "AWS::Lambda::Function"
   },
   {
-    "LogicalResourceId": "MyConnectorPolicy",
+    "LogicalResourceId": "TriggerFunctionMyConnectorPolicy",
     "ResourceType": "AWS::IAM::ManagedPolicy"
   }
 ]
