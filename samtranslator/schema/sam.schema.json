@@ -727,6 +727,68 @@
       "title": "DynamoDBEventProperties",
       "type": "object"
     },
+    "EmbeddedConnector": {
+      "additionalProperties": false,
+      "properties": {
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "MetaData": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Properties": {
+          "$ref": "#/definitions/EmbeddedConnectorProperties"
+        },
+        "UpdatePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Properties"
+      ],
+      "title": "EmbeddedConnector",
+      "type": "object"
+    },
+    "EmbeddedConnectorProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "Destination": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__schema__common__ResourceReference"
+            }
+          ],
+          "description": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Destination"
+        },
+        "Permissions": {
+          "description": "The permission type that the source resource is allowed to perform on the destination resource\\.  \n`Read` includes AWS Identity and Access Management \\(IAM\\) actions that allow reading data from the resource\\.  \n`Write` inclues IAM actions that allow initiating and writing data to a resource\\.  \n*Valid values*: `Read` or `Write`  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "items": {
+            "enum": [
+              "Read",
+              "Write"
+            ],
+            "type": "string"
+          },
+          "markdownDescription": "The permission type that the source resource is allowed to perform on the destination resource\\.  \n`Read` includes AWS Identity and Access Management \\(IAM\\) actions that allow reading data from the resource\\.  \n`Write` inclues IAM actions that allow initiating and writing data to a resource\\.  \n*Valid values*: `Read` or `Write`  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Permissions",
+          "type": "array"
+        },
+        "SourceReference": {
+          "$ref": "#/definitions/SourceReference"
+        }
+      },
+      "required": [
+        "Destination",
+        "Permissions"
+      ],
+      "title": "EmbeddedConnectorProperties",
+      "type": "object"
+    },
     "EndpointConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -2115,85 +2177,6 @@
       "title": "RequestParameters",
       "type": "object"
     },
-    "ResourceReference": {
-      "additionalProperties": false,
-      "properties": {
-        "Arn": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "description": "The ARN of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "The ARN of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "Arn"
-        },
-        "Id": {
-          "description": "The [logical ID](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html) of a resource in the same template\\.  \nWhen `Id` is specified, if the connector generates AWS Identity and Access Management \\(IAM\\) policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "The [logical ID](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html) of a resource in the same template\\.  \nWhen `Id` is specified, if the connector generates AWS Identity and Access Management \\(IAM\\) policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "Id",
-          "type": "string"
-        },
-        "Name": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "description": "The name of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "The name of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "Name"
-        },
-        "Qualifier": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "description": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "Qualifier"
-        },
-        "QueueUrl": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "description": "The Amazon SQS queue URL\\. This property only applies to Amazon SQS resources\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "The Amazon SQS queue URL\\. This property only applies to Amazon SQS resources\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "QueueUrl"
-        },
-        "ResourceId": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "description": "The ID of a resource\\. For example, the API Gateway API ID\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "The ID of a resource\\. For example, the API Gateway API ID\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "ResourceId"
-        },
-        "RoleName": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "description": "The role name associated with a resource\\.  \nWhen `Id` is specified, if the connector generates IAM policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "The role name associated with a resource\\.  \nWhen `Id` is specified, if the connector generates IAM policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "RoleName"
-        },
-        "Type": {
-          "description": "The AWS CloudFormation type of a resource\\. For more information, go to [AWS resource and property types reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html)\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "The AWS CloudFormation type of a resource\\. For more information, go to [AWS resource and property types reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html)\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "Type",
-          "type": "string"
-        }
-      },
-      "title": "ResourceReference",
-      "type": "object"
-    },
     "S3Event": {
       "additionalProperties": false,
       "properties": {
@@ -2658,6 +2641,23 @@
         "Topics"
       ],
       "title": "SelfManagedKafkaEventProperties",
+      "type": "object"
+    },
+    "SourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "Qualifier": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Qualifier"
+        }
+      },
+      "title": "SourceReference",
       "type": "object"
     },
     "SqsSubscription": {
@@ -3509,7 +3509,11 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Connectors": {
-          "$ref": "#/definitions/PassThroughProp"
+          "additionalProperties": {
+            "$ref": "#/definitions/EmbeddedConnector"
+          },
+          "title": "Connectors",
+          "type": "object"
         },
         "DeletionPolicy": {
           "$ref": "#/definitions/PassThroughProp"
@@ -3869,7 +3873,7 @@
         "Destination": {
           "allOf": [
             {
-              "$ref": "#/definitions/ResourceReference"
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_connector__ResourceReference"
             }
           ],
           "description": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3892,7 +3896,7 @@
         "Source": {
           "allOf": [
             {
-              "$ref": "#/definitions/ResourceReference"
+              "$ref": "#/definitions/samtranslator__schema__aws_serverless_connector__ResourceReference"
             }
           ],
           "description": "The source resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3927,6 +3931,85 @@
         "Properties"
       ],
       "title": "Resource",
+      "type": "object"
+    },
+    "samtranslator__schema__aws_serverless_connector__ResourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "Arn": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The ARN of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The ARN of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Arn"
+        },
+        "Id": {
+          "description": "The [logical ID](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html) of a resource in the same template\\.  \nWhen `Id` is specified, if the connector generates AWS Identity and Access Management \\(IAM\\) policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The [logical ID](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html) of a resource in the same template\\.  \nWhen `Id` is specified, if the connector generates AWS Identity and Access Management \\(IAM\\) policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Id",
+          "type": "string"
+        },
+        "Name": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The name of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The name of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Name"
+        },
+        "Qualifier": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Qualifier"
+        },
+        "QueueUrl": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The Amazon SQS queue URL\\. This property only applies to Amazon SQS resources\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The Amazon SQS queue URL\\. This property only applies to Amazon SQS resources\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "QueueUrl"
+        },
+        "ResourceId": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The ID of a resource\\. For example, the API Gateway API ID\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The ID of a resource\\. For example, the API Gateway API ID\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "ResourceId"
+        },
+        "RoleName": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The role name associated with a resource\\.  \nWhen `Id` is specified, if the connector generates IAM policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The role name associated with a resource\\.  \nWhen `Id` is specified, if the connector generates IAM policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "RoleName"
+        },
+        "Type": {
+          "description": "The AWS CloudFormation type of a resource\\. For more information, go to [AWS resource and property types reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html)\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The AWS CloudFormation type of a resource\\. For more information, go to [AWS resource and property types reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html)\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "title": "ResourceReference",
       "type": "object"
     },
     "samtranslator__schema__aws_serverless_function__ApiEvent": {
@@ -5009,7 +5092,11 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Connectors": {
-          "$ref": "#/definitions/PassThroughProp"
+          "additionalProperties": {
+            "$ref": "#/definitions/EmbeddedConnector"
+          },
+          "title": "Connectors",
+          "type": "object"
         },
         "DeletionPolicy": {
           "$ref": "#/definitions/PassThroughProp"
@@ -5841,7 +5928,11 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Connectors": {
-          "$ref": "#/definitions/PassThroughProp"
+          "additionalProperties": {
+            "$ref": "#/definitions/EmbeddedConnector"
+          },
+          "title": "Connectors",
+          "type": "object"
         },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
@@ -6103,7 +6194,11 @@
       "additionalProperties": false,
       "properties": {
         "Connectors": {
-          "$ref": "#/definitions/PassThroughProp"
+          "additionalProperties": {
+            "$ref": "#/definitions/EmbeddedConnector"
+          },
+          "title": "Connectors",
+          "type": "object"
         },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_simpletable__Properties"
@@ -6621,7 +6716,11 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Connectors": {
-          "$ref": "#/definitions/PassThroughProp"
+          "additionalProperties": {
+            "$ref": "#/definitions/EmbeddedConnector"
+          },
+          "title": "Connectors",
+          "type": "object"
         },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__Properties"
@@ -7039,6 +7138,85 @@
         }
       },
       "title": "ScheduleV2EventProperties",
+      "type": "object"
+    },
+    "samtranslator__schema__common__ResourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "Arn": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The ARN of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The ARN of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Arn"
+        },
+        "Id": {
+          "description": "The [logical ID](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html) of a resource in the same template\\.  \nWhen `Id` is specified, if the connector generates AWS Identity and Access Management \\(IAM\\) policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The [logical ID](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html) of a resource in the same template\\.  \nWhen `Id` is specified, if the connector generates AWS Identity and Access Management \\(IAM\\) policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Id",
+          "type": "string"
+        },
+        "Name": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The name of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The name of a resource\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Name"
+        },
+        "Qualifier": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Qualifier"
+        },
+        "QueueUrl": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The Amazon SQS queue URL\\. This property only applies to Amazon SQS resources\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The Amazon SQS queue URL\\. This property only applies to Amazon SQS resources\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "QueueUrl"
+        },
+        "ResourceId": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The ID of a resource\\. For example, the API Gateway API ID\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The ID of a resource\\. For example, the API Gateway API ID\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "ResourceId"
+        },
+        "RoleName": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The role name associated with a resource\\.  \nWhen `Id` is specified, if the connector generates IAM policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The role name associated with a resource\\.  \nWhen `Id` is specified, if the connector generates IAM policies, the IAM role associated to those policies will be inferred from the resource `Id`\\. When `Id` is not specified, provide `RoleName` of the resource for connectors to attach generated IAM policies to an IAM role\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "RoleName"
+        },
+        "Type": {
+          "description": "The AWS CloudFormation type of a resource\\. For more information, go to [AWS resource and property types reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html)\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The AWS CloudFormation type of a resource\\. For more information, go to [AWS resource and property types reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html)\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "title": "ResourceReference",
       "type": "object"
     }
   },

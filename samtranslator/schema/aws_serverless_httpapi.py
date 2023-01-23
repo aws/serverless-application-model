@@ -4,7 +4,14 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, DictStrAny
+from samtranslator.schema.common import (
+    PassThroughProp,
+    BaseModel,
+    SamIntrinsicable,
+    get_prop,
+    DictStrAny,
+    EmbeddedConnector,
+)
 
 oauth2authorizer = get_prop("sam-property-httpapi-oauth2authorizer")
 lambdauthorizeridentity = get_prop("sam-property-httpapi-lambdaauthorizationidentity")
@@ -136,4 +143,4 @@ class Resource(BaseModel):
     Properties: Optional[Properties]
     Metadata: Optional[PassThroughProp]
     Condition: Optional[PassThroughProp]
-    Connectors: Optional[PassThroughProp]
+    Connectors: Optional[Dict[str, EmbeddedConnector]]

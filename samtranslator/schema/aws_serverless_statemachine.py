@@ -4,7 +4,14 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, DictStrAny, get_prop
+from samtranslator.schema.common import (
+    PassThroughProp,
+    BaseModel,
+    SamIntrinsicable,
+    DictStrAny,
+    get_prop,
+    EmbeddedConnector,
+)
 
 properties = get_prop("sam-resource-statemachine")
 deadletterconfig = get_prop("sam-property-statemachine-statemachinedeadletterconfig")
@@ -165,4 +172,4 @@ class Resource(BaseModel):
     Type: Literal["AWS::Serverless::StateMachine"]
     Properties: Properties
     Condition: Optional[PassThroughProp]
-    Connectors: Optional[PassThroughProp]
+    Connectors: Optional[Dict[str, EmbeddedConnector]]
