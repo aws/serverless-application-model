@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Union, TypeVar
 from functools import partial
 
+from typing_extensions import TypedDict
+
 import pydantic
 from pydantic import Extra, Field
 
@@ -59,3 +61,8 @@ class BaseModel(LenientBaseModel):
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html
 class Ref(BaseModel):
     Ref: str
+
+
+class Tags(BaseModel):
+    Key: str
+    Value: str

@@ -79,6 +79,7 @@ from samtranslator.model.sns import SNSTopic, SNSTopicPolicy
 from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
+from samtranslator.model.appsync import GraphQLApi, Auth
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.schema.common import PassThrough
 from samtranslator.validator.value_validator import sam_expect
@@ -2064,3 +2065,35 @@ class SamConnector(SamResourceMacro):
             except KeyError:
                 original_metadata = {}
             resource.set_resource_attribute("Metadata", {**original_metadata, **metadata})
+
+
+class SamGraphQLApi(SamResourceMacro):
+    """SAM GraphQL API Macro (WIP)."""
+
+    resource_type = "AWS::Serverless::GraphQLApi"
+    property_types = {
+        "Name": PropertyType(False, IS_STR),
+        "Tags": PropertyType(False, list_of(IS_DICT)),
+        "XrayEnabled": PropertyType(False, is_type(bool)),
+        "Auth": PropertyType(True, IS_DICT),
+    }
+
+    Auth: Auth
+    Tags: Optional[PassThrough]
+    XrayEnabled: Optional[PassThrough]
+    Name: Optional[str]
+
+    @cw_timer
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:  # type: ignore
+        appsync_api = self._construct_appsync_api()
+        resources: List[Resource] = [appsync_api]
+
+        return resources
+
+    def _construct_appsync_api(self) -> GraphQLApi:
+        api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
+        api.Name = self.Name if self.Name else self.logical_id
+        api.Tags = self.Tags
+        api.XrayEnabled = self.XrayEnabled
+        api.AuthenticationType = self.Auth["Type"]
+        return api

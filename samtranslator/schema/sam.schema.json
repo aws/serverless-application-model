@@ -2722,6 +2722,25 @@
       "title": "SqsSubscription",
       "type": "object"
     },
+    "Tags": {
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "Value": {
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "title": "Tags",
+      "type": "object"
+    },
     "UsagePlan": {
       "additionalProperties": false,
       "properties": {
@@ -5440,6 +5459,69 @@
       "title": "ScheduleV2EventProperties",
       "type": "object"
     },
+    "samtranslator__schema__aws_serverless_graphqlapi__Auth": {
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "title": "Auth",
+      "type": "object"
+    },
+    "samtranslator__schema__aws_serverless_graphqlapi__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "Auth": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_graphqlapi__Auth"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "Tags": {
+          "items": {
+            "$ref": "#/definitions/Tags"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "XrayEnabled": {
+          "title": "Xrayenabled",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "Auth"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "samtranslator__schema__aws_serverless_graphqlapi__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__schema__aws_serverless_graphqlapi__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::GraphQLApi"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
     "samtranslator__schema__aws_serverless_httpapi__Auth": {
       "additionalProperties": false,
       "properties": {
@@ -7066,6 +7148,9 @@
           },
           {
             "$ref": "#/definitions/samtranslator__schema__any_cfn_resource__Resource"
+          },
+          {
+            "$ref": "#/definitions/samtranslator__schema__aws_serverless_graphqlapi__Resource"
           }
         ]
       },

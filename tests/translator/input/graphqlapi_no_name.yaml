@@ -1,0 +1,13 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+      - Key: key1
+        Value: value1
+      - Key: key2
+        Value: value2

@@ -19,6 +19,7 @@ from samtranslator.schema import (
     aws_serverless_layerversion,
     aws_serverless_api,
     aws_serverless_httpapi,
+    aws_serverless_graphqlapi,
     any_cfn_resource,
 )
 
@@ -53,6 +54,7 @@ class SamModel(_ModelWithoutResources):
             Resources,
             # Ignore resources that are not AWS::Serverless::*
             any_cfn_resource.Resource,
+            aws_serverless_graphqlapi.Resource,
         ],
     ]
 
