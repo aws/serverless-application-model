@@ -1,7 +1,8 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Union, TypeVar, List, Literal
+from typing import Any, Dict, Optional, Union, TypeVar, List
+from typing_extensions import Literal
 from functools import partial
 
 import pydantic
