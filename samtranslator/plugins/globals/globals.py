@@ -49,6 +49,7 @@ class Globals:
             "SnapStart",
             "EphemeralStorage",
             "FunctionUrlConfig",
+            "RuntimeManagementConfig",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
@@ -88,7 +89,7 @@ class Globals:
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {
-        SamResourceType.Function.value: [],
+        SamResourceType.Function.value: ["RuntimeManagementConfig"],
     }
 
     def __init__(self, template):  # type: ignore[no-untyped-def]
