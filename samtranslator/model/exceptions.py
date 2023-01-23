@@ -48,13 +48,13 @@ class DuplicateLogicalIdException(ExceptionWithMessage):
         message -- explanation of the error
     """
 
-    def __init__(self, logical_id: str, duplicate_id: str, type: str) -> None:
+    def __init__(self, logical_id: str, duplicate_id: str, resource_type: str) -> None:
         self._logical_id = logical_id
         self._duplicate_id = duplicate_id
-        self._type = type
+        self._type = resource_type
 
     @property
-    def message(self):  # type: ignore[no-untyped-def]
+    def message(self) -> str:
         return (
             "Transforming resource with id [{logical_id}] attempts to create a new"
             ' resource with id [{duplicate_id}] and type "{type}". A resource with that id already'
@@ -102,21 +102,40 @@ class InvalidResourcePropertyTypeException(InvalidResourceException):
     def __init__(
         self,
         logical_id: str,
-        property_identifier: str,
+        key_path: str,
         expected_type: Optional[ExpectedType],
         message: Optional[str] = None,
     ) -> None:
-        message = message or self._default_message(property_identifier, expected_type)
+        message = message or self._default_message(key_path, expected_type)
         super().__init__(logical_id, message)
 
-        self.property_identifier = property_identifier
+        self.key_path = key_path
 
     @staticmethod
-    def _default_message(property_identifier: str, expected_type: Optional[ExpectedType]) -> str:
+    def _default_message(key_path: str, expected_type: Optional[ExpectedType]) -> str:
         if expected_type:
             type_description, _ = expected_type.value
-            return f"Property '{property_identifier}' should be a {type_description}."
-        return f"Type of property '{property_identifier}' is invalid."
+            return f"Property '{key_path}' should be a {type_description}."
+        return f"Type of property '{key_path}' is invalid."
+
+
+class InvalidResourceAttributeTypeException(InvalidResourceException):
+    def __init__(
+        self,
+        logical_id: str,
+        key_path: str,
+        expected_type: Optional[ExpectedType],
+        message: Optional[str] = None,
+    ) -> None:
+        message = message or self._default_message(logical_id, key_path, expected_type)
+        super().__init__(logical_id, message)
+
+    @staticmethod
+    def _default_message(logical_id: str, key_path: str, expected_type: Optional[ExpectedType]) -> str:
+        if expected_type:
+            type_description, _ = expected_type.value
+            return f"Attribute '{key_path}' should be a {type_description}."
+        return f"Type of attribute '{key_path}' is invalid."
 
 
 class InvalidEventException(ExceptionWithMessage):

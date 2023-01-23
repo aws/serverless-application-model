@@ -25,9 +25,10 @@ black:
 
 black-check:
 	# Checking latest schema was generated (run `make schema` if this fails)
-	python samtranslator/schema/schema.py > .tmp_schema.json
-	diff -u samtranslator/schema/schema.json .tmp_schema.json
-	rm .tmp_schema.json
+	mkdir -p .tmp
+	python samtranslator/schema/schema.py --sam-schema .tmp/sam.schema.json --cfn-schema samtranslator/schema/cloudformation.schema.json --unified-schema .tmp/schema.json
+	diff -u samtranslator/schema/sam.schema.json .tmp/sam.schema.json
+	diff -u samtranslator/schema/schema.json .tmp/schema.json
 	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
 	bin/json-format.py --check tests integration samtranslator/policy_templates_data
 	bin/yaml-format.py --check tests
@@ -44,14 +45,20 @@ lint:
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
 
+update-cfn-schema:
+	curl -o samtranslator/schema/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
+
 schema:
-	python samtranslator/schema/schema.py > samtranslator/schema/schema.json
+	python samtranslator/schema/schema.py --sam-schema samtranslator/schema/sam.schema.json --cfn-schema samtranslator/schema/cloudformation.schema.json --unified-schema samtranslator/schema/schema.json
 
 # Command to run everytime you make changes to verify everything works
 dev: test
 
 # Verifications to run before sending a pull request
 pr: black-check lint init dev
+
+clean:
+	rm -r .tmp
 
 define HELP_MESSAGE
 

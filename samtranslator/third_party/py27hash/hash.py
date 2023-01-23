@@ -24,7 +24,7 @@ def hash27(value):  # type: ignore[no-untyped-def]
     return Hash.hash(value)
 
 
-class Hash(object):
+class Hash:
     """
     Various hashing methods using Python 2.7's algorithms
     """

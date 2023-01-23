@@ -1,10 +1,9 @@
 import hashlib
 import json
-import sys
 from typing import Any, Optional
 
 
-class LogicalIdGenerator(object):
+class LogicalIdGenerator:
 
     # NOTE: Changing the length of the hash will change backwards compatibility. This will break the stability contract
     #       given by this class
@@ -21,7 +20,7 @@ class LogicalIdGenerator(object):
 
         data_str = ""
         if data_obj:
-            data_str = self._stringify(data_obj)  # type: ignore[no-untyped-call]
+            data_str = self._stringify(data_obj)
 
         self._prefix = prefix
         self.data_str = data_str
@@ -45,10 +44,10 @@ class LogicalIdGenerator(object):
         :rtype string
         """
 
-        data_hash = self.get_hash()  # type: ignore[no-untyped-call]
+        data_hash = self.get_hash()
         return "{prefix}{hash}".format(prefix=self._prefix, hash=data_hash)
 
-    def get_hash(self, length=HASH_LENGTH):  # type: ignore[no-untyped-def]
+    def get_hash(self, length: int = HASH_LENGTH) -> str:
         """
         Generate and return a hash of data that can be used as suffix of logicalId
 
@@ -63,20 +62,12 @@ class LogicalIdGenerator(object):
         if not self.data_str:
             return data_hash
 
-        encoded_data_str = self.data_str
-        if sys.version_info.major == 2:
-            # In Py2, only unicode needs to be encoded.
-            if isinstance(self.data_str, unicode):  # type: ignore[name-defined] # pylint: disable=E0602
-                encoded_data_str = self.data_str.encode("utf-8")
-        else:
-            # data_str should always be unicode on python 3
-            encoded_data_str = self.data_str.encode("utf-8")  # type: ignore[assignment]
-
-        data_hash = hashlib.sha1(encoded_data_str).hexdigest()  # type: ignore[arg-type]
+        encoded_data_str = self.data_str.encode("utf-8")
+        data_hash = hashlib.sha1(encoded_data_str).hexdigest()
 
         return data_hash[:length]
 
-    def _stringify(self, data):  # type: ignore[no-untyped-def]
+    def _stringify(self, data: Any) -> str:
         """
         Stable, platform & language-independent stringification of a data with basic Python type.
 
