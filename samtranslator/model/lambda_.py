@@ -114,6 +114,7 @@ class LambdaEventSourceMapping(Resource):
         "FilterCriteria": PropertyType(False, IS_DICT),
         "AmazonManagedKafkaEventSourceConfig": PropertyType(False, IS_DICT),
         "SelfManagedKafkaEventSourceConfig": PropertyType(False, IS_DICT),
+        "ScalingConfig": PropertyType(False, IS_DICT),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}

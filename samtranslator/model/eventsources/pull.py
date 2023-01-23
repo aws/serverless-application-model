@@ -54,6 +54,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         "KafkaBootstrapServers": PropertyType(False, is_type(list)),
         "FilterCriteria": PropertyType(False, IS_DICT),
         "ConsumerGroupId": PropertyType(False, IS_STR),
+        "ScalingConfig": PropertyType(False, IS_DICT),
     }
 
     BatchSize: Optional[Intrinsicable[int]]
@@ -75,6 +76,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     KafkaBootstrapServers: Optional[List[Any]]
     FilterCriteria: Optional[Dict[str, Any]]
     ConsumerGroupId: Optional[Intrinsicable[str]]
+    ScalingConfig: Optional[Dict[str, Any]]
 
     @abstractmethod
     def get_policy_arn(self) -> Optional[str]:
@@ -132,6 +134,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds
         lambda_eventsourcemapping.FunctionResponseTypes = self.FunctionResponseTypes
         lambda_eventsourcemapping.FilterCriteria = self.FilterCriteria
+        lambda_eventsourcemapping.ScalingConfig = self.ScalingConfig
         self._validate_filter_criteria()  # type: ignore[no-untyped-call]
 
         if self.KafkaBootstrapServers:
