@@ -73,6 +73,7 @@ Currently, the following resources and properties are being supported:
       EventInvokeConfig:
       Architectures:
       EphemeralStorage:
+      RuntimeManagementConfig:
 
     Api:
       # Properties of AWS::Serverless::Api

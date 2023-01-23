@@ -31,6 +31,7 @@ class LambdaFunction(Resource):
         "Architectures": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
         "SnapStart": PropertyType(False, IS_DICT),
         "EphemeralStorage": PropertyType(False, IS_DICT),
+        "RuntimeManagementConfig": PropertyType(False, IS_DICT),
     }
 
     Code: Dict[str, Any]
@@ -56,6 +57,7 @@ class LambdaFunction(Resource):
     Architectures: Optional[List[Any]]
     SnapStart: Optional[Dict[str, Any]]
     EphemeralStorage: Optional[Dict[str, Any]]
+    RuntimeManagementConfig: Optional[Dict[str, Any]]
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
@@ -66,6 +68,7 @@ class LambdaVersion(Resource):
         "CodeSha256": PropertyType(False, IS_STR),
         "Description": PropertyType(False, IS_STR),
         "FunctionName": PropertyType(True, one_of(IS_STR, IS_DICT)),
+        "RuntimeManagementConfig": PropertyType(False, IS_DICT),
     }
 
     runtime_attrs = {

@@ -115,6 +115,8 @@ ignore_templates:
   - tests/translator/output/**/state_machine_with_event_schedule_state.json
   - tests/translator/output/**/state_machine_with_schedule.json
   - tests/translator/output/**/state_machine_with_schedule_dlq_retry_policy.json
+  - tests/translator/output/**/globals_for_function.json  # RuntimeManagementConfig
+  - tests/translator/output/**/function_with_runtime_config.json  # RuntimeManagementConfig
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
   - W2531 # EOL runtime; not relevant for transform tests
