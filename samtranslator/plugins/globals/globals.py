@@ -1,4 +1,4 @@
-﻿from typing import Dict, List
+from typing import Dict, List
 
 from samtranslator.model.exceptions import ExceptionWithMessage
 from samtranslator.public.sdk.resource import SamResourceType
@@ -49,6 +49,7 @@ class Globals(object):
             "SnapStart",
             "EphemeralStorage",
             "FunctionUrlConfig",
+            "RuntimeManagementConfig",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
@@ -88,7 +89,7 @@ class Globals(object):
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {
-        SamResourceType.Function.value: [],
+        SamResourceType.Function.value: ["RuntimeManagementConfig"],
     }
 
     def __init__(self, template):  # type: ignore[no-untyped-def]
