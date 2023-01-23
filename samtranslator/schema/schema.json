@@ -532,6 +532,9 @@
         },
         "SnapStart": {
           "title": "Snapstart"
+        },
+        "RuntimeManagementConfig": {
+          "title": "Runtimemanagementconfig"
         }
       },
       "additionalProperties": false
@@ -4001,6 +4004,9 @@
         },
         "SnapStart": {
           "title": "Snapstart"
+        },
+        "RuntimeManagementConfig": {
+          "title": "Runtimemanagementconfig"
         },
         "Tags": {
           "title": "Tags",
