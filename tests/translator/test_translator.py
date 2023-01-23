@@ -62,12 +62,8 @@ def deep_sort_lists(value):
     if isinstance(value, dict):
         return {k: deep_sort_lists(v) for k, v in value.items()}
     if isinstance(value, list):
-        if sys.version_info.major < 3:
-            # Py2 can sort lists with complex types like dictionaries
-            return sorted((deep_sort_lists(x) for x in value))
-        else:
-            # Py3 cannot sort lists with complex types. Hence a custom comparator function
-            return sorted((deep_sort_lists(x) for x in value), key=cmp_to_key(custom_list_data_comparator))
+        # Py3 cannot sort lists with complex types. Hence a custom comparator function
+        return sorted((deep_sort_lists(x) for x in value), key=cmp_to_key(custom_list_data_comparator))
     else:
         return value
 
@@ -272,10 +268,11 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
     )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success(self, testcase, partition_with_region):
+    @patch("samtranslator.translator.arn_generator._get_region_from_session")
+    def test_transform_success(self, testcase, partition_with_region, mock_get_region_from_session):
         partition = partition_with_region[0]
         region = partition_with_region[1]
+        mock_get_region_from_session.return_value = region
 
         manifest = self._read_input(testcase)
         expected = self._read_expected_output(testcase, partition)
@@ -342,10 +339,11 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
     )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success_openapi3(self, testcase, partition_with_region):
+    @patch("samtranslator.translator.arn_generator._get_region_from_session")
+    def test_transform_success_openapi3(self, testcase, partition_with_region, mock_get_region_from_session):
         partition = partition_with_region[0]
         region = partition_with_region[1]
+        mock_get_region_from_session.return_value = region
 
         manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
@@ -397,10 +395,11 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
     )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success_resource_policy(self, testcase, partition_with_region):
+    @patch("samtranslator.translator.arn_generator._get_region_from_session")
+    def test_transform_success_resource_policy(self, testcase, partition_with_region, mock_get_region_from_session):
         partition = partition_with_region[0]
         region = partition_with_region[1]
+        mock_get_region_from_session.return_value = region
 
         manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
@@ -445,8 +444,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
     )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success_no_side_effect(self, testcase, partition_with_region):
+    @patch("samtranslator.translator.arn_generator._get_region_from_session")
+    def test_transform_success_no_side_effect(self, testcase, partition_with_region, mock_get_region_from_session):
         """
         Tests that the transform does not leak/leave data in shared caches/lists between executions
         Performs the transform of the templates in a row without reinitialization
@@ -461,6 +460,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         """
         partition = partition_with_region[0]
         region = partition_with_region[1]
+        mock_get_region_from_session.return_value = region
 
         for template in testcase[1]:
             print(template, partition, region)
@@ -769,6 +769,14 @@ class TestTemplateValidation(TestCase):
         self.assertEqual(expected, actual)
 
 
+class _SomethingPlugin(BasePlugin):
+    pass
+
+
+class _CustomPlugin(BasePlugin):
+    pass
+
+
 class TestPluginsUsage(TestCase):
     # Tests if plugins are properly injected into the translator
 
@@ -777,7 +785,7 @@ class TestPluginsUsage(TestCase):
     def test_prepare_plugins_must_add_required_plugins(self, make_policy_template_for_function_plugin_mock):
 
         # This is currently the only required plugin
-        plugin_instance = BasePlugin("something")
+        plugin_instance = _SomethingPlugin()
         make_policy_template_for_function_plugin_mock.return_value = plugin_instance
 
         sam_plugins = prepare_plugins([])
@@ -787,10 +795,10 @@ class TestPluginsUsage(TestCase):
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_prepare_plugins_must_merge_input_plugins(self, make_policy_template_for_function_plugin_mock):
 
-        required_plugin = BasePlugin("something")
+        required_plugin = _SomethingPlugin()
         make_policy_template_for_function_plugin_mock.return_value = required_plugin
 
-        custom_plugin = BasePlugin("someplugin")
+        custom_plugin = _CustomPlugin()
         sam_plugins = prepare_plugins([custom_plugin])
         self.assertEqual(7, len(sam_plugins))
 

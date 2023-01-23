@@ -1,4 +1,5 @@
 import copy
+from typing import TYPE_CHECKING
 
 from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
@@ -49,7 +50,7 @@ class Translator:
         self.feature_toggle = None
         self.boto_session = boto_session
         self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())  # type: ignore[no-untyped-call, no-untyped-call]
-        MetricsMethodWrapperSingleton.set_instance(self.metrics)  # type: ignore[no-untyped-call]
+        MetricsMethodWrapperSingleton.set_instance(self.metrics)
         self._translated_resouce_mapping = {}
 
         if self.boto_session:
@@ -185,15 +186,15 @@ class Translator:
             except (InvalidResourceException, InvalidEventException, InvalidTemplateException) as e:
                 document_errors.append(e)  # type: ignore[arg-type]
 
-        if deployment_preference_collection.any_enabled():  # type: ignore[no-untyped-call]
-            template["Resources"].update(deployment_preference_collection.get_codedeploy_application().to_dict())  # type: ignore[no-untyped-call]
+        if deployment_preference_collection.any_enabled():
+            template["Resources"].update(deployment_preference_collection.get_codedeploy_application().to_dict())
             if deployment_preference_collection.needs_resource_condition():
                 new_conditions = deployment_preference_collection.create_aggregate_deployment_condition()
                 if new_conditions:
                     template.get("Conditions", {}).update(new_conditions)
 
-            if not deployment_preference_collection.can_skip_service_role():  # type: ignore[no-untyped-call]
-                template["Resources"].update(deployment_preference_collection.get_codedeploy_iam_role().to_dict())  # type: ignore[no-untyped-call]
+            if not deployment_preference_collection.can_skip_service_role():
+                template["Resources"].update(deployment_preference_collection.get_codedeploy_iam_role().to_dict())
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
                 try:
@@ -282,8 +283,8 @@ def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = N
         parameters = {}
     required_plugins = [
         DefaultDefinitionBodyPlugin(),
-        make_implicit_rest_api_plugin(),  # type: ignore[no-untyped-call]
-        make_implicit_http_api_plugin(),  # type: ignore[no-untyped-call]
+        make_implicit_rest_api_plugin(),
+        make_implicit_http_api_plugin(),
         GlobalsPlugin(),
         make_policy_template_for_function_plugin(),
     ]
@@ -299,14 +300,19 @@ def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = N
     return SamPlugins(plugins + required_plugins)
 
 
-def make_implicit_rest_api_plugin():  # type: ignore[no-untyped-def]
+if TYPE_CHECKING:
+    from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin
+    from samtranslator.plugins.api.implicit_http_api_plugin import ImplicitHttpApiPlugin
+
+
+def make_implicit_rest_api_plugin() -> "ImplicitRestApiPlugin":
     # This is necessary to prevent a circular dependency on imports when loading package
     from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin
 
     return ImplicitRestApiPlugin()
 
 
-def make_implicit_http_api_plugin():  # type: ignore[no-untyped-def]
+def make_implicit_http_api_plugin() -> "ImplicitHttpApiPlugin":
     # This is necessary to prevent a circular dependency on imports when loading package
     from samtranslator.plugins.api.implicit_http_api_plugin import ImplicitHttpApiPlugin
 

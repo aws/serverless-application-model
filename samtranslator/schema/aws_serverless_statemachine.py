@@ -4,7 +4,7 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, DictStrAny, get_prop
+from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, DictStrAny, get_prop
 
 properties = get_prop("sam-resource-statemachine")
 deadletterconfig = get_prop("sam-property-statemachine-statemachinedeadletterconfig")
@@ -20,24 +20,24 @@ event = get_prop("sam-property-statemachine-statemachineeventsource")
 
 
 class DeadLetterConfig(BaseModel):
-    Arn: Optional[PassThrough] = deadletterconfig("Arn")
+    Arn: Optional[PassThroughProp] = deadletterconfig("Arn")
     QueueLogicalId: Optional[str] = deadletterconfig("QueueLogicalId")
     Type: Optional[Literal["SQS"]] = deadletterconfig("Type")
 
 
 class ScheduleTarget(BaseModel):
-    Id: PassThrough  # TODO: Add docs
+    Id: PassThroughProp  # TODO: Add docs
 
 
 class ScheduleEventProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig] = scheduleeventproperties("DeadLetterConfig")
-    Description: Optional[PassThrough] = scheduleeventproperties("Description")
+    Description: Optional[PassThroughProp] = scheduleeventproperties("Description")
     Enabled: Optional[bool] = scheduleeventproperties("Enabled")
-    Input: Optional[PassThrough] = scheduleeventproperties("Input")
-    Name: Optional[PassThrough] = scheduleeventproperties("Name")
-    RetryPolicy: Optional[PassThrough] = scheduleeventproperties("RetryPolicy")
-    Schedule: Optional[PassThrough] = scheduleeventproperties("Schedule")
-    State: Optional[PassThrough] = scheduleeventproperties("State")
+    Input: Optional[PassThroughProp] = scheduleeventproperties("Input")
+    Name: Optional[PassThroughProp] = scheduleeventproperties("Name")
+    RetryPolicy: Optional[PassThroughProp] = scheduleeventproperties("RetryPolicy")
+    Schedule: Optional[PassThroughProp] = scheduleeventproperties("Schedule")
+    State: Optional[PassThroughProp] = scheduleeventproperties("State")
     Target: Optional[ScheduleTarget]  # TODO: Add docs
 
 
@@ -48,20 +48,20 @@ class ScheduleEvent(BaseModel):
 
 class ScheduleV2EventProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig] = scheduleeventv2properties("DeadLetterConfig")
-    Description: Optional[PassThrough] = scheduleeventv2properties("Description")
-    EndDate: Optional[PassThrough] = scheduleeventv2properties("EndDate")
-    FlexibleTimeWindow: Optional[PassThrough] = scheduleeventv2properties("FlexibleTimeWindow")
-    GroupName: Optional[PassThrough] = scheduleeventv2properties("GroupName")
-    Input: Optional[PassThrough] = scheduleeventv2properties("Input")
-    KmsKeyArn: Optional[PassThrough] = scheduleeventv2properties("KmsKeyArn")
-    Name: Optional[PassThrough] = scheduleeventv2properties("Name")
-    PermissionsBoundary: Optional[PassThrough] = scheduleeventv2properties("PermissionsBoundary")
-    RetryPolicy: Optional[PassThrough] = scheduleeventv2properties("RetryPolicy")
-    RoleArn: Optional[PassThrough]  # TODO: Add to docs
-    ScheduleExpression: Optional[PassThrough] = scheduleeventv2properties("ScheduleExpression")
-    ScheduleExpressionTimezone: Optional[PassThrough] = scheduleeventv2properties("ScheduleExpressionTimezone")
-    StartDate: Optional[PassThrough] = scheduleeventv2properties("StartDate")
-    State: Optional[PassThrough] = scheduleeventv2properties("State")
+    Description: Optional[PassThroughProp] = scheduleeventv2properties("Description")
+    EndDate: Optional[PassThroughProp] = scheduleeventv2properties("EndDate")
+    FlexibleTimeWindow: Optional[PassThroughProp] = scheduleeventv2properties("FlexibleTimeWindow")
+    GroupName: Optional[PassThroughProp] = scheduleeventv2properties("GroupName")
+    Input: Optional[PassThroughProp] = scheduleeventv2properties("Input")
+    KmsKeyArn: Optional[PassThroughProp] = scheduleeventv2properties("KmsKeyArn")
+    Name: Optional[PassThroughProp] = scheduleeventv2properties("Name")
+    PermissionsBoundary: Optional[PassThroughProp] = scheduleeventv2properties("PermissionsBoundary")
+    RetryPolicy: Optional[PassThroughProp] = scheduleeventv2properties("RetryPolicy")
+    RoleArn: Optional[PassThroughProp] = scheduleeventv2properties("RoleArn")
+    ScheduleExpression: Optional[PassThroughProp] = scheduleeventv2properties("ScheduleExpression")
+    ScheduleExpressionTimezone: Optional[PassThroughProp] = scheduleeventv2properties("ScheduleExpressionTimezone")
+    StartDate: Optional[PassThroughProp] = scheduleeventv2properties("StartDate")
+    State: Optional[PassThroughProp] = scheduleeventv2properties("State")
 
 
 class ScheduleV2Event(BaseModel):
@@ -84,10 +84,10 @@ class ResourcePolicy(BaseModel):
 
 
 class CloudWatchEventProperties(BaseModel):
-    EventBusName: Optional[PassThrough] = cloudwatcheventproperties("EventBusName")
-    Input: Optional[PassThrough] = cloudwatcheventproperties("Input")
-    InputPath: Optional[PassThrough] = cloudwatcheventproperties("InputPath")
-    Pattern: Optional[PassThrough] = cloudwatcheventproperties("Pattern")
+    EventBusName: Optional[PassThroughProp] = cloudwatcheventproperties("EventBusName")
+    Input: Optional[PassThroughProp] = cloudwatcheventproperties("Input")
+    InputPath: Optional[PassThroughProp] = cloudwatcheventproperties("InputPath")
+    Pattern: Optional[PassThroughProp] = cloudwatcheventproperties("Pattern")
 
 
 class CloudWatchEvent(BaseModel):
@@ -96,16 +96,16 @@ class CloudWatchEvent(BaseModel):
 
 
 class EventBridgeRuleTarget(BaseModel):
-    Id: PassThrough  # TODO: Add docs
+    Id: PassThroughProp  # TODO: Add docs
 
 
 class EventBridgeRuleEventProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig] = eventbridgeruleeventproperties("DeadLetterConfig")
-    EventBusName: Optional[PassThrough] = eventbridgeruleeventproperties("EventBusName")
-    Input: Optional[PassThrough] = eventbridgeruleeventproperties("Input")
-    InputPath: Optional[PassThrough] = eventbridgeruleeventproperties("InputPath")
-    Pattern: Optional[PassThrough] = eventbridgeruleeventproperties("Pattern")
-    RetryPolicy: Optional[PassThrough] = eventbridgeruleeventproperties("RetryPolicy")
+    EventBusName: Optional[PassThroughProp] = eventbridgeruleeventproperties("EventBusName")
+    Input: Optional[PassThroughProp] = eventbridgeruleeventproperties("Input")
+    InputPath: Optional[PassThroughProp] = eventbridgeruleeventproperties("InputPath")
+    Pattern: Optional[PassThroughProp] = eventbridgeruleeventproperties("Pattern")
+    RetryPolicy: Optional[PassThroughProp] = eventbridgeruleeventproperties("RetryPolicy")
     Target: Optional[EventBridgeRuleTarget]  # TODO: Add docs
 
 
@@ -137,7 +137,7 @@ class ApiEvent(BaseModel):
 class Properties(BaseModel):
     Definition: Optional[DictStrAny] = properties("Definition")
     DefinitionSubstitutions: Optional[DictStrAny] = properties("DefinitionSubstitutions")
-    DefinitionUri: Optional[Union[str, PassThrough]] = properties("DefinitionUri")
+    DefinitionUri: Optional[Union[str, PassThroughProp]] = properties("DefinitionUri")
     Events: Optional[
         Dict[
             str,
@@ -150,18 +150,18 @@ class Properties(BaseModel):
             ],
         ]
     ] = properties("Events")
-    Logging: Optional[PassThrough] = properties("Logging")
-    Name: Optional[PassThrough] = properties("Name")
-    PermissionsBoundary: Optional[PassThrough] = properties("PermissionsBoundary")
+    Logging: Optional[PassThroughProp] = properties("Logging")
+    Name: Optional[PassThroughProp] = properties("Name")
+    PermissionsBoundary: Optional[PassThroughProp] = properties("PermissionsBoundary")
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = properties("Policies")
-    Role: Optional[PassThrough] = properties("Role")
-    RolePath: Optional[PassThrough]  # TODO: Add docs
+    Role: Optional[PassThroughProp] = properties("Role")
+    RolePath: Optional[PassThroughProp]  # TODO: Add docs
     Tags: Optional[DictStrAny] = properties("Tags")
-    Tracing: Optional[PassThrough] = properties("Tracing")
-    Type: Optional[PassThrough] = properties("Type")
+    Tracing: Optional[PassThroughProp] = properties("Tracing")
+    Type: Optional[PassThroughProp] = properties("Type")
 
 
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::StateMachine"]
     Properties: Properties
-    Condition: Optional[PassThrough]
+    Condition: Optional[PassThroughProp]

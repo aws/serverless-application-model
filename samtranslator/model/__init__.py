@@ -1,8 +1,9 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
 import re
 import inspect
-from typing import Any, Callable, Dict, List, Optional, Union
-
+from abc import ABC
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from abc import ABCMeta
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
 from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
@@ -10,7 +11,7 @@ from samtranslator.plugins import LifeCycleEvents
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 
-class PropertyType(object):
+class PropertyType:
     """Stores validation information for a CloudFormation resource property.
 
     The attribute "expected_type" is only used by InvalidResourcePropertyTypeException
@@ -64,7 +65,7 @@ class PassThroughProperty(PropertyType):
         super().__init__(required, any_type(), False)
 
 
-class Resource(object):
+class Resource(ABC):
     """A Resource object represents an abstract entity that contains a Type and a Properties object. They map well to
     CloudFormation resources as well sub-types like AWS::Lambda::Function or `Events` section of
     AWS::Serverless::Function.
@@ -138,7 +139,7 @@ class Resource(object):
         return tuple(cls._supported_resource_attributes)
 
     @classmethod
-    def get_pass_through_attributes(cls):  # type: ignore[no-untyped-def]
+    def get_pass_through_attributes(cls) -> Tuple[str, ...]:
         """
         A getter method for the resource attributes to be passed to auto-generated resources
         returns: a tuple that contains the name of all pass through attributes
@@ -254,11 +255,11 @@ class Resource(object):
         """
         self.validate_properties()
 
-        resource_dict = self._generate_resource_dict()  # type: ignore[no-untyped-call]
+        resource_dict = self._generate_resource_dict()
 
         return {self.logical_id: resource_dict}
 
-    def _generate_resource_dict(self):  # type: ignore[no-untyped-def]
+    def _generate_resource_dict(self) -> Dict[str, Any]:
         """Generates the resource dict for this Resource, the value associated with the logical id in a CloudFormation
         template's Resources section.
 
@@ -291,7 +292,7 @@ class Resource(object):
         :raises InvalidResourceException: if an invalid property is provided
         """
         if name in self._keywords or name in self.property_types.keys():
-            return super(Resource, self).__setattr__(name, value)
+            return super().__setattr__(name, value)
 
         raise InvalidResourceException(
             self.logical_id,
@@ -336,7 +337,7 @@ class Resource(object):
         """
 
         if attr not in self._supported_resource_attributes:
-            raise KeyError("Unsupported resource attribute specified: %s" % attr)
+            raise KeyError(f"Unsupported resource attribute specified: {attr}")
 
         self.resource_attributes[attr] = value
 
@@ -347,7 +348,7 @@ class Resource(object):
         :return: Value of the attribute, if set in the resource. None otherwise
         """
         if attr not in self.resource_attributes:
-            raise KeyError("%s is not in resource attributes" % attr)
+            raise KeyError(f"{attr} is not in resource attributes")
 
         return self.resource_attributes[attr]
 
@@ -370,10 +371,10 @@ class Resource(object):
 
         :return: Dictionary that will resolve to value of the attribute when CloudFormation stack update is executed
         """
+        if attr_name not in self.runtime_attrs:
+            raise KeyError(f"{attr_name} attribute is not supported for resource {self.resource_type}")
 
-        if attr_name in self.runtime_attrs:
-            return self.runtime_attrs[attr_name](self)
-        raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
+        return self.runtime_attrs[attr_name](self)
 
     def get_passthrough_resource_attributes(self) -> Dict[str, Any]:
         """
@@ -383,13 +384,13 @@ class Resource(object):
         :return: Dictionary of resource attributes.
         """
         attributes = {}
-        for resource_attribute in self.get_pass_through_attributes():  # type: ignore[no-untyped-call]
+        for resource_attribute in self.get_pass_through_attributes():
             if resource_attribute in self.resource_attributes:
                 attributes[resource_attribute] = self.resource_attributes.get(resource_attribute)
         return attributes
 
 
-class ResourceMacro(Resource):
+class ResourceMacro(Resource, metaclass=ABCMeta):
     """A ResourceMacro object represents a CloudFormation macro. A macro appears in the CloudFormation template in the
     "Resources" mapping, but must be expanded into one or more vanilla CloudFormation resources before a stack can be
     created from it.
@@ -416,10 +417,9 @@ class ResourceMacro(Resource):
         :param dict kwargs
         :returns: a list of vanilla CloudFormation Resource instances, to which this macro expands
         """
-        raise NotImplementedError("Method to_cloudformation() must be implemented in a subclass of ResourceMacro")
 
 
-class SamResourceMacro(ResourceMacro):
+class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
     """ResourceMacro that specifically refers to SAM (AWS::Serverless::*) resources."""
 
     # SAM resources can provide a list of properties that they expose. These properties usually resolve to
@@ -465,9 +465,9 @@ class SamResourceMacro(ResourceMacro):
         # Create a map of {ResourceType: LogicalId} for quick access
         resource_id_by_type = {resource.resource_type: resource.logical_id for resource in generated_cfn_resources}
 
-        for property, cfn_type in self.referable_properties.items():
+        for property_name, cfn_type in self.referable_properties.items():
             if cfn_type in resource_id_by_type:
-                supported_resource_refs.add(self.logical_id, property, resource_id_by_type[cfn_type])
+                supported_resource_refs.add(self.logical_id, property_name, resource_id_by_type[cfn_type])
 
         return supported_resource_refs
 
@@ -519,7 +519,7 @@ class SamResourceMacro(ResourceMacro):
         return value
 
 
-class ResourceTypeResolver(object):
+class ResourceTypeResolver:
     """ResourceTypeResolver maps Resource Types to Resource classes, e.g. AWS::Serverless::Function to
     samtranslator.model.sam_resources.SamFunction."""
 
@@ -579,16 +579,16 @@ class ResourceResolver:
         """Return a dictionary of all resources from the SAM template."""
         return self.resources
 
-    def get_resource_by_logical_id(self, input: str) -> Dict[str, Any]:
+    def get_resource_by_logical_id(self, _input: str) -> Dict[str, Any]:
         """
         Recursively find resource with matching Logical ID that are present in the template and returns the value.
         If it is not in template, this method simply returns the input unchanged.
 
-        :param input: Logical ID of a resource
+        :param _input: Logical ID of a resource
 
         :param resources: Dictionary of the resource from the SAM template
         """
-        if not isinstance(input, str):
-            raise TypeError("Invalid logical ID '{}'. Expected a string.".format(input))
+        if not isinstance(_input, str):
+            raise TypeError("Invalid logical ID '{}'. Expected a string.".format(_input))
 
-        return self.resources.get(input, None)
+        return self.resources.get(_input, None)

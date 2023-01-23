@@ -185,7 +185,7 @@ class TestResourceRuntimeAttributes(TestCase):
         self.assertEqual("value1", resource.get_runtime_attr("attr1"))
         self.assertEqual("value2", resource.get_runtime_attr("attr2"))
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(KeyError):
             resource.get_runtime_attr("invalid_attribute")
 
     def test_resource_default_runtime_attributes(self):

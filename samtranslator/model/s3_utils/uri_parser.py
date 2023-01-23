@@ -35,8 +35,8 @@ def to_s3_uri(code_dict):  # type: ignore[no-untyped-def]
     try:
         uri = "s3://{bucket}/{key}".format(bucket=code_dict["S3Bucket"], key=code_dict["S3Key"])
         version = code_dict.get("S3ObjectVersion", None)
-    except (TypeError, AttributeError):
-        raise TypeError("Code location should be a dictionary")
+    except (TypeError, AttributeError) as ex:
+        raise TypeError("Code location should be a dictionary") from ex
 
     if version:
         uri += "?versionId=" + version

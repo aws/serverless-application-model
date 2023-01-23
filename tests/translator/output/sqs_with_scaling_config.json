@@ -1,0 +1,72 @@
+{
+  "Resources": {
+    "SQSFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "queues.zip"
+        },
+        "Handler": "queue.sqs_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "SQSFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "SQSFunctionMySqsQueue": {
+      "Properties": {
+        "BatchSize": 10,
+        "Enabled": false,
+        "EventSourceArn": "arn:aws:sqs:us-west-2:012345678901:my-queue",
+        "FunctionName": {
+          "Ref": "SQSFunction"
+        },
+        "ScalingConfig": {
+          "MaximumConcurrency": 500
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "SQSFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

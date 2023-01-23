@@ -1,0 +1,16 @@
+Resources:
+  SQSFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/queues.zip
+      Handler: queue.sqs_handler
+      Runtime: python2.7
+      Events:
+        MySqsQueue:
+          Type: SQS
+          Properties:
+            Queue: arn:aws:sqs:us-west-2:012345678901:my-queue
+            BatchSize: 10
+            Enabled: false
+            ScalingConfig:
+              MaximumConcurrency: 500
