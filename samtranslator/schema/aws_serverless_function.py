@@ -445,6 +445,7 @@ AssumeRolePolicyDocument = Optional[DictStrAny]
 Architectures = Optional[PassThrough]
 EphemeralStorage = Optional[PassThrough]
 SnapStart = Optional[PassThrough]  # TODO: check the type
+RuntimeManagementConfig = Optional[PassThrough]  # TODO: check the type
 
 
 class Properties(BaseModel):
@@ -504,6 +505,7 @@ class Properties(BaseModel):
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
     Runtime: Optional[Runtime] = prop("Runtime")
     SnapStart: Optional[SnapStart]  # TODO: add prop and types
+    RuntimeManagementConfig: Optional[RuntimeManagementConfig]  # TODO: add prop and types
     Tags: Optional[Tags] = prop("Tags")
     Timeout: Optional[Timeout] = prop("Timeout")
     Tracing: Optional[Tracing] = prop("Tracing")
@@ -536,6 +538,7 @@ class Globals(BaseModel):
     Architectures: Optional[Architectures] = prop("Architectures")
     EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
     SnapStart: Optional[SnapStart]  # TODO: add prop
+    RuntimeManagementConfig: Optional[RuntimeManagementConfig]  # TODO: add prop
 
 
 class Resource(BaseModel):

@@ -127,6 +127,7 @@ class SamFunction(SamResourceMacro):
         "Architectures": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
         "SnapStart": PropertyType(False, IS_DICT),
         "FunctionUrlConfig": PropertyType(False, IS_DICT),
+        "RuntimeManagementConfig": PropertyType(False, IS_DICT),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -530,6 +531,7 @@ class SamFunction(SamResourceMacro):
 
         lambda_function.CodeSigningConfigArn = self.CodeSigningConfigArn
 
+        lambda_function.RuntimeManagementConfig = self.RuntimeManagementConfig  # type: ignore[attr-defined]
         self._validate_package_type(lambda_function)
         self._validate_architectures(lambda_function)
         return lambda_function
@@ -893,6 +895,8 @@ class SamFunction(SamResourceMacro):
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr("name")
         lambda_version.Description = self.VersionDescription
+        # Copy the same runtime policy for the version and the function
+        lambda_version.RuntimeManagementConfig = function.RuntimeManagementConfig
 
         return lambda_version
 
