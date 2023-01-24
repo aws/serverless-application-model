@@ -1,0 +1,11 @@
+{
+  "Resources": {
+    "SuperCoolAPI": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "Name": "SuperDuperCoolAPI"
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    }
+  }
+}

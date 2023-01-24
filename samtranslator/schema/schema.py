@@ -19,6 +19,7 @@ from samtranslator.schema import (
     aws_serverless_layerversion,
     aws_serverless_api,
     aws_serverless_httpapi,
+    aws_serverless_graphqlapi,
     any_cfn_resource,
 )
 
@@ -39,6 +40,7 @@ Resources = Union[
     aws_serverless_api.Resource,
     aws_serverless_httpapi.Resource,
     aws_serverless_application.Resource,
+    aws_serverless_graphqlapi.Resource,
 ]
 
 
