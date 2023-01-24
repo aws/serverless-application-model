@@ -721,7 +721,6 @@
         }
       },
       "required": [
-        "StartingPosition",
         "Stream"
       ],
       "title": "DynamoDBEventProperties",
@@ -1449,7 +1448,6 @@
         }
       },
       "required": [
-        "StartingPosition",
         "Stream"
       ],
       "title": "KinesisEventProperties",
@@ -2039,7 +2037,6 @@
         }
       },
       "required": [
-        "StartingPosition",
         "Stream",
         "Topics"
       ],
