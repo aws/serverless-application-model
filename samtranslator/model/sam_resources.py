@@ -2092,8 +2092,13 @@ class SamGraphQLApi(SamResourceMacro):
 
     def _construct_appsync_api(self) -> GraphQLApi:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
+
+        if "Type" not in self.Auth:
+            raise InvalidResourceException(self.logical_id, "'Auth' object is missing required property 'Type'.")
+
+        api.AuthenticationType = self.Auth["Type"]
         api.Name = self.Name if self.Name else self.logical_id
         api.Tags = self.Tags
         api.XrayEnabled = self.XrayEnabled
-        api.AuthenticationType = self.Auth["Type"]
+
         return api
