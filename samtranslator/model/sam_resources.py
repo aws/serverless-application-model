@@ -2073,7 +2073,7 @@ class SamGraphQLApi(SamResourceMacro):
     resource_type = "AWS::Serverless::GraphQLApi"
     property_types = {
         "Name": PropertyType(False, IS_STR),
-        "Tags": PropertyType(False, list_of(IS_DICT)),
+        "Tags": PropertyType(False, IS_DICT),
         "XrayEnabled": PropertyType(False, is_type(bool)),
         "Auth": PropertyType(True, IS_DICT),
     }
@@ -2095,7 +2095,9 @@ class SamGraphQLApi(SamResourceMacro):
 
         api.AuthenticationType = self.Auth["Type"]
         api.Name = self.Name if self.Name else self.logical_id
-        api.Tags = self.Tags
         api.XrayEnabled = self.XrayEnabled
+
+        if self.Tags:
+            api.Tags = get_tag_list(self.Tags)
 
         return api

@@ -1,24 +1,19 @@
-from typing import Optional, List
+from typing import Optional
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import BaseModel, get_prop
+from samtranslator.schema.common import BaseModel, get_prop, DictStrAny
 
 properties = get_prop("sam-resource-graphqlapi")
 
 # TODO: add docs
-class Tags(BaseModel):
-    Key: str
-    Value: str
-
-
 class Auth(BaseModel):
     Type: str
 
 
 class Properties(BaseModel):
     Auth: Auth
-    Tags: Optional[List[Tags]]
+    Tags: Optional[DictStrAny]
     Name: Optional[str]
     XrayEnabled: Optional[bool]
 

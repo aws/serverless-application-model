@@ -2722,25 +2722,6 @@
       "title": "SqsSubscription",
       "type": "object"
     },
-    "Tags": {
-      "additionalProperties": false,
-      "properties": {
-        "Key": {
-          "title": "Key",
-          "type": "string"
-        },
-        "Value": {
-          "title": "Value",
-          "type": "string"
-        }
-      },
-      "required": [
-        "Key",
-        "Value"
-      ],
-      "title": "Tags",
-      "type": "object"
-    },
     "UsagePlan": {
       "additionalProperties": false,
       "properties": {
@@ -5484,11 +5465,8 @@
           "type": "string"
         },
         "Tags": {
-          "items": {
-            "$ref": "#/definitions/Tags"
-          },
           "title": "Tags",
-          "type": "array"
+          "type": "object"
         },
         "XrayEnabled": {
           "title": "Xrayenabled",
