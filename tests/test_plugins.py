@@ -296,6 +296,11 @@ class TestBasePlugin(TestCase):
         plugin = Yoyoyo()
         self.assertEqual("Yoyoyo", plugin.name)
 
+    def test_initialization_should_set_custom_name(self):
+
+        plugin = Yoyoyo("custom-name")
+        self.assertEqual("custom-name", plugin.name)
+
     def test_on_methods_must_not_do_anything(self):
         data_mock = Mock()
 
