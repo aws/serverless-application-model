@@ -2,11 +2,16 @@ from typing import Optional, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import BaseModel, get_prop, Tags
+from samtranslator.schema.common import BaseModel, get_prop
 
 properties = get_prop("sam-resource-graphqlapi")
 
 # TODO: add docs
+class Tags(BaseModel):
+    Key: str
+    Value: str
+
+
 class Auth(BaseModel):
     Type: str
 
