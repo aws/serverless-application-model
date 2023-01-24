@@ -37,6 +37,7 @@ Resources = Union[
     aws_serverless_api.Resource,
     aws_serverless_httpapi.Resource,
     aws_serverless_application.Resource,
+    aws_serverless_graphqlapi.Resource,
 ]
 
 
