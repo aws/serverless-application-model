@@ -368,7 +368,9 @@ class Translator:
 
                 # can't allow user to override the Id using SourceReference
                 if "Id" in properties["SourceReference"]:
-                    raise InvalidResourceException(connector_logical_id, "Id shouldn't be defined in 'SourceReference'")
+                    raise InvalidResourceException(
+                        connector_logical_id, "'Id' shouldn't be defined in 'SourceReference'."
+                    )
 
                 properties["Source"].update(properties["SourceReference"])
                 del properties["SourceReference"]

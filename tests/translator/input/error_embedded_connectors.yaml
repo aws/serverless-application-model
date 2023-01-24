@@ -71,6 +71,14 @@ Resources:
             Id: MyQueue
           Permissions:
           - Write
+      TestSourceReferenceId:
+        Properties:
+          SourceReference:
+            Id: foo
+          Destination:
+            Id: MyQueue
+          Permissions:
+          - Write
     Properties:
       Runtime: python3.9
       InlineCode: foo
@@ -140,3 +148,24 @@ Resources:
           Permissions:
           - Write
     Type: AWS::SQS::Queue
+
+  DuplicateTest:
+    Type: AWS::Serverless::Function
+    Connectors:
+      DuplicateId:
+        Properties:
+          Destination:
+            Id: MyFunction
+          Permissions:
+          - Write
+    Properties:
+      Runtime: python3.9
+      InlineCode: foo
+      Handler: foo
+
+  DuplicateTestDuplicateId:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      InlineCode: foo
+      Handler: foo
