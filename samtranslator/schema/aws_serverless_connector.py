@@ -6,6 +6,7 @@ from samtranslator.schema.common import PassThroughProp, BaseModel, get_prop
 
 resourcereference = get_prop("sam-property-connector-resourcereference")
 properties = get_prop("sam-resource-connector")
+Permissions_type = List[Literal["Read", "Write"]]
 
 
 class ResourceReference(BaseModel):
@@ -22,7 +23,7 @@ class ResourceReference(BaseModel):
 class Properties(BaseModel):
     Source: ResourceReference = properties("Source")
     Destination: ResourceReference = properties("Destination")
-    Permissions: List[Literal["Read", "Write"]] = properties("Permissions")
+    Permissions: Permissions_type = properties("Permissions")
 
 
 class Resource(BaseModel):
@@ -37,7 +38,7 @@ class SourceReference(BaseModel):
 class EmbeddedConnectorProperties(BaseModel):
     SourceReference: Optional[SourceReference]  # TODO: add docs for SourceReference
     Destination: ResourceReference = properties("Destination")
-    Permissions: List[Literal["Read", "Write"]] = properties("Permissions")
+    Permissions: Permissions_type = properties("Permissions")
 
 
 class EmbeddedConnector(BaseModel):

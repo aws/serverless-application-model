@@ -34,6 +34,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.eventsources.push import Api
 from samtranslator.model.sam_resources import SamConnector
 from samtranslator.validator.value_validator import sam_expect
+from samtranslator.model import Resource
 
 
 class Translator:
@@ -130,7 +131,8 @@ class Translator:
         # replaces Connectors attributes with serverless Connector resources
         resources = sam_template.get("Resources", {})
         embedded_connectors = self._get_embedded_connectors(resources)
-        self._update_resources(resources, embedded_connectors)
+        connector_resources = self._update_resources(embedded_connectors)
+        resources.update(connector_resources)
         self._delete_connectors_attribute(resources)
 
         template = copy.deepcopy(sam_template)
@@ -277,18 +279,20 @@ class Translator:
         return functions + statemachines + apis + others + connectors
 
     @staticmethod
-    def _update_resources(resources: Dict[str, Any], connectors_list: List[SamConnector]) -> None:
+    def _update_resources(connectors_list: List[Resource]) -> Dict[str, Any]:
+        connector_resources = {}
         for connector in connectors_list:
-            resources.update(connector.to_dict())
+            connector_resources.update(connector.to_dict())
+        return connector_resources
 
     @staticmethod
     def _delete_connectors_attribute(resources: Dict[str, Any]) -> None:
-        for source_logical_id, resource in resources.items():
+        for resource in resources.values():
             if "Connectors" not in resource:
                 continue
-            del resources[source_logical_id]["Connectors"]
+            del resource["Connectors"]
 
-    def _get_embedded_connectors(self, resources: Dict[str, Any]) -> List[SamConnector]:
+    def _get_embedded_connectors(self, resources: Dict[str, Any]) -> List[Resource]:
         """
         Loops through the SAM Template resources to find any connectors that have been attached to the resources.
         Converts those attached connectors into Connector resources and returns a list of them
@@ -339,7 +343,7 @@ class Translator:
 
     def _get_generated_connector(
         self, source_logical_id: str, connector_logical_id: str, connector_dict: Dict[str, Any]
-    ) -> Any:
+    ) -> Resource:
         """
         Generates the connector resource from the embedded connector
 
@@ -369,7 +373,7 @@ class Translator:
                 properties["Source"].update(properties["SourceReference"])
                 del properties["SourceReference"]
 
-        return SamConnector.from_dict(connector_logical_id, connector)  # type: ignore[no-untyped-call]
+        return SamConnector.from_dict(connector_logical_id, connector)
 
 
 def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:

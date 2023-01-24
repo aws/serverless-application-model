@@ -362,7 +362,7 @@ class S3(PushEventSource):
         #   The de-dupe happens inside `samtranslator.translator.Translator.translate` method when merging results of
         #   to_cloudformation() to output template.
         self._inject_notification_configuration(function, bucket, bucket_id)  # type: ignore[no-untyped-call]
-        resources.append(S3Bucket.from_dict(bucket_id, bucket))  # type: ignore[no-untyped-call]
+        resources.append(S3Bucket.from_dict(bucket_id, bucket))
 
         return resources
 
@@ -1142,7 +1142,7 @@ class Cognito(PushEventSource):
         resources.append(lambda_permission)
 
         self._inject_lambda_config(function, userpool)  # type: ignore[no-untyped-call]
-        resources.append(CognitoUserPool.from_dict(userpool_id, userpool))  # type: ignore[no-untyped-call]
+        resources.append(CognitoUserPool.from_dict(userpool_id, userpool))
         return resources
 
     def _inject_lambda_config(self, function, userpool):  # type: ignore[no-untyped-def]

@@ -1,4 +1,4 @@
-from ..model import Resource
+from samtranslator.model import Resource
 from typing import Dict, Any
 
 do_not_verify = {
