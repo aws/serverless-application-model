@@ -147,7 +147,7 @@ class Resource(ABC):
         return tuple(cls._pass_through_attributes)
 
     @classmethod
-    def from_dict(cls, logical_id, resource_dict, relative_id=None, sam_plugins=None):  # type: ignore[no-untyped-def]
+    def from_dict(cls, logical_id: str, resource_dict: Dict[str, Any], relative_id: Optional[str] = None, sam_plugins=None) -> "Resource":  # type: ignore[no-untyped-def]
         """Constructs a Resource object with the given logical id, based on the given resource dict. The resource dict
         is the value associated with the logical id in a CloudFormation template's Resources section, and takes the
         following format. ::

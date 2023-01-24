@@ -1,0 +1,72 @@
+Resources:
+  MyRole1:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  MyRole2:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  TriggerFunction:
+    Type: AWS::Lambda::Function
+    Connectors:
+      MyConnector:
+        Properties:
+          Destination:
+            Id: MyFunction2
+          Permissions:
+          - Write
+    Properties:
+      Role: !GetAtt MyRole1.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          exports.handler = async (event) => {
+            const params = {
+              FunctionName: process.env.FUNCTION_NAME,
+              InvocationType: 'RequestResponse',
+              Payload: '{}',
+            };
+            const lambda = new AWS.Lambda();
+            const response = await lambda.invoke(params).promise();
+            if(response.StatusCode !== 200){
+              throw new Error('Failed to get response from lambda function')
+            }
+            return response;
+          };
+      Environment:
+        Variables:
+          FUNCTION_NAME: !Ref MyFunction2
+
+  MyFunction2:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt MyRole2.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          exports.handler = async (event) => {
+            console.log(JSON.stringify(event));
+          };
+Metadata:
+  SamTransformTest: true

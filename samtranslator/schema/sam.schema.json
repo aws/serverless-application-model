@@ -727,6 +727,68 @@
       "title": "DynamoDBEventProperties",
       "type": "object"
     },
+    "EmbeddedConnector": {
+      "additionalProperties": false,
+      "properties": {
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Properties": {
+          "$ref": "#/definitions/EmbeddedConnectorProperties"
+        },
+        "UpdatePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Properties"
+      ],
+      "title": "EmbeddedConnector",
+      "type": "object"
+    },
+    "EmbeddedConnectorProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "Destination": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceReference"
+            }
+          ],
+          "description": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Destination"
+        },
+        "Permissions": {
+          "description": "The permission type that the source resource is allowed to perform on the destination resource\\.  \n`Read` includes AWS Identity and Access Management \\(IAM\\) actions that allow reading data from the resource\\.  \n`Write` inclues IAM actions that allow initiating and writing data to a resource\\.  \n*Valid values*: `Read` or `Write`  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "items": {
+            "enum": [
+              "Read",
+              "Write"
+            ],
+            "type": "string"
+          },
+          "markdownDescription": "The permission type that the source resource is allowed to perform on the destination resource\\.  \n`Read` includes AWS Identity and Access Management \\(IAM\\) actions that allow reading data from the resource\\.  \n`Write` inclues IAM actions that allow initiating and writing data to a resource\\.  \n*Valid values*: `Read` or `Write`  \n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Permissions",
+          "type": "array"
+        },
+        "SourceReference": {
+          "$ref": "#/definitions/SourceReference"
+        }
+      },
+      "required": [
+        "Destination",
+        "Permissions"
+      ],
+      "title": "EmbeddedConnectorProperties",
+      "type": "object"
+    },
     "EndpointConfiguration": {
       "additionalProperties": false,
       "properties": {
@@ -2660,6 +2722,23 @@
       "title": "SelfManagedKafkaEventProperties",
       "type": "object"
     },
+    "SourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "Qualifier": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Qualifier"
+        }
+      },
+      "title": "SourceReference",
+      "type": "object"
+    },
     "SqsSubscription": {
       "additionalProperties": false,
       "properties": {
@@ -3507,6 +3586,13 @@
       "properties": {
         "Condition": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "Connectors": {
+          "additionalProperties": {
+            "$ref": "#/definitions/EmbeddedConnector"
+          },
+          "title": "Connectors",
+          "type": "object"
         },
         "DeletionPolicy": {
           "$ref": "#/definitions/PassThroughProp"
@@ -5011,6 +5097,13 @@
         "Condition": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "Connectors": {
+          "additionalProperties": {
+            "$ref": "#/definitions/EmbeddedConnector"
+          },
+          "title": "Connectors",
+          "type": "object"
+        },
         "DeletionPolicy": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -5840,6 +5933,13 @@
         "Condition": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "Connectors": {
+          "additionalProperties": {
+            "$ref": "#/definitions/EmbeddedConnector"
+          },
+          "title": "Connectors",
+          "type": "object"
+        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -6099,6 +6199,13 @@
     "samtranslator__schema__aws_serverless_simpletable__Resource": {
       "additionalProperties": false,
       "properties": {
+        "Connectors": {
+          "additionalProperties": {
+            "$ref": "#/definitions/EmbeddedConnector"
+          },
+          "title": "Connectors",
+          "type": "object"
+        },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_simpletable__Properties"
         },
@@ -6613,6 +6720,13 @@
       "properties": {
         "Condition": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "Connectors": {
+          "additionalProperties": {
+            "$ref": "#/definitions/EmbeddedConnector"
+          },
+          "title": "Connectors",
+          "type": "object"
         },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__Properties"

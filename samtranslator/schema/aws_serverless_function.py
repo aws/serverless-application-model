@@ -4,7 +4,15 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, DictStrAny, Ref
+from samtranslator.schema.common import (
+    PassThroughProp,
+    BaseModel,
+    SamIntrinsicable,
+    get_prop,
+    DictStrAny,
+    Ref,
+)
+from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
@@ -547,6 +555,7 @@ class Globals(BaseModel):
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::Function"]
     Properties: Optional[Properties]
+    Connectors: Optional[Dict[str, EmbeddedConnector]]
     DeletionPolicy: Optional[PassThroughProp]
     UpdateReplacePolicy: Optional[PassThroughProp]
     Condition: Optional[PassThroughProp]

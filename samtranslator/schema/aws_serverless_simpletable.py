@@ -5,6 +5,7 @@ from typing import Optional, Any, Dict
 from typing_extensions import Literal
 
 from samtranslator.schema.common import PassThroughProp, BaseModel, get_prop
+from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
 primarykey = get_prop("sam-property-simpletable-primarykeyobject")
 properties = get_prop("sam-resource-simpletable")
@@ -33,3 +34,4 @@ class Globals(BaseModel):
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::SimpleTable"]
     Properties: Optional[Properties]
+    Connectors: Optional[Dict[str, EmbeddedConnector]]

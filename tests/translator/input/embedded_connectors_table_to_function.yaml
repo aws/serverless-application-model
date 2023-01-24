@@ -1,0 +1,61 @@
+Resources:
+  MyServerlessFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+        };
+
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt MyRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          exports.handler = async (event) => {
+            console.log(JSON.stringify(event));
+          };
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref MyTable
+  MyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Connectors:
+      TableConnectorLambdaFunction:
+        Properties:
+          Destination:
+            Id: MyLambdaFunction
+          Permissions:
+          - Read
+      TableConnectorServerlessFunction:
+        Properties:
+          Destination:
+            Id: MyServerlessFunction
+          Permissions:
+          - Read
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      AttributeDefinitions:
+      - AttributeName: Id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: Id
+        KeyType: HASH

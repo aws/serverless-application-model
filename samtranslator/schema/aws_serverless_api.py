@@ -4,7 +4,14 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, DictStrAny
+from samtranslator.schema.common import (
+    PassThroughProp,
+    BaseModel,
+    SamIntrinsicable,
+    get_prop,
+    DictStrAny,
+)
+from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 cognitoauthorizeridentity = get_prop("sam-property-api-cognitoauthorizationidentity")
@@ -217,6 +224,7 @@ class Resource(BaseModel):
     Properties: Properties
     Condition: Optional[PassThroughProp]
     DeletionPolicy: Optional[PassThroughProp]
+    Connectors: Optional[Dict[str, EmbeddedConnector]]
     UpdatePolicy: Optional[PassThroughProp]
     UpdateReplacePolicy: Optional[PassThroughProp]
     DependsOn: Optional[PassThroughProp]
