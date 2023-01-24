@@ -42,6 +42,7 @@ class EmbeddedConnectorProperties(BaseModel):
     Permissions: PermissionsType = properties("Permissions")
 
 
+# TODO make connectors a part of all CFN Resources
 class EmbeddedConnector(BaseModel):
     Properties: EmbeddedConnectorProperties
     DependsOn: Optional[PassThroughProp]
