@@ -1,0 +1,83 @@
+Resources:
+  MyHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Connectors:
+      MyConnectorServerlessHttpApiToLambda:
+        Properties:
+          Destination:
+            Id: MyFunction
+          Permissions:
+          - Write
+      MyConnectorApigwToLambda:
+        Properties:
+          Destination:
+            Id: MyServerlessFunction
+          Permissions:
+          - Write
+    Properties:
+      StageName: Prod
+
+  MyApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: A test API
+      Name: MyRestAPI
+
+  MyApiGatewayRootMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        Type: MOCK
+      ResourceId: !GetAtt MyApiGateway.RootResourceId
+      RestApiId: !Ref MyApiGateway
+
+  MyApiGatewayV2:
+    Type: AWS::ApiGatewayV2::Api
+    Connectors:
+      MyConnectorApiV2ToLambda:
+        Properties:
+          Destination:
+            Id: MyServerlessFunction
+          Permissions:
+          - Write
+    Properties:
+      Name: MyApi
+      ProtocolType: WEBSOCKET
+
+  MyServerlessFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+        };
+
+  MyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  MyFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt MyRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |-
+          const AWS = require('aws-sdk');
+          exports.handler = async (event) => {
+            console.log(JSON.stringify(event));
+          };

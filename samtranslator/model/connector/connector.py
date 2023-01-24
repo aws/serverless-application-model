@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Iterable
 
 from samtranslator.model import ResourceResolver
 from samtranslator.model.intrinsics import get_logical_id_from_intrinsic, ref, fnGetAtt
@@ -32,7 +32,7 @@ def _is_nonblank_str(s: Any) -> bool:
     return s and isinstance(s, str)
 
 
-def add_depends_on(logical_id: str, depends_on: str, resource_resolver: ResourceResolver):  # type: ignore[no-untyped-def]
+def add_depends_on(logical_id: str, depends_on: str, resource_resolver: ResourceResolver) -> None:
     """
     Add DependsOn attribute to resource.
     """
@@ -57,7 +57,9 @@ def replace_depends_on_logical_id(logical_id: str, replacement: List[str], resou
             resource["DependsOn"] = insert_unique(depends_on, replacement)
 
 
-def get_event_source_mappings(event_source_id: str, function_id: str, resource_resolver: ResourceResolver):  # type: ignore[no-untyped-def]
+def get_event_source_mappings(
+    event_source_id: str, function_id: str, resource_resolver: ResourceResolver
+) -> Iterable[str]:
     """
     Get logical IDs of `AWS::Lambda::EventSourceMapping`s between resource logical IDs.
     """
@@ -80,8 +82,9 @@ def get_event_source_mappings(event_source_id: str, function_id: str, resource_r
 
 def _is_valid_resource_reference(obj: Dict[str, Any]) -> bool:
     id_provided = "Id" in obj
-    non_id_provided = len([k for k in obj.keys() if k != "Id"]) > 0
-    # Must provide either Id, or a combination of other properties, but not both
+    # Every property in ResourceReference can be implied using 'Id', except for 'Qualifier', so users should be able to combine 'Id' and 'Qualifier'
+    non_id_provided = len([k for k in obj.keys() if k not in ["Id", "Qualifier"]]) > 0
+    # Must provide Id (with optional Qualifier) or a supported combination of other properties.
     return id_provided != non_id_provided
 
 
@@ -89,11 +92,13 @@ def get_resource_reference(
     obj: Dict[str, Any], resource_resolver: ResourceResolver, connecting_obj: Dict[str, Any]
 ) -> ConnectorResourceReference:
     if not _is_valid_resource_reference(obj):
-        raise ConnectorResourceError("Must provide either 'Id' or a combination of the other properties, not both.")
+        raise ConnectorResourceError(
+            "Must provide 'Id' (with optional 'Qualifier') or a supported combination of other properties."
+        )
 
     logical_id = obj.get("Id")
 
-    # Must either provide Id or a combination of the other properties (not both).
+    # Must provide Id (with optional Qualifier) or a supported combination of other properties
     # If Id is not provided, all values must come from overrides.
     if not logical_id:
         resource_type = obj.get("Type")
@@ -136,7 +141,7 @@ def get_resource_reference(
 
     name = _get_resource_name(logical_id, resource_type)
 
-    qualifier = _get_resource_qualifier(resource_type)
+    qualifier = obj.get("Qualifier") if "Qualifier" in obj else _get_resource_qualifier(resource_type)
 
     return ConnectorResourceReference(
         logical_id=logical_id,
@@ -182,25 +187,29 @@ def _get_resource_role_name(
     return ref(logical_id)
 
 
-def _get_resource_queue_url(logical_id: str, resource_type: str) -> Any:
+def _get_resource_queue_url(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
     if resource_type == "AWS::SQS::Queue":
         return ref(logical_id)
+    return None
 
 
-def _get_resource_id(logical_id: str, resource_type: str) -> Any:
+def _get_resource_id(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
     if resource_type in ["AWS::ApiGateway::RestApi", "AWS::ApiGatewayV2::Api"]:
         return ref(logical_id)
+    return None
 
 
-def _get_resource_name(logical_id: str, resource_type: str) -> Any:
+def _get_resource_name(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
     if resource_type == "AWS::StepFunctions::StateMachine":
         return fnGetAtt(logical_id, "Name")
+    return None
 
 
-def _get_resource_qualifier(resource_type: str) -> Any:
+def _get_resource_qualifier(resource_type: str) -> Optional[str]:
     # Qualifier is used as the execute-api ARN suffix; by default allow whole API
     if resource_type in ["AWS::ApiGateway::RestApi", "AWS::ApiGatewayV2::Api"]:
         return "*"
+    return None
 
 
 def _get_resource_arn(logical_id: str, resource_type: str) -> Any:

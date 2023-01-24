@@ -1,0 +1,137 @@
+{
+  "Resources": {
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": " const AWS = require('aws-sdk'); exports.handler = async (event) => { console.log(JSON.stringify(event)); };"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MySNSTopic": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "MySNSTopicSnsToFunctionConnectorWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MySNSTopicSnsToFunctionConnector": {
+            "Destination": {
+              "Type": "AWS::Serverless::Function"
+            },
+            "Source": {
+              "Type": "AWS::SNS::Topic"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "sns.amazonaws.com",
+        "SourceArn": {
+          "Ref": "MySNSTopic"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MySNSTopicSnsToQueueConnectorQueuePolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MySNSTopicSnsToQueueConnector": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::SNS::Topic"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sqs:SendMessage",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "MySNSTopic"
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Resource": {
+                "Fn::GetAtt": [
+                  "MyQueue",
+                  "Arn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Queues": [
+          {
+            "Ref": "MyQueue"
+          }
+        ]
+      },
+      "Type": "AWS::SQS::QueuePolicy"
+    }
+  }
+}

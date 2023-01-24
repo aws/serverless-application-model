@@ -75,6 +75,28 @@ Resources:
       Permissions:
       - Write
 
+  ApiV1ToLambdaWithId:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyApiV1
+        Qualifier: Prod/GET/foobar
+      Destination:
+        Id: MyFunction
+      Permissions:
+      - Write
+
+  ApiV2ToLambdaWithId:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyApiV2
+        Qualifier: '*'
+      Destination:
+        Id: MyFunction
+      Permissions:
+      - Write
+
   SfnToSfn:
     Type: AWS::Serverless::Connector
     Properties:

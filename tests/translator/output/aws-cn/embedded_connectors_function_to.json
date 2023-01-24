@@ -1,0 +1,878 @@
+{
+  "Resources": {
+    "MyBucket": {
+      "Type": "AWS::S3::Bucket"
+    },
+    "MyLambdaFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "MyTable"
+            }
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x"
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyLambdaFunctionLambdaSQSConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyLambdaFunctionLambdaSQSConnector": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyLambdaFunctionLambdaTableConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyLambdaFunctionLambdaTableConnector": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyLambdaFunctionLambdaTableConnectorWithTableArnPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyLambdaFunctionLambdaTableConnectorWithTableArn": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MySNSTopic": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "MyServerlessFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyServerlessFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyServerlessFunctionBucketConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyServerlessFunctionBucketConnector": {
+            "Destination": {
+              "Type": "AWS::S3::Bucket"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:GetObjectLegalHold",
+                "s3:GetObjectRetention",
+                "s3:GetObjectTorrent",
+                "s3:GetObjectVersion",
+                "s3:GetObjectVersionAcl",
+                "s3:GetObjectVersionForReplication",
+                "s3:GetObjectVersionTorrent",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads",
+                "s3:ListBucketVersions",
+                "s3:ListMultipartUploadParts"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyBucket",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyBucket",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "s3:AbortMultipartUpload",
+                "s3:DeleteObject",
+                "s3:DeleteObjectVersion",
+                "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:RestoreObject"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyBucket",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyBucket",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyServerlessFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyServerlessFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyServerlessFunctionSFNConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyServerlessFunctionSFNConnector": {
+            "Destination": {
+              "Type": "AWS::Serverless::StateMachine"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "states:StartExecution",
+                "states:StartSyncExecution"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Ref": "MyStateMachine"
+                }
+              ]
+            },
+            {
+              "Action": [
+                "states:StopExecution"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
+                    {
+                      "DestinationName": {
+                        "Fn::GetAtt": [
+                          "MyStateMachine",
+                          "Name"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "states:DescribeStateMachine",
+                "states:ListExecutions"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Ref": "MyStateMachine"
+                }
+              ]
+            },
+            {
+              "Action": [
+                "states:DescribeExecution",
+                "states:DescribeStateMachineForExecution",
+                "states:GetExecutionHistory"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
+                    {
+                      "DestinationName": {
+                        "Fn::GetAtt": [
+                          "MyStateMachine",
+                          "Name"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyServerlessFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyServerlessFunctionSNSConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyServerlessFunctionSNSConnector": {
+            "Destination": {
+              "Type": "AWS::SNS::Topic"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sns:Publish"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Ref": "MySNSTopic"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyServerlessFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyServerlessFunctionSQSConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyServerlessFunctionSQSConnector": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "sqs:DeleteMessage",
+                "sqs:SendMessage",
+                "sqs:ChangeMessageVisibility",
+                "sqs:PurgeQueue"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyServerlessFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyServerlessFunctionTableConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyServerlessFunctionTableConnector": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyServerlessFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyServerlessFunctionTableConnectorWithTableArnPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyServerlessFunctionTableConnectorWithTableArn": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyServerlessFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyStateMachine": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"MyLambdaState\"",
+              "}"
+            ]
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MyStateMachineRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "MyStateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "Id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "Id",
+            "KeyType": "HASH"
+          }
+        ]
+      },
+      "Type": "AWS::DynamoDB::Table"
+    }
+  }
+}

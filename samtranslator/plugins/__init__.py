@@ -1,4 +1,5 @@
 import logging
+from abc import ABC
 
 from enum import Enum
 
@@ -15,21 +16,18 @@ class LifeCycleEvents(Enum):
     after_transform_template = "after_transform_template"
 
 
-class BasePlugin(object):
+class BasePlugin(ABC):
     """
     Base class for a NoOp plugin that implements all available hooks
     """
 
-    def __init__(self, name: str) -> None:
-        """
-        Initialize the plugin with given name. Name is always required to register a plugin
+    @classmethod
+    def _name(cls) -> str:
+        return cls.__name__
 
-        :param name: Name of this plugin.
-        """
-        if not name:
-            raise ValueError("'name' is required to create a plugin")
-
-        self.name = name
+    @property
+    def name(self) -> str:
+        return self._name()
 
     def on_before_transform_resource(self, logical_id, resource_type, resource_properties):  # type: ignore[no-untyped-def]
         """
@@ -54,7 +52,6 @@ class BasePlugin(object):
 
         # Plugins can choose to skip implementing certain hook methods. In which case we will default to a
         # NoOp implementation
-        pass
 
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """
@@ -72,7 +69,6 @@ class BasePlugin(object):
         :return: nothing
         :raises InvalidDocumentException: If the hook decides that the SAM template is invalid.
         """
-        pass
 
     def on_after_transform_template(self, template):  # type: ignore[no-untyped-def]
         """
@@ -89,4 +85,3 @@ class BasePlugin(object):
         :raises InvalidDocumentException: If the hook decides that the SAM template is invalid.
         :raises InvalidResourceException: If the hook decides that a SAM resource is invalid.
         """
-        pass

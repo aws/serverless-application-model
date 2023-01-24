@@ -3,12 +3,21 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Union, TypeVar
 from functools import partial
-
 import pydantic
 from pydantic import Extra, Field
 
 # Value passed directly to CloudFormation; not used by SAM
 PassThrough = Any  # TODO: Make it behave like typescript's unknown
+
+# If using PassThrough as-is, pydantic will mark the field as not required:
+#  - https://github.com/pydantic/pydantic/issues/990
+#  - https://github.com/pydantic/pydantic/issues/1223
+#
+# That isn't what we want; we want it to specify any type, but still required.
+# Using a class gets around it.
+class PassThroughProp(pydantic.BaseModel):
+    __root__: PassThrough
+
 
 # Intrinsic resolvable by the SAM transform
 T = TypeVar("T")

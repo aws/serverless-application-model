@@ -1,9 +1,10 @@
 import json
 from copy import deepcopy
+from typing import Any, Dict, List, Tuple
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
-from samtranslator.model.iam import IAMRolePolicies
+from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
@@ -16,7 +17,7 @@ from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.utils.cfn_dynamic_references import is_dynamic_reference
 
 
-class StateMachineGenerator(object):
+class StateMachineGenerator:
     _SAM_KEY = "stateMachine:createdBy"
     _SAM_VALUE = "SAM"
     _SUBSTITUTION_NAME_TEMPLATE = "definition_substitution_%s"
@@ -108,7 +109,7 @@ class StateMachineGenerator(object):
         :returns: a list of resources including the State Machine resource.
         :rtype: list
         """
-        resources = [self.state_machine]
+        resources: List[Any] = [self.state_machine]
 
         # Defaulting to {} will add the DefinitionSubstitutions field on the transform output even when it is not relevant
         if self.definition_substitutions:
@@ -128,7 +129,7 @@ class StateMachineGenerator(object):
                     self.state_machine.DefinitionSubstitutions = substitutions
             self.state_machine.DefinitionString = self._build_definition_string(processed_definition)  # type: ignore[no-untyped-call]
         elif self.definition_uri:
-            self.state_machine.DefinitionS3Location = self._construct_definition_uri()  # type: ignore[no-untyped-call]
+            self.state_machine.DefinitionS3Location = self._construct_definition_uri()
         else:
             raise InvalidResourceException(
                 self.logical_id, "Either 'Definition' or 'DefinitionUri' property must be specified."
@@ -143,7 +144,7 @@ class StateMachineGenerator(object):
                 raise Exception("Managed policy map is empty, but should not be.")
             if not self.policies:
                 self.policies = []
-            execution_role = self._construct_role()  # type: ignore[no-untyped-call]
+            execution_role = self._construct_role()
             self.state_machine.RoleArn = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
 
@@ -151,14 +152,14 @@ class StateMachineGenerator(object):
         self.state_machine.StateMachineType = self.type
         self.state_machine.LoggingConfiguration = self.logging
         self.state_machine.TracingConfiguration = self.tracing
-        self.state_machine.Tags = self._construct_tag_list()  # type: ignore[no-untyped-call]
+        self.state_machine.Tags = self._construct_tag_list()
 
-        event_resources = self._generate_event_resources()  # type: ignore[no-untyped-call]
+        event_resources = self._generate_event_resources()
         resources.extend(event_resources)
 
         return resources
 
-    def _construct_definition_uri(self):  # type: ignore[no-untyped-def]
+    def _construct_definition_uri(self) -> Dict[str, Any]:
         """
         Constructs the State Machine's `DefinitionS3 property`_, from the SAM State Machines's DefinitionUri property.
 
@@ -204,7 +205,7 @@ class StateMachineGenerator(object):
         definition_string = fnJoin("\n", definition_lines)
         return definition_string
 
-    def _construct_role(self):  # type: ignore[no-untyped-def]
+    def _construct_role(self) -> IAMRole:
         """
         Constructs a State Machine execution role based on this SAM State Machine's Policies property.
 
@@ -226,14 +227,14 @@ class StateMachineGenerator(object):
             role_path=self.role_path,
             attributes=self.passthrough_resource_attributes,
             managed_policy_map=self.managed_policy_map,
-            assume_role_policy_document=IAMRolePolicies.stepfunctions_assume_role_policy(),  # type: ignore[no-untyped-call]
+            assume_role_policy_document=IAMRolePolicies.stepfunctions_assume_role_policy(),
             resource_policies=state_machine_policies,
-            tags=self._construct_tag_list(),  # type: ignore[no-untyped-call]
+            tags=self._construct_tag_list(),
             permissions_boundary=self.permissions_boundary,
         )
         return execution_role
 
-    def _construct_tag_list(self):  # type: ignore[no-untyped-def]
+    def _construct_tag_list(self) -> List[Dict[str, Any]]:
         """
         Transforms the SAM defined Tags into the form CloudFormation is expecting.
 
@@ -243,7 +244,7 @@ class StateMachineGenerator(object):
         sam_tag = {self._SAM_KEY: self._SAM_VALUE}
         return get_tag_list(sam_tag) + get_tag_list(self.tags)
 
-    def _generate_event_resources(self):  # type: ignore[no-untyped-def]
+    def _generate_event_resources(self) -> List[Dict[str, Any]]:
         """Generates and returns the resources associated with this state machine's event sources.
 
         :returns: a list containing the state machine's event resources
@@ -263,57 +264,57 @@ class StateMachineGenerator(object):
                     for name, resource in self.event_resources[logical_id].items():
                         kwargs[name] = resource
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, str(e))
+                    raise InvalidEventException(logical_id, str(e)) from e
                 resources += eventsource.to_cloudformation(resource=self.state_machine, **kwargs)
 
         return resources
 
-    def _replace_dynamic_values_with_substitutions(self, input):  # type: ignore[no-untyped-def]
+    def _replace_dynamic_values_with_substitutions(self, _input):  # type: ignore[no-untyped-def]
         """
         Replaces the CloudFormation instrinsic functions and dynamic references within the input with substitutions.
 
-        :param input: Input dictionary in which the dynamic values need to be replaced with substitutions
+        :param _input: Input dictionary in which the dynamic values need to be replaced with substitutions
 
         :returns: List of substitution to dynamic value mappings
         :rtype: dict
         """
         substitution_map = {}
-        for path in self._get_paths_to_intrinsics(input):  # type: ignore[no-untyped-call]
-            location = input
+        for path in self._get_paths_to_intrinsics(_input):  # type: ignore[no-untyped-call]
+            location = _input
             for step in path[:-1]:
                 location = location[step]
-            sub_name, sub_key = self._generate_substitution()  # type: ignore[no-untyped-call]
+            sub_name, sub_key = self._generate_substitution()
             substitution_map[sub_name] = location[path[-1]]
             location[path[-1]] = sub_key
         return substitution_map
 
-    def _get_paths_to_intrinsics(self, input, path=None):  # type: ignore[no-untyped-def]
+    def _get_paths_to_intrinsics(self, _input, path=None):  # type: ignore[no-untyped-def]
         """
         Returns all paths to dynamic values within a dictionary
 
-        :param input: Input dictionary to find paths to dynamic values in
+        :param _input: Input dictionary to find paths to dynamic values in
         :param path: Optional list to keep track of the path to the input dictionary
         :returns list: List of keys that defines the path to a dynamic value within the input dictionary
         """
         if path is None:
             path = []
         dynamic_value_paths = []  # type: ignore[var-annotated]
-        if isinstance(input, dict):
-            iterator = input.items()
-        elif isinstance(input, list):
-            iterator = enumerate(input)  # type: ignore[assignment]
+        if isinstance(_input, dict):
+            iterator = _input.items()
+        elif isinstance(_input, list):
+            iterator = enumerate(_input)  # type: ignore[assignment]
         else:
             return dynamic_value_paths
 
         for key, value in sorted(iterator, key=lambda item: item[0]):  # type: ignore[no-any-return]
-            if is_intrinsic(value) or is_dynamic_reference(value):  # type: ignore[no-untyped-call, no-untyped-call]
+            if is_intrinsic(value) or is_dynamic_reference(value):
                 dynamic_value_paths.append(path + [key])
             elif isinstance(value, (dict, list)):
                 dynamic_value_paths.extend(self._get_paths_to_intrinsics(value, path + [key]))  # type: ignore[no-untyped-call]
 
         return dynamic_value_paths
 
-    def _generate_substitution(self):  # type: ignore[no-untyped-def]
+    def _generate_substitution(self) -> Tuple[str, str]:
         """
         Generates a name and key for a new substitution.
 

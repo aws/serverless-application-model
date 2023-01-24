@@ -1,0 +1,217 @@
+{
+  "Resources": {
+    "MyApiV1": {
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiV1ApiV1ToLambdaWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyApiV1ApiV1ToLambda": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::ApiGateway::RestApi"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceQualifier": "Prod/GET/foobar",
+              "SourceResourceId": {
+                "Ref": "MyApiV1"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyApiV2": {
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "MyApiV2ApiV2ToLambdaWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyApiV2ApiV2ToLambda": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::ApiGatewayV2::Api"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceQualifier": "*",
+              "SourceResourceId": {
+                "Ref": "MyApiV2"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyQueue2": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyRule": {
+      "Type": "AWS::Events::Rule"
+    },
+    "MyRuleRuleToTopicTopicPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyRuleRuleToTopic": {
+            "Destination": {
+              "Type": "AWS::SNS::Topic"
+            },
+            "Source": {
+              "Type": "AWS::Events::Rule"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sns:Publish",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Fn::GetAtt": [
+                      "MyRule",
+                      "Arn"
+                    ]
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Resource": {
+                "Ref": "MyTopic"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Topics": [
+          {
+            "Ref": "MyTopic"
+          }
+        ]
+      },
+      "Type": "AWS::SNS::TopicPolicy"
+    },
+    "MySNSTopic": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "MySNSTopicTopicToLambdaHardcodedWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MySNSTopicTopicToLambdaHardcoded": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::SNS::Topic"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "sns.amazonaws.com",
+        "SourceArn": {
+          "Ref": "MySNSTopic"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyTopic": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "MyTopicTopicToQueueQueuePolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyTopicTopicToQueue": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::SNS::Topic"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sqs:SendMessage",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "MyTopic"
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Resource": {
+                "Ref": "MyQueue"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Queues": [
+          "sqs.us.amazonaws.com/1234567890/test"
+        ]
+      },
+      "Type": "AWS::SQS::QueuePolicy"
+    }
+  }
+}

@@ -286,23 +286,21 @@ class TestSamPluginsAct(TestCase):
         parent_mock.assert_has_calls([call.plugin1_hook(), call.plugin2_hook()])
 
 
+class Yoyoyo(BasePlugin):
+    pass
+
+
 class TestBasePlugin(TestCase):
     def test_initialization_should_set_name(self):
 
-        name = "some name"
-        plugin = BasePlugin(name)
-        self.assertEqual(name, plugin.name)
-
-    def test_initialization_without_name_must_raise_exception(self):
-
-        with self.assertRaises(ValueError):
-            BasePlugin(None)
+        plugin = Yoyoyo()
+        self.assertEqual("Yoyoyo", plugin.name)
 
     def test_on_methods_must_not_do_anything(self):
         data_mock = Mock()
 
         # Simple test to verify that all methods starting with "on_" prefix must not implement any functionality
-        plugin = BasePlugin("name")
+        plugin = Yoyoyo()
 
         # Add every on_ method here
         plugin.on_before_transform_resource(data_mock, data_mock, data_mock)

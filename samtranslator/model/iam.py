@@ -58,7 +58,7 @@ class IAMRolePolicies:
         return document
 
     @classmethod
-    def stepfunctions_assume_role_policy(cls):  # type: ignore[no-untyped-def]
+    def stepfunctions_assume_role_policy(cls) -> Dict[str, Any]:
         document = {
             "Version": "2012-10-17",
             "Statement": [
@@ -72,7 +72,7 @@ class IAMRolePolicies:
         return document
 
     @classmethod
-    def cloud_watch_log_assume_role_policy(cls):  # type: ignore[no-untyped-def]
+    def cloud_watch_log_assume_role_policy(cls) -> Dict[str, Any]:
         document = {
             "Version": "2012-10-17",
             "Statement": [
