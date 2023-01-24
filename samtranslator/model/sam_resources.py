@@ -36,6 +36,7 @@ from samtranslator.model import (
     SamResourceMacro,
     Resource,
     ResourceTypeResolver,
+    Property,
 )
 from samtranslator.model.apigateway import (
     ApiGatewayDeployment,
@@ -2072,14 +2073,14 @@ class SamGraphQLApi(SamResourceMacro):
 
     resource_type = "AWS::Serverless::GraphQLApi"
     property_types = {
-        "Name": PropertyType(False, IS_STR),
-        "Tags": PropertyType(False, IS_DICT),
-        "XrayEnabled": PropertyType(False, is_type(bool)),
-        "Auth": PropertyType(True, IS_DICT),
+        "Name": Property(False, IS_STR),
+        "Tags": Property(False, IS_DICT),
+        "XrayEnabled": PassThroughProperty(False),
+        "Auth": Property(True, IS_DICT),
     }
 
     Auth: Auth
-    Tags: Optional[PassThrough]
+    Tags: Optional[Dict[str, Any]]
     XrayEnabled: Optional[PassThrough]
     Name: Optional[str]
 
