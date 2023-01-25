@@ -45,7 +45,11 @@ lint:
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
 
-update-cfn-schema:
+update-schema-data:
+	mkdir -p .tmp
+	rm -rf .tmp/aws-sam-developer-guide
+	git clone https://github.com/awsdocs/aws-sam-developer-guide.git .tmp/aws-sam-developer-guide
+	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > samtranslator/schema/docs.json
 	curl -o samtranslator/schema/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
 
 schema:
@@ -58,7 +62,7 @@ dev: test
 pr: black-check lint init dev
 
 clean:
-	rm -r .tmp
+	rm -rf .tmp
 
 define HELP_MESSAGE
 
