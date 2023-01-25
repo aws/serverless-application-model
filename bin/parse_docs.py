@@ -17,12 +17,14 @@ from pathlib import Path
 from typing import Iterator, Tuple, Dict
 
 
-def parse(s: str) -> Iterator[Tuple[str, str]]:
+def parse(s: str, sam_docs: bool) -> Iterator[Tuple[str, str]]:
     """Parse an AWS SAM docs page in Markdown format, yielding each property."""
     parts = s.split("\n\n")
     for part in parts:
-        # SAM docs have a space at the beginning
-        if re.match(r" ?`\w+`  <a .+", part):
+        # TODO: More robust matching against properties? This might skip or include wrong sections
+        sam_prop = sam_docs and part.startswith(" `")
+        cfn_prop = not sam_docs and re.match(r"`\w+`  <a .+", part)
+        if sam_prop or cfn_prop:
             name = part.split("`")[1]
             yield name, part.strip()
 
@@ -61,7 +63,7 @@ def main() -> None:
 
     props: Dict[str, Dict[str, str]] = {}
     for path in args.dir.glob("*.md"):
-        for name, description in parse(path.read_text()):
+        for name, description in parse(path.read_text(), not args.cfn):
             if path.stem not in props:
                 props[path.stem] = {}
             description = remove_first_line(description)  # Remove property name; already in the schema title
