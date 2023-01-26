@@ -17,11 +17,14 @@ from pathlib import Path
 from typing import Iterator, Tuple, Dict
 
 
-def parse(s: str) -> Iterator[Tuple[str, str]]:
-    """Parse an AWS SAM docs page in Markdown format, yielding each property."""
+def parse(s: str, cfn_docs: bool) -> Iterator[Tuple[str, str]]:
+    """Parse an AWS docs page in Markdown format, yielding each property."""
     parts = s.split("\n\n")
     for part in parts:
-        if part.startswith(" `"):
+        # TODO: More robust matching against properties? This might skip or include wrong sections
+        sam_prop = not cfn_docs and part.startswith(" `")
+        cfn_prop = cfn_docs and re.match(r"`\w+`  <a .+", part)
+        if sam_prop or cfn_prop:
             name = part.split("`")[1]
             yield name, part.strip()
 
@@ -33,10 +36,13 @@ def fix_markdown_code_link(s: str) -> str:
 
 
 def remove_first_line(s: str) -> str:
-    return s.split("\n", 1)[1]
+    try:
+        return s.split("\n", 1)[1]
+    except IndexError:
+        return ""
 
 
-def convert_to_full_path(description: str) -> str:
+def convert_to_full_path(description: str, prefix: str) -> str:
     pattern = re.compile("\(([#\.a-zA-Z0-9_-]+)\)")
     matched_content = pattern.findall(description)
 
@@ -45,25 +51,29 @@ def convert_to_full_path(description: str) -> str:
             url = path.split(".")[0] + ".html"
             if "#" in path:
                 url += "#" + path.split("#")[1]
-            description = description.replace(
-                path, f"https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/{url}"
-            )
+            description = description.replace(path, prefix + url)
     return description
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", type=Path)
+    parser.add_argument("--cfn", action="store_true")
     args = parser.parse_args()
 
     props: Dict[str, Dict[str, str]] = {}
     for path in args.dir.glob("*.md"):
-        for name, description in parse(path.read_text()):
+        for name, description in parse(path.read_text(), args.cfn):
             if path.stem not in props:
                 props[path.stem] = {}
             description = remove_first_line(description)  # Remove property name; already in the schema title
             description = fix_markdown_code_link(description)
-            description = convert_to_full_path(description)
+            prefix = (
+                "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/"
+                if args.cfn
+                else "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/"
+            )
+            description = convert_to_full_path(description, prefix)
             props[path.stem][name] = description
 
     print(
