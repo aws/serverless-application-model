@@ -47,10 +47,22 @@ prepare-companion-stack:
 
 update-schema-data:
 	mkdir -p .tmp
+
+	# Update and parse SAM docs
 	rm -rf .tmp/aws-sam-developer-guide
-	git clone https://github.com/awsdocs/aws-sam-developer-guide.git .tmp/aws-sam-developer-guide
+	git clone --depth 1 https://github.com/awsdocs/aws-sam-developer-guide.git .tmp/aws-sam-developer-guide
 	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > samtranslator/schema/docs.json
-	curl -o samtranslator/schema/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
+
+	# Update and parse CloudFormation docs
+	rm -rf .tmp/aws-cloudformation-user-guide
+	git clone --depth 1 git@github.com:awsdocs/aws-cloudformation-user-guide.git .tmp/aws-cloudformation-user-guide
+	bin/parse_docs.py --cfn .tmp/aws-cloudformation-user-guide/doc_source > samtranslator/schema/cloudformation-docs.json
+
+	# Update CloudFormation schema
+	curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
+
+	# Add CloudFormation docs to CloudFormation schema
+	python bin/add_docs_cfn_schema.py --schema .tmp/cloudformation.schema.json --docs samtranslator/schema/cloudformation-docs.json > samtranslator/schema/cloudformation.schema.json
 
 schema:
 	python samtranslator/schema/schema.py --sam-schema samtranslator/schema/sam.schema.json --cfn-schema samtranslator/schema/cloudformation.schema.json --unified-schema samtranslator/schema/schema.json
