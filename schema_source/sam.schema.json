@@ -3619,6 +3619,9 @@
           "title": "Type",
           "type": "string"
         },
+        "UpdatePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "UpdateReplacePolicy": {
           "$ref": "#/definitions/PassThroughProp"
         }
