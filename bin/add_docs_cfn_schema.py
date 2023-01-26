@@ -2,6 +2,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Iterator
 
 
 def slugify(s: str) -> str:
@@ -13,17 +14,7 @@ def stringafter(s: str, sep: str) -> str:
 
 
 # e.g. for AWS::S3::Bucket it's prefixed with aws-properties-s3-bucket: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html
-
-
-def slug_property(s: str) -> str:
-    return "aws-properties-" + slugify(stringafter(s, "::"))
-
-
-def slug_resource(s: str) -> str:
-    return "aws-resource-" + slugify(stringafter(s, "::"))
-
-
-def prop_slugs(s: str) -> str:
+def prop_slugs(s: str) -> Iterator[str]:
     slug = slugify(stringafter(s, "::"))
     yield "aws-properties-" + slug
     yield "aws-resource-" + slug
