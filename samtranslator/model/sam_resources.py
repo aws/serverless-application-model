@@ -1807,6 +1807,40 @@ class SamConnector(SamResourceMacro):
         "Permissions": PropertyType(True, list_of(IS_STR)),
     }
 
+    @cw_timer
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:  # type: ignore
+        resource_resolver: ResourceResolver = kwargs["resource_resolver"]
+        original_template = kwargs["original_template"]
+
+        multi_dest = True
+        if isinstance(self.Destination, dict):
+            multi_dest = False
+            self.Destination = [self.Destination]
+
+        list_generated_resources: List[Resource] = []
+
+        for dest_index, dest in enumerate(self.Destination):
+            try:
+                destination = get_resource_reference(dest, resource_resolver, self.Source)
+                source = get_resource_reference(self.Source, resource_resolver, dest)
+            except ConnectorResourceError as e:
+                raise InvalidResourceException(self.logical_id, str(e)) from e
+
+            generated_resources = self.generate_resources(
+                source, destination, dest_index, multi_dest, resource_resolver
+            )
+
+            self._add_connector_metadata(generated_resources, original_template, source, destination)
+            list_generated_resources.extend(generated_resources)
+
+        generated_logical_ids = [resource.logical_id for resource in list_generated_resources]
+        replace_depends_on_logical_id(self.logical_id, generated_logical_ids, resource_resolver)
+
+        if list_generated_resources:
+            return list_generated_resources
+
+        raise InvalidResourceException(self.logical_id, "'Destination' is an empty list")
+
     def generate_resources(
         self,
         source: ConnectorResourceReference,
@@ -1894,40 +1928,6 @@ class SamConnector(SamResourceMacro):
         else:
             raise TypeError(f"Profile type {profile_type} is not supported")
         return generated_resources
-
-    @cw_timer
-    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:  # type: ignore
-        resource_resolver: ResourceResolver = kwargs["resource_resolver"]
-        original_template = kwargs["original_template"]
-
-        multi_dest = True
-        if isinstance(self.Destination, dict):
-            multi_dest = False
-            self.Destination = [self.Destination]
-
-        list_generated_resources: List[Resource] = []
-
-        for dest_index, dest in enumerate(self.Destination):
-            try:
-                destination = get_resource_reference(dest, resource_resolver, self.Source)
-                source = get_resource_reference(self.Source, resource_resolver, dest)
-            except ConnectorResourceError as e:
-                raise InvalidResourceException(self.logical_id, str(e))
-
-            generated_resources = self.generate_resources(
-                source, destination, dest_index, multi_dest, resource_resolver
-            )
-
-            self._add_connector_metadata(generated_resources, original_template, source, destination)
-            list_generated_resources.extend(generated_resources)
-
-        generated_logical_ids = [resource.logical_id for resource in list_generated_resources]
-        replace_depends_on_logical_id(self.logical_id, generated_logical_ids, resource_resolver)
-
-        if list_generated_resources:
-            return list_generated_resources
-
-        raise InvalidResourceException(self.logical_id, "'Destination' is an empty list")
 
     def _get_policy_statements(self, profile: ConnectorProfile) -> Dict[str, Any]:
         policy_statements = []
