@@ -50,6 +50,9 @@ def main() -> None:
                         log(f"Skipping {k}: {kk} not in {slug} docs")
                         continue
                     vv["markdownDescription"] = docs[slug][kk]
+                    vv[
+                        "title"
+                    ] = kk  # GoFormation schema doesn't include it, so VS Code defaults to something unrelated (e.g. "Resources")
         # Resource
         else:
             for slug in prop_slugs(k):
@@ -61,6 +64,9 @@ def main() -> None:
                         log(f"Skipping {k}: {kk} not in {slug} docs")
                         continue
                     vv["markdownDescription"] = docs[slug][kk]
+                    vv[
+                        "title"
+                    ] = kk  # GoFormation schema doesn't include it, so VS Code defaults to something unrelated (e.g. "Resources")
 
     print(json.dumps(schema, indent=2, sort_keys=True))
 
