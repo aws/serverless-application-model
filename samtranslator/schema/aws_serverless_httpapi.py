@@ -141,6 +141,9 @@ class Globals(BaseModel):
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::HttpApi"]
     Properties: Optional[Properties]
-    Metadata: Optional[PassThroughProp]
     Condition: Optional[PassThroughProp]
     Connectors: Optional[Dict[str, EmbeddedConnector]]
+    UpdateReplacePolicy: Optional[PassThroughProp]
+    DependsOn: Optional[PassThroughProp]
+    Metadata: Optional[PassThroughProp]
+    DeletionPolicy: Optional[PassThroughProp]

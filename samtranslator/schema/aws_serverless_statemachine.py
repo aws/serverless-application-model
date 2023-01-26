@@ -172,4 +172,8 @@ class Resource(BaseModel):
     Type: Literal["AWS::Serverless::StateMachine"]
     Properties: Properties
     Condition: Optional[PassThroughProp]
+    DeletionPolicy: Optional[PassThroughProp]
+    UpdateReplacePolicy: Optional[PassThroughProp]
+    DependsOn: Optional[PassThroughProp]
+    Metadata: Optional[PassThroughProp]
     Connectors: Optional[Dict[str, EmbeddedConnector]]

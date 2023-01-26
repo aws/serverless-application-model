@@ -27,3 +27,6 @@ class Resource(BaseModel):
     Type: Literal["AWS::Serverless::Application"]
     Properties: Properties
     Condition: Optional[PassThroughProp]
+    DeletionPolicy: Optional[PassThroughProp]
+    UpdateReplacePolicy: Optional[PassThroughProp]
+    DependsOn: Optional[PassThroughProp]

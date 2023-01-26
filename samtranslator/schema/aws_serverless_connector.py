@@ -30,6 +30,11 @@ class Properties(BaseModel):
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::Connector"]
     Properties: Properties
+    DependsOn: Optional[PassThroughProp]
+    DeletionPolicy: Optional[PassThroughProp]
+    Metadata: Optional[PassThroughProp]
+    UpdateReplacePolicy: Optional[PassThroughProp]
+    Condition: Optional[PassThroughProp]
 
 
 class SourceReference(BaseModel):
@@ -48,4 +53,5 @@ class EmbeddedConnector(BaseModel):
     DependsOn: Optional[PassThroughProp]
     DeletionPolicy: Optional[PassThroughProp]
     Metadata: Optional[PassThroughProp]
-    UpdatePolicy: Optional[PassThroughProp]
+    UpdateReplacePolicy: Optional[PassThroughProp]
+    Condition: Optional[PassThroughProp]

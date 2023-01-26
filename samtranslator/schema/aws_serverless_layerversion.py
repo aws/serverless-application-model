@@ -31,3 +31,5 @@ class Resource(BaseModel):
     Properties: Properties
     Condition: Optional[PassThroughProp]
     DeletionPolicy: Optional[PassThroughProp]
+    UpdateReplacePolicy: Optional[PassThroughProp]
+    DependsOn: Optional[PassThroughProp]
