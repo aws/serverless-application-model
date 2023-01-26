@@ -47,13 +47,17 @@ prepare-companion-stack:
 
 update-schema-data:
 	mkdir -p .tmp
+
 	rm -rf .tmp/aws-sam-developer-guide
 	git clone --depth 1 https://github.com/awsdocs/aws-sam-developer-guide.git .tmp/aws-sam-developer-guide
 	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > samtranslator/schema/docs.json
+
 	rm -rf .tmp/aws-cloudformation-user-guide
 	git clone --depth 1 git@github.com:awsdocs/aws-cloudformation-user-guide.git .tmp/aws-cloudformation-user-guide
 	bin/parse_docs.py --cfn .tmp/aws-cloudformation-user-guide/doc_source > samtranslator/schema/cloudformation-docs.json
+
 	curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
+
 	python bin/add_docs_cfn_schema.py --schema .tmp/cloudformation.schema.json --docs samtranslator/schema/cloudformation-docs.json > samtranslator/schema/cloudformation.schema.json
 
 schema:
