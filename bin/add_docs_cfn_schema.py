@@ -12,12 +12,21 @@ def stringafter(s: str, sep: str) -> str:
     return s.split(sep, 1)[1]
 
 
+# e.g. for AWS::S3::Bucket it's prefixed with aws-properties-s3-bucket: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html
+
+
 def slug_property(s: str) -> str:
     return "aws-properties-" + slugify(stringafter(s, "::"))
 
 
 def slug_resource(s: str) -> str:
     return "aws-resource-" + slugify(stringafter(s, "::"))
+
+
+def prop_slugs(s: str) -> str:
+    slug = slugify(stringafter(s, "::"))
+    yield "aws-properties-" + slug
+    yield "aws-resource-" + slug
 
 
 def log(s: str) -> None:
@@ -41,26 +50,26 @@ def main() -> None:
             continue
         # Property
         if "." in k:
-            slug = slug_property(k)
-            if slug not in docs:
-                log(f"Skipping {k}: {slug} not in docs")
-                continue
-            for kk, vv in v["properties"].items():
-                if kk not in docs[slug]:
-                    log(f"Skipping {k}: {kk} not in {slug} docs")
+            for slug in prop_slugs(k):
+                if slug not in docs:
+                    log(f"Skipping {k}: {slug} not in docs")
                     continue
-                vv["markdownDescription"] = docs[slug][kk]
+                for kk, vv in v["properties"].items():
+                    if kk not in docs[slug]:
+                        log(f"Skipping {k}: {kk} not in {slug} docs")
+                        continue
+                    vv["markdownDescription"] = docs[slug][kk]
         # Resource
         else:
-            slug = slug_resource(k)
-            if slug not in docs:
-                log(f"Skipping {k}: {slug} not in docs")
-                continue
-            for kk, vv in v["properties"]["Properties"]["properties"].items():
-                if kk not in docs[slug]:
-                    log(f"Skipping {k}: {kk} not in {slug} docs")
+            for slug in prop_slugs(k):
+                if slug not in docs:
+                    log(f"Skipping {k}: {slug} not in docs")
                     continue
-                vv["markdownDescription"] = docs[slug][kk]
+                for kk, vv in v["properties"]["Properties"]["properties"].items():
+                    if kk not in docs[slug]:
+                        log(f"Skipping {k}: {kk} not in {slug} docs")
+                        continue
+                    vv["markdownDescription"] = docs[slug][kk]
 
     print(json.dumps(schema, indent=2, sort_keys=True))
 
