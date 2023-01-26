@@ -135,3 +135,15 @@ def any_type() -> Validator:
         return True
 
     return validate
+
+
+def is_str() -> Validator:
+    """
+    For compatibility reason, we need this `is_str()` as it
+    is consumed by old versions of AWS SAM CLI (<1.71.0).
+
+    Related PRs/commits:
+    https://github.com/aws/serverless-application-model/pull/2752
+    https://github.com/aws/aws-sam-cli/commit/d18f57c5f39273a04fb582f90e6c5817a4651912
+    """
+    return IS_STR

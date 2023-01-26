@@ -35,7 +35,7 @@ CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST = [
 CODE_DEPLOY_CONDITION_NAME = "ServerlessCodeDeployCondition"
 
 
-class DeploymentPreferenceCollection(object):
+class DeploymentPreferenceCollection:
     """
     This class contains the collection of all global and
     specific / per function deployment preferences. It includes ways to add
@@ -184,7 +184,7 @@ class DeploymentPreferenceCollection(object):
         try:
             deployment_group.AlarmConfiguration = self._convert_alarms(deployment_preference.alarms)  # type: ignore[no-untyped-call]
         except ValueError as e:
-            raise InvalidResourceException(function_logical_id, str(e))
+            raise InvalidResourceException(function_logical_id, str(e)) from e
 
         deployment_group.ApplicationName = ref(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         deployment_group.AutoRollbackConfiguration = {

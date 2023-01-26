@@ -1,0 +1,52 @@
+%YAML 1.1
+---
+Parameters:
+  RuntimeVersionParam:
+    Type: String
+  RuntimeUpdateParam:
+    Type: String
+
+Resources:
+  FunctionWithRuntimeManagementConfig:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.8
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+  MinimalFunctionWithManualRuntimeManagementConfig:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.8
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Manual
+        RuntimeVersionArn: !Sub arn:aws:lambda:${AWS::Region}::runtime:python3.8::0af1966588ced06e3143ae720245c9b7aeaae213c6921c12c742a166679cc505
+  FunctionWithRuntimeManagementConfigAndAlias:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.8
+      AutoPublishAlias: live
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+  FunctionWithIntrinsicUpdateRuntimeOn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.8
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: !Ref RuntimeUpdateParam
+  FunctionWithIntrinsicRuntimeVersion:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.8
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: !Ref RuntimeUpdateParam
+        RuntimeVersionArn: !Ref RuntimeVersionParam

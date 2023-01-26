@@ -75,7 +75,7 @@ class ApiGatewayV2ApiMapping(Resource):
 JwtConfiguration = Dict[str, Union[str, List[str]]]
 
 
-class ApiGatewayV2Authorizer(object):
+class ApiGatewayV2Authorizer:
     def __init__(  # type: ignore[no-untyped-def]
         self,
         api_logical_id=None,

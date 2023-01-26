@@ -24,10 +24,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
         :param policy_template_processor: Instance of the PolicyTemplateProcessor that knows how to convert policy
             template to a statement
         """
-
-        # Plugin name is the class name for easy disambiguation
-        _plugin_name = PolicyTemplatesForResourcePlugin.__name__
-        super(PolicyTemplatesForResourcePlugin, self).__init__(_plugin_name)
+        super().__init__()
 
         self._policy_template_processor = policy_template_processor
 
@@ -39,7 +36,6 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
         :param string logical_id: Logical ID of the resource being processed
         :param string resource_type: Type of the resource being processed
         :param dict resource_properties: Properties of the resource
-        :return: Nothing
         """
 
         if not self._is_supported(resource_type):  # type: ignore[no-untyped-call]
@@ -107,11 +103,11 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
 
         except InsufficientParameterValues as ex:
             # Exception's message will give lot of specific details
-            raise InvalidResourceException(logical_id, str(ex))
-        except InvalidParameterValues:
+            raise InvalidResourceException(logical_id, str(ex)) from ex
+        except InvalidParameterValues as ex:
             raise InvalidResourceException(
                 logical_id, "Must specify valid parameter values for policy template '{}'".format(template_name)
-            )
+            ) from ex
 
     def _is_supported(self, resource_type):  # type: ignore[no-untyped-def]
         """
