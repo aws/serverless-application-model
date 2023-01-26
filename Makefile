@@ -52,9 +52,9 @@ update-schema-data:
 	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > samtranslator/schema/docs.json
 	rm -rf .tmp/aws-cloudformation-user-guide
 	git clone --depth 1 git@github.com:awsdocs/aws-cloudformation-user-guide.git .tmp/aws-cloudformation-user-guide
-	bin/parse_docs.py --cfn .tmp/aws-cloudformation-user-guide/doc_source > samtranslator/schema/cfn-docs.json
+	bin/parse_docs.py --cfn .tmp/aws-cloudformation-user-guide/doc_source > samtranslator/schema/cloudformation-docs.json
 	curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
-	python bin/add_docs_cfn_schema.py --schema .tmp/cloudformation.schema.json --docs samtranslator/schema/cfn-docs.json > samtranslator/schema/cloudformation.schema.json
+	python bin/add_docs_cfn_schema.py --schema .tmp/cloudformation.schema.json --docs samtranslator/schema/cloudformation-docs.json > samtranslator/schema/cloudformation.schema.json
 
 schema:
 	python samtranslator/schema/schema.py --sam-schema samtranslator/schema/sam.schema.json --cfn-schema samtranslator/schema/cloudformation.schema.json --unified-schema samtranslator/schema/schema.json
