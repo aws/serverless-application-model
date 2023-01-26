@@ -54,7 +54,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         "KafkaBootstrapServers": PropertyType(False, is_type(list)),
         "FilterCriteria": PropertyType(False, IS_DICT),
         "ConsumerGroupId": PropertyType(False, IS_STR),
-        "ScalingConfig": PropertyType(False, IS_STR),
+        "ScalingConfig": PropertyType(False, IS_DICT),
     }
 
     BatchSize: Optional[Intrinsicable[int]]

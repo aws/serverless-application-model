@@ -4,7 +4,15 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, DictStrAny, Ref
+from samtranslator.schema.common import (
+    PassThroughProp,
+    BaseModel,
+    SamIntrinsicable,
+    get_prop,
+    DictStrAny,
+    Ref,
+)
+from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
@@ -156,7 +164,7 @@ class KinesisEventProperties(BaseModel):
     MaximumRecordAgeInSeconds: Optional[PassThroughProp] = kinesiseventproperties("MaximumRecordAgeInSeconds")
     MaximumRetryAttempts: Optional[PassThroughProp] = kinesiseventproperties("MaximumRetryAttempts")
     ParallelizationFactor: Optional[PassThroughProp] = kinesiseventproperties("ParallelizationFactor")
-    StartingPosition: PassThroughProp = kinesiseventproperties("StartingPosition")
+    StartingPosition: Optional[PassThroughProp] = kinesiseventproperties("StartingPosition")
     StartingPositionTimestamp: Optional[PassThroughProp] = kinesiseventproperties("StartingPositionTimestamp")
     Stream: PassThroughProp = kinesiseventproperties("Stream")
     TumblingWindowInSeconds: Optional[PassThroughProp] = kinesiseventproperties("TumblingWindowInSeconds")
@@ -180,7 +188,7 @@ class DynamoDBEventProperties(BaseModel):
     MaximumRecordAgeInSeconds: Optional[PassThroughProp] = dynamodbeventproperties("MaximumRecordAgeInSeconds")
     MaximumRetryAttempts: Optional[PassThroughProp] = dynamodbeventproperties("MaximumRetryAttempts")
     ParallelizationFactor: Optional[PassThroughProp] = dynamodbeventproperties("ParallelizationFactor")
-    StartingPosition: PassThroughProp = dynamodbeventproperties("StartingPosition")
+    StartingPosition: Optional[PassThroughProp] = dynamodbeventproperties("StartingPosition")
     StartingPositionTimestamp: Optional[PassThroughProp] = dynamodbeventproperties("StartingPositionTimestamp")
     Stream: PassThroughProp = dynamodbeventproperties("Stream")
     TumblingWindowInSeconds: Optional[PassThroughProp] = dynamodbeventproperties("TumblingWindowInSeconds")
@@ -357,7 +365,7 @@ class MSKEventProperties(BaseModel):
     ConsumerGroupId: Optional[PassThroughProp] = mskeventproperties("ConsumerGroupId")
     FilterCriteria: Optional[PassThroughProp] = mskeventproperties("FilterCriteria")
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumBatchingWindowInSeconds")
-    StartingPosition: PassThroughProp = mskeventproperties("StartingPosition")
+    StartingPosition: Optional[PassThroughProp] = mskeventproperties("StartingPosition")
     StartingPositionTimestamp: Optional[PassThroughProp] = mskeventproperties("StartingPositionTimestamp")
     Stream: PassThroughProp = mskeventproperties("Stream")
     Topics: PassThroughProp = mskeventproperties("Topics")
@@ -448,6 +456,7 @@ AssumeRolePolicyDocument = Optional[DictStrAny]
 Architectures = Optional[PassThroughProp]
 EphemeralStorage = Optional[PassThroughProp]
 SnapStart = Optional[PassThroughProp]  # TODO: check the type
+RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
 
 
 class Properties(BaseModel):
@@ -507,6 +516,7 @@ class Properties(BaseModel):
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
     Runtime: Optional[Runtime] = prop("Runtime")
     SnapStart: Optional[SnapStart] = prop("SnapStart")
+    RuntimeManagementConfig: Optional[RuntimeManagementConfig]  # TODO: add prop and types
     Tags: Optional[Tags] = prop("Tags")
     Timeout: Optional[Timeout] = prop("Timeout")
     Tracing: Optional[Tracing] = prop("Tracing")
@@ -539,11 +549,13 @@ class Globals(BaseModel):
     Architectures: Optional[Architectures] = prop("Architectures")
     EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
     SnapStart: Optional[SnapStart] = prop("SnapStart")
+    RuntimeManagementConfig: Optional[RuntimeManagementConfig]  # TODO: add prop
 
 
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::Function"]
     Properties: Optional[Properties]
+    Connectors: Optional[Dict[str, EmbeddedConnector]]
     DeletionPolicy: Optional[PassThroughProp]
     UpdateReplacePolicy: Optional[PassThroughProp]
     Condition: Optional[PassThroughProp]

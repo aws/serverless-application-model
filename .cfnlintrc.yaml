@@ -108,13 +108,15 @@ ignore_templates:
   - tests/translator/output/**/s3_intrinsics.json
   - tests/translator/output/**/schema_validation_1.json
   - tests/translator/output/**/self_managed_kafka_with_intrinsics.json
-  - tests/translator/output/**/sqs_with_scaling_config.json # TODO: remove once SQS scaling config is available
+  - tests/translator/output/**/sqs_with_scaling_config.json  # Invalid Property Resources/SQSFunctionMySqsQueue/Properties/ScalingConfig
   - tests/translator/output/**/state_machine_with_condition.json
   - tests/translator/output/**/state_machine_with_condition_and_events.json
   - tests/translator/output/**/state_machine_with_eb_dlq_target_id.json
   - tests/translator/output/**/state_machine_with_event_schedule_state.json
   - tests/translator/output/**/state_machine_with_schedule.json
   - tests/translator/output/**/state_machine_with_schedule_dlq_retry_policy.json
+  - tests/translator/output/**/globals_for_function.json  # RuntimeManagementConfig
+  - tests/translator/output/**/function_with_runtime_config.json  # RuntimeManagementConfig
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
   - W2531 # EOL runtime; not relevant for transform tests

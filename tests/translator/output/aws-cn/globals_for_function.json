@@ -37,6 +37,9 @@
           ]
         },
         "Runtime": "nodejs12.x",
+        "RuntimeManagementConfig": {
+          "UpdateRuntimeOn": "FunctionChange"
+        },
         "SnapStart": {
           "ApplyOn": "None"
         },
@@ -131,6 +134,9 @@
       "Properties": {
         "FunctionName": {
           "Ref": "FunctionWithOverrides"
+        },
+        "RuntimeManagementConfig": {
+          "UpdateRuntimeOn": "FunctionChange"
         }
       },
       "Type": "AWS::Lambda::Version"
@@ -168,6 +174,9 @@
           ]
         },
         "Runtime": "python2.7",
+        "RuntimeManagementConfig": {
+          "UpdateRuntimeOn": "Auto"
+        },
         "SnapStart": {
           "ApplyOn": "PublishedVersions"
         },
@@ -253,6 +262,9 @@
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"
+        },
+        "RuntimeManagementConfig": {
+          "UpdateRuntimeOn": "Auto"
         }
       },
       "Type": "AWS::Lambda::Version"

@@ -50,6 +50,7 @@ class TestConnectors(BaseTest):
             ("combination/connector_sqs_to_function",),
             ("combination/connector_sns_to_function_write",),
             ("combination/connector_table_to_function_read",),
+            ("combination/embedded_connector",),
         ]
     )
     @retry_once
