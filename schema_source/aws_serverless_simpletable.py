@@ -35,3 +35,8 @@ class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::SimpleTable"]
     Properties: Optional[Properties]
     Connectors: Optional[Dict[str, EmbeddedConnector]]
+    Condition: Optional[PassThroughProp]
+    DeletionPolicy: Optional[PassThroughProp]
+    UpdateReplacePolicy: Optional[PassThroughProp]
+    DependsOn: Optional[PassThroughProp]
+    Metadata: Optional[PassThroughProp]
