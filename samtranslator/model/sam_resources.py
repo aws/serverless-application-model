@@ -2050,8 +2050,10 @@ class SamConnector(SamResourceMacro):
         topic_policy_name = (
             f"{self.logical_id}TopicPolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}TopicPolicy"
         )
-        topic_policy = SNSTopicPolicy(logical_id=topic_policy_name, depends_on=self.depends_on, attributes=self.resource_attributes)
-        
+        topic_policy = SNSTopicPolicy(
+            logical_id=topic_policy_name, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
         topic_policy.Topics = [topic_arn]
         topic_policy.PolicyDocument = self._get_policy_statements(profile)
 
@@ -2078,8 +2080,10 @@ class SamConnector(SamResourceMacro):
         queue_policy_name = (
             f"{self.logical_id}QueuePolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}QueuePolicy"
         )
-        queue_policy = SQSQueuePolicy(logical_id=queue_policy_name, depends_on=self.depends_on, attributes=self.resource_attributes)
-        
+        queue_policy = SQSQueuePolicy(
+            logical_id=queue_policy_name, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
         queue_policy.PolicyDocument = self._get_policy_statements(profile)
         queue_policy.Queues = [queue_url]
 

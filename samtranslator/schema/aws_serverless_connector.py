@@ -38,7 +38,7 @@ class SourceReference(BaseModel):
 
 class EmbeddedConnectorProperties(BaseModel):
     SourceReference: Optional[SourceReference]  # TODO: add docs for SourceReference
-    Destination: ResourceReference = properties("Destination")
+    Destination: Union[ResourceReference, List[ResourceReference]] = properties("Destination")
     Permissions: PermissionsType = properties("Permissions")
 
 
