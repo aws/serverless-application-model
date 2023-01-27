@@ -18,7 +18,7 @@ integ-test:
 	pytest --no-cov integration/*
 
 black:
-	black setup.py samtranslator/* tests/* integration/* bin/*.py
+	black setup.py samtranslator/* tests/* integration/* bin/*.py schema_source
 	bin/json-format.py --write tests integration samtranslator/policy_templates_data
 	bin/yaml-format.py --write tests
 	bin/yaml-format.py --write integration --add-test-metadata
@@ -29,16 +29,16 @@ black-check:
 	python -m schema_source.schema --sam-schema .tmp/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema .tmp/schema.json
 	diff -u schema_source/sam.schema.json .tmp/sam.schema.json
 	diff -u samtranslator/schema/schema.json .tmp/schema.json
-	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
+	black --check setup.py samtranslator/* tests/* integration/* bin/*.py schema_source
 	bin/json-format.py --check tests integration samtranslator/policy_templates_data
 	bin/yaml-format.py --check tests
 	bin/yaml-format.py --check integration --add-test-metadata
 
 lint:
 	# mypy performs type check
-	mypy --strict samtranslator bin
+	mypy --strict samtranslator bin schema_source
 	# Linter performs static analysis to catch latent bugs
-	pylint --rcfile .pylintrc samtranslator
+	pylint --rcfile .pylintrc samtranslator schema_source
 	# cfn-lint to make sure generated CloudFormation makes sense
 	bin/run_cfn_lint.sh
 
