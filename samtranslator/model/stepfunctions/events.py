@@ -6,9 +6,8 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Property, PropertyType, ResourceMacro, Resource
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
-from samtranslator.model.types import IS_DICT, IS_STR, is_type
+from samtranslator.model.types import IS_DICT, IS_STR, is_type, PassThrough
 from samtranslator.model.intrinsics import fnSub
-from samtranslator.schema.common import PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils

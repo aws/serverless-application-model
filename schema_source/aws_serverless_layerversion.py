@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, ResourceAttributes
+from schema_source.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, ResourceAttributes
 
 contenturi = get_prop("sam-property-layerversion-layercontent")
 properties = get_prop("sam-resource-layerversion")

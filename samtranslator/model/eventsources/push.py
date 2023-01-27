@@ -20,7 +20,7 @@ from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.model.iot import IotTopicRule
 from samtranslator.model.cognito import CognitoUserPool
-from samtranslator.schema.common import PassThrough
+from samtranslator.model.types import PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException

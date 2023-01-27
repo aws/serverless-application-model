@@ -4,7 +4,7 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import (
+from schema_source.common import (
     PassThroughProp,
     BaseModel,
     SamIntrinsicable,
@@ -12,7 +12,7 @@ from samtranslator.schema.common import (
     DictStrAny,
     ResourceAttributes,
 )
-from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
+from schema_source.aws_serverless_connector import EmbeddedConnector
 
 oauth2authorizer = get_prop("sam-property-httpapi-oauth2authorizer")
 lambdauthorizeridentity = get_prop("sam-property-httpapi-lambdaauthorizationidentity")

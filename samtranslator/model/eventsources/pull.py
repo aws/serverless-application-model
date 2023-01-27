@@ -4,8 +4,7 @@ from typing import Any, Dict, List, Optional
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType, PassThroughProperty
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import IS_DICT, is_type, IS_STR
-from samtranslator.schema.common import PassThrough
+from samtranslator.model.types import IS_DICT, is_type, IS_STR, PassThrough
 from samtranslator.model.intrinsics import is_intrinsic
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
