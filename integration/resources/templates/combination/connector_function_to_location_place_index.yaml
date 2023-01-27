@@ -16,7 +16,6 @@ Resources:
           response = client.describe_place_index(
             IndexName=indexName
           )
-          print(response)
           response = client.search_place_index_for_position(
             IndexName=indexName,
             MaxResults=10,
@@ -25,18 +24,15 @@ Resources:
                 -123.12,
                 49.28
             ]
-          )['Results'][0]
-          print(response)
+          )
           response = client.search_place_index_for_text(
             IndexName=indexName,
             Text="effiel tow"
           )
-          print(response)
           response = client.search_place_index_for_suggestions(
             IndexName=indexName,
             Text="effiel tow"
           )
-          print(response)
       Environment:
         Variables:
           LOCATION_INDEX: !Sub ${AWS::StackName}-PlaceIndex
