@@ -3934,6 +3934,9 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_application__Properties"
         },
@@ -6142,6 +6145,9 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
         "Properties": {

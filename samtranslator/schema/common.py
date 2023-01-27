@@ -9,6 +9,7 @@ from pydantic import Extra, Field
 # Value passed directly to CloudFormation; not used by SAM
 PassThrough = Any  # TODO: Make it behave like typescript's unknown
 
+
 # If using PassThrough as-is, pydantic will mark the field as not required:
 #  - https://github.com/pydantic/pydantic/issues/990
 #  - https://github.com/pydantic/pydantic/issues/1223
@@ -58,3 +59,11 @@ class BaseModel(LenientBaseModel):
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html
 class Ref(BaseModel):
     Ref: str
+
+
+class ResourceAttributes(BaseModel):
+    DependsOn: Optional[PassThroughProp]
+    DeletionPolicy: Optional[PassThroughProp]
+    Metadata: Optional[PassThroughProp]
+    UpdateReplacePolicy: Optional[PassThroughProp]
+    Condition: Optional[PassThroughProp]

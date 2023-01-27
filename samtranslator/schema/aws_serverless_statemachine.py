@@ -10,6 +10,7 @@ from samtranslator.schema.common import (
     SamIntrinsicable,
     DictStrAny,
     get_prop,
+    ResourceAttributes,
 )
 from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
@@ -168,12 +169,7 @@ class Properties(BaseModel):
     Type: Optional[PassThroughProp] = properties("Type")
 
 
-class Resource(BaseModel):
+class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::StateMachine"]
     Properties: Properties
-    Condition: Optional[PassThroughProp]
-    DeletionPolicy: Optional[PassThroughProp]
-    UpdateReplacePolicy: Optional[PassThroughProp]
-    DependsOn: Optional[PassThroughProp]
-    Metadata: Optional[PassThroughProp]
     Connectors: Optional[Dict[str, EmbeddedConnector]]
