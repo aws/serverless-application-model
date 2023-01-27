@@ -61,6 +61,11 @@ update-schema-data:
 	# Update CloudFormation schema
 	curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
 
+	# Update foo
+	# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-resource-specification.html
+	curl https://dnwj8swjjbsbt.cloudfront.net/latest/gzip/CloudFormationResourceSpecification.json | gunzip > .tmp/resource-spec.json
+	python bin/foo.py --spec .tmp/resource-spec.json > samtranslator/schema/foo.json
+
 	# Add CloudFormation docs to CloudFormation schema
 	python bin/add_docs_cfn_schema.py --schema .tmp/cloudformation.schema.json --docs samtranslator/schema/cloudformation-docs.json > samtranslator/schema/cloudformation.schema.json
 
