@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from typing_extensions import Literal
 
@@ -23,8 +23,8 @@ class ResourceReference(BaseModel):
 
 class Properties(BaseModel):
     Source: ResourceReference = properties("Source")
-    Destination: ResourceReference = properties("Destination")
-    Permissions: PermissionsType = properties("Permissions")
+    Destination: Union[ResourceReference, List[ResourceReference]] = properties("Destination")
+    Permissions: List[Literal["Read", "Write"]] = properties("Permissions")
 
 
 class Resource(ResourceAttributes):
@@ -38,7 +38,7 @@ class SourceReference(BaseModel):
 
 class EmbeddedConnectorProperties(BaseModel):
     SourceReference: Optional[SourceReference]  # TODO: add docs for SourceReference
-    Destination: ResourceReference = properties("Destination")
+    Destination: Union[ResourceReference, List[ResourceReference]] = properties("Destination")
     Permissions: PermissionsType = properties("Permissions")
 
 
