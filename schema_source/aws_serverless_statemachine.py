@@ -12,6 +12,7 @@ from schema_source.common import (
     ResourceAttributes,
     SamIntrinsicable,
     get_prop,
+    ResourceAttributes,
 )
 
 properties = get_prop("sam-resource-statemachine")

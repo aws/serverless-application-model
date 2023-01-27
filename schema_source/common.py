@@ -10,6 +10,7 @@ from pydantic import Extra, Field
 from samtranslator.model.types import PassThrough
 
 
+
 # If using PassThrough as-is, pydantic will mark the field as not required:
 #  - https://github.com/pydantic/pydantic/issues/990
 #  - https://github.com/pydantic/pydantic/issues/1223
