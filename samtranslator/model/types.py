@@ -147,3 +147,7 @@ def is_str() -> Validator:
     https://github.com/aws/aws-sam-cli/commit/d18f57c5f39273a04fb582f90e6c5817a4651912
     """
     return IS_STR
+
+
+# Value passed directly to CloudFormation; not used by SAM
+PassThrough = Any  # TODO: Make it behave like typescript's unknown

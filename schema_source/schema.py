@@ -9,8 +9,8 @@ import pydantic
 from typing import Any, Dict, Type, Optional, Union
 
 
-from samtranslator.schema.common import BaseModel, LenientBaseModel
-from samtranslator.schema import (
+from schema_source.common import BaseModel, LenientBaseModel
+from schema_source import (
     aws_serverless_simpletable,
     aws_serverless_application,
     aws_serverless_connector,

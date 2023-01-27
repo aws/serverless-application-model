@@ -6,8 +6,8 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigateway import ApiGatewayAuthorizer
 from samtranslator.model.intrinsics import ref, make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.model.types import PassThrough
 from samtranslator.open_api.base_editor import BaseEditor
-from samtranslator.schema.common import PassThrough
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.utils.utils import InvalidValueType, dict_deep_set
