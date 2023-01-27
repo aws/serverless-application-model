@@ -55,17 +55,25 @@ def convert_to_full_path(description: str, prefix: str) -> str:
     return description
 
 
+def stringbetween(s: str, sep1: str, sep2: str) -> str:
+    return s.split(sep1, 1)[1].split(sep2, 1)[0]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", type=Path)
     parser.add_argument("--cfn", action="store_true")
+    parser.add_argument("--with-title", help="use doc title instead of filename as key", action="store_true")
     args = parser.parse_args()
 
     props: Dict[str, Dict[str, str]] = {}
     for path in args.dir.glob("*.md"):
-        for name, description in parse(path.read_text(), args.cfn):
-            if path.stem not in props:
-                props[path.stem] = {}
+        text = path.read_text()
+        title = stringbetween(text, "# ", "<a")
+        page = title if args.with_title else path.stem
+        for name, description in parse(text, args.cfn):
+            if page not in props:
+                props[page] = {}
             description = remove_first_line(description)  # Remove property name; already in the schema title
             description = fix_markdown_code_link(description)
             prefix = (
@@ -74,7 +82,7 @@ def main() -> None:
                 else "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/"
             )
             description = convert_to_full_path(description, prefix)
-            props[path.stem][name] = description
+            props[page][name] = description
 
     print(
         json.dumps(
