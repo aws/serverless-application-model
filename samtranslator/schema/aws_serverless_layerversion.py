@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop
+from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, ResourceAttributes
 
 contenturi = get_prop("sam-property-layerversion-layercontent")
 properties = get_prop("sam-resource-layerversion")
@@ -26,8 +26,6 @@ class Properties(BaseModel):
     RetentionPolicy: Optional[SamIntrinsicable[str]] = properties("RetentionPolicy")
 
 
-class Resource(BaseModel):
+class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::LayerVersion"]
     Properties: Properties
-    Condition: Optional[PassThroughProp]
-    DeletionPolicy: Optional[PassThroughProp]

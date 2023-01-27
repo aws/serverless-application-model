@@ -1966,7 +1966,10 @@ class SamConnector(SamResourceMacro):
         policy_document = self._get_policy_statements(profile)
 
         policy_name = f"{self.logical_id}PolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}Policy"
-        policy = IAMManagedPolicy(policy_name)
+        policy = IAMManagedPolicy(
+            logical_id=policy_name, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
         policy.PolicyDocument = policy_document
         policy.Roles = [role_name]
 
@@ -2010,7 +2013,12 @@ class SamConnector(SamResourceMacro):
                     if multi_dest
                     else f"{self.logical_id}{name}LambdaPermission"
                 )
-                permission = LambdaPermission(permission_name)
+                permission = LambdaPermission(
+                    logical_id=permission_name,
+                    depends_on=self.depends_on,
+                    attributes=self.resource_attributes,
+                )
+
                 permissions = profile["AccessCategories"][name]
                 permission.Action = permissions["Action"]
                 permission.FunctionName = function_arn
@@ -2042,7 +2050,8 @@ class SamConnector(SamResourceMacro):
         topic_policy_name = (
             f"{self.logical_id}TopicPolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}TopicPolicy"
         )
-        topic_policy = SNSTopicPolicy(topic_policy_name)
+        topic_policy = SNSTopicPolicy(logical_id=topic_policy_name, depends_on=self.depends_on, attributes=self.resource_attributes)
+        
         topic_policy.Topics = [topic_arn]
         topic_policy.PolicyDocument = self._get_policy_statements(profile)
 
@@ -2069,7 +2078,8 @@ class SamConnector(SamResourceMacro):
         queue_policy_name = (
             f"{self.logical_id}QueuePolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}QueuePolicy"
         )
-        queue_policy = SQSQueuePolicy(queue_policy_name)
+        queue_policy = SQSQueuePolicy(logical_id=queue_policy_name, depends_on=self.depends_on, attributes=self.resource_attributes)
+        
         queue_policy.PolicyDocument = self._get_policy_statements(profile)
         queue_policy.Queues = [queue_url]
 

@@ -11,6 +11,7 @@ from samtranslator.schema.common import (
     get_prop,
     DictStrAny,
     Ref,
+    ResourceAttributes,
 )
 from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
@@ -552,12 +553,7 @@ class Globals(BaseModel):
     RuntimeManagementConfig: Optional[RuntimeManagementConfig]  # TODO: add prop
 
 
-class Resource(BaseModel):
+class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::Function"]
     Properties: Optional[Properties]
     Connectors: Optional[Dict[str, EmbeddedConnector]]
-    DeletionPolicy: Optional[PassThroughProp]
-    UpdateReplacePolicy: Optional[PassThroughProp]
-    Condition: Optional[PassThroughProp]
-    DependsOn: Optional[PassThroughProp]
-    Metadata: Optional[PassThroughProp]

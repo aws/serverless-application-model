@@ -729,6 +729,9 @@
     "EmbeddedConnector": {
       "additionalProperties": false,
       "properties": {
+        "Condition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "DeletionPolicy": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -741,7 +744,7 @@
         "Properties": {
           "$ref": "#/definitions/EmbeddedConnectorProperties"
         },
-        "UpdatePolicy": {
+        "UpdateReplacePolicy": {
           "$ref": "#/definitions/PassThroughProp"
         }
       },
@@ -3610,9 +3613,6 @@
           "title": "Type",
           "type": "string"
         },
-        "UpdatePolicy": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
         "UpdateReplacePolicy": {
           "$ref": "#/definitions/PassThroughProp"
         }
@@ -3925,6 +3925,15 @@
         "Condition": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_application__Properties"
         },
@@ -3934,6 +3943,9 @@
           ],
           "title": "Type",
           "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
@@ -3997,6 +4009,18 @@
     "samtranslator__schema__aws_serverless_connector__Resource": {
       "additionalProperties": false,
       "properties": {
+        "Condition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_connector__Properties"
         },
@@ -4006,6 +4030,9 @@
           ],
           "title": "Type",
           "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
@@ -5943,6 +5970,12 @@
           "title": "Connectors",
           "type": "object"
         },
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -5955,6 +5988,9 @@
           ],
           "title": "Type",
           "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
@@ -6111,6 +6147,12 @@
         "DeletionPolicy": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_layerversion__Properties"
         },
@@ -6120,6 +6162,9 @@
           ],
           "title": "Type",
           "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
@@ -6202,12 +6247,24 @@
     "samtranslator__schema__aws_serverless_simpletable__Resource": {
       "additionalProperties": false,
       "properties": {
+        "Condition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Connectors": {
           "additionalProperties": {
             "$ref": "#/definitions/EmbeddedConnector"
           },
           "title": "Connectors",
           "type": "object"
+        },
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_simpletable__Properties"
@@ -6218,6 +6275,9 @@
           ],
           "title": "Type",
           "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
@@ -6731,6 +6791,15 @@
           "title": "Connectors",
           "type": "object"
         },
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Properties": {
           "$ref": "#/definitions/samtranslator__schema__aws_serverless_statemachine__Properties"
         },
@@ -6740,6 +6809,9 @@
           ],
           "title": "Type",
           "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
