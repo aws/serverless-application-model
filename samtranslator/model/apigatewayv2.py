@@ -1,10 +1,9 @@
 from typing import Any, Dict, List, Optional, Union
 
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import IS_DICT, is_type, one_of, IS_STR, list_of
+from samtranslator.model.types import IS_DICT, is_type, one_of, IS_STR, list_of, PassThrough
 from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException
-from samtranslator.schema.common import PassThrough
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect

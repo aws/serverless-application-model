@@ -4,8 +4,8 @@ from typing import Optional, Any, Dict
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThroughProp, BaseModel, get_prop, ResourceAttributes
-from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
+from schema_source.common import PassThroughProp, BaseModel, get_prop, ResourceAttributes
+from schema_source.aws_serverless_connector import EmbeddedConnector
 
 primarykey = get_prop("sam-property-simpletable-primarykeyobject")
 properties = get_prop("sam-resource-simpletable")

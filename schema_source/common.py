@@ -6,8 +6,7 @@ from functools import partial
 import pydantic
 from pydantic import Extra, Field
 
-# Value passed directly to CloudFormation; not used by SAM
-PassThrough = Any  # TODO: Make it behave like typescript's unknown
+from samtranslator.model.types import PassThrough
 
 
 # If using PassThrough as-is, pydantic will mark the field as not required:
