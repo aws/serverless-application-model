@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--spec", help="CloudFormation resource specification", required=True, type=Path)
     args = parser.parse_args()
