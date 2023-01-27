@@ -40,7 +40,7 @@ Resources:
       Environment:
         Variables:
           LOCATION_INDEX: !Sub ${AWS::StackName}-PlaceIndex
-        
+
 
   MyPlace:
     Type: AWS::Location::PlaceIndex
@@ -57,3 +57,5 @@ Resources:
         Id: MyPlace
       Permissions:
       - Read
+Metadata:
+  SamTransformTest: true

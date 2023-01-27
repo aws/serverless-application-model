@@ -1,14 +1,93 @@
 {
   "Resources": {
-    "MyPlace": {
-      "Type": "AWS::Location::PlaceIndex",
+    "MyConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector": {
+            "Destination": {
+              "Type": "AWS::Location::PlaceIndex"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        }
+      },
       "Properties": {
-        "DataSource": "Here",
-        "IndexName": "MyPlaceIndex"
-      }
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "geo:DescribePlaceIndex",
+                "geo:GetPlace",
+                "geo:SearchPlaceIndexForPosition",
+                "geo:SearchPlaceIndexForSuggestions",
+                "geo:SearchPlaceIndexForText"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:geo:us-east-1:123123123123:place-index/explore.place"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyConnectorWithIdPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnectorWithId": {
+            "Destination": {
+              "Type": "AWS::Location::PlaceIndex"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "geo:DescribePlaceIndex",
+                "geo:GetPlace",
+                "geo:SearchPlaceIndexForPosition",
+                "geo:SearchPlaceIndexForSuggestions",
+                "geo:SearchPlaceIndexForText"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyPlace",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
     },
     "MyFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
@@ -27,13 +106,12 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "MyFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -46,7 +124,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -57,94 +136,15 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "MyConnectorPolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Metadata": {
-        "aws:sam:connectors": {
-          "MyConnector": {
-            "Source": {
-              "Type": "AWS::Serverless::Function"
-            },
-            "Destination": {
-              "Type": "AWS::Location::PlaceIndex"
-            }
-          }
-        }
       },
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "geo:DescribePlaceIndex",
-                "geo:GetPlace",
-                "geo:SearchPlaceIndexForPosition",
-                "geo:SearchPlaceIndexForSuggestions",
-                "geo:SearchPlaceIndexForText"
-              ],
-              "Resource": [
-                {
-                  "Fn::Sub": "arn:${AWS::Partition}:geo:us-east-1:123123123123:place-index/explore.place"
-                }
-              ]
-            }
-          ]
-        },
-        "Roles": [
-          {
-            "Ref": "MyFunctionRole"
-          }
-        ]
-      }
+      "Type": "AWS::IAM::Role"
     },
-    "MyConnectorWithIdPolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Metadata": {
-        "aws:sam:connectors": {
-          "MyConnectorWithId": {
-            "Source": {
-              "Type": "AWS::Serverless::Function"
-            },
-            "Destination": {
-              "Type": "AWS::Location::PlaceIndex"
-            }
-          }
-        }
-      },
+    "MyPlace": {
       "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "geo:DescribePlaceIndex",
-                "geo:GetPlace",
-                "geo:SearchPlaceIndexForPosition",
-                "geo:SearchPlaceIndexForSuggestions",
-                "geo:SearchPlaceIndexForText"
-              ],
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "MyPlace",
-                    "Arn"
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        "Roles": [
-          {
-            "Ref": "MyFunctionRole"
-          }
-        ]
-      }
+        "DataSource": "Here",
+        "IndexName": "MyPlaceIndex"
+      },
+      "Type": "AWS::Location::PlaceIndex"
     }
   }
 }
