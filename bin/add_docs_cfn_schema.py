@@ -33,8 +33,6 @@ def main() -> None:
 
     # Assumes schema is from GoFormation and has consistent structure
     # TODO: Use a more generic walk
-    # TODO: Use a more robust cross-referencing method than guessing slugs, doesn't always work
-    #       e.g. AWS::EC2::Instance.Ebs corresponds to aws-properties-ec2-blockdev-template
     for def_name, def_schema in schema["definitions"].items():
         if not def_name.startswith("AWS::"):
             log(f"Skipping {def_name}: does not start with AWS::")
@@ -42,15 +40,15 @@ def main() -> None:
         # If e.g. AWS::S3::Bucket, we only look under Properties
         # TODO: Support resource attributes et al.
         props = def_schema["properties"] if "." in def_name else def_schema["properties"]["Properties"]["properties"]
-        slug = def_name.replace(".", " ")
-        if slug not in docs:
-            log(f"Skipping {def_name}: {slug} not in docs")
+        page = def_name.replace(".", " ")
+        if page not in docs:
+            log(f"Skipping {def_name}: {page} not in docs")
             continue
         for prop_name, prop_schema in props.items():
-            if prop_name not in docs[slug]:
-                log(f"Skipping {def_name}: {prop_name} not in {slug} docs")
+            if prop_name not in docs[page]:
+                log(f"Skipping {def_name}: {prop_name} not in {page} docs")
                 continue
-            prop_schema["markdownDescription"] = docs[slug][prop_name]
+            prop_schema["markdownDescription"] = docs[page][prop_name]
             # GoFormation schema doesn't include it, so VS Code defaults to something unrelated (e.g. "Resources")
             prop_schema["title"] = prop_name
 
