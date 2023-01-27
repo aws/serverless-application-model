@@ -24,8 +24,8 @@ from samtranslator.model.exceptions import (
     InvalidTemplateException,
 )
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
+from samtranslator.model.types import PassThrough
 from samtranslator.region_configuration import RegionConfiguration
-from samtranslator.schema.common import PassThrough
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.intrinsics import is_intrinsic, fnSub
 from samtranslator.model.lambda_ import LambdaPermission

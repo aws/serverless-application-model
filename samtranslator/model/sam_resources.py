@@ -62,7 +62,7 @@ from samtranslator.model.lambda_ import (
     LambdaUrl,
     LambdaPermission,
 )
-from samtranslator.model.types import dict_of, IS_STR, is_type, IS_DICT, list_of, one_of, any_type
+from samtranslator.model.types import dict_of, IS_STR, is_type, IS_DICT, list_of, one_of, any_type, PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.intrinsics import (
@@ -80,7 +80,6 @@ from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.utils.types import Intrinsicable
-from samtranslator.schema.common import PassThrough
 from samtranslator.validator.value_validator import sam_expect
 
 

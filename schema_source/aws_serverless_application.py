@@ -4,7 +4,7 @@ from typing import Optional, Any, Dict, Union
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, ResourceAttributes
+from schema_source.common import PassThroughProp, BaseModel, SamIntrinsicable, get_prop, ResourceAttributes
 
 location = get_prop("sam-property-application-applicationlocationobject")
 properties = get_prop("sam-resource-application")

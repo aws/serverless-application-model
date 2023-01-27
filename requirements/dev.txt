@@ -35,3 +35,6 @@ mypy==0.971
 boto3-stubs[appconfig,serverlessrepo]>=1.19.5,==1.*
 types-PyYAML~=5.4
 types-jsonschema~=3.2
+
+# schema generation, requiring features in >=1.10
+pydantic~=1.10
