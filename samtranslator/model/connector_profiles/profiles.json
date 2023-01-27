@@ -352,6 +352,29 @@
             }
           }
         }
+      },
+      "AWS::Location::PlaceIndex": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "geo:DescribePlaceIndex",
+                    "geo:GetPlace",
+                    "geo:SearchPlaceIndexForPosition",
+                    "geo:SearchPlaceIndexForSuggestions",
+                    "geo:SearchPlaceIndexForText"
+                  ],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
       }
     },
     "AWS::ApiGatewayV2::Api": {
