@@ -1,0 +1,40 @@
+Parameters:
+  Param:
+    Type: String
+    AllowedValues:
+    - test1
+    - test2
+Conditions:
+  Cond:
+    Fn::Equals:
+    - !Ref Param
+    - test1
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      InlineCode: foo
+      Handler: foo
+
+  MyOtherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      InlineCode: foo
+      Handler: foo
+
+  MyConnectors:
+    Type: AWS::Serverless::Connector
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Metadata:
+      foo: bar
+    Condition: Cond
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination:
+        Id: MyOtherFunction
+      Permissions:
+      - Write

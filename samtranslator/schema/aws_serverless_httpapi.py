@@ -10,6 +10,7 @@ from samtranslator.schema.common import (
     SamIntrinsicable,
     get_prop,
     DictStrAny,
+    ResourceAttributes,
 )
 from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
@@ -138,9 +139,7 @@ class Globals(BaseModel):
     DefaultRouteSettings: Optional[DefaultRouteSettings] = properties("DefaultRouteSettings")
 
 
-class Resource(BaseModel):
+class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::HttpApi"]
     Properties: Optional[Properties]
-    Metadata: Optional[PassThroughProp]
-    Condition: Optional[PassThroughProp]
     Connectors: Optional[Dict[str, EmbeddedConnector]]

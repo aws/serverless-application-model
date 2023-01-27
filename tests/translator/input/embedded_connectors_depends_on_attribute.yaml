@@ -1,0 +1,25 @@
+Resources:
+  MyFunction:
+    Connectors:
+      MyConnector:
+        DependsOn: SomeTable
+        Properties:
+          Destination:
+            Id: MyOtherFunction
+          Permissions:
+          - Write
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      InlineCode: foo
+      Handler: foo
+
+  MyOtherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      InlineCode: foo
+      Handler: foo
+
+  SomeTable:
+    Type: AWS::Serverless::SimpleTable

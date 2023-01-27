@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThroughProp, BaseModel, get_prop
+from samtranslator.schema.common import PassThroughProp, BaseModel, get_prop, ResourceAttributes
 
 resourcereference = get_prop("sam-property-connector-resourcereference")
 properties = get_prop("sam-resource-connector")
@@ -27,7 +27,7 @@ class Properties(BaseModel):
     Permissions: PermissionsType = properties("Permissions")
 
 
-class Resource(BaseModel):
+class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::Connector"]
     Properties: Properties
 
@@ -43,9 +43,5 @@ class EmbeddedConnectorProperties(BaseModel):
 
 
 # TODO make connectors a part of all CFN Resources
-class EmbeddedConnector(BaseModel):
+class EmbeddedConnector(ResourceAttributes):
     Properties: EmbeddedConnectorProperties
-    DependsOn: Optional[PassThroughProp]
-    DeletionPolicy: Optional[PassThroughProp]
-    Metadata: Optional[PassThroughProp]
-    UpdatePolicy: Optional[PassThroughProp]

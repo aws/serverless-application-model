@@ -1931,7 +1931,9 @@ class SamConnector(SamResourceMacro):
             )
 
         policy_document = self._get_policy_statements(profile)
-        policy = IAMManagedPolicy(f"{self.logical_id}Policy")
+        policy = IAMManagedPolicy(
+            logical_id=f"{self.logical_id}Policy", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
         policy.PolicyDocument = policy_document
         policy.Roles = [role_name]
 
@@ -1968,7 +1970,11 @@ class SamConnector(SamResourceMacro):
         lambda_permissions = []
         for name in profile["AccessCategories"].keys():
             if name in self.Permissions:
-                permission = LambdaPermission(f"{self.logical_id}{name}LambdaPermission")
+                permission = LambdaPermission(
+                    logical_id=f"{self.logical_id}{name}LambdaPermission",
+                    depends_on=self.depends_on,
+                    attributes=self.resource_attributes,
+                )
                 permissions = profile["AccessCategories"][name]
                 permission.Action = permissions["Action"]
                 permission.FunctionName = function_arn
@@ -1995,7 +2001,9 @@ class SamConnector(SamResourceMacro):
                 self.logical_id, f"Unable to get SNS topic ARN from '{property_name}' resource."
             )
 
-        topic_policy = SNSTopicPolicy(f"{self.logical_id}TopicPolicy")
+        topic_policy = SNSTopicPolicy(
+            logical_id=f"{self.logical_id}TopicPolicy", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
         topic_policy.Topics = [topic_arn]
         topic_policy.PolicyDocument = self._get_policy_statements(profile)
 
@@ -2017,7 +2025,9 @@ class SamConnector(SamResourceMacro):
                 self.logical_id, f"Unable to get SQS queue URL from '{property_name}' resource."
             )
 
-        queue_policy = SQSQueuePolicy(f"{self.logical_id}QueuePolicy")
+        queue_policy = SQSQueuePolicy(
+            logical_id=f"{self.logical_id}QueuePolicy", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
         queue_policy.PolicyDocument = self._get_policy_statements(profile)
         queue_policy.Queues = [queue_url]
 
