@@ -224,4 +224,3 @@ class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::Api"]
     Properties: Properties
     Connectors: Optional[Dict[str, EmbeddedConnector]]
-    UpdatePolicy: Optional[PassThroughProp]
