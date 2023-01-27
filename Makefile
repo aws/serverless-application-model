@@ -56,7 +56,7 @@ update-schema-data:
 	# Update and parse CloudFormation docs
 	rm -rf .tmp/aws-cloudformation-user-guide
 	git clone --depth 1 git@github.com:awsdocs/aws-cloudformation-user-guide.git .tmp/aws-cloudformation-user-guide
-	bin/parse_docs.py --cfn .tmp/aws-cloudformation-user-guide/doc_source > schema_source/cloudformation-docs.json
+	bin/parse_docs.py --cfn --with-title .tmp/aws-cloudformation-user-guide/doc_source > schema_source/cloudformation-docs.json
 
 	# Update CloudFormation schema
 	curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
