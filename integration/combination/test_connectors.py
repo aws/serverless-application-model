@@ -1,10 +1,13 @@
+from unittest.case import skipIf
+
 from time import sleep
 from unittest import SkipTest
 from parameterized import parameterized
 from tenacity import retry, stop_after_attempt, retry_if_exception
 from integration.conftest import clean_bucket
 from integration.helpers.base_test import S3_BUCKET_PREFIX, BaseTest
-from integration.helpers.resource import generate_suffix
+from integration.helpers.resource import generate_suffix, current_region_does_not_support
+from integration.config.service_names import LOCATION
 
 retry_once = retry(
     stop=stop_after_attempt(2),
@@ -13,6 +16,10 @@ retry_once = retry(
 )
 
 
+@skipIf(
+    current_region_does_not_support([LOCATION]),
+    "Location service is not supported in this testing region",
+)
 class TestConnectors(BaseTest):
     def tearDown(self):
         # Some tests will create items in S3 Bucket, which result in stack DELETE_FAILED state
