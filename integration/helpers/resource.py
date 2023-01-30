@@ -10,6 +10,7 @@ from integration.config.service_names import (
     REST_API,
     S3_EVENTS,
     SQS,
+    LOCATION,
     SCHEDULE_EVENT,
     STATE_MACHINE_INLINE_DEFINITION,
 )
@@ -222,6 +223,7 @@ SERVICE_DETECTORS: Dict[str, Callable[[Dict[str, Any], Set[str]], bool]] = {
     S3_EVENTS: lambda template_dict, cfn_resource_types: any(
         _resource_using_s3_events(resource) for resource in template_dict.get("Resources", {}).values()
     ),
+    LOCATION: lambda template_dict, cfn_resource_types: "AWS::Location::PlaceIndex" in cfn_resource_types,
 }
 
 
