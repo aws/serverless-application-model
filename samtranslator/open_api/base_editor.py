@@ -9,7 +9,7 @@ from samtranslator.model.intrinsics import is_intrinsic_no_value, make_condition
 from samtranslator.utils.py27hash_fix import Py27Dict
 
 
-class BaseEditor(object):
+class BaseEditor:
     # constants:
     _X_APIGW_INTEGRATION = "x-amazon-apigateway-integration"
     _CONDITIONAL_IF = "Fn::If"

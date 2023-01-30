@@ -1,0 +1,28 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs16.x
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = async (event) => {
+          console.log(event);
+        };
+
+  MyQueue:
+    Type: AWS::SQS::Queue
+    Connectors:
+      MyConnector:
+        Properties:
+          Destination:
+            Id: MyFunction
+          Permissions:
+          - Read
+          - Write
+
+  MyEventSourceMapping:
+    DependsOn: MyQueueMyConnectorPolicy
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !Ref MyFunction
+      EventSourceArn: !GetAtt MyQueue.Arn

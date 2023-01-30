@@ -1,0 +1,18 @@
+[
+  {
+    "LogicalResourceId": "TriggerFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyPlace",
+    "ResourceType": "AWS::Location::PlaceIndex"
+  },
+  {
+    "LogicalResourceId": "MyConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  }
+]

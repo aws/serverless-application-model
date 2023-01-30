@@ -33,7 +33,7 @@ DefaultStageName = "$default"
 HttpApiTagName = "httpapi:createdBy"
 
 
-class HttpApiGenerator(object):
+class HttpApiGenerator:
     def __init__(
         self,
         logical_id: str,
@@ -673,7 +673,7 @@ class HttpApiGenerator(object):
             raise InvalidResourceException(
                 self.logical_id,
                 f"Invalid 'DefinitionBody': {str(ex)}'.",
-            )
+            ) from ex
         if description_in_definition_body:
             raise InvalidResourceException(
                 self.logical_id,
@@ -701,7 +701,7 @@ class HttpApiGenerator(object):
             raise InvalidResourceException(
                 self.logical_id,
                 f"Invalid 'DefinitionBody': {str(ex)}.",
-            )
+            ) from ex
         if title_in_definition_body != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
             raise InvalidResourceException(
                 self.logical_id,

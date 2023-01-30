@@ -24,8 +24,8 @@ from samtranslator.model.exceptions import (
     InvalidTemplateException,
 )
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
+from samtranslator.model.types import PassThrough
 from samtranslator.region_configuration import RegionConfiguration
-from samtranslator.schema.common import PassThrough
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.intrinsics import is_intrinsic, fnSub
 from samtranslator.model.lambda_ import LambdaPermission
@@ -67,7 +67,7 @@ UsagePlanProperties.__new__.__defaults__ = (None, None, None, None, None, None)
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
 
 
-class SharedApiUsagePlan(object):
+class SharedApiUsagePlan:
     """
     Collects API information from different API resources in the same template,
     so that these information can be used in the shared usage plan
@@ -160,7 +160,7 @@ class SharedApiUsagePlan(object):
                 del template_conditions[SharedApiUsagePlan.SHARED_USAGE_PLAN_CONDITION_NAME]
 
 
-class ApiGenerator(object):
+class ApiGenerator:
     def __init__(
         self,
         logical_id: str,
@@ -684,7 +684,7 @@ class ApiGenerator(object):
                     allow_credentials=properties.AllowCredentials,
                 )
             except InvalidTemplateException as ex:
-                raise InvalidResourceException(self.logical_id, ex.message)
+                raise InvalidResourceException(self.logical_id, ex.message) from ex
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger

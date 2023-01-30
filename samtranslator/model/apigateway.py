@@ -5,8 +5,7 @@ from typing import Any, Dict, List, Optional
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.intrinsics import fnSub, ref
-from samtranslator.model.types import IS_DICT, IS_STR, is_type, list_of, one_of
-from samtranslator.schema.common import PassThrough
+from samtranslator.model.types import IS_DICT, IS_STR, is_type, list_of, one_of, PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
@@ -130,7 +129,7 @@ class ApiGatewayDeployment(Resource):
         stage.update_deployment_ref(self.logical_id)
 
 
-class ApiGatewayResponse(object):
+class ApiGatewayResponse:
     ResponseParameterProperties = ["Headers", "Paths", "QueryStrings"]
 
     def __init__(
@@ -263,7 +262,7 @@ class ApiGatewayApiKey(Resource):
     runtime_attrs = {"api_key_id": lambda self: ref(self.logical_id)}
 
 
-class ApiGatewayAuthorizer(object):
+class ApiGatewayAuthorizer:
     _VALID_FUNCTION_PAYLOAD_TYPES = [None, "TOKEN", "REQUEST"]
 
     def __init__(  # type: ignore[no-untyped-def]

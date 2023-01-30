@@ -1,4 +1,4 @@
-class GeneratedLogicalId(object):
+class GeneratedLogicalId:
     """
     Class to generate LogicalIDs for various scenarios.  SAM generates LogicalIds for new resources based on code
     that is spread across the translator codebase. It becomes to difficult to audit them and to standardize

@@ -769,6 +769,14 @@ class TestTemplateValidation(TestCase):
         self.assertEqual(expected, actual)
 
 
+class _SomethingPlugin(BasePlugin):
+    pass
+
+
+class _CustomPlugin(BasePlugin):
+    pass
+
+
 class TestPluginsUsage(TestCase):
     # Tests if plugins are properly injected into the translator
 
@@ -777,7 +785,7 @@ class TestPluginsUsage(TestCase):
     def test_prepare_plugins_must_add_required_plugins(self, make_policy_template_for_function_plugin_mock):
 
         # This is currently the only required plugin
-        plugin_instance = BasePlugin("something")
+        plugin_instance = _SomethingPlugin()
         make_policy_template_for_function_plugin_mock.return_value = plugin_instance
 
         sam_plugins = prepare_plugins([])
@@ -787,10 +795,10 @@ class TestPluginsUsage(TestCase):
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_prepare_plugins_must_merge_input_plugins(self, make_policy_template_for_function_plugin_mock):
 
-        required_plugin = BasePlugin("something")
+        required_plugin = _SomethingPlugin()
         make_policy_template_for_function_plugin_mock.return_value = required_plugin
 
-        custom_plugin = BasePlugin("someplugin")
+        custom_plugin = _CustomPlugin()
         sam_plugins = prepare_plugins([custom_plugin])
         self.assertEqual(7, len(sam_plugins))
 
