@@ -35,14 +35,14 @@ Resources:
           )
       Environment:
         Variables:
-          LOCATION_INDEX: !Sub ${AWS::StackName}-PlaceIndex
+          LOCATION_INDEX: !Sub ${AWS::StackName}-PI
 
 
   MyPlace:
     Type: AWS::Location::PlaceIndex
     Properties:
       DataSource: Here
-      IndexName: !Sub ${AWS::StackName}-PlaceIndex
+      IndexName: !Sub ${AWS::StackName}-PI
 
   MyConnector:
     Type: AWS::Serverless::Connector
