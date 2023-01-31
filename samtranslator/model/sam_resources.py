@@ -162,7 +162,7 @@ class SamFunction(SamResourceMacro):
     EphemeralStorage: Optional[Dict[str, Any]]
     AutoPublishAlias: Optional[Intrinsicable[str]]
     AutoPublishCodeSha256: Optional[Intrinsicable[str]]
-    AutoPublishAliasAdditionalProperties: Optional[bool]
+    AutoPublishAliasAdditionalProperties: Optional[Intrinsicable[bool]]
     VersionDescription: Optional[Intrinsicable[str]]
     ProvisionedConcurrencyConfig: Optional[Dict[str, Any]]
     FileSystemConfigs: Optional[Dict[str, Any]]
