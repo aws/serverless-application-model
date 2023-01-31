@@ -45,11 +45,9 @@ class EventSource(ResourceMacro, metaclass=ABCMeta):
         if prefix is None:
             prefix = self.logical_id
         if suffix.isalnum():
-            logical_id = prefix + resource_type + suffix
-        else:
-            generator = logical_id_generator.LogicalIdGenerator(prefix + resource_type, suffix)
-            logical_id = generator.gen()
-        return logical_id
+            return prefix + resource_type + suffix
+        generator = logical_id_generator.LogicalIdGenerator(prefix + resource_type, suffix)
+        return generator.gen()
 
     def _construct_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):  # type: ignore[no-untyped-def]
         """Constructs the IAM Role resource allowing the event service to invoke
@@ -329,10 +327,7 @@ class Api(EventSource):
                 permitted_stage = explicit_api["StageName"]
 
                 # Stage could be a intrinsic, in which case leave the suffix to default value
-                if isinstance(permitted_stage, str):
-                    stage_suffix = permitted_stage
-                else:
-                    stage_suffix = "Stage"  # type: ignore[unreachable]
+                stage_suffix = permitted_stage if isinstance(permitted_stage, str) else "Stage"
 
             else:
                 # RestApiId is a string, not an intrinsic, but we did not find a valid API resource for this ID
@@ -440,7 +435,7 @@ class Api(EventSource):
         :returns: a body mapping request which passes the Api input to the state machine execution
         :rtype: dict
         """
-        request_templates = {
+        return {
             "application/json": fnSub(
                 json.dumps(
                     {
@@ -450,7 +445,6 @@ class Api(EventSource):
                 )
             )
         }
-        return request_templates
 
     def _generate_request_template_unescaped(self, resource: Resource) -> Dict[str, Any]:
         """Generates the Body mapping request template for the Api. This allows for the input
@@ -464,7 +458,7 @@ class Api(EventSource):
         :returns: a body mapping request which passes the Api input to the state machine execution
         :rtype: dict
         """
-        request_templates = {
+        return {
             "application/json": fnSub(
                 # Need to unescape single quotes escaped by escapeJavaScript.
                 # Also the mapping template isn't valid JSON, so can't use json.dumps().
@@ -474,4 +468,3 @@ class Api(EventSource):
                 + """}"}"""
             )
         }
-        return request_templates

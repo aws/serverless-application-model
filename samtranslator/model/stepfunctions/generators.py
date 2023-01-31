@@ -200,8 +200,7 @@ class StateMachineGenerator:
         # Indenting and then splitting the JSON-encoded string for readability of the state machine definition in the CloudFormation translated resource.
         # Separators are passed explicitly to maintain trailing whitespace consistency across Py2 and Py3
         definition_lines = json.dumps(definition_dict, sort_keys=True, indent=4, separators=(",", ": ")).split("\n")
-        definition_string = fnJoin("\n", definition_lines)
-        return definition_string
+        return fnJoin("\n", definition_lines)
 
     def _construct_role(self) -> IAMRole:
         """
@@ -220,7 +219,7 @@ class StateMachineGenerator:
             policy_template_processor=None,
         )
 
-        execution_role = construct_role_for_resource(
+        return construct_role_for_resource(
             resource_logical_id=self.logical_id,
             role_path=self.role_path,
             attributes=self.passthrough_resource_attributes,
@@ -230,7 +229,6 @@ class StateMachineGenerator:
             tags=self._construct_tag_list(),
             permissions_boundary=self.permissions_boundary,
         )
-        return execution_role
 
     def _construct_tag_list(self) -> List[Dict[str, Any]]:
         """
@@ -306,9 +304,9 @@ class StateMachineGenerator:
 
         for key, value in sorted(iterator, key=lambda item: item[0]):  # type: ignore[no-any-return]
             if is_intrinsic(value) or is_dynamic_reference(value):
-                dynamic_value_paths.append(path + [key])
+                dynamic_value_paths.append([*path, key])
             elif isinstance(value, (dict, list)):
-                dynamic_value_paths.extend(self._get_paths_to_intrinsics(value, path + [key]))  # type: ignore[no-untyped-call]
+                dynamic_value_paths.extend(self._get_paths_to_intrinsics(value, [*path, key]))  # type: ignore[no-untyped-call]
 
         return dynamic_value_paths
 

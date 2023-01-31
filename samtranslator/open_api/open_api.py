@@ -548,11 +548,8 @@ class OpenApiEditor(BaseEditor):
         :return: True, if data is valid OpenApi
         """
 
-        if bool(data) and isinstance(data, dict) and isinstance(data.get("paths"), dict):
-            if bool(data.get("openapi")):
-                return OpenApiEditor.safe_compare_regex_with_string(
-                    OpenApiEditor._OPENAPI_VERSION_3_REGEX, data["openapi"]
-                )
+        if bool(data) and isinstance(data, dict) and isinstance(data.get("paths"), dict) and bool(data.get("openapi")):
+            return OpenApiEditor.safe_compare_regex_with_string(OpenApiEditor._OPENAPI_VERSION_3_REGEX, data["openapi"])
         return False
 
     @staticmethod

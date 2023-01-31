@@ -221,12 +221,11 @@ class SamFunction(SamResourceMacro):
         lambda_function = self._construct_lambda_function()
         resources.append(lambda_function)
 
-        if self.ProvisionedConcurrencyConfig:
-            if not self.AutoPublishAlias:
-                raise InvalidResourceException(
-                    self.logical_id,
-                    "To set ProvisionedConcurrencyConfig AutoPublishALias must be defined on the function",
-                )
+        if self.ProvisionedConcurrencyConfig and not self.AutoPublishAlias:
+            raise InvalidResourceException(
+                self.logical_id,
+                "To set ProvisionedConcurrencyConfig AutoPublishALias must be defined on the function",
+            )
 
         lambda_alias: Optional[LambdaAlias] = None
         alias_name = ""
@@ -313,14 +312,13 @@ class SamFunction(SamResourceMacro):
         resolved_event_invoke_config = intrinsics_resolver.resolve_parameter_refs(self.EventInvokeConfig)
 
         logical_id = "{id}EventInvokeConfig".format(id=function_name)
-        if lambda_alias:
-            lambda_event_invoke_config = LambdaEventInvokeConfig(
+        lambda_event_invoke_config = (
+            LambdaEventInvokeConfig(
                 logical_id=logical_id, depends_on=[lambda_alias.logical_id], attributes=self.resource_attributes
             )
-        else:
-            lambda_event_invoke_config = LambdaEventInvokeConfig(
-                logical_id=logical_id, attributes=self.resource_attributes
-            )
+            if lambda_alias
+            else LambdaEventInvokeConfig(logical_id=logical_id, attributes=self.resource_attributes)
+        )
 
         dest_config = {}
         input_dest_config = resolved_event_invoke_config.get("DestinationConfig")
@@ -397,10 +395,11 @@ class SamFunction(SamResourceMacro):
                 if resource:
                     if combined_condition:
                         resource.set_resource_attribute("Condition", combined_condition)
-                    if property_condition:
-                        destination = make_conditional(property_condition, resource.get_runtime_attr("arn"), dest_arn)
-                    else:
-                        destination = resource.get_runtime_attr("arn")
+                    destination = (
+                        make_conditional(property_condition, resource.get_runtime_attr("arn"), dest_arn)
+                        if property_condition
+                        else resource.get_runtime_attr("arn")
+                    )
                 policy = self._add_event_invoke_managed_policy(dest_config, resource_logical_id, destination)
             else:
                 raise InvalidResourceException(
@@ -541,18 +540,18 @@ class SamFunction(SamResourceMacro):
     def _add_event_invoke_managed_policy(
         self, dest_config: Dict[str, Any], logical_id: str, dest_arn: Any
     ) -> Dict[str, Any]:
-        policy = {}
         if dest_config and dest_config.get("Type"):
-            if dest_config.get("Type") == "SQS":
-                policy = IAMRolePolicies.sqs_send_message_role_policy(dest_arn, logical_id)
-            if dest_config.get("Type") == "SNS":
-                policy = IAMRolePolicies.sns_publish_role_policy(dest_arn, logical_id)
+            _type = dest_config.get("Type")
+            if _type == "SQS":
+                return IAMRolePolicies.sqs_send_message_role_policy(dest_arn, logical_id)
+            if _type == "SNS":
+                return IAMRolePolicies.sns_publish_role_policy(dest_arn, logical_id)
             # Event Bridge and Lambda Arns are passthrough.
-            if dest_config.get("Type") == "EventBridge":
-                policy = IAMRolePolicies.event_bus_put_events_role_policy(dest_arn, logical_id)
-            if dest_config.get("Type") == "Lambda":
-                policy = IAMRolePolicies.lambda_invoke_function_role_policy(dest_arn, logical_id)
-        return policy
+            if _type == "EventBridge":
+                return IAMRolePolicies.event_bus_put_events_role_policy(dest_arn, logical_id)
+            if _type == "Lambda":
+                return IAMRolePolicies.lambda_invoke_function_role_policy(dest_arn, logical_id)
+        return {}
 
     def _construct_role(
         self, managed_policy_map: Dict[str, Any], event_invoke_policies: List[Dict[str, Any]]
@@ -564,10 +563,11 @@ class SamFunction(SamResourceMacro):
         """
         role_attributes = self.get_passthrough_resource_attributes()
 
-        if self.AssumeRolePolicyDocument is not None:
-            assume_role_policy_document = self.AssumeRolePolicyDocument
-        else:
-            assume_role_policy_document = IAMRolePolicies.lambda_assume_role_policy()
+        assume_role_policy_document = (
+            self.AssumeRolePolicyDocument
+            if self.AssumeRolePolicyDocument is not None
+            else IAMRolePolicies.lambda_assume_role_policy()
+        )
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
@@ -593,11 +593,10 @@ class SamFunction(SamResourceMacro):
                 )
             )
 
-        if self.EventInvokeConfig:
-            if event_invoke_policies is not None:
-                policy_documents.extend(event_invoke_policies)
+        if self.EventInvokeConfig and event_invoke_policies is not None:
+            policy_documents.extend(event_invoke_policies)
 
-        execution_role = construct_role_for_resource(
+        return construct_role_for_resource(
             resource_logical_id=self.logical_id,
             attributes=role_attributes,
             managed_policy_map=managed_policy_map,
@@ -609,7 +608,6 @@ class SamFunction(SamResourceMacro):
             permissions_boundary=self.PermissionsBoundary,
             tags=self._construct_tag_list(self.Tags),
         )
-        return execution_role
 
     def _validate_package_type(self, lambda_function: LambdaFunction) -> None:
         """
@@ -879,7 +877,7 @@ class SamFunction(SamResourceMacro):
         try:
             logical_dict = code_dict.copy()
         except (AttributeError, UnboundLocalError):
-            pass
+            pass  # noqa: try-except-pass
         else:
             if function.Environment:
                 logical_dict.update(function.Environment)
@@ -1528,12 +1526,9 @@ class SamApplication(SamResourceMacro):
         """Adds tags to the stack if this resource is using the serverless app repo"""
         application_tags = {}
         if isinstance(self.Location, dict):
-            if self.APPLICATION_ID_KEY in self.Location.keys() and self.Location[self.APPLICATION_ID_KEY] is not None:
+            if self.APPLICATION_ID_KEY in self.Location and self.Location[self.APPLICATION_ID_KEY] is not None:
                 application_tags[self._SAR_APP_KEY] = self.Location[self.APPLICATION_ID_KEY]
-            if (
-                self.SEMANTIC_VERSION_KEY in self.Location.keys()
-                and self.Location[self.SEMANTIC_VERSION_KEY] is not None
-            ):
+            if self.SEMANTIC_VERSION_KEY in self.Location and self.Location[self.SEMANTIC_VERSION_KEY] is not None:
                 application_tags[self._SAR_SEMVER_KEY] = self.Location[self.SEMANTIC_VERSION_KEY]
         return application_tags
 
@@ -1772,8 +1767,7 @@ class SamStateMachine(SamResourceMacro):
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
         )
 
-        resources = state_machine_generator.to_cloudformation()
-        return resources
+        return state_machine_generator.to_cloudformation()
 
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
@@ -1976,16 +1970,14 @@ class SamConnector(SamResourceMacro):
         policy.Roles = [role_name]
 
         depended_by = profile.get("DependedBy")
-        if depended_by == "DESTINATION_EVENT_SOURCE_MAPPING":
-            if source.logical_id and destination.logical_id:
-                # The dependency type assumes Destination is a AWS::Lambda::Function
-                esm_ids = list(get_event_source_mappings(source.logical_id, destination.logical_id, resource_resolver))
-                # There can only be a single ESM from a resource to function, otherwise deployment fails
-                if len(esm_ids) == 1:
-                    add_depends_on(esm_ids[0], policy.logical_id, resource_resolver)
-        if depended_by == "SOURCE":
-            if source.logical_id:
-                add_depends_on(source.logical_id, policy.logical_id, resource_resolver)
+        if depended_by == "DESTINATION_EVENT_SOURCE_MAPPING" and source.logical_id and destination.logical_id:
+            # The dependency type assumes Destination is a AWS::Lambda::Function
+            esm_ids = list(get_event_source_mappings(source.logical_id, destination.logical_id, resource_resolver))
+            # There can only be a single ESM from a resource to function, otherwise deployment fails
+            if len(esm_ids) == 1:
+                add_depends_on(esm_ids[0], policy.logical_id, resource_resolver)
+        if depended_by == "SOURCE" and source.logical_id:
+            add_depends_on(source.logical_id, policy.logical_id, resource_resolver)
 
         return policy
 
@@ -2008,7 +2000,7 @@ class SamConnector(SamResourceMacro):
             )
 
         lambda_permissions = []
-        for name in profile["AccessCategories"].keys():
+        for name in profile["AccessCategories"]:
             if name in self.Permissions:
                 permission_name = (
                     f"{self.logical_id}{name}LambdaPermissionDestination{dest_index}"

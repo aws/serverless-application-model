@@ -274,7 +274,7 @@ class Resource(ABC):
         resource_dict.update(self.resource_attributes)
 
         properties_dict = {}
-        for name in self.property_types.keys():
+        for name in self.property_types:
             value = getattr(self, name)
             if value is not None:
                 properties_dict[name] = value
@@ -291,7 +291,7 @@ class Resource(ABC):
         :param value: the value of the attribute to be set
         :raises InvalidResourceException: if an invalid property is provided
         """
-        if name in self._keywords or name in self.property_types.keys():
+        if name in self._keywords or name in self.property_types:
             return super().__setattr__(name, value)
 
         raise InvalidResourceException(
@@ -534,7 +534,7 @@ class ResourceTypeResolver:
             for _, resource_class in inspect.getmembers(
                 module,
                 lambda cls: inspect.isclass(cls)
-                and cls.__module__ == module.__name__
+                and cls.__module__ == module.__name__  # noqa: function-uses-loop-variable
                 and hasattr(cls, "resource_type"),
             ):
                 self.resource_types[resource_class.resource_type] = resource_class
