@@ -19,6 +19,11 @@ from typing import Dict, Iterator, Tuple
 
 def parse(s: str) -> Iterator[Tuple[str, str]]:
     """Parse an AWS docs page in Markdown format, yielding each property."""
+    try:
+        # Prevent from parsing return values accidentally
+        s = s[: s.index("Return Values")]
+    except ValueError:
+        pass
     parts = s.split("\n\n")
     for part in parts:
         match = re.match(r"^\s*`(\w+)`\s+<a", part)

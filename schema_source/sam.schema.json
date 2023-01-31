@@ -6701,8 +6701,8 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Returns the name of the state machine, such as `HelloWorld-StateMachine`\\.",
-          "markdownDescription": "Returns the name of the state machine, such as `HelloWorld-StateMachine`\\.",
+          "description": "The name of the state machine\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StateMachineName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-statemachinename) property of an `AWS::StepFunctions::StateMachine` resource\\.",
+          "markdownDescription": "The name of the state machine\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StateMachineName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-statemachinename) property of an `AWS::StepFunctions::StateMachine` resource\\.",
           "title": "Name"
         },
         "PermissionsBoundary": {
