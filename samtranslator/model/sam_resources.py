@@ -877,23 +877,25 @@ class SamFunction(SamResourceMacro):
         #                 and next hashes. The chances that two subsequent hashes collide is fairly low.
         prefix = "{id}Version".format(id=self.logical_id)
         logical_dict = {}
-        try:
-            logical_dict = code_dict.copy()
-        except (AttributeError, UnboundLocalError):
-            pass  # noqa: try-except-pass
+        # We can't directly change AutoPublishAlias as that would be a breaking change, so we have to add this opt-in
+        # property that when set to true would change the lambda version whenever a property in the lambda function changes
+        if self.AutoPublishAliasAllProperties:
+            properties = function._generate_resource_dict().get("Properties", {})
+            logical_dict = properties
         else:
-            if function.Environment:
-                logical_dict.update(function.Environment)
-            if function.MemorySize:
-                logical_dict.update({"MemorySize": function.MemorySize})
-            # If SnapStart is enabled we want to publish a new version, to have the corresponding snapshot
-            if function.SnapStart and function.SnapStart.get("ApplyOn", "None") != "None":
-                logical_dict.update({"SnapStart": function.SnapStart})
-            # We can't directly change AutoPublishAlias as that would be a breaking change, so we have to add this opt-in
-            # property that when set to true would change the lambda version whenever a property in the lambda function changes
-            if self.AutoPublishAliasAllProperties:
-                properties = function._generate_resource_dict().get("Properties", {})
-                logical_dict.update(properties)
+            try:
+                logical_dict = code_dict.copy()
+            except (AttributeError, UnboundLocalError):
+                pass  # noqa: try-except-pass
+            else:
+                if function.Environment:
+                    logical_dict.update(function.Environment)
+                if function.MemorySize:
+                    logical_dict.update({"MemorySize": function.MemorySize})
+                # If SnapStart is enabled we want to publish a new version, to have the corresponding snapshot
+                if function.SnapStart and function.SnapStart.get("ApplyOn", "None") != "None":
+                    logical_dict.update({"SnapStart": function.SnapStart})
+
         logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()
