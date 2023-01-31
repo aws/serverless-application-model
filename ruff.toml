@@ -16,7 +16,7 @@ select = [
     "RET", # flake8-return
     "SIM", # flake8-simplify
     "TID", # flake8-tidy-imports
-    "RUF"
+    "RUF", # Ruff-specific rules
 ]
 
 # Mininal python version we support is 3.7
