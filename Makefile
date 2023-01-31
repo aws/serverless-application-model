@@ -51,27 +51,30 @@ lint-fix:
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
 
-update-schema-data:
+fetch-schema-data:
 	mkdir -p .tmp
 
-	# Update and parse SAM docs
 	rm -rf .tmp/aws-sam-developer-guide
 	git clone --depth 1 https://github.com/awsdocs/aws-sam-developer-guide.git .tmp/aws-sam-developer-guide
-	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > schema_source/docs.json
 
-	# Update and parse CloudFormation docs
 	rm -rf .tmp/aws-cloudformation-user-guide
 	git clone --depth 1 git@github.com:awsdocs/aws-cloudformation-user-guide.git .tmp/aws-cloudformation-user-guide
-	bin/parse_docs.py --cfn --with-title .tmp/aws-cloudformation-user-guide/doc_source > schema_source/cloudformation-docs.json
 
-	# Update CloudFormation schema
 	curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
+
+update-schema-data:
+	# Parse docs
+	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > schema_source/docs.json
+	bin/parse_docs.py --cfn --with-title .tmp/aws-cloudformation-user-guide/doc_source > schema_source/cloudformation-docs.json
 
 	# Add CloudFormation docs to CloudFormation schema
 	python bin/add_docs_cfn_schema.py --schema .tmp/cloudformation.schema.json --docs schema_source/cloudformation-docs.json > schema_source/cloudformation.schema.json
 
 schema:
 	python -m schema_source.schema --sam-schema schema_source/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema samtranslator/schema/schema.json
+
+# Update all schema data and schemas
+schema-all: fetch-schema-data update-schema-data schema
 
 # Command to run everytime you make changes to verify everything works
 dev: test
