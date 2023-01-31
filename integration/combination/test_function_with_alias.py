@@ -36,7 +36,7 @@ class TestFunctionWithAlias(BaseTest):
         self.assertEqual(len(versions), 1)
 
     def test_updating_version_by_changing_property_value_additional_properties(self):
-        self.create_and_verify_stack("combination/function_with_alias_and_additional_properties_property")
+        self.create_and_verify_stack("combination/function_with_alias_and_all_properties_property")
         alias_name = "Live"
         function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
         version_ids = self.get_function_version_by_name(function_name)
