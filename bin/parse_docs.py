@@ -13,20 +13,21 @@ Usage:
 import argparse
 import json
 import re
+from contextlib import suppress
 from pathlib import Path
 from typing import Dict, Iterator, Tuple
 
 
-def parse(s: str, cfn_docs: bool) -> Iterator[Tuple[str, str]]:
+def parse(s: str) -> Iterator[Tuple[str, str]]:
     """Parse an AWS docs page in Markdown format, yielding each property."""
+    # Prevent from parsing return values accidentally
+    with suppress(ValueError):
+        s = s[: s.index("Return Values")]
     parts = s.split("\n\n")
     for part in parts:
-        # TODO: More robust matching against properties? This might skip or include wrong sections
-        sam_prop = not cfn_docs and part.startswith(" `")
-        cfn_prop = cfn_docs and re.match(r"`\w+`  <a .+", part)
-        if sam_prop or cfn_prop:
-            name = part.split("`")[1]
-            yield name, part.strip()
+        match = re.match(r"^\s*`(\w+)`\s+<a", part)
+        if match:
+            yield match.group(1), part.strip()
 
 
 # TODO: Change in the docs instead?
@@ -71,7 +72,7 @@ def main() -> None:
         text = path.read_text()
         title = stringbetween(text, "# ", "<a")
         page = title if args.with_title else path.stem
-        for name, description in parse(text, args.cfn):
+        for name, description in parse(text):
             if page not in props:
                 props[page] = {}
             description = remove_first_line(description)  # Remove property name; already in the schema title
