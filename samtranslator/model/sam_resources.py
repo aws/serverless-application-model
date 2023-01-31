@@ -11,6 +11,7 @@ from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
+    Property,
     PassThroughProperty,
     PropertyType,
     Resource,
@@ -121,7 +122,7 @@ class SamFunction(SamResourceMacro):
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(IS_STR)),
         "AutoPublishCodeSha256": PropertyType(False, one_of(IS_STR)),
-        "AutoPublishAliasAdditionalProperties": PropertyType(False, is_type(bool)),
+        "AutoPublishAliasAllProperties": Property(False, is_type(bool)),
         "VersionDescription": PropertyType(False, IS_STR),
         "ProvisionedConcurrencyConfig": PropertyType(False, IS_DICT),
         "FileSystemConfigs": PropertyType(False, list_of(IS_DICT)),
@@ -162,7 +163,7 @@ class SamFunction(SamResourceMacro):
     EphemeralStorage: Optional[Dict[str, Any]]
     AutoPublishAlias: Optional[Intrinsicable[str]]
     AutoPublishCodeSha256: Optional[Intrinsicable[str]]
-    AutoPublishAliasAdditionalProperties: Optional[Intrinsicable[bool]]
+    AutoPublishAliasAllProperties: Optional[bool]
     VersionDescription: Optional[Intrinsicable[str]]
     ProvisionedConcurrencyConfig: Optional[Dict[str, Any]]
     FileSystemConfigs: Optional[Dict[str, Any]]
@@ -890,7 +891,7 @@ class SamFunction(SamResourceMacro):
                 logical_dict.update({"SnapStart": function.SnapStart})
             # We can't directly change AutoPublishAlias as that would be a breaking change, so we have to add this opt-in
             # property that when set to true would change the lambda version whenever a property in the lambda function changes
-            if self.AutoPublishAliasAdditionalProperties:
+            if self.AutoPublishAliasAllProperties:
                 properties = function._generate_resource_dict().get("Properties", {})
                 logical_dict.update(properties)
         logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()

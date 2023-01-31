@@ -6,7 +6,7 @@ Resources:
       Runtime: nodejs14.x
       CodeUri: ${codeuri}
       AutoPublishAlias: Live
-      AutoPublishAliasAdditionalProperties: true
+      AutoPublishAliasAllProperties: true
       Description: foo
 Metadata:
   SamTransformTest: true
