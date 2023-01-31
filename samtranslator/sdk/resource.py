@@ -12,7 +12,7 @@ class SamResource:
     with any CloudFormation constructs, like DependsOn, Conditions etc.
     """
 
-    type = None
+    type = None  # noqa: builtin-attribute-shadowing
     properties: Dict[str, Any] = {}  # TODO: Replace `Any` with something more specific
 
     def __init__(self, resource_dict: Dict[str, Any]) -> None:
@@ -40,24 +40,16 @@ class SamResource:
         # As long as the type is valid and type string.
         # validate the condition should be string
         # TODO Refactor this file so that it has logical id, can use sam_expect here after that
-        if self.condition:
+        if self.condition and not IS_STR(self.condition, should_raise=False):
+            raise InvalidDocumentException([InvalidTemplateException("Every Condition member must be a string.")])
 
-            if not IS_STR(self.condition, should_raise=False):
-                raise InvalidDocumentException([InvalidTemplateException("Every Condition member must be a string.")])
+        if self.deletion_policy and not IS_STR(self.deletion_policy, should_raise=False):
+            raise InvalidDocumentException([InvalidTemplateException("Every DeletionPolicy member must be a string.")])
 
-        if self.deletion_policy:
-
-            if not IS_STR(self.deletion_policy, should_raise=False):
-                raise InvalidDocumentException(
-                    [InvalidTemplateException("Every DeletionPolicy member must be a string.")]
-                )
-
-        if self.update_replace_policy:
-
-            if not IS_STR(self.update_replace_policy, should_raise=False):
-                raise InvalidDocumentException(
-                    [InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")]
-                )
+        if self.update_replace_policy and not IS_STR(self.update_replace_policy, should_raise=False):
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")]
+            )
 
         # TODO: should we raise exception if `self.type` is not a string?
         return isinstance(self.type, str) and SamResourceType.has_value(self.type)

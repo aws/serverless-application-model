@@ -274,13 +274,10 @@ class ApiGenerator:
                 self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
             )
 
-        if self.open_api_version:
-            if not SwaggerEditor.safe_compare_regex_with_string(
-                SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
-            ):
-                raise InvalidResourceException(
-                    self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'."
-                )
+        if self.open_api_version and not SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
+        ):
+            raise InvalidResourceException(self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'.")
 
         self._add_cors()
         self._add_auth()
@@ -475,7 +472,7 @@ class ApiGenerator:
             sam_expect(mutual_tls_auth, self.logical_id, "Domain.MutualTlsAuthentication").to_be_a_map()
             if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
                 invalid_keys = []
-                for key in mutual_tls_auth.keys():
+                for key in mutual_tls_auth:
                     if key not in {"TruststoreUri", "TruststoreVersion"}:
                         invalid_keys.append(key)
                 invalid_keys.sort()
@@ -648,7 +645,7 @@ class ApiGenerator:
         elif isinstance(self.cors, dict):
 
             # Make sure keys in the dict are recognized
-            if not all(key in CorsProperties._fields for key in self.cors.keys()):
+            if not all(key in CorsProperties._fields for key in self.cors):
                 raise InvalidResourceException(self.logical_id, INVALID_ERROR)
 
             properties = CorsProperties(**self.cors)
@@ -720,7 +717,7 @@ class ApiGenerator:
             )
 
         # Make sure keys in the dict are recognized
-        if not all(key in AuthProperties._fields for key in self.auth.keys()):
+        if not all(key in AuthProperties._fields for key in self.auth):
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
 
         if not SwaggerEditor.is_valid(self.definition_body):
@@ -776,7 +773,7 @@ class ApiGenerator:
         if not isinstance(usage_plan_properties, dict):
             raise InvalidResourceException(self.logical_id, "'UsagePlan' must be a dictionary")
         # throws error if the property invalid/ unsupported for UsagePlan
-        if not all(key in UsagePlanProperties._fields for key in usage_plan_properties.keys()):
+        if not all(key in UsagePlanProperties._fields for key in usage_plan_properties):
             raise InvalidResourceException(self.logical_id, "Invalid property for 'UsagePlan'")
 
         create_usage_plan = usage_plan_properties.get("CreateUsagePlan")
@@ -948,7 +945,7 @@ class ApiGenerator:
                     "Invalid property type '{}' for GatewayResponses. "
                     "Expected an object of type 'GatewayResponse'.".format(type(responses_value).__name__),
                 )
-            for response_key in responses_value.keys():
+            for response_key in responses_value:
                 if response_key not in GatewayResponseProperties:
                     raise InvalidResourceException(
                         self.logical_id,
@@ -1228,7 +1225,7 @@ class ApiGenerator:
         if isinstance(value, dict) and value.get("Type"):
             rest_api.Parameters = {"endpointConfigurationTypes": value.get("Type")}
             rest_api.EndpointConfiguration = {"Types": [value.get("Type")]}
-            if "VPCEndpointIds" in value.keys():
+            if "VPCEndpointIds" in value:
                 rest_api.EndpointConfiguration["VpcEndpointIds"] = value.get("VPCEndpointIds")
         else:
             rest_api.EndpointConfiguration = {"Types": [value]}

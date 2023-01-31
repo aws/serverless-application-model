@@ -183,9 +183,12 @@ class Translator:
                     if verify_unique_logical_id(resource, sam_template["Resources"]):
                         # For each generated resource, pass through existing metadata that may exist on the original SAM resource.
                         _r = resource.to_dict()
-                        if resource_dict.get("Metadata") and passthrough_metadata:
-                            if not template["Resources"].get(resource.logical_id):
-                                _r[resource.logical_id]["Metadata"] = resource_dict["Metadata"]
+                        if (
+                            resource_dict.get("Metadata")
+                            and passthrough_metadata
+                            and not template["Resources"].get(resource.logical_id)
+                        ):
+                            _r[resource.logical_id]["Metadata"] = resource_dict["Metadata"]
                         template["Resources"].update(_r)
                     else:
                         self.document_errors.append(
@@ -396,7 +399,7 @@ def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = N
         make_policy_template_for_function_plugin(),
     ]
 
-    plugins = [] if not plugins else plugins
+    plugins = plugins if plugins else []
 
     # If a ServerlessAppPlugin does not yet exist, create one and add to the beginning of the required plugins list.
     if not any(isinstance(plugin, ServerlessAppPlugin) for plugin in plugins):

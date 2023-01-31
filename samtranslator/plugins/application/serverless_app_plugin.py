@@ -95,10 +95,9 @@ class ServerlessAppPlugin(BasePlugin):
         intrinsic_resolvers = self._get_intrinsic_resolvers(template_dict.get("Mappings", {}))  # type: ignore[no-untyped-call]
 
         service_call = None
-        if self._validate_only:
-            service_call = self._handle_get_application_request
-        else:
-            service_call = self._handle_create_cfn_template_request
+        service_call = (
+            self._handle_get_application_request if self._validate_only else self._handle_create_cfn_template_request
+        )
         for logical_id, app in template.iterate({SamResourceType.Application.value}):
             if not self._can_process_application(app):  # type: ignore[no-untyped-call]
                 # Handle these cases in the on_before_transform_resource event

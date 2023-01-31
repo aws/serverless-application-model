@@ -51,7 +51,7 @@ else:
 def execute_command(command, args):  # type: ignore[no-untyped-def]
     try:
         aws_cmd = "aws" if platform.system().lower() != "windows" else "aws.cmd"
-        command_with_args = [aws_cmd, "cloudformation", command] + list(args)
+        command_with_args = [aws_cmd, "cloudformation", command, *list(args)]
 
         LOG.debug("Executing command: %s", command_with_args)
 

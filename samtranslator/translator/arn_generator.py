@@ -16,19 +16,17 @@ def _get_region_from_session() -> str:
 @lru_cache(maxsize=1)  # Only need to cache one as once deployed, it is not gonna deal with another region.
 def _region_to_partition(region: str) -> str:
     # setting default partition to aws, this will be overwritten by checking the region below
-    partition = "aws"
-
     region_string = region.lower()
     if region_string.startswith("cn-"):
-        partition = "aws-cn"
-    elif region_string.startswith("us-iso-"):
-        partition = "aws-iso"
-    elif region_string.startswith("us-isob"):
-        partition = "aws-iso-b"
-    elif region_string.startswith("us-gov"):
-        partition = "aws-us-gov"
+        return "aws-cn"
+    if region_string.startswith("us-iso-"):
+        return "aws-iso"
+    if region_string.startswith("us-isob"):
+        return "aws-iso-b"
+    if region_string.startswith("us-gov"):
+        return "aws-us-gov"
 
-    return partition
+    return "aws"
 
 
 class ArnGenerator:
@@ -76,10 +74,11 @@ class ArnGenerator:
             # Use Boto3 to get the region where code is running. This uses Boto's regular region resolution
             # mechanism, starting from AWS_DEFAULT_REGION environment variable.
 
-            if ArnGenerator.BOTO_SESSION_REGION_NAME is None:
-                region = _get_region_from_session()
-            else:
-                region = ArnGenerator.BOTO_SESSION_REGION_NAME  # type: ignore[unreachable]
+            region = (
+                _get_region_from_session()
+                if ArnGenerator.BOTO_SESSION_REGION_NAME is None
+                else ArnGenerator.BOTO_SESSION_REGION_NAME
+            )
 
         # If region is still None, then we could not find the region. This will only happen
         # in the local context. When this is deployed, we will be able to find the region like

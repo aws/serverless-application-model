@@ -177,7 +177,7 @@ class Py27Keys:
         # add keys in the py2 order -- we can't do a straigh-up deep copy of keyorder because
         # in py2 copy.deepcopy of a dict may result in reordering of the keys
         ret = Py27Keys()
-        for k in self.keys():
+        for k in self:
             if k is self.DUMMY:
                 continue
             ret.add(copy.deepcopy(k, memo))  # type: ignore[no-untyped-call]
@@ -240,10 +240,9 @@ class Py27Keys:
     def remove(self, key):  # type: ignore[no-untyped-def]
         """Removes key"""
         i = self._get_key_idx(key)  # type: ignore[no-untyped-call]
-        if i in self.keyorder:
-            if self.keyorder[i] is not self.DUMMY:
-                self.keyorder[i] = self.DUMMY
-                self.size -= 1
+        if i in self.keyorder and self.keyorder[i] is not self.DUMMY:
+            self.keyorder[i] = self.DUMMY
+            self.size -= 1
 
     def add(self, key):  # type: ignore[no-untyped-def]
         """Adds key"""
@@ -552,7 +551,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
             list of values
         """
         # pylint: disable=consider-using-dict-items
-        return [self[k] for k in self.keys()]  # type: ignore[no-untyped-call]
+        return [self[k] for k in self]
 
     def items(self):  # type: ignore[no-untyped-def]
         """
@@ -564,7 +563,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
             list of items
         """
         # pylint: disable=consider-using-dict-items
-        return [(k, self[k]) for k in self.keys()]  # type: ignore[no-untyped-call]
+        return [(k, self[k]) for k in self]
 
     def setdefault(self, key, default):  # type: ignore[no-untyped-def]
         """
