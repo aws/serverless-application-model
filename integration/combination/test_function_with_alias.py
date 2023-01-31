@@ -45,7 +45,7 @@ class TestFunctionWithAlias(BaseTest):
         alias = self.get_alias(function_name, alias_name)
         self.assertEqual("1", alias["FunctionVersion"])
 
-        # Changing CodeUri should create a new version, and leave the existing version in tact
+        # Changing Handler should create a new version, and leave the existing version intact
         self.set_template_resource_property("MyLambdaFunction", "Handler", "not_index.handler")
         self.update_stack()
 
@@ -54,6 +54,16 @@ class TestFunctionWithAlias(BaseTest):
 
         alias = self.get_alias(function_name, alias_name)
         self.assertEqual("2", alias["FunctionVersion"])
+
+        # Changing Description should create a new version, and leave the existing version intact
+        self.set_template_resource_property("MyLambdaFunction", "Description", "bar")
+        self.update_stack()
+
+        version_ids = self.get_function_version_by_name(function_name)
+        self.assertEqual(["1", "2", "3"], version_ids)
+
+        alias = self.get_alias(function_name, alias_name)
+        self.assertEqual("3", alias["FunctionVersion"])
 
         # Make sure the stack has only One Version & One Alias resource
         alias = self.get_stack_resources("AWS::Lambda::Alias")

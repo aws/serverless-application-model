@@ -7,5 +7,6 @@ Resources:
       CodeUri: ${codeuri}
       AutoPublishAlias: Live
       AutoPublishAliasAdditionalProperties: true
+      Description: foo
 Metadata:
   SamTransformTest: true
