@@ -1,5 +1,5 @@
 import re
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
@@ -17,28 +17,27 @@ class Action(ABC):
     _resource_ref_separator = "."
     intrinsic_name: str
 
-    @abstractmethod
-    def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
+    def resolve_parameter_refs(  # noqa: empty-method-without-abstract-decorator
+        self, input_dict: Optional[Any], parameters: Dict[str, Any]
+    ) -> Optional[Any]:
         """
-        Subclass must implement this method to resolve the intrinsic function
+        Subclass optionally implement this method to resolve the intrinsic function
         TODO: input_dict should not be None.
         """
 
-    @abstractmethod
-    def resolve_resource_refs(
+    def resolve_resource_refs(  # noqa: empty-method-without-abstract-decorator
         self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
     ) -> Optional[Any]:
         """
-        Subclass must implement this method to resolve resource references
+        Subclass optionally implement this method to resolve resource references
         TODO: input_dict should not be None.
         """
 
-    @abstractmethod
-    def resolve_resource_id_refs(
+    def resolve_resource_id_refs(  # noqa: empty-method-without-abstract-decorator
         self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
     ) -> Optional[Any]:
         """
-        Subclass must implement this method to resolve resource references
+        Subclass optionally implement this method to resolve resource references
         TODO: input_dict should not be None.
         """
 

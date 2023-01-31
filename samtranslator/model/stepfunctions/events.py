@@ -327,7 +327,7 @@ class Api(EventSource):
                 permitted_stage = explicit_api["StageName"]
 
                 # Stage could be a intrinsic, in which case leave the suffix to default value
-                stage_suffix = permitted_stage if isinstance(permitted_stage, str) else "Stage"  # type: ignore[unreachable]
+                stage_suffix = permitted_stage if isinstance(permitted_stage, str) else "Stage"
 
             else:
                 # RestApiId is a string, not an intrinsic, but we did not find a valid API resource for this ID

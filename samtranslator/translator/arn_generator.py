@@ -74,7 +74,11 @@ class ArnGenerator:
             # Use Boto3 to get the region where code is running. This uses Boto's regular region resolution
             # mechanism, starting from AWS_DEFAULT_REGION environment variable.
 
-            region = _get_region_from_session() if ArnGenerator.BOTO_SESSION_REGION_NAME is None else ArnGenerator.BOTO_SESSION_REGION_NAME  # type: ignore[unreachable]
+            region = (
+                _get_region_from_session()
+                if ArnGenerator.BOTO_SESSION_REGION_NAME is None
+                else ArnGenerator.BOTO_SESSION_REGION_NAME
+            )
 
         # If region is still None, then we could not find the region. This will only happen
         # in the local context. When this is deployed, we will be able to find the region like

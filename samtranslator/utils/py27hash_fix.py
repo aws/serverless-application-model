@@ -551,7 +551,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
             list of values
         """
         # pylint: disable=consider-using-dict-items
-        return [self[k] for k in self]  # type: ignore[no-untyped-call]
+        return [self[k] for k in self]
 
     def items(self):  # type: ignore[no-untyped-def]
         """
@@ -563,7 +563,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
             list of items
         """
         # pylint: disable=consider-using-dict-items
-        return [(k, self[k]) for k in self]  # type: ignore[no-untyped-call]
+        return [(k, self[k]) for k in self]
 
     def setdefault(self, key, default):  # type: ignore[no-untyped-def]
         """
