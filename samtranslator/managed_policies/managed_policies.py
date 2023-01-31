@@ -2,7 +2,6 @@ import json
 import os
 from typing import Dict
 
-
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "managed_policies.json"), encoding="utf-8") as f:
     _MANAGED_POLICIES = json.load(f)
 
