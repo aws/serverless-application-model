@@ -4693,8 +4693,15 @@
           "title": "AutoPublishAlias"
         },
         "AutoPublishAliasAdditionalProperties": {
-          "title": "Autopublishaliasadditionalproperties",
-          "type": "boolean"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Autopublishaliasadditionalproperties"
         },
         "AutoPublishCodeSha256": {
           "anyOf": [
