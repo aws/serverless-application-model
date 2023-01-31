@@ -11,8 +11,8 @@ from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
-    Property,
     PassThroughProperty,
+    Property,
     PropertyType,
     Resource,
     ResourceResolver,
