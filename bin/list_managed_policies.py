@@ -6,7 +6,7 @@ from samtranslator.public.translator import ManagedPolicyLoader
 
 
 # TODO: generic replace?
-def foo(arn: str, partition) -> str:
+def foo(arn: str, partition: str) -> str:
     return arn.replace("arn:aws:", "arn:" + partition + ":")
 
 
