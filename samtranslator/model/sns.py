@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import IS_DICT, IS_STR, list_of
 from samtranslator.model.intrinsics import ref
+from samtranslator.model.types import IS_DICT, IS_STR, list_of
 
 
 class SNSSubscription(Resource):

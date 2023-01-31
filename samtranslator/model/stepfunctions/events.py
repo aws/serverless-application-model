@@ -3,16 +3,16 @@ from abc import ABCMeta
 from typing import Any, Dict, Optional, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import Property, PropertyType, ResourceMacro, Resource
-from samtranslator.model.events import EventsRule
-from samtranslator.model.iam import IAMRole, IAMRolePolicies
-from samtranslator.model.types import IS_DICT, IS_STR, is_type, PassThrough
-from samtranslator.model.intrinsics import fnSub
-from samtranslator.translator import logical_id_generator
-from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
+from samtranslator.model.events import EventsRule
 from samtranslator.model.eventsources.push import Api as PushApi
+from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.iam import IAMRole, IAMRolePolicies
+from samtranslator.model.intrinsics import fnSub
+from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type
 from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.translator import logical_id_generator
 
 CONDITION = "Condition"
 SFN_EVETSOURCE_METRIC_PREFIX = "SFNEventSource"

@@ -14,7 +14,7 @@ import argparse
 import json
 import re
 from pathlib import Path
-from typing import Iterator, Tuple, Dict
+from typing import Dict, Iterator, Tuple
 
 
 def parse(s: str, cfn_docs: bool) -> Iterator[Tuple[str, str]]:

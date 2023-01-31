@@ -5,27 +5,25 @@ from typing import Any, Dict, List, Optional, Union, cast
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import ResourceMacro, PropertyType
+from samtranslator.model import PropertyType, ResourceMacro
+from samtranslator.model.cognito import CognitoUserPool
+from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
+from samtranslator.model.events import EventsRule
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import IS_DICT, is_type, list_of, dict_of, one_of, IS_STR
-from samtranslator.model.intrinsics import is_intrinsic, ref, fnGetAtt, fnSub, make_shorthand, make_conditional
-from samtranslator.model.tags.resource_tagging import get_tag_list
-
+from samtranslator.model.eventsources.pull import SQS
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidEventException, InvalidResourceException
+from samtranslator.model.intrinsics import fnGetAtt, fnSub, is_intrinsic, make_conditional, make_shorthand, ref
+from samtranslator.model.iot import IotTopicRule
+from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
-from samtranslator.model.lambda_ import LambdaPermission
-from samtranslator.model.events import EventsRule
-from samtranslator.model.eventsources.pull import SQS
-from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
-from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
-from samtranslator.model.iot import IotTopicRule
-from samtranslator.model.cognito import CognitoUserPool
-from samtranslator.model.types import PassThrough
+from samtranslator.model.sqs import SQSQueue, SQSQueuePolicies, SQSQueuePolicy
+from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, dict_of, is_type, list_of, one_of
+from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException
-from samtranslator.swagger.swagger import SwaggerEditor
-from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.validator.value_validator import sam_expect
 

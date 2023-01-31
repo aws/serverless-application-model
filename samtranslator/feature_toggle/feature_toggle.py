@@ -1,15 +1,15 @@
 import json
+import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, cast
 
 import boto3
-import logging
-
 from botocore.config import Config
+
 from samtranslator.feature_toggle.dialup import (
     DisabledDialup,
-    ToggleDialup,
     SimpleAccountPercentileDialup,
+    ToggleDialup,
 )
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.utils.constants import BOTO3_CONNECT_TIMEOUT

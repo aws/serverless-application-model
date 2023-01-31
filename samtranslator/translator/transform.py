@@ -1,5 +1,5 @@
-from samtranslator.translator.translator import Translator
 from samtranslator.parser.parser import Parser
+from samtranslator.translator.translator import Translator
 from samtranslator.utils.py27hash_fix import to_py27_compatible_template, undo_mark_unicode_str_in_template
 
 

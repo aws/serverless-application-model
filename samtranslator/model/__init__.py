@@ -1,14 +1,14 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
-import re
 import inspect
-from abc import ABC
+import re
+from abc import ABC, ABCMeta
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from abc import ABCMeta
+
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
+from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
-from samtranslator.model.tags.resource_tagging import get_tag_list
 
 
 class PropertyType:

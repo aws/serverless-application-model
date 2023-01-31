@@ -1,8 +1,8 @@
 from typing import Dict
 
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import IS_DICT, list_of
 from samtranslator.model.intrinsics import fnGetAtt, ref
+from samtranslator.model.types import IS_DICT, list_of
 
 
 class SQSQueue(Resource):

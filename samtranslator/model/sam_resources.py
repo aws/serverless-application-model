@@ -1,86 +1,89 @@
 ﻿""" SAM macro definitions """
 import copy
-from typing import Any, cast, Dict, List, Optional, Tuple, Union, Callable
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
+
+import samtranslator.model.eventsources
+import samtranslator.model.eventsources.cloudwatchlogs
+import samtranslator.model.eventsources.pull
+import samtranslator.model.eventsources.push
+import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
+from samtranslator.metrics.method_decorator import cw_timer
+from samtranslator.model import (
+    PassThroughProperty,
+    PropertyType,
+    Resource,
+    ResourceResolver,
+    ResourceTypeResolver,
+    SamResourceMacro,
+)
+from samtranslator.model.apigateway import (
+    ApiGatewayApiKey,
+    ApiGatewayDeployment,
+    ApiGatewayDomainName,
+    ApiGatewayStage,
+    ApiGatewayUsagePlan,
+    ApiGatewayUsagePlanKey,
+)
+from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
+from samtranslator.model.architecture import ARM64, X86_64
+from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
-    ConnectorResourceReference,
     ConnectorResourceError,
+    ConnectorResourceReference,
     add_depends_on,
-    replace_depends_on_logical_id,
     get_event_source_mappings,
     get_resource_reference,
+    replace_depends_on_logical_id,
 )
 from samtranslator.model.connector_profiles.profile import (
     ConnectorProfile,
-    profile_replace,
     get_profile,
+    profile_replace,
     verify_profile_variables_replaced,
 )
-
-import samtranslator.model.eventsources
-import samtranslator.model.eventsources.pull
-import samtranslator.model.eventsources.push
-import samtranslator.model.eventsources.cloudwatchlogs
-import samtranslator.model.eventsources.scheduler
-from .api.api_generator import ApiGenerator
-from .api.http_api_generator import HttpApiGenerator
-from .packagetype import ZIP, IMAGE
-from .s3_utils.uri_parser import construct_s3_location_object, construct_image_code_object
-from .tags.resource_tagging import get_tag_list
-from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import (
-    ResourceResolver,
-    PassThroughProperty,
-    PropertyType,
-    SamResourceMacro,
-    Resource,
-    ResourceTypeResolver,
-)
-from samtranslator.model.apigateway import (
-    ApiGatewayDeployment,
-    ApiGatewayStage,
-    ApiGatewayDomainName,
-    ApiGatewayUsagePlan,
-    ApiGatewayUsagePlanKey,
-    ApiGatewayApiKey,
-)
-from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2DomainName
-from samtranslator.model.architecture import ARM64, X86_64
-from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
-from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
-from samtranslator.model.resource_policies import ResourcePolicies
-from samtranslator.model.iam import IAMManagedPolicy, IAMRolePolicies, IAMRole
-from samtranslator.model.lambda_ import (
-    LambdaFunction,
-    LambdaVersion,
-    LambdaAlias,
-    LambdaLayerVersion,
-    LambdaEventInvokeConfig,
-    LambdaUrl,
-    LambdaPermission,
-)
-from samtranslator.model.types import dict_of, IS_STR, is_type, IS_DICT, list_of, one_of, any_type, PassThrough
-from samtranslator.translator import logical_id_generator
-from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.model.iam import IAMManagedPolicy, IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import (
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
-    ref,
-    make_not_conditional,
-    make_conditional,
     make_and_condition,
+    make_conditional,
+    make_not_conditional,
+    ref,
 )
-from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy
-from samtranslator.model.sns import SNSTopic, SNSTopicPolicy
-from samtranslator.model.stepfunctions import StateMachineGenerator
+from samtranslator.model.lambda_ import (
+    LambdaAlias,
+    LambdaEventInvokeConfig,
+    LambdaFunction,
+    LambdaLayerVersion,
+    LambdaPermission,
+    LambdaUrl,
+    LambdaVersion,
+)
+from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
+from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
+from samtranslator.model.sns import SNSTopic, SNSTopicPolicy
+from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy
+from samtranslator.model.stepfunctions import StateMachineGenerator
+from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, any_type, dict_of, is_type, list_of, one_of
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
+from samtranslator.translator import logical_id_generator
+from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect
+
+from .api.api_generator import ApiGenerator
+from .api.http_api_generator import HttpApiGenerator
+from .packagetype import IMAGE, ZIP
+from .s3_utils.uri_parser import construct_image_code_object, construct_s3_location_object
+from .tags.resource_tagging import get_tag_list
+
+_CONDITION_CHAR_LIMIT = 255
 
 
 class SamFunction(SamResourceMacro):
@@ -453,11 +456,11 @@ class SamFunction(SamResourceMacro):
         return None, None
 
     def _make_gen_condition_name(self, name: str, hash_input: str) -> str:
-        # Make sure the property name is not over 255 characters (CFN limit)
+        # Make sure the property name is not over CFN limit (currently 255)
         hash_digest = logical_id_generator.LogicalIdGenerator("", hash_input).gen()
         condition_name: str = name + hash_digest
-        if len(condition_name) > 255:
-            return input(condition_name)[:255]
+        if len(condition_name) > _CONDITION_CHAR_LIMIT:
+            return input(condition_name)[:_CONDITION_CHAR_LIMIT]
         return condition_name
 
     def _get_resolved_alias_name(

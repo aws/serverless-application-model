@@ -3,24 +3,22 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+from typing import Any, Dict, Optional, Type, Union
 
 import pydantic
 
-from typing import Any, Dict, Type, Optional, Union
-
-
-from schema_source.common import BaseModel, LenientBaseModel
 from schema_source import (
-    aws_serverless_simpletable,
+    any_cfn_resource,
+    aws_serverless_api,
     aws_serverless_application,
     aws_serverless_connector,
     aws_serverless_function,
-    aws_serverless_statemachine,
-    aws_serverless_layerversion,
-    aws_serverless_api,
     aws_serverless_httpapi,
-    any_cfn_resource,
+    aws_serverless_layerversion,
+    aws_serverless_simpletable,
+    aws_serverless_statemachine,
 )
+from schema_source.common import BaseModel, LenientBaseModel
 
 
 class Globals(BaseModel):

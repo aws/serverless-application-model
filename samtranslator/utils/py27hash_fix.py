@@ -1,16 +1,14 @@
 """
 """
 
-import ctypes
 import copy
+import ctypes
 import json
 import logging
-
 from typing import Any, Dict, Iterator, List, cast
 
 from samtranslator.parser.parser import Parser
 from samtranslator.third_party.py27hash.hash import Hash
-
 
 LOG = logging.getLogger(__name__)
 # Constants based on Python2.7 dictionary
@@ -165,6 +163,7 @@ class Py27Keys:
     # marker for deleted keys
     # we use DUMMY for a dummy key, force it to be treated as a str to avoid mypy unhappy
     DUMMY: str = cast(str, ["dummy"])
+    _LARGE_DICT_SIZE_THRESHOLD = 50000
 
     def __init__(self) -> None:
         super().__init__()
@@ -264,7 +263,7 @@ class Py27Keys:
         # Resize if 2/3 capacity
         if self.size > start_size and self.fill * 3 >= ((self.mask + 1) * 2):
             # Python2 dict increases size by a factor of 4 for small dict, and 2 for large dict
-            self._resize(self.size * (2 if self.size > 50000 else 4))  # type: ignore[no-untyped-call]
+            self._resize(self.size * (2 if self.size > self._LARGE_DICT_SIZE_THRESHOLD else 4))  # type: ignore[no-untyped-call]
 
     def keys(self) -> List[str]:
         """Return keys in Python2 order"""

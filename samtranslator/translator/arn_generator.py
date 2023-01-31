@@ -1,8 +1,7 @@
 from functools import lru_cache
+from typing import Optional
 
 import boto3
-
-from typing import Optional
 
 
 class NoRegionFound(Exception):

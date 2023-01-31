@@ -5,14 +5,12 @@ from typing import Any, Dict, List, Tuple
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
+from samtranslator.model.intrinsics import fnJoin, is_intrinsic
 from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
-from samtranslator.model.stepfunctions import StepFunctionsStateMachine
-from samtranslator.model.intrinsics import fnJoin
+from samtranslator.model.stepfunctions.resources import StepFunctionsStateMachine
 from samtranslator.model.tags.resource_tagging import get_tag_list
-
-from samtranslator.model.intrinsics import is_intrinsic
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.utils.cfn_dynamic_references import is_dynamic_reference
 

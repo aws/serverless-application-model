@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
+from samtranslator.model.intrinsics import fnGetAtt, ref
 from samtranslator.model.types import IS_DICT
-from samtranslator.model.intrinsics import ref, fnGetAtt
 
 
 class IotTopicRule(Resource):

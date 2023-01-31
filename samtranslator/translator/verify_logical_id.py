@@ -1,5 +1,6 @@
+from typing import Any, Dict
+
 from samtranslator.model import Resource
-from typing import Dict, Any
 
 do_not_verify = {
     # type_after_transform: type_before_transform

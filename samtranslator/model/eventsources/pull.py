@@ -2,15 +2,14 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Optional
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import ResourceMacro, PropertyType, PassThroughProperty
+from samtranslator.model import PassThroughProperty, PropertyType, ResourceMacro
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import IS_DICT, is_type, IS_STR, PassThrough
-from samtranslator.model.intrinsics import is_intrinsic
-
-from samtranslator.model.lambda_ import LambdaEventSourceMapping
-from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRolePolicies
+from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.lambda_ import LambdaEventSourceMapping
+from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type
+from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect
 

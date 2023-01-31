@@ -1,11 +1,11 @@
-﻿import copy
+import copy
 import re
-from typing import Callable, Dict, Any, Optional, TypeVar
+from typing import Any, Callable, Dict, Optional, TypeVar
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigateway import ApiGatewayAuthorizer
-from samtranslator.model.intrinsics import ref, make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.model.intrinsics import fnSub, make_conditional, ref
 from samtranslator.model.types import PassThrough
 from samtranslator.open_api.base_editor import BaseEditor
 from samtranslator.translator.arn_generator import ArnGenerator

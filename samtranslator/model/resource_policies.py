@@ -1,14 +1,14 @@
-from enum import Enum
 from collections import namedtuple
-from typing import Dict, Any, List
+from enum import Enum
+from typing import Any, Dict, List
 
+from samtranslator.model.exceptions import InvalidTemplateException
 from samtranslator.model.intrinsics import (
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
     validate_intrinsic_if_items,
 )
-from samtranslator.model.exceptions import InvalidTemplateException
 
 PolicyEntry = namedtuple("PolicyEntry", "data type")
 

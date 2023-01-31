@@ -2,9 +2,9 @@
 Helper classes to publish metrics
 """
 import logging
+from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict
-from abc import ABC, abstractmethod
 
 LOG = logging.getLogger(__name__)
 

@@ -1,20 +1,19 @@
 from __future__ import annotations
 
-from typing import Optional, Dict, Union, List
+from typing import Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
+from schema_source.aws_serverless_connector import EmbeddedConnector
 from schema_source.common import (
-    PassThroughProp,
     BaseModel,
-    SamIntrinsicable,
-    get_prop,
     DictStrAny,
+    PassThroughProp,
     Ref,
     ResourceAttributes,
+    SamIntrinsicable,
+    get_prop,
 )
-from schema_source.aws_serverless_connector import EmbeddedConnector
-
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
 apiauth = get_prop("sam-property-function-apifunctionauth")
