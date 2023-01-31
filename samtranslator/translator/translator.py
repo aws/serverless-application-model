@@ -46,7 +46,8 @@ class Translator:
         :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to be installed in the translator,
             in addition to the default ones.
         """
-        self.managed_policy_map = get_managed_policy_map()
+        partition = ArnGenerator.get_partition_name()
+        self.managed_policy_map = get_managed_policy_map(partition)
         self.plugins = plugins
         self.sam_parser = sam_parser
         self.feature_toggle = None
