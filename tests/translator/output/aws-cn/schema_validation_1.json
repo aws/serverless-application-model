@@ -60,7 +60,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "AWSXrayWriteOnlyAccess",
+          "arn:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess",
           "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
@@ -170,7 +170,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "AWSXrayWriteOnlyAccess",
+          "arn:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess",
           "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess"
         ],
         "Policies": [

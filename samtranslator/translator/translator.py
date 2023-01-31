@@ -46,8 +46,6 @@ class Translator:
         :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to be installed in the translator,
             in addition to the default ones.
         """
-        partition = ArnGenerator.get_partition_name()
-        self.managed_policy_map = get_managed_policy_map(partition)
         self.plugins = plugins
         self.sam_parser = sam_parser
         self.feature_toggle = None
@@ -59,6 +57,9 @@ class Translator:
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
+
+        partition = ArnGenerator.get_partition_name()
+        self.managed_policy_map = get_managed_policy_map(partition)
 
     def _get_function_names(
         self, resource_dict: Dict[str, Any], intrinsics_resolver: IntrinsicsResolver
