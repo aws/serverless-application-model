@@ -592,3 +592,20 @@ class ResourceResolver:
             raise TypeError("Invalid logical ID '{}'. Expected a string.".format(_input))
 
         return self.resources.get(_input, None)
+
+
+__all__: List[str] = [
+    "IS_DICT",
+    "IS_STR",
+    "Validator",
+    "any_type",
+    "is_type",
+    "PropertyType",
+    "Property",
+    "PassThroughProperty",
+    "Resource",
+    "ResourceMacro",
+    "SamResourceMacro",
+    "ResourceTypeResolver",
+    "ResourceResolver",
+]

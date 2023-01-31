@@ -1,0 +1,6 @@
+# black formatter takes care of the line length
+line-length = 999
+
+[per-file-ignores]
+# python scripts in bin/ needs some python path configurations before import
+"bin/*.py" = ["E402"]  # E402: module-import-not-at-top-of-file

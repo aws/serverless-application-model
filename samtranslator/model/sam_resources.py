@@ -698,7 +698,7 @@ class SamFunction(SamResourceMacro):
         sam_expect(dlq_type, self.logical_id, "DeadLetterQueue.Type").to_be_a_string()
 
         # Validate required Types
-        if not dlq_type in self.dead_letter_queue_policy_actions:
+        if dlq_type not in self.dead_letter_queue_policy_actions:
             raise InvalidResourceException(
                 self.logical_id, "'DeadLetterQueue' requires Type of {}".format(valid_dlq_types)
             )
@@ -1693,7 +1693,7 @@ class SamLayerVersion(SamResourceMacro):
             return
         for arq in architectures:
             # We validate the values only if we they're not intrinsics
-            if not is_intrinsic(arq) and not arq in [ARM64, X86_64]:
+            if not is_intrinsic(arq) and arq not in [ARM64, X86_64]:
                 raise InvalidResourceException(
                     lambda_layer.logical_id,
                     "CompatibleArchitectures needs to be a list of '{}' or '{}'".format(X86_64, ARM64),

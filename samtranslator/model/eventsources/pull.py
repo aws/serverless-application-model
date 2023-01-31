@@ -205,7 +205,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                     role.Policies = []
                 for policy in policy_statements:
                     if policy not in role.Policies:
-                        if not policy.get("PolicyDocument") in [d["PolicyDocument"] for d in role.Policies]:
+                        if policy.get("PolicyDocument") not in [d["PolicyDocument"] for d in role.Policies]:
                             role.Policies.append(policy)
         # add SQS or SNS policy only if role is present in kwargs
         if role is not None and destination_config_policy is not None and destination_config_policy:
@@ -214,7 +214,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                 role.Policies.append(destination_config_policy)
             if role.Policies and destination_config_policy not in role.Policies:
                 # do not add the  policy if the same policy document is already present
-                if not destination_config_policy.get("PolicyDocument") in [d["PolicyDocument"] for d in role.Policies]:
+                if destination_config_policy.get("PolicyDocument") not in [d["PolicyDocument"] for d in role.Policies]:
                     role.Policies.append(destination_config_policy)
 
     def _validate_filter_criteria(self) -> None:

@@ -7,6 +7,7 @@ pytest-env~=0.6.2
 pytest-rerunfailures~=9.1.1
 pylint~=2.15.0
 pyyaml~=5.4
+ruff==0.0.237  # loose the requirement once it is more stable
 
 # Test requirements
 pytest~=6.2.5
