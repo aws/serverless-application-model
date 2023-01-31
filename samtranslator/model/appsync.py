@@ -1,8 +1,9 @@
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
+
 from typing_extensions import TypedDict
 
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import IS_DICT, is_type, list_of, IS_STR
+from samtranslator.model.types import IS_DICT, IS_STR, is_type, list_of
 
 
 class Auth(TypedDict, total=False):

@@ -5569,7 +5569,7 @@
       "title": "ScheduleV2EventProperties",
       "type": "object"
     },
-    "samtranslator__schema__aws_serverless_graphqlapi__Auth": {
+    "schema_source__aws_serverless_graphqlapi__Auth": {
       "additionalProperties": false,
       "properties": {
         "Type": {
@@ -5583,11 +5583,11 @@
       "title": "Auth",
       "type": "object"
     },
-    "samtranslator__schema__aws_serverless_graphqlapi__Properties": {
+    "schema_source__aws_serverless_graphqlapi__Properties": {
       "additionalProperties": false,
       "properties": {
         "Auth": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_graphqlapi__Auth"
+          "$ref": "#/definitions/schema_source__aws_serverless_graphqlapi__Auth"
         },
         "Name": {
           "title": "Name",
@@ -5608,11 +5608,11 @@
       "title": "Properties",
       "type": "object"
     },
-    "samtranslator__schema__aws_serverless_graphqlapi__Resource": {
+    "schema_source__aws_serverless_graphqlapi__Resource": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
-          "$ref": "#/definitions/samtranslator__schema__aws_serverless_graphqlapi__Properties"
+          "$ref": "#/definitions/schema_source__aws_serverless_graphqlapi__Properties"
         },
         "Type": {
           "enum": [
@@ -5629,7 +5629,7 @@
       "title": "Resource",
       "type": "object"
     },
-    "samtranslator__schema__aws_serverless_httpapi__Auth": {
+    "schema_source__aws_serverless_httpapi__Auth": {
       "additionalProperties": false,
       "properties": {
         "Authorizers": {
@@ -7320,10 +7320,10 @@
             "$ref": "#/definitions/schema_source__aws_serverless_application__Resource"
           },
           {
-            "$ref": "#/definitions/samtranslator__schema__aws_serverless_graphqlapi__Resource"
+            "$ref": "#/definitions/schema_source__aws_serverless_graphqlapi__Resource"
           },
           {
-            "$ref": "#/definitions/samtranslator__schema__any_cfn_resource__Resource"
+            "$ref": "#/definitions/schema_source__any_cfn_resource__Resource"
           }
         ]
       },

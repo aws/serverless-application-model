@@ -12,12 +12,12 @@ from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
     PassThroughProperty,
+    Property,
     PropertyType,
     Resource,
     ResourceResolver,
     ResourceTypeResolver,
     SamResourceMacro,
-    Property
 )
 from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
@@ -28,6 +28,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayUsagePlanKey,
 )
 from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
+from samtranslator.model.appsync import Auth, GraphQLApi
 from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
@@ -73,7 +74,6 @@ from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy
 from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, any_type, dict_of, is_type, list_of, one_of
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
-from samtranslator.model.appsync import GraphQLApi, Auth
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable

@@ -2,7 +2,7 @@ from typing import Optional
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import BaseModel, get_prop, DictStrAny
+from schema_source.common import BaseModel, DictStrAny, get_prop
 
 properties = get_prop("sam-resource-graphqlapi")
 
