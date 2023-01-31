@@ -1,8 +1,8 @@
-﻿from typing import Any, Dict, List
+from typing import Any, Dict, List
 
 from samtranslator.model.exceptions import ExceptionWithMessage
-from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
+from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.swagger.swagger import SwaggerEditor
 
 

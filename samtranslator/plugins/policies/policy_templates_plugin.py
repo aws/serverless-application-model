@@ -1,9 +1,9 @@
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.plugins import BasePlugin
-from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
+from samtranslator.model.resource_policies import PolicyTypes, ResourcePolicies
+from samtranslator.plugins import BasePlugin
+from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 
 
 class PolicyTemplatesForResourcePlugin(BasePlugin):

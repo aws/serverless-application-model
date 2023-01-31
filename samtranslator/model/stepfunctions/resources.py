@@ -1,8 +1,8 @@
 from typing import Any, Dict, List, Optional
 
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import IS_DICT, list_of, IS_STR
 from samtranslator.model.intrinsics import fnGetAtt, ref
+from samtranslator.model.types import IS_DICT, IS_STR, list_of
 
 
 class StepFunctionsStateMachine(Resource):

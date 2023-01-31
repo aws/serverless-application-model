@@ -45,6 +45,9 @@ lint:
 	# cfn-lint to make sure generated CloudFormation makes sense
 	bin/run_cfn_lint.sh
 
+lint-fix:
+	ruff --fix samtranslator bin schema_source
+
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
 

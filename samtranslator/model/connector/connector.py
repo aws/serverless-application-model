@@ -1,10 +1,9 @@
 from collections import namedtuple
-from typing import Any, Dict, List, Optional, Iterable
+from typing import Any, Dict, Iterable, List, Optional
 
 from samtranslator.model import ResourceResolver
-from samtranslator.model.intrinsics import get_logical_id_from_intrinsic, ref, fnGetAtt
+from samtranslator.model.intrinsics import fnGetAtt, get_logical_id_from_intrinsic, ref
 from samtranslator.utils.utils import as_array, insert_unique
-
 
 # TODO: Switch to dataclass
 ConnectorResourceReference = namedtuple(

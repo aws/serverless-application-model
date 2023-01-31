@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, Type, cast
 from samtranslator.model.intrinsics import make_conditional
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
 from samtranslator.public.open_api import OpenApiEditor
-from samtranslator.public.sdk.resource import SamResourceType, SamResource
+from samtranslator.public.sdk.resource import SamResource, SamResourceType
 from samtranslator.sdk.template import SamTemplate
 from samtranslator.validator.value_validator import sam_expect
 

@@ -1,40 +1,38 @@
 import copy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
-from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
-from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
-from typing import Dict, Any, Optional, List, Tuple
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
     FeatureToggleDefaultConfigProvider,
 )
-from samtranslator.model import ResourceResolver, ResourceTypeResolver, sam_resources
+from samtranslator.intrinsics.actions import FindInMapAction
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
+from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
+from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
+from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
+from samtranslator.model import Resource, ResourceResolver, ResourceTypeResolver, sam_resources
 from samtranslator.model.api.api_generator import SharedApiUsagePlan
-from samtranslator.translator.verify_logical_id import verify_unique_logical_id
-from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
+from samtranslator.model.eventsources.push import Api
 from samtranslator.model.exceptions import (
-    InvalidDocumentException,
-    InvalidResourceException,
     DuplicateLogicalIdException,
+    InvalidDocumentException,
     InvalidEventException,
+    InvalidResourceException,
     InvalidTemplateException,
 )
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
-from samtranslator.intrinsics.actions import FindInMapAction
-from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
+from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
+from samtranslator.model.sam_resources import SamConnector
+from samtranslator.plugins import LifeCycleEvents
 from samtranslator.plugins.api.default_definition_body_plugin import DefaultDefinitionBodyPlugin
 from samtranslator.plugins.application.serverless_app_plugin import ServerlessAppPlugin
-from samtranslator.plugins import LifeCycleEvents
-from samtranslator.plugins.sam_plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
+from samtranslator.plugins.sam_plugins import SamPlugins
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.model.eventsources.push import Api
-from samtranslator.model.sam_resources import SamConnector
+from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.validator.value_validator import sam_expect
-from samtranslator.model import Resource
 
 
 class Translator:
@@ -410,8 +408,8 @@ def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = N
 
 
 if TYPE_CHECKING:
-    from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin
     from samtranslator.plugins.api.implicit_http_api_plugin import ImplicitHttpApiPlugin
+    from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin
 
 
 def make_implicit_rest_api_plugin() -> "ImplicitRestApiPlugin":

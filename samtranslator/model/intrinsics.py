@@ -1,4 +1,8 @@
-from typing import Any, Dict, Iterable, List, Union, Optional
+from typing import Any, Dict, Iterable, List, Optional, Union
+
+MIN_NUM_CONDITIONS_TO_COMBINE = 2
+_NUM_ARGUMENTS_REQUIRED_IN_IF = 3
+_NUM_ARGUMENTS_REQUIRED_IN_GETATT = 2
 
 
 def fnGetAtt(logical_name: str, attribute_name: str) -> Dict[str, List[str]]:
@@ -88,8 +92,8 @@ def make_combined_condition(
     :param string condition_name: base name desired for new condition
     :return: dictionary of condition_name: condition_value
     """
-    if len(conditions_list) < 2:
-        # Can't make a condition if <2 conditions provided.
+    if len(conditions_list) < MIN_NUM_CONDITIONS_TO_COMBINE:
+        # Can't make a condition not enough conditions are provided.
         return None
 
     # Total number of conditions allows in an Fn::Or statement. See docs:
@@ -182,8 +186,8 @@ def validate_intrinsic_if_items(items: Any) -> None:
     ValueError
         If the items are invalid
     """
-    if not isinstance(items, list) or len(items) != 3:
-        raise ValueError("Fn::If requires 3 arguments")
+    if not isinstance(items, list) or len(items) != _NUM_ARGUMENTS_REQUIRED_IN_IF:
+        raise ValueError(f"Fn::If requires {_NUM_ARGUMENTS_REQUIRED_IN_IF} arguments")
 
 
 def is_intrinsic_no_value(_input: Any) -> bool:
@@ -219,13 +223,13 @@ def get_logical_id_from_intrinsic(_input: Any) -> Optional[str]:
 
     # Fn::GetAtt: [<logical-id>, <attribute>]
     v = _input.get("Fn::GetAtt")
-    if isinstance(v, list) and len(v) == 2 and isinstance(v[0], str):
+    if isinstance(v, list) and len(v) == _NUM_ARGUMENTS_REQUIRED_IN_GETATT and isinstance(v[0], str):
         return v[0]
 
     # Fn::GetAtt: <logical-id>.<attribute>
     if isinstance(v, str):
         tokens = v.split(".")
-        if len(tokens) == 2:
+        if len(tokens) == _NUM_ARGUMENTS_REQUIRED_IN_GETATT:
             return tokens[0]
 
     return None

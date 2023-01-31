@@ -24,19 +24,18 @@ import os
 import platform
 import subprocess
 import sys
+from functools import reduce
 
 import boto3
-
 from docopt import docopt  # type: ignore[import]
-from functools import reduce
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
 
+from samtranslator.model.exceptions import InvalidDocumentException
 from samtranslator.public.translator import ManagedPolicyLoader
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
-from samtranslator.model.exceptions import InvalidDocumentException
 
 LOG = logging.getLogger(__name__)
 cli_options = docopt(__doc__)

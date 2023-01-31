@@ -1,6 +1,12 @@
 # black formatter takes care of the line length
 line-length = 999
 
+# Enable Pyflakes `E`, `F` codes, pylint `PL` and isort `I`.
+select = ["E", "F", "PL", "I"]
+
+# Mininal python version we support is 3.7
+target-version = "py37"
+
 [per-file-ignores]
 # python scripts in bin/ needs some python path configurations before import
 "bin/*.py" = ["E402"]  # E402: module-import-not-at-top-of-file

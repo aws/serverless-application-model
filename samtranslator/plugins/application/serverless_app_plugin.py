@@ -1,21 +1,21 @@
+import copy
+import json
+import logging
+from time import sleep
 from typing import Any, Dict, Tuple
 
 import boto3
-import json
 from botocore.config import Config
 from botocore.exceptions import ClientError, EndpointConnectionError
-import logging
-from time import sleep
-import copy
 
+from samtranslator.intrinsics.actions import FindInMapAction
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins import BasePlugin
 from samtranslator.plugins.exceptions import InvalidPluginException
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
-from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.utils.constants import BOTO3_CONNECT_TIMEOUT
 from samtranslator.validator.value_validator import sam_expect

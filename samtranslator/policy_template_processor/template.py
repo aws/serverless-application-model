@@ -1,9 +1,8 @@
 from typing import Any
 
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import RefAction
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
-
 
 POLICY_PARAMETER_DISAMBIGUATE_PREFIX = "___SAM_POLICY_PARAMETER_"
 

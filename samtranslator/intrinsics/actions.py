@@ -1,8 +1,8 @@
 import re
 from abc import ABC
-from typing import Any, Dict, Optional, Tuple, Callable, List
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 
 
 class Action(ABC):
@@ -68,10 +68,15 @@ class Action(ABC):
         splits = ref_value.split(cls._resource_ref_separator, 1)
 
         # Either there is no 'dot' (or) one of the values is empty string (Ex: when you split "LogicalId.")
-        if len(splits) != 2 or not all(splits):
+        try:
+            logical_id, property_name = splits
+        except ValueError:
             return no_result
 
-        return splits[0], splits[1]
+        if not logical_id or not property_name:
+            return no_result
+
+        return logical_id, property_name
 
 
 class RefAction(Action):
@@ -233,11 +238,11 @@ class SubAction(Action):
             splits = ref_value.split(self._resource_ref_separator)
 
             # If we don't find at least two parts, there is nothing to resolve
-            if len(splits) < 2:
+            try:
+                logical_id, property_name = splits[:2]
+            except ValueError:
                 return full_ref
 
-            logical_id = splits[0]
-            property_name = splits[1]
             resolved_value = supported_resource_refs.get(logical_id, property_name)
             if not resolved_value:
                 # This ID/property combination is not in the supported references
@@ -400,6 +405,8 @@ class SubAction(Action):
 class GetAttAction(Action):
     intrinsic_name = "Fn::GetAtt"
 
+    _MIN_NUM_ARGUMENTS = 2
+
     def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
         # Parameters can never be referenced within GetAtt value
         return input_dict
@@ -503,9 +510,9 @@ class GetAttAction(Action):
         return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)
 
     def _check_input_value(self, value: Any) -> bool:
-        # Value must be an array with *at least* two elements. If not, this is invalid GetAtt syntax. We just pass along
+        # Value must be an array with enough elements. If not, this is invalid GetAtt syntax. We just pass along
         # the input to CFN for it to do the "official" validation.
-        if not isinstance(value, list) or len(value) < 2:
+        if not isinstance(value, list) or len(value) < self._MIN_NUM_ARGUMENTS:
             return False
 
         # If items in value array is not a string, then following join line will fail. So if any element is not a string
@@ -542,6 +549,8 @@ class FindInMapAction(Action):
 
     intrinsic_name = "Fn::FindInMap"
 
+    _NUM_ARGUMENTS = 3
+
     def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
         """
         Recursively resolves "Fn::FindInMap"references that are present in the mappings and returns the value.
@@ -558,11 +567,11 @@ class FindInMapAction(Action):
         value = input_dict[self.intrinsic_name]
 
         # FindInMap expects an array with 3 values
-        if not isinstance(value, list) or len(value) != 3:
+        if not isinstance(value, list) or len(value) != self._NUM_ARGUMENTS:
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
-                        f"Invalid FindInMap value {value}. FindInMap expects an array with 3 values."
+                        f"Invalid FindInMap value {value}. FindInMap expects an array with {self._NUM_ARGUMENTS} values."
                     )
                 ]
             )

@@ -6,6 +6,7 @@ from samtranslator.model.intrinsics import fnSub
 from samtranslator.model.log import SubscriptionFilter
 from samtranslator.model.types import IS_STR
 from samtranslator.translator.arn_generator import ArnGenerator
+
 from . import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from .push import PushEventSource
 

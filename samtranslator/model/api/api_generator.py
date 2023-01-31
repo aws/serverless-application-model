@@ -1,39 +1,38 @@
 import logging
 from collections import namedtuple
-from typing import List, Optional, Set, Dict, Any, cast, Union, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
 from samtranslator.model.apigateway import (
+    ApiGatewayApiKey,
+    ApiGatewayAuthorizer,
+    ApiGatewayBasePathMapping,
     ApiGatewayDeployment,
+    ApiGatewayDomainName,
+    ApiGatewayResponse,
     ApiGatewayRestApi,
     ApiGatewayStage,
-    ApiGatewayAuthorizer,
-    ApiGatewayResponse,
-    ApiGatewayDomainName,
-    ApiGatewayBasePathMapping,
     ApiGatewayUsagePlan,
     ApiGatewayUsagePlanKey,
-    ApiGatewayApiKey,
 )
-from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidDocumentException,
     InvalidResourceException,
     InvalidTemplateException,
 )
+from samtranslator.model.intrinsics import fnGetAtt, fnSub, is_intrinsic, make_or_condition, ref
+from samtranslator.model.lambda_ import LambdaPermission
+from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
+from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import PassThrough
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
-from samtranslator.model.intrinsics import is_intrinsic, fnSub
-from samtranslator.model.lambda_ import LambdaPermission
-from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.utils.types import Intrinsicable
-from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.utils.types import Intrinsicable
 from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
 

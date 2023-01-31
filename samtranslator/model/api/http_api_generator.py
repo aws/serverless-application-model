@@ -3,20 +3,19 @@ from collections import namedtuple
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model.intrinsics import ref, fnGetAtt
 from samtranslator.model.apigatewayv2 import (
-    ApiGatewayV2HttpApi,
-    ApiGatewayV2Stage,
+    ApiGatewayV2ApiMapping,
     ApiGatewayV2Authorizer,
     ApiGatewayV2DomainName,
-    ApiGatewayV2ApiMapping,
+    ApiGatewayV2HttpApi,
+    ApiGatewayV2Stage,
 )
 from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.intrinsics import fnGetAtt, is_intrinsic, is_intrinsic_no_value, ref
+from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
-from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
-from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
