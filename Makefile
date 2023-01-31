@@ -76,6 +76,9 @@ schema:
 # Update all schema data and schemas
 schema-all: fetch-schema-data update-schema-data schema
 
+managed-policies:
+	python bin/list_managed_policies.py > samtranslator/managed_policies/managed_policies.json
+
 # Command to run everytime you make changes to verify everything works
 dev: test
 

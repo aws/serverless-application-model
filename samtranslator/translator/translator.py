@@ -8,6 +8,7 @@ from samtranslator.feature_toggle.feature_toggle import (
 from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
+from samtranslator.managed_policies.managed_policies import get_managed_policy_map
 from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 from samtranslator.model import Resource, ResourceResolver, ResourceTypeResolver, sam_resources
@@ -45,7 +46,7 @@ class Translator:
         :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to be installed in the translator,
             in addition to the default ones.
         """
-        self.managed_policy_map = managed_policy_map
+        self.managed_policy_map = get_managed_policy_map()
         self.plugins = plugins
         self.sam_parser = sam_parser
         self.feature_toggle = None
