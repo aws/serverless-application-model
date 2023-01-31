@@ -1,0 +1,124 @@
+Resources:
+  MyServerlessFunction:
+    Type: AWS::Serverless::Function
+    Connectors:
+      BucketConnector:
+        Properties:
+          Destination:
+            Id: MyBucket
+          Permissions:
+          - Read
+          - Write
+      SQSConnector:
+        Properties:
+          Destination:
+            Id: MyQueue
+          Permissions:
+          - Read
+          - Write
+      TableConnector:
+        Properties:
+          Destination:
+            Id: MyTable
+          Permissions:
+          - Read
+          - Write
+      TableConnectorWithTableArn:
+        Properties:
+          Destination:
+            Type: AWS::DynamoDB::Table
+            Arn: !GetAtt MyTable.Arn
+          Permissions:
+          - Read
+          - Write
+      SNSConnector:
+        Properties:
+          Destination:
+            Id: MySNSTopic
+          Permissions:
+          - Write
+      SFNConnector:
+        Properties:
+          Destination:
+            Id: MyStateMachine
+          Permissions:
+          - Read
+          - Write
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+        };
+
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Connectors:
+      LambdaSQSConnector:
+        Properties:
+          Destination:
+            Id: MyQueue
+          Permissions:
+          - Read
+      LambdaTableConnector:
+        Properties:
+          Destination:
+            Id: MyTable
+          Permissions:
+          - Read
+          - Write
+      LambdaTableConnectorWithTableArn:
+        Properties:
+          Destination:
+            Type: AWS::DynamoDB::Table
+            Arn: !GetAtt MyTable.Arn
+          Permissions:
+          - Read
+          - Write
+    Properties:
+      Role: !GetAtt MyRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          exports.handler = async (event) => {
+            console.log(JSON.stringify(event));
+          };
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref MyTable
+
+  MyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+
+  MyBucket:
+    Type: AWS::S3::Bucket
+  MyQueue:
+    Type: AWS::SQS::Queue
+  MySNSTopic:
+    Type: AWS::SNS::Topic
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        StartAt: MyLambdaState
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+      - AttributeName: Id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: Id
+        KeyType: HASH

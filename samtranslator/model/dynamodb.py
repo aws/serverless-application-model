@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import IS_DICT, is_type, dict_of, list_of, IS_STR, one_of
 from samtranslator.model.intrinsics import fnGetAtt, ref
+from samtranslator.model.types import IS_DICT, IS_STR, dict_of, is_type, list_of, one_of
 
 
 class DynamoDBTable(Resource):

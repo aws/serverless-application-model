@@ -1,5 +1,5 @@
-from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
 from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.sqs import SQSQueue, SQSQueuePolicies, SQSQueuePolicy
 
 
 class EventBridgeRuleUtils:

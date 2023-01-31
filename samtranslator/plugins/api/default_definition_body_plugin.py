@@ -1,9 +1,9 @@
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.plugins import BasePlugin
-from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.plugins import BasePlugin
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.swagger.swagger import SwaggerEditor
 
 
 class DefaultDefinitionBodyPlugin(BasePlugin):

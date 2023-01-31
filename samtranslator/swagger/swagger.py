@@ -1,13 +1,13 @@
-﻿import copy
+import copy
 import re
-from typing import Callable, Dict, Any, Optional, TypeVar
+from typing import Any, Callable, Dict, Optional, TypeVar
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigateway import ApiGatewayAuthorizer
-from samtranslator.model.intrinsics import ref, make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.model.intrinsics import fnSub, make_conditional, ref
+from samtranslator.model.types import PassThrough
 from samtranslator.open_api.base_editor import BaseEditor
-from samtranslator.schema.common import PassThrough
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.utils.utils import InvalidValueType, dict_deep_set
@@ -582,7 +582,7 @@ class SwaggerEditor(BaseEditor):
             # applied (Function Api Events first; then Api Resource) complicates it.
             # Check if Function/Path/Method specified 'NONE' for Authorizer
             for idx, security in enumerate(existing_non_authorizer_security):
-                is_none = any(key == "NONE" for key in security.keys())
+                is_none = any(key == "NONE" for key in security)
 
                 if is_none:
                     none_idx = idx
@@ -655,7 +655,7 @@ class SwaggerEditor(BaseEditor):
             # Check if Function/Path/Method specified 'False' for ApiKeyRequired
             apikeyfalse_idx = -1
             for idx, security in enumerate(existing_apikey_security):
-                is_none = any(key == "api_key_false" for key in security.keys())
+                is_none = any(key == "api_key_false" for key in security)
 
                 if is_none:
                     apikeyfalse_idx = idx
@@ -1203,7 +1203,7 @@ class SwaggerEditor(BaseEditor):
 
         # Make sure any changes to the paths are reflected back in output
         # iterate keys to make sure if "paths" is of Py27UniStr type, it won't be overriden as str
-        for key in self._doc.keys():
+        for key in self._doc:
             if key == "paths":
                 self._doc[key] = self.paths
 
@@ -1255,8 +1255,7 @@ class SwaggerEditor(BaseEditor):
 
     @staticmethod
     def get_openapi_versions_supported_regex() -> str:
-        openapi_version_supported_regex = r"\A[2-3](\.\d)(\.\d)?$"
-        return openapi_version_supported_regex
+        return r"\A[2-3](\.\d)(\.\d)?$"
 
     @staticmethod
     def get_path_without_trailing_slash(path):  # type: ignore[no-untyped-def]

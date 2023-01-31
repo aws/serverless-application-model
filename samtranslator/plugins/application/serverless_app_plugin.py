@@ -1,21 +1,21 @@
+import copy
+import json
+import logging
+from time import sleep
 from typing import Any, Dict, Tuple
 
 import boto3
-import json
 from botocore.config import Config
 from botocore.exceptions import ClientError, EndpointConnectionError
-import logging
-from time import sleep
-import copy
 
+from samtranslator.intrinsics.actions import FindInMapAction
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins import BasePlugin
 from samtranslator.plugins.exceptions import InvalidPluginException
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
-from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.utils.constants import BOTO3_CONNECT_TIMEOUT
 from samtranslator.validator.value_validator import sam_expect
@@ -95,10 +95,9 @@ class ServerlessAppPlugin(BasePlugin):
         intrinsic_resolvers = self._get_intrinsic_resolvers(template_dict.get("Mappings", {}))  # type: ignore[no-untyped-call]
 
         service_call = None
-        if self._validate_only:
-            service_call = self._handle_get_application_request
-        else:
-            service_call = self._handle_create_cfn_template_request
+        service_call = (
+            self._handle_get_application_request if self._validate_only else self._handle_create_cfn_template_request
+        )
         for logical_id, app in template.iterate({SamResourceType.Application.value}):
             if not self._can_process_application(app):  # type: ignore[no-untyped-call]
                 # Handle these cases in the on_before_transform_resource event

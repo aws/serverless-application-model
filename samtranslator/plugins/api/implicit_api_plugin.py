@@ -1,20 +1,18 @@
 import copy
-
 from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model.intrinsics import make_combined_condition
 from samtranslator.model.eventsources.push import Api
+from samtranslator.model.intrinsics import MIN_NUM_CONDITIONS_TO_COMBINE, make_combined_condition
 from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.public.exceptions import InvalidDocumentException, InvalidEventException, InvalidResourceException
 from samtranslator.public.plugins import BasePlugin
-from samtranslator.public.exceptions import InvalidDocumentException, InvalidResourceException, InvalidEventException
 from samtranslator.public.sdk.resource import SamResource, SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.utils.py27hash_fix import Py27Dict
 from samtranslator.validator.value_validator import sam_expect
-
 
 T = TypeVar("T", bound=Union[Type[OpenApiEditor], Type[SwaggerEditor]])
 
@@ -208,7 +206,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         is_referencing_http_from_api_event = (
             not template.get(api_id)
             or template.get(api_id).type == "AWS::Serverless::HttpApi"
-            and not template.get(api_id).type == self.SERVERLESS_API_RESOURCE_TYPE
+            and template.get(api_id).type != self.SERVERLESS_API_RESOURCE_TYPE
         )
 
         # RestApiId is not pointing to a valid  API resource
@@ -371,7 +369,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
                                            top-level condition.
         """
         # defensive precondition check
-        if not conditions_to_combine or len(conditions_to_combine) < 2:
+        if not conditions_to_combine or len(conditions_to_combine) < MIN_NUM_CONDITIONS_TO_COMBINE:
             raise ValueError("conditions_to_combine must have at least 2 conditions")
 
         template_conditions = template_dict.setdefault("Conditions", {})

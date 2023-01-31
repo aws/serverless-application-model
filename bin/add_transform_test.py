@@ -12,14 +12,15 @@ Options:
     --disable-update-partition      Disable updating the partition of arn to aws-cn/aws-us-gov
 """
 import json
-import subprocess
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
-from docopt import docopt  # type: ignore
 from pathlib import Path
 from typing import Any, Dict
+
+from docopt import docopt  # type: ignore
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 TRANSFORM_TEST_DIR = os.path.join(SCRIPT_DIR, "..", "tests", "translator")

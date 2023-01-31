@@ -1,8 +1,8 @@
 from typing import Any, Dict, Optional, Type
 
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
+from samtranslator.public.sdk.resource import SamResource, SamResourceType
 from samtranslator.public.swagger import SwaggerEditor
-from samtranslator.public.sdk.resource import SamResourceType, SamResource
 from samtranslator.sdk.template import SamTemplate
 from samtranslator.validator.value_validator import sam_expect
 

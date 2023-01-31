@@ -118,7 +118,7 @@ class BaseTest(TestCase):
 
     @retry(
         stop=stop_after_attempt(5),
-        wait=wait_fixed(30),
+        wait=wait_fixed(30) + wait_random(0, 15),
         retry=retry_if_exception_type(Exception),
     )
     def tearDown(self):

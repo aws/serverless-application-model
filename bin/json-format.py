@@ -9,7 +9,7 @@ sys.path.insert(0, my_path + "/..")
 import json
 from typing import Type
 
-from bin._file_formatter import FileFormatter
+from bin._file_formatter import FileFormatter  # noqa: module-import-not-at-top-of-file
 
 
 class JSONFormatter(FileFormatter):
@@ -17,7 +17,7 @@ class JSONFormatter(FileFormatter):
     def description() -> str:
         return "JSON file formatter"
 
-    def format(self, input_str: str) -> str:
+    def format_str(self, input_str: str) -> str:
         """Opinionated format JSON file."""
         obj = json.loads(input_str)
         return json.dumps(obj, indent=2, sort_keys=True) + "\n"
