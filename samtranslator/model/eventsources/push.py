@@ -1291,7 +1291,11 @@ class HttpApi(PushEventSource):
         path = OpenApiEditor.get_path_without_trailing_slash(path)  # type: ignore[no-untyped-call]
 
         # Handle case where Method is already the ANY ApiGateway extension
-        method = "*" if self._method.lower() == "any" or self._method.lower() == OpenApiEditor._X_ANY_METHOD else self._method.upper()
+        method = (
+            "*"
+            if self._method.lower() == "any" or self._method.lower() == OpenApiEditor._X_ANY_METHOD
+            else self._method.upper()
+        )
 
         api_id = self.ApiId
 

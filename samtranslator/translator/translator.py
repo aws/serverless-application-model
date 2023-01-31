@@ -183,7 +183,11 @@ class Translator:
                     if verify_unique_logical_id(resource, sam_template["Resources"]):
                         # For each generated resource, pass through existing metadata that may exist on the original SAM resource.
                         _r = resource.to_dict()
-                        if resource_dict.get("Metadata") and passthrough_metadata and not template["Resources"].get(resource.logical_id):
+                        if (
+                            resource_dict.get("Metadata")
+                            and passthrough_metadata
+                            and not template["Resources"].get(resource.logical_id)
+                        ):
                             _r[resource.logical_id]["Metadata"] = resource_dict["Metadata"]
                         template["Resources"].update(_r)
                     else:

@@ -44,9 +44,7 @@ class SamResource:
             raise InvalidDocumentException([InvalidTemplateException("Every Condition member must be a string.")])
 
         if self.deletion_policy and not IS_STR(self.deletion_policy, should_raise=False):
-            raise InvalidDocumentException(
-                [InvalidTemplateException("Every DeletionPolicy member must be a string.")]
-            )
+            raise InvalidDocumentException([InvalidTemplateException("Every DeletionPolicy member must be a string.")])
 
         if self.update_replace_policy and not IS_STR(self.update_replace_policy, should_raise=False):
             raise InvalidDocumentException(

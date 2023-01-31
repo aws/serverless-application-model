@@ -277,9 +277,7 @@ class ApiGenerator:
         if self.open_api_version and not SwaggerEditor.safe_compare_regex_with_string(
             SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
         ):
-            raise InvalidResourceException(
-                self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'."
-            )
+            raise InvalidResourceException(self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'.")
 
         self._add_cors()
         self._add_auth()

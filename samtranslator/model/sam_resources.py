@@ -312,7 +312,13 @@ class SamFunction(SamResourceMacro):
         resolved_event_invoke_config = intrinsics_resolver.resolve_parameter_refs(self.EventInvokeConfig)
 
         logical_id = "{id}EventInvokeConfig".format(id=function_name)
-        lambda_event_invoke_config = LambdaEventInvokeConfig(logical_id=logical_id, depends_on=[lambda_alias.logical_id], attributes=self.resource_attributes) if lambda_alias else LambdaEventInvokeConfig(logical_id=logical_id, attributes=self.resource_attributes)
+        lambda_event_invoke_config = (
+            LambdaEventInvokeConfig(
+                logical_id=logical_id, depends_on=[lambda_alias.logical_id], attributes=self.resource_attributes
+            )
+            if lambda_alias
+            else LambdaEventInvokeConfig(logical_id=logical_id, attributes=self.resource_attributes)
+        )
 
         dest_config = {}
         input_dest_config = resolved_event_invoke_config.get("DestinationConfig")
@@ -389,7 +395,11 @@ class SamFunction(SamResourceMacro):
                 if resource:
                     if combined_condition:
                         resource.set_resource_attribute("Condition", combined_condition)
-                    destination = make_conditional(property_condition, resource.get_runtime_attr("arn"), dest_arn) if property_condition else resource.get_runtime_attr("arn")
+                    destination = (
+                        make_conditional(property_condition, resource.get_runtime_attr("arn"), dest_arn)
+                        if property_condition
+                        else resource.get_runtime_attr("arn")
+                    )
                 policy = self._add_event_invoke_managed_policy(dest_config, resource_logical_id, destination)
             else:
                 raise InvalidResourceException(
@@ -553,7 +563,11 @@ class SamFunction(SamResourceMacro):
         """
         role_attributes = self.get_passthrough_resource_attributes()
 
-        assume_role_policy_document = self.AssumeRolePolicyDocument if self.AssumeRolePolicyDocument is not None else IAMRolePolicies.lambda_assume_role_policy()
+        assume_role_policy_document = (
+            self.AssumeRolePolicyDocument
+            if self.AssumeRolePolicyDocument is not None
+            else IAMRolePolicies.lambda_assume_role_policy()
+        )
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
@@ -1514,10 +1528,7 @@ class SamApplication(SamResourceMacro):
         if isinstance(self.Location, dict):
             if self.APPLICATION_ID_KEY in self.Location and self.Location[self.APPLICATION_ID_KEY] is not None:
                 application_tags[self._SAR_APP_KEY] = self.Location[self.APPLICATION_ID_KEY]
-            if (
-                self.SEMANTIC_VERSION_KEY in self.Location
-                and self.Location[self.SEMANTIC_VERSION_KEY] is not None
-            ):
+            if self.SEMANTIC_VERSION_KEY in self.Location and self.Location[self.SEMANTIC_VERSION_KEY] is not None:
                 application_tags[self._SAR_SEMVER_KEY] = self.Location[self.SEMANTIC_VERSION_KEY]
         return application_tags
 
