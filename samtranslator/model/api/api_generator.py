@@ -477,7 +477,7 @@ class ApiGenerator:
             if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
                 invalid_keys = []
                 for key in mutual_tls_auth.keys():
-                    if not key in {"TruststoreUri", "TruststoreVersion"}:
+                    if key not in {"TruststoreUri", "TruststoreVersion"}:
                         invalid_keys.append(key)
                 invalid_keys.sort()
                 raise InvalidResourceException(
