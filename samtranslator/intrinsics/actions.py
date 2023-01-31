@@ -17,25 +17,27 @@ class Action(ABC):
     _resource_ref_separator = "."
     intrinsic_name: str
 
-    def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
+    def resolve_parameter_refs(  # noqa: empty-method-without-abstract-decorator
+        self, input_dict: Optional[Any], parameters: Dict[str, Any]
+    ) -> Optional[Any]:
         """
-        Subclass must implement this method to resolve the intrinsic function
+        Subclass optionally implement this method to resolve the intrinsic function
         TODO: input_dict should not be None.
         """
 
-    def resolve_resource_refs(
+    def resolve_resource_refs(  # noqa: empty-method-without-abstract-decorator
         self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
     ) -> Optional[Any]:
         """
-        Subclass must implement this method to resolve resource references
+        Subclass optionally implement this method to resolve resource references
         TODO: input_dict should not be None.
         """
 
-    def resolve_resource_id_refs(
+    def resolve_resource_id_refs(  # noqa: empty-method-without-abstract-decorator
         self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
     ) -> Optional[Any]:
         """
-        Subclass must implement this method to resolve resource references
+        Subclass optionally implement this method to resolve resource references
         TODO: input_dict should not be None.
         """
 
@@ -517,11 +519,7 @@ class GetAttAction(Action):
 
         # If items in value array is not a string, then following join line will fail. So if any element is not a string
         # we just pass along the input to CFN for doing the validation
-        for item in value:
-            if not isinstance(item, str):
-                return False
-
-        return True
+        return all(isinstance(item, str) for item in value)
 
     def _get_resolved_dictionary(
         self, input_dict: Optional[Dict[str, Any]], key: str, resolved_value: Optional[str], remaining: List[str]
@@ -537,7 +535,7 @@ class GetAttAction(Action):
         if input_dict and resolved_value:
             # We resolved to a new resource logicalId. Use this as the first element and keep remaining elements intact
             # This is the new value of Fn::GetAtt
-            input_dict[key] = [resolved_value] + remaining
+            input_dict[key] = [resolved_value, *remaining]
 
         return input_dict
 

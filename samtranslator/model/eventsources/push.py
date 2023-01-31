@@ -598,7 +598,7 @@ class SNS(PushEventSource):
         )
         event_source.Queue = queue_arn
         event_source.BatchSize = batch_size or 10
-        event_source.Enabled = enabled or True
+        event_source.Enabled = True
         return event_source.to_cloudformation(function=function, role=role)
 
     def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, function, logical_id=None):  # type: ignore[no-untyped-def]
@@ -741,7 +741,7 @@ class Api(PushEventSource):
         api_id = self.RestApiId
 
         # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
-        resource = "${__ApiId__}/" + "${__Stage__}/" + method + path
+        resource = f"${{__ApiId__}}/${{__Stage__}}/{method}{path}"
         partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
@@ -887,7 +887,7 @@ class Api(PushEventSource):
                         )
 
                     if not isinstance(parameter_value, dict) or not all(
-                        key in REQUEST_PARAMETER_PROPERTIES for key in parameter_value.keys()
+                        key in REQUEST_PARAMETER_PROPERTIES for key in parameter_value
                     ):
                         raise InvalidEventException(
                             self.relative_id,
@@ -1288,14 +1288,14 @@ class HttpApi(PushEventSource):
             # Case where default exists for this function, and so the permissions for that will apply here as well
             # This can save us several CFN resources (not duplicating permissions)
             return None
-        else:
-            path = OpenApiEditor.get_path_without_trailing_slash(path)  # type: ignore[no-untyped-call]
+        path = OpenApiEditor.get_path_without_trailing_slash(path)  # type: ignore[no-untyped-call]
 
         # Handle case where Method is already the ANY ApiGateway extension
-        if self._method.lower() == "any" or self._method.lower() == OpenApiEditor._X_ANY_METHOD:
-            method = "*"
-        else:
-            method = self._method.upper()
+        method = (
+            "*"
+            if self._method.lower() == "any" or self._method.lower() == OpenApiEditor._X_ANY_METHOD
+            else self._method.upper()
+        )
 
         api_id = self.ApiId
 

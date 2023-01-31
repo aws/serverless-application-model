@@ -27,7 +27,7 @@ class FileFormatter(ABC):
         return "JSON file formatter"
 
     @abstractmethod
-    def format(self, input_str: str) -> str:
+    def format_str(self, input_str: str) -> str:
         """Format method to formatted file content."""
 
     @staticmethod
@@ -41,15 +41,14 @@ class FileFormatter(ABC):
         """Return file extension of files to format."""
 
     @classmethod
-    def config_additional_args(cls) -> None:
+    def config_additional_args(cls) -> None:  # noqa: empty-method-without-abstract-decorator
         """Optionally configure additional args to arg parser."""
-        pass
 
     def process_file(self, file_path: str) -> None:
         with open(file_path, "r", encoding="utf-8") as f:
             file_str = f.read()
             try:
-                formatted_file_str = self.format(file_str)
+                formatted_file_str = self.format_str(file_str)
             except self.decode_exception() as error:
                 raise ValueError(f"{file_path}: Cannot decode the file content") from error
             except Exception as error:
@@ -65,7 +64,7 @@ class FileFormatter(ABC):
         self.scanned_file_found += 1
 
     def process_directory(self, directory_path: str) -> None:
-        for root, dirs, files in os.walk(directory_path):
+        for root, _dirs, files in os.walk(directory_path):
             for file in files:
                 file_path = os.path.join(root, file)
                 _, extension = os.path.splitext(file_path)

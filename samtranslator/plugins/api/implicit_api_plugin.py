@@ -206,7 +206,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         is_referencing_http_from_api_event = (
             not template.get(api_id)
             or template.get(api_id).type == "AWS::Serverless::HttpApi"
-            and not template.get(api_id).type == self.SERVERLESS_API_RESOURCE_TYPE
+            and template.get(api_id).type != self.SERVERLESS_API_RESOURCE_TYPE
         )
 
         # RestApiId is not pointing to a valid  API resource
