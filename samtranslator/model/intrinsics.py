@@ -51,14 +51,12 @@ def make_condition_or_list(conditions_list: Iterable[Any]) -> List[Dict[str, Any
 
 def make_or_condition(conditions_list: Iterable[Any]) -> Dict[str, List[Dict[str, Any]]]:
     or_list = make_condition_or_list(conditions_list)
-    condition = fnOr(or_list)
-    return condition
+    return fnOr(or_list)
 
 
 def make_and_condition(conditions_list: Iterable[Any]) -> Dict[str, List[Dict[str, Any]]]:
     and_list = make_condition_or_list(conditions_list)
-    condition = fnAnd(and_list)
-    return condition
+    return fnAnd(and_list)
 
 
 def calculate_number_of_conditions(conditions_length: int, max_conditions: int) -> int:
@@ -76,8 +74,7 @@ def calculate_number_of_conditions(conditions_length: int, max_conditions: int) 
     :param int max_conditions: maximum number of conditions that can be put in an Fn::Or statement
     :return: the number (int) of necessary additional conditions.
     """
-    num_conditions = 1 + (conditions_length - 2) // (max_conditions - 1)
-    return num_conditions
+    return 1 + (conditions_length - 2) // (max_conditions - 1)
 
 
 def make_combined_condition(

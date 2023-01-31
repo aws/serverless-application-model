@@ -84,11 +84,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
             else self._process_policy_template(logical_id, else_statement)  # type: ignore[no-untyped-call]
         )
 
-        processed_intrinsic_if = {
-            "Fn::If": [policy_entry.data["Fn::If"][0], processed_then_statement, processed_else_statement]
-        }
-
-        return processed_intrinsic_if
+        return {"Fn::If": [policy_entry.data["Fn::If"][0], processed_then_statement, processed_else_statement]}
 
     def _process_policy_template(self, logical_id, template_data):  # type: ignore[no-untyped-def]
 

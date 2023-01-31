@@ -185,7 +185,7 @@ class HttpApiGenerator:
 
         elif isinstance(self.cors_configuration, dict):
             # Make sure keys in the dict are recognized
-            if not all(key in CorsProperties._fields for key in self.cors_configuration.keys()):
+            if not all(key in CorsProperties._fields for key in self.cors_configuration):
                 raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")
 
             properties = CorsProperties(**self.cors_configuration)
@@ -296,7 +296,7 @@ class HttpApiGenerator:
             if isinstance(mutual_tls_auth, dict):
                 if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
                     invalid_keys = []
-                    for key in mutual_tls_auth.keys():
+                    for key in mutual_tls_auth:
                         if key not in {"TruststoreUri", "TruststoreVersion"}:
                             invalid_keys.append(key)
                     invalid_keys.sort()
@@ -466,7 +466,7 @@ class HttpApiGenerator:
             )
 
         # Make sure keys in the dict are recognized
-        if not all(key in AuthProperties._fields for key in self.auth.keys()):
+        if not all(key in AuthProperties._fields for key in self.auth):
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
 
         if not OpenApiEditor.is_valid(self.definition_body):

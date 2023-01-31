@@ -93,9 +93,6 @@ class FeatureToggle:
 class FeatureToggleConfigProvider(ABC):
     """Interface for all FeatureToggle config providers"""
 
-    def __init__(self) -> None:
-        pass
-
     @property
     @abstractmethod
     def config(self) -> Dict[str, Any]:
@@ -142,7 +139,7 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
                 connect_timeout=BOTO3_CONNECT_TIMEOUT, read_timeout=5, retries={"total_max_attempts": 2}
             )
             self.app_config_client = (
-                boto3.client("appconfig", config=client_config) if not app_config_client else app_config_client
+                app_config_client if app_config_client else boto3.client("appconfig", config=client_config)
             )
             response = self.app_config_client.get_configuration(
                 Application=application_id,

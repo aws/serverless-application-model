@@ -12,9 +12,6 @@ LOG = logging.getLogger(__name__)
 class MetricsPublisher(ABC):
     """Interface for all MetricPublishers"""
 
-    def __init__(self) -> None:
-        pass
-
     @abstractmethod
     def publish(self, namespace, metrics):  # type: ignore[no-untyped-def]
         """

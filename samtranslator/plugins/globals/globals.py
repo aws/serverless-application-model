@@ -408,7 +408,7 @@ class GlobalProperties:
         # Local has higher priority than global. So iterate over local dict and merge into global if keys are overridden
         global_dict = global_dict.copy()
 
-        for key in local_dict.keys():
+        for key in local_dict:
 
             if key in global_dict:
                 # Both local & global contains the same key. Let's do a merge.

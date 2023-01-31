@@ -95,12 +95,12 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
     sam_props["Resources"]["additionalProperties"]["anyOf"].extend(cfn_resources)
 
     # Add any other top-level properties from CloudFormation schema to SAM schema
-    for k in cfn_props.keys():
+    for k in cfn_props:
         if k not in sam_props:
             sam_props[k] = cfn_props[k]
 
     # Add definitions from CloudFormation schema to SAM schema
-    for k in cfn_defs.keys():
+    for k in cfn_defs:
         if k in sam_defs:
             raise Exception(f"Key {k} already in SAM schema definitions")
         sam_defs[k] = cfn_defs[k]
