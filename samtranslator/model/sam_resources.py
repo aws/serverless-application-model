@@ -121,6 +121,7 @@ class SamFunction(SamResourceMacro):
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(IS_STR)),
         "AutoPublishCodeSha256": PropertyType(False, one_of(IS_STR)),
+        "AutoPublishAliasAdditionalProperties": PropertyType(False, is_type(bool)),
         "VersionDescription": PropertyType(False, IS_STR),
         "ProvisionedConcurrencyConfig": PropertyType(False, IS_DICT),
         "FileSystemConfigs": PropertyType(False, list_of(IS_DICT)),
@@ -161,6 +162,7 @@ class SamFunction(SamResourceMacro):
     EphemeralStorage: Optional[Dict[str, Any]]
     AutoPublishAlias: Optional[Intrinsicable[str]]
     AutoPublishCodeSha256: Optional[Intrinsicable[str]]
+    AutoPublishAliasAdditionalProperties: Optional[bool]
     VersionDescription: Optional[Intrinsicable[str]]
     ProvisionedConcurrencyConfig: Optional[Dict[str, Any]]
     FileSystemConfigs: Optional[Dict[str, Any]]
@@ -886,6 +888,11 @@ class SamFunction(SamResourceMacro):
             # If SnapStart is enabled we want to publish a new version, to have the corresponding snapshot
             if function.SnapStart and function.SnapStart.get("ApplyOn", "None") != "None":
                 logical_dict.update({"SnapStart": function.SnapStart})
+            # We can't directly change AutoPublishAlias as that would be a breaking change, so we have to add this opt-in
+            # property that when set to true would change the lambda version whenever a property in the lambda function changes
+            if self.AutoPublishAliasAdditionalProperties:
+                properties = function._generate_resource_dict().get("Properties", {})
+                logical_dict.update(properties)
         logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()
