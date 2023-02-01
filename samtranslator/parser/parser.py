@@ -2,12 +2,12 @@ import logging
 
 from samtranslator.model.exceptions import (
     InvalidDocumentException,
-    InvalidTemplateException,
     InvalidResourceAttributeTypeException,
+    InvalidTemplateException,
 )
-from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)

@@ -31,7 +31,7 @@ class YAMLFormatter(FileFormatter):
     def description() -> str:
         return "YAML file formatter"
 
-    def format(self, input_str: str) -> str:
+    def format_str(self, input_str: str) -> str:
         """Opinionated format YAML file."""
         obj = yaml.load(input_str)
         if self.args.add_test_metadata:
@@ -48,7 +48,7 @@ class YAMLFormatter(FileFormatter):
         # and we don't really want those, so if no yaml version
         # is specified in the original file, remove it from the output file.
         if not re.match(YAML_VERSION_COMMENT_REGEX, input_str):
-            formatted = re.sub(YAML_VERSION_COMMENT_REGEX, "", formatted)
+            return re.sub(YAML_VERSION_COMMENT_REGEX, "", formatted)
 
         return formatted
 

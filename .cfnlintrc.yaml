@@ -108,7 +108,7 @@ ignore_templates:
   - tests/translator/output/**/s3_intrinsics.json
   - tests/translator/output/**/schema_validation_1.json
   - tests/translator/output/**/self_managed_kafka_with_intrinsics.json
-  - tests/translator/output/**/sqs_with_scaling_config.json # TODO: remove once SQS scaling config is available
+  - tests/translator/output/**/sqs_with_scaling_config.json  # Invalid Property Resources/SQSFunctionMySqsQueue/Properties/ScalingConfig
   - tests/translator/output/**/state_machine_with_condition.json
   - tests/translator/output/**/state_machine_with_condition_and_events.json
   - tests/translator/output/**/state_machine_with_eb_dlq_target_id.json

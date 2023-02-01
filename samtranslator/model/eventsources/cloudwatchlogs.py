@@ -6,6 +6,7 @@ from samtranslator.model.intrinsics import fnSub
 from samtranslator.model.log import SubscriptionFilter
 from samtranslator.model.types import IS_STR
 from samtranslator.translator.arn_generator import ArnGenerator
+
 from . import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from .push import PushEventSource
 
@@ -37,9 +38,7 @@ class CloudWatchLogs(PushEventSource):
         source_arn = self.get_source_arn()
         permission = self._construct_permission(function, source_arn=source_arn)  # type: ignore[no-untyped-call]
         subscription_filter = self.get_subscription_filter(function, permission)  # type: ignore[no-untyped-call]
-        resources = [permission, subscription_filter]
-
-        return resources
+        return [permission, subscription_filter]
 
     def get_source_arn(self) -> Dict[str, Any]:
         resource = "log-group:${__LogGroupName__}:*"

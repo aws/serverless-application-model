@@ -1,9 +1,9 @@
 # Help resolve intrinsic functions
-from typing import Any, Dict, Optional, Callable, List, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
-from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAttAction
-from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
+from samtranslator.intrinsics.actions import Action, GetAttAction, RefAction, SubAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 
 # All intrinsics are supported by default
 DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}

@@ -7,6 +7,7 @@ pytest-env~=0.6.2
 pytest-rerunfailures~=9.1.1
 pylint~=2.15.0
 pyyaml~=5.4
+ruff==0.0.237  # loose the requirement once it is more stable
 
 # Test requirements
 pytest~=6.2.5
@@ -35,3 +36,6 @@ mypy==0.971
 boto3-stubs[appconfig,serverlessrepo]>=1.19.5,==1.*
 types-PyYAML~=5.4
 types-jsonschema~=3.2
+
+# schema generation, requiring features in >=1.10
+pydantic~=1.10

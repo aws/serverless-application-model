@@ -1,11 +1,9 @@
 import copy
 import json
 import pytest
-import os
 import itertools
 
 from pathlib import Path
-from typing import Iterator
 from unittest import TestCase
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
@@ -16,7 +14,7 @@ from samtranslator.yaml_helper import yaml_parse
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-SCHEMA = json.loads(PROJECT_ROOT.joinpath("samtranslator/schema/sam.schema.json").read_bytes())
+SCHEMA = json.loads(PROJECT_ROOT.joinpath("schema_source/sam.schema.json").read_bytes())
 UNIFIED_SCHEMA = json.loads(PROJECT_ROOT.joinpath("samtranslator/schema/schema.json").read_bytes())
 
 # TODO: Enable (most likely) everything but 'error_*' and 'basic_schema_validation_failure'
@@ -146,20 +144,20 @@ class TestValidateUnifiedSchema(TestCase):
         assert len(UNIFIED_SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]) > 1000
         assert (
             "The set of properties must conform to the defined `Type`"
-            in UNIFIED_SCHEMA["definitions"]["samtranslator__schema__aws_serverless_statemachine__ApiEvent"][
-                "properties"
-            ]["Properties"]["markdownDescription"]
+            in UNIFIED_SCHEMA["definitions"]["schema_source__aws_serverless_statemachine__ApiEvent"]["properties"][
+                "Properties"
+            ]["markdownDescription"]
         )
 
         # Contains all definitions from SAM-only schema (except rule that ignores non-SAM)
         sam_defs = copy.deepcopy(SCHEMA["definitions"])
-        del sam_defs["samtranslator__schema__any_cfn_resource__Resource"]
+        del sam_defs["schema_source__any_cfn_resource__Resource"]
         assert sam_defs.items() <= UNIFIED_SCHEMA["definitions"].items()
 
         # Contains all resources from SAM-only schema (except rule that ignores non-SAM)
         unified_resources = UNIFIED_SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]
         for v in SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]:
-            if v["$ref"] != "#/definitions/samtranslator__schema__any_cfn_resource__Resource":
+            if v["$ref"] != "#/definitions/schema_source__any_cfn_resource__Resource":
                 assert v in unified_resources
 
     @parameterized.expand(

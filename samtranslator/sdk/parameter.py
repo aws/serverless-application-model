@@ -1,6 +1,7 @@
-import boto3
-from typing import Dict, Any
 import copy
+from typing import Any, Dict
+
+import boto3
 
 from samtranslator.translator.arn_generator import ArnGenerator, NoRegionFound
 

@@ -40,7 +40,9 @@ class SamTemplate:
             if needs_filter:
                 yield logicalId, resource
 
-    def set(self, logical_id: str, resource: Union[SamResource, Dict[str, Any]]) -> None:
+    def set(  # noqa: builtin-attribute-shadowing
+        self, logical_id: str, resource: Union[SamResource, Dict[str, Any]]
+    ) -> None:
         """
         Adds the resource to dictionary with given logical Id. It will overwrite, if the logical_id is already used.
 

@@ -1,5 +1,5 @@
 import copy
-from typing import Optional, cast, Any, List
+from typing import Any, List, Optional, cast
 
 
 def as_array(x: Any) -> List[Any]:

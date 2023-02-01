@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import IS_STR
 from samtranslator.model.intrinsics import fnGetAtt, ref
+from samtranslator.model.types import IS_STR
 
 
 class SubscriptionFilter(Resource):

@@ -1,7 +1,7 @@
 from typing import Any, List, Optional
 
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import is_type, IS_STR
+from samtranslator.model.types import IS_STR, is_type
 from samtranslator.utils.types import Intrinsicable
 
 

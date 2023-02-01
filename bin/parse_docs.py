@@ -13,17 +13,21 @@ Usage:
 import argparse
 import json
 import re
+from contextlib import suppress
 from pathlib import Path
-from typing import Iterator, Tuple, Dict
+from typing import Dict, Iterator, Tuple
 
 
 def parse(s: str) -> Iterator[Tuple[str, str]]:
-    """Parse an AWS SAM docs page in Markdown format, yielding each property."""
+    """Parse an AWS docs page in Markdown format, yielding each property."""
+    # Prevent from parsing return values accidentally
+    with suppress(ValueError):
+        s = s[: s.index("Return Values")]
     parts = s.split("\n\n")
     for part in parts:
-        if part.startswith(" `"):
-            name = part.split("`")[1]
-            yield name, part.strip()
+        match = re.match(r"^\s*`(\w+)`\s+<a", part)
+        if match:
+            yield match.group(1), part.strip()
 
 
 # TODO: Change in the docs instead?
@@ -33,10 +37,13 @@ def fix_markdown_code_link(s: str) -> str:
 
 
 def remove_first_line(s: str) -> str:
-    return s.split("\n", 1)[1]
+    try:
+        return s.split("\n", 1)[1]
+    except IndexError:
+        return ""
 
 
-def convert_to_full_path(description: str) -> str:
+def convert_to_full_path(description: str, prefix: str) -> str:
     pattern = re.compile("\(([#\.a-zA-Z0-9_-]+)\)")
     matched_content = pattern.findall(description)
 
@@ -45,26 +52,38 @@ def convert_to_full_path(description: str) -> str:
             url = path.split(".")[0] + ".html"
             if "#" in path:
                 url += "#" + path.split("#")[1]
-            description = description.replace(
-                path, f"https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/{url}"
-            )
+            description = description.replace(path, prefix + url)
     return description
+
+
+def stringbetween(s: str, sep1: str, sep2: str) -> str:
+    return s.split(sep1, 1)[1].split(sep2, 1)[0]
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", type=Path)
+    parser.add_argument("--cfn", action="store_true")
+    parser.add_argument("--with-title", help="use doc title instead of filename as key", action="store_true")
     args = parser.parse_args()
 
     props: Dict[str, Dict[str, str]] = {}
     for path in args.dir.glob("*.md"):
-        for name, description in parse(path.read_text()):
-            if path.stem not in props:
-                props[path.stem] = {}
+        text = path.read_text()
+        title = stringbetween(text, "# ", "<a")
+        page = title if args.with_title else path.stem
+        for name, description in parse(text):
+            if page not in props:
+                props[page] = {}
             description = remove_first_line(description)  # Remove property name; already in the schema title
             description = fix_markdown_code_link(description)
-            description = convert_to_full_path(description)
-            props[path.stem][name] = description
+            prefix = (
+                "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/"
+                if args.cfn
+                else "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/"
+            )
+            description = convert_to_full_path(description, prefix)
+            props[page][name] = description
 
     print(
         json.dumps(

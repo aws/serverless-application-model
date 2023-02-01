@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.intrinsics import ref
-from samtranslator.model.types import IS_DICT, is_type, one_of, IS_STR
+from samtranslator.model.types import IS_DICT, IS_STR, is_type, one_of
 
 
 class CodeDeployApplication(Resource):

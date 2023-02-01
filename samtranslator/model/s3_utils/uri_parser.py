@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional, Union
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
+
 from samtranslator.model.exceptions import InvalidResourceException
 
 

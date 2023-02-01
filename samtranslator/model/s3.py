@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import IS_DICT, is_type, IS_STR, any_type
-from samtranslator.model.intrinsics import ref, fnGetAtt
+from samtranslator.model.intrinsics import fnGetAtt, ref
+from samtranslator.model.types import IS_DICT, IS_STR, any_type, is_type
 
 
 class S3Bucket(Resource):
