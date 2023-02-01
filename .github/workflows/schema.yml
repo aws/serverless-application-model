@@ -19,6 +19,7 @@ jobs:
           make schema-all
 
   push:
+    needs: update
     runs-on: ubuntu-latest
     
     permissions:
