@@ -428,7 +428,6 @@ class ApiGenerator:
     def _construct_api_domain(
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
     ) -> Tuple[Optional[ApiGatewayDomainName], Optional[List[ApiGatewayBasePathMapping]], Any]:
-        # pylint: disable=duplicate-code
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
@@ -585,7 +584,6 @@ class ApiGenerator:
         return recordset_list
 
     def _construct_alias_target(self, domain: Dict[str, Any], api_domain_name: str, route53: Any) -> Dict[str, Any]:
-        # pylint: disable=duplicate-code
         alias_target = {}
         target_health = route53.get("EvaluateTargetHealth")
 
