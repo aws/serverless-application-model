@@ -23,7 +23,9 @@ jobs:
       - name: Update schema
         run: |
           make init
-          make schema-all
+          make fetch-schema-data
+          make update-schema-data
+          make schema
     
       - name: Push change to temporary branch
         run: |
