@@ -4692,6 +4692,10 @@
           "markdownDescription": "The name of the Lambda alias\\. For more information about Lambda aliases, see [Lambda function aliases](https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html) in the *AWS Lambda Developer Guide*\\. For examples that use this property, see [Deploying serverless applications gradually](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/automating-updates-to-serverless-apps.html)\\.  \nAWS SAM generates [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html) and [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html) resources when this property is set\\. For information about this scenario, see [AutoPublishAlias property is specified](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources-function.html#sam-specification-generated-resources-function-autopublishalias)\\. For general information about generated AWS CloudFormation resources, see [Generated AWS CloudFormation resources](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "AutoPublishAlias"
         },
+        "AutoPublishAliasAllProperties": {
+          "title": "Autopublishaliasallproperties",
+          "type": "boolean"
+        },
         "AutoPublishCodeSha256": {
           "anyOf": [
             {
