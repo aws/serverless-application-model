@@ -751,7 +751,6 @@ class Api(PushEventSource):
         return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)  # type: ignore[no-untyped-call]
 
     def _add_swagger_integration(self, api, api_id, function, intrinsics_resolver):  # type: ignore[no-untyped-def]
-        # pylint: disable=duplicate-code
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
