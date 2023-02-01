@@ -58,8 +58,7 @@ class Translator:
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
 
-        partition = ArnGenerator.get_partition_name()
-        self.managed_policy_map = get_managed_policy_map(partition)
+        self.managed_policy_map = get_managed_policy_map()
 
     def _get_function_names(
         self, resource_dict: Dict[str, Any], intrinsics_resolver: IntrinsicsResolver

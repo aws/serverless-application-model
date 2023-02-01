@@ -1,10 +1,15 @@
 import json
 import os
 from typing import Dict
+from functools import lru_cache
 
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "managed_policies.json"), encoding="utf-8") as f:
-    _MANAGED_POLICIES: Dict[str, Dict[str, str]] = json.load(f)
+from samtranslator.translator.arn_generator import ArnGenerator
 
 
-def get_managed_policy_map(partition: str) -> Dict[str, str]:
-    return _MANAGED_POLICIES[partition]
+@lru_cache(maxsize=1)
+def get_managed_policy_map() -> Dict[str, str]:
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "managed_policies.json")
+    with open(path, encoding="utf-8") as f:
+        policies: Dict[str, str] = json.load(f)
+        partition = ArnGenerator.get_partition_name()
+        return {k: v.replace("<partition>", partition) for k, v in policies.items()}
