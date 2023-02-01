@@ -26,7 +26,6 @@ import subprocess
 import sys
 from functools import reduce
 
-import boto3
 from docopt import docopt  # type: ignore[import]
 
 my_path = os.path.dirname(os.path.abspath(__file__))
