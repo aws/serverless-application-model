@@ -22,8 +22,8 @@ jobs:
       - name: Update schema
         id: schema
         run: |
-          make init
-          make schema-all
+          #make init
+          #make schema-all
           git diff --exit-code || echo "changed=true" >> $GITHUB_OUTPUT
     
       - name: Push change to temporary branch
