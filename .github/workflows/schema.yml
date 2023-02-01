@@ -25,6 +25,7 @@ jobs:
         run: |
           make init
           make schema-all
+          # Set gh action condition "steps.schema.outputs.changed" to true if there is diff:
           git diff --exit-code || echo "changed=true" >> $GITHUB_OUTPUT
     
       - name: Push change to temporary branch
