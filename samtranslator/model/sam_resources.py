@@ -893,7 +893,6 @@ class SamFunction(SamResourceMacro):
             # If SnapStart is enabled we want to publish a new version, to have the corresponding snapshot
             if function.SnapStart and function.SnapStart.get("ApplyOn", "None") != "None":
                 logical_dict.update({"SnapStart": function.SnapStart})
-
         logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()
