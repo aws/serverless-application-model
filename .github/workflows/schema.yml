@@ -6,13 +6,13 @@ on:
   schedule:
     - cron: "0 0 * * 1-5"
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   update:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v3
