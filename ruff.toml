@@ -25,3 +25,25 @@ target-version = "py37"
 [per-file-ignores]
 # python scripts in bin/ needs some python path configurations before import
 "bin/*.py" = ["E402"]  # E402: module-import-not-at-top-of-file
+
+# Quick exclusion of too-many-args in legacy files,
+# due to there are too many violations in them.
+"samtranslator/metrics/metrics.py" = ["PLR0913"]
+"samtranslator/model/api/api_generator.py" = ["PLR0913"]
+"samtranslator/model/api/http_api_generator.py" = ["PLR0913"]
+"samtranslator/model/apigateway.py" = ["PLR0913"]
+"samtranslator/model/apigatewayv2.py" = ["PLR0913"]
+"samtranslator/model/eventsources/push.py" = ["PLR0913"]
+"samtranslator/model/eventsources/scheduler.py" = ["PLR0913"]
+"samtranslator/model/role_utils/role_constructor.py" = ["PLR0913"]
+"samtranslator/model/sam_resources.py" = ["PLR0913"]
+"samtranslator/model/stepfunctions/events.py" = ["PLR0913"]
+"samtranslator/model/stepfunctions/generators.py" = ["PLR0913"]
+"samtranslator/open_api/open_api.py" = ["PLR0913"]
+"samtranslator/plugins/api/implicit_api_plugin.py" = ["PLR0913"]
+"samtranslator/plugins/api/implicit_http_api_plugin.py" = ["PLR0913"]
+"samtranslator/plugins/api/implicit_rest_api_plugin.py" = ["PLR0913"]
+"samtranslator/plugins/application/serverless_app_plugin.py" = ["PLR0913"]
+"samtranslator/swagger/swagger.py" = ["PLR0913"]
+"samtranslator/translator/translator.py" = ["PLR0913"]
+"samtranslator/validator/value_validator.py" = ["PLR0913"]
