@@ -16,12 +16,6 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Create temporary branch
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git checkout -b tmp/schema/$GITHUB_RUN_ID/$GITHUB_RUN_ATTEMPT
-
       - name: Update schema
         run: |
           make init
@@ -29,11 +23,14 @@ jobs:
 
       - name: Push change to temporary branch
         run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout -b tmp/schema/$GITHUB_RUN_ID/$GITHUB_RUN_ATTEMPT
           git add -u
           git commit -m "chore(schema): update"
           git push --set-upstream origin tmp/schema/$GITHUB_RUN_ID/$GITHUB_RUN_ATTEMPT
 
-      - name: Create PR for change
-        run: gh pr create --fill --base main
+      - name: Create PR
+        run: gh pr create --fill --base develop
         env:
           GH_TOKEN: ${{ github.token }}
