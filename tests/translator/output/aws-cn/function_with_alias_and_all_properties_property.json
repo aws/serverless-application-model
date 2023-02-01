@@ -1,5 +1,159 @@
 {
   "Resources": {
+    "HashChangeFunction": {
+      "Properties": {
+        "Architectures": [
+          "x86_64"
+        ],
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "EphemeralStorage": {
+          "Size": 1024
+        },
+        "FileSystemConfigs": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "AccessPoint",
+                "Arn"
+              ]
+            },
+            "LocalMountPath": "/mnt/EFS"
+          }
+        ],
+        "Handler": "hello.handler",
+        "KmsKeyArn": "thisIsaKey",
+        "Layers": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1"
+          }
+        ],
+        "PackageType": "Zip",
+        "ReservedConcurrentExecutions": 100,
+        "Role": "arn:${AWS::Partition}:iam::123456123456:role/service-role/SampleRole",
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 1,
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-085912345678492fb"
+          ],
+          "SubnetIds": [
+            "subnet-071f712345678e7c8"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "HashChangeFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "HashChangeFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "HashChangeFunctionVersion7d5d845d14",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "HashChangeFunctionVersion7d5d845d14": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "HashChangeFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "HashNoChangeFunction": {
+      "Properties": {
+        "Architectures": [
+          "x86_64"
+        ],
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "EphemeralStorage": {
+          "Size": 1024
+        },
+        "FileSystemConfigs": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "AccessPoint",
+                "Arn"
+              ]
+            },
+            "LocalMountPath": "/mnt/EFS"
+          }
+        ],
+        "Handler": "hello.handler",
+        "KmsKeyArn": "thisIsaKey",
+        "Layers": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1"
+          }
+        ],
+        "PackageType": "Zip",
+        "ReservedConcurrentExecutions": 100,
+        "Role": "arn:${AWS::Partition}:iam::123456123456:role/service-role/SampleRole",
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 1,
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-085912345678492fb"
+          ],
+          "SubnetIds": [
+            "subnet-071f712345678e7c8"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "HashNoChangeFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "HashNoChangeFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "HashNoChangeFunctionVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "HashNoChangeFunctionVersion640128d35d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "HashNoChangeFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
     "MinimalFunction": {
       "Properties": {
         "Code": {
