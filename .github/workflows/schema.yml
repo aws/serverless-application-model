@@ -27,7 +27,7 @@ jobs:
           git diff --exit-code || echo "changed=true" >> $GITHUB_OUTPUT
     
       - name: Push change to temporary branch
-        if: steps.schema.changed
+        if: steps.schema.outputs.changed
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
@@ -37,7 +37,7 @@ jobs:
           git push --set-upstream origin tmp/schema/$GITHUB_RUN_ID/$GITHUB_RUN_ATTEMPT
 
       - name: Create PR
-        if: steps.schema.changed
+        if: steps.schema.outputs.changed
         run: gh pr create --fill --base develop
         env:
           GH_TOKEN: ${{ github.token }}
