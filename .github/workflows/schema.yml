@@ -3,13 +3,10 @@ name: Update schema
 on:
   push:
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -21,6 +18,14 @@ jobs:
           make init
           make schema-all
 
+  push:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
       - name: Push change to temporary branch
         run: |
           git config user.name github-actions
