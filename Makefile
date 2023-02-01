@@ -35,13 +35,9 @@ black-check:
 	bin/yaml-format.py --check integration --add-test-metadata
 
 lint:
-	# experimental: use ruff to perform checks before pylint to see
-	# if it can check issues before pylint
 	ruff samtranslator bin schema_source
 	# mypy performs type check
 	mypy --strict samtranslator bin schema_source
-	# Linter performs static analysis to catch latent bugs
-	pylint --rcfile .pylintrc samtranslator schema_source
 	# cfn-lint to make sure generated CloudFormation makes sense
 	bin/run_cfn_lint.sh
 
