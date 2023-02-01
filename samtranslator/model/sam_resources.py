@@ -28,7 +28,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayUsagePlanKey,
 )
 from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
-from samtranslator.model.appsync import Auth, GraphQLApi
+from samtranslator.model.appsync import Auth, GraphQLApi, GraphQLSchema
 from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
@@ -2137,22 +2137,30 @@ class SamGraphQLApi(SamResourceMacro):
         "Tags": Property(False, IS_DICT),
         "XrayEnabled": PassThroughProperty(False),
         "Auth": Property(True, IS_DICT),
+        "SchemaInline": Property(False, IS_STR),
+        "SchemaUri": Property(False, IS_STR),
     }
 
     Auth: Auth
     Tags: Optional[Dict[str, Any]]
     XrayEnabled: Optional[PassThrough]
     Name: Optional[str]
+    SchemaInline: Optional[str]
+    SchemaUri: Optional[str]
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:  # type: ignore
         appsync_api = self._construct_appsync_api()
-        resources: List[Resource] = [appsync_api]
+        appsync_schema = self._construct_appsync_schema(appsync_api.get_runtime_attr("api_id"))
+        resources: List[Resource] = [appsync_api, appsync_schema]
 
         return resources
 
     def _construct_appsync_api(self) -> GraphQLApi:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
+
+        if "Type" not in self.Auth:
+            raise InvalidResourceException(self.logical_id, "'Auth' object is missing required property 'Type'.")
 
         api.AuthenticationType = self.Auth["Type"]
         api.Name = self.Name if self.Name else self.logical_id
@@ -2162,3 +2170,22 @@ class SamGraphQLApi(SamResourceMacro):
             api.Tags = get_tag_list(self.Tags)
 
         return api
+
+    def _construct_appsync_schema(self, api_id: Intrinsicable[str]) -> GraphQLSchema:
+        schema = GraphQLSchema(
+            logical_id=f"{self.logical_id}Schema", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
+        if not self.SchemaInline and not self.SchemaUri:
+            raise InvalidResourceException(self.logical_id, "One of 'SchemaInline' or 'SchemaUri' must be set.")
+
+        if self.SchemaInline and self.SchemaUri:
+            raise InvalidResourceException(
+                self.logical_id, "Both 'SchemaInline' and 'SchemaUri' cannot be defined at the same time."
+            )
+
+        schema.ApiId = api_id
+        schema.Definition = self.SchemaInline
+        schema.DefinitionS3Location = self.SchemaUri
+
+        return schema

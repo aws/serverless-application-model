@@ -3,6 +3,10 @@ Resources:
   SuperCoolAPI:
     Type: AWS::Serverless::GraphQLApi
     Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
       XrayEnabled: true
       Auth:
         Type: AWS_IAM

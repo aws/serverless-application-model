@@ -5593,6 +5593,14 @@
           "title": "Name",
           "type": "string"
         },
+        "SchemaInline": {
+          "title": "Schemainline",
+          "type": "string"
+        },
+        "SchemaUri": {
+          "title": "Schemauri",
+          "type": "string"
+        },
         "Tags": {
           "title": "Tags",
           "type": "object"
