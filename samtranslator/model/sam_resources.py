@@ -1,5 +1,6 @@
 ﻿""" SAM macro definitions """
 import copy
+from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 import samtranslator.model.eventsources
@@ -883,18 +884,15 @@ class SamFunction(SamResourceMacro):
             properties = function._generate_resource_dict().get("Properties", {})
             logical_dict = properties
         else:
-            try:
+            with suppress(AttributeError, UnboundLocalError):
                 logical_dict = code_dict.copy()
-            except (AttributeError, UnboundLocalError):
-                pass  # noqa: try-except-pass
-            else:
-                if function.Environment:
-                    logical_dict.update(function.Environment)
-                if function.MemorySize:
-                    logical_dict.update({"MemorySize": function.MemorySize})
-                # If SnapStart is enabled we want to publish a new version, to have the corresponding snapshot
-                if function.SnapStart and function.SnapStart.get("ApplyOn", "None") != "None":
-                    logical_dict.update({"SnapStart": function.SnapStart})
+            if function.Environment:
+                logical_dict.update(function.Environment)
+            if function.MemorySize:
+                logical_dict.update({"MemorySize": function.MemorySize})
+            # If SnapStart is enabled we want to publish a new version, to have the corresponding snapshot
+            if function.SnapStart and function.SnapStart.get("ApplyOn", "None") != "None":
+                logical_dict.update({"SnapStart": function.SnapStart})
 
         logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()
 
