@@ -7,6 +7,7 @@ Resources:
         type Mutation {
           addTodo(id: ID!, name: String, description: String, priority: Int): Todo
         }
+      SchemaUri: https://bucket-name.s3.region-code.amazonaws.com/key-name
       XrayEnabled: true
       Auth:
         Type: AWS_IAM

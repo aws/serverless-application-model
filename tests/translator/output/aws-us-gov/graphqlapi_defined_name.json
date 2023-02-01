@@ -6,6 +6,18 @@
         "Name": "SuperDuperCoolAPI"
       },
       "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "SuperCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "DefinitionS3Location": "https://bucket-name.s3.region-code.amazonaws.com/key-name"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
     }
   }
 }

@@ -16,6 +16,8 @@ class Properties(BaseModel):
     Tags: Optional[DictStrAny]
     Name: Optional[str]
     XrayEnabled: Optional[bool]
+    SchemaInline: Optional[str]
+    SchemaUri: Optional[str]
 
 
 class Resource(BaseModel):
