@@ -1,5 +1,16 @@
 {
   "Resources": {
+    "AccessPoint": {
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "EfsFileSystem"
+        }
+      },
+      "Type": "AWS::EFS::AccessPoint"
+    },
+    "EfsFileSystem": {
+      "Type": "AWS::EFS::FileSystem"
+    },
     "HashChangeFunction": {
       "Properties": {
         "Architectures": [
@@ -24,7 +35,9 @@
           }
         ],
         "Handler": "hello.handler",
-        "KmsKeyArn": "thisIsaKey",
+        "KmsKeyArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:key:key"
+        },
         "Layers": [
           {
             "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1"
@@ -32,7 +45,9 @@
         ],
         "PackageType": "Zip",
         "ReservedConcurrentExecutions": 100,
-        "Role": "arn:${AWS::Partition}:iam::123456123456:role/service-role/SampleRole",
+        "Role": {
+          "Fn::Sub": "arn:${AWS::Partition}:iam::role"
+        },
         "Runtime": "python2.7",
         "Tags": [
           {
@@ -59,7 +74,7 @@
         },
         "FunctionVersion": {
           "Fn::GetAtt": [
-            "HashChangeFunctionVersion7d5d845d14",
+            "HashChangeFunctionVersion17ca83d2bf",
             "Version"
           ]
         },
@@ -67,7 +82,7 @@
       },
       "Type": "AWS::Lambda::Alias"
     },
-    "HashChangeFunctionVersion7d5d845d14": {
+    "HashChangeFunctionVersion17ca83d2bf": {
       "DeletionPolicy": "Retain",
       "Properties": {
         "Description": "sam-testing",
@@ -101,7 +116,9 @@
           }
         ],
         "Handler": "hello.handler",
-        "KmsKeyArn": "thisIsaKey",
+        "KmsKeyArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:key:key"
+        },
         "Layers": [
           {
             "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1"
@@ -109,7 +126,9 @@
         ],
         "PackageType": "Zip",
         "ReservedConcurrentExecutions": 100,
-        "Role": "arn:${AWS::Partition}:iam::123456123456:role/service-role/SampleRole",
+        "Role": {
+          "Fn::Sub": "arn:${AWS::Partition}:iam::role"
+        },
         "Runtime": "python2.7",
         "Tags": [
           {
