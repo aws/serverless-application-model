@@ -29,7 +29,7 @@ def parse(s: str) -> Iterator[Tuple[str, str]]:
     for part in parts:
         match = re.match(r"^\s*`(\w+)`\s+<a", part)
         if match:
-            yield match.group(1), part.strip()
+            yield match.group(1), part
 
 
 # TODO: Change in the docs instead?
@@ -84,7 +84,7 @@ def main() -> None:
                 else "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/"
             )
             description = convert_to_full_path(description, prefix)
-            props[page][name] = description
+            props[page][name] = description.strip()
 
     print(
         json.dumps(
