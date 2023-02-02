@@ -2,7 +2,7 @@
 
 ## Context
 
-The AWS SAM specification is spe
+The [AWS SAM specification](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html) is defined by a [JSON schema](https://github.com/aws/serverless-application-model/discussions/2645).
 
 ## Schema generation
 
@@ -34,3 +34,5 @@ flowchart TD
   cfnschemadocs --> final
   samschemadocs --> final
 ```
+
+The schema is [automatically updated](https://github.com/aws/serverless-application-model/blob/develop/.github/workflows/schema.yml) at regular intervals.
