@@ -13,9 +13,8 @@ Usage:
 import argparse
 import json
 import re
-from contextlib import suppress
 from pathlib import Path
-from typing import Dict, Optional, Iterator, Tuple
+from typing import Dict, Iterator, Optional, Tuple
 
 
 def parse(s: str) -> Iterator[Tuple[str, str]]:
