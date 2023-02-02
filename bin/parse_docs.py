@@ -14,7 +14,7 @@ import argparse
 import json
 import re
 from pathlib import Path
-from typing import Dict, Iterator, Optional, Tuple
+from typing import Dict, Iterator, Tuple
 
 
 def parse(s: str) -> Iterator[Tuple[str, str]]:
@@ -56,14 +56,14 @@ def convert_to_full_path(description: str, prefix: str) -> str:
     return description
 
 
-def stringbetween(s: str, sep1: str, sep2: str) -> Optional[str]:
+def stringbetween(s: str, sep1: str, sep2: str) -> str:
     """
     Return string between regexes. Case-insensitive. If sep2 doesn't match,
     returns to end of string.
     """
     start = re.search(sep1, s, re.IGNORECASE)
     if not start:
-        return None
+        return ""
     s = s[start.end() :]
     end = re.search(sep2, s, re.IGNORECASE)
     if not end:
