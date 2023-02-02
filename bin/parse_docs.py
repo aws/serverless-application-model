@@ -84,6 +84,9 @@ def main() -> None:
                 else "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/"
             )
             description = convert_to_full_path(description, prefix)
+            # Assume properties (what we care about) at top, so skip if already exists
+            if name in props[page]:
+                continue
             props[page][name] = description.strip()
 
     print(
