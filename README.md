@@ -122,3 +122,4 @@ You can also join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers
 - [SAM template specification](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html)
 - [SAM connectors](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/managing-permissions-connectors.html)
 - [SAM policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html)
+- [SAM Advanced Workshop](https://catalog.us-east-1.prod.workshops.aws/workshops/9a27e484-7336-4ed0-8f90-f2747e4ac65c/en-US/unicorn-contracts)
