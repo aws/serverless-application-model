@@ -15,14 +15,16 @@ import json
 import re
 from contextlib import suppress
 from pathlib import Path
-from typing import Dict, Iterator, Tuple
+from typing import Dict, List, Iterator, Tuple
 
 
 def parse(s: str) -> Iterator[Tuple[str, str]]:
     """Parse an AWS docs page in Markdown format, yielding each property."""
     # Prevent from parsing return values accidentally
     with suppress(ValueError):
-        s = s[: s.index("Return Values")]
+        s = s[: s.index("# Return Value")]
+    with suppress(ValueError):
+        s = s[: s.index("# Return value")]
     parts = s.split("\n\n")
     for part in parts:
         match = re.match(r"^\s*`(\w+)`\s+<a", part)
