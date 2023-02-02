@@ -77,3 +77,14 @@ Resources:
       OpenApiVersion: 3.0.1
       StageName: Prod
       Domain: !Ref MyDomainName  # this should be a map after solution
+
+  MyApiWithIncorrectBasePathItemType:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: Prod
+      Domain:
+        DomainName: api-example.com
+        CertificateArn: my-api-cert-arn
+        BasePath:
+        - 3 # this should not be a number

@@ -1,0 +1,35 @@
+Resources:
+  StateMachineFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          console.log("Hello world!")
+        };
+      Handler: index.handler
+      Runtime: nodejs14.x
+
+  StateMachineIdWith30Characters:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      Definition:
+        StartAt: MyLambdaState
+        States:
+          MyLambdaState:
+            Type: Task
+            Resource: !GetAtt StateMachineFunction.Arn
+            End: true
+      Policies:
+      - LambdaInvokePolicy:
+          FunctionName: !Ref StateMachineFunction
+      Events:
+        EventIdWith23Characters:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Name: TestSchedule
+            Description: test schedule
+            Enabled: false
+            Target:
+              Id: MyTargetID

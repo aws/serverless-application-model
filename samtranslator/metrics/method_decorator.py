@@ -2,11 +2,12 @@
 Method decorator for execution latency collection
 """
 import functools
+import logging
 from datetime import datetime
+from typing import Any, Callable, Optional, Union
+
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 from samtranslator.model import Resource
-import logging
-from typing import Any, Callable, Optional, Union
 
 LOG = logging.getLogger(__name__)
 
@@ -21,11 +22,11 @@ class MetricsMethodWrapperSingleton:
     _METRICS_INSTANCE = _DUMMY_INSTANCE
 
     @staticmethod
-    def set_instance(metrics):  # type: ignore[no-untyped-def]
+    def set_instance(metrics: Metrics) -> None:
         MetricsMethodWrapperSingleton._METRICS_INSTANCE = metrics
 
     @staticmethod
-    def get_instance():  # type: ignore[no-untyped-def]
+    def get_instance() -> Metrics:
         """
         Return the instance, if nothing is set return a dummy one
         """

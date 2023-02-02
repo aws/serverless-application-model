@@ -1,0 +1,17 @@
+Resources:
+  AppApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      FailOnWarnings: true
+      StageName: $default
+  AppFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: foo
+      Handler: bar
+      Runtime: nodejs14.x
+      Events:
+        AppHandler:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppApi

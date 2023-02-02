@@ -1,0 +1,10 @@
+Resources:
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: SomeStage
+      DefinitionBody:
+        swagger: 2.0
+        paths: {}
+        x-amazon-apigateway-endpoint-configuration: this should be a dict
+      DisableExecuteApiEndpoint: true

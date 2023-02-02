@@ -1,0 +1,50 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.7
+      InlineCode: |
+        def handler(event, context):
+            return {'body': 'Hello World!', 'statusCode': 200}
+      Events:
+        GetApi:
+          Type: HttpApi
+          Properties:
+            Auth:
+              Authorizer: NONE
+            ApiId:
+              Ref: MyApi
+            Method: GET
+            Path: /get
+
+  MyLambdaFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.7
+      InlineCode: |
+        def handler(event, context):
+            return {'body': 'Hello World!', 'statusCode': 200}
+      Events:
+        GetRestApi:
+          Type: Api
+          Properties:
+            Auth:
+              Authorizer: NONE
+            RestApiId:
+              Ref: MyRestApi
+            Method: GET
+            Path: /get
+
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+
+  MyRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+      - I am a list

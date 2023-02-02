@@ -28,6 +28,8 @@ Globals:
       ApplyOn: PublishedVersions
     EphemeralStorage:
       Size: 1024
+    RuntimeManagementConfig:
+      UpdateRuntimeOn: Auto
 
 Resources:
   MinimalFunction:
@@ -57,3 +59,5 @@ Resources:
       SnapStart:
         ApplyOn: None
       ReservedConcurrentExecutions: 100
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: FunctionChange

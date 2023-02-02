@@ -1,18 +1,20 @@
-import copy
+from typing import Any
 
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import RefAction
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 
+POLICY_PARAMETER_DISAMBIGUATE_PREFIX = "___SAM_POLICY_PARAMETER_"
 
-class Template(object):
+
+class Template:
     """
     Class representing a single policy template. It includes the name, parameters and template dictionary.
     """
 
     def __init__(self, template_name, parameters, template_definition):  # type: ignore[no-untyped-def]
         """
-        Initialize a template. This performs the check to ensure all parameters are referenced in the template.
+        Initialize a template.
         For simplicity, this method assumes that inputs have already been validated against the JSON Schema. So no
         further validation is performed.
 
@@ -21,8 +23,6 @@ class Template(object):
         :param template_definition: Template definition. Refer to JSON Schema for structure of this dict
         :raises ValueError: If one or more of the parameters are not referenced in the template definition
         """
-        Template.check_parameters_exist(parameters, template_definition)  # type: ignore[no-untyped-call]
-
         self.name = template_name
         self.parameters = parameters
         self.definition = template_definition
@@ -50,16 +50,52 @@ class Template(object):
         # injection of values for parameters not intended in the template. This is important because "Ref" resolution
         # will substitute any references for which a value is provided.
         necessary_parameter_values = {
-            name: value for name, value in parameter_values.items() if name in self.parameters
+            POLICY_PARAMETER_DISAMBIGUATE_PREFIX + name: value
+            for name, value in parameter_values.items()
+            if name in self.parameters
         }
 
         # Only "Ref" is supported
         supported_intrinsics = {RefAction.intrinsic_name: RefAction()}
 
-        resolver = IntrinsicsResolver(necessary_parameter_values, supported_intrinsics)  # type: ignore[no-untyped-call]
-        definition_copy = copy.deepcopy(self.definition)
+        resolver = IntrinsicsResolver(necessary_parameter_values, supported_intrinsics)
+        definition_copy = self._disambiguate_policy_parameter(self.definition)
 
         return resolver.resolve_parameter_refs(definition_copy)
+
+    @staticmethod
+    def _disambiguate_policy_parameter(policy_definition: Any) -> Any:
+        """
+        Return a deepcopy of policy definition where all parameters are
+        renamed to avoid naming collision of normal CFN parameters.
+        This is to avoid IntrinsicResolver.resolve_parameter_refs()
+        will make infinitely recursion on this:
+        ```
+        - DynamoDBCrudPolicy:
+          TableName:  <- this is the policy parameter
+            Fn::ImportValue:
+              Fn::Join:
+              - '-'
+              - - Ref: TableName <- this is the CFN parameter
+                - hello
+                - Ref: EnvironmentType
+        ```
+        Once IntrinsicResolver.resolve_parameter_refs() replace the "Ref: TableName"
+        with "TableName: .... Ref: TableName - hello ---"
+        There are "Ref: TableName" in it again (indefinitely).
+        """
+
+        def _traverse(node: Any) -> Any:
+            if isinstance(node, dict):
+                copy = {key: _traverse(value) for key, value in node.items()}
+                if "Ref" in copy and isinstance(copy["Ref"], str):
+                    copy["Ref"] = POLICY_PARAMETER_DISAMBIGUATE_PREFIX + copy["Ref"]
+                return copy
+            if isinstance(node, list):
+                return [_traverse(item) for item in node]
+            return node
+
+        return _traverse(policy_definition)
 
     def missing_parameter_values(self, parameter_values):  # type: ignore[no-untyped-def]
         """
@@ -83,20 +119,6 @@ class Template(object):
         :return: True, if it is valid. False otherwise
         """
         return parameter_values is not None and isinstance(parameter_values, dict)
-
-    @staticmethod
-    def check_parameters_exist(parameters, template_definition):  # type: ignore[no-untyped-def]
-        """
-        Verify that every one of the parameters in the given list have been "Ref"ed in the template definition. This
-        is a sanity check to prevent any mis-spelled properties etc. It also checks that parameters are used *only* with
-        a "Ref" and not anything else
-
-        :param dict parameters: Dictionary representing parameters. Refer to the JSON Schema for structure of this dict
-        :param template_definition: Template definition. Refer to JSON Schema for structure of this dict
-        :returns: Nothing
-        :raises ValueError: If one or more of the parameters are not referenced in the template definition
-        """
-        pass
 
     @staticmethod
     def from_dict(template_name, template_values_dict):  # type: ignore[no-untyped-def]

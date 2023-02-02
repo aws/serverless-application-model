@@ -6,10 +6,10 @@ class InvalidPluginException(Exception):
         message -- explanation of the error
     """
 
-    def __init__(self, plugin_name, message):  # type: ignore[no-untyped-def]
+    def __init__(self, plugin_name: str, message: str) -> None:
         self._plugin_name = plugin_name
         self._message = message
 
     @property
-    def message(self):  # type: ignore[no-untyped-def]
+    def message(self) -> str:
         return "The {} plugin is invalid. {}".format(self._plugin_name, self._message)

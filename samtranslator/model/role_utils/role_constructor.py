@@ -1,7 +1,7 @@
-from samtranslator.model.iam import IAMRole
-from samtranslator.model.resource_policies import PolicyTypes
-from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.iam import IAMRole
+from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
+from samtranslator.model.resource_policies import PolicyTypes
 
 
 def construct_role_for_resource(  # type: ignore[no-untyped-def]

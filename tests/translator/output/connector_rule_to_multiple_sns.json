@@ -80,7 +80,7 @@
                 "Service": "events.amazonaws.com"
               },
               "Resource": {
-                "Ref": "MySNSTopic2.Arn"
+                "Ref": "MySNSTopic2"
               }
             }
           ],
@@ -88,7 +88,7 @@
         },
         "Topics": [
           {
-            "Ref": "MySNSTopic2.Arn"
+            "Ref": "MySNSTopic2"
           }
         ]
       },
@@ -102,24 +102,7 @@
           ]
         },
         "Name": "mynewabc",
-        "State": "ENABLED",
-        "Targets": [
-          {
-            "Arn": {
-              "Fn::GetAtt": [
-                "StateMachine",
-                "Arn"
-              ]
-            },
-            "Id": "StateMachine",
-            "RoleArn": {
-              "Fn::GetAtt": [
-                "MyRuleRole",
-                "Arn"
-              ]
-            }
-          }
-        ]
+        "State": "ENABLED"
       },
       "Type": "AWS::Events::Rule"
     },
@@ -131,9 +114,7 @@
               "Action": "sts:AssumeRole",
               "Effect": "Allow",
               "Principal": {
-                "Service": {
-                  "Fn::Sub": "events.amazonaws.com"
-                }
+                "Service": "events.amazonaws.com"
               }
             }
           ]
@@ -142,10 +123,6 @@
       "Type": "AWS::IAM::Role"
     },
     "MySNSTopic": {
-      "DependsOn": [
-        "MyConnectorTopicPolicyDestination0",
-        "MyConnectorTopicPolicyDestination1"
-      ],
       "Type": "AWS::SNS::Topic"
     },
     "MySNSTopic2": {

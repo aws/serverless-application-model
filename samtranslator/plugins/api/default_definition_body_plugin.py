@@ -1,9 +1,9 @@
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.plugins import BasePlugin
-from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.plugins import BasePlugin
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.swagger.swagger import SwaggerEditor
 
 
 class DefaultDefinitionBodyPlugin(BasePlugin):
@@ -13,13 +13,6 @@ class DefaultDefinitionBodyPlugin(BasePlugin):
     SAM is used. It accomplishes this by simply setting DefinitionBody
     to a minimum Swagger definition and sets `__MANAGE_SWAGGER: true`.
     """
-
-    def __init__(self) -> None:
-        """
-        Initialize the plugin.
-        """
-
-        super(DefaultDefinitionBodyPlugin, self).__init__(DefaultDefinitionBodyPlugin.__name__)
 
     @cw_timer(prefix="Plugin-DefaultDefinitionBody")
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]

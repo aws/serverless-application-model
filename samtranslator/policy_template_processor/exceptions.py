@@ -4,7 +4,7 @@ class TemplateNotFoundException(Exception):
     """
 
     def __init__(self, template_name):  # type: ignore[no-untyped-def]
-        super(TemplateNotFoundException, self).__init__(f"Template with name '{template_name}' is not found")
+        super().__init__(f"Template with name '{template_name}' is not found")
 
 
 class InsufficientParameterValues(Exception):
@@ -13,7 +13,7 @@ class InsufficientParameterValues(Exception):
     """
 
     def __init__(self, message):  # type: ignore[no-untyped-def]
-        super(InsufficientParameterValues, self).__init__(message)
+        super().__init__(message)
 
 
 class InvalidParameterValues(Exception):
@@ -22,4 +22,4 @@ class InvalidParameterValues(Exception):
     """
 
     def __init__(self, message):  # type: ignore[no-untyped-def]
-        super(InvalidParameterValues, self).__init__(message)
+        super().__init__(message)

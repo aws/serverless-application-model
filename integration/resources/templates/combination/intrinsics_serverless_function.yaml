@@ -44,7 +44,7 @@ Resources:
         Fn::Sub: ['${filename}.handler', filename: index]
 
       Runtime:
-        Fn::Join: ['', [nodejs, 12.x]]
+        Fn::Join: ['', [nodejs, 16.x]]
 
       Role:
         Fn::GetAtt: [MyNewRole, Arn]

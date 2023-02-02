@@ -46,10 +46,12 @@ class TestConnectors(BaseTest):
             ("combination/connector_event_rule_to_eb_custom_write",),
             ("combination/connector_event_rule_to_lambda_write",),
             ("combination/connector_event_rule_to_lambda_write_multiple",),
+            ("combination/connector_function_to_location_place_index",),
             ("combination/connector_mix_destination",),
             ("combination/connector_sqs_to_function",),
             ("combination/connector_sns_to_function_write",),
             ("combination/connector_table_to_function_read",),
+            ("combination/embedded_connector",),
         ]
     )
     @retry_once
@@ -59,7 +61,6 @@ class TestConnectors(BaseTest):
 
         lambda_function_name = self.get_physical_id_by_logical_id("TriggerFunction")
         lambda_client = self.client_provider.lambda_client
-        s3_client = self.client_provider.s3_client
 
         request_params = {
             "FunctionName": lambda_function_name,

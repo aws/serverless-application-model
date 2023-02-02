@@ -1,5 +1,6 @@
-from typing import Any, Dict, Optional
-from urllib.parse import urlparse, parse_qs
+from typing import Any, Dict, Optional, Union
+from urllib.parse import parse_qs, urlparse
+
 from samtranslator.model.exceptions import InvalidResourceException
 
 
@@ -35,8 +36,8 @@ def to_s3_uri(code_dict):  # type: ignore[no-untyped-def]
     try:
         uri = "s3://{bucket}/{key}".format(bucket=code_dict["S3Bucket"], key=code_dict["S3Key"])
         version = code_dict.get("S3ObjectVersion", None)
-    except (TypeError, AttributeError):
-        raise TypeError("Code location should be a dictionary")
+    except (TypeError, AttributeError) as ex:
+        raise TypeError("Code location should be a dictionary") from ex
 
     if version:
         uri += "?versionId=" + version
@@ -62,7 +63,9 @@ def construct_image_code_object(image_uri, logical_id, property_name):  # type: 
     return {"ImageUri": image_uri}
 
 
-def construct_s3_location_object(location_uri, logical_id, property_name):  # type: ignore[no-untyped-def]
+def construct_s3_location_object(
+    location_uri: Union[str, Dict[str, Any]], logical_id: str, property_name: str
+) -> Dict[str, Any]:
     """Constructs a Lambda `Code` or `Content` property, from the SAM `CodeUri` or `ContentUri` property.
     This follows the current scheme for Lambda Functions and LayerVersions.
 

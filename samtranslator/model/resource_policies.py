@@ -1,18 +1,19 @@
-from enum import Enum
 from collections import namedtuple
+from enum import Enum
+from typing import Any, Dict, List
 
+from samtranslator.model.exceptions import InvalidTemplateException
 from samtranslator.model.intrinsics import (
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
     validate_intrinsic_if_items,
 )
-from samtranslator.model.exceptions import InvalidTemplateException
 
 PolicyEntry = namedtuple("PolicyEntry", "data type")
 
 
-class ResourcePolicies(object):
+class ResourcePolicies:
     """
     Class encapsulating the policies property of SAM resources. This class strictly encapsulates the data
     and does not take opinions on how to handle them.
@@ -28,7 +29,7 @@ class ResourcePolicies(object):
 
     POLICIES_PROPERTY_NAME = "Policies"
 
-    def __init__(self, resource_properties, policy_template_processor=None):  # type: ignore[no-untyped-def]
+    def __init__(self, resource_properties: Dict[str, Any], policy_template_processor: Any = None):
         """
         Initialize with policies data from resource's properties
 
@@ -41,7 +42,7 @@ class ResourcePolicies(object):
         self._policy_template_processor = policy_template_processor
 
         # Build the list of policies upon construction.
-        self.policies = self._get_policies(resource_properties)  # type: ignore[no-untyped-call]
+        self.policies = self._get_policies(resource_properties)
 
     def get(self):  # type: ignore[no-untyped-def]
         """
@@ -56,7 +57,7 @@ class ResourcePolicies(object):
     def __len__(self):  # type: ignore[no-untyped-def]
         return len(self.policies)
 
-    def _get_policies(self, resource_properties):  # type: ignore[no-untyped-def]
+    def _get_policies(self, resource_properties: Dict[str, Any]) -> List[Any]:
         """
         Returns a list of policies from the resource properties. This method knows how to interpret and handle
         polymorphic nature of the policies property.
@@ -171,7 +172,7 @@ class ResourcePolicies(object):
         try:
             validate_intrinsic_if_items(intrinsic_if_value)
         except ValueError as e:
-            raise InvalidTemplateException(str(e))
+            raise InvalidTemplateException(str(e)) from e
 
         if_data = intrinsic_if_value[1]
         else_data = intrinsic_if_value[2]

@@ -1,12 +1,12 @@
-﻿from typing import Dict, List
+from typing import Any, Dict, List
 
 from samtranslator.model.exceptions import ExceptionWithMessage
-from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
+from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.swagger.swagger import SwaggerEditor
 
 
-class Globals(object):
+class Globals:
     """
     Class to parse and process Globals section in SAM template. If a property is specified at Global section for
     say Function, then this class will add it to each resource of AWS::Serverless::Function type.
@@ -35,6 +35,7 @@ class Globals(object):
             "Tracing",
             "KmsKeyArn",
             "AutoPublishAlias",
+            "AutoPublishAliasAllProperties",
             "Layers",
             "DeploymentPreference",
             "RolePath",
@@ -49,6 +50,7 @@ class Globals(object):
             "SnapStart",
             "EphemeralStorage",
             "FunctionUrlConfig",
+            "RuntimeManagementConfig",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
@@ -88,7 +90,7 @@ class Globals(object):
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {
-        SamResourceType.Function.value: [],
+        SamResourceType.Function.value: ["RuntimeManagementConfig"],
     }
 
     def __init__(self, template):  # type: ignore[no-untyped-def]
@@ -139,7 +141,7 @@ class Globals(object):
             del template[cls._KEYWORD]
 
     @classmethod
-    def fix_openapi_definitions(cls, template):  # type: ignore[no-untyped-def]
+    def fix_openapi_definitions(cls, template: Dict[str, Any]) -> None:
         """
         Helper method to postprocess the resources to make sure the swagger doc version matches
         the one specified on the resource with flag OpenApiVersion.
@@ -152,7 +154,6 @@ class Globals(object):
         To make sure we don't modify customer defined swagger, we also check for __MANAGE_SWAGGER flag.
 
         :param dict template: SAM template
-        :return: Modified SAM template with corrected swagger doc matching the OpenApiVersion.
         """
         resources = template.get("Resources", {})
 
@@ -184,7 +185,7 @@ class Globals(object):
         :raises: InvalidResourceException if the input contains properties that we don't support
         """
 
-        globals = {}
+        _globals = {}
         if not isinstance(globals_dict, dict):
             raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary")  # type: ignore[no-untyped-call]
 
@@ -218,15 +219,15 @@ class Globals(object):
                     )
 
             # Store all Global properties in a map with key being the AWS::Serverless::* resource type
-            globals[resource_type] = GlobalProperties(properties)  # type: ignore[no-untyped-call]
+            _globals[resource_type] = GlobalProperties(properties)  # type: ignore[no-untyped-call]
 
-        return globals
+        return _globals
 
     def _make_resource_type(self, key):  # type: ignore[no-untyped-def]
         return self._RESOURCE_PREFIX + key
 
 
-class GlobalProperties(object):
+class GlobalProperties:
     """
     Object holding the global properties of given type. It also contains methods to perform a merge between
     Global & resource-level properties. Here are the different cases during the merge and how we handle them:
@@ -367,8 +368,8 @@ class GlobalProperties(object):
         :return: Merged result
         """
 
-        token_global = self._token_of(global_value)  # type: ignore[no-untyped-call]
-        token_local = self._token_of(local_value)  # type: ignore[no-untyped-call]
+        token_global = self._token_of(global_value)
+        token_local = self._token_of(local_value)
 
         # The following statements codify the rules explained in the doctring above
         if token_global != token_local:
@@ -408,7 +409,7 @@ class GlobalProperties(object):
         # Local has higher priority than global. So iterate over local dict and merge into global if keys are overridden
         global_dict = global_dict.copy()
 
-        for key in local_dict.keys():
+        for key in local_dict:
 
             if key in global_dict:
                 # Both local & global contains the same key. Let's do a merge.
@@ -431,24 +432,24 @@ class GlobalProperties(object):
         """
         return local_value
 
-    def _token_of(self, input):  # type: ignore[no-untyped-def]
+    def _token_of(self, _input: Any) -> str:
         """
         Returns the token type of the input.
 
-        :param input: Input whose type is to be determined
+        :param _input: Input whose type is to be determined
         :return TOKENS: Token type of the input
         """
 
-        if isinstance(input, dict):
+        if isinstance(_input, dict):
 
             # Intrinsic functions are always dicts
-            if is_intrinsics(input):
+            if is_intrinsics(_input):
                 # Intrinsic functions are handled *exactly* like a primitive type because
                 # they resolve to a primitive type when creating a stack with CloudFormation
                 return self.TOKEN.PRIMITIVE
             return self.TOKEN.DICT
 
-        if isinstance(input, list):
+        if isinstance(_input, list):
             return self.TOKEN.LIST
 
         return self.TOKEN.PRIMITIVE
@@ -475,5 +476,5 @@ class InvalidGlobalsSectionException(ExceptionWithMessage):
         self._message = message
 
     @property
-    def message(self):  # type: ignore[no-untyped-def]
+    def message(self) -> str:
         return "'{}' section is invalid. {}".format(self._logical_id, self._message)

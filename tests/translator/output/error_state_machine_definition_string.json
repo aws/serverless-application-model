@@ -1,8 +1,3 @@
 {
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [StateMachine] is invalid. Type of property 'Definition' is invalid.",
-  "errors": [
-    {
-      "errorMessage": "Resource with id [StateMachine] is invalid. Type of property 'Definition' is invalid."
-    }
-  ]
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [StateMachine] is invalid. Property 'Definition' should be a map."
 }

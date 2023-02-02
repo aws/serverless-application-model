@@ -1,11 +1,13 @@
 import logging
-from samtranslator.model.exceptions import InvalidResourceException, InvalidDocumentException, InvalidTemplateException
+from typing import Any, List, Optional, Union
+
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, InvalidTemplateException
 from samtranslator.plugins import BasePlugin, LifeCycleEvents
 
 LOG = logging.getLogger(__name__)
 
 
-class SamPlugins(object):
+class SamPlugins:
     """
     Class providing support for arbitrary plugins that can extend core SAM translator in interesting ways.
     Use this class to register plugins that get called when certain life cycle events happen in the translator.
@@ -45,13 +47,13 @@ class SamPlugins(object):
     set by the plugin. SAM translator will convert this into a nice error message and display to the user.
     """
 
-    def __init__(self, initial_plugins=None):  # type: ignore[no-untyped-def]
+    def __init__(self, initial_plugins: Optional[Union[BasePlugin, List[BasePlugin]]] = None) -> None:
         """
         Initialize the plugins class with an optional list of plugins
 
         :param BasePlugin or list initial_plugins: Single plugin or a List of plugins to initialize with
         """
-        self._plugins = []
+        self._plugins: List[BasePlugin] = []
 
         if initial_plugins is None:
             initial_plugins = []
@@ -75,12 +77,12 @@ class SamPlugins(object):
         if not plugin or not isinstance(plugin, BasePlugin):
             raise ValueError("Plugin must be implemented as a subclass of BasePlugin class")
 
-        if self.is_registered(plugin.name):  # type: ignore[no-untyped-call]
+        if self.is_registered(plugin.name):
             raise ValueError("Plugin with name {} is already registered".format(plugin.name))
 
         self._plugins.append(plugin)
 
-    def is_registered(self, plugin_name):  # type: ignore[no-untyped-def]
+    def is_registered(self, plugin_name: str) -> bool:
         """
         Checks if a plugin with given name is already registered
 
@@ -90,7 +92,7 @@ class SamPlugins(object):
 
         return plugin_name in [p.name for p in self._plugins]
 
-    def _get(self, plugin_name):  # type: ignore[no-untyped-def]
+    def _get(self, plugin_name: str) -> Union[Any, None]:
         """
         Retrieves the plugin with given name
 
@@ -104,13 +106,12 @@ class SamPlugins(object):
 
         return None
 
-    def act(self, event, *args, **kwargs):  # type: ignore[no-untyped-def]
+    def act(self, event: LifeCycleEvents, *args: Any, **kwargs: Any) -> None:
         """
         Act on the specific life cycle event. The action here is to invoke the hook function on all registered plugins.
         *args and **kwargs will be passed directly to the plugin's hook functions
 
         :param samtranslator.plugins.LifeCycleEvents event: Event to act upon
-        :return: Nothing
         :raises ValueError: If event is not a valid life cycle event
         :raises NameError: If a plugin does not have the hook method defined
         :raises Exception: Any exception that a plugin raises
@@ -137,7 +138,7 @@ class SamPlugins(object):
                 LOG.exception("Plugin '%s' raised an exception: %s", plugin.name, ex)
                 raise ex
 
-    def __len__(self):  # type: ignore[no-untyped-def]
+    def __len__(self) -> int:
         """
         Returns the number of plugins registered with this class
 

@@ -1,3 +1,6 @@
+from functools import lru_cache
+from typing import Optional
+
 import boto3
 
 
@@ -5,7 +8,28 @@ class NoRegionFound(Exception):
     pass
 
 
-class ArnGenerator(object):
+@lru_cache(maxsize=1)  # Only need to cache one as once deployed, it is not gonna deal with another region.
+def _get_region_from_session() -> str:
+    return boto3.session.Session().region_name
+
+
+@lru_cache(maxsize=1)  # Only need to cache one as once deployed, it is not gonna deal with another region.
+def _region_to_partition(region: str) -> str:
+    # setting default partition to aws, this will be overwritten by checking the region below
+    region_string = region.lower()
+    if region_string.startswith("cn-"):
+        return "aws-cn"
+    if region_string.startswith("us-iso-"):
+        return "aws-iso"
+    if region_string.startswith("us-isob"):
+        return "aws-iso-b"
+    if region_string.startswith("us-gov"):
+        return "aws-us-gov"
+
+    return "aws"
+
+
+class ArnGenerator:
     BOTO_SESSION_REGION_NAME = None
 
     @classmethod
@@ -23,7 +47,7 @@ class ArnGenerator(object):
         return arn.format(partition, service, resource)
 
     @classmethod
-    def generate_aws_managed_policy_arn(cls, policy_name):  # type: ignore[no-untyped-def]
+    def generate_aws_managed_policy_arn(cls, policy_name: str) -> str:
         """
         Method to create an ARN of AWS Owned Managed Policy. This uses the right partition name to construct
         the ARN
@@ -31,10 +55,10 @@ class ArnGenerator(object):
         :param policy_name: Name of the policy
         :return: ARN Of the managed policy
         """
-        return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)  # type: ignore[no-untyped-call]
+        return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)
 
     @classmethod
-    def get_partition_name(cls, region=None):  # type: ignore[no-untyped-def]
+    def get_partition_name(cls, region: Optional[str] = None) -> str:
         """
         Gets the name of the partition given the region name. If region name is not provided, this method will
         use Boto3 to get name of the region where this code is running.
@@ -50,10 +74,11 @@ class ArnGenerator(object):
             # Use Boto3 to get the region where code is running. This uses Boto's regular region resolution
             # mechanism, starting from AWS_DEFAULT_REGION environment variable.
 
-            if ArnGenerator.BOTO_SESSION_REGION_NAME is None:
-                region = boto3.session.Session().region_name
-            else:
-                region = ArnGenerator.BOTO_SESSION_REGION_NAME  # type: ignore[unreachable]
+            region = (
+                _get_region_from_session()
+                if ArnGenerator.BOTO_SESSION_REGION_NAME is None
+                else ArnGenerator.BOTO_SESSION_REGION_NAME
+            )
 
         # If region is still None, then we could not find the region. This will only happen
         # in the local context. When this is deployed, we will be able to find the region like
@@ -61,17 +86,4 @@ class ArnGenerator(object):
         if region is None:
             raise NoRegionFound("AWS Region cannot be found")
 
-        # setting default partition to aws, this will be overwritten by checking the region below
-        partition = "aws"
-
-        region_string = region.lower()
-        if region_string.startswith("cn-"):
-            partition = "aws-cn"
-        elif region_string.startswith("us-iso-"):
-            partition = "aws-iso"
-        elif region_string.startswith("us-isob"):
-            partition = "aws-iso-b"
-        elif region_string.startswith("us-gov"):
-            partition = "aws-us-gov"
-
-        return partition
+        return _region_to_partition(region)

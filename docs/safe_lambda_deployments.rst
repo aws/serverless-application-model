@@ -292,7 +292,7 @@ Hooks are extremely powerful because:
 
 Checkout the lambda_safe_deployments_ folder for an example for how to create SAM template that contains a hook function.
 
-.. _lambda_safe_deployments: https://github.com/awslabs/serverless-application-model/blob/master/examples/2016-10-31/lambda_safe_deployments
+.. _lambda_safe_deployments: https://github.com/aws/serverless-application-model/tree/5f2287613ca46dba8d65e833e00f2f515d1b44a5/examples/2016-10-31/lambda_safe_deployments
 
 Internals
 ~~~~~~~~~

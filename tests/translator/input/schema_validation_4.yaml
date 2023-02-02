@@ -1,0 +1,62 @@
+Transform: AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Some description
+Parameters:
+  InstanceTypeParameter:
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+    - t2.micro
+    - m1.small
+    - m1.large
+    Description: Enter t2.micro, m1.small, or m1.large. Default is t2.micro.
+Conditions:
+  CreateProdResources: !Equals
+  - !Ref InstanceTypeParameter
+  - prod
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    Condition: CreateProdResources
+  MyTable:
+    Type: AWS::Serverless::SimpleTable
+
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-79fd7eee
+      KeyName: testkey
+      BlockDeviceMappings:
+      - DeviceName: /dev/sdm
+        Ebs:
+          VolumeType: io1
+          Iops: 200
+          DeleteOnTermination: false
+          VolumeSize: 20
+      - DeviceName: /dev/sdk
+        NoDevice: {}
+
+  Function:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: arn:aws:iam::123456789012:role/lambda-role
+      Code:
+        S3Bucket: my-bucket
+        S3Key: function.zip
+      Runtime: nodejs12.x
+      Timeout: 5
+      TracingConfig:
+        Mode: Active
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-085912345678492fb
+        SubnetIds:
+        - subnet-071f712345678e7c8
+        - subnet-07fd123456788a036
+
+Outputs:
+  BackupLoadBalancerDNSName:
+    Description: The DNSName of the backup load balancer
+    Value: !Ref Function
+    Condition: CreateProdResources

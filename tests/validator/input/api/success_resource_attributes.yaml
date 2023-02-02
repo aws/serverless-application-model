@@ -30,24 +30,6 @@ Resources:
     Properties:
       StageName: Stage name
 
-  ApiUpdatePolicyDelete:
-    UpdatePolicy: Delete
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: Stage name
-
-  ApiUpdatePolicyRetain:
-    UpdatePolicy: Retain
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: Stage name
-
-  ApiUpdatePolicySnapshot:
-    UpdatePolicy: Snapshot
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: Stage name
-
   ApiUpdateReplacePolicyDelete:
     UpdateReplacePolicy: Delete
     Type: AWS::Serverless::Api

@@ -5,6 +5,7 @@ from parameterized import parameterized, param
 
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.model.exceptions import InvalidDocumentException
+from samtranslator.utils.py27hash_fix import Py27Dict
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
 _X_ANY_METHOD = "x-amazon-apigateway-any-method"
@@ -223,7 +224,7 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
             },
         }
 
-        self.editor.add_lambda_integration(path, method, integration_uri)
+        self.editor.add_lambda_integration(path, method, integration_uri, Py27Dict(), Py27Dict())
 
         self.assertTrue(self.editor.has_path(path, method))
         actual = self.editor.openapi["paths"][path][method]
@@ -243,7 +244,7 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
             },
         }
 
-        self.editor.add_lambda_integration(path, method, integration_uri)
+        self.editor.add_lambda_integration(path, method, integration_uri, Py27Dict(), Py27Dict())
 
         self.assertTrue(self.editor.has_path(path, method))
         actual = self.editor.openapi["paths"][path][method]
@@ -270,7 +271,7 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
             ]
         }
 
-        self.editor.add_lambda_integration(path, method, integration_uri, condition=condition)
+        self.editor.add_lambda_integration(path, method, integration_uri, Py27Dict(), Py27Dict(), condition=condition)
 
         self.assertTrue(self.editor.has_path(path, method))
         actual = self.editor.openapi["paths"][path][method]
@@ -297,7 +298,7 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
         # Just make sure test is working on an existing path
         self.assertTrue(self.editor.has_path(path, method))
 
-        self.editor.add_lambda_integration(path, method, integration_uri)
+        self.editor.add_lambda_integration(path, method, integration_uri, Py27Dict(), Py27Dict())
 
         actual = self.editor.openapi["paths"][path][method]
         self.assertEqual(expected, actual)

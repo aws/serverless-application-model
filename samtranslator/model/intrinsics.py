@@ -1,4 +1,8 @@
-from typing import Any, Dict, Iterable, List, Union, Optional
+from typing import Any, Dict, Iterable, List, Optional, Union
+
+MIN_NUM_CONDITIONS_TO_COMBINE = 2
+_NUM_ARGUMENTS_REQUIRED_IN_IF = 3
+_NUM_ARGUMENTS_REQUIRED_IN_GETATT = 2
 
 
 def fnGetAtt(logical_name: str, attribute_name: str) -> Dict[str, List[str]]:
@@ -47,14 +51,12 @@ def make_condition_or_list(conditions_list: Iterable[Any]) -> List[Dict[str, Any
 
 def make_or_condition(conditions_list: Iterable[Any]) -> Dict[str, List[Dict[str, Any]]]:
     or_list = make_condition_or_list(conditions_list)
-    condition = fnOr(or_list)
-    return condition
+    return fnOr(or_list)
 
 
 def make_and_condition(conditions_list: Iterable[Any]) -> Dict[str, List[Dict[str, Any]]]:
     and_list = make_condition_or_list(conditions_list)
-    condition = fnAnd(and_list)
-    return condition
+    return fnAnd(and_list)
 
 
 def calculate_number_of_conditions(conditions_length: int, max_conditions: int) -> int:
@@ -72,8 +74,7 @@ def calculate_number_of_conditions(conditions_length: int, max_conditions: int) 
     :param int max_conditions: maximum number of conditions that can be put in an Fn::Or statement
     :return: the number (int) of necessary additional conditions.
     """
-    num_conditions = 1 + (conditions_length - 2) // (max_conditions - 1)
-    return num_conditions
+    return 1 + (conditions_length - 2) // (max_conditions - 1)
 
 
 def make_combined_condition(
@@ -88,8 +89,8 @@ def make_combined_condition(
     :param string condition_name: base name desired for new condition
     :return: dictionary of condition_name: condition_value
     """
-    if len(conditions_list) < 2:
-        # Can't make a condition if <2 conditions provided.
+    if len(conditions_list) < MIN_NUM_CONDITIONS_TO_COMBINE:
+        # Can't make a condition not enough conditions are provided.
         return None
 
     # Total number of conditions allows in an Fn::Or statement. See docs:
@@ -135,36 +136,36 @@ def make_shorthand(intrinsic_dict: Dict[str, Any]) -> str:
     raise NotImplementedError("Shorthanding is only supported for Ref and Fn::GetAtt")
 
 
-def is_intrinsic(input: Any) -> bool:
+def is_intrinsic(_input: Any) -> bool:
     """
-    Checks if the given input is an intrinsic function dictionary. Intrinsic function is a dictionary with single
+    Checks if the given _input is an intrinsic function dictionary. Intrinsic function is a dictionary with single
     key that is the name of the intrinsics.
 
-    :param input: Input value to check if it is an intrinsic
+    :param _input: Input value to check if it is an intrinsic
     :return: True, if yes
     """
 
-    if input is not None and isinstance(input, dict) and len(input) == 1:
+    if _input is not None and isinstance(_input, dict) and len(_input) == 1:
 
-        key: str = list(input.keys())[0]
+        key: str = list(_input.keys())[0]
         return key == "Ref" or key == "Condition" or key.startswith("Fn::")
 
     return False
 
 
-def is_intrinsic_if(input: Any) -> bool:
+def is_intrinsic_if(_input: Any) -> bool:
     """
     Is the given input an intrinsic if? Intrinsic function 'if' is a dictionary with single
     key - if
 
-    :param input: Input value to check if it is an intrinsic if
+    :param _input: Input value to check if it is an intrinsic if
     :return: True, if yes
     """
 
-    if not is_intrinsic(input):
+    if not is_intrinsic(_input):
         return False
 
-    key: str = list(input.keys())[0]
+    key: str = list(_input.keys())[0]
     return key == "Fn::If"
 
 
@@ -182,50 +183,50 @@ def validate_intrinsic_if_items(items: Any) -> None:
     ValueError
         If the items are invalid
     """
-    if not isinstance(items, list) or len(items) != 3:
-        raise ValueError("Fn::If requires 3 arguments")
+    if not isinstance(items, list) or len(items) != _NUM_ARGUMENTS_REQUIRED_IN_IF:
+        raise ValueError(f"Fn::If requires {_NUM_ARGUMENTS_REQUIRED_IN_IF} arguments")
 
 
-def is_intrinsic_no_value(input: Any) -> bool:
+def is_intrinsic_no_value(_input: Any) -> bool:
     """
     Is the given input an intrinsic Ref: AWS::NoValue? Intrinsic function is a dictionary with single
     key - Ref and value - AWS::NoValue
 
-    :param input: Input value to check if it is an intrinsic if
+    :param _input: Input value to check if it is an intrinsic if
     :return: True, if yes
     """
 
-    if not is_intrinsic(input):
+    if not is_intrinsic(_input):
         return False
 
-    key: str = list(input.keys())[0]
-    return key == "Ref" and input["Ref"] == "AWS::NoValue"
+    key: str = list(_input.keys())[0]
+    return key == "Ref" and _input["Ref"] == "AWS::NoValue"
 
 
-def get_logical_id_from_intrinsic(input: Any) -> Optional[str]:
+def get_logical_id_from_intrinsic(_input: Any) -> Optional[str]:
     """
     Verify if input is an Fn:GetAtt or Ref intrinsic
 
-    :param input: Input value to check if it is an intrinsic
+    :param _input: Input value to check if it is an intrinsic
     :return: logical id if yes, return input for any other intrinsic function
     """
-    if not is_intrinsic(input):
+    if not is_intrinsic(_input):
         return None
 
     # !Ref <logical-id>
-    v = input.get("Ref")
+    v = _input.get("Ref")
     if isinstance(v, str):
         return v
 
     # Fn::GetAtt: [<logical-id>, <attribute>]
-    v = input.get("Fn::GetAtt")
-    if isinstance(v, list) and len(v) == 2 and isinstance(v[0], str):
+    v = _input.get("Fn::GetAtt")
+    if isinstance(v, list) and len(v) == _NUM_ARGUMENTS_REQUIRED_IN_GETATT and isinstance(v[0], str):
         return v[0]
 
     # Fn::GetAtt: <logical-id>.<attribute>
     if isinstance(v, str):
         tokens = v.split(".")
-        if len(tokens) == 2:
+        if len(tokens) == _NUM_ARGUMENTS_REQUIRED_IN_GETATT:
             return tokens[0]
 
     return None

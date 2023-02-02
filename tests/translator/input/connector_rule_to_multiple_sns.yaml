@@ -7,10 +7,6 @@ Resources:
         source:
         - aws.ec2
       State: ENABLED
-      Targets:
-      - RoleArn: !GetAtt MyRuleRole.Arn
-        Arn: !GetAtt 'StateMachine.Arn'
-        Id: StateMachine
 
   MyRuleRole:
     Type: AWS::IAM::Role
@@ -19,12 +15,11 @@ Resources:
         Statement:
         - Effect: Allow
           Principal:
-            Service: !Sub events.amazonaws.com
+            Service: events.amazonaws.com
           Action: sts:AssumeRole
 
   MySNSTopic:
     Type: AWS::SNS::Topic
-    DependsOn: MyConnector
 
   MySNSTopic2:
     Type: AWS::SNS::Topic
@@ -37,6 +32,6 @@ Resources:
       Destination:
       - Id: MySNSTopic
       - Type: AWS::SNS::Topic
-        Arn: !Ref MySNSTopic2.Arn
+        Arn: !Ref MySNSTopic2
       Permissions:
       - Write

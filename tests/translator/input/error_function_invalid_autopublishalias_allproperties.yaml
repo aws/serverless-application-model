@@ -1,0 +1,15 @@
+Resources:
+  InvalidAutoPublishAliasAllPropertiesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.lambda_handler
+      CodeUri: s3://bucket/object
+      Runtime: python3.7
+      AutoPublishAlias: live
+      AutoPublishAliasAllProperties: !If [false, true, false]
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            Path: /path
+            Method: GET

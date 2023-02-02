@@ -3,20 +3,19 @@ from collections import namedtuple
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model.intrinsics import ref, fnGetAtt
 from samtranslator.model.apigatewayv2 import (
-    ApiGatewayV2HttpApi,
-    ApiGatewayV2Stage,
+    ApiGatewayV2ApiMapping,
     ApiGatewayV2Authorizer,
     ApiGatewayV2DomainName,
-    ApiGatewayV2ApiMapping,
+    ApiGatewayV2HttpApi,
+    ApiGatewayV2Stage,
 )
 from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.intrinsics import fnGetAtt, is_intrinsic, is_intrinsic_no_value, ref
+from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
-from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
-from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
@@ -33,7 +32,7 @@ DefaultStageName = "$default"
 HttpApiTagName = "httpapi:createdBy"
 
 
-class HttpApiGenerator(object):
+class HttpApiGenerator:
     def __init__(
         self,
         logical_id: str,
@@ -120,6 +119,7 @@ class HttpApiGenerator(object):
 
         self._add_title()
         self._add_description()
+        self._update_default_path()
 
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict(self.definition_uri)
@@ -185,7 +185,7 @@ class HttpApiGenerator(object):
 
         elif isinstance(self.cors_configuration, dict):
             # Make sure keys in the dict are recognized
-            if not all(key in CorsProperties._fields for key in self.cors_configuration.keys()):
+            if not all(key in CorsProperties._fields for key in self.cors_configuration):
                 raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")
 
             properties = CorsProperties(**self.cors_configuration)
@@ -223,6 +223,19 @@ class HttpApiGenerator(object):
 
         # Assign the OpenApi back to template
         self.definition_body = editor.openapi
+
+    def _update_default_path(self) -> None:
+        # Only do the following if FailOnWarnings is enabled for backward compatibility.
+        if not self.fail_on_warnings or not self.definition_body:
+            return
+
+        # Using default stage name generate warning during deployment
+        #   Warnings found during import: Parse issue: attribute paths.
+        #   Resource $default should start with / (Service: AmazonApiGatewayV2; Status Code: 400;
+        # Deployment fails when FailOnWarnings is true: https://github.com/aws/serverless-application-model/issues/2297
+        paths: Dict[str, Any] = self.definition_body.get("paths", {})
+        if DefaultStageName in paths:
+            paths[f"/{DefaultStageName}"] = paths.pop(DefaultStageName)
 
     def _construct_api_domain(
         self, http_api: ApiGatewayV2HttpApi, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
@@ -283,7 +296,7 @@ class HttpApiGenerator(object):
             if isinstance(mutual_tls_auth, dict):
                 if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
                     invalid_keys = []
-                    for key in mutual_tls_auth.keys():
+                    for key in mutual_tls_auth:
                         if key not in {"TruststoreUri", "TruststoreVersion"}:
                             invalid_keys.append(key)
                     invalid_keys.sort()
@@ -453,7 +466,7 @@ class HttpApiGenerator(object):
             )
 
         # Make sure keys in the dict are recognized
-        if not all(key in AuthProperties._fields for key in self.auth.keys()):
+        if not all(key in AuthProperties._fields for key in self.auth):
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
 
         if not OpenApiEditor.is_valid(self.definition_body):
@@ -549,14 +562,10 @@ class HttpApiGenerator(object):
         if not authorizers_config:
             return authorizers
 
-        if not isinstance(authorizers_config, dict):
-            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")
+        sam_expect(authorizers_config, self.logical_id, "Auth.Authorizers").to_be_a_map()
 
         for authorizer_name, authorizer in authorizers_config.items():
-            if not isinstance(authorizer, dict):
-                raise InvalidResourceException(
-                    self.logical_id, "Authorizer %s must be a dictionary." % (authorizer_name)
-                )
+            sam_expect(authorizer, self.logical_id, f"Auth.Authorizers.{authorizer_name}").to_be_a_map()
 
             if "OpenIdConnectUrl" in authorizer:
                 raise InvalidResourceException(
@@ -663,7 +672,7 @@ class HttpApiGenerator(object):
             raise InvalidResourceException(
                 self.logical_id,
                 f"Invalid 'DefinitionBody': {str(ex)}'.",
-            )
+            ) from ex
         if description_in_definition_body:
             raise InvalidResourceException(
                 self.logical_id,
@@ -691,7 +700,7 @@ class HttpApiGenerator(object):
             raise InvalidResourceException(
                 self.logical_id,
                 f"Invalid 'DefinitionBody': {str(ex)}.",
-            )
+            ) from ex
         if title_in_definition_body != OpenApiEditor._DEFAULT_OPENAPI_TITLE:
             raise InvalidResourceException(
                 self.logical_id,

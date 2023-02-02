@@ -1,9 +1,11 @@
 import re
+from abc import ABC
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 
 
-class Action(object):
+class Action(ABC):
     """
     Base class for intrinsic function actions. Each intrinsic function must subclass this,
     override the intrinsic_name, and provide a resolve() method
@@ -13,35 +15,33 @@ class Action(object):
     """
 
     _resource_ref_separator = "."
+    intrinsic_name: str
 
-    # Note(xinhol): `Action` should have been an abstract class. Disabling the type check for the next
-    # line to avoid any potential behavior change.
-    # TODO: Make `Action` an abstract class and not giving `intrinsic_name` initial value.
-    intrinsic_name: str = None  # type: ignore
+    def resolve_parameter_refs(  # noqa: empty-method-without-abstract-decorator
+        self, input_dict: Optional[Any], parameters: Dict[str, Any]
+    ) -> Optional[Any]:
+        """
+        Subclass optionally implement this method to resolve the intrinsic function
+        TODO: input_dict should not be None.
+        """
 
-    def __init__(self) -> None:
-        if not self.intrinsic_name:
-            raise TypeError("Subclass must provide a intrinsic_name")
+    def resolve_resource_refs(  # noqa: empty-method-without-abstract-decorator
+        self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
+    ) -> Optional[Any]:
+        """
+        Subclass optionally implement this method to resolve resource references
+        TODO: input_dict should not be None.
+        """
 
-    def resolve_parameter_refs(self, input_dict, parameters):  # type: ignore[no-untyped-def]
+    def resolve_resource_id_refs(  # noqa: empty-method-without-abstract-decorator
+        self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
+    ) -> Optional[Any]:
         """
-        Subclass must implement this method to resolve the intrinsic function
+        Subclass optionally implement this method to resolve resource references
+        TODO: input_dict should not be None.
         """
-        raise NotImplementedError("Subclass must implement this method")
 
-    def resolve_resource_refs(self, input_dict, supported_resource_refs):  # type: ignore[no-untyped-def]
-        """
-        Subclass must implement this method to resolve resource references
-        """
-        raise NotImplementedError("Subclass must implement this method")
-
-    def resolve_resource_id_refs(self, input_dict, supported_resource_id_refs):  # type: ignore[no-untyped-def]
-        """
-        Subclass must implement this method to resolve resource references
-        """
-        raise NotImplementedError("Subclass must implement this method")
-
-    def can_handle(self, input_dict):  # type: ignore[no-untyped-def]
+    def can_handle(self, input_dict: Any) -> bool:
         """
         Validates that the input dictionary contains only one key and is of the given intrinsic_name
 
@@ -49,15 +49,10 @@ class Action(object):
         :return: True if it matches expected structure, False otherwise
         """
 
-        return (
-            input_dict is not None
-            and isinstance(input_dict, dict)
-            and len(input_dict) == 1
-            and self.intrinsic_name in input_dict
-        )
+        return isinstance(input_dict, dict) and len(input_dict) == 1 and self.intrinsic_name in input_dict
 
     @classmethod
-    def _parse_resource_reference(cls, ref_value):  # type: ignore[no-untyped-def]
+    def _parse_resource_reference(cls, ref_value: Any) -> Tuple[Optional[str], Optional[str]]:
         """
         Splits a resource reference of structure "LogicalId.Property" and returns the "LogicalId" and "Property"
         separately.
@@ -75,16 +70,21 @@ class Action(object):
         splits = ref_value.split(cls._resource_ref_separator, 1)
 
         # Either there is no 'dot' (or) one of the values is empty string (Ex: when you split "LogicalId.")
-        if len(splits) != 2 or not all(splits):
+        try:
+            logical_id, property_name = splits
+        except ValueError:
             return no_result
 
-        return splits[0], splits[1]
+        if not logical_id or not property_name:
+            return no_result
+
+        return logical_id, property_name
 
 
 class RefAction(Action):
     intrinsic_name = "Ref"
 
-    def resolve_parameter_refs(self, input_dict, parameters):  # type: ignore[no-untyped-def]
+    def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
         """
         Resolves references that are present in the parameters and returns the value. If it is not in parameters,
         this method simply returns the input unchanged.
@@ -95,7 +95,7 @@ class RefAction(Action):
         :param parameters: Dictionary of parameter values for resolution
         :return:
         """
-        if not self.can_handle(input_dict):  # type: ignore[no-untyped-call]
+        if input_dict is None or not self.can_handle(input_dict):
             return input_dict
 
         param_name = input_dict[self.intrinsic_name]
@@ -107,7 +107,9 @@ class RefAction(Action):
             return parameters[param_name]
         return input_dict
 
-    def resolve_resource_refs(self, input_dict, supported_resource_refs):  # type: ignore[no-untyped-def]
+    def resolve_resource_refs(
+        self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
+    ) -> Optional[Any]:
         """
         Resolves references to some property of a resource. These are runtime properties which can't be converted
         to a value here. Instead we output another reference that will more actually resolve to the value when
@@ -122,23 +124,25 @@ class RefAction(Action):
         :return dict: Dictionary with resource references resolved.
         """
 
-        if not self.can_handle(input_dict):  # type: ignore[no-untyped-call]
+        if input_dict is None or not self.can_handle(input_dict):
             return input_dict
 
         ref_value = input_dict[self.intrinsic_name]
-        logical_id, property = self._parse_resource_reference(ref_value)  # type: ignore[no-untyped-call]
+        logical_id, property_name = self._parse_resource_reference(ref_value)
 
         # ref_value could not be parsed
         if not logical_id:
             return input_dict
 
-        resolved_value = supported_resource_refs.get(logical_id, property)
+        resolved_value = supported_resource_refs.get(logical_id, property_name)
         if not resolved_value:
             return input_dict
 
         return {self.intrinsic_name: resolved_value}
 
-    def resolve_resource_id_refs(self, input_dict, supported_resource_id_refs):  # type: ignore[no-untyped-def]
+    def resolve_resource_id_refs(
+        self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
+    ) -> Optional[Any]:
         """
         Updates references to the old logical id of a resource to the new (generated) logical id.
 
@@ -150,7 +154,7 @@ class RefAction(Action):
         :return dict: Dictionary with resource references resolved.
         """
 
-        if not self.can_handle(input_dict):  # type: ignore[no-untyped-call]
+        if input_dict is None or not self.can_handle(input_dict):
             return input_dict
 
         ref_value = input_dict[self.intrinsic_name]
@@ -169,7 +173,7 @@ class RefAction(Action):
 class SubAction(Action):
     intrinsic_name = "Fn::Sub"
 
-    def resolve_parameter_refs(self, input_dict, parameters):  # type: ignore[no-untyped-def]
+    def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
         """
         Substitute references found within the string of `Fn::Sub` intrinsic function
 
@@ -180,7 +184,7 @@ class SubAction(Action):
         :return: Resolved
         """
 
-        def do_replacement(full_ref, prop_name):  # type: ignore[no-untyped-def]
+        def do_replacement(full_ref: str, prop_name: str) -> Any:
             """
             Replace parameter references with actual value. Return value of this method is directly replaces the
             reference structure
@@ -191,9 +195,11 @@ class SubAction(Action):
             """
             return parameters.get(prop_name, full_ref)
 
-        return self._handle_sub_action(input_dict, do_replacement)  # type: ignore[no-untyped-call]
+        return self._handle_sub_action(input_dict, do_replacement)
 
-    def resolve_resource_refs(self, input_dict, supported_resource_refs):  # type: ignore[no-untyped-def]
+    def resolve_resource_refs(
+        self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
+    ) -> Optional[Any]:
         """
         Resolves reference to some property of a resource. Inside string to be substituted, there could be either a
         "Ref" or a "GetAtt" usage of this property. They have to be handled differently.
@@ -219,7 +225,7 @@ class SubAction(Action):
         :return: Resolved dictionary
         """
 
-        def do_replacement(full_ref, ref_value):  # type: ignore[no-untyped-def]
+        def do_replacement(full_ref: str, ref_value: str) -> str:
             """
             Perform the appropriate replacement to handle ${LogicalId.Property} type references inside a Sub.
             This method is called to get the replacement string for each reference within Sub's value
@@ -234,12 +240,12 @@ class SubAction(Action):
             splits = ref_value.split(self._resource_ref_separator)
 
             # If we don't find at least two parts, there is nothing to resolve
-            if len(splits) < 2:
+            try:
+                logical_id, property_name = splits[:2]
+            except ValueError:
                 return full_ref
 
-            logical_id = splits[0]
-            property = splits[1]
-            resolved_value = supported_resource_refs.get(logical_id, property)
+            resolved_value = supported_resource_refs.get(logical_id, property_name)
             if not resolved_value:
                 # This ID/property combination is not in the supported references
                 return full_ref
@@ -247,12 +253,14 @@ class SubAction(Action):
             # We found a LogicalId.Property combination that can be resolved. Construct the output by replacing
             # the part of the reference string and not constructing a new ref. This allows us to support GetAtt-like
             # syntax and retain other attributes. Ex: ${LogicalId.Property.Arn} => ${SomeOtherLogicalId.Arn}
-            replacement = self._resource_ref_separator.join([logical_id, property])
+            replacement = self._resource_ref_separator.join([logical_id, property_name])
             return full_ref.replace(replacement, resolved_value)
 
-        return self._handle_sub_action(input_dict, do_replacement)  # type: ignore[no-untyped-call]
+        return self._handle_sub_action(input_dict, do_replacement)
 
-    def resolve_resource_id_refs(self, input_dict, supported_resource_id_refs):  # type: ignore[no-untyped-def]
+    def resolve_resource_id_refs(
+        self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
+    ) -> Optional[Any]:
         """
         Resolves reference to some property of a resource. Inside string to be substituted, there could be either a
         "Ref" or a "GetAtt" usage of this property. They have to be handled differently.
@@ -277,7 +285,7 @@ class SubAction(Action):
         :return: Resolved dictionary
         """
 
-        def do_replacement(full_ref, ref_value):  # type: ignore[no-untyped-def]
+        def do_replacement(full_ref: str, ref_value: str) -> str:
             """
             Perform the appropriate replacement to handle ${LogicalId} type references inside a Sub.
             This method is called to get the replacement string for each reference within Sub's value
@@ -306,9 +314,11 @@ class SubAction(Action):
             # syntax and retain other attributes. Ex: ${LogicalId.Property.Arn} => ${SomeOtherLogicalId.Arn}
             return full_ref.replace(logical_id, resolved_value)
 
-        return self._handle_sub_action(input_dict, do_replacement)  # type: ignore[no-untyped-call]
+        return self._handle_sub_action(input_dict, do_replacement)
 
-    def _handle_sub_action(self, input_dict, handler):  # type: ignore[no-untyped-def]
+    def _handle_sub_action(
+        self, input_dict: Optional[Dict[Any, Any]], handler: Callable[[str, str], str]
+    ) -> Optional[Any]:
         """
         Handles resolving replacements in the Sub action based on the handler that is passed as an input.
 
@@ -318,17 +328,17 @@ class SubAction(Action):
         :param handler: handler that is specific to each implementation.
         :return: Resolved value of the Sub dictionary
         """
-        if not self.can_handle(input_dict):  # type: ignore[no-untyped-call]
+        if input_dict is None or not self.can_handle(input_dict):
             return input_dict
 
         key = self.intrinsic_name
         sub_value = input_dict[key]
 
-        input_dict[key] = self._handle_sub_value(sub_value, handler)  # type: ignore[no-untyped-call]
+        input_dict[key] = self._handle_sub_value(sub_value, handler)
 
         return input_dict
 
-    def _handle_sub_value(self, sub_value, handler_method):  # type: ignore[no-untyped-def]
+    def _handle_sub_value(self, sub_value: Any, handler_method: Callable[[str, str], str]) -> Any:
         """
         Generic method to handle value to Fn::Sub key. We are interested in parsing the ${} syntaxes inside
         the string portion of the value.
@@ -343,15 +353,15 @@ class SubAction(Action):
         # because that's the best we can do here.
         if isinstance(sub_value, str):
             # Ex: {Fn::Sub: "some string"}
-            sub_value = self._sub_all_refs(sub_value, handler_method)  # type: ignore[no-untyped-call]
+            sub_value = self._sub_all_refs(sub_value, handler_method)
 
         elif isinstance(sub_value, list) and len(sub_value) > 0 and isinstance(sub_value[0], str):
             # Ex: {Fn::Sub: ["some string", {a:b}] }
-            sub_value[0] = self._sub_all_refs(sub_value[0], handler_method)  # type: ignore[no-untyped-call]
+            sub_value[0] = self._sub_all_refs(sub_value[0], handler_method)
 
         return sub_value
 
-    def _sub_all_refs(self, text, handler_method):  # type: ignore[no-untyped-def]
+    def _sub_all_refs(self, text: str, handler_method: Callable[[str, str], str]) -> str:
         """
         Substitute references within a string that is using ${key} syntax by calling the `handler_method` on every
         occurrence of this structure. The value returned by this method directly replaces the reference structure.
@@ -397,11 +407,15 @@ class SubAction(Action):
 class GetAttAction(Action):
     intrinsic_name = "Fn::GetAtt"
 
-    def resolve_parameter_refs(self, input_dict, parameters):  # type: ignore[no-untyped-def]
+    _MIN_NUM_ARGUMENTS = 2
+
+    def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
         # Parameters can never be referenced within GetAtt value
         return input_dict
 
-    def resolve_resource_refs(self, input_dict, supported_resource_refs):  # type: ignore[no-untyped-def]
+    def resolve_resource_refs(
+        self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
+    ) -> Optional[Any]:
         """
         Resolve resource references within a GetAtt dict.
 
@@ -426,13 +440,13 @@ class GetAttAction(Action):
         :return: Resolved dictionary
         """
 
-        if not self.can_handle(input_dict):  # type: ignore[no-untyped-call]
+        if input_dict is None or not self.can_handle(input_dict):
             return input_dict
 
         key = self.intrinsic_name
         value = input_dict[key]
 
-        if not self._check_input_value(value):  # type: ignore[no-untyped-call]
+        if not self._check_input_value(value):
             return input_dict
 
         # Value of GetAtt is an array. It can contain any number of elements, with first being the LogicalId of
@@ -448,13 +462,15 @@ class GetAttAction(Action):
         value_str = self._resource_ref_separator.join(value)
         splits = value_str.split(self._resource_ref_separator)
         logical_id = splits[0]
-        property = splits[1]
+        property_name = splits[1]
         remaining = splits[2:]  # if any
 
-        resolved_value = supported_resource_refs.get(logical_id, property)
-        return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)  # type: ignore[no-untyped-call]
+        resolved_value = supported_resource_refs.get(logical_id, property_name)
+        return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)
 
-    def resolve_resource_id_refs(self, input_dict, supported_resource_id_refs):  # type: ignore[no-untyped-def]
+    def resolve_resource_id_refs(
+        self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
+    ) -> Optional[Any]:
         """
         Resolve resource references within a GetAtt dict.
 
@@ -478,13 +494,13 @@ class GetAttAction(Action):
         :return: Resolved dictionary
         """
 
-        if not self.can_handle(input_dict):  # type: ignore[no-untyped-call]
+        if input_dict is None or not self.can_handle(input_dict):
             return input_dict
 
         key = self.intrinsic_name
         value = input_dict[key]
 
-        if not self._check_input_value(value):  # type: ignore[no-untyped-call]
+        if not self._check_input_value(value):
             return input_dict
 
         value_str = self._resource_ref_separator.join(value)
@@ -493,23 +509,21 @@ class GetAttAction(Action):
         remaining = splits[1:]  # if any
 
         resolved_value = supported_resource_id_refs.get(logical_id)
-        return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)  # type: ignore[no-untyped-call]
+        return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)
 
-    def _check_input_value(self, value):  # type: ignore[no-untyped-def]
-        # Value must be an array with *at least* two elements. If not, this is invalid GetAtt syntax. We just pass along
+    def _check_input_value(self, value: Any) -> bool:
+        # Value must be an array with enough elements. If not, this is invalid GetAtt syntax. We just pass along
         # the input to CFN for it to do the "official" validation.
-        if not isinstance(value, list) or len(value) < 2:
+        if not isinstance(value, list) or len(value) < self._MIN_NUM_ARGUMENTS:
             return False
 
         # If items in value array is not a string, then following join line will fail. So if any element is not a string
         # we just pass along the input to CFN for doing the validation
-        for item in value:
-            if not isinstance(item, str):
-                return False
+        return all(isinstance(item, str) for item in value)
 
-        return True
-
-    def _get_resolved_dictionary(self, input_dict, key, resolved_value, remaining):  # type: ignore[no-untyped-def]
+    def _get_resolved_dictionary(
+        self, input_dict: Optional[Dict[str, Any]], key: str, resolved_value: Optional[str], remaining: List[str]
+    ) -> Optional[Any]:
         """
         Resolves the function and returns the updated dictionary
 
@@ -518,10 +532,10 @@ class GetAttAction(Action):
         :param resolved_value: Resolved or updated value for this action.
         :param remaining: Remaining sections for the GetAtt action.
         """
-        if resolved_value:
+        if input_dict and resolved_value:
             # We resolved to a new resource logicalId. Use this as the first element and keep remaining elements intact
             # This is the new value of Fn::GetAtt
-            input_dict[key] = [resolved_value] + remaining
+            input_dict[key] = [resolved_value, *remaining]
 
         return input_dict
 
@@ -533,7 +547,9 @@ class FindInMapAction(Action):
 
     intrinsic_name = "Fn::FindInMap"
 
-    def resolve_parameter_refs(self, input_dict, parameters):  # type: ignore[no-untyped-def]
+    _NUM_ARGUMENTS = 3
+
+    def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
         """
         Recursively resolves "Fn::FindInMap"references that are present in the mappings and returns the value.
         If it is not in mappings, this method simply returns the input unchanged.
@@ -543,33 +559,49 @@ class FindInMapAction(Action):
 
         :param parameters: Dictionary of mappings from the SAM template
         """
-        if not self.can_handle(input_dict):  # type: ignore[no-untyped-call]
+        if input_dict is None or not self.can_handle(input_dict):
             return input_dict
 
         value = input_dict[self.intrinsic_name]
 
         # FindInMap expects an array with 3 values
-        if not isinstance(value, list) or len(value) != 3:
+        if not isinstance(value, list) or len(value) != self._NUM_ARGUMENTS:
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
-                        f"Invalid FindInMap value {value}. FindInMap expects an array with 3 values."
+                        f"Invalid FindInMap value {value}. FindInMap expects an array with {self._NUM_ARGUMENTS} values."
                     )
                 ]
             )
 
-        map_name = self.resolve_parameter_refs(value[0], parameters)  # type: ignore[no-untyped-call]
-        top_level_key = self.resolve_parameter_refs(value[1], parameters)  # type: ignore[no-untyped-call]
-        second_level_key = self.resolve_parameter_refs(value[2], parameters)  # type: ignore[no-untyped-call]
+        map_name = self.resolve_parameter_refs(value[0], parameters)
+        top_level_key = self.resolve_parameter_refs(value[1], parameters)
+        second_level_key = self.resolve_parameter_refs(value[2], parameters)
 
-        if not isinstance(map_name, str) or not isinstance(top_level_key, str) or not isinstance(second_level_key, str):
+        if not all(isinstance(key, str) for key in [map_name, top_level_key, second_level_key]):
             return input_dict
 
-        if (
-            map_name not in parameters
-            or top_level_key not in parameters[map_name]
-            or second_level_key not in parameters[map_name][top_level_key]
-        ):
+        invalid_2_level_map_exception = InvalidDocumentException(
+            [
+                InvalidTemplateException(
+                    f"Cannot use {self.intrinsic_name} on Mapping '{map_name}' which is not a a two-level map."
+                )
+            ]
+        )
+
+        # We should be able to use dict_deep_get() if
+        # the behavior of missing key is return None instead of input_dict.
+        if map_name not in parameters:
+            return input_dict
+
+        if not isinstance(parameters[map_name], dict):
+            raise invalid_2_level_map_exception
+        if top_level_key not in parameters[map_name]:
+            return input_dict
+
+        if not isinstance(parameters[map_name][top_level_key], dict):
+            raise invalid_2_level_map_exception
+        if second_level_key not in parameters[map_name][top_level_key]:
             return input_dict
 
         return parameters[map_name][top_level_key][second_level_key]

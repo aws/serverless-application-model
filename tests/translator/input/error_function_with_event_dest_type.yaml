@@ -2,16 +2,6 @@ Parameters:
   SNSArn:
     Type: String
     Default: my-sns-arn
-Globals:
-  Function:
-    AutoPublishAlias: live
-    EventInvokeConfig:
-      MaximumEventAgeInSeconds: 70
-      MaximumRetryAttempts: 1
-      DestinationConfig:
-        OnFailure:
-          Type: blah
-          Destination: !Ref SNSArn
 
 Resources:
   MyTestFunction:
@@ -36,3 +26,36 @@ Resources:
       Handler: index.handler
       Runtime: nodejs12.x
       MemorySize: 1024
+      AutoPublishAlias: live
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 70
+        MaximumRetryAttempts: 1
+        DestinationConfig:
+          OnFailure:
+            Type: blah
+            Destination: !Ref SNSArn
+
+  MyTestFunctionInvalidDestinationConfigType:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: hello
+      Handler: index.handler
+      Runtime: nodejs12.x
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 70
+        MaximumRetryAttempts: 1
+        DestinationConfig:
+        - this should not be a list
+
+  MyTestFunctionInvalidDestinationConfigOnSuccessType:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: hello
+      Handler: index.handler
+      Runtime: nodejs12.x
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 70
+        MaximumRetryAttempts: 1
+        DestinationConfig:
+          OnSuccess:
+          - this should not be a list

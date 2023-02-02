@@ -1,0 +1,19 @@
+Parameters:
+  TableName:
+    Type: String
+
+Resources:
+  MapFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs16.x
+      CodeUri: s3://bucket/key
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Fn::ImportValue:
+              Fn::Join:
+              - '-'
+              - - Ref: TableName # this is the same as DynamoDBCrudPolicy's parameter name
+                - hello

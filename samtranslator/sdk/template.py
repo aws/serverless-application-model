@@ -1,13 +1,13 @@
-from typing import Any, Dict, Iterator, Optional, Set, Tuple, Union
-
-from samtranslator.sdk.resource import SamResource
-
 """
 Classes representing SAM template and resources.
 """
 
+from typing import Any, Dict, Iterator, Optional, Set, Tuple, Union
 
-class SamTemplate(object):
+from samtranslator.sdk.resource import SamResource
+
+
+class SamTemplate:
     """
     Class representing the SAM template
     """
@@ -33,14 +33,16 @@ class SamTemplate(object):
         for logicalId, resource_dict in self.resources.items():
 
             resource = SamResource(resource_dict)
-            needs_filter = resource.valid()  # type: ignore[no-untyped-call]
+            needs_filter = resource.valid()
             if resource_types:
                 needs_filter = needs_filter and resource.type in resource_types
 
             if needs_filter:
                 yield logicalId, resource
 
-    def set(self, logical_id: str, resource: Union[SamResource, Dict[str, Any]]) -> None:
+    def set(  # noqa: builtin-attribute-shadowing
+        self, logical_id: str, resource: Union[SamResource, Dict[str, Any]]
+    ) -> None:
         """
         Adds the resource to dictionary with given logical Id. It will overwrite, if the logical_id is already used.
 
@@ -76,7 +78,7 @@ class SamTemplate(object):
         if logicalId in self.resources:
             del self.resources[logicalId]
 
-    def to_dict(self):  # type: ignore[no-untyped-def]
+    def to_dict(self) -> Dict[str, Any]:
         """
         Returns the template as a dictionary
 

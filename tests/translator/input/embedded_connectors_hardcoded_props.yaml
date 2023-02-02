@@ -1,0 +1,67 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyFunction:
+    Type: AWS::Lambda::Function
+
+  MyRule:
+    Type: AWS::Events::Rule
+    Connectors:
+      RuleToTopic:
+        Properties:
+          Destination:
+            Type: AWS::SNS::Topic
+            Arn: !Ref MyTopic
+          Permissions:
+          - Write
+
+  MyQueue:
+    Type: AWS::SQS::Queue
+  MyQueue2:
+    Type: AWS::SQS::Queue
+
+  MyTopic:
+    Type: AWS::SNS::Topic
+    Connectors:
+      TopicToQueue:
+        Properties:
+          Destination:
+            Type: AWS::SQS::Queue
+            Arn: !Ref MyQueue
+            QueueUrl: sqs.us.amazonaws.com/1234567890/test
+          Permissions:
+          - Write
+
+  MyApiV1:
+    Type: AWS::ApiGateway::RestApi
+    Connectors:
+      ApiV1ToLambda:
+        Properties:
+          SourceReference:
+            Qualifier: Prod/GET/foobar
+          Destination:
+            Id: MyFunction
+          Permissions:
+          - Write
+
+  MyApiV2:
+    Type: AWS::ApiGatewayV2::Api
+    Connectors:
+      ApiV2ToLambda:
+        Properties:
+          SourceReference:
+            Qualifier: '*'
+          Destination:
+            Id: MyFunction
+          Permissions:
+          - Write
+
+  MySNSTopic:
+    Type: AWS::SNS::Topic
+    Connectors:
+      TopicToLambdaHardcoded:
+        Properties:
+          Destination:
+            Type: AWS::Lambda::Function
+            Arn: !GetAtt MyFunction.Arn
+          Permissions:
+          - Write

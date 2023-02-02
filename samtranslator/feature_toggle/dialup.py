@@ -1,19 +1,20 @@
 import hashlib
+from abc import ABC, abstractmethod
 
 
-class BaseDialup(object):
+class BaseDialup(ABC):
     """BaseDialup class to provide an interface for all dialup classes"""
 
     def __init__(self, region_config, **kwargs):  # type: ignore[no-untyped-def]
         self.region_config = region_config
 
-    def is_enabled(self):  # type: ignore[no-untyped-def]
+    @abstractmethod
+    def is_enabled(self) -> bool:
         """
         Returns a bool on whether this dialup is enabled or not
         """
-        raise NotImplementedError
 
-    def __str__(self):  # type: ignore[no-untyped-def]
+    def __str__(self) -> str:
         return self.__class__.__name__
 
 
@@ -23,7 +24,7 @@ class DisabledDialup(BaseDialup):
     """
 
     def __init__(self, region_config, **kwargs):  # type: ignore[no-untyped-def]
-        super(DisabledDialup, self).__init__(region_config)  # type: ignore[no-untyped-call]
+        super().__init__(region_config)  # type: ignore[no-untyped-call]
 
     def is_enabled(self) -> bool:
         return False
@@ -36,7 +37,7 @@ class ToggleDialup(BaseDialup):
     """
 
     def __init__(self, region_config, **kwargs):  # type: ignore[no-untyped-def]
-        super(ToggleDialup, self).__init__(region_config)  # type: ignore[no-untyped-call]
+        super().__init__(region_config)  # type: ignore[no-untyped-call]
         self.region_config = region_config
 
     def is_enabled(self):  # type: ignore[no-untyped-def]
@@ -50,11 +51,11 @@ class SimpleAccountPercentileDialup(BaseDialup):
     """
 
     def __init__(self, region_config, account_id, feature_name, **kwargs):  # type: ignore[no-untyped-def]
-        super(SimpleAccountPercentileDialup, self).__init__(region_config)  # type: ignore[no-untyped-call]
+        super().__init__(region_config)  # type: ignore[no-untyped-call]
         self.account_id = account_id
         self.feature_name = feature_name
 
-    def _get_account_percentile(self):  # type: ignore[no-untyped-def]
+    def _get_account_percentile(self) -> int:
         """
         Get account percentile based on sha256 hash of account ID and feature_name
 
@@ -65,10 +66,10 @@ class SimpleAccountPercentileDialup(BaseDialup):
         m.update(self.feature_name.encode())
         return int(m.hexdigest(), 16) % 100
 
-    def is_enabled(self):  # type: ignore[no-untyped-def]
+    def is_enabled(self) -> bool:
         """
         Enable when account_percentile falls within target_percentile
         Meaning only (target_percentile)% of accounts will be enabled
         """
-        target_percentile = self.region_config.get("enabled-%", 0)
-        return self._get_account_percentile() < target_percentile  # type: ignore[no-untyped-call]
+        target_percentile: int = self.region_config.get("enabled-%", 0)
+        return self._get_account_percentile() < target_percentile
