@@ -64,14 +64,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", type=Path)
     parser.add_argument("--cfn", action="store_true")
-    parser.add_argument("--with-title", help="use doc title instead of filename as key", action="store_true")
     args = parser.parse_args()
 
     props: Dict[str, Dict[str, str]] = {}
     for path in args.dir.glob("*.md"):
         text = path.read_text()
         title = stringbetween(text, "# ", "<a")
-        page = title if args.with_title else path.stem
+        page = title if args.cfn else path.stem
         for name, description in parse(text):
             if page not in props:
                 props[page] = {}

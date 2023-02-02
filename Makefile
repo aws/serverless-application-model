@@ -61,7 +61,7 @@ fetch-schema-data:
 update-schema-data:
 	# Parse docs
 	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > schema_source/docs.json
-	bin/parse_docs.py --cfn --with-title .tmp/aws-cloudformation-user-guide/doc_source > schema_source/cloudformation-docs.json
+	bin/parse_docs.py --cfn .tmp/aws-cloudformation-user-guide/doc_source > schema_source/cloudformation-docs.json
 
 	# Add CloudFormation docs to CloudFormation schema
 	python bin/add_docs_cfn_schema.py --schema .tmp/cloudformation.schema.json --docs schema_source/cloudformation-docs.json > schema_source/cloudformation.schema.json
