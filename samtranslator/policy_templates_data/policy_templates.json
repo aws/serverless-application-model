@@ -2153,7 +2153,44 @@
       "Description": "Gives access to a parameter to load secrets in this account. If not using default key, KMSDecryptPolicy will also be needed.",
       "Parameters": {
         "ParameterName": {
-          "Description": "The name of the secret stored in SSM in your account."
+          "Description": "The name of the secret stored in SSM in your account. Name shouldn't contain a leading slash."
+        }
+      }
+    },
+    "SSMParameterWithSlashPrefixReadPolicy": {
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "ssm:DescribeParameters"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+          },
+          {
+            "Action": [
+              "ssm:GetParameters",
+              "ssm:GetParameter",
+              "ssm:GetParametersByPath"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${parameterName}",
+                {
+                  "parameterName": {
+                    "Ref": "ParameterName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Description": "Gives access to a parameter to load secrets in this account. If not using default key, KMSDecryptPolicy will also be needed.",
+      "Parameters": {
+        "ParameterName": {
+          "Description": "The name of the secret stored in SSM in your account. Name should contain a leading slash."
         }
       }
     },
