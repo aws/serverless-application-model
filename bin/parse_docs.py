@@ -22,12 +22,14 @@ def parse(s: str) -> Iterator[Tuple[str, str]]:
     """Parse an AWS docs page in Markdown format, yielding each property."""
     # Prevent from parsing return values accidentally
     with suppress(ValueError):
-        s = s[: s.index("Return Values")]
+        s = s[: s.index("# Return Value")]
+    with suppress(ValueError):
+        s = s[: s.index("# Return value")]
     parts = s.split("\n\n")
     for part in parts:
         match = re.match(r"^\s*`(\w+)`\s+<a", part)
         if match:
-            yield match.group(1), part.strip()
+            yield match.group(1), part
 
 
 # TODO: Change in the docs instead?
@@ -64,14 +66,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", type=Path)
     parser.add_argument("--cfn", action="store_true")
-    parser.add_argument("--with-title", help="use doc title instead of filename as key", action="store_true")
     args = parser.parse_args()
 
     props: Dict[str, Dict[str, str]] = {}
     for path in args.dir.glob("*.md"):
         text = path.read_text()
         title = stringbetween(text, "# ", "<a")
-        page = title if args.with_title else path.stem
+        page = title if args.cfn else path.stem
         for name, description in parse(text):
             if page not in props:
                 props[page] = {}
@@ -83,7 +84,10 @@ def main() -> None:
                 else "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/"
             )
             description = convert_to_full_path(description, prefix)
-            props[page][name] = description
+            # Assume properties (what we care about) at top, so skip if already exists
+            if name in props[page]:
+                continue
+            props[page][name] = description.strip()
 
     print(
         json.dumps(
