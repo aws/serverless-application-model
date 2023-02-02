@@ -1837,7 +1837,7 @@ class SamConnector(SamResourceMacro):
                 source, destination, dest_index, multi_dest, resource_resolver
             )
 
-            self._add_connector_metadata(generated_resources, original_template, source, destination)
+            self._add_connector_metadata(generated_resources, original_template, source, destination, multi_dest)
             list_generated_resources.extend(generated_resources)
 
         generated_logical_ids = [resource.logical_id for resource in list_generated_resources]
@@ -2096,6 +2096,7 @@ class SamConnector(SamResourceMacro):
         original_template: Dict[str, Any],
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
+        is_multi_dest: bool,
     ) -> None:
         """
         Add metadata attribute to generated resources.
@@ -2111,18 +2112,7 @@ class SamConnector(SamResourceMacro):
         original_resources = original_template.get("Resources", {})
         original_source_type = original_resources.get(source.logical_id, {}).get("Type")
         original_dest_type = original_resources.get(destination.logical_id, {}).get("Type")
-        metadata = {
-            "aws:sam:connectors": {
-                self.logical_id: {
-                    # If the source/destination is a serverless resource,
-                    # we prefer to include the original serverless resource type
-                    # over the transformed CFN resource type so it can distinguish
-                    # connector usage between serverless resources and CFN resources.
-                    "Source": {"Type": original_source_type or source.resource_type},
-                    "Destination": {"Type": original_dest_type or destination.resource_type},
-                }
-            }
-        }
+
         for resource in generated_resources:
             # Although as today the generated resources do not have any existing metadata,
             # To make it future proof, we still does a merge to avoid overwriting.
@@ -2130,4 +2120,24 @@ class SamConnector(SamResourceMacro):
                 original_metadata = resource.get_resource_attribute("Metadata")
             except KeyError:
                 original_metadata = {}
+
+            connector_type: Dict[str, Any] = {
+                "multidest:connector": is_multi_dest,
+                "embedded:connector": "aws:sam:embedded:connector" in original_metadata,
+            }
+            original_metadata = {k: v for k, v in original_metadata.items() if k != "aws:sam:embedded:connector"}
+
+            metadata = {
+                "aws:sam:connectors": {
+                    self.logical_id: {
+                        # If the source/destination is a serverless resource,
+                        # we prefer to include the original serverless resource type
+                        # over the transformed CFN resource type so it can distinguish
+                        # connector usage between serverless resources and CFN resources.
+                        "Source": {"Type": original_source_type or source.resource_type},
+                        "Destination": {"Type": original_dest_type or destination.resource_type},
+                        **connector_type,
+                    }
+                }
+            }
             resource.set_resource_attribute("Metadata", {**original_metadata, **metadata})

@@ -81,7 +81,9 @@
             },
             "Source": {
               "Type": "AWS::SQS::Queue"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },

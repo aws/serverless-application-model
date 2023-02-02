@@ -121,7 +121,9 @@
             },
             "Source": {
               "Type": "AWS::DynamoDB::Table"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },
@@ -172,7 +174,9 @@
             },
             "Source": {
               "Type": "AWS::DynamoDB::Table"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },

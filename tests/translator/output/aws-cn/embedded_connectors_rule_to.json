@@ -46,7 +46,9 @@
             },
             "Source": {
               "Type": "AWS::Events::Rule"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },
@@ -113,7 +115,9 @@
             },
             "Source": {
               "Type": "AWS::Events::Rule"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },
@@ -180,7 +184,9 @@
             },
             "Source": {
               "Type": "AWS::Events::Rule"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },

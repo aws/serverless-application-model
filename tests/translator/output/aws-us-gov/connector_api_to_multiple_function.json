@@ -9,7 +9,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::Api"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": true
           }
         }
       },
@@ -45,7 +47,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::Api"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": true
           }
         }
       },

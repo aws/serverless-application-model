@@ -42,7 +42,9 @@
             },
             "Source": {
               "Type": "AWS::ApiGatewayV2::Api"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },
@@ -115,7 +117,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::HttpApi"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },
@@ -151,7 +155,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::HttpApi"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },

@@ -1,4 +1,5 @@
 import copy
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 from samtranslator.feature_toggle.feature_toggle import (
@@ -330,6 +331,14 @@ class Translator:
                         source_logical_id,
                         connector_logical_id,
                         connector_dict,
+                    )
+
+                    # In case the generated resource already contains Metadata, we need to append to it
+                    original_metadata = {}
+                    with suppress(KeyError):
+                        original_metadata = generated_connector.get_resource_attribute("Metadata")
+                    generated_connector.set_resource_attribute(
+                        "Metadata", {**original_metadata, "aws:sam:embedded:connector": True}
                     )
 
                     if not verify_unique_logical_id(generated_connector, resources):

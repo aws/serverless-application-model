@@ -9,7 +9,9 @@
             },
             "Source": {
               "Type": "AWS::SNS::Topic"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },

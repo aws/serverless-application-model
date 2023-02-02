@@ -9,7 +9,9 @@
             },
             "Source": {
               "Type": "AWS::Lambda::Function"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },
@@ -51,7 +53,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::Function"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },
@@ -95,7 +99,9 @@
             },
             "Source": {
               "Type": "AWS::Lambda::Function"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },

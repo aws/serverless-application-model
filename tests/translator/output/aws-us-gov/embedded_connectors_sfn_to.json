@@ -143,7 +143,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },
@@ -185,7 +187,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },
@@ -362,7 +366,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },

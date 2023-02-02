@@ -9,7 +9,9 @@
             },
             "Source": {
               "Type": "AWS::SQS::Queue"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },
@@ -65,7 +67,9 @@
             },
             "Source": {
               "Type": "AWS::SQS::Queue"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },
@@ -121,7 +125,9 @@
             },
             "Source": {
               "Type": "AWS::SQS::Queue"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },
@@ -177,7 +183,9 @@
             },
             "Source": {
               "Type": "AWS::DynamoDB::Table"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },

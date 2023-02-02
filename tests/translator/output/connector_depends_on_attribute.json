@@ -10,7 +10,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::Function"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },

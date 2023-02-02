@@ -15,7 +15,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::Function"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": true
           }
         }
       },
@@ -114,7 +116,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::Function"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": true
           }
         }
       },

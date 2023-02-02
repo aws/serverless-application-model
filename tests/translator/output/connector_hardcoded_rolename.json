@@ -9,7 +9,9 @@
             },
             "Source": {
               "Type": "AWS::Lambda::Function"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },

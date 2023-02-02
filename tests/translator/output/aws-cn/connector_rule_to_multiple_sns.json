@@ -9,7 +9,9 @@
             },
             "Source": {
               "Type": "AWS::Events::Rule"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": true
           }
         }
       },
@@ -56,7 +58,9 @@
             },
             "Source": {
               "Type": "AWS::Events::Rule"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": true
           }
         }
       },

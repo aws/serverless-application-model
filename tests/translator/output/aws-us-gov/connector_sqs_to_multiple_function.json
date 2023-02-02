@@ -9,7 +9,9 @@
             },
             "Source": {
               "Type": "AWS::SQS::Queue"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": true
           }
         }
       },
@@ -65,7 +67,9 @@
             },
             "Source": {
               "Type": "AWS::SQS::Queue"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": true
           }
         }
       },

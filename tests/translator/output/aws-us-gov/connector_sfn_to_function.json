@@ -9,7 +9,9 @@
             },
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
-            }
+            },
+            "embedded:connector": false,
+            "multidest:connector": false
           }
         }
       },

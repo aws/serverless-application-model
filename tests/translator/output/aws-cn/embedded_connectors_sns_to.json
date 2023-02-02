@@ -67,7 +67,9 @@
             },
             "Source": {
               "Type": "AWS::SNS::Topic"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },
@@ -95,7 +97,9 @@
             },
             "Source": {
               "Type": "AWS::SNS::Topic"
-            }
+            },
+            "embedded:connector": true,
+            "multidest:connector": false
           }
         }
       },
