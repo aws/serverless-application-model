@@ -13,7 +13,6 @@ Usage:
 import argparse
 import json
 import re
-from contextlib import suppress
 from pathlib import Path
 from typing import Dict, Iterator, Tuple
 
@@ -21,10 +20,9 @@ from typing import Dict, Iterator, Tuple
 def parse(s: str) -> Iterator[Tuple[str, str]]:
     """Parse an AWS docs page in Markdown format, yielding each property."""
     # Prevent from parsing return values accidentally
-    with suppress(ValueError):
-        s = s[: s.index("# Return Value")]
-    with suppress(ValueError):
-        s = s[: s.index("# Return value")]
+    s = stringbetween(s, "#\s+Properties", "#\s+Return values")
+    if not s:
+        return
     parts = s.split("\n\n")
     for part in parts:
         match = re.match(r"^\s*`(\w+)`\s+<a", part)
@@ -59,7 +57,18 @@ def convert_to_full_path(description: str, prefix: str) -> str:
 
 
 def stringbetween(s: str, sep1: str, sep2: str) -> str:
-    return s.split(sep1, 1)[1].split(sep2, 1)[0]
+    """
+    Return string between regexes. Case-insensitive. If sep2 doesn't match,
+    returns to end of string.
+    """
+    start = re.search(sep1, s, re.IGNORECASE)
+    if not start:
+        return ""
+    s = s[start.end() :]
+    end = re.search(sep2, s, re.IGNORECASE)
+    if not end:
+        return s
+    return s[: end.start()]
 
 
 def main() -> None:
@@ -71,7 +80,14 @@ def main() -> None:
     props: Dict[str, Dict[str, str]] = {}
     for path in args.dir.glob("*.md"):
         text = path.read_text()
-        title = stringbetween(text, "# ", "<a")
+        title = stringbetween(text, r"#\s+", r"<a")
+        if not title:
+            raise Exception(f"{path} has no title")
+        # In CFN docs, always expect either `AWS::Foo::Bar`, or `AWS::Foo::Bar SomeProperty`,
+        # which maps to the definition names in GoFormation schema
+        # Tangentially related: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-resource-specification-format.html
+        if args.cfn and not re.match(r"^\w+::\w+::\w+( \w+)?$", title):
+            continue
         page = title if args.cfn else path.stem
         for name, description in parse(text):
             if page not in props:
