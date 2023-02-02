@@ -40,6 +40,6 @@ jobs:
 
       - name: Create PR
         if: steps.schema.outputs.changed
-        run: gh pr create --fill --base develop
+        run: gh pr create --fill --base develop --body 'Created by the [`schema.yml`](https://github.com/aws/serverless-application-model/blob/develop/.github/workflows/schema.yml) workflow.'
         env:
           GH_TOKEN: ${{ github.token }}
