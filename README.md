@@ -115,9 +115,15 @@ You can also join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers
 
 ## Learn more
 
+### Workshops and tutorials
+
 - [The Complete AWS SAM Workshop](https://catalog.workshops.aws/complete-aws-sam)
+- [AWS Serverless Developer Experience Workshop](https://catalog.us-east-1.prod.workshops.aws/workshops/9a27e484-7336-4ed0-8f90-f2747e4ac65c/en-US)
 - [Deploying a "Hello, World!" application](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-hello-world.html)
 - [Testing in the cloud using the SAM CLI](https://aws.amazon.com/blogs/compute/accelerating-serverless-development-with-aws-sam-accelerate/)
+
+### Documentation
+
 - [SAM Developer Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html)
 - [SAM template specification](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html)
 - [SAM connectors](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/managing-permissions-connectors.html)
