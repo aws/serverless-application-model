@@ -7,8 +7,8 @@
             "Destination": {
               "Type": "AWS::DynamoDB::Table"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Lambda::Function"
             }
@@ -101,8 +101,8 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
             }
@@ -131,8 +131,8 @@
             "Destination": {
               "Type": "AWS::SNS::Topic"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Events::Rule"
             }
@@ -200,8 +200,8 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
             }

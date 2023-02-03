@@ -44,8 +44,8 @@
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Events::Rule"
             }
@@ -113,8 +113,8 @@
             "Destination": {
               "Type": "AWS::Events::EventBus"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Events::Rule"
             }
@@ -182,8 +182,8 @@
             "Destination": {
               "Type": "AWS::Events::EventBus"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Events::Rule"
             }

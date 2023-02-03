@@ -40,8 +40,8 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::ApiGatewayV2::Api"
             }
@@ -78,8 +78,8 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::ApiGateway::RestApi"
             }
@@ -116,8 +116,8 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::Api"
             }
@@ -154,8 +154,8 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::HttpApi"
             }

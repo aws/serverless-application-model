@@ -35,8 +35,8 @@
             "Destination": {
               "Type": "AWS::S3::Bucket"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": true,
+            "Embedded": true,
+            "MultiDestination": true,
             "Source": {
               "Type": "AWS::Serverless::Function"
             }
@@ -136,8 +136,8 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": true,
+            "Embedded": true,
+            "MultiDestination": true,
             "Source": {
               "Type": "AWS::Serverless::Function"
             }

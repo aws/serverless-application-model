@@ -119,8 +119,8 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::DynamoDB::Table"
             }
@@ -172,8 +172,8 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::DynamoDB::Table"
             }

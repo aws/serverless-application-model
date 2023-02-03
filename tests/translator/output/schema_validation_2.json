@@ -48,8 +48,8 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
             }

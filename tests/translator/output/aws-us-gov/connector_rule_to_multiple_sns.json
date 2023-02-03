@@ -7,8 +7,8 @@
             "Destination": {
               "Type": "AWS::SNS::Topic"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": true,
+            "Embedded": false,
+            "MultiDestination": true,
             "Source": {
               "Type": "AWS::Events::Rule"
             }
@@ -56,8 +56,8 @@
             "Destination": {
               "Type": "AWS::SNS::Topic"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": true,
+            "Embedded": false,
+            "MultiDestination": true,
             "Source": {
               "Type": "AWS::Events::Rule"
             }

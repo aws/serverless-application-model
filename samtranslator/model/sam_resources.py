@@ -2122,8 +2122,8 @@ class SamConnector(SamResourceMacro):
                 original_metadata = {}
 
             connector_type: Dict[str, Any] = {
-                "MultiDestConnector": is_multi_dest,
-                "EmbeddedConnector": "aws:sam:embedded:connector" in original_metadata,
+                "MultiDestination": is_multi_dest,
+                "Embedded": "aws:sam:embedded:connector" in original_metadata,
             }
             original_metadata = {k: v for k, v in original_metadata.items() if k != "aws:sam:embedded:connector"}
 

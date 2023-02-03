@@ -7,8 +7,8 @@
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
             }
@@ -112,8 +112,8 @@
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
             }
@@ -217,8 +217,8 @@
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
             }

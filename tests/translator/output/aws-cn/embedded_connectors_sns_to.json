@@ -65,8 +65,8 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
             }
@@ -95,8 +95,8 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
             }

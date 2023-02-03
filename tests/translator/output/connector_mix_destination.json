@@ -132,8 +132,8 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": true,
+            "Embedded": false,
+            "MultiDestination": true,
             "Source": {
               "Type": "AWS::Events::Rule"
             }
@@ -184,8 +184,8 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": true,
+            "Embedded": false,
+            "MultiDestination": true,
             "Source": {
               "Type": "AWS::Events::Rule"
             }

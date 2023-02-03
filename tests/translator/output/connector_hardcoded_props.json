@@ -7,8 +7,8 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::ApiGateway::RestApi"
             }
@@ -45,8 +45,8 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::ApiGateway::RestApi"
             }
@@ -83,8 +83,8 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::ApiGatewayV2::Api"
             }
@@ -121,8 +121,8 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::ApiGatewayV2::Api"
             }
@@ -159,8 +159,8 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Lambda::Function"
             }
@@ -224,8 +224,8 @@
             "Destination": {
               "Type": "AWS::SNS::Topic"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Events::Rule"
             }
@@ -279,8 +279,8 @@
             "Destination": {
               "Type": "AWS::StepFunctions::StateMachine"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::StepFunctions::StateMachine"
             }
@@ -380,8 +380,8 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
             }

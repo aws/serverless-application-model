@@ -10,8 +10,8 @@
             "Destination": {
               "Type": "AWS::S3::Bucket"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::Function"
             }

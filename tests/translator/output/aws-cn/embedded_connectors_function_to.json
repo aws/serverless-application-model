@@ -33,8 +33,8 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Lambda::Function"
             }
@@ -77,8 +77,8 @@
             "Destination": {
               "Type": "AWS::DynamoDB::Table"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Lambda::Function"
             }
@@ -171,8 +171,8 @@
             "Destination": {
               "Type": "AWS::DynamoDB::Table"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Lambda::Function"
             }
@@ -309,8 +309,8 @@
             "Destination": {
               "Type": "AWS::S3::Bucket"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::Function"
             }
@@ -440,8 +440,8 @@
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::Function"
             }
@@ -537,8 +537,8 @@
             "Destination": {
               "Type": "AWS::SNS::Topic"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::Function"
             }
@@ -577,8 +577,8 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::Function"
             }
@@ -638,8 +638,8 @@
             "Destination": {
               "Type": "AWS::DynamoDB::Table"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::Function"
             }
@@ -732,8 +732,8 @@
             "Destination": {
               "Type": "AWS::DynamoDB::Table"
             },
-            "EmbeddedConnector": true,
-            "MultiDestConnector": false,
+            "Embedded": true,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Serverless::Function"
             }

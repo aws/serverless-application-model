@@ -7,8 +7,8 @@
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Events::Rule"
             }

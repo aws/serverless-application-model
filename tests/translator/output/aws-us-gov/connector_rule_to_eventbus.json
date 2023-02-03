@@ -15,8 +15,8 @@
             "Destination": {
               "Type": "AWS::Events::EventBus"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Events::Rule"
             }
@@ -58,8 +58,8 @@
             "Destination": {
               "Type": "AWS::Events::EventBus"
             },
-            "EmbeddedConnector": false,
-            "MultiDestConnector": false,
+            "Embedded": false,
+            "MultiDestination": false,
             "Source": {
               "Type": "AWS::Events::Rule"
             }
