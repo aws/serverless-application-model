@@ -10,11 +10,11 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -62,11 +62,11 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },

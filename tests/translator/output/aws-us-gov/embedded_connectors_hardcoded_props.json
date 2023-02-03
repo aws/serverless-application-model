@@ -10,11 +10,11 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
+            "EmbeddedConnector": true,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::ApiGateway::RestApi"
-            },
-            "embedded:connector": true,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -51,11 +51,11 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
+            "EmbeddedConnector": true,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::ApiGatewayV2::Api"
-            },
-            "embedded:connector": true,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -101,11 +101,11 @@
             "Destination": {
               "Type": "AWS::SNS::Topic"
             },
+            "EmbeddedConnector": true,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Events::Rule"
-            },
-            "embedded:connector": true,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -153,11 +153,11 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
+            "EmbeddedConnector": true,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
-            },
-            "embedded:connector": true,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -186,11 +186,11 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
+            "EmbeddedConnector": true,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
-            },
-            "embedded:connector": true,
-            "multidest:connector": false
+            }
           }
         }
       },

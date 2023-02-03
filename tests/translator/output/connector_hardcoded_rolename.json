@@ -7,11 +7,11 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Lambda::Function"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },

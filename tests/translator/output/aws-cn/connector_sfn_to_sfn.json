@@ -7,11 +7,11 @@
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -112,11 +112,11 @@
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -217,11 +217,11 @@
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Serverless::StateMachine"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },

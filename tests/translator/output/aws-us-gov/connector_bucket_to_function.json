@@ -81,11 +81,11 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::S3::Bucket"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },

@@ -7,11 +7,11 @@
             "Destination": {
               "Type": "AWS::Location::PlaceIndex"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Serverless::Function"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -51,11 +51,11 @@
             "Destination": {
               "Type": "AWS::Location::PlaceIndex"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Serverless::Function"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },

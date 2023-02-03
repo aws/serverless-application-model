@@ -40,11 +40,11 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::ApiGatewayV2::Api"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -78,11 +78,11 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::ApiGateway::RestApi"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -116,11 +116,11 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Serverless::Api"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -154,11 +154,11 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Serverless::HttpApi"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },

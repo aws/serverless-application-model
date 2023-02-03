@@ -7,11 +7,11 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::SQS::Queue"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -65,11 +65,11 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::SQS::Queue"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -123,11 +123,11 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::SQS::Queue"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -181,11 +181,11 @@
             "Destination": {
               "Type": "AWS::Lambda::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::DynamoDB::Table"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },

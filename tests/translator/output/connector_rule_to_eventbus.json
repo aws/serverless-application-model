@@ -15,11 +15,11 @@
             "Destination": {
               "Type": "AWS::Events::EventBus"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Events::Rule"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -58,11 +58,11 @@
             "Destination": {
               "Type": "AWS::Events::EventBus"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Events::Rule"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         }
       },

@@ -44,11 +44,11 @@
             "Destination": {
               "Type": "AWS::Serverless::StateMachine"
             },
+            "EmbeddedConnector": true,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Events::Rule"
-            },
-            "embedded:connector": true,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -113,11 +113,11 @@
             "Destination": {
               "Type": "AWS::Events::EventBus"
             },
+            "EmbeddedConnector": true,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Events::Rule"
-            },
-            "embedded:connector": true,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -182,11 +182,11 @@
             "Destination": {
               "Type": "AWS::Events::EventBus"
             },
+            "EmbeddedConnector": true,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Events::Rule"
-            },
-            "embedded:connector": true,
-            "multidest:connector": false
+            }
           }
         }
       },

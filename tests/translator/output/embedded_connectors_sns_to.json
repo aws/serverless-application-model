@@ -65,11 +65,11 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
+            "EmbeddedConnector": true,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
-            },
-            "embedded:connector": true,
-            "multidest:connector": false
+            }
           }
         }
       },
@@ -95,11 +95,11 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
+            "EmbeddedConnector": true,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::SNS::Topic"
-            },
-            "embedded:connector": true,
-            "multidest:connector": false
+            }
           }
         }
       },

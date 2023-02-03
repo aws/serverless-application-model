@@ -28,11 +28,11 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": false,
             "Source": {
               "Type": "AWS::Serverless::Function"
-            },
-            "embedded:connector": false,
-            "multidest:connector": false
+            }
           }
         },
         "foo": "bar"

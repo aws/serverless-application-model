@@ -132,11 +132,11 @@
             "Destination": {
               "Type": "AWS::SQS::Queue"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": true,
             "Source": {
               "Type": "AWS::Events::Rule"
-            },
-            "embedded:connector": false,
-            "multidest:connector": true
+            }
           }
         }
       },
@@ -184,11 +184,11 @@
             "Destination": {
               "Type": "AWS::Serverless::Function"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": true,
             "Source": {
               "Type": "AWS::Events::Rule"
-            },
-            "embedded:connector": false,
-            "multidest:connector": true
+            }
           }
         }
       },

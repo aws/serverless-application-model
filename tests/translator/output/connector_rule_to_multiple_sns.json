@@ -7,11 +7,11 @@
             "Destination": {
               "Type": "AWS::SNS::Topic"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": true,
             "Source": {
               "Type": "AWS::Events::Rule"
-            },
-            "embedded:connector": false,
-            "multidest:connector": true
+            }
           }
         }
       },
@@ -56,11 +56,11 @@
             "Destination": {
               "Type": "AWS::SNS::Topic"
             },
+            "EmbeddedConnector": false,
+            "MultiDestConnector": true,
             "Source": {
               "Type": "AWS::Events::Rule"
-            },
-            "embedded:connector": false,
-            "multidest:connector": true
+            }
           }
         }
       },
