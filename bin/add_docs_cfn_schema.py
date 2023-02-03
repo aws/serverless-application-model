@@ -4,6 +4,7 @@ Script to augment CloudFormation JSON schema with Markdown documentation.
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -34,8 +35,8 @@ def main() -> None:
     # Assumes schema is from GoFormation and has consistent structure
     # TODO: Use a more generic walk
     for def_name, def_schema in schema["definitions"].items():
-        if not def_name.startswith("AWS::"):
-            log(f"Skipping {def_name}: does not start with AWS::")
+        if not re.match(r"^\w+::\w+::\w+(.\w+)?$", def_name):
+            log(f"Skipping {def_name}: not expected format")
             continue
         # If e.g. AWS::S3::Bucket, we only look under Properties
         # TODO: Support resource attributes et al.
