@@ -1,0 +1,12 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      CodeUri: ${codeuri}
+      AutoPublishAlias: Live
+      AutoPublishAliasAllProperties: true
+      Description: foo
+Metadata:
+  SamTransformTest: true

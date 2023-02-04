@@ -448,6 +448,7 @@ Tracing = Optional[SamIntrinsicable[Literal["Active", "PassThrough"]]]
 KmsKeyArn = Optional[PassThroughProp]
 Layers = Optional[PassThroughProp]
 AutoPublishAlias = Optional[SamIntrinsicable[str]]
+AutoPublishAliasAllProperties = Optional[bool]
 RolePath = Optional[PassThroughProp]
 PermissionsBoundary = Optional[PassThroughProp]
 ReservedConcurrentExecutions = Optional[PassThroughProp]
@@ -463,6 +464,7 @@ class Properties(BaseModel):
     Architectures: Optional[Architectures] = prop("Architectures")
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
+    AutoPublishAliasAllProperties: Optional[AutoPublishAliasAllProperties]  # TODO: add docs
     AutoPublishCodeSha256: Optional[SamIntrinsicable[str]] = prop("AutoPublishCodeSha256")
     CodeSigningConfigArn: Optional[SamIntrinsicable[str]] = prop("CodeSigningConfigArn")
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
