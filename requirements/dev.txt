@@ -1,5 +1,4 @@
 coverage~=5.3
-flake8~=3.8.4
 pytest-cov~=2.10.1
 pytest-xdist~=2.5
 pytest-env~=0.6.2
