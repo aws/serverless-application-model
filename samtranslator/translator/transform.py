@@ -14,7 +14,7 @@ def transform(input_fragment, parameter_values, managed_policy_loader, feature_t
 
     sam_parser = Parser()
     to_py27_compatible_template(input_fragment, parameter_values)  # type: ignore[no-untyped-call]
-    translator = Translator(None, sam_parser)  # type: ignore[no-untyped-call]
+    translator = Translator(managed_policy_loader.load(), sam_parser)  # type: ignore[no-untyped-call]
     transformed = translator.translate(
         input_fragment,
         parameter_values=parameter_values,
