@@ -12,4 +12,4 @@ def get_managed_policy_map() -> Dict[str, str]:
     with open(path, encoding="utf-8") as f:
         policies: Dict[str, str] = json.load(f)
         partition = ArnGenerator.get_partition_name()
-        return {k: v.format(partition=partition) for k, v in policies.items()}
+        return policies[partition]
