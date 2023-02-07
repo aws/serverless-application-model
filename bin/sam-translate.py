@@ -26,17 +26,20 @@ import subprocess
 import sys
 from functools import reduce
 
+import boto3
 from docopt import docopt  # type: ignore[import]
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
 
 from samtranslator.model.exceptions import InvalidDocumentException
+from samtranslator.public.translator import ManagedPolicyLoader
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
 
 LOG = logging.getLogger(__name__)
 cli_options = docopt(__doc__)
+iam_client = boto3.client("iam")
 cwd = os.getcwd()
 
 if cli_options.get("--verbose"):
@@ -93,7 +96,7 @@ def transform_template(input_file_path, output_file_path):  # type: ignore[no-un
         sam_template = yaml_parse(f)  # type: ignore[no-untyped-call]
 
     try:
-        cloud_formation_template = transform(sam_template, {}, None)  # type: ignore[no-untyped-call]
+        cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))  # type: ignore[no-untyped-call]
         cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=1)
 
         with open(output_file_path, "w") as f:
