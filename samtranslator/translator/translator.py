@@ -38,7 +38,7 @@ from samtranslator.validator.value_validator import sam_expect
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None, metrics=None, load_managed_policies=None):  # type: ignore[no-untyped-def]
+    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None, metrics=None, get_managed_policy_map=None):  # type: ignore[no-untyped-def]
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -46,7 +46,7 @@ class Translator:
             in addition to the default ones.
         """
         self.managed_policy_map = managed_policy_map
-        self.load_managed_policies = load_managed_policies
+        self.get_managed_policy_map = get_managed_policy_map
         self.plugins = plugins
         self.sam_parser = sam_parser
         self.feature_toggle = None
@@ -158,7 +158,7 @@ class Translator:
 
                 kwargs = macro.resources_to_link(sam_template["Resources"])
                 kwargs["managed_policy_map"] = self.managed_policy_map
-                kwargs["load_managed_policies"] = self.load_managed_policies
+                kwargs["get_managed_policy_map"] = self.get_managed_policy_map
                 kwargs["intrinsics_resolver"] = intrinsics_resolver
                 kwargs["mappings_resolver"] = mappings_resolver
                 kwargs["deployment_preference_collection"] = deployment_preference_collection
