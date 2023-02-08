@@ -2,6 +2,7 @@ import json
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 
+from samtranslator.internal.managed_policies.managed_policies import get_bundled_managed_policies
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
@@ -12,6 +13,7 @@ from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.model.stepfunctions.resources import StepFunctionsStateMachine
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
+from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.cfn_dynamic_references import is_dynamic_reference
 
 
@@ -47,6 +49,7 @@ class StateMachineGenerator:
         tags=None,
         resource_attributes=None,
         passthrough_resource_attributes=None,
+        get_managed_policy_map=None,
     ):
         """
         Constructs an State Machine Generator class that generates a State Machine resource
@@ -98,6 +101,7 @@ class StateMachineGenerator:
             logical_id, depends_on=depends_on, attributes=resource_attributes
         )
         self.substitution_counter = 1
+        self.get_managed_policy_map = get_managed_policy_map
 
     @cw_timer(prefix="Generator", name="StateMachine")
     def to_cloudformation(self):  # type: ignore[no-untyped-def]
@@ -219,6 +223,8 @@ class StateMachineGenerator:
             policy_template_processor=None,
         )
 
+        bundled_managed_policies = get_bundled_managed_policies(ArnGenerator.get_partition_name())
+
         return construct_role_for_resource(
             resource_logical_id=self.logical_id,
             role_path=self.role_path,
@@ -228,6 +234,8 @@ class StateMachineGenerator:
             resource_policies=state_machine_policies,
             tags=self._construct_tag_list(),
             permissions_boundary=self.permissions_boundary,
+            bundled_managed_policies=bundled_managed_policies,
+            get_managed_policy_map=self.get_managed_policy_map,
         )
 
     def _construct_tag_list(self) -> List[Dict[str, Any]]:
