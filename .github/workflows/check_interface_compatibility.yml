@@ -1,0 +1,76 @@
+name: Check interface compatibility
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]
+
+
+
+jobs:
+  check-interface-compatibility:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Extract new public interfaces
+        run: |
+          make init
+          bin/public_interface.py extract >> ${{ runner.temp }}/interfaces.new.json
+
+      - name: Backup bin/public_interface.py
+        run: |
+          # Keep a copy of bin/public_interface.py to use on the base branch
+          # So we are using the same bin/public_interface.py to process old/new codebase.
+          cp bin/public_interface.py ${{ runner.temp }}/public_interface.py
+
+      - name: Checkout the base branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.base_ref }}
+
+      - name: Extract original public interfaces
+        run: |
+          echo "Original HEAD: $(git rev-parse --short HEAD)"
+          make init
+          # Recover bin/public_interface.py
+          cp ${{ runner.temp }}/public_interface.py bin/public_interface.py
+          bin/public_interface.py extract >> ${{ runner.temp }}/interfaces.original.json
+
+      - name: Archive interface files for debugging
+        uses: actions/upload-artifact@v3
+        with:
+          name: interface-json-files
+          path: ${{ runner.temp }}/interfaces.*.json
+          retention-days: 7  # Only storing it for a week in case of debugging needs.
+    
+      - name: Detect compatibility breaking changes
+        id: detect
+        run: |
+          output=$(bash -c '(bin/public_interface.py check ${{ runner.temp }}/interfaces.original.json ${{ runner.temp }}/interfaces.new.json); exit $?')
+          exit_code=$?
+          echo "output=$output"
+          echo "exit_code=$exit_code"
+          echo "output=$output" >> $GITHUB_OUTPUT
+          echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
+
+      - name: Post GitHub PR comment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `hi${{ steps.detect.outputs.output }}`
+            })
+
+      - name: Determine the success/failure of the workflow
+        run: |
+          if [ ${{ steps.detect.outputs.exit_code }} -ne 0 ]; then
+            exit ${{ steps.detect.outputs.exit_code }}
+          fi
