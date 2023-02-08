@@ -116,7 +116,7 @@ class _BreakingChanges(NamedTuple):
     ) -> None:
         """Print all breaking changes in markdown."""
         print("\n# Compatibility breaking changes:")
-        print("** These changes are considered breaking changes and may break packages consuming")
+        print("**These changes are considered breaking changes and may break packages consuming")
         print("the PyPI package [aws-sam-translator](https://pypi.org/project/aws-sam-translator/).")
         print("Please consider revisiting these changes to make sure they are intentional:**")
         if self.deleted_variables:
