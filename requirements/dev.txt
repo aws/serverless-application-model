@@ -19,9 +19,6 @@ tenacity~=7.0.0
 # Requirements for examples
 requests~=2.25.0
 
-# CLI requirements
-docopt~=0.6.2
-
 # formatter
 black==20.8b1
 ruamel.yaml==0.17.21  # It can parse yaml while perserving comments
