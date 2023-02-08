@@ -1,4 +1,7 @@
 import json
+from abc import ABC, abstractmethod
+from typing import Any, Dict, cast
+
 import boto3
 import logging
 
@@ -87,15 +90,16 @@ class FeatureToggle:
         return is_enabled
 
 
-class FeatureToggleConfigProvider:
+class FeatureToggleConfigProvider(ABC):
     """Interface for all FeatureToggle config providers"""
 
     def __init__(self) -> None:
         pass
 
     @property
-    def config(self):  # type: ignore[no-untyped-def]
-        raise NotImplementedError
+    @abstractmethod
+    def config(self) -> Dict[str, Any]:
+        pass
 
 
 class FeatureToggleDefaultConfigProvider(FeatureToggleConfigProvider):
@@ -105,7 +109,7 @@ class FeatureToggleDefaultConfigProvider(FeatureToggleConfigProvider):
         FeatureToggleConfigProvider.__init__(self)
 
     @property
-    def config(self):  # type: ignore[no-untyped-def]
+    def config(self) -> Dict[str, Any]:
         return {}
 
 
@@ -116,10 +120,10 @@ class FeatureToggleLocalConfigProvider(FeatureToggleConfigProvider):
         FeatureToggleConfigProvider.__init__(self)
         with open(local_config_path, "r", encoding="utf-8") as f:
             config_json = f.read()
-        self.feature_toggle_config = json.loads(config_json)
+        self.feature_toggle_config = cast(Dict[str, Any], json.loads(config_json))
 
     @property
-    def config(self):  # type: ignore[no-untyped-def]
+    def config(self) -> Dict[str, Any]:
         return self.feature_toggle_config
 
 
@@ -147,13 +151,13 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
                 ClientId="FeatureToggleAppConfigConfigProvider",
             )
             binary_config_string = response["Content"].read()
-            self.feature_toggle_config = json.loads(binary_config_string.decode("utf-8"))
+            self.feature_toggle_config = cast(Dict[str, Any], json.loads(binary_config_string.decode("utf-8")))
             LOG.info("Finished loading feature toggle config from AppConfig.")
         except Exception as ex:
             LOG.error("Failed to load config from AppConfig: {}. Using empty config.".format(ex))
             # There is chance that AppConfig is not available in a particular region.
-            self.feature_toggle_config = json.loads("{}")
+            self.feature_toggle_config = {}
 
     @property
-    def config(self):  # type: ignore[no-untyped-def]
+    def config(self) -> Dict[str, Any]:
         return self.feature_toggle_config

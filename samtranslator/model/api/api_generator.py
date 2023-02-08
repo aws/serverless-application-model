@@ -67,7 +67,7 @@ UsagePlanProperties.__new__.__defaults__ = (None, None, None, None, None, None)
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
 
 
-class SharedApiUsagePlan(object):
+class SharedApiUsagePlan:
     """
     Collects API information from different API resources in the same template,
     so that these information can be used in the shared usage plan
@@ -160,7 +160,7 @@ class SharedApiUsagePlan(object):
                 del template_conditions[SharedApiUsagePlan.SHARED_USAGE_PLAN_CONDITION_NAME]
 
 
-class ApiGenerator(object):
+class ApiGenerator:
     def __init__(
         self,
         logical_id: str,
@@ -473,31 +473,24 @@ class ApiGenerator(object):
 
         mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
         if mutual_tls_auth:
-            if isinstance(mutual_tls_auth, dict):
-                if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
-                    invalid_keys = []
-                    for key in mutual_tls_auth.keys():
-                        if not key in {"TruststoreUri", "TruststoreVersion"}:
-                            invalid_keys.append(key)
-                    invalid_keys.sort()
-                    raise InvalidResourceException(
-                        ",".join(invalid_keys),
-                        "Available MutualTlsAuthentication fields are {}.".format(
-                            ["TruststoreUri", "TruststoreVersion"]
-                        ),
-                    )
-                domain.MutualTlsAuthentication = {}
-                if mutual_tls_auth.get("TruststoreUri", None):
-                    domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]  # type: ignore[attr-defined]
-                if mutual_tls_auth.get("TruststoreVersion", None):
-                    domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]  # type: ignore[attr-defined]
-            else:
+            sam_expect(mutual_tls_auth, self.logical_id, "Domain.MutualTlsAuthentication").to_be_a_map()
+            if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
+                invalid_keys = []
+                for key in mutual_tls_auth.keys():
+                    if not key in {"TruststoreUri", "TruststoreVersion"}:
+                        invalid_keys.append(key)
+                invalid_keys.sort()
                 raise InvalidResourceException(
-                    mutual_tls_auth,
-                    "MutualTlsAuthentication must be a map with at least one of the following fields {}.".format(
+                    self.logical_id,
+                    "Available Domain.MutualTlsAuthentication fields are {}.".format(
                         ["TruststoreUri", "TruststoreVersion"]
                     ),
                 )
+            domain.MutualTlsAuthentication = {}
+            if mutual_tls_auth.get("TruststoreUri", None):
+                domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
+            if mutual_tls_auth.get("TruststoreVersion", None):
+                domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
 
         if self.domain.get("SecurityPolicy", None):
             domain.SecurityPolicy = self.domain["SecurityPolicy"]
@@ -691,7 +684,7 @@ class ApiGenerator(object):
                     allow_credentials=properties.AllowCredentials,
                 )
             except InvalidTemplateException as ex:
-                raise InvalidResourceException(self.logical_id, ex.message)
+                raise InvalidResourceException(self.logical_id, ex.message) from ex
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
@@ -788,7 +781,7 @@ class ApiGenerator(object):
             raise InvalidResourceException(self.logical_id, "Invalid property for 'UsagePlan'")
 
         create_usage_plan = usage_plan_properties.get("CreateUsagePlan")
-        usage_plan = None
+        usage_plan: Optional[ApiGatewayUsagePlan] = None
         api_key = None
         usage_plan_key = None
 
@@ -1117,7 +1110,7 @@ class ApiGenerator(object):
         # The dict below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
         authorizers = Py27Dict()
         if default_authorizer == "AWS_IAM":
-            authorizers[default_authorizer] = ApiGatewayAuthorizer(  # type: ignore[no-untyped-call]
+            authorizers[default_authorizer] = ApiGatewayAuthorizer(
                 api_logical_id=self.logical_id, name=default_authorizer, is_aws_iam_authorizer=True
             )
 
@@ -1131,7 +1124,7 @@ class ApiGenerator(object):
         for authorizer_name, authorizer in authorizers_config.items():
             sam_expect(authorizer, self.logical_id, f"Auth.Authorizers.{authorizer_name}").to_be_a_map()
 
-            authorizers[authorizer_name] = ApiGatewayAuthorizer(  # type: ignore[no-untyped-call]
+            authorizers[authorizer_name] = ApiGatewayAuthorizer(
                 api_logical_id=self.logical_id,
                 name=authorizer_name,
                 user_pool_arn=authorizer.get("UserPoolArn"),

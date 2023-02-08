@@ -3,18 +3,26 @@ Helper classes to publish metrics
 """
 import logging
 from datetime import datetime
+from typing import Any, Dict
+from abc import ABC, abstractmethod
 
 LOG = logging.getLogger(__name__)
 
 
-class MetricsPublisher:
+class MetricsPublisher(ABC):
     """Interface for all MetricPublishers"""
 
     def __init__(self) -> None:
         pass
 
+    @abstractmethod
     def publish(self, namespace, metrics):  # type: ignore[no-untyped-def]
-        raise NotImplementedError
+        """
+        Abstract method to publish all metrics to CloudWatch
+
+        :param namespace: namespace applied to all metrics published.
+        :param metrics: list of metrics to be published
+        """
 
 
 class CWMetricsPublisher(MetricsPublisher):
@@ -101,7 +109,7 @@ class MetricDatum:
         self.dimensions = dimensions if dimensions else []
         self.timestamp = timestamp if timestamp else datetime.utcnow()
 
-    def get_metric_data(self):  # type: ignore[no-untyped-def]
+    def get_metric_data(self) -> Dict[str, Any]:
         return {
             "MetricName": self.name,
             "Value": self.value,
@@ -123,13 +131,13 @@ class Metrics:
         self.metrics_cache = {}
         self.namespace = namespace
 
-    def __del__(self):  # type: ignore[no-untyped-def]
+    def __del__(self) -> None:
         if len(self.metrics_cache) > 0:
             # attempting to publish if user forgot to call publish in code
             LOG.warning(
                 "There are unpublished metrics. Please make sure you call publish after you record all metrics."
             )
-            self.publish()  # type: ignore[no-untyped-call]
+            self.publish()
 
     def _record_metric(self, name, value, unit, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
         """
@@ -167,7 +175,7 @@ class Metrics:
         """
         self._record_metric(name, value, Unit.Milliseconds, dimensions, timestamp)  # type: ignore[no-untyped-call]
 
-    def publish(self):  # type: ignore[no-untyped-def]
+    def publish(self) -> None:
         """Calls publish method from the configured metrics publisher to publish metrics"""
         # flatten the key->list dict into a flat list; we don't care about the key as it's
         # the metric name which is also in the MetricDatum object

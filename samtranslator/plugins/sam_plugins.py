@@ -6,7 +6,7 @@ from samtranslator.plugins import BasePlugin, LifeCycleEvents
 LOG = logging.getLogger(__name__)
 
 
-class SamPlugins(object):
+class SamPlugins:
     """
     Class providing support for arbitrary plugins that can extend core SAM translator in interesting ways.
     Use this class to register plugins that get called when certain life cycle events happen in the translator.
@@ -111,7 +111,6 @@ class SamPlugins(object):
         *args and **kwargs will be passed directly to the plugin's hook functions
 
         :param samtranslator.plugins.LifeCycleEvents event: Event to act upon
-        :return: Nothing
         :raises ValueError: If event is not a valid life cycle event
         :raises NameError: If a plugin does not have the hook method defined
         :raises Exception: Any exception that a plugin raises

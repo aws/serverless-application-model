@@ -1,0 +1,86 @@
+Resources:
+  MyEventsRule1:
+    Type: AWS::Events::Rule
+    Connectors:
+      SfnConnector:
+        Properties:
+          Destination:
+            Id: StateMachine
+          Permissions:
+          - Write
+    Properties:
+      Name: mynewabc
+      EventPattern:
+        source:
+        - aws.ec2
+      State: ENABLED
+      Targets:
+      - RoleArn: !GetAtt MyRuleRole.Arn
+        Arn: !GetAtt StateMachine.Arn
+        Id: StateMachine
+
+  MyEventsRule2:
+    Type: AWS::Events::Rule
+    Connectors:
+      MyEVBusConnector:
+        Properties:
+          Destination:
+            Id: EventBus
+          Permissions:
+          - Write
+    Properties:
+      Name: mynewabc
+      EventPattern:
+        source:
+        - aws.ec2
+      State: ENABLED
+      Targets:
+      - RoleArn: !GetAtt MyRuleRole.Arn
+        Arn: !GetAtt 'EventBus.Arn'
+        Id: EventBus
+
+  MyEventsRuleToDefaultBus:
+    Type: AWS::Events::Rule
+    Connectors:
+      MyConnectorToDefaultBus:
+        Properties:
+          Destination:
+            Type: AWS::Events::EventBus
+            Arn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
+          Permissions:
+          - Write
+    Properties:
+      Name: mynewabc
+      EventPattern:
+        source:
+        - aws.ec2
+      State: ENABLED
+      Targets:
+      - RoleArn: !GetAtt MyRuleRole.Arn
+        Arn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
+        Id: EventBus
+
+  MyRuleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: events.amazonaws.com
+          Action: sts:AssumeRole
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: MyLambdaState
+      Policies:
+      - LambdaInvokePolicy:
+          FunctionName: SomethingIsNotStateMachineFunction
+
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub '${AWS::StackName}-EventBus'

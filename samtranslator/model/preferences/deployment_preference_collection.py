@@ -35,7 +35,7 @@ CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST = [
 CODE_DEPLOY_CONDITION_NAME = "ServerlessCodeDeployCondition"
 
 
-class DeploymentPreferenceCollection(object):
+class DeploymentPreferenceCollection:
     """
     This class contains the collection of all global and
     specific / per function deployment preferences. It includes ways to add
@@ -80,13 +80,13 @@ class DeploymentPreferenceCollection(object):
         # TODO: find a way to deal with this implicit assumption
         return cast(DeploymentPreference, self._resource_preferences.get(logical_id))
 
-    def any_enabled(self):  # type: ignore[no-untyped-def]
+    def any_enabled(self) -> bool:
         """
         :return: boolean whether any deployment preferences in the collection are enabled
         """
         return any(preference.enabled for preference in self._resource_preferences.values())
 
-    def can_skip_service_role(self):  # type: ignore[no-untyped-def]
+    def can_skip_service_role(self) -> bool:
         """
         If every one of the deployment preferences have a custom IAM role provided, we can skip creating the
         service role altogether.
@@ -128,7 +128,7 @@ class DeploymentPreferenceCollection(object):
         """
         return [logical_id for logical_id, preference in self._resource_preferences.items() if preference.enabled]
 
-    def get_codedeploy_application(self):  # type: ignore[no-untyped-def]
+    def get_codedeploy_application(self) -> CodeDeployApplication:
         codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         codedeploy_application_resource.ComputePlatform = "Lambda"
         if self.needs_resource_condition():
@@ -139,7 +139,7 @@ class DeploymentPreferenceCollection(object):
             codedeploy_application_resource.set_resource_attribute("Condition", condition_name)
         return codedeploy_application_resource
 
-    def get_codedeploy_iam_role(self):  # type: ignore[no-untyped-def]
+    def get_codedeploy_iam_role(self) -> IAMRole:
         iam_role = IAMRole(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID)
         iam_role.AssumeRolePolicyDocument = {
             "Version": "2012-10-17",
@@ -184,7 +184,7 @@ class DeploymentPreferenceCollection(object):
         try:
             deployment_group.AlarmConfiguration = self._convert_alarms(deployment_preference.alarms)  # type: ignore[no-untyped-call]
         except ValueError as e:
-            raise InvalidResourceException(function_logical_id, str(e))
+            raise InvalidResourceException(function_logical_id, str(e)) from e
 
         deployment_group.ApplicationName = ref(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         deployment_group.AutoRollbackConfiguration = {
@@ -310,5 +310,5 @@ class DeploymentPreferenceCollection(object):
             return not self.__eq__(other)  # type: ignore[no-untyped-call]
         return NotImplemented
 
-    def __hash__(self):  # type: ignore[no-untyped-def]
+    def __hash__(self) -> int:
         return hash(tuple(sorted(self.__dict__.items())))

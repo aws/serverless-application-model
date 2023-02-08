@@ -5,7 +5,7 @@ from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemp
 from samtranslator.model.types import IS_STR
 
 
-class SamResource(object):
+class SamResource:
     """
     Class representing a SAM resource. It is designed to make minimal assumptions about the resource structure.
     Any mutating methods also touch only "Properties" and "Type" attributes of the resource. This allows compatibility
@@ -31,7 +31,7 @@ class SamResource(object):
         # Properties is *not* required. Ex: SimpleTable resource has no required properties
         self.properties = resource_dict.get("Properties", {})
 
-    def valid(self):  # type: ignore[no-untyped-def]
+    def valid(self) -> bool:
         """
         Checks if the resource data is valid
 
@@ -39,7 +39,7 @@ class SamResource(object):
         """
         # As long as the type is valid and type string.
         # validate the condition should be string
-
+        # TODO Refactor this file so that it has logical id, can use sam_expect here after that
         if self.condition:
 
             if not IS_STR(self.condition, should_raise=False):
@@ -59,11 +59,12 @@ class SamResource(object):
                     [InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")]
                 )
 
-        return SamResourceType.has_value(self.type)  # type: ignore[no-untyped-call]
+        # TODO: should we raise exception if `self.type` is not a string?
+        return isinstance(self.type, str) and SamResourceType.has_value(self.type)
 
     def to_dict(self) -> Dict[str, Any]:
 
-        if self.valid():  # type: ignore[no-untyped-call]
+        if self.valid():
             # Touch a resource dictionary ONLY if it is valid
             # Modify only Type & Properties section to preserve CloudFormation properties like DependsOn, Conditions etc
             self.resource_dict["Type"] = self.type
@@ -86,7 +87,7 @@ class SamResourceType(Enum):
     StateMachine = "AWS::Serverless::StateMachine"
 
     @classmethod
-    def has_value(cls, value):  # type: ignore[no-untyped-def]
+    def has_value(cls, value: str) -> bool:
         """
         Checks if the given value belongs to the Enum
 

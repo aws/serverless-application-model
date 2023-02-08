@@ -104,7 +104,7 @@ Outputs:
   ApiKeyId:
     Description: API Key ID
     Value:
-      Fn::GetAtt: MyFirstApiKey.APIKeyId
+      Ref: MyFirstApiKey
   ApiUrl:
     Description: API endpoint URL for Prod environment
     Value:

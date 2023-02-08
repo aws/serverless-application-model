@@ -4,7 +4,15 @@ from typing import Optional, Dict, Union, List
 
 from typing_extensions import Literal
 
-from samtranslator.schema.common import PassThrough, BaseModel, SamIntrinsicable, get_prop, DictStrAny, Ref
+from samtranslator.schema.common import (
+    PassThroughProp,
+    BaseModel,
+    SamIntrinsicable,
+    get_prop,
+    DictStrAny,
+    Ref,
+)
+from samtranslator.schema.aws_serverless_connector import EmbeddedConnector
 
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
@@ -77,7 +85,7 @@ class DeploymentPreference(BaseModel):
     Hooks: Optional[Hooks] = deploymentpreference("Hooks")
     PassthroughCondition: Optional[SamIntrinsicable[bool]] = deploymentpreference("PassthroughCondition")
     Role: Optional[SamIntrinsicable[str]] = deploymentpreference("Role")
-    TriggerConfigurations: Optional[PassThrough] = deploymentpreference("TriggerConfigurations")
+    TriggerConfigurations: Optional[PassThroughProp] = deploymentpreference("TriggerConfigurations")
     Type: Optional[SamIntrinsicable[str]] = deploymentpreference(
         "Type"
     )  # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field.
@@ -111,8 +119,8 @@ class EventInvokeConfig(BaseModel):
 
 class S3EventProperties(BaseModel):
     Bucket: SamIntrinsicable[str] = s3eventproperties("Bucket")
-    Events: PassThrough = s3eventproperties("Events")
-    Filter: Optional[PassThrough] = s3eventproperties("Filter")
+    Events: PassThroughProp = s3eventproperties("Events")
+    Filter: Optional[PassThroughProp] = s3eventproperties("Filter")
 
 
 class S3Event(BaseModel):
@@ -129,10 +137,10 @@ class SqsSubscription(BaseModel):
 
 
 class SNSEventProperties(BaseModel):
-    FilterPolicy: Optional[PassThrough] = snseventproperties("FilterPolicy")
-    Region: Optional[PassThrough] = snseventproperties("Region")
+    FilterPolicy: Optional[PassThroughProp] = snseventproperties("FilterPolicy")
+    Region: Optional[PassThroughProp] = snseventproperties("Region")
     SqsSubscription: Optional[Union[bool, SqsSubscription]] = snseventproperties("SqsSubscription")
-    Topic: PassThrough = snseventproperties("Topic")
+    Topic: PassThroughProp = snseventproperties("Topic")
 
 
 class SNSEvent(BaseModel):
@@ -142,24 +150,24 @@ class SNSEvent(BaseModel):
 
 class FunctionUrlConfig(BaseModel):
     AuthType: SamIntrinsicable[str] = functionurlconfig("AuthType")
-    Cors: Optional[PassThrough] = functionurlconfig("Cors")
+    Cors: Optional[PassThroughProp] = functionurlconfig("Cors")
 
 
 class KinesisEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough] = kinesiseventproperties("BatchSize")
-    BisectBatchOnFunctionError: Optional[PassThrough] = kinesiseventproperties("BisectBatchOnFunctionError")
-    DestinationConfig: Optional[PassThrough] = kinesiseventproperties("DestinationConfig")
-    Enabled: Optional[PassThrough] = kinesiseventproperties("Enabled")
-    FilterCriteria: Optional[PassThrough] = kinesiseventproperties("FilterCriteria")
-    FunctionResponseTypes: Optional[PassThrough] = kinesiseventproperties("FunctionResponseTypes")
-    MaximumBatchingWindowInSeconds: Optional[PassThrough] = kinesiseventproperties("MaximumBatchingWindowInSeconds")
-    MaximumRecordAgeInSeconds: Optional[PassThrough] = kinesiseventproperties("MaximumRecordAgeInSeconds")
-    MaximumRetryAttempts: Optional[PassThrough] = kinesiseventproperties("MaximumRetryAttempts")
-    ParallelizationFactor: Optional[PassThrough] = kinesiseventproperties("ParallelizationFactor")
-    StartingPosition: PassThrough = kinesiseventproperties("StartingPosition")
-    StartingPositionTimestamp: PassThrough  # TODO: add documentation
-    Stream: PassThrough = kinesiseventproperties("Stream")
-    TumblingWindowInSeconds: Optional[PassThrough] = kinesiseventproperties("TumblingWindowInSeconds")
+    BatchSize: Optional[PassThroughProp] = kinesiseventproperties("BatchSize")
+    BisectBatchOnFunctionError: Optional[PassThroughProp] = kinesiseventproperties("BisectBatchOnFunctionError")
+    DestinationConfig: Optional[PassThroughProp] = kinesiseventproperties("DestinationConfig")
+    Enabled: Optional[PassThroughProp] = kinesiseventproperties("Enabled")
+    FilterCriteria: Optional[PassThroughProp] = kinesiseventproperties("FilterCriteria")
+    FunctionResponseTypes: Optional[PassThroughProp] = kinesiseventproperties("FunctionResponseTypes")
+    MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = kinesiseventproperties("MaximumBatchingWindowInSeconds")
+    MaximumRecordAgeInSeconds: Optional[PassThroughProp] = kinesiseventproperties("MaximumRecordAgeInSeconds")
+    MaximumRetryAttempts: Optional[PassThroughProp] = kinesiseventproperties("MaximumRetryAttempts")
+    ParallelizationFactor: Optional[PassThroughProp] = kinesiseventproperties("ParallelizationFactor")
+    StartingPosition: Optional[PassThroughProp] = kinesiseventproperties("StartingPosition")
+    StartingPositionTimestamp: Optional[PassThroughProp] = kinesiseventproperties("StartingPositionTimestamp")
+    Stream: PassThroughProp = kinesiseventproperties("Stream")
+    TumblingWindowInSeconds: Optional[PassThroughProp] = kinesiseventproperties("TumblingWindowInSeconds")
 
 
 class KinesisEvent(BaseModel):
@@ -168,20 +176,22 @@ class KinesisEvent(BaseModel):
 
 
 class DynamoDBEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough] = dynamodbeventproperties("BatchSize")
-    BisectBatchOnFunctionError: Optional[PassThrough] = dynamodbeventproperties("BisectBatchOnFunctionError")
-    DestinationConfig: Optional[PassThrough] = dynamodbeventproperties("DestinationConfig")
-    Enabled: Optional[PassThrough] = dynamodbeventproperties("Enabled")
-    FilterCriteria: Optional[PassThrough] = dynamodbeventproperties("FilterCriteria")
-    FunctionResponseTypes: Optional[PassThrough] = dynamodbeventproperties("FunctionResponseTypes")
-    MaximumBatchingWindowInSeconds: Optional[PassThrough] = dynamodbeventproperties("MaximumBatchingWindowInSeconds")
-    MaximumRecordAgeInSeconds: Optional[PassThrough] = dynamodbeventproperties("MaximumRecordAgeInSeconds")
-    MaximumRetryAttempts: Optional[PassThrough] = dynamodbeventproperties("MaximumRetryAttempts")
-    ParallelizationFactor: Optional[PassThrough] = dynamodbeventproperties("ParallelizationFactor")
-    StartingPosition: PassThrough = dynamodbeventproperties("StartingPosition")
-    StartingPositionTimestamp: PassThrough  # TODO: add documentation
-    Stream: PassThrough = dynamodbeventproperties("Stream")
-    TumblingWindowInSeconds: Optional[PassThrough] = dynamodbeventproperties("TumblingWindowInSeconds")
+    BatchSize: Optional[PassThroughProp] = dynamodbeventproperties("BatchSize")
+    BisectBatchOnFunctionError: Optional[PassThroughProp] = dynamodbeventproperties("BisectBatchOnFunctionError")
+    DestinationConfig: Optional[PassThroughProp] = dynamodbeventproperties("DestinationConfig")
+    Enabled: Optional[PassThroughProp] = dynamodbeventproperties("Enabled")
+    FilterCriteria: Optional[PassThroughProp] = dynamodbeventproperties("FilterCriteria")
+    FunctionResponseTypes: Optional[PassThroughProp] = dynamodbeventproperties("FunctionResponseTypes")
+    MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = dynamodbeventproperties(
+        "MaximumBatchingWindowInSeconds"
+    )
+    MaximumRecordAgeInSeconds: Optional[PassThroughProp] = dynamodbeventproperties("MaximumRecordAgeInSeconds")
+    MaximumRetryAttempts: Optional[PassThroughProp] = dynamodbeventproperties("MaximumRetryAttempts")
+    ParallelizationFactor: Optional[PassThroughProp] = dynamodbeventproperties("ParallelizationFactor")
+    StartingPosition: Optional[PassThroughProp] = dynamodbeventproperties("StartingPosition")
+    StartingPositionTimestamp: Optional[PassThroughProp] = dynamodbeventproperties("StartingPositionTimestamp")
+    Stream: PassThroughProp = dynamodbeventproperties("Stream")
+    TumblingWindowInSeconds: Optional[PassThroughProp] = dynamodbeventproperties("TumblingWindowInSeconds")
 
 
 class DynamoDBEvent(BaseModel):
@@ -190,12 +200,12 @@ class DynamoDBEvent(BaseModel):
 
 
 class SQSEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough] = sqseventproperties("BatchSize")
-    Enabled: Optional[PassThrough] = sqseventproperties("Enabled")
-    FilterCriteria: Optional[PassThrough] = sqseventproperties("FilterCriteria")
-    MaximumBatchingWindowInSeconds: Optional[PassThrough] = sqseventproperties("MaximumBatchingWindowInSeconds")
-    Queue: PassThrough = sqseventproperties("Queue")
-    ScalingConfig: Optional[PassThrough]  # Update docs when live
+    BatchSize: Optional[PassThroughProp] = sqseventproperties("BatchSize")
+    Enabled: Optional[PassThroughProp] = sqseventproperties("Enabled")
+    FilterCriteria: Optional[PassThroughProp] = sqseventproperties("FilterCriteria")
+    MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = sqseventproperties("MaximumBatchingWindowInSeconds")
+    Queue: PassThroughProp = sqseventproperties("Queue")
+    ScalingConfig: Optional[PassThroughProp]  # Update docs when live
 
 
 class SQSEvent(BaseModel):
@@ -239,11 +249,11 @@ class ApiEvent(BaseModel):
 
 class CloudWatchEventProperties(BaseModel):
     Enabled: Optional[bool] = cloudwatcheventproperties("Enabled")
-    EventBusName: Optional[PassThrough] = cloudwatcheventproperties("EventBusName")
-    Input: Optional[PassThrough] = cloudwatcheventproperties("Input")
-    InputPath: Optional[PassThrough] = cloudwatcheventproperties("InputPath")
-    Pattern: Optional[PassThrough] = cloudwatcheventproperties("Pattern")
-    State: Optional[PassThrough] = cloudwatcheventproperties("State")
+    EventBusName: Optional[PassThroughProp] = cloudwatcheventproperties("EventBusName")
+    Input: Optional[PassThroughProp] = cloudwatcheventproperties("Input")
+    InputPath: Optional[PassThroughProp] = cloudwatcheventproperties("InputPath")
+    Pattern: Optional[PassThroughProp] = cloudwatcheventproperties("Pattern")
+    State: Optional[PassThroughProp] = cloudwatcheventproperties("State")
 
 
 class CloudWatchEvent(BaseModel):
@@ -252,20 +262,20 @@ class CloudWatchEvent(BaseModel):
 
 
 class DeadLetterConfig(BaseModel):
-    Arn: Optional[PassThrough] = deadletterconfig("Arn")
+    Arn: Optional[PassThroughProp] = deadletterconfig("Arn")
     QueueLogicalId: Optional[str] = deadletterconfig("QueueLogicalId")
     Type: Optional[Literal["SQS"]] = deadletterconfig("Type")
 
 
 class EventsScheduleProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig] = eventsscheduleproperties("DeadLetterConfig")
-    Description: Optional[PassThrough] = eventsscheduleproperties("Description")
+    Description: Optional[PassThroughProp] = eventsscheduleproperties("Description")
     Enabled: Optional[bool] = eventsscheduleproperties("Enabled")
-    Input: Optional[PassThrough] = eventsscheduleproperties("Input")
-    Name: Optional[PassThrough] = eventsscheduleproperties("Name")
-    RetryPolicy: Optional[PassThrough] = eventsscheduleproperties("RetryPolicy")
-    Schedule: Optional[PassThrough] = eventsscheduleproperties("Schedule")
-    State: Optional[PassThrough] = eventsscheduleproperties("State")
+    Input: Optional[PassThroughProp] = eventsscheduleproperties("Input")
+    Name: Optional[PassThroughProp] = eventsscheduleproperties("Name")
+    RetryPolicy: Optional[PassThroughProp] = eventsscheduleproperties("RetryPolicy")
+    Schedule: Optional[PassThroughProp] = eventsscheduleproperties("Schedule")
+    State: Optional[PassThroughProp] = eventsscheduleproperties("State")
 
 
 class ScheduleEvent(BaseModel):
@@ -274,16 +284,16 @@ class ScheduleEvent(BaseModel):
 
 
 class EventBridgeRuleTarget(BaseModel):
-    Id: PassThrough = eventbridgeruletarget("Id")
+    Id: PassThroughProp = eventbridgeruletarget("Id")
 
 
 class EventBridgeRuleEventProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig] = eventbridgeruleeventproperties("DeadLetterConfig")
-    EventBusName: Optional[PassThrough] = eventbridgeruleeventproperties("EventBusName")
-    Input: Optional[PassThrough] = eventbridgeruleeventproperties("Input")
-    InputPath: Optional[PassThrough] = eventbridgeruleeventproperties("InputPath")
-    Pattern: PassThrough = eventbridgeruleeventproperties("Pattern")
-    RetryPolicy: Optional[PassThrough] = eventbridgeruleeventproperties("RetryPolicy")
+    EventBusName: Optional[PassThroughProp] = eventbridgeruleeventproperties("EventBusName")
+    Input: Optional[PassThroughProp] = eventbridgeruleeventproperties("Input")
+    InputPath: Optional[PassThroughProp] = eventbridgeruleeventproperties("InputPath")
+    Pattern: PassThroughProp = eventbridgeruleeventproperties("Pattern")
+    RetryPolicy: Optional[PassThroughProp] = eventbridgeruleeventproperties("RetryPolicy")
     Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
 
 
@@ -293,8 +303,8 @@ class EventBridgeRuleEvent(BaseModel):
 
 
 class CloudWatchLogsEventProperties(BaseModel):
-    FilterPattern: PassThrough = cloudwatchlogseventproperties("FilterPattern")
-    LogGroupName: PassThrough = cloudwatchlogseventproperties("LogGroupName")
+    FilterPattern: PassThroughProp = cloudwatchlogseventproperties("FilterPattern")
+    LogGroupName: PassThroughProp = cloudwatchlogseventproperties("LogGroupName")
 
 
 class CloudWatchLogsEvent(BaseModel):
@@ -303,8 +313,8 @@ class CloudWatchLogsEvent(BaseModel):
 
 
 class IoTRuleEventProperties(BaseModel):
-    AwsIotSqlVersion: Optional[PassThrough] = iotruleeventproperties("AwsIotSqlVersion")
-    Sql: PassThrough = iotruleeventproperties("Sql")
+    AwsIotSqlVersion: Optional[PassThroughProp] = iotruleeventproperties("AwsIotSqlVersion")
+    Sql: PassThroughProp = iotruleeventproperties("Sql")
 
 
 class IoTRuleEvent(BaseModel):
@@ -322,7 +332,7 @@ class AlexaSkillEvent(BaseModel):
 
 
 class CognitoEventProperties(BaseModel):
-    Trigger: PassThrough = cognitoeventproperties("Trigger")
+    Trigger: PassThroughProp = cognitoeventproperties("Trigger")
     UserPool: SamIntrinsicable[str] = cognitoeventproperties("UserPool")
 
 
@@ -342,7 +352,7 @@ class HttpApiEventProperties(BaseModel):
     Method: Optional[str] = httpapieventproperties("Method")
     Path: Optional[str] = httpapieventproperties("Path")
     PayloadFormatVersion: Optional[SamIntrinsicable[str]] = httpapieventproperties("PayloadFormatVersion")
-    RouteSettings: Optional[PassThrough] = httpapieventproperties("RouteSettings")
+    RouteSettings: Optional[PassThroughProp] = httpapieventproperties("RouteSettings")
     TimeoutInMillis: Optional[SamIntrinsicable[int]] = httpapieventproperties("TimeoutInMillis")
 
 
@@ -352,14 +362,14 @@ class HttpApiEvent(BaseModel):
 
 
 class MSKEventProperties(BaseModel):
-    ConsumerGroupId: Optional[PassThrough] = mskeventproperties("ConsumerGroupId")
-    FilterCriteria: Optional[PassThrough] = mskeventproperties("FilterCriteria")
-    MaximumBatchingWindowInSeconds: Optional[PassThrough] = mskeventproperties("MaximumBatchingWindowInSeconds")
-    StartingPosition: PassThrough = mskeventproperties("StartingPosition")
-    StartingPositionTimestamp: PassThrough  # TODO: add documentation
-    Stream: PassThrough = mskeventproperties("Stream")
-    Topics: PassThrough = mskeventproperties("Topics")
-    SourceAccessConfigurations: Optional[PassThrough]  # TODO: update docs when live
+    ConsumerGroupId: Optional[PassThroughProp] = mskeventproperties("ConsumerGroupId")
+    FilterCriteria: Optional[PassThroughProp] = mskeventproperties("FilterCriteria")
+    MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumBatchingWindowInSeconds")
+    StartingPosition: Optional[PassThroughProp] = mskeventproperties("StartingPosition")
+    StartingPositionTimestamp: Optional[PassThroughProp] = mskeventproperties("StartingPositionTimestamp")
+    Stream: PassThroughProp = mskeventproperties("Stream")
+    Topics: PassThroughProp = mskeventproperties("Topics")
+    SourceAccessConfigurations: Optional[PassThroughProp]  # TODO: update docs when live
 
 
 class MSKEvent(BaseModel):
@@ -368,14 +378,14 @@ class MSKEvent(BaseModel):
 
 
 class MQEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough] = mqeventproperties("BatchSize")
-    Broker: PassThrough = mqeventproperties("Broker")
-    Enabled: Optional[PassThrough] = mqeventproperties("Enabled")
-    FilterCriteria: Optional[PassThrough] = mqeventproperties("FilterCriteria")
-    MaximumBatchingWindowInSeconds: Optional[PassThrough] = mqeventproperties("MaximumBatchingWindowInSeconds")
-    Queues: PassThrough = mqeventproperties("Queues")
+    BatchSize: Optional[PassThroughProp] = mqeventproperties("BatchSize")
+    Broker: PassThroughProp = mqeventproperties("Broker")
+    Enabled: Optional[PassThroughProp] = mqeventproperties("Enabled")
+    FilterCriteria: Optional[PassThroughProp] = mqeventproperties("FilterCriteria")
+    MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mqeventproperties("MaximumBatchingWindowInSeconds")
+    Queues: PassThroughProp = mqeventproperties("Queues")
     SecretsManagerKmsKeyId: Optional[str] = mqeventproperties("SecretsManagerKmsKeyId")
-    SourceAccessConfigurations: PassThrough = mqeventproperties("SourceAccessConfigurations")
+    SourceAccessConfigurations: PassThroughProp = mqeventproperties("SourceAccessConfigurations")
 
 
 class MQEvent(BaseModel):
@@ -384,15 +394,15 @@ class MQEvent(BaseModel):
 
 
 class SelfManagedKafkaEventProperties(BaseModel):
-    BatchSize: Optional[PassThrough] = selfmanagedkafkaeventproperties("BatchSize")
-    ConsumerGroupId: Optional[PassThrough] = selfmanagedkafkaeventproperties("ConsumerGroupId")
-    Enabled: Optional[PassThrough] = selfmanagedkafkaeventproperties("Enabled")
-    FilterCriteria: Optional[PassThrough] = selfmanagedkafkaeventproperties("FilterCriteria")
+    BatchSize: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("BatchSize")
+    ConsumerGroupId: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("ConsumerGroupId")
+    Enabled: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("Enabled")
+    FilterCriteria: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("FilterCriteria")
     KafkaBootstrapServers: Optional[List[SamIntrinsicable[str]]] = selfmanagedkafkaeventproperties(
         "KafkaBootstrapServers"
     )
-    SourceAccessConfigurations: PassThrough = selfmanagedkafkaeventproperties("SourceAccessConfigurations")
-    Topics: PassThrough = selfmanagedkafkaeventproperties("Topics")
+    SourceAccessConfigurations: PassThroughProp = selfmanagedkafkaeventproperties("SourceAccessConfigurations")
+    Topics: PassThroughProp = selfmanagedkafkaeventproperties("Topics")
 
 
 class SelfManagedKafkaEvent(BaseModel):
@@ -403,20 +413,20 @@ class SelfManagedKafkaEvent(BaseModel):
 # TODO: Same as ScheduleV2EventProperties in state machine?
 class ScheduleV2EventProperties(BaseModel):
     DeadLetterConfig: Optional[DeadLetterConfig] = schedulev2eventproperties("DeadLetterConfig")
-    Description: Optional[PassThrough] = schedulev2eventproperties("Description")
-    EndDate: Optional[PassThrough] = schedulev2eventproperties("EndDate")
-    FlexibleTimeWindow: Optional[PassThrough] = schedulev2eventproperties("FlexibleTimeWindow")
-    GroupName: Optional[PassThrough] = schedulev2eventproperties("GroupName")
-    Input: Optional[PassThrough] = schedulev2eventproperties("Input")
-    KmsKeyArn: Optional[PassThrough] = schedulev2eventproperties("KmsKeyArn")
-    Name: Optional[PassThrough] = schedulev2eventproperties("Name")
-    PermissionsBoundary: Optional[PassThrough] = schedulev2eventproperties("PermissionsBoundary")
-    RetryPolicy: Optional[PassThrough] = schedulev2eventproperties("RetryPolicy")
-    RoleArn: Optional[PassThrough]  # TODO: Add to docs
-    ScheduleExpression: Optional[PassThrough] = schedulev2eventproperties("ScheduleExpression")
-    ScheduleExpressionTimezone: Optional[PassThrough] = schedulev2eventproperties("ScheduleExpressionTimezone")
-    StartDate: Optional[PassThrough] = schedulev2eventproperties("StartDate")
-    State: Optional[PassThrough] = schedulev2eventproperties("State")
+    Description: Optional[PassThroughProp] = schedulev2eventproperties("Description")
+    EndDate: Optional[PassThroughProp] = schedulev2eventproperties("EndDate")
+    FlexibleTimeWindow: Optional[PassThroughProp] = schedulev2eventproperties("FlexibleTimeWindow")
+    GroupName: Optional[PassThroughProp] = schedulev2eventproperties("GroupName")
+    Input: Optional[PassThroughProp] = schedulev2eventproperties("Input")
+    KmsKeyArn: Optional[PassThroughProp] = schedulev2eventproperties("KmsKeyArn")
+    Name: Optional[PassThroughProp] = schedulev2eventproperties("Name")
+    PermissionsBoundary: Optional[PassThroughProp] = schedulev2eventproperties("PermissionsBoundary")
+    RetryPolicy: Optional[PassThroughProp] = schedulev2eventproperties("RetryPolicy")
+    RoleArn: Optional[PassThroughProp] = schedulev2eventproperties("RoleArn")
+    ScheduleExpression: Optional[PassThroughProp] = schedulev2eventproperties("ScheduleExpression")
+    ScheduleExpressionTimezone: Optional[PassThroughProp] = schedulev2eventproperties("ScheduleExpressionTimezone")
+    StartDate: Optional[PassThroughProp] = schedulev2eventproperties("StartDate")
+    State: Optional[PassThroughProp] = schedulev2eventproperties("State")
 
 
 class ScheduleV2Event(BaseModel):
@@ -424,29 +434,29 @@ class ScheduleV2Event(BaseModel):
     Properties: ScheduleV2EventProperties = event("Properties")
 
 
-Handler = Optional[PassThrough]
-Runtime = Optional[PassThrough]
+Handler = Optional[PassThroughProp]
+Runtime = Optional[PassThroughProp]
 CodeUriType = Optional[Union[str, CodeUri]]
 DeadLetterQueueType = Optional[SamIntrinsicable[DeadLetterQueue]]
-Description = Optional[PassThrough]
-MemorySize = Optional[PassThrough]
-Timeout = Optional[PassThrough]
-VpcConfig = Optional[PassThrough]
-Environment = Optional[PassThrough]
+Description = Optional[PassThroughProp]
+MemorySize = Optional[PassThroughProp]
+Timeout = Optional[PassThroughProp]
+VpcConfig = Optional[PassThroughProp]
+Environment = Optional[PassThroughProp]
 Tags = Optional[DictStrAny]
 Tracing = Optional[SamIntrinsicable[Literal["Active", "PassThrough"]]]
-KmsKeyArn = Optional[PassThrough]
-Layers = Optional[PassThrough]
+KmsKeyArn = Optional[PassThroughProp]
+Layers = Optional[PassThroughProp]
 AutoPublishAlias = Optional[SamIntrinsicable[str]]
-RolePath = Optional[PassThrough]  # TODO: update docs when live
-PermissionsBoundary = Optional[PassThrough]
-ReservedConcurrentExecutions = Optional[PassThrough]
-ProvisionedConcurrencyConfig = Optional[PassThrough]
+RolePath = Optional[PassThroughProp]
+PermissionsBoundary = Optional[PassThroughProp]
+ReservedConcurrentExecutions = Optional[PassThroughProp]
+ProvisionedConcurrencyConfig = Optional[PassThroughProp]
 AssumeRolePolicyDocument = Optional[DictStrAny]
-Architectures = Optional[PassThrough]
-EphemeralStorage = Optional[PassThrough]
-SnapStart = Optional[PassThrough]  # TODO: check the type
-RuntimeManagementConfig = Optional[PassThrough]  # TODO: check the type
+Architectures = Optional[PassThroughProp]
+EphemeralStorage = Optional[PassThroughProp]
+SnapStart = Optional[PassThroughProp]  # TODO: check the type
+RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
 
 
 class Properties(BaseModel):
@@ -487,30 +497,30 @@ class Properties(BaseModel):
             ],
         ]
     ] = prop("Events")
-    FileSystemConfigs: Optional[PassThrough] = prop("FileSystemConfigs")
-    FunctionName: Optional[PassThrough] = prop("FunctionName")
+    FileSystemConfigs: Optional[PassThroughProp] = prop("FileSystemConfigs")
+    FunctionName: Optional[PassThroughProp] = prop("FunctionName")
     FunctionUrlConfig: Optional[FunctionUrlConfig] = prop("FunctionUrlConfig")
     Handler: Optional[Handler] = prop("Handler")
-    ImageConfig: Optional[PassThrough] = prop("ImageConfig")
-    ImageUri: Optional[PassThrough] = prop("ImageUri")
-    InlineCode: Optional[PassThrough] = prop("InlineCode")
+    ImageConfig: Optional[PassThroughProp] = prop("ImageConfig")
+    ImageUri: Optional[PassThroughProp] = prop("ImageUri")
+    InlineCode: Optional[PassThroughProp] = prop("InlineCode")
     KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
     Layers: Optional[Layers] = prop("Layers")
     MemorySize: Optional[MemorySize] = prop("MemorySize")
-    PackageType: Optional[PassThrough] = prop("PackageType")
-    RolePath: Optional[RolePath]  # TODO: Add to docs
+    PackageType: Optional[PassThroughProp] = prop("PackageType")
+    RolePath: Optional[RolePath] = prop("RolePath")
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = prop("Policies")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
     Runtime: Optional[Runtime] = prop("Runtime")
-    SnapStart: Optional[SnapStart]  # TODO: add prop and types
+    SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig]  # TODO: add prop and types
     Tags: Optional[Tags] = prop("Tags")
     Timeout: Optional[Timeout] = prop("Timeout")
     Tracing: Optional[Tracing] = prop("Tracing")
-    VersionDescription: Optional[PassThrough] = prop("VersionDescription")
+    VersionDescription: Optional[PassThroughProp] = prop("VersionDescription")
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
 
 
@@ -530,7 +540,7 @@ class Globals(BaseModel):
     Layers: Optional[Layers] = prop("Layers")
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
-    RolePath: Optional[RolePath]
+    RolePath: Optional[RolePath] = prop("RolePath")
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
@@ -538,15 +548,16 @@ class Globals(BaseModel):
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Architectures: Optional[Architectures] = prop("Architectures")
     EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
-    SnapStart: Optional[SnapStart]  # TODO: add prop
+    SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig]  # TODO: add prop
 
 
 class Resource(BaseModel):
     Type: Literal["AWS::Serverless::Function"]
     Properties: Optional[Properties]
-    DeletionPolicy: Optional[PassThrough]
-    UpdateReplacePolicy: Optional[PassThrough]
-    Condition: Optional[PassThrough]
-    DependsOn: Optional[PassThrough]
-    Metadata: Optional[PassThrough]
+    Connectors: Optional[Dict[str, EmbeddedConnector]]
+    DeletionPolicy: Optional[PassThroughProp]
+    UpdateReplacePolicy: Optional[PassThroughProp]
+    Condition: Optional[PassThroughProp]
+    DependsOn: Optional[PassThroughProp]
+    Metadata: Optional[PassThroughProp]
