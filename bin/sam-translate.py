@@ -15,6 +15,9 @@ from pathlib import Path
 
 import boto3
 
+my_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, my_path + "/..")
+
 from samtranslator.model.exceptions import InvalidDocumentException
 from samtranslator.public.translator import ManagedPolicyLoader
 from samtranslator.translator.transform import transform
