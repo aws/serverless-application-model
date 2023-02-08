@@ -7,6 +7,7 @@ Known limitations: cannot transform CodeUri pointing at local directory.
 import argparse
 import json
 import logging
+import os
 import platform
 import subprocess
 import sys
