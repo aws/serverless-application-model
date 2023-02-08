@@ -135,7 +135,7 @@ class _BreakingChanges(NamedTuple):
                 print(f"- {name}: `{before}` -> `{after}`")
 
 
-def _only_new_optional_arguments_or_existing_arguments_optionalized(
+def _only_new_optional_arguments_or_existing_arguments_optionalized_or_var_arguments(
     original_arguments: List[Dict[str, Any]], arguments: List[Dict[str, Any]]
 ) -> bool:
     if len(original_arguments) > len(arguments):
@@ -152,18 +152,27 @@ def _only_new_optional_arguments_or_existing_arguments_optionalized(
             continue
         return False
     # it is an optional argument when it has a default value:
-    return all(["default" in argument for argument in arguments[len(original_arguments) :]])
+    return all(
+        [
+            "default" in argument or argument["kind"] in ("VAR_KEYWORD", "VAR_POSITIONAL")
+            for argument in arguments[len(original_arguments) :]
+        ]
+    )
 
 
 def _is_compatible(original_arguments: List[Dict[str, Any]], arguments: List[Dict[str, Any]]) -> bool:
     """
     If there is an argument change, it is compatible only when
     - new optional arguments are added or existing arguments become optional.
+    - var arguments (*args, **kwargs) are added
     - self is removed (method -> staticmethod).
-    - both of them combined
+    - combination of above
     """
-    if original_arguments == arguments or _only_new_optional_arguments_or_existing_arguments_optionalized(
-        original_arguments, arguments
+    if (
+        original_arguments == arguments
+        or _only_new_optional_arguments_or_existing_arguments_optionalized_or_var_arguments(
+            original_arguments, arguments
+        )
     ):
         return True
     if original_arguments and original_arguments[0] == _ARGUMENT_SELF:

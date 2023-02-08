@@ -73,6 +73,22 @@ class TestDetectBreakingChanges(TestCase):
             _BreakingChanges(deleted_variables=[], deleted_routines=[], incompatible_routines=[]),
         )
 
+    def test_routines_still_compatible_when_adding_var_arguments(self):
+        self.assertEqual(
+            _detect_breaking_changes(
+                {"samtranslator.model.do_something": []},
+                [],
+                {
+                    "samtranslator.model.do_something": [
+                        {"name": "args", "kind": "VAR_POSITIONAL"},
+                        {"name": "kwargs", "kind": "VAR_KEYWORD"},
+                    ]
+                },
+                [],
+            ),
+            _BreakingChanges(deleted_variables=[], deleted_routines=[], incompatible_routines=[]),
+        )
+
     def test_routines_still_compatible_when_converting_from_method_to_staticmethod(self):
         self.assertEqual(
             _detect_breaking_changes(
