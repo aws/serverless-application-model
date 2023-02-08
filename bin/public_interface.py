@@ -88,6 +88,7 @@ def main() -> None:
 
     subparsers = parser.add_subparsers(dest="command")
     extract = subparsers.add_parser("extract", help="Extract public interfaces into a JSON file")
+    extract.add_argument("--module", help="The module to extract public interfaces", type=str, default="samtranslator")
     extract.add_argument(
         "output_file",
         help="The path to output JSON file",
@@ -97,7 +98,7 @@ def main() -> None:
 
     if args.command == "extract":
         scanner = InterfaceScanner()
-        scanner.scan_interfaces_recursively("samtranslator")
+        scanner.scan_interfaces_recursively(args.module)
         _save(scanner.signatures, scanner.constants, args.output_file)
     # TODO: handle compare
     else:
