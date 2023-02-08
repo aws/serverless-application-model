@@ -1609,6 +1609,36 @@
               ]
             },
             "PolicyName": "KitchenSinkFunctionRolePolicy59"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ssm:DescribeParameters"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                },
+                {
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:GetParameter",
+                    "ssm:GetParametersByPath"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${parameterName}",
+                      {
+                        "parameterName": "/name"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "KitchenSinkFunctionRolePolicy60"
           }
         ],
         "Tags": [

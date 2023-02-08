@@ -2,11 +2,12 @@
 Method decorator for execution latency collection
 """
 import functools
+import logging
 from datetime import datetime
+from typing import Any, Callable, Optional, Union
+
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 from samtranslator.model import Resource
-import logging
-from typing import Any, Callable, Optional, Union
 
 LOG = logging.getLogger(__name__)
 

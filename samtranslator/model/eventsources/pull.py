@@ -2,16 +2,14 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Optional
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import ResourceMacro, PropertyType, PassThroughProperty
+from samtranslator.model import PassThroughProperty, PropertyType, ResourceMacro
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import IS_DICT, is_type, IS_STR
-from samtranslator.schema.common import PassThrough
-from samtranslator.model.intrinsics import is_intrinsic
-
-from samtranslator.model.lambda_ import LambdaEventSourceMapping
-from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRolePolicies
+from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.lambda_ import LambdaEventSourceMapping
+from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type
+from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect
 
@@ -205,17 +203,19 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                 if role.Policies is None:
                     role.Policies = []
                 for policy in policy_statements:
-                    if policy not in role.Policies:
-                        if not policy.get("PolicyDocument") in [d["PolicyDocument"] for d in role.Policies]:
-                            role.Policies.append(policy)
+                    if policy not in role.Policies and policy.get("PolicyDocument") not in [
+                        d["PolicyDocument"] for d in role.Policies
+                    ]:
+                        role.Policies.append(policy)
         # add SQS or SNS policy only if role is present in kwargs
         if role is not None and destination_config_policy is not None and destination_config_policy:
             if role.Policies is None:
                 role.Policies = []
                 role.Policies.append(destination_config_policy)
             if role.Policies and destination_config_policy not in role.Policies:
-                # do not add the  policy if the same policy document is already present
-                if not destination_config_policy.get("PolicyDocument") in [d["PolicyDocument"] for d in role.Policies]:
+                policy_document = destination_config_policy.get("PolicyDocument")
+                # do not add the policy if the same policy document is already present
+                if policy_document not in [d["PolicyDocument"] for d in role.Policies]:
                     role.Policies.append(destination_config_policy)
 
     def _validate_filter_criteria(self) -> None:
@@ -503,15 +503,13 @@ class SelfManagedKafka(PullEventSource):
             kms_policy = self.get_kms_policy(self.SecretsManagerKmsKeyId)
             statements.append(kms_policy)
 
-        document = {
+        return {
             "PolicyDocument": {
                 "Statement": statements,
                 "Version": "2012-10-17",
             },
             "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
         }
-
-        return document
 
     def get_secret_key(self, source_access_configurations: List[Any]):  # type: ignore[no-untyped-def]
         authentication_uri = None

@@ -1,0 +1,13 @@
+# AutoPublishCodeSha256 should take precedence when making the hash for the logical id of the Lambda version even if
+# AutoPublishAliasAllProperties is set to true
+Resources:
+  MinimalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      AutoPublishAliasAllProperties: true
+      AutoPublishCodeSha256: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+      VersionDescription: sam-testing

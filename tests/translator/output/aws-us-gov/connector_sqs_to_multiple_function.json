@@ -1,0 +1,332 @@
+{
+  "Resources": {
+    "ConnectorPolicyDestination0": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "Connector": {
+            "Destination": {
+              "Type": "AWS::Serverless::Function"
+            },
+            "Source": {
+              "Type": "AWS::SQS::Queue"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:DeleteMessage"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "Queue",
+                    "Arn"
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "Queue",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "InvokedFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "ConnectorPolicyDestination1": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "Connector": {
+            "Destination": {
+              "Type": "AWS::Serverless::Function"
+            },
+            "Source": {
+              "Type": "AWS::SQS::Queue"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:DeleteMessage"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "Queue",
+                    "Arn"
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "Queue",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "InvokedFunction2Role"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "InvokedFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  const sqs = new AWS.SQS();\n  await sqs.sendMessage({\n    QueueUrl: process.env.VERIFICATION_QUEUE_URL,\n    MessageBody: \"test\"\n  }).promise();\n};\n"
+        },
+        "Environment": {
+          "Variables": {
+            "VERIFICATION_QUEUE_URL": {
+              "Ref": "VerificationQueue"
+            }
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "InvokedFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "InvokedFunction2": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  const sqs = new AWS.SQS();\n  await sqs.sendMessage({\n    QueueUrl: process.env.VERIFICATION_QUEUE_URL,\n    MessageBody: \"test\"\n  }).promise();\n};\n"
+        },
+        "Environment": {
+          "Variables": {
+            "VERIFICATION_QUEUE_URL": {
+              "Ref": "VerificationQueue"
+            }
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "InvokedFunction2Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "InvokedFunction2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sqs:SendMessage*"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                      {
+                        "queueName": {
+                          "Fn::GetAtt": [
+                            "VerificationQueue",
+                            "QueueName"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "InvokedFunction2RolePolicy0"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "InvokedFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sqs:SendMessage*"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                      {
+                        "queueName": {
+                          "Fn::GetAtt": [
+                            "VerificationQueue",
+                            "QueueName"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "InvokedFunctionRolePolicy0"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "Queue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "SQSEventSourceMapping": {
+      "DependsOn": [
+        "ConnectorPolicyDestination0"
+      ],
+      "Properties": {
+        "BatchSize": 10,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "Queue",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "InvokedFunction"
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "SQSEventSourceMapping2": {
+      "DependsOn": [
+        "ConnectorPolicyDestination1"
+      ],
+      "Properties": {
+        "BatchSize": 10,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "Queue",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "InvokedFunction2"
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "VerificationQueue": {
+      "Type": "AWS::SQS::Queue"
+    }
+  }
+}

@@ -4,5 +4,5 @@
 
 __all__ = ["Translator", "ManagedPolicyLoader"]
 
-from samtranslator.translator.translator import Translator
 from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
+from samtranslator.translator.translator import Translator

@@ -1,17 +1,16 @@
 import copy
+import json
 import re
-from typing import Callable, Any, Dict, Optional, TypeVar
+from typing import Any, Callable, Dict, Optional, TypeVar
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Authorizer
-from samtranslator.model.intrinsics import ref, make_conditional, is_intrinsic
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.model.intrinsics import is_intrinsic, make_conditional, ref
 from samtranslator.open_api.base_editor import BaseEditor
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.utils.types import Intrinsicable
-from samtranslator.utils.utils import dict_deep_get, InvalidValueType
-import json
-
+from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 
 T = TypeVar("T")
 
@@ -549,11 +548,8 @@ class OpenApiEditor(BaseEditor):
         :return: True, if data is valid OpenApi
         """
 
-        if bool(data) and isinstance(data, dict) and isinstance(data.get("paths"), dict):
-            if bool(data.get("openapi")):
-                return OpenApiEditor.safe_compare_regex_with_string(
-                    OpenApiEditor._OPENAPI_VERSION_3_REGEX, data["openapi"]
-                )
+        if bool(data) and isinstance(data, dict) and isinstance(data.get("paths"), dict) and bool(data.get("openapi")):
+            return OpenApiEditor.safe_compare_regex_with_string(OpenApiEditor._OPENAPI_VERSION_3_REGEX, data["openapi"])
         return False
 
     @staticmethod

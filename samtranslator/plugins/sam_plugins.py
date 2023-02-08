@@ -1,6 +1,7 @@
 import logging
-from typing import Optional, Any, List, Union
-from samtranslator.model.exceptions import InvalidResourceException, InvalidDocumentException, InvalidTemplateException
+from typing import Any, List, Optional, Union
+
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, InvalidTemplateException
 from samtranslator.plugins import BasePlugin, LifeCycleEvents
 
 LOG = logging.getLogger(__name__)

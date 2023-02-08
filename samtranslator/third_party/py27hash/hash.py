@@ -29,9 +29,11 @@ class Hash:
     Various hashing methods using Python 2.7's algorithms
     """
 
+    _FLOAT_ZERO = 0.0
+
     @staticmethod
     @lru_cache(maxsize=2048)
-    def hash(value):  # type: ignore[no-untyped-def]
+    def hash(value):  # type: ignore[no-untyped-def]  # noqa: builtin-attribute-shadowing
         """
         Returns a Python 2.7 hash for a value.
 
@@ -104,7 +106,7 @@ class Hash:
         """
 
         fpart = math.modf(value)
-        if fpart[0] == 0.0:
+        if fpart[0] == Hash._FLOAT_ZERO:
             return hash(int(fpart[1]))
 
         v, e = math.frexp(value)

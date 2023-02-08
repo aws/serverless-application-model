@@ -1,16 +1,14 @@
 """
 """
 
-import ctypes
 import copy
+import ctypes
 import json
 import logging
-
 from typing import Any, Dict, Iterator, List, cast
 
 from samtranslator.parser.parser import Parser
 from samtranslator.third_party.py27hash.hash import Hash
-
 
 LOG = logging.getLogger(__name__)
 # Constants based on Python2.7 dictionary
@@ -165,6 +163,7 @@ class Py27Keys:
     # marker for deleted keys
     # we use DUMMY for a dummy key, force it to be treated as a str to avoid mypy unhappy
     DUMMY: str = cast(str, ["dummy"])
+    _LARGE_DICT_SIZE_THRESHOLD = 50000
 
     def __init__(self) -> None:
         super().__init__()
@@ -178,7 +177,7 @@ class Py27Keys:
         # add keys in the py2 order -- we can't do a straigh-up deep copy of keyorder because
         # in py2 copy.deepcopy of a dict may result in reordering of the keys
         ret = Py27Keys()
-        for k in self.keys():
+        for k in self:
             if k is self.DUMMY:
                 continue
             ret.add(copy.deepcopy(k, memo))  # type: ignore[no-untyped-call]
@@ -241,10 +240,9 @@ class Py27Keys:
     def remove(self, key):  # type: ignore[no-untyped-def]
         """Removes key"""
         i = self._get_key_idx(key)  # type: ignore[no-untyped-call]
-        if i in self.keyorder:
-            if self.keyorder[i] is not self.DUMMY:
-                self.keyorder[i] = self.DUMMY
-                self.size -= 1
+        if i in self.keyorder and self.keyorder[i] is not self.DUMMY:
+            self.keyorder[i] = self.DUMMY
+            self.size -= 1
 
     def add(self, key):  # type: ignore[no-untyped-def]
         """Adds key"""
@@ -264,7 +262,7 @@ class Py27Keys:
         # Resize if 2/3 capacity
         if self.size > start_size and self.fill * 3 >= ((self.mask + 1) * 2):
             # Python2 dict increases size by a factor of 4 for small dict, and 2 for large dict
-            self._resize(self.size * (2 if self.size > 50000 else 4))  # type: ignore[no-untyped-call]
+            self._resize(self.size * (2 if self.size > self._LARGE_DICT_SIZE_THRESHOLD else 4))  # type: ignore[no-untyped-call]
 
     def keys(self) -> List[str]:
         """Return keys in Python2 order"""
@@ -374,7 +372,6 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         """
         Method necessary to fully pickle Python 3 subclassed dict objects with attribute fields.
         """
-        # pylint: disable = W0235
         return super().__reduce__()
 
     def __setitem__(self, key, value):  # type: ignore[no-untyped-def]
@@ -552,8 +549,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         list
             list of values
         """
-        # pylint: disable=consider-using-dict-items
-        return [self[k] for k in self.keys()]  # type: ignore[no-untyped-call]
+        return [self[k] for k in self]
 
     def items(self):  # type: ignore[no-untyped-def]
         """
@@ -564,8 +560,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         list
             list of items
         """
-        # pylint: disable=consider-using-dict-items
-        return [(k, self[k]) for k in self.keys()]  # type: ignore[no-untyped-call]
+        return [(k, self[k]) for k in self]
 
     def setdefault(self, key, default):  # type: ignore[no-untyped-def]
         """

@@ -1,87 +1,91 @@
 ﻿""" SAM macro definitions """
 import copy
-from typing import Any, cast, Dict, List, Optional, Tuple, Union, Callable
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
+from contextlib import suppress
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
+
+import samtranslator.model.eventsources
+import samtranslator.model.eventsources.cloudwatchlogs
+import samtranslator.model.eventsources.pull
+import samtranslator.model.eventsources.push
+import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
+from samtranslator.metrics.method_decorator import cw_timer
+from samtranslator.model import (
+    PassThroughProperty,
+    Property,
+    PropertyType,
+    Resource,
+    ResourceResolver,
+    ResourceTypeResolver,
+    SamResourceMacro,
+)
+from samtranslator.model.apigateway import (
+    ApiGatewayApiKey,
+    ApiGatewayDeployment,
+    ApiGatewayDomainName,
+    ApiGatewayStage,
+    ApiGatewayUsagePlan,
+    ApiGatewayUsagePlanKey,
+)
+from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
+from samtranslator.model.architecture import ARM64, X86_64
+from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
-    ConnectorResourceReference,
     ConnectorResourceError,
+    ConnectorResourceReference,
     add_depends_on,
-    replace_depends_on_logical_id,
     get_event_source_mappings,
     get_resource_reference,
+    replace_depends_on_logical_id,
 )
 from samtranslator.model.connector_profiles.profile import (
     ConnectorProfile,
-    profile_replace,
     get_profile,
+    profile_replace,
     verify_profile_variables_replaced,
 )
-
-import samtranslator.model.eventsources
-import samtranslator.model.eventsources.pull
-import samtranslator.model.eventsources.push
-import samtranslator.model.eventsources.cloudwatchlogs
-import samtranslator.model.eventsources.scheduler
-from .api.api_generator import ApiGenerator
-from .api.http_api_generator import HttpApiGenerator
-from .packagetype import ZIP, IMAGE
-from .s3_utils.uri_parser import construct_s3_location_object, construct_image_code_object
-from .tags.resource_tagging import get_tag_list
-from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import (
-    ResourceResolver,
-    PassThroughProperty,
-    PropertyType,
-    SamResourceMacro,
-    Resource,
-    ResourceTypeResolver,
-)
-from samtranslator.model.apigateway import (
-    ApiGatewayDeployment,
-    ApiGatewayStage,
-    ApiGatewayDomainName,
-    ApiGatewayUsagePlan,
-    ApiGatewayUsagePlanKey,
-    ApiGatewayApiKey,
-)
-from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2DomainName
-from samtranslator.model.architecture import ARM64, X86_64
-from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
-from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
-from samtranslator.model.resource_policies import ResourcePolicies
-from samtranslator.model.iam import IAMManagedPolicy, IAMRolePolicies, IAMRole
-from samtranslator.model.lambda_ import (
-    LambdaFunction,
-    LambdaVersion,
-    LambdaAlias,
-    LambdaLayerVersion,
-    LambdaEventInvokeConfig,
-    LambdaUrl,
-    LambdaPermission,
-)
-from samtranslator.model.types import dict_of, IS_STR, is_type, IS_DICT, list_of, one_of, any_type
-from samtranslator.translator import logical_id_generator
-from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.model.iam import IAMManagedPolicy, IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import (
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
-    ref,
-    make_not_conditional,
-    make_conditional,
     make_and_condition,
+    make_conditional,
+    make_not_conditional,
+    ref,
 )
-from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy
-from samtranslator.model.sns import SNSTopic, SNSTopicPolicy
-from samtranslator.model.stepfunctions import StateMachineGenerator
+from samtranslator.model.lambda_ import (
+    LambdaAlias,
+    LambdaEventInvokeConfig,
+    LambdaFunction,
+    LambdaLayerVersion,
+    LambdaPermission,
+    LambdaUrl,
+    LambdaVersion,
+)
+from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
+from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
+from samtranslator.model.sns import SNSTopic, SNSTopicPolicy
+from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy
+from samtranslator.model.stepfunctions import StateMachineGenerator
+from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, any_type, dict_of, is_type, list_of, one_of
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
+from samtranslator.translator import logical_id_generator
+from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
-from samtranslator.schema.common import PassThrough
 from samtranslator.validator.value_validator import sam_expect
+
+from .api.api_generator import ApiGenerator
+from .api.http_api_generator import HttpApiGenerator
+from .packagetype import IMAGE, ZIP
+from .s3_utils.uri_parser import construct_image_code_object, construct_s3_location_object
+from .tags.resource_tagging import get_tag_list
+
+_CONDITION_CHAR_LIMIT = 255
 
 
 class SamFunction(SamResourceMacro):
@@ -119,6 +123,7 @@ class SamFunction(SamResourceMacro):
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(IS_STR)),
         "AutoPublishCodeSha256": PropertyType(False, one_of(IS_STR)),
+        "AutoPublishAliasAllProperties": Property(False, is_type(bool)),
         "VersionDescription": PropertyType(False, IS_STR),
         "ProvisionedConcurrencyConfig": PropertyType(False, IS_DICT),
         "FileSystemConfigs": PropertyType(False, list_of(IS_DICT)),
@@ -159,6 +164,7 @@ class SamFunction(SamResourceMacro):
     EphemeralStorage: Optional[Dict[str, Any]]
     AutoPublishAlias: Optional[Intrinsicable[str]]
     AutoPublishCodeSha256: Optional[Intrinsicable[str]]
+    AutoPublishAliasAllProperties: Optional[bool]
     VersionDescription: Optional[Intrinsicable[str]]
     ProvisionedConcurrencyConfig: Optional[Dict[str, Any]]
     FileSystemConfigs: Optional[Dict[str, Any]]
@@ -219,12 +225,11 @@ class SamFunction(SamResourceMacro):
         lambda_function = self._construct_lambda_function()
         resources.append(lambda_function)
 
-        if self.ProvisionedConcurrencyConfig:
-            if not self.AutoPublishAlias:
-                raise InvalidResourceException(
-                    self.logical_id,
-                    "To set ProvisionedConcurrencyConfig AutoPublishALias must be defined on the function",
-                )
+        if self.ProvisionedConcurrencyConfig and not self.AutoPublishAlias:
+            raise InvalidResourceException(
+                self.logical_id,
+                "To set ProvisionedConcurrencyConfig AutoPublishALias must be defined on the function",
+            )
 
         lambda_alias: Optional[LambdaAlias] = None
         alias_name = ""
@@ -311,14 +316,13 @@ class SamFunction(SamResourceMacro):
         resolved_event_invoke_config = intrinsics_resolver.resolve_parameter_refs(self.EventInvokeConfig)
 
         logical_id = "{id}EventInvokeConfig".format(id=function_name)
-        if lambda_alias:
-            lambda_event_invoke_config = LambdaEventInvokeConfig(
+        lambda_event_invoke_config = (
+            LambdaEventInvokeConfig(
                 logical_id=logical_id, depends_on=[lambda_alias.logical_id], attributes=self.resource_attributes
             )
-        else:
-            lambda_event_invoke_config = LambdaEventInvokeConfig(
-                logical_id=logical_id, attributes=self.resource_attributes
-            )
+            if lambda_alias
+            else LambdaEventInvokeConfig(logical_id=logical_id, attributes=self.resource_attributes)
+        )
 
         dest_config = {}
         input_dest_config = resolved_event_invoke_config.get("DestinationConfig")
@@ -395,10 +399,11 @@ class SamFunction(SamResourceMacro):
                 if resource:
                     if combined_condition:
                         resource.set_resource_attribute("Condition", combined_condition)
-                    if property_condition:
-                        destination = make_conditional(property_condition, resource.get_runtime_attr("arn"), dest_arn)
-                    else:
-                        destination = resource.get_runtime_attr("arn")
+                    destination = (
+                        make_conditional(property_condition, resource.get_runtime_attr("arn"), dest_arn)
+                        if property_condition
+                        else resource.get_runtime_attr("arn")
+                    )
                 policy = self._add_event_invoke_managed_policy(dest_config, resource_logical_id, destination)
             else:
                 raise InvalidResourceException(
@@ -454,11 +459,11 @@ class SamFunction(SamResourceMacro):
         return None, None
 
     def _make_gen_condition_name(self, name: str, hash_input: str) -> str:
-        # Make sure the property name is not over 255 characters (CFN limit)
+        # Make sure the property name is not over CFN limit (currently 255)
         hash_digest = logical_id_generator.LogicalIdGenerator("", hash_input).gen()
         condition_name: str = name + hash_digest
-        if len(condition_name) > 255:
-            return input(condition_name)[:255]
+        if len(condition_name) > _CONDITION_CHAR_LIMIT:
+            return input(condition_name)[:_CONDITION_CHAR_LIMIT]
         return condition_name
 
     def _get_resolved_alias_name(
@@ -539,18 +544,18 @@ class SamFunction(SamResourceMacro):
     def _add_event_invoke_managed_policy(
         self, dest_config: Dict[str, Any], logical_id: str, dest_arn: Any
     ) -> Dict[str, Any]:
-        policy = {}
         if dest_config and dest_config.get("Type"):
-            if dest_config.get("Type") == "SQS":
-                policy = IAMRolePolicies.sqs_send_message_role_policy(dest_arn, logical_id)
-            if dest_config.get("Type") == "SNS":
-                policy = IAMRolePolicies.sns_publish_role_policy(dest_arn, logical_id)
+            _type = dest_config.get("Type")
+            if _type == "SQS":
+                return IAMRolePolicies.sqs_send_message_role_policy(dest_arn, logical_id)
+            if _type == "SNS":
+                return IAMRolePolicies.sns_publish_role_policy(dest_arn, logical_id)
             # Event Bridge and Lambda Arns are passthrough.
-            if dest_config.get("Type") == "EventBridge":
-                policy = IAMRolePolicies.event_bus_put_events_role_policy(dest_arn, logical_id)
-            if dest_config.get("Type") == "Lambda":
-                policy = IAMRolePolicies.lambda_invoke_function_role_policy(dest_arn, logical_id)
-        return policy
+            if _type == "EventBridge":
+                return IAMRolePolicies.event_bus_put_events_role_policy(dest_arn, logical_id)
+            if _type == "Lambda":
+                return IAMRolePolicies.lambda_invoke_function_role_policy(dest_arn, logical_id)
+        return {}
 
     def _construct_role(
         self, managed_policy_map: Dict[str, Any], event_invoke_policies: List[Dict[str, Any]]
@@ -562,10 +567,11 @@ class SamFunction(SamResourceMacro):
         """
         role_attributes = self.get_passthrough_resource_attributes()
 
-        if self.AssumeRolePolicyDocument is not None:
-            assume_role_policy_document = self.AssumeRolePolicyDocument
-        else:
-            assume_role_policy_document = IAMRolePolicies.lambda_assume_role_policy()
+        assume_role_policy_document = (
+            self.AssumeRolePolicyDocument
+            if self.AssumeRolePolicyDocument is not None
+            else IAMRolePolicies.lambda_assume_role_policy()
+        )
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
@@ -591,11 +597,10 @@ class SamFunction(SamResourceMacro):
                 )
             )
 
-        if self.EventInvokeConfig:
-            if event_invoke_policies is not None:
-                policy_documents.extend(event_invoke_policies)
+        if self.EventInvokeConfig and event_invoke_policies is not None:
+            policy_documents.extend(event_invoke_policies)
 
-        execution_role = construct_role_for_resource(
+        return construct_role_for_resource(
             resource_logical_id=self.logical_id,
             attributes=role_attributes,
             managed_policy_map=managed_policy_map,
@@ -607,7 +612,6 @@ class SamFunction(SamResourceMacro):
             permissions_boundary=self.PermissionsBoundary,
             tags=self._construct_tag_list(self.Tags),
         )
-        return execution_role
 
     def _validate_package_type(self, lambda_function: LambdaFunction) -> None:
         """
@@ -699,7 +703,7 @@ class SamFunction(SamResourceMacro):
         sam_expect(dlq_type, self.logical_id, "DeadLetterQueue.Type").to_be_a_string()
 
         # Validate required Types
-        if not dlq_type in self.dead_letter_queue_policy_actions:
+        if dlq_type not in self.dead_letter_queue_policy_actions:
             raise InvalidResourceException(
                 self.logical_id, "'DeadLetterQueue' requires Type of {}".format(valid_dlq_types)
             )
@@ -874,11 +878,14 @@ class SamFunction(SamResourceMacro):
         #                 and next hashes. The chances that two subsequent hashes collide is fairly low.
         prefix = "{id}Version".format(id=self.logical_id)
         logical_dict = {}
-        try:
-            logical_dict = code_dict.copy()
-        except (AttributeError, UnboundLocalError):
-            pass
+        # We can't directly change AutoPublishAlias as that would be a breaking change, so we have to add this opt-in
+        # property that when set to true would change the lambda version whenever a property in the lambda function changes
+        if self.AutoPublishAliasAllProperties:
+            properties = function._generate_resource_dict().get("Properties", {})
+            logical_dict = properties
         else:
+            with suppress(AttributeError, UnboundLocalError):
+                logical_dict = code_dict.copy()
             if function.Environment:
                 logical_dict.update(function.Environment)
             if function.MemorySize:
@@ -1526,12 +1533,9 @@ class SamApplication(SamResourceMacro):
         """Adds tags to the stack if this resource is using the serverless app repo"""
         application_tags = {}
         if isinstance(self.Location, dict):
-            if self.APPLICATION_ID_KEY in self.Location.keys() and self.Location[self.APPLICATION_ID_KEY] is not None:
+            if self.APPLICATION_ID_KEY in self.Location and self.Location[self.APPLICATION_ID_KEY] is not None:
                 application_tags[self._SAR_APP_KEY] = self.Location[self.APPLICATION_ID_KEY]
-            if (
-                self.SEMANTIC_VERSION_KEY in self.Location.keys()
-                and self.Location[self.SEMANTIC_VERSION_KEY] is not None
-            ):
+            if self.SEMANTIC_VERSION_KEY in self.Location and self.Location[self.SEMANTIC_VERSION_KEY] is not None:
                 application_tags[self._SAR_SEMVER_KEY] = self.Location[self.SEMANTIC_VERSION_KEY]
         return application_tags
 
@@ -1694,7 +1698,7 @@ class SamLayerVersion(SamResourceMacro):
             return
         for arq in architectures:
             # We validate the values only if we they're not intrinsics
-            if not is_intrinsic(arq) and not arq in [ARM64, X86_64]:
+            if not is_intrinsic(arq) and arq not in [ARM64, X86_64]:
                 raise InvalidResourceException(
                     lambda_layer.logical_id,
                     "CompatibleArchitectures needs to be a list of '{}' or '{}'".format(X86_64, ARM64),
@@ -1770,8 +1774,7 @@ class SamStateMachine(SamResourceMacro):
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
         )
 
-        resources = state_machine_generator.to_cloudformation()
-        return resources
+        return state_machine_generator.to_cloudformation()
 
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
@@ -1801,13 +1804,13 @@ class SamConnector(SamResourceMacro):
     """
 
     Source: Dict[str, Any]
-    Destination: Dict[str, Any]
+    Destination: Union[Dict[str, Any], List[Dict[str, Any]]]
     Permissions: List[str]
 
     resource_type = "AWS::Serverless::Connector"
     property_types = {
         "Source": PropertyType(True, dict_of(IS_STR, any_type())),
-        "Destination": PropertyType(True, dict_of(IS_STR, any_type())),
+        "Destination": PropertyType(True, one_of(dict_of(IS_STR, any_type()), list_of(dict_of(IS_STR, any_type())))),
         "Permissions": PropertyType(True, list_of(IS_STR)),
     }
 
@@ -1816,12 +1819,43 @@ class SamConnector(SamResourceMacro):
         resource_resolver: ResourceResolver = kwargs["resource_resolver"]
         original_template = kwargs["original_template"]
 
-        try:
-            destination = get_resource_reference(self.Destination, resource_resolver, self.Source)
-            source = get_resource_reference(self.Source, resource_resolver, self.Destination)
-        except ConnectorResourceError as e:
-            raise InvalidResourceException(self.logical_id, str(e)) from e
+        multi_dest = True
+        if isinstance(self.Destination, dict):
+            multi_dest = False
+            self.Destination = [self.Destination]
 
+        list_generated_resources: List[Resource] = []
+
+        for dest_index, dest in enumerate(self.Destination):
+            try:
+                destination = get_resource_reference(dest, resource_resolver, self.Source)
+                source = get_resource_reference(self.Source, resource_resolver, dest)
+            except ConnectorResourceError as e:
+                raise InvalidResourceException(self.logical_id, str(e)) from e
+
+            generated_resources = self.generate_resources(
+                source, destination, dest_index, multi_dest, resource_resolver
+            )
+
+            self._add_connector_metadata(generated_resources, original_template, source, destination)
+            list_generated_resources.extend(generated_resources)
+
+        generated_logical_ids = [resource.logical_id for resource in list_generated_resources]
+        replace_depends_on_logical_id(self.logical_id, generated_logical_ids, resource_resolver)
+
+        if list_generated_resources:
+            return list_generated_resources
+
+        raise InvalidResourceException(self.logical_id, "'Destination' is an empty list")
+
+    def generate_resources(
+        self,
+        source: ConnectorResourceReference,
+        destination: ConnectorResourceReference,
+        dest_index: int,
+        multi_dest: bool,
+        resource_resolver: ResourceResolver,
+    ) -> List[Resource]:
         profile = get_profile(source.resource_type, destination.resource_type)
         if not profile:
             raise InvalidResourceException(
@@ -1836,7 +1870,6 @@ class SamConnector(SamResourceMacro):
         valid_permissions_combinations = profile_properties.get("ValidAccessCategories")
 
         valid_permissions_str = ", ".join(profile_permissions)
-
         if not self.Permissions:
             raise InvalidResourceException(
                 self.logical_id,
@@ -1847,7 +1880,7 @@ class SamConnector(SamResourceMacro):
             if permission not in profile_permissions:
                 raise InvalidResourceException(
                     self.logical_id,
-                    f"Unsupported 'Permissions' provided; valid values are: {valid_permissions_str}.",
+                    f"Unsupported 'Permissions' provided for connector from {source.resource_type} to {destination.resource_type}; valid values are: {valid_permissions_str}.",
                 )
 
         if valid_permissions_combinations:
@@ -1858,7 +1891,7 @@ class SamConnector(SamResourceMacro):
                 )
                 raise InvalidResourceException(
                     self.logical_id,
-                    f"Unsupported 'Permissions' provided; valid combinations are: {valid_permissions_combination_str}.",
+                    f"Unsupported 'Permissions' provided for connector from {source.resource_type} to {destination.resource_type}; valid combinations are: {valid_permissions_combination_str}.",
                 )
 
         replacement = {
@@ -1881,26 +1914,27 @@ class SamConnector(SamResourceMacro):
         generated_resources: List[Resource] = []
         if profile_type == "AWS_IAM_ROLE_MANAGED_POLICY":
             generated_resources.append(
-                self._construct_iam_policy(source, destination, profile_properties, resource_resolver)
+                self._construct_iam_policy(
+                    source, destination, profile_properties, resource_resolver, dest_index, multi_dest
+                )
             )
-        if profile_type == "AWS_SQS_QUEUE_POLICY":
-            generated_resources.append(self._construct_sqs_queue_policy(source, destination, profile_properties))
-        if profile_type == "AWS_SNS_TOPIC_POLICY":
-            generated_resources.append(self._construct_sns_topic_policy(source, destination, profile_properties))
-        if profile_type == "AWS_LAMBDA_PERMISSION":
+        elif profile_type == "AWS_SQS_QUEUE_POLICY":
+            generated_resources.append(
+                self._construct_sqs_queue_policy(source, destination, profile_properties, dest_index, multi_dest)
+            )
+        elif profile_type == "AWS_SNS_TOPIC_POLICY":
+            generated_resources.append(
+                self._construct_sns_topic_policy(source, destination, profile_properties, dest_index, multi_dest)
+            )
+        elif profile_type == "AWS_LAMBDA_PERMISSION":
             generated_resources.extend(
-                self._construct_lambda_permission_policy(source, destination, profile_properties)
+                self._construct_lambda_permission_policy(
+                    source, destination, profile_properties, dest_index, multi_dest
+                )
             )
-
-        generated_logical_ids = [resource.logical_id for resource in generated_resources]
-        replace_depends_on_logical_id(self.logical_id, generated_logical_ids, resource_resolver)
-
-        self._add_connector_metadata(generated_resources, original_template, source, destination)
-        if generated_resources:
-            return generated_resources
-
-        # Should support all profile types
-        raise TypeError(f"Unknown profile policy type '{profile_type}'")
+        else:
+            raise TypeError(f"Profile type {profile_type} is not supported")
+        return generated_resources
 
     def _get_policy_statements(self, profile: ConnectorProfile) -> Dict[str, Any]:
         policy_statements = []
@@ -1919,6 +1953,8 @@ class SamConnector(SamResourceMacro):
         destination: ConnectorResourceReference,
         profile: ConnectorProfile,
         resource_resolver: ResourceResolver,
+        dest_index: int,
+        multi_dest: bool,
     ) -> IAMManagedPolicy:
         source_policy = profile["SourcePolicy"]
         resource = source if source_policy else destination
@@ -1931,21 +1967,24 @@ class SamConnector(SamResourceMacro):
             )
 
         policy_document = self._get_policy_statements(profile)
-        policy = IAMManagedPolicy(f"{self.logical_id}Policy")
+
+        policy_name = f"{self.logical_id}PolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}Policy"
+        policy = IAMManagedPolicy(
+            logical_id=policy_name, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
         policy.PolicyDocument = policy_document
         policy.Roles = [role_name]
 
         depended_by = profile.get("DependedBy")
-        if depended_by == "DESTINATION_EVENT_SOURCE_MAPPING":
-            if source.logical_id and destination.logical_id:
-                # The dependency type assumes Destination is a AWS::Lambda::Function
-                esm_ids = list(get_event_source_mappings(source.logical_id, destination.logical_id, resource_resolver))
-                # There can only be a single ESM from a resource to function, otherwise deployment fails
-                if len(esm_ids) == 1:
-                    add_depends_on(esm_ids[0], policy.logical_id, resource_resolver)
-        if depended_by == "SOURCE":
-            if source.logical_id:
-                add_depends_on(source.logical_id, policy.logical_id, resource_resolver)
+        if depended_by == "DESTINATION_EVENT_SOURCE_MAPPING" and source.logical_id and destination.logical_id:
+            # The dependency type assumes Destination is a AWS::Lambda::Function
+            esm_ids = list(get_event_source_mappings(source.logical_id, destination.logical_id, resource_resolver))
+            # There can only be a single ESM from a resource to function, otherwise deployment fails
+            if len(esm_ids) == 1:
+                add_depends_on(esm_ids[0], policy.logical_id, resource_resolver)
+        if depended_by == "SOURCE" and source.logical_id:
+            add_depends_on(source.logical_id, policy.logical_id, resource_resolver)
 
         return policy
 
@@ -1954,6 +1993,8 @@ class SamConnector(SamResourceMacro):
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
         profile: ConnectorProfile,
+        dest_index: int,
+        multi_dest: bool,
     ) -> List[LambdaPermission]:
         source_policy = profile["SourcePolicy"]
         lambda_function = source if source_policy else destination
@@ -1966,9 +2007,19 @@ class SamConnector(SamResourceMacro):
             )
 
         lambda_permissions = []
-        for name in profile["AccessCategories"].keys():
+        for name in profile["AccessCategories"]:
             if name in self.Permissions:
-                permission = LambdaPermission(f"{self.logical_id}{name}LambdaPermission")
+                permission_name = (
+                    f"{self.logical_id}{name}LambdaPermissionDestination{dest_index}"
+                    if multi_dest
+                    else f"{self.logical_id}{name}LambdaPermission"
+                )
+                permission = LambdaPermission(
+                    logical_id=permission_name,
+                    depends_on=self.depends_on,
+                    attributes=self.resource_attributes,
+                )
+
                 permissions = profile["AccessCategories"][name]
                 permission.Action = permissions["Action"]
                 permission.FunctionName = function_arn
@@ -1984,6 +2035,8 @@ class SamConnector(SamResourceMacro):
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
         profile: ConnectorProfile,
+        dest_index: int,
+        multi_dest: bool,
     ) -> SNSTopicPolicy:
         source_policy = profile["SourcePolicy"]
         sns_topic = source if source_policy else destination
@@ -1995,7 +2048,13 @@ class SamConnector(SamResourceMacro):
                 self.logical_id, f"Unable to get SNS topic ARN from '{property_name}' resource."
             )
 
-        topic_policy = SNSTopicPolicy(f"{self.logical_id}TopicPolicy")
+        topic_policy_name = (
+            f"{self.logical_id}TopicPolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}TopicPolicy"
+        )
+        topic_policy = SNSTopicPolicy(
+            logical_id=topic_policy_name, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
         topic_policy.Topics = [topic_arn]
         topic_policy.PolicyDocument = self._get_policy_statements(profile)
 
@@ -2006,6 +2065,8 @@ class SamConnector(SamResourceMacro):
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
         profile: ConnectorProfile,
+        dest_index: int,
+        multi_dest: bool,
     ) -> SQSQueuePolicy:
         source_policy = profile["SourcePolicy"]
         sqs_queue = source if source_policy else destination
@@ -2017,7 +2078,13 @@ class SamConnector(SamResourceMacro):
                 self.logical_id, f"Unable to get SQS queue URL from '{property_name}' resource."
             )
 
-        queue_policy = SQSQueuePolicy(f"{self.logical_id}QueuePolicy")
+        queue_policy_name = (
+            f"{self.logical_id}QueuePolicyDestination{dest_index}" if multi_dest else f"{self.logical_id}QueuePolicy"
+        )
+        queue_policy = SQSQueuePolicy(
+            logical_id=queue_policy_name, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
         queue_policy.PolicyDocument = self._get_policy_statements(profile)
         queue_policy.Queues = [queue_url]
 

@@ -1,39 +1,38 @@
 import logging
 from collections import namedtuple
-from typing import List, Optional, Set, Dict, Any, cast, Union, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
 from samtranslator.model.apigateway import (
+    ApiGatewayApiKey,
+    ApiGatewayAuthorizer,
+    ApiGatewayBasePathMapping,
     ApiGatewayDeployment,
+    ApiGatewayDomainName,
+    ApiGatewayResponse,
     ApiGatewayRestApi,
     ApiGatewayStage,
-    ApiGatewayAuthorizer,
-    ApiGatewayResponse,
-    ApiGatewayDomainName,
-    ApiGatewayBasePathMapping,
     ApiGatewayUsagePlan,
     ApiGatewayUsagePlanKey,
-    ApiGatewayApiKey,
 )
-from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidDocumentException,
     InvalidResourceException,
     InvalidTemplateException,
 )
-from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
-from samtranslator.region_configuration import RegionConfiguration
-from samtranslator.schema.common import PassThrough
-from samtranslator.swagger.swagger import SwaggerEditor
-from samtranslator.model.intrinsics import is_intrinsic, fnSub
+from samtranslator.model.intrinsics import fnGetAtt, fnSub, is_intrinsic, make_or_condition, ref
 from samtranslator.model.lambda_ import LambdaPermission
-from samtranslator.translator.logical_id_generator import LogicalIdGenerator
-from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.utils.types import Intrinsicable
+from samtranslator.model.route53 import Route53RecordSetGroup
+from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.model.types import PassThrough
+from samtranslator.region_configuration import RegionConfiguration
+from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.utils.types import Intrinsicable
 from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
 
@@ -275,13 +274,10 @@ class ApiGenerator:
                 self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
             )
 
-        if self.open_api_version:
-            if not SwaggerEditor.safe_compare_regex_with_string(
-                SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
-            ):
-                raise InvalidResourceException(
-                    self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'."
-                )
+        if self.open_api_version and not SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
+        ):
+            raise InvalidResourceException(self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'.")
 
         self._add_cors()
         self._add_auth()
@@ -432,7 +428,6 @@ class ApiGenerator:
     def _construct_api_domain(
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
     ) -> Tuple[Optional[ApiGatewayDomainName], Optional[List[ApiGatewayBasePathMapping]], Any]:
-        # pylint: disable=duplicate-code
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
@@ -476,8 +471,8 @@ class ApiGenerator:
             sam_expect(mutual_tls_auth, self.logical_id, "Domain.MutualTlsAuthentication").to_be_a_map()
             if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
                 invalid_keys = []
-                for key in mutual_tls_auth.keys():
-                    if not key in {"TruststoreUri", "TruststoreVersion"}:
+                for key in mutual_tls_auth:
+                    if key not in {"TruststoreUri", "TruststoreVersion"}:
                         invalid_keys.append(key)
                 invalid_keys.sort()
                 raise InvalidResourceException(
@@ -589,7 +584,6 @@ class ApiGenerator:
         return recordset_list
 
     def _construct_alias_target(self, domain: Dict[str, Any], api_domain_name: str, route53: Any) -> Dict[str, Any]:
-        # pylint: disable=duplicate-code
         alias_target = {}
         target_health = route53.get("EvaluateTargetHealth")
 
@@ -649,7 +643,7 @@ class ApiGenerator:
         elif isinstance(self.cors, dict):
 
             # Make sure keys in the dict are recognized
-            if not all(key in CorsProperties._fields for key in self.cors.keys()):
+            if not all(key in CorsProperties._fields for key in self.cors):
                 raise InvalidResourceException(self.logical_id, INVALID_ERROR)
 
             properties = CorsProperties(**self.cors)
@@ -721,7 +715,7 @@ class ApiGenerator:
             )
 
         # Make sure keys in the dict are recognized
-        if not all(key in AuthProperties._fields for key in self.auth.keys()):
+        if not all(key in AuthProperties._fields for key in self.auth):
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
 
         if not SwaggerEditor.is_valid(self.definition_body):
@@ -777,7 +771,7 @@ class ApiGenerator:
         if not isinstance(usage_plan_properties, dict):
             raise InvalidResourceException(self.logical_id, "'UsagePlan' must be a dictionary")
         # throws error if the property invalid/ unsupported for UsagePlan
-        if not all(key in UsagePlanProperties._fields for key in usage_plan_properties.keys()):
+        if not all(key in UsagePlanProperties._fields for key in usage_plan_properties):
             raise InvalidResourceException(self.logical_id, "Invalid property for 'UsagePlan'")
 
         create_usage_plan = usage_plan_properties.get("CreateUsagePlan")
@@ -949,7 +943,7 @@ class ApiGenerator:
                     "Invalid property type '{}' for GatewayResponses. "
                     "Expected an object of type 'GatewayResponse'.".format(type(responses_value).__name__),
                 )
-            for response_key in responses_value.keys():
+            for response_key in responses_value:
                 if response_key not in GatewayResponseProperties:
                     raise InvalidResourceException(
                         self.logical_id,
@@ -1229,7 +1223,7 @@ class ApiGenerator:
         if isinstance(value, dict) and value.get("Type"):
             rest_api.Parameters = {"endpointConfigurationTypes": value.get("Type")}
             rest_api.EndpointConfiguration = {"Types": [value.get("Type")]}
-            if "VPCEndpointIds" in value.keys():
+            if "VPCEndpointIds" in value:
                 rest_api.EndpointConfiguration["VpcEndpointIds"] = value.get("VPCEndpointIds")
         else:
             rest_api.EndpointConfiguration = {"Types": [value]}

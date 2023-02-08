@@ -1,8 +1,8 @@
-﻿from typing import Any, Dict, List
+from typing import Any, Dict, List
 
 from samtranslator.model.exceptions import ExceptionWithMessage
-from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
+from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.swagger.swagger import SwaggerEditor
 
 
@@ -35,6 +35,7 @@ class Globals:
             "Tracing",
             "KmsKeyArn",
             "AutoPublishAlias",
+            "AutoPublishAliasAllProperties",
             "Layers",
             "DeploymentPreference",
             "RolePath",
@@ -408,7 +409,7 @@ class GlobalProperties:
         # Local has higher priority than global. So iterate over local dict and merge into global if keys are overridden
         global_dict = global_dict.copy()
 
-        for key in local_dict.keys():
+        for key in local_dict:
 
             if key in global_dict:
                 # Both local & global contains the same key. Let's do a merge.
