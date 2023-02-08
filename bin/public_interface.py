@@ -1,5 +1,12 @@
 #!/usr/bin/env python
-"""Extract/compare public interfaces."""
+"""
+Extract/compare public interfaces.
+
+aws-sam-translator library hasn't documented public interfaces,
+so we assume anything public by convention unless it is prefixed with "_".
+(see https://peps.python.org/pep-0008/#descriptive-naming-styles)
+This CLI tool helps automate the detection of compatibility-breaking changes.
+"""
 import argparse
 import importlib
 import inspect
