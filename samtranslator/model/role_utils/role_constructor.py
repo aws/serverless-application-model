@@ -1,7 +1,27 @@
+from typing import Callable, Dict, Optional
+
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 from samtranslator.model.resource_policies import PolicyTypes
+
+
+def _get_managed_policy_arn(
+    name: str,
+    managed_policy_map: Optional[Dict[str, str]],
+    bundled_managed_policies: Optional[Dict[str, str]],
+    get_managed_policy_map: Optional[Callable[[], Dict[str, str]]],
+) -> str:
+    if isinstance(managed_policy_map, dict) and name in managed_policy_map:
+        return managed_policy_map[name]
+    if isinstance(bundled_managed_policies, dict) and name in bundled_managed_policies:
+        return bundled_managed_policies[name]
+    if callable(get_managed_policy_map):
+        # TODO: Error handling?
+        fallback_managed_policies = get_managed_policy_map()
+        if isinstance(fallback_managed_policies, dict) and name in fallback_managed_policies:
+            return fallback_managed_policies[name]
+    return name
 
 
 def construct_role_for_resource(  # type: ignore[no-untyped-def]
@@ -15,6 +35,8 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
     role_path=None,
     permissions_boundary=None,
     tags=None,
+    bundled_managed_policies=None,
+    get_managed_policy_map=None,
 ) -> IAMRole:
     """
     Constructs an execution role for a resource.
@@ -86,8 +108,13 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
             #
 
             policy_arn = policy_entry.data
-            if isinstance(policy_entry.data, str) and policy_entry.data in managed_policy_map:
-                policy_arn = managed_policy_map[policy_entry.data]
+            if isinstance(policy_entry.data, str):
+                policy_arn = _get_managed_policy_arn(
+                    policy_entry.data,
+                    managed_policy_map,
+                    bundled_managed_policies,
+                    get_managed_policy_map,
+                )
 
             # De-Duplicate managed policy arns before inserting. Mainly useful
             # when customer specifies a managed policy which is already inserted
