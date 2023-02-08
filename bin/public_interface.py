@@ -72,14 +72,17 @@ def _save(signature: Dict[str, inspect.Signature], variables: Set[str], output_f
     with open(output_file, "w") as f:
         result: Dict[str, Any] = {"routines": {}, "variables": sorted(variables)}
         for key, value in signature.items():
-            result["routines"][key] = [
-                {
-                    "name": parameter.name,
-                    "kind": parameter.kind.name,
-                    "default": parameter.default if parameter.default != inspect.Parameter.empty else None,
-                }
-                for parameter in value.parameters.values()
-            ]
+            for parameter in value.parameters.values():
+                result["routines"][key] = [
+                    {
+                        "name": parameter.name,
+                        "kind": parameter.kind.name,
+                        "default": parameter.default,
+                    }
+                    if parameter.default != inspect.Parameter.empty
+                    else {"name": parameter.name, "kind": parameter.kind.name}
+                    for parameter in value.parameters.values()
+                ]
         json.dump(result, f, indent=2, sort_keys=True)
 
 
