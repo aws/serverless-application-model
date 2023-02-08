@@ -13,7 +13,6 @@ import inspect
 import json
 import os.path
 import pkgutil
-from pathlib import Path
 from typing import Any, Dict, Set, Union
 
 
@@ -75,41 +74,35 @@ class InterfaceScanner:
             self.signatures[full_path] = inspect.signature(method)
 
 
-def _save(signature: Dict[str, inspect.Signature], variables: Set[str], output_file: Path) -> None:
-    with open(output_file, "w") as f:
-        result: Dict[str, Any] = {"routines": {}, "variables": sorted(variables)}
-        for key, value in signature.items():
-            for parameter in value.parameters.values():
-                result["routines"][key] = [
-                    {
-                        "name": parameter.name,
-                        "kind": parameter.kind.name,
-                        "default": parameter.default,
-                    }
-                    if parameter.default != inspect.Parameter.empty
-                    else {"name": parameter.name, "kind": parameter.kind.name}
-                    for parameter in value.parameters.values()
-                ]
-        json.dump(result, f, indent=2, sort_keys=True)
+def _print(signature: Dict[str, inspect.Signature], variables: Set[str]) -> None:
+    result: Dict[str, Any] = {"routines": {}, "variables": sorted(variables)}
+    for key, value in signature.items():
+        for parameter in value.parameters.values():
+            result["routines"][key] = [
+                {
+                    "name": parameter.name,
+                    "kind": parameter.kind.name,
+                    "default": parameter.default,
+                }
+                if parameter.default != inspect.Parameter.empty
+                else {"name": parameter.name, "kind": parameter.kind.name}
+                for parameter in value.parameters.values()
+            ]
+    print(json.dumps(result, indent=2, sort_keys=True))
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
 
     subparsers = parser.add_subparsers(dest="command")
-    extract = subparsers.add_parser("extract", help="Extract public interfaces into a JSON file")
+    extract = subparsers.add_parser("extract", help="Extract public interfaces")
     extract.add_argument("--module", help="The module to extract public interfaces", type=str, default="samtranslator")
-    extract.add_argument(
-        "output_file",
-        help="The path to output JSON file",
-        type=Path,
-    )
     args = parser.parse_args()
 
     if args.command == "extract":
         scanner = InterfaceScanner()
         scanner.scan_interfaces_recursively(args.module)
-        _save(scanner.signatures, scanner.variables, args.output_file)
+        _print(scanner.signatures, scanner.variables)
     # TODO: handle compare
     else:
         parser.print_help()
