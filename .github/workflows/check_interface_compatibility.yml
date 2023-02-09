@@ -36,7 +36,6 @@ jobs:
 
       - name: Extract PR public interfaces
         run: |
-          echo "HEAD: $(git rev-parse --short HEAD)"
           make init
           # Recover bin/public_interface.py
           cp ${{ runner.temp }}/public_interface.py bin/public_interface.py
@@ -48,20 +47,15 @@ jobs:
           exit_code=0
           output=$(bin/public_interface.py check ${{ runner.temp }}/interfaces.original.json ${{ runner.temp }}/interfaces.new.json) || exit_code=$?
 
-          echo "output=$output"
-          echo "exit_code=$exit_code"
+          # Show the output in job summary
           echo "$output" >> $GITHUB_STEP_SUMMARY
+          
+          # Save exit code to determine whether to post pull request comment or not
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
-          echo "$output" >> ${{ runner.temp }}/output.txt
-
-      - name: Archive interface files for debugging
-        uses: actions/upload-artifact@v3
-        with:
-          name: interface-json-files
-          path: |
-            ${{ runner.temp }}/interfaces.*.json
-            output.txt
-          retention-days: 7  # Only storing it for a week in case of debugging needs.
+          
+          # Save the output for next step to process it,
+          # and saving it into a file can avoid the need of escaping in github-script.
+          echo "$output" >> ${{ runner.temp }}/output.md
 
       - name: Post GitHub PR comment
         if: ${{ steps.detect.outputs.exit_code != '0' }}
@@ -70,16 +64,17 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const fs = require('fs');
-            const data = fs.readFileSync('${{ runner.temp }}/output.txt', 'utf8')
+            const output = fs.readFileSync('${{ runner.temp }}/output.md', 'utf8')
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "hi" + data
+              body: output
             })
 
       - name: Determine the success/failure of the workflow
         run: |
           if [ ${{ steps.detect.outputs.exit_code }} -ne 0 ]; then
+            cat ${{ runner.temp }}/output.md
             exit ${{ steps.detect.outputs.exit_code }}
           fi
