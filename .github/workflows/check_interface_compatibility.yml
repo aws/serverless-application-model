@@ -19,7 +19,7 @@ jobs:
       - name: Extract original public interfaces
         run: |
           make init
-          bin/public_interface.py extract >> ${{ runner.temp }}/interfaces.original.json
+          bin/public_interface.py extract > ${{ runner.temp }}/interfaces.original.json
 
       - name: Backup original bin/public_interface.py
         run: |
@@ -39,7 +39,7 @@ jobs:
           make init
           # Recover bin/public_interface.py
           cp ${{ runner.temp }}/public_interface.py bin/public_interface.py
-          bin/public_interface.py extract >> ${{ runner.temp }}/interfaces.new.json
+          bin/public_interface.py extract > ${{ runner.temp }}/interfaces.new.json
     
       - name: Detect compatibility breaking changes
         id: detect
@@ -55,7 +55,7 @@ jobs:
           
           # Save the output for next step to process it,
           # and saving it into a file can avoid the need of escaping in github-script.
-          echo "$output" >> ${{ runner.temp }}/output.md
+          echo "$output" > ${{ runner.temp }}/output.md
 
       - name: Post GitHub PR comment
         if: ${{ steps.detect.outputs.exit_code != '0' }}
