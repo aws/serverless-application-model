@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  check-interface-compatibility:
+  check-compatibility:
     runs-on: ubuntu-latest
 
     steps:
