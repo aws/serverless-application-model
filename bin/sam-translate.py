@@ -7,6 +7,7 @@ Known limitations: cannot transform CodeUri pointing at local directory.
 import argparse
 import json
 import logging
+import os
 import platform
 import subprocess
 import sys
@@ -14,6 +15,10 @@ from functools import reduce
 from pathlib import Path
 
 import boto3
+
+# To allow this script to be executed from other directories
+my_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, my_path + "/..")
 
 from samtranslator.model.exceptions import InvalidDocumentException
 from samtranslator.public.translator import ManagedPolicyLoader
