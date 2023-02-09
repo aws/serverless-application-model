@@ -51,6 +51,8 @@ class InterfaceScanner:
         There is no method to verify if a module attribute is a constant,
         After some experiment, here we assume if an attribute is a value
         (without `__module__`) and not a module itself is a constant.
+
+        Note: Class (and other types) should be treated as a variable too
         """
         for constant_name, _ in inspect.getmembers(
             importlib.import_module(module_name),
@@ -59,6 +61,13 @@ class InterfaceScanner:
             if constant_name.startswith("_"):
                 continue
             full_path = f"{module_name}.{constant_name}"
+            self.variables.add(full_path)
+
+        for class_name, _class in inspect.getmembers(importlib.import_module(module_name), inspect.isclass):
+            # Skip imported and ones starting with "_"
+            if _class.__module__ != module_name or class_name.startswith("_"):
+                continue
+            full_path = f"{module_name}.{class_name}"
             self.variables.add(full_path)
 
     def _scan_classes_in_module(self, module_name: str) -> None:
