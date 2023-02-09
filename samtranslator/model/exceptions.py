@@ -21,6 +21,7 @@ class ExceptionWithMessage(ABC, Exception):
     def metadata(self) -> Optional[Dict[str, Any]]:
         """Return the exception metadata."""
 
+
 class InvalidDocumentException(ExceptionWithMessage):
     """Exception raised when the given document is invalid and cannot be transformed.
 
@@ -102,7 +103,9 @@ class InvalidResourceException(ExceptionWithMessage):
         message -- explanation of the error
     """
 
-    def __init__(self, logical_id: Union[str, List[str]], message: str, metadata: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(
+        self, logical_id: Union[str, List[str]], message: str, metadata: Optional[Dict[str, Any]] = None
+    ) -> None:
         self._logical_id = logical_id
         self._message = message
         self._metadata = metadata

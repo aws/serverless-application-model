@@ -22,6 +22,7 @@ ConnectorResourceReference = namedtuple(
 
 UNSUPPORTED_CONNECTOR_PROFILE_TYPE = "UNSUPPORTED_CONNECTOR_PROFILE_TYPE"
 
+
 class ConnectorResourceError(Exception):
     """
     Indicates a template error making a resource unusable for connectors.
