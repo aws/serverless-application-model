@@ -1,10 +1,7 @@
-name: Check interface compatibility
+name: Check compatibility
 
 on:
   pull_request:
-
-permissions:
-  pull-requests: write
 
 jobs:
   check-interface-compatibility:
@@ -47,35 +44,8 @@ jobs:
           exit_code=0
           output=$(bin/public_interface.py check "${{ runner.temp }}"/interfaces.original.json "${{ runner.temp }}"/interfaces.new.json) || exit_code=$?
 
-          # Show the output in job summary
-          echo "$output" >> $GITHUB_STEP_SUMMARY
-
-          # Update steps.detect.outputs.change_detected=true for next steps
           if [ "$exit_code" -ne 0 ]; then
-            echo "change_detected=true" >> $GITHUB_OUTPUT
+            # Show the output in job summary and fail the workflow
+            echo "$output" >> $GITHUB_STEP_SUMMARY
+            exit "$exit_code"
           fi
-
-          # Save the output for next step to process it,
-          # and saving it into a file can avoid the need of escaping in github-script.
-          echo "$output" > "${{ runner.temp }}"/output.md
-
-      - name: Post GitHub PR comment
-        if: ${{ steps.detect.outputs.change_detected }}
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const fs = require('fs');
-            const output = fs.readFileSync('${{ runner.temp }}/output.md', 'utf8')
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
-
-      - name: Show detection output
-        if: ${{ steps.detect.outputs.change_detected }}
-        run: |
-          cat "${{ runner.temp }}"/output.md
-          exit 1
