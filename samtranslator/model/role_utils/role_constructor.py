@@ -12,8 +12,11 @@ def _get_managed_policy_arn(
     bundled_managed_policies: Optional[Dict[str, str]],
     get_managed_policy_map: Optional[Callable[[], Dict[str, str]]],
 ) -> str:
-    if isinstance(managed_policy_map, dict) and name in managed_policy_map:
-        return managed_policy_map[name]
+    if managed_policy_map is not None:
+        if isinstance(managed_policy_map, dict) and name in managed_policy_map:
+            return managed_policy_map[name]
+        # In case managed_policy_map is used, keep previous behavior for backward compatibility
+        return name
     if isinstance(bundled_managed_policies, dict) and name in bundled_managed_policies:
         return bundled_managed_policies[name]
     if callable(get_managed_policy_map):

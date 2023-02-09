@@ -279,11 +279,15 @@ class SamFunction(SamResourceMacro):
         if not managed_policy_map:
             raise Exception("Managed policy map is empty, but should not be.")
 
-        self.get_managed_policy_map = kwargs.get("get_managed_policy_map")
+        get_managed_policy_map = kwargs.get("get_managed_policy_map")
 
         execution_role = None
         if lambda_function.Role is None:
-            execution_role = self._construct_role(managed_policy_map, event_invoke_policies)
+            execution_role = self._construct_role(
+                managed_policy_map,
+                event_invoke_policies,
+                get_managed_policy_map,
+            )
             lambda_function.Role = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
 
@@ -561,7 +565,10 @@ class SamFunction(SamResourceMacro):
         return {}
 
     def _construct_role(
-        self, managed_policy_map: Dict[str, Any], event_invoke_policies: List[Dict[str, Any]]
+        self,
+        managed_policy_map: Dict[str, Any],
+        event_invoke_policies: List[Dict[str, Any]],
+        get_managed_policy_map: Optional[Callable[[], Dict[str, str]]] = None,
     ) -> IAMRole:
         """Constructs a Lambda execution role based on this SAM function's Policies property.
 
@@ -617,7 +624,7 @@ class SamFunction(SamResourceMacro):
             permissions_boundary=self.PermissionsBoundary,
             tags=self._construct_tag_list(self.Tags),
             bundled_managed_policies=bundled_managed_policies,
-            get_managed_policy_map=self.get_managed_policy_map,
+            get_managed_policy_map=get_managed_policy_map,
         )
 
     def _validate_package_type(self, lambda_function: LambdaFunction) -> None:
