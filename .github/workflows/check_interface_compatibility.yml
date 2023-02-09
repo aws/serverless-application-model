@@ -1,7 +1,7 @@
 name: Check interface compatibility
 
 on:
-  pull_request_target:
+  pull_request:
 
 permissions:
   pull-requests: write
@@ -11,43 +11,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the base branch
+      - name: Checkout the PR
         uses: actions/checkout@v3
 
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: Extract original public interfaces
-        run: |
-          make init
-          bin/public_interface.py extract > ${{ runner.temp }}/interfaces.original.json
-
-      - name: Backup original bin/public_interface.py
-        run: |
-          # Keep a copy of bin/public_interface.py to use on the base branch
-          # So we are using the same bin/public_interface.py to process old/new codebase.
-          # Because the step has credential of GitHub token to post comments,
-          # always use the original version that is in our repository.
-          cp bin/public_interface.py ${{ runner.temp }}/public_interface.py
-
-      - name: Checkout the PR
-        uses: actions/checkout@v3
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-
       - name: Extract PR public interfaces
         run: |
           make init
-          # Recover bin/public_interface.py
-          cp ${{ runner.temp }}/public_interface.py bin/public_interface.py
           bin/public_interface.py extract > ${{ runner.temp }}/interfaces.new.json
+
+      - name: Backup PR bin/public_interface.py
+        run: |
+          # Keep a copy of bin/public_interface.py
+          # So we are using the same bin/public_interface.py to process old/new codebase.
+          cp bin/public_interface.py "${{ runner.temp }}"/public_interface.py
+
+      - name: Checkout the base
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ github.base_ref }}"
+
+      - name: Extract original public interfaces
+        run: |
+          make init
+          # Recover bin/public_interface.py
+          cp "${{ runner.temp }}"/public_interface.py bin/public_interface.py
+          bin/public_interface.py extract > "${{ runner.temp }}"/interfaces.original.json
     
       - name: Detect compatibility breaking changes
         id: detect
         run: |
           exit_code=0
-          output=$(bin/public_interface.py check ${{ runner.temp }}/interfaces.original.json ${{ runner.temp }}/interfaces.new.json) || exit_code=$?
+          output=$(bin/public_interface.py check "${{ runner.temp }}"/interfaces.original.json "${{ runner.temp }}"/interfaces.new.json) || exit_code=$?
 
           # Show the output in job summary
           echo "$output" >> $GITHUB_STEP_SUMMARY
@@ -59,7 +57,7 @@ jobs:
 
           # Save the output for next step to process it,
           # and saving it into a file can avoid the need of escaping in github-script.
-          echo "$output" > ${{ runner.temp }}/output.md
+          echo "$output" > "${{ runner.temp }}"/output.md
 
       - name: Post GitHub PR comment
         if: ${{ steps.detect.outputs.change_detected }}
@@ -79,5 +77,5 @@ jobs:
       - name: Show detection output
         if: ${{ steps.detect.outputs.change_detected }}
         run: |
-          cat ${{ runner.temp }}/output.md
+          cat "${{ runner.temp }}"/output.md
           exit 1
