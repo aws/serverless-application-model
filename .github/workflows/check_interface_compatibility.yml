@@ -64,7 +64,7 @@ jobs:
           retention-days: 7  # Only storing it for a week in case of debugging needs.
 
       - name: Post GitHub PR comment
-        if: ${{ steps.detect.outputs.exit_code != "0" }}
+        if: ${{ steps.detect.outputs.exit_code != '0' }}
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
