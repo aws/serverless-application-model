@@ -51,6 +51,8 @@ class InterfaceScanner:
         There is no method to verify if a module attribute is a constant,
         After some experiment, here we assume if an attribute is a value
         (without `__module__`) and not a module itself is a constant.
+
+        Note: Class (and other types) should be treated as a variable too
         """
         for constant_name, _ in inspect.getmembers(
             importlib.import_module(module_name),
@@ -59,6 +61,13 @@ class InterfaceScanner:
             if constant_name.startswith("_"):
                 continue
             full_path = f"{module_name}.{constant_name}"
+            self.variables.add(full_path)
+
+        for class_name, _class in inspect.getmembers(importlib.import_module(module_name), inspect.isclass):
+            # Skip imported and ones starting with "_"
+            if _class.__module__ != module_name or class_name.startswith("_"):
+                continue
+            full_path = f"{module_name}.{class_name}"
             self.variables.add(full_path)
 
     def _scan_classes_in_module(self, module_name: str) -> None:
@@ -81,17 +90,16 @@ class InterfaceScanner:
 def _print(signature: Dict[str, inspect.Signature], variables: Set[str]) -> None:
     result: Dict[str, Any] = {"routines": {}, "variables": sorted(variables)}
     for key, value in signature.items():
-        for parameter in value.parameters.values():
-            result["routines"][key] = [
-                {
-                    "name": parameter.name,
-                    "kind": parameter.kind.name,
-                    "default": parameter.default,
-                }
-                if parameter.default != inspect.Parameter.empty
-                else {"name": parameter.name, "kind": parameter.kind.name}
-                for parameter in value.parameters.values()
-            ]
+        result["routines"][key] = [
+            {
+                "name": parameter.name,
+                "kind": parameter.kind.name,
+                "default": parameter.default,
+            }
+            if parameter.default != inspect.Parameter.empty
+            else {"name": parameter.name, "kind": parameter.kind.name}
+            for parameter in value.parameters.values()
+        ]
     print(json.dumps(result, indent=2, sort_keys=True))
 
 
@@ -123,12 +131,12 @@ class _BreakingChanges(NamedTuple):
             print("\n## Deleted module level variables")
             for name in self.deleted_variables:
                 print(f"- {name}")
-        if self.deleted_variables:
+        if self.deleted_routines:
             print("\n## Deleted routines")
             for name in self.deleted_routines:
                 print(f"- {name}")
         if self.incompatible_routines:
-            print("\n## Deleted routines")
+            print("\n## Incompatible routines")
             for name in self.incompatible_routines:
                 before = f"({', '.join(self._argument_to_str(arg) for arg in original_routines[name])})"
                 after = f"({', '.join(self._argument_to_str(arg) for arg in routines[name])})"
