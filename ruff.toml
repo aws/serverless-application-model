@@ -25,7 +25,6 @@ target-version = "py37"
 [per-file-ignores]
 # python scripts in bin/ needs some python path configurations before import
 "bin/*.py" = ["E402"]  # E402: module-import-not-at-top-of-file
-"samtranslator/translator/transform.py" = ["PLR0913"]  # Too many arguments to function call
 
 # Quick exclusion of too-many-args in legacy files,
 # due to there are too many violations in them.
