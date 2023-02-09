@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the base branch
+        uses: actions/checkout@v3
+
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
@@ -49,16 +51,18 @@ jobs:
 
           # Show the output in job summary
           echo "$output" >> $GITHUB_STEP_SUMMARY
-          
-          # Save exit code to determine whether to post pull request comment or not
-          echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
-          
+
+          # Update steps.detect.outputs.change_detected=true for next steps
+          if [ ${{ steps.detect.outputs.exit_code }} -ne 0 ]; then
+            echo "change_detected=true" >> $GITHUB_OUTPUT
+          fi
+
           # Save the output for next step to process it,
           # and saving it into a file can avoid the need of escaping in github-script.
           echo "$output" > ${{ runner.temp }}/output.md
 
       - name: Post GitHub PR comment
-        if: ${{ steps.detect.outputs.exit_code != '0' }}
+        if: ${{ steps.detect.outputs.change_detected }}
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -72,9 +76,8 @@ jobs:
               body: output
             })
 
-      - name: Determine the success/failure of the workflow
+      - name: Show detection output
+        if: ${{ steps.detect.outputs.change_detected }}
         run: |
-          if [ ${{ steps.detect.outputs.exit_code }} -ne 0 ]; then
-            cat ${{ runner.temp }}/output.md
-            exit ${{ steps.detect.outputs.exit_code }}
-          fi
+          cat ${{ runner.temp }}/output.md
+          exit ${{ steps.detect.outputs.exit_code }}
