@@ -16,29 +16,31 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Extract new public interfaces
+      - name: Extract original public interfaces
         run: |
           make init
-          bin/public_interface.py extract >> ${{ runner.temp }}/interfaces.new.json
+          bin/public_interface.py extract >> ${{ runner.temp }}/interfaces.original.json
 
-      - name: Backup bin/public_interface.py
+      - name: Backup original bin/public_interface.py
         run: |
           # Keep a copy of bin/public_interface.py to use on the base branch
           # So we are using the same bin/public_interface.py to process old/new codebase.
+          # Because the step has credential of GitHub token to post comments,
+          # always use the original version that is in our repository.
           cp bin/public_interface.py ${{ runner.temp }}/public_interface.py
 
-      - name: Checkout the base branch
+      - name: Checkout the PR
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.base_ref }}
+          ref: "refs/pull/${{ github.event.number }}/merge"
 
-      - name: Extract original public interfaces
+      - name: Extract PR public interfaces
         run: |
-          echo "Original HEAD: $(git rev-parse --short HEAD)"
+          echo "HEAD: $(git rev-parse --short HEAD)"
           make init
           # Recover bin/public_interface.py
           cp ${{ runner.temp }}/public_interface.py bin/public_interface.py
-          bin/public_interface.py extract >> ${{ runner.temp }}/interfaces.original.json
+          bin/public_interface.py extract >> ${{ runner.temp }}/interfaces.new.json
 
       - name: Archive interface files for debugging
         uses: actions/upload-artifact@v3
