@@ -273,6 +273,7 @@ class ApiGatewayAuthorizer:
         function_invoke_role=None,
         is_aws_iam_authorizer=False,
         authorization_scopes=None,
+        disable_default_function_permissions=False,
     ):
         if authorization_scopes is None:
             authorization_scopes = []
@@ -286,6 +287,7 @@ class ApiGatewayAuthorizer:
         self.function_invoke_role = function_invoke_role
         self.is_aws_iam_authorizer = is_aws_iam_authorizer
         self.authorization_scopes = authorization_scopes
+        self.disable_default_function_permissions = disable_default_function_permissions
 
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
             raise InvalidResourceException(
@@ -300,8 +302,15 @@ class ApiGatewayAuthorizer:
                 "of Headers, QueryStrings, StageVariables, or Context.",
             )
 
-        if authorization_scopes is not None and not isinstance(authorization_scopes, list):
-            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
+        if authorization_scopes is not None:
+            sam_expect(authorization_scopes, api_logical_id, f"Authorizers.{name}.AuthorizationScopes").to_be_a_list()
+
+        if disable_default_function_permissions is not None:
+            sam_expect(
+                disable_default_function_permissions,
+                api_logical_id,
+                f"Authorizers.{name}.DisableDefaultFunctionPermissions",
+            ).to_be_a_bool()
 
     def _is_missing_identity_source(self, identity: Dict[str, Any]) -> bool:
         if not identity:

@@ -1127,6 +1127,7 @@ class ApiGenerator:
                 function_payload_type=authorizer.get("FunctionPayloadType"),
                 function_invoke_role=authorizer.get("FunctionInvokeRole"),
                 authorization_scopes=authorizer.get("AuthorizationScopes"),
+                disable_default_function_permissions=authorizer.get("DisableDefaultFunctionPermissions"),
             )
         return authorizers
 
@@ -1170,7 +1171,7 @@ class ApiGenerator:
 
         for authorizer_name, authorizer in authorizers.items():
             # Construct permissions for Lambda Authorizers only
-            if not authorizer.function_arn:
+            if not authorizer.function_arn or authorizer.disable_default_function_permissions:
                 continue
 
             permission = self._get_permission(authorizer_name, authorizer.function_arn)  # type: ignore[no-untyped-call]
