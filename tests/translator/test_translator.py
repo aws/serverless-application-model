@@ -715,10 +715,8 @@ class TestTemplateValidation(TestCase):
         with open(os.path.join(OUTPUT_FOLDER, "translate_convert_no_metadata.json"), "r") as f:
             expected = json.loads(f.read())
 
-        mock_policy_loader = get_policy_mock()
-
         sam_parser = Parser()
-        translator = Translator(mock_policy_loader, sam_parser)
+        translator = Translator(None, sam_parser)
         actual = translator.translate(template, {})
         self.assertEqual(expected, actual)
 
@@ -731,10 +729,8 @@ class TestTemplateValidation(TestCase):
         with open(os.path.join(OUTPUT_FOLDER, "translate_convert_metadata.json"), "r") as f:
             expected = json.loads(f.read())
 
-        mock_policy_loader = get_policy_mock()
-
         sam_parser = Parser()
-        translator = Translator(mock_policy_loader, sam_parser)
+        translator = Translator(None, sam_parser)
         actual = translator.translate(template, {}, passthrough_metadata=True)
         self.assertEqual(expected, actual)
 
