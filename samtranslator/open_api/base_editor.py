@@ -71,7 +71,7 @@ class BaseEditor:
                 return True
         return False
 
-    def make_path_conditional__(self, path: str, condition: str) -> None:
+    def make_path_conditional(self, path: str, condition: str) -> None:
         """
         Wrap entire API path definition in a CloudFormation if condition.
         :param path: path name

@@ -405,13 +405,13 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
                 all_methods_contain_conditions = None not in all_method_conditions
                 if at_least_one_method and all_methods_contain_conditions:
                     if len(all_method_conditions) == 1:
-                        editor.make_path_conditional__(path, all_method_conditions.pop())
+                        editor.make_path_conditional(path, all_method_conditions.pop())
                     else:
                         path_condition_name = self._path_condition_name(api_id, path)  # type: ignore[no-untyped-call]
                         self._add_combined_condition_to_template(  # type: ignore[no-untyped-call]
                             template.template_dict, path_condition_name, all_method_conditions
                         )
-                        editor.make_path_conditional__(path, path_condition_name)
+                        editor.make_path_conditional(path, path_condition_name)
 
             api.properties["DefinitionBody"] = self._get_api_definition_from_editor(editor)  # type: ignore[no-untyped-call] # TODO make static method
             template.set(api_id, api)
