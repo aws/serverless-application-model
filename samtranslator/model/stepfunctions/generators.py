@@ -142,8 +142,6 @@ class StateMachineGenerator:
         if self.role:
             self.state_machine.RoleArn = self.role
         else:
-            if self.policies and not self.managed_policy_map:
-                raise Exception("Managed policy map is empty, but should not be.")
             if not self.policies:
                 self.policies = []
             execution_role = self._construct_role()

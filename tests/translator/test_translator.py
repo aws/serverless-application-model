@@ -496,36 +496,6 @@ def test_transform_invalid_document(testcase):
     assert error_message == expected.get("errorMessage")
 
 
-@patch("boto3.session.Session.region_name", "ap-southeast-1")
-@patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-def test_transform_unhandled_failure_empty_managed_policy_map():
-    document = {
-        "Transform": "AWS::Serverless-2016-10-31",
-        "Resources": {
-            "Resource": {
-                "Type": "AWS::Serverless::Function",
-                "Properties": {
-                    "CodeUri": "s3://bucket/key",
-                    "Handler": "index.handler",
-                    "Runtime": "nodejs12.x",
-                    "Policies": "AmazonS3FullAccess",
-                },
-            }
-        },
-    }
-
-    parameter_values = get_template_parameter_values()
-    mock_policy_loader = MagicMock()
-    mock_policy_loader.load.return_value = {}
-
-    with pytest.raises(Exception) as e:
-        transform(document, parameter_values, mock_policy_loader)
-
-    error_message = str(e.value)
-
-    assert error_message == "Managed policy map is empty, but should not be."
-
-
 def assert_metric_call(mock, transform, transform_failure=0, invalid_document=0):
     metric_dimensions = [{"Name": "Transform", "Value": transform}]
 

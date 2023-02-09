@@ -276,9 +276,6 @@ class SamFunction(SamResourceMacro):
             resources.extend(event_invoke_resources)
 
         managed_policy_map = kwargs.get("managed_policy_map", {})
-        if not managed_policy_map:
-            raise Exception("Managed policy map is empty, but should not be.")
-
         get_managed_policy_map = kwargs.get("get_managed_policy_map")
 
         execution_role = None
