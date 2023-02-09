@@ -1,6 +1,6 @@
 import json
 from re import match
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
@@ -65,7 +65,7 @@ class ApiGatewayStage(Resource):
 
     runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
 
-    def update_deployment_ref(self, deployment_logical_id):  # type: ignore[no-untyped-def]
+    def update_deployment_ref(self, deployment_logical_id: str) -> None:
         self.DeploymentId = ref(deployment_logical_id)
 
 
@@ -87,13 +87,19 @@ class ApiGatewayDeployment(Resource):
 
     runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}
 
-    def make_auto_deployable(  # type: ignore[no-untyped-def]
-        self, stage, openapi_version=None, swagger=None, domain=None, redeploy_restapi_parameters=None
-    ):
+    def make_auto_deployable(
+        self,
+        stage: ApiGatewayStage,
+        openapi_version: Optional[Union[Dict[str, Any], str]] = None,
+        swagger: Optional[Dict[str, Any]] = None,
+        domain: Optional[Dict[str, Any]] = None,
+        redeploy_restapi_parameters: Optional[Any] = None,
+    ) -> None:
         """
         Sets up the resource such that it will trigger a re-deployment when Swagger changes
         or the openapi version changes or a domain resource changes.
 
+        :param stage: The ApiGatewayStage object which will be re-deployed
         :param swagger: Dictionary containing the Swagger definition of the API
         :param openapi_version: string containing value of OpenApiVersion flag in the template
         :param domain: Dictionary containing the custom domain configuration for the API
@@ -158,7 +164,7 @@ class ApiGatewayResponse:
     def generate_swagger(self) -> Py27Dict:
         # Applying Py27Dict here as this goes into swagger
         swagger = Py27Dict()
-        swagger["responseParameters"] = self._add_prefixes(self.response_parameters)  # type: ignore[no-untyped-call]
+        swagger["responseParameters"] = self._add_prefixes(self.response_parameters)
         swagger["responseTemplates"] = self.response_templates
 
         # Prevent "null" being written.
@@ -167,7 +173,7 @@ class ApiGatewayResponse:
 
         return swagger
 
-    def _add_prefixes(self, response_parameters):  # type: ignore[no-untyped-def]
+    def _add_prefixes(self, response_parameters: Dict[Any, Any]) -> Dict[str, str]:
         GATEWAY_RESPONSE_PREFIX = "gatewayresponse."
         # applying Py27Dict as this is part of swagger
         prefixed_parameters = Py27Dict()
@@ -358,7 +364,7 @@ class ApiGatewayAuthorizer:
             partition = ArnGenerator.get_partition_name()
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
             authorizer_uri = fnSub(
-                ArnGenerator.generate_arn(  # type: ignore[no-untyped-call]
+                ArnGenerator.generate_arn(
                     partition=partition, service="apigateway", resource=resource, include_account_id=False
                 ),
                 {"__FunctionArn__": self.function_arn},

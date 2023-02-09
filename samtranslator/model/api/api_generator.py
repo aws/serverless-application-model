@@ -405,7 +405,7 @@ class ApiGenerator:
             stage_logical_id = generator.gen()
         stage = ApiGatewayStage(stage_logical_id, attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
-        stage.update_deployment_ref(deployment.logical_id)  # type: ignore[no-untyped-call]
+        stage.update_deployment_ref(deployment.logical_id)
         stage.StageName = self.stage_name
         stage.CacheClusterEnabled = self.cache_cluster_enabled
         stage.CacheClusterSize = self.cache_cluster_size
@@ -416,7 +416,7 @@ class ApiGenerator:
         stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
-            deployment.make_auto_deployable(  # type: ignore[no-untyped-call]
+            deployment.make_auto_deployable(
                 stage, self.remove_extra_stage, swagger, self.domain, redeploy_restapi_parameters
             )
 
@@ -1143,7 +1143,7 @@ class ApiGenerator:
         partition = ArnGenerator.get_partition_name()
         resource = "${__ApiId__}/authorizers/*"
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
+            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),
             {"__ApiId__": api_id},
         )
 
