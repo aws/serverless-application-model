@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 from samtranslator.internal.managed_policies.managed_policies import get_bundled_managed_policies
 from samtranslator.internal.types import GetManagedPolicyMap
@@ -9,8 +9,10 @@ from samtranslator.model.resource_policies import PolicyTypes
 from samtranslator.translator.arn_generator import ArnGenerator
 
 
-def _has_key(d: Dict[Any, Any], k: Any) -> bool:
-    return isinstance(d, dict) and k in d
+def _dict_get(d: Optional[Dict[str, str]], k: str) -> Optional[str]:
+    if isinstance(d, dict) and k in d:
+        return d[k]
+    return None
 
 
 # Not designed for efficiency
@@ -19,19 +21,22 @@ def _get_managed_policy_arn(
     managed_policy_map: Optional[Dict[str, str]],
     get_managed_policy_map: Optional[GetManagedPolicyMap],
 ) -> str:
-    if _has_key(managed_policy_map, name):
-        return managed_policy_map[name]
+    arn = _dict_get(managed_policy_map, name)
+    if arn:
+        return arn
 
     partition = ArnGenerator.get_partition_name()
     bundled_managed_policies = get_bundled_managed_policies(partition)
-    if _has_key(bundled_managed_policies, name):
-        return bundled_managed_policies[name]
+    arn = _dict_get(bundled_managed_policies, name)
+    if arn:
+        return arn
 
     if callable(get_managed_policy_map):
         # TODO: Error handling?
         fallback_managed_policies = get_managed_policy_map()
-        if _has_key(fallback_managed_policies, name):
-            return fallback_managed_policies[name]
+        arn = _dict_get(fallback_managed_policies, name)
+        if arn:
+            return arn
 
     return name
 
