@@ -9,7 +9,6 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
-from samtranslator.internal.managed_policies.managed_policies import get_bundled_managed_policies
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
@@ -608,8 +607,6 @@ class SamFunction(SamResourceMacro):
         if self.EventInvokeConfig and event_invoke_policies is not None:
             policy_documents.extend(event_invoke_policies)
 
-        bundled_managed_policies = get_bundled_managed_policies(ArnGenerator.get_partition_name())
-
         return construct_role_for_resource(
             resource_logical_id=self.logical_id,
             attributes=role_attributes,
@@ -621,7 +618,6 @@ class SamFunction(SamResourceMacro):
             role_path=self.RolePath,
             permissions_boundary=self.PermissionsBoundary,
             tags=self._construct_tag_list(self.Tags),
-            bundled_managed_policies=bundled_managed_policies,
             get_managed_policy_map=get_managed_policy_map,
         )
 
