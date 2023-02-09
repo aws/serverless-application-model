@@ -2,9 +2,9 @@ name: Check interface compatibility
 
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened, edited]
 
-
+permissions:
+  pull-requests: write
 
 jobs:
   check-interface-compatibility:
