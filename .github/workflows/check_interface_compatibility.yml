@@ -52,8 +52,9 @@ jobs:
       - name: Detect compatibility breaking changes
         id: detect
         run: |
-          output=$(bash -c '(bin/public_interface.py check ${{ runner.temp }}/interfaces.original.json ${{ runner.temp }}/interfaces.new.json); exit $?')
-          exit_code=$?
+          exit_code=0
+          output=$(bin/public_interface.py check ${{ runner.temp }}/interfaces.original.json ${{ runner.temp }}/interfaces.new.json) | exit_code=$?
+
           echo "output=$output"
           echo "exit_code=$exit_code"
           echo "output=$output" >> $GITHUB_OUTPUT
