@@ -57,19 +57,22 @@ jobs:
 
           echo "output=$output"
           echo "exit_code=$exit_code"
-          echo "output=$output" >> $GITHUB_OUTPUT
+          echo "$output" >> $GITHUB_STEP_SUMMARY
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
+          echo "$output" ${{ runner.temp }}/output.txt
 
       - name: Post GitHub PR comment
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            const fs = require('fs');
+            const data = fs.readFileSync('${{ runner.temp }}/output.txt', 'utf8')
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `hi${{ steps.detect.outputs.output }}`
+              body: "hi" + data
             })
 
       - name: Determine the success/failure of the workflow
