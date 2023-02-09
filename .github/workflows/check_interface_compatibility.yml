@@ -46,7 +46,7 @@ jobs:
         id: detect
         run: |
           exit_code=0
-          output=$(bin/public_interface.py check ${{ runner.temp }}/interfaces.original.json ${{ runner.temp }}/interfaces.new.json) | exit_code=$?
+          output=$(bin/public_interface.py check ${{ runner.temp }}/interfaces.original.json ${{ runner.temp }}/interfaces.new.json) || exit_code=$?
 
           echo "output=$output"
           echo "exit_code=$exit_code"
