@@ -1849,7 +1849,7 @@ class SamConnector(SamResourceMacro):
 
         raise InvalidResourceException(self.logical_id, "'Destination' is an empty list")
 
-    def generate_resources(
+    def generate_resources(  # noqa: too-many-branches
         self,
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
