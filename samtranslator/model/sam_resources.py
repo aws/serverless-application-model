@@ -32,6 +32,7 @@ from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV
 from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
+    UNSUPPORTED_CONNECTOR_PROFILE_TYPE,
     ConnectorResourceError,
     ConnectorResourceReference,
     add_depends_on,
@@ -1861,6 +1862,7 @@ class SamConnector(SamResourceMacro):
             raise InvalidResourceException(
                 self.logical_id,
                 f"Unable to create connector from {source.resource_type} to {destination.resource_type}; it's not supported or the template is invalid.",
+                {UNSUPPORTED_CONNECTOR_PROFILE_TYPE: {source.resource_type: destination.resource_type}},
             )
 
         # removing duplicate permissions
