@@ -58,9 +58,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: interface-json-files
-          path:
-            - ${{ runner.temp }}/interfaces.*.json
-            - output.txt
+          path: |
+            ${{ runner.temp }}/interfaces.*.json
+            output.txt
           retention-days: 7  # Only storing it for a week in case of debugging needs.
 
       - name: Post GitHub PR comment
