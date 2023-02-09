@@ -6,7 +6,7 @@ from samtranslator.model.intrinsics import fnGetAtt, get_logical_id_from_intrins
 from samtranslator.utils.utils import as_array, insert_unique
 
 # TODO: Switch to dataclass
-ConnectorResourceReference = namedtuple(
+_ConnectorResourceReference = namedtuple(
     "ConnectorResourceReference",
     [
         "logical_id",
@@ -91,7 +91,7 @@ def _is_valid_resource_reference(obj: Dict[str, Any]) -> bool:
 
 def get_resource_reference(
     obj: Dict[str, Any], resource_resolver: ResourceResolver, connecting_obj: Dict[str, Any]
-) -> ConnectorResourceReference:
+) -> _ConnectorResourceReference:
     if not _is_valid_resource_reference(obj):
         raise ConnectorResourceError(
             "Must provide 'Id' (with optional 'Qualifier') or a supported combination of other properties."
@@ -107,7 +107,7 @@ def get_resource_reference(
             raise ConnectorResourceError("'Type' is missing or not a string.")
         resource_type = str(resource_type)
 
-        return ConnectorResourceReference(
+        return _ConnectorResourceReference(
             logical_id=None,
             resource_type=resource_type,
             arn=obj.get("Arn"),
@@ -144,7 +144,7 @@ def get_resource_reference(
 
     qualifier = obj.get("Qualifier") if "Qualifier" in obj else _get_resource_qualifier(resource_type)
 
-    return ConnectorResourceReference(
+    return _ConnectorResourceReference(
         logical_id=logical_id,
         resource_type=resource_type,
         arn=arn,

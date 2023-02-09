@@ -33,7 +33,7 @@ from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
     ConnectorResourceError,
-    ConnectorResourceReference,
+    _ConnectorResourceReference,
     add_depends_on_,
     get_event_source_mappings,
     get_resource_reference,
@@ -1850,8 +1850,8 @@ class SamConnector(SamResourceMacro):
 
     def generate_resources(
         self,
-        source: ConnectorResourceReference,
-        destination: ConnectorResourceReference,
+        source: _ConnectorResourceReference,
+        destination: _ConnectorResourceReference,
         dest_index: int,
         multi_dest: bool,
         resource_resolver: ResourceResolver,
@@ -1949,8 +1949,8 @@ class SamConnector(SamResourceMacro):
 
     def _construct_iam_policy(
         self,
-        source: ConnectorResourceReference,
-        destination: ConnectorResourceReference,
+        source: _ConnectorResourceReference,
+        destination: _ConnectorResourceReference,
         profile: ConnectorProfile,
         resource_resolver: ResourceResolver,
         dest_index: int,
@@ -1990,8 +1990,8 @@ class SamConnector(SamResourceMacro):
 
     def _construct_lambda_permission_policy(
         self,
-        source: ConnectorResourceReference,
-        destination: ConnectorResourceReference,
+        source: _ConnectorResourceReference,
+        destination: _ConnectorResourceReference,
         profile: ConnectorProfile,
         dest_index: int,
         multi_dest: bool,
@@ -2032,8 +2032,8 @@ class SamConnector(SamResourceMacro):
 
     def _construct_sns_topic_policy(
         self,
-        source: ConnectorResourceReference,
-        destination: ConnectorResourceReference,
+        source: _ConnectorResourceReference,
+        destination: _ConnectorResourceReference,
         profile: ConnectorProfile,
         dest_index: int,
         multi_dest: bool,
@@ -2062,8 +2062,8 @@ class SamConnector(SamResourceMacro):
 
     def _construct_sqs_queue_policy(
         self,
-        source: ConnectorResourceReference,
-        destination: ConnectorResourceReference,
+        source: _ConnectorResourceReference,
+        destination: _ConnectorResourceReference,
         profile: ConnectorProfile,
         dest_index: int,
         multi_dest: bool,
@@ -2094,8 +2094,8 @@ class SamConnector(SamResourceMacro):
         self,
         generated_resources: List[Resource],
         original_template: Dict[str, Any],
-        source: ConnectorResourceReference,
-        destination: ConnectorResourceReference,
+        source: _ConnectorResourceReference,
+        destination: _ConnectorResourceReference,
     ) -> None:
         """
         Add metadata attribute to generated resources.
