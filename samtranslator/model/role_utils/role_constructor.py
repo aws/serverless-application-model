@@ -1,44 +1,8 @@
-from typing import Dict, Optional
-
-from samtranslator.internal.managed_policies.managed_policies import get_bundled_managed_policies
-from samtranslator.internal.types import GetManagedPolicyMap
+from samtranslator.internal.managed_policies.managed_policies import get_managed_policy_arn
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 from samtranslator.model.resource_policies import PolicyTypes
-from samtranslator.translator.arn_generator import ArnGenerator
-
-
-def _dict_get(d: Optional[Dict[str, str]], k: str) -> Optional[str]:
-    if isinstance(d, dict) and k in d:
-        return d[k]
-    return None
-
-
-# Not designed for efficiency
-def _get_managed_policy_arn(
-    name: str,
-    managed_policy_map: Optional[Dict[str, str]],
-    get_managed_policy_map: Optional[GetManagedPolicyMap],
-) -> str:
-    arn = _dict_get(managed_policy_map, name)
-    if arn:
-        return arn
-
-    partition = ArnGenerator.get_partition_name()
-    bundled_managed_policies = get_bundled_managed_policies(partition)
-    arn = _dict_get(bundled_managed_policies, name)
-    if arn:
-        return arn
-
-    if callable(get_managed_policy_map):
-        # TODO: Error handling?
-        fallback_managed_policies = get_managed_policy_map()
-        arn = _dict_get(fallback_managed_policies, name)
-        if arn:
-            return arn
-
-    return name
 
 
 def construct_role_for_resource(  # type: ignore[no-untyped-def]
@@ -125,11 +89,13 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
 
             policy_arn = policy_entry.data
             if isinstance(policy_entry.data, str):
-                policy_arn = _get_managed_policy_arn(
+                arn = get_managed_policy_arn(
                     policy_entry.data,
                     managed_policy_map,
                     get_managed_policy_map,
                 )
+                if arn:
+                    policy_arn = arn
 
             # De-Duplicate managed policy arns before inserting. Mainly useful
             # when customer specifies a managed policy which is already inserted
