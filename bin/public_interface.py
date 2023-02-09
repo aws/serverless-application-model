@@ -123,7 +123,7 @@ class _BreakingChanges(NamedTuple):
             print("\n## Deleted module level variables")
             for name in self.deleted_variables:
                 print(f"- {name}")
-        if self.deleted_variables:
+        if self.deleted_routines:
             print("\n## Deleted routines")
             for name in self.deleted_routines:
                 print(f"- {name}")

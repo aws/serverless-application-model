@@ -36,7 +36,7 @@ class SamTemplateValidator:
         # of referencing inside a "$ref" of a schema as this will lead to mixups
         # on Windows because of different path separator: \\ instead of /
         schema_store = {}
-        definitions_dir = os.path.join(sam_schema.SCHEMA_DIR, "definitions")
+        definitions_dir = os.path.join(sam_schema._SCHEMA_DIR, "definitions")
 
         for sub_schema in os.listdir(definitions_dir):
             if sub_schema.endswith(".json"):
