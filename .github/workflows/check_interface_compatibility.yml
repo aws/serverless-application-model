@@ -21,7 +21,7 @@ jobs:
       - name: Extract PR public interfaces
         run: |
           make init
-          bin/public_interface.py extract > ${{ runner.temp }}/interfaces.new.json
+          bin/public_interface.py extract > "${{ runner.temp }}"/interfaces.new.json
 
       - name: Backup PR bin/public_interface.py
         run: |
