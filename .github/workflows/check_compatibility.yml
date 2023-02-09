@@ -43,6 +43,7 @@ jobs:
         run: |
           exit_code=0
           output=$(bin/public_interface.py check "${{ runner.temp }}"/interfaces.original.json "${{ runner.temp }}"/interfaces.new.json) || exit_code=$?
+          echo "$output"
 
           if [ "$exit_code" -ne 0 ]; then
             # Show the output in job summary and fail the workflow
