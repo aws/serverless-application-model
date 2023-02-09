@@ -46,7 +46,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: interface-json-files
-          path: ${{ runner.temp }}/interfaces.*.json
+          path:
+            - ${{ runner.temp }}/interfaces.*.json
+            - output.txt
           retention-days: 7  # Only storing it for a week in case of debugging needs.
     
       - name: Detect compatibility breaking changes
@@ -59,7 +61,7 @@ jobs:
           echo "exit_code=$exit_code"
           echo "$output" >> $GITHUB_STEP_SUMMARY
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
-          echo "$output" ${{ runner.temp }}/output.txt
+          echo "$output" >> ${{ runner.temp }}/output.txt
 
       - name: Post GitHub PR comment
         uses: actions/github-script@v6
