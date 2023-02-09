@@ -1,5 +1,6 @@
-from typing import Callable, Dict, Optional
+from typing import Dict, Optional
 
+from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
@@ -10,7 +11,7 @@ def _get_managed_policy_arn(
     name: str,
     managed_policy_map: Optional[Dict[str, str]],
     bundled_managed_policies: Optional[Dict[str, str]],
-    get_managed_policy_map: Optional[Callable[[], Dict[str, str]]],
+    get_managed_policy_map: Optional[GetManagedPolicyMap],
 ) -> str:
     if managed_policy_map is not None:
         if isinstance(managed_policy_map, dict) and name in managed_policy_map:

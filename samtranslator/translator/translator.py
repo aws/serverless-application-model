@@ -1,10 +1,11 @@
 import copy
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
     FeatureToggleDefaultConfigProvider,
 )
+from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
@@ -95,7 +96,7 @@ class Translator:
         parameter_values: Dict[Any, Any],
         feature_toggle: Optional[FeatureToggle] = None,
         passthrough_metadata: Optional[bool] = False,
-        get_managed_policy_map: Optional[Callable[[], Dict[str, str]]] = None,
+        get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
     ) -> Dict[str, Any]:
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
