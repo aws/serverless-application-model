@@ -41,15 +41,6 @@ jobs:
           # Recover bin/public_interface.py
           cp ${{ runner.temp }}/public_interface.py bin/public_interface.py
           bin/public_interface.py extract >> ${{ runner.temp }}/interfaces.new.json
-
-      - name: Archive interface files for debugging
-        uses: actions/upload-artifact@v3
-        with:
-          name: interface-json-files
-          path:
-            - ${{ runner.temp }}/interfaces.*.json
-            - output.txt
-          retention-days: 7  # Only storing it for a week in case of debugging needs.
     
       - name: Detect compatibility breaking changes
         id: detect
@@ -62,6 +53,15 @@ jobs:
           echo "$output" >> $GITHUB_STEP_SUMMARY
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
           echo "$output" >> ${{ runner.temp }}/output.txt
+
+      - name: Archive interface files for debugging
+        uses: actions/upload-artifact@v3
+        with:
+          name: interface-json-files
+          path:
+            - ${{ runner.temp }}/interfaces.*.json
+            - output.txt
+          retention-days: 7  # Only storing it for a week in case of debugging needs.
 
       - name: Post GitHub PR comment
         uses: actions/github-script@v6
