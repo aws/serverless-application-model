@@ -31,7 +31,7 @@ def _is_nonblank_str(s: Any) -> bool:
     return s and isinstance(s, str)
 
 
-def add_depends_on(logical_id: str, depends_on: str, resource_resolver: ResourceResolver) -> None:
+def add_depends_on_(logical_id: str, depends_on: str, resource_resolver: ResourceResolver) -> None:
     """
     Add DependsOn attribute to resource.
     """
@@ -45,7 +45,9 @@ def add_depends_on(logical_id: str, depends_on: str, resource_resolver: Resource
     resource["DependsOn"] = deps
 
 
-def replace_depends_on_logical_id(logical_id: str, replacement: List[str], resource_resolver: ResourceResolver) -> None:
+def replace_depends_on_logical_id(
+    logical_id: str, replacement: List[str], resource_resolver: ResourceResolver, something
+) -> None:
     """
     For every resource's `DependsOn`, replace `logical_id` by `replacement`.
     """

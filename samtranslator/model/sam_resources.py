@@ -34,7 +34,7 @@ from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
     ConnectorResourceError,
     ConnectorResourceReference,
-    add_depends_on,
+    add_depends_on_,
     get_event_source_mappings,
     get_resource_reference,
     replace_depends_on_logical_id,
@@ -1841,7 +1841,7 @@ class SamConnector(SamResourceMacro):
             list_generated_resources.extend(generated_resources)
 
         generated_logical_ids = [resource.logical_id for resource in list_generated_resources]
-        replace_depends_on_logical_id(self.logical_id, generated_logical_ids, resource_resolver)
+        replace_depends_on_logical_id(self.logical_id, generated_logical_ids, resource_resolver, 1)
 
         if list_generated_resources:
             return list_generated_resources
@@ -1982,9 +1982,9 @@ class SamConnector(SamResourceMacro):
             esm_ids = list(get_event_source_mappings(source.logical_id, destination.logical_id, resource_resolver))
             # There can only be a single ESM from a resource to function, otherwise deployment fails
             if len(esm_ids) == 1:
-                add_depends_on(esm_ids[0], policy.logical_id, resource_resolver)
+                add_depends_on_(esm_ids[0], policy.logical_id, resource_resolver)
         if depended_by == "SOURCE" and source.logical_id:
-            add_depends_on(source.logical_id, policy.logical_id, resource_resolver)
+            add_depends_on_(source.logical_id, policy.logical_id, resource_resolver)
 
         return policy
 
