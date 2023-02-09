@@ -1862,7 +1862,7 @@ class SamConnector(SamResourceMacro):
             raise InvalidResourceException(
                 self.logical_id,
                 f"Unable to create connector from {source.resource_type} to {destination.resource_type}; it's not supported or the template is invalid.",
-                {UNSUPPORTED_CONNECTOR_PROFILE_TYPE: f"{source.resource_type} to {destination.resource_type}"},
+                {UNSUPPORTED_CONNECTOR_PROFILE_TYPE: {source.resource_type: destination.resource_type}},
             )
 
         # removing duplicate permissions
