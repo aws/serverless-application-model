@@ -15,7 +15,7 @@ Benefits of using the SAM transform include:
 - Local testing and debugging with the [AWS SAM CLI](https://github.com/aws/aws-sam-cli).
 - Extension of the CloudFormation template syntax.
 
-## Getting started
+## Getting started 
 
 Save the following as `template.yaml`:
 
