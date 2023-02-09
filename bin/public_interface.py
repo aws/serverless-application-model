@@ -128,7 +128,7 @@ class _BreakingChanges(NamedTuple):
             for name in self.deleted_routines:
                 print(f"- {name}")
         if self.incompatible_routines:
-            print("\n## Deleted routines")
+            print("\n## Incompatible routines")
             for name in self.incompatible_routines:
                 before = f"({', '.join(self._argument_to_str(arg) for arg in original_routines[name])})"
                 after = f"({', '.join(self._argument_to_str(arg) for arg in routines[name])})"
