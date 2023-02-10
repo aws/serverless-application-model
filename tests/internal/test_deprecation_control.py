@@ -1,7 +1,7 @@
 import warnings
 from unittest import TestCase
 
-from samtranslator.internal.deprecation_control import deprecated, pending_deprecation
+from samtranslator.internal.deprecation_control import deprecated
 
 
 def replacement_function(x, y):
@@ -21,6 +21,6 @@ class TestDeprecationControl(TestCase):
             self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
             self.assertIn(
                 "deprecated_function is deprecated and will be removed in a future release, "
-                "please consider to use replacement_function",
+                "please use replacement_function",
                 str(w[-1].message),
             )
