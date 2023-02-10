@@ -59,7 +59,7 @@ class PushEventSource(ResourceMacro, metaclass=ABCMeta):
     principal: str = None  # type: ignore
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
 
-    def _construct_permission(  # type: ignore[no-untyped-def]
+    def _construct_permission(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None
     ):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
@@ -563,7 +563,7 @@ class SNS(PushEventSource):
         resources.append(subscription)
         return resources
 
-    def _inject_subscription(
+    def _inject_subscription(  # noqa: too-many-arguments
         self,
         protocol: str,
         endpoint: str,
@@ -750,7 +750,9 @@ class Api(PushEventSource):
 
         return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)  # type: ignore[no-untyped-call]
 
-    def _add_swagger_integration(self, api, api_id, function, intrinsics_resolver):  # type: ignore[no-untyped-def]
+    def _add_swagger_integration(  # type: ignore[no-untyped-def] # noqa: too-many-statements
+        self, api, api_id, function, intrinsics_resolver
+    ):
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
@@ -938,7 +940,7 @@ class Api(PushEventSource):
         return rest_api_id["Ref"] if isinstance(rest_api_id, dict) and "Ref" in rest_api_id else rest_api_id
 
     @staticmethod
-    def add_auth_to_swagger(
+    def add_auth_to_swagger(  # noqa: too-many-arguments
         event_auth: Dict[str, Any],
         api: Dict[str, Any],
         api_id: str,

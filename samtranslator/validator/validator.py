@@ -166,7 +166,7 @@ class SamTemplateValidator:
 
         if final_message.endswith(" under any of the given schemas"):
             return "Is not valid"
-        if final_message.startswith("None is not of type ") or final_message.startswith("None is not one of "):
+        if final_message.startswith(("None is not of type ", "None is not one of ")):
             return "Must not be empty"
         if " does not match " in final_message and "patternError" in error.schema:
             return re.sub("does not match .+", error.schema.get("patternError"), final_message)

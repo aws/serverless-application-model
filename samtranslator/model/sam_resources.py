@@ -298,7 +298,7 @@ class SamFunction(SamResourceMacro):
 
         return resources
 
-    def _construct_event_invoke_config(
+    def _construct_event_invoke_config(  # noqa: too-many-arguments
         self,
         function_name: str,
         alias_name: str,
@@ -931,7 +931,7 @@ class SamFunction(SamResourceMacro):
 
         return alias
 
-    def _validate_deployment_preference_and_add_update_policy(
+    def _validate_deployment_preference_and_add_update_policy(  # noqa: too-many-arguments
         self,
         deployment_preference_collection: DeploymentPreferenceCollection,
         lambda_alias: Optional[LambdaAlias],
@@ -1849,7 +1849,7 @@ class SamConnector(SamResourceMacro):
 
         raise InvalidResourceException(self.logical_id, "'Destination' is an empty list")
 
-    def generate_resources(
+    def generate_resources(  # noqa: too-many-branches
         self,
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
@@ -1949,7 +1949,7 @@ class SamConnector(SamResourceMacro):
             "Statement": policy_statements,
         }
 
-    def _construct_iam_policy(
+    def _construct_iam_policy(  # noqa: too-many-arguments
         self,
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
