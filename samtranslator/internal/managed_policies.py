@@ -16,7 +16,6 @@ def _dict_get(d: Optional[Dict[str, str]], k: str) -> Optional[str]:
     return None
 
 
-# Not designed for efficiency
 def get_managed_policy_arn(
     name: str,
     managed_policy_map: Optional[Dict[str, str]],
