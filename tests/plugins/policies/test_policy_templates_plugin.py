@@ -194,7 +194,6 @@ class TestPolicyTemplatesForResourcePlugin(TestCase):
         self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": {"Param1": "value1"}}})
 
     def test_on_before_transform_resource_must_skip_unsupported_resources(self):
-
         is_supported_mock = Mock()
         data_mock = Mock()
 

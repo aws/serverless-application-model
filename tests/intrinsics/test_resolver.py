@@ -193,6 +193,5 @@ class TestSupportedIntrinsics(TestCase):
             IntrinsicsResolver({}, supported_intrinsics)
 
     def test_configure_supported_intrinsics_must_error_for_non_dict_input(self):
-
         with self.assertRaises(TypeError):
             IntrinsicsResolver({}, [1, 2, 3])

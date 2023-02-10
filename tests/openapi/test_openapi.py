@@ -13,10 +13,8 @@ _X_ANY_METHOD = "x-amazon-apigateway-any-method"
 
 # TODO: add a case for swagger and make sure it fails
 class TestOpenApiEditor_init(TestCase):
-
     # OAS3 doesn't support swagger
     def test_must_raise_on_valid_swagger(self):
-
         valid_swagger = {
             "swagger": "2.0",  # "openapi": "2.1.0"
             "paths": {"/foo": {}, "/bar": {}},
@@ -25,7 +23,6 @@ class TestOpenApiEditor_init(TestCase):
             OpenApiEditor(valid_swagger)
 
     def test_must_raise_on_invalid_openapi(self):
-
         invalid_openapi = {"paths": {}}  # Missing "openapi" keyword
         with self.assertRaises(InvalidDocumentException):
             OpenApiEditor(invalid_openapi)
@@ -107,7 +104,6 @@ class TestOpenApiEditor_has_path(TestCase):
         self.assertFalse(self.editor.has_path("/bar", "xyz"))
 
     def test_must_not_fail_on_bad_path(self):
-
         self.assertTrue(self.editor.has_path("badpath"))
         self.assertFalse(self.editor.has_path("badpath", "somemethod"))
 
@@ -151,7 +147,6 @@ class TestOpenApiEditor_has_integration(TestCase):
 
 class TestOpenApiEditor_add_path(TestCase):
     def setUp(self):
-
         self.original_openapi = {
             "openapi": "3.0.1",
             "paths": {"/foo": {"get": {"a": "b"}}, "/bar": {}, "/badpath": "string value"},
@@ -167,14 +162,12 @@ class TestOpenApiEditor_add_path(TestCase):
         ]
     )
     def test_must_add_new_path_and_method(self, path, method, case):
-
         self.assertFalse(self.editor.has_path(path, method))
         self.editor.add_path(path, method)
         self.assertTrue(self.editor.has_path(path, method), "must add for " + case)
         self.assertEqual(self.editor.openapi["paths"][path][method], {})
 
     def test_must_raise_non_dict_path_values(self):
-
         path = "/badpath"
         method = "get"
 
@@ -198,7 +191,6 @@ class TestOpenApiEditor_add_path(TestCase):
 
 class TestOpenApiEditor_add_lambda_integration(TestCase):
     def setUp(self):
-
         self.original_openapi = {
             "openapi": "3.0.1",
             "paths": {
@@ -306,13 +298,11 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
 
 class TestOpenApiEditor_iter_on_path(TestCase):
     def setUp(self):
-
         self.original_openapi = {"openapi": "3.0.1", "paths": {"/foo": {}, "/bar": {}, "/baz": "some value"}}
 
         self.editor = OpenApiEditor(self.original_openapi)
 
     def test_must_iterate_on_paths(self):
-
         expected = {"/foo", "/bar", "/baz"}
         actual = set(list(self.editor.iter_on_path()))
 
@@ -336,7 +326,6 @@ class TestOpenApiEditor_normalize_method_name(TestCase):
 
 class TestOpenApiEditor_openapi_property(TestCase):
     def test_must_return_copy_of_openapi(self):
-
         input = {"openapi": "3.0.1", "paths": {}}
 
         editor = OpenApiEditor(input)
@@ -377,7 +366,6 @@ class TestOpenApiEditor_is_valid(TestCase):
 
 class TestOpenApiEditor_add_auth(TestCase):
     def setUp(self):
-
         self.original_openapi = {
             "openapi": "3.0.1",
             "paths": {
@@ -391,7 +379,6 @@ class TestOpenApiEditor_add_auth(TestCase):
 
 class TestOpenApiEditor_is_integration_function_logical_id_match(TestCase):
     def setUp(self):
-
         self.original_openapi = {
             "openapi": "3.0.1",
             "paths": {
@@ -430,7 +417,6 @@ class TestOpenApiEditor_is_integration_function_logical_id_match(TestCase):
         self.editor = OpenApiEditor(self.original_openapi)
 
     def test_must_match_integration_function_if_exists(self):
-
         self.assertTrue(
             self.editor.is_integration_function_logical_id_match(
                 OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD, "HttpApiFunction"
@@ -464,7 +450,6 @@ class TestOpenApiEdit_add_description(TestCase):
 
 class TestOpenApiEditor_is_integration_function_logical_id_match_with_alias(TestCase):
     def setUp(self):
-
         self.original_openapi = {
             "openapi": "3.0.1",
             "paths": {
@@ -503,7 +488,6 @@ class TestOpenApiEditor_is_integration_function_logical_id_match_with_alias(Test
         self.editor = OpenApiEditor(self.original_openapi)
 
     def test_no_match_if_alias(self):
-
         self.assertFalse(
             self.editor.is_integration_function_logical_id_match(
                 OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD, "HttpApiFunctionAlias"

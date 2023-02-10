@@ -410,7 +410,6 @@ class GlobalProperties:
         global_dict = global_dict.copy()
 
         for key in local_dict:
-
             if key in global_dict:
                 # Both local & global contains the same key. Let's do a merge.
                 global_dict[key] = self._do_merge(global_dict[key], local_dict[key])  # type: ignore[no-untyped-call]
@@ -441,7 +440,6 @@ class GlobalProperties:
         """
 
         if isinstance(_input, dict):
-
             # Intrinsic functions are always dicts
             if is_intrinsics(_input):
                 # Intrinsic functions are handled *exactly* like a primitive type because

@@ -14,7 +14,6 @@ from samtranslator.model.intrinsics import (
 class TestIntrinsics(TestCase):
     @parameterized.expand(["Ref", "Condition", "Fn::foo", "Fn::sub", "Fn::something"])
     def test_is_intrinsic_must_detect_intrinsics(self, intrinsic_name):
-
         input = {intrinsic_name: ["some value"]}
 
         self.assertTrue(is_intrinsic(input))
