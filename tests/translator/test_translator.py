@@ -667,6 +667,33 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
 
 class TestTemplateValidation(TestCase):
+    _MANAGED_POLICIES_TEMPLATE = {
+        "Resources": {
+            "MyFunction": {
+                "Type": "AWS::Serverless::Function",
+                "Properties": {
+                    "Runtime": "python3.8",
+                    "Handler": "foo",
+                    "InlineCode": "bar",
+                    "Policies": [
+                        "foo",
+                        "bar",
+                    ],
+                },
+            },
+            "MyStateMachine": {
+                "Type": "AWS::Serverless::StateMachine",
+                "Properties": {
+                    "DefinitionUri": "s3://foo/bar",
+                    "Policies": [
+                        "foo",
+                        "bar",
+                    ],
+                },
+            },
+        }
+    }
+
     @parameterized.expand(
         [
             # All combinations, should use first that matches from left
@@ -697,23 +724,6 @@ class TestTemplateValidation(TestCase):
         get_managed_policy_map() are expected to be the same. They must both be
         currently supported managed policies for the Policies property to work.
         """
-        parameters = {}
-        sam_template = {
-            "Resources": {
-                "MyFunction": {
-                    "Type": "AWS::Serverless::Function",
-                    "Properties": {
-                        "Runtime": "python3.8",
-                        "Handler": "foo",
-                        "InlineCode": "bar",
-                        "Policies": [
-                            "foo",
-                            "bar",
-                        ],
-                    },
-                }
-            }
-        }
 
         def get_managed_policy_map():
             return get_managed_policy_map_value
@@ -722,14 +732,18 @@ class TestTemplateValidation(TestCase):
             "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
             {"aws": bundled_managed_policy_map},
         ):
+            parameters = {}
             cfn_template = Translator(managed_policy_map, Parser()).translate(
-                sam_template,
+                self._MANAGED_POLICIES_TEMPLATE,
                 parameters,
                 get_managed_policy_map=get_managed_policy_map,
             )
 
-        actual_arn = cfn_template["Resources"]["MyFunctionRole"]["Properties"]["ManagedPolicyArns"][1]
-        self.assertEqual(actual_arn, expected_arn)
+        function_arn = cfn_template["Resources"]["MyFunctionRole"]["Properties"]["ManagedPolicyArns"][1]
+        sfn_arn = cfn_template["Resources"]["MyStateMachineRole"]["Properties"]["ManagedPolicyArns"][0]
+
+        self.assertEqual(function_arn, expected_arn)
+        self.assertEqual(sfn_arn, expected_arn)
 
     @parameterized.expand(
         [
@@ -752,23 +766,6 @@ class TestTemplateValidation(TestCase):
         Ensure expectd ARN is derived from managed policy name when transforming
         with transform(). It calls Translator.translate() under the hood.
         """
-        parameters = {}
-        sam_template = {
-            "Resources": {
-                "MyFunction": {
-                    "Type": "AWS::Serverless::Function",
-                    "Properties": {
-                        "Runtime": "python3.8",
-                        "Handler": "foo",
-                        "InlineCode": "bar",
-                        "Policies": [
-                            "foo",
-                            "bar",
-                        ],
-                    },
-                }
-            }
-        }
 
         class ManagedPolicyLoader:
             def load(self):
@@ -778,14 +775,18 @@ class TestTemplateValidation(TestCase):
             "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
             {"aws": bundled_managed_policy_map},
         ):
+            parameters = {}
             cfn_template = transform(
-                sam_template,
+                self._MANAGED_POLICIES_TEMPLATE,
                 parameters,
                 ManagedPolicyLoader(),
             )
 
-        actual_arn = cfn_template["Resources"]["MyFunctionRole"]["Properties"]["ManagedPolicyArns"][1]
-        self.assertEqual(actual_arn, expected_arn)
+        function_arn = cfn_template["Resources"]["MyFunctionRole"]["Properties"]["ManagedPolicyArns"][1]
+        sfn_arn = cfn_template["Resources"]["MyStateMachineRole"]["Properties"]["ManagedPolicyArns"][0]
+
+        self.assertEqual(function_arn, expected_arn)
+        self.assertEqual(sfn_arn, expected_arn)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
