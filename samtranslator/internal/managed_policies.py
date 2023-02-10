@@ -30,9 +30,9 @@ def get_managed_policy_arn(
     policies are the same for any region within a partition).
 
     Determined in this order:
-      1. Caller-provided managed policy map (can be omitted)
-      2. Managed policy map bundled with the transform code (i.e. fast)
-      3. Caller-provided managed policy map (as function for lazy loading)
+      1. Caller-provided managed policy map (can be None, mostly for compatibility)
+      2. Managed policy map bundled with the transform code (fast!)
+      3. Caller-provided managed policy map (load lazily as last resort)
     """
     # Caller-provided policy map (eager)
     arn = _dict_get(managed_policy_map, name)
