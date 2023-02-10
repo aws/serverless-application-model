@@ -141,7 +141,8 @@ class Translator:
         intrinsics_resolver = IntrinsicsResolver(parameter_values)
 
         # The available managed policies aren't expected to change during the
-        # run of a transform; cache function return value
+        # run of a transform; cache function return value as it can be called
+        # multiple times
         @lru_cache(maxsize=None)
         def cached_get_managed_policy_map() -> Optional[Dict[str, str]]:
             if not get_managed_policy_map:
