@@ -173,7 +173,7 @@ class ApiGatewayResponse:
 
         return swagger
 
-    def _add_prefixes(self, response_parameters: Dict[Any, Any]) -> Dict[str, str]:
+    def _add_prefixes(self, response_parameters: Dict[str, Any]) -> Dict[str, str]:
         GATEWAY_RESPONSE_PREFIX = "gatewayresponse."
         # applying Py27Dict as this is part of swagger
         prefixed_parameters = Py27Dict()
