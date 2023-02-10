@@ -1366,7 +1366,7 @@ class SamHttpApi(SamResourceMacro):
         :returns: a list of vanilla CloudFormation Resources, to which this Function expands
         :rtype: list
         """
-        resources = []
+        resources: List[Resource] = []
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.CorsConfiguration = intrinsics_resolver.resolve_parameter_refs(self.CorsConfiguration)
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
@@ -1816,7 +1816,7 @@ class SamConnector(SamResourceMacro):
     }
 
     @cw_timer
-    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:  # type: ignore
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
         resource_resolver: ResourceResolver = kwargs["resource_resolver"]
         original_template = kwargs["original_template"]
 

@@ -1,7 +1,7 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
 import inspect
 import re
-from abc import ABC, ABCMeta
+from abc import ABC, ABCMeta, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
@@ -409,6 +409,7 @@ class ResourceMacro(Resource, metaclass=ABCMeta):
         """
         return {}
 
+    @abstractmethod
     def to_cloudformation(self, **kwargs: Any) -> List[Any]:
         """Returns a list of Resource instances, representing vanilla CloudFormation resources, to which this macro
         expands. The caller should be able to update their template with the expanded resources by calling

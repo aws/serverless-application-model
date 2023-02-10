@@ -73,7 +73,7 @@ class SchedulerEventSource(ResourceMacro):
 
     DEFAULT_FLEXIBLE_TIME_WINDOW = {"Mode": "OFF"}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs: Dict[str, Any]) -> List[Resource]:
         """Returns the Scheduler Schedule and an IAM role.
 
