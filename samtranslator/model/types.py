@@ -11,6 +11,7 @@ either a string or a list of strings, but do not validate whether the string(s) 
 from typing import Any, Callable, Type, Union
 
 import samtranslator.model.exceptions
+from samtranslator.internal.deprecation_control import deprecated
 
 # Validator always looks like def ...(value: Any, should_raise: bool = True) -> bool,
 # However, Python type hint doesn't support functions with optional keyword argument
@@ -137,6 +138,7 @@ def any_type() -> Validator:
     return validate
 
 
+@deprecated(replacement="IS_STR")
 def is_str() -> Validator:
     """
     For compatibility reason, we need this `is_str()` as it
