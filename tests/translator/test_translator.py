@@ -667,6 +667,82 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
 
 class TestTemplateValidation(TestCase):
+    @parameterized.expand(
+        [
+            # All combinations, should use first that matches from left
+            ({"foo": "a1"}, {"foo": "a2"}, {"foo": "a3"}, "a1"),
+            (None, None, {"foo": "a3"}, "a3"),
+            (None, {"foo": "a2"}, None, "a2"),
+            ({"foo": "a1"}, {"foo": "a2"}, None, "a1"),
+            (None, None, {"foo": "a3"}, "a3"),
+            (None, {"foo": "a2"}, None, "a2"),
+            ({"foo": "a1"}, None, None, "a1"),
+            (None, None, None, "foo"),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_managed_policies(
+        self,
+        managed_policy_map,
+        bundled_managed_policy_map,
+        get_managed_policy_map_value,
+        expected_arn,
+    ):
+        """
+        Make sure expected ARN is derived from the managed policy name, as the
+        policy map can come from 3 different sources (caller-provided map, bundled map,
+        lazily-loaded caller-provided map).
+
+        Tests both using Translator.translate() and transform(), as both are used.
+        """
+        parameters = {}
+        template = {
+            "Resources": {
+                "MyFunction": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {
+                        "Runtime": "python3.8",
+                        "Handler": "foo",
+                        "InlineCode": "bar",
+                        "Policies": [
+                            "foo",
+                            "bar",
+                        ],
+                    },
+                }
+            }
+        }
+
+        def get_managed_policy_map():
+            return get_managed_policy_map_value
+
+        class ManagedPolicyLoader:
+            def load(self):
+                return managed_policy_map
+
+        with patch(
+            "samtranslator.internal.managed_policies.managed_policies._BUNDLED_MANAGED_POLICIES",
+            {"aws": bundled_managed_policy_map},
+        ):
+            cfn1 = Translator(managed_policy_map, Parser()).translate(
+                template,
+                parameters,
+                get_managed_policy_map=get_managed_policy_map,
+            )
+            cfn2 = transform(
+                template,
+                parameters,
+                ManagedPolicyLoader(),
+                get_managed_policy_map=get_managed_policy_map,
+            )
+
+        cfn1_arn = cfn1["Resources"]["MyFunctionRole"]["Properties"]["ManagedPolicyArns"][1]
+        cfn2_arn = cfn2["Resources"]["MyFunctionRole"]["Properties"]["ManagedPolicyArns"][1]
+
+        self.assertEqual(cfn1_arn, expected_arn)
+        self.assertEqual(cfn2_arn, expected_arn)
+
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_throws_when_resource_not_found(self):
