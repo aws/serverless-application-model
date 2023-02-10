@@ -1,4 +1,4 @@
-from samtranslator.internal.managed_policies.managed_policies import get_managed_policy_arn
+from samtranslator.internal.managed_policies import get_managed_policy_arn
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value

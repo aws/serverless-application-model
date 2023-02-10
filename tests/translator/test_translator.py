@@ -691,11 +691,11 @@ class TestTemplateValidation(TestCase):
     ):
         """
         Ensure expectd ARN is derived from managed policy name when transforming
-        with Translator.translate().
+        with Translator.translate() (used in actual transform).
 
-        This is to test the logic, but in practice managed_policy_map and
-        get_managed_policy_map() are expected to be the same (they're both currently
-        supported managed policies).
+        This tests the fallback logic, but in practice managed_policy_map and
+        get_managed_policy_map() are expected to be the same. They must both be
+        currently supported managed policies for the Policies property to work.
         """
         parameters = {}
         sam_template = {
@@ -719,7 +719,7 @@ class TestTemplateValidation(TestCase):
             return get_managed_policy_map_value
 
         with patch(
-            "samtranslator.internal.managed_policies.managed_policies._BUNDLED_MANAGED_POLICIES",
+            "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
             {"aws": bundled_managed_policy_map},
         ):
             cfn_template = Translator(managed_policy_map, Parser()).translate(
@@ -750,12 +750,7 @@ class TestTemplateValidation(TestCase):
     ):
         """
         Ensure expectd ARN is derived from managed policy name when transforming
-        with transform() (which calls Translator.translate() under the hood).
-
-        transform() takes a ManagedPolicyLoader as input. transform() used to always
-        eager-load managed_policy_map, but for performance reasons, it was changed to
-        lazy-load the map (passed as get_managed_policy_map), and managed_policy_map itself
-        was set to None, so that the bundled policy map takes precedence.
+        with transform(). It calls Translator.translate() under the hood.
         """
         parameters = {}
         sam_template = {
@@ -780,7 +775,7 @@ class TestTemplateValidation(TestCase):
                 return managed_policy_map
 
         with patch(
-            "samtranslator.internal.managed_policies.managed_policies._BUNDLED_MANAGED_POLICIES",
+            "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
             {"aws": bundled_managed_policy_map},
         ):
             cfn_template = transform(
