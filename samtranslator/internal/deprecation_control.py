@@ -6,8 +6,8 @@ For the difference between DeprecationWarning
 and other deprecation warning classes, refer to
 https://peps.python.org/pep-0565/#additional-use-case-for-futurewarning
 
-If external packages import deprecated/pending-deprecation
-interfaces, it is their responsibility to detect and remove them.
+If external packages import deprecated interfaces,
+it is their responsibility to detect and remove them.
 """
 import warnings
 from functools import wraps
