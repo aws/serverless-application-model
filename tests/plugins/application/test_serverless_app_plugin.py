@@ -108,7 +108,6 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
     @patch("botocore.client.BaseClient._make_api_call", mock_create_cloud_formation_template)
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_must_process_applications(self, SamTemplateMock):
-
         self.plugin = ServerlessAppPlugin(sar_client=boto3.client("serverlessrepo"))
         template_dict = {"a": "b"}
         app_resources = [
@@ -133,7 +132,6 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
     @patch("botocore.client.BaseClient._make_api_call", mock_get_application)
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_must_process_applications_validate(self, SamTemplateMock):
-
         self.plugin = ServerlessAppPlugin(validate_only=True)
         template_dict = {"a": "b"}
         app_resources = [

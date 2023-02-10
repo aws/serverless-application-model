@@ -146,7 +146,6 @@ def is_intrinsic(_input: Any) -> bool:
     """
 
     if _input is not None and isinstance(_input, dict) and len(_input) == 1:
-
         key: str = list(_input.keys())[0]
         return key == "Ref" or key == "Condition" or key.startswith("Fn::")
 

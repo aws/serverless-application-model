@@ -119,7 +119,6 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         for logicalId, resource in template.iterate(
             {SamResourceType.Function.value, SamResourceType.StateMachine.value}
         ):
-
             api_events = self._get_api_events(resource)  # type: ignore[no-untyped-call]
             condition = resource.condition
             deletion_policy = resource.deletion_policy
@@ -179,7 +178,6 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
 
         api_events = Py27Dict()
         for event_id, event in resource.properties["Events"].items():
-
             if event and isinstance(event, dict) and event.get("Type") == self.API_EVENT_TYPE:
                 api_events[event_id] = event
 

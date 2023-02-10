@@ -4,7 +4,6 @@ from typing import Any, Optional
 
 
 class LogicalIdGenerator:
-
     # NOTE: Changing the length of the hash will change backwards compatibility. This will break the stability contract
     #       given by this class
     HASH_LENGTH = 10

@@ -614,7 +614,6 @@ class TestFunctionUrlConfig(TestCase):
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_with_invalid_function_url_config_with_authorization_type_value_as_None(self):
-
         function = SamFunction("foo")
         function.CodeUri = "s3://foobar/foo.zip"
         function.Runtime = "foo"

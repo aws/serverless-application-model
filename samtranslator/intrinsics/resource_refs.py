@@ -9,7 +9,6 @@ class SupportedResourceReferences:
     """
 
     def __init__(self) -> None:
-
         # This is a two level map like:
         # { "LogicalId": {"Property": "Value"} }
         self._refs: Dict[str, Dict[str, Any]] = {}

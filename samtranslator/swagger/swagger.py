@@ -712,7 +712,6 @@ class SwaggerEditor(BaseEditor):
             authorizers = Py27Dict()
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
-
             security_dict = Py27Dict()
             security_dict[authorizer_name] = []
             authorizer_security = [security_dict]
@@ -755,7 +754,6 @@ class SwaggerEditor(BaseEditor):
         :param bool apikey_required: Whether the apikey security is required
         """
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
-
             if apikey_required:
                 # We want to enable apikey required security
                 security_dict = Py27Dict()
@@ -825,7 +823,6 @@ class SwaggerEditor(BaseEditor):
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
             if self._doc.get("swagger") is not None:
-
                 existing_parameters = method_definition.get("parameters", [])
 
                 # construct parameter as py27 dict
@@ -874,7 +871,6 @@ class SwaggerEditor(BaseEditor):
         self.definitions = self.definitions or Py27Dict()
 
         for model_name, schema in models.items():
-
             model_type = schema.get("type")
 
             if not model_type:
@@ -1168,7 +1164,6 @@ class SwaggerEditor(BaseEditor):
             existing_parameters = method_definition.get("parameters", [])
 
             for request_parameter in request_parameters:
-
                 parameter_name = request_parameter["Name"]
                 location_name = parameter_name.replace("method.request.", "")
 

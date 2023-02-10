@@ -140,7 +140,6 @@ class SharedApiUsagePlan:
             return
 
         if condition and condition not in self.conditions:
-
             if template_conditions is None:
                 raise InvalidTemplateException(
                     "Can't have condition without having 'Conditions' section in the template"
@@ -641,7 +640,6 @@ class ApiGenerator:
             # Just set Origin property. Others will be defaults
             properties = CorsProperties(AllowOrigin=self.cors)  # type: ignore[call-arg]
         elif isinstance(self.cors, dict):
-
             # Make sure keys in the dict are recognized
             if not all(key in CorsProperties._fields for key in self.cors):
                 raise InvalidResourceException(self.logical_id, INVALID_ERROR)

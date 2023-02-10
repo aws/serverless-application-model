@@ -1,3 +1,5 @@
+from typing import Any, List
+
 import pytest
 
 from unittest import TestCase
@@ -129,7 +131,6 @@ class TestResourceAttributes(TestCase):
         self.assertEqual(r.to_dict(), dict_with_attributes2)
 
     def test_invalid_attr(self):
-
         with pytest.raises(KeyError) as ex:
             # Unsupported attributes cannot be added to the resource
             self.MyResource("id", attributes={"foo": "bar"})
@@ -220,6 +221,9 @@ class TestSamResourceReferableProperties(TestCase):
             property_types = {}
             referable_properties = {"prop1": "resource_type1", "prop2": "resource_type2", "prop3": "resource_type3"}
 
+            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+                return []
+
         sam_resource = NewSamResource("SamLogicalId")
 
         cfn_resources = [self.ResourceType1("logicalId1"), self.ResourceType2("logicalId2")]
@@ -240,6 +244,9 @@ class TestSamResourceReferableProperties(TestCase):
             resource_type = "foo"
             property_types = {}
             referable_properties = {"prop1": "resource_type1", "prop2": "resource_type2", "prop3": "resource_type3"}
+
+            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+                return []
 
         sam_resource1 = NewSamResource("SamLogicalId1")
         sam_resource2 = NewSamResource("SamLogicalId2")
@@ -267,6 +274,9 @@ class TestSamResourceReferableProperties(TestCase):
             property_types = {}
             referable_properties = {"prop1": "foo", "prop2": "bar"}
 
+            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+                return []
+
         sam_resource = NewSamResource("SamLogicalId")
 
         # None of the CFN resource types are in the referable list
@@ -282,6 +292,9 @@ class TestSamResourceReferableProperties(TestCase):
             property_types = {}
             referable_properties = {}
 
+            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+                return []
+
         sam_resource = NewSamResource("SamLogicalId")
 
         cfn_resources = [self.ResourceType1("logicalId1"), self.ResourceType2("logicalId2")]
@@ -296,6 +309,9 @@ class TestSamResourceReferableProperties(TestCase):
             property_types = {}
             referable_properties = {"prop1": "resource_type1"}
 
+            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+                return []
+
         sam_resource = NewSamResource("SamLogicalId")
 
         cfn_resources = []
@@ -309,6 +325,9 @@ class TestSamResourceReferableProperties(TestCase):
             resource_type = "foo"
             property_types = {}
             referable_properties = {"prop1": "resource_type1"}
+
+            def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+                return []
 
         sam_resource = NewSamResource("SamLogicalId")
 

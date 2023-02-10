@@ -30,9 +30,7 @@ import uuid
 
 
 def parse_s3_url(url, bucket_name_property="Bucket", object_key_property="Key", version_property=None):
-
     if isinstance(url, str) and url.startswith("s3://"):
-
         parsed = urlparse(url)
         query = parse_qs(parsed.query)
 

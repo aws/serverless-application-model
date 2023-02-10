@@ -26,7 +26,6 @@ class TestGlobalsPlugin(TestCase):
 
     @patch("samtranslator.plugins.globals.globals_plugin.Globals")
     def test_on_before_transform_template_must_raise_on_invalid_globals_section(self, GlobalsMock):
-
         id = "id"
         msg = "msg"
         template = {"foo": "bar"}
