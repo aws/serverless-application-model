@@ -372,7 +372,6 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         """
         Method necessary to fully pickle Python 3 subclassed dict objects with attribute fields.
         """
-        # pylint: disable = W0235
         return super().__reduce__()
 
     def __setitem__(self, key, value):  # type: ignore[no-untyped-def]
@@ -550,7 +549,6 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         list
             list of values
         """
-        # pylint: disable=consider-using-dict-items
         return [self[k] for k in self]
 
     def items(self):  # type: ignore[no-untyped-def]
@@ -562,7 +560,6 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         list
             list of items
         """
-        # pylint: disable=consider-using-dict-items
         return [(k, self[k]) for k in self]
 
     def setdefault(self, key, default):  # type: ignore[no-untyped-def]

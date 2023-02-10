@@ -1,0 +1,333 @@
+{
+  "Resources": {
+    "AccessPoint": {
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "EfsFileSystem"
+        }
+      },
+      "Type": "AWS::EFS::AccessPoint"
+    },
+    "EfsFileSystem": {
+      "Type": "AWS::EFS::FileSystem"
+    },
+    "HashChangeFunction": {
+      "Properties": {
+        "Architectures": [
+          "x86_64"
+        ],
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "EphemeralStorage": {
+          "Size": 1024
+        },
+        "FileSystemConfigs": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "AccessPoint",
+                "Arn"
+              ]
+            },
+            "LocalMountPath": "/mnt/EFS"
+          }
+        ],
+        "Handler": "hello.handler",
+        "KmsKeyArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:key:key"
+        },
+        "Layers": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1"
+          }
+        ],
+        "PackageType": "Zip",
+        "ReservedConcurrentExecutions": 100,
+        "Role": {
+          "Fn::Sub": "arn:${AWS::Partition}:iam::role"
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 1,
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-085912345678492fb"
+          ],
+          "SubnetIds": [
+            "subnet-071f712345678e7c8"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "HashChangeFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "HashChangeFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "HashChangeFunctionVersion17ca83d2bf",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "HashChangeFunctionVersion17ca83d2bf": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "HashChangeFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "HashNoChangeFunction": {
+      "Properties": {
+        "Architectures": [
+          "x86_64"
+        ],
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "EphemeralStorage": {
+          "Size": 1024
+        },
+        "FileSystemConfigs": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "AccessPoint",
+                "Arn"
+              ]
+            },
+            "LocalMountPath": "/mnt/EFS"
+          }
+        ],
+        "Handler": "hello.handler",
+        "KmsKeyArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:key:key"
+        },
+        "Layers": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1"
+          }
+        ],
+        "PackageType": "Zip",
+        "ReservedConcurrentExecutions": 100,
+        "Role": {
+          "Fn::Sub": "arn:${AWS::Partition}:iam::role"
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 1,
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-085912345678492fb"
+          ],
+          "SubnetIds": [
+            "subnet-071f712345678e7c8"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "HashNoChangeFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "HashNoChangeFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "HashNoChangeFunctionVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "HashNoChangeFunctionVersion640128d35d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "HashNoChangeFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "MinimalFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MinimalFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MinimalFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MinimalFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "MinimalFunctionVersion62bebcf0c1",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "MinimalFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MinimalFunctionVersion62bebcf0c1": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "MinimalFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "OtherMinimalFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "OtherMinimalFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "OtherMinimalFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "OtherMinimalFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "OtherMinimalFunctionVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "OtherMinimalFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "OtherMinimalFunctionVersion640128d35d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "OtherMinimalFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    }
+  }
+}

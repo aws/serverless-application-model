@@ -35,6 +35,7 @@ class Globals:
             "Tracing",
             "KmsKeyArn",
             "AutoPublishAlias",
+            "AutoPublishAliasAllProperties",
             "Layers",
             "DeploymentPreference",
             "RolePath",

@@ -1,0 +1,86 @@
+Resources:
+  MinimalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      AutoPublishAliasAllProperties: true
+      VersionDescription: sam-testing
+
+  OtherMinimalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      AutoPublishAliasAllProperties: false
+      VersionDescription: sam-testing
+
+  # this function will only use Code lambda function property to make the hash
+  HashNoChangeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      VersionDescription: sam-testing
+      Timeout: 1
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-085912345678492fb
+        SubnetIds:
+        - subnet-071f712345678e7c8
+      ReservedConcurrentExecutions: 100
+      Layers:
+      - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1
+      PackageType: Zip
+      Architectures:
+      - x86_64
+      EphemeralStorage:
+        Size: 1024
+      Role: !Sub arn:${AWS::Partition}:iam::role
+      KmsKeyArn: !Sub arn:${AWS::Partition}:key:key
+      FileSystemConfigs:
+      - Arn: !GetAtt AccessPoint.Arn
+        LocalMountPath: /mnt/EFS
+
+  # this function will all the lambda function properties to make the hash
+  HashChangeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      AutoPublishAliasAllProperties: true
+      VersionDescription: sam-testing
+      Timeout: 1
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-085912345678492fb
+        SubnetIds:
+        - subnet-071f712345678e7c8
+      ReservedConcurrentExecutions: 100
+      Layers:
+      - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1
+      PackageType: Zip
+      Architectures:
+      - x86_64
+      EphemeralStorage:
+        Size: 1024
+      Role: !Sub arn:${AWS::Partition}:iam::role
+      KmsKeyArn: !Sub arn:${AWS::Partition}:key:key
+      FileSystemConfigs:
+      - Arn: !GetAtt AccessPoint.Arn
+        LocalMountPath: /mnt/EFS
+
+  AccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref EfsFileSystem
+  EfsFileSystem:
+    Type: AWS::EFS::FileSystem
