@@ -14,7 +14,6 @@ class TestDeploymentPreferenceCollection(TestCase):
         ]
     )
     def test_codedeploy_iam_role_contains_AWSCodeDeployRoleForLambdaLimited_managedpolicy(self, partition):
-
         with patch(
             "samtranslator.translator.arn_generator.ArnGenerator.get_partition_name"
         ) as get_partition_name_patch:
@@ -35,7 +34,6 @@ class TestDeploymentPreferenceCollection(TestCase):
         ]
     )
     def test_codedeploy_iam_role_contains_AWSCodeDeployRoleForLambda_managedpolicy(self, partition):
-
         with patch(
             "samtranslator.translator.arn_generator.ArnGenerator.get_partition_name"
         ) as get_partition_name_patch:

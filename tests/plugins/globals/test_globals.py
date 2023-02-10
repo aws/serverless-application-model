@@ -7,7 +7,6 @@ from samtranslator.plugins.globals.globals import GlobalProperties, Globals, Inv
 
 
 class GlobalPropertiesTestCases(object):
-
     dict_with_single_level_should_be_merged = {
         "global": {"a": 1, "b": 2},
         "local": {"a": "foo", "c": 3, "d": 4},
@@ -174,11 +173,9 @@ class GlobalPropertiesTestCases(object):
 
 
 class TestGlobalPropertiesMerge(TestCase):
-
     # Get all attributes of the test case object which is not a built-in method like __str__
     @parameterized.expand([d for d in dir(GlobalPropertiesTestCases) if not d.startswith("__")])
     def test_global_properties_merge(self, testcase):
-
         configuration = getattr(GlobalPropertiesTestCases, testcase)
         if not configuration:
             raise Exception("Invalid configuration for test case " + testcase)
@@ -192,7 +189,6 @@ class TestGlobalPropertiesMerge(TestCase):
 class TestGlobalsPropertiesEdgeCases(TestCase):
     @patch.object(GlobalProperties, "_token_of")
     def test_merge_with_objects_of_unsupported_token_type(self, token_of_mock):
-
         token_of_mock.return_value = "some random type"
         properties = GlobalProperties("global value")
 
@@ -240,35 +236,30 @@ class TestGlobalsObject(TestCase):
         self.assertEqual(self.template["Globals"]["type2"], parsed_globals["prefix_type2"].global_properties)
 
     def test_parse_should_error_if_globals_is_not_dict(self):
-
         template = {"Globals": "hello"}
 
         with self.assertRaises(InvalidGlobalsSectionException):
             Globals(template)
 
     def test_parse_should_error_if_globals_contains_unknown_types(self):
-
         template = {"Globals": {"random_type": {"key": "value"}, "type1": {"key": "value"}}}
 
         with self.assertRaises(InvalidGlobalsSectionException):
             Globals(template)
 
     def test_parse_should_error_if_globals_contains_unknown_properties_of_known_type(self):
-
         template = {"Globals": {"type1": {"unknown_property": "value"}}}
 
         with self.assertRaises(InvalidGlobalsSectionException):
             Globals(template)
 
     def test_parse_should_error_if_value_is_not_dictionary(self):
-
         template = {"Globals": {"type1": "string value"}}
 
         with self.assertRaises(InvalidGlobalsSectionException):
             Globals(template)
 
     def test_parse_should_not_error_if_value_is_empty(self):
-
         template = {"Globals": {"type1": {}}}  # empty value
 
         globals = Globals(template)
@@ -278,7 +269,6 @@ class TestGlobalsObject(TestCase):
         self.assertEqual({}, parsed["prefix_type1"].global_properties)
 
     def test_init_without_globals_section_in_template(self):
-
         template = {"a": "b"}
 
         global_obj = Globals(template)
@@ -301,7 +291,6 @@ class TestGlobalsObject(TestCase):
 
     @patch.object(Globals, "_parse")
     def test_merge_must_actually_do_merge(self, parse_mock):
-
         type1_mock = Mock()
         type2_mock = Mock()
         parse_mock.return_value = {"type1": type1_mock, "type2": type2_mock}
@@ -320,7 +309,6 @@ class TestGlobalsObject(TestCase):
 
     @patch.object(Globals, "_parse")
     def test_merge_must_skip_unsupported_types(self, parse_mock):
-
         type1_mock = Mock()
         parse_mock.return_value = {"type1": type1_mock}
 
@@ -337,7 +325,6 @@ class TestGlobalsObject(TestCase):
 
     @patch.object(Globals, "_parse")
     def test_merge_must_skip_with_no_types(self, parse_mock):
-
         parse_mock.return_value = {}
 
         local_properties = {"a": "b"}
@@ -351,7 +338,6 @@ class TestGlobalsObject(TestCase):
         self.assertEqual(expected, result)
 
     def test_merge_end_to_end_on_known_type1(self):
-
         type = "prefix_type1"
         properties = {"prop1": "overridden value", "a": "b", "key": [1, 2, 3]}
 
@@ -363,7 +349,6 @@ class TestGlobalsObject(TestCase):
         self.assertEqual(expected, result)
 
     def test_merge_end_to_end_on_known_type2(self):
-
         type = "prefix_type2"
         properties = {"a": "b", "key": [1, 2, 3]}
 
@@ -380,7 +365,6 @@ class TestGlobalsObject(TestCase):
         self.assertEqual(expected, result)
 
     def test_merge_end_to_end_unknown_type(self):
-
         type = "some unknown type"
         properties = {"a": "b", "key": [1, 2, 3]}
 

@@ -13,7 +13,6 @@ class TestRegionConfiguration(TestCase):
         ]
     )
     def test_when_apigw_edge_configuration_supported(self, partition):
-
         with patch(
             "samtranslator.translator.arn_generator.ArnGenerator.get_partition_name"
         ) as get_partition_name_patch:

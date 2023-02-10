@@ -8,7 +8,6 @@ from unittest.mock import Mock, patch, call
 
 class TestSamPluginsRegistration(TestCase):
     def setUp(self):
-
         # Setup the plugin to be a "subclass" of the BasePlugin
         self.mock_plugin_name = "mock_plugin"
         self.mock_plugin = Mock(spec=BasePlugin)
@@ -17,20 +16,17 @@ class TestSamPluginsRegistration(TestCase):
         self.sam_plugins = SamPlugins()
 
     def test_register_must_work(self):
-
         self.sam_plugins.register(self.mock_plugin)
 
         self.assertEqual(self.mock_plugin, self.sam_plugins._get(self.mock_plugin_name))
 
     def test_register_must_raise_on_duplicate_plugin(self):
-
         self.sam_plugins.register(self.mock_plugin)
 
         with self.assertRaises(ValueError):
             self.sam_plugins.register(self.mock_plugin)
 
     def test_register_must_raise_on_invalid_plugin_type(self):
-
         # Plugin which is not an instance of BaseClass
         bad_plugin = Mock()
         bad_plugin.name = "some name"
@@ -39,7 +35,6 @@ class TestSamPluginsRegistration(TestCase):
             self.sam_plugins.register(bad_plugin)
 
     def test_register_must_append_plugins_to_end(self):
-
         plugin1 = _make_mock_plugin("plugin1")
         plugin2 = _make_mock_plugin("plugin2")
         plugin3 = _make_mock_plugin("plugin3")
@@ -53,7 +48,6 @@ class TestSamPluginsRegistration(TestCase):
         self.assertEqual(expected, self.sam_plugins._plugins)
 
     def test_must_register_plugins_list_on_initialization(self):
-
         plugin1 = _make_mock_plugin("plugin1")
         plugin2 = _make_mock_plugin("plugin2")
 
@@ -84,7 +78,6 @@ class TestSamPluginsRegistration(TestCase):
         self.assertTrue(self.sam_plugins.is_registered(self.mock_plugin_name))
 
     def test_is_registered_must_return_false_when_no_plugins_registered(self):
-
         # No Plugins are registered
         self.assertFalse(self.sam_plugins.is_registered(self.mock_plugin_name))
 
@@ -94,7 +87,6 @@ class TestSamPluginsRegistration(TestCase):
         self.assertFalse(self.sam_plugins.is_registered("some plugin name"))
 
     def test_get_must_return_a_registered_plugin(self):
-
         plugin1 = _make_mock_plugin("plugin1")
         plugin2 = _make_mock_plugin("plugin2")
 
@@ -105,7 +97,6 @@ class TestSamPluginsRegistration(TestCase):
         self.assertEqual(plugin2, self.sam_plugins._get(plugin2.name))
 
     def test_get_must_handle_no_registered_plugins(self):
-
         # NO plugins registered
         self.assertIsNone(self.sam_plugins._get("some plugin"))
 
@@ -127,7 +118,6 @@ class TestSamPluginsAct(TestCase):
         self.mock_lifecycle_events.my_event = self.my_event
 
     def test_act_must_invoke_correct_hook_method(self):
-
         # Setup the plugin to return a mock when the "on_" method is invoked
         plugin = _make_mock_plugin("plugin")
         hook_method = Mock()
@@ -145,7 +135,6 @@ class TestSamPluginsAct(TestCase):
         hook_method.assert_called_once_with(arg1, arg2, kwargs1=kwargs1, kwargs2=kwargs2)
 
     def test_act_must_invoke_hook_on_all_plugins(self):
-
         # Create three plugins, and setup hook methods on it
         plugin1 = _make_mock_plugin("plugin1")
         setattr(plugin1, "on_" + self.my_event.name, Mock())
@@ -170,7 +159,6 @@ class TestSamPluginsAct(TestCase):
         plugin3.on_my_event.assert_called_once_with(arg1, arg2, kwargs1=kwargs1, kwargs2=kwargs2)
 
     def test_act_must_invoke_plugins_in_sequence(self):
-
         # Create three plugins, and setup hook methods on it
         plugin1 = _make_mock_plugin("plugin1")
         setattr(plugin1, "on_" + self.my_event.name, Mock())
@@ -197,7 +185,6 @@ class TestSamPluginsAct(TestCase):
         parent_mock.assert_has_calls([call.plugin1_hook(), call.plugin2_hook(), call.plugin3_hook()])
 
     def test_act_must_skip_if_no_plugins_are_registered(self):
-
         # Create three plugins, and setup hook methods on it
         plugin1 = _make_mock_plugin("plugin1")
         setattr(plugin1, "on_" + self.my_event.name, Mock())
@@ -210,12 +197,10 @@ class TestSamPluginsAct(TestCase):
         plugin1.on_my_event.assert_not_called()
 
     def test_act_must_fail_on_invalid_event_type_string(self):
-
         with self.assertRaises(ValueError):
             self.sam_plugins.act("some event")
 
     def test_act_must_fail_on_invalid_event_type_object(self):
-
         with self.assertRaises(ValueError):
             self.sam_plugins.act(Mock())
 
@@ -227,7 +212,6 @@ class TestSamPluginsAct(TestCase):
             self.sam_plugins.act(SomeEnum.A)
 
     def test_act_must_fail_on_non_existent_hook_method(self):
-
         # Create a plugin but setup hook method with wrong name
         plugin1 = _make_mock_plugin("plugin1")
         setattr(plugin1, "on_unknown_event", Mock())
@@ -239,7 +223,6 @@ class TestSamPluginsAct(TestCase):
         plugin1.on_unknown_event.assert_not_called()
 
     def test_act_must_raise_exceptions_raised_by_plugins(self):
-
         # Create a plugin but setup hook method with wrong name
         plugin1 = _make_mock_plugin("plugin1")
         setattr(plugin1, "on_" + self.my_event.name, Mock())
@@ -292,12 +275,10 @@ class Yoyoyo(BasePlugin):
 
 class TestBasePlugin(TestCase):
     def test_initialization_should_set_name(self):
-
         plugin = Yoyoyo()
         self.assertEqual("Yoyoyo", plugin.name)
 
     def test_initialization_should_set_custom_name(self):
-
         plugin = Yoyoyo("custom-name")
         self.assertEqual("custom-name", plugin.name)
 

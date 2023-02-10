@@ -131,7 +131,6 @@ class TestResourceAttributes(TestCase):
         self.assertEqual(r.to_dict(), dict_with_attributes2)
 
     def test_invalid_attr(self):
-
         with pytest.raises(KeyError) as ex:
             # Unsupported attributes cannot be added to the resource
             self.MyResource("id", attributes={"foo": "bar"})
