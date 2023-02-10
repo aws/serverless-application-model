@@ -13,6 +13,9 @@ import warnings
 from functools import wraps
 from typing import Callable, Optional, TypeVar
 
+from typing_extensions import ParamSpec
+
+PT = ParamSpec("PT")  # parameters
 RT = TypeVar("RT")  # return type
 
 
@@ -20,7 +23,7 @@ def _make_message(message: str, replacement: Optional[str]) -> str:
     return f"{message}, please use {replacement}" if replacement else message
 
 
-def deprecated(replacement: Optional[str]) -> Callable[[Callable[..., RT]], Callable[..., RT]]:
+def deprecated(replacement: Optional[str]) -> Callable[[Callable[PT, RT]], Callable[PT, RT]]:
     """
     Mark a function/method as deprecated.
 
@@ -28,7 +31,7 @@ def deprecated(replacement: Optional[str]) -> Callable[[Callable[..., RT]], Call
     by code in __main__.
     """
 
-    def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
+    def decorator(func: Callable[PT, RT]) -> Callable[PT, RT]:
         @wraps(func)
         def wrapper(*args, **kwargs) -> RT:  # type: ignore
             warning_message = _make_message(
