@@ -90,9 +90,7 @@ class MetricDatum:
     Class to hold Metric data.
     """
 
-    def __init__(  # type: ignore[no-untyped-def]
-        self, name, value, unit, dimensions=None, timestamp=None
-    ):
+    def __init__(self, name, value, unit, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
         """
         Constructor
 
@@ -138,9 +136,7 @@ class Metrics:
             )
             self.publish()
 
-    def _record_metric(  # type: ignore[no-untyped-def]
-        self, name, value, unit, dimensions=None, timestamp=None
-    ):
+    def _record_metric(self, name, value, unit, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
         """
         Create and save metric object in internal cache.
 
