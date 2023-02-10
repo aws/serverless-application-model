@@ -160,7 +160,7 @@ class SharedApiUsagePlan:
 
 
 class ApiGenerator:
-    def __init__(
+    def __init__(  # noqa: too-many-arguments
         self,
         logical_id: str,
         cache_cluster_enabled: Optional[Intrinsicable[bool]],

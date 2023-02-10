@@ -114,7 +114,7 @@ class SwaggerEditor(BaseEditor):
                     [InvalidTemplateException(f"Invalid OpenAPI definition: {str(ex)}.")]
                 ) from ex
 
-    def add_lambda_integration(
+    def add_lambda_integration(  # noqa: too-many-arguments
         self,
         path: str,
         method: str,
@@ -175,7 +175,7 @@ class SwaggerEditor(BaseEditor):
             if condition:
                 path_item[method] = make_conditional(condition, path_item[method])
 
-    def add_state_machine_integration(  # type: ignore[no-untyped-def]
+    def add_state_machine_integration(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self,
         path,
         method,
@@ -271,7 +271,7 @@ class SwaggerEditor(BaseEditor):
                     normalized_method_name = self._normalize_method_name(method_name)
                     yield normalized_method_name, method_definition
 
-    def add_cors(  # type: ignore[no-untyped-def]
+    def add_cors(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None, allow_credentials=None
     ):
         """

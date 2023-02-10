@@ -33,7 +33,7 @@ HttpApiTagName = "httpapi:createdBy"
 
 
 class HttpApiGenerator:
-    def __init__(
+    def __init__(  # noqa: too-many-arguments
         self,
         logical_id: str,
         stage_variables: Optional[Dict[str, Intrinsicable[str]]],
