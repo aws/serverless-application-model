@@ -712,7 +712,7 @@ class HttpApiGenerator:
         open_api_editor.add_title(self.name)
         self.definition_body = open_api_editor.openapi
 
-    @cw_timer(prefix="Generator", name="HttpApi")  # type: ignore[misc]
+    @cw_timer(prefix="Generator", name="HttpApi")
     def to_cloudformation(
         self, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
     ) -> Tuple[

@@ -4,12 +4,14 @@ Method decorator for execution latency collection
 import functools
 import logging
 from datetime import datetime
-from typing import Any, Callable, Optional, Union
+from typing import Callable, Optional, TypeVar, Union, overload
 
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 from samtranslator.model import Resource
 
 LOG = logging.getLogger(__name__)
+
+_RT = TypeVar("_RT")  # return value
 
 
 class MetricsMethodWrapperSingleton:
@@ -76,9 +78,21 @@ def _send_cw_metric(prefix, name, execution_time_ms, func, args):  # type: ignor
         LOG.warning("Failed to add metrics", exc_info=e)
 
 
+@overload
 def cw_timer(
-    _func: Optional[Callable[..., Any]] = None, name: Optional[str] = None, prefix: Optional[str] = None
-) -> Union[Callable[..., Any], Callable[[Callable[..., Any]], Callable[..., Any]]]:
+    *, name: Optional[str] = None, prefix: Optional[str] = None
+) -> Callable[[Callable[..., _RT]], Callable[..., _RT]]:
+    ...
+
+
+@overload
+def cw_timer(_func: Callable[..., _RT], name: Optional[str] = None, prefix: Optional[str] = None) -> Callable[..., _RT]:
+    ...
+
+
+def cw_timer(
+    _func: Optional[Callable[..., _RT]] = None, name: Optional[str] = None, prefix: Optional[str] = None
+) -> Union[Callable[..., _RT], Callable[[Callable[..., _RT]], Callable[..., _RT]]]:
     """
     A method decorator, that will calculate execution time of the decorated method, and store this information as a
     metric in CloudWatch by calling the metrics singleton instance.
@@ -91,9 +105,9 @@ def cw_timer(
     If prefix is defined, it will be added in the beginning of what is been generated above
     """
 
-    def cw_timer_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+    def cw_timer_decorator(func: Callable[..., _RT]) -> Callable[..., _RT]:
         @functools.wraps(func)
-        def wrapper_cw_timer(*args, **kwargs):  # type: ignore[no-untyped-def]
+        def wrapper_cw_timer(*args, **kwargs) -> _RT:  # type: ignore[no-untyped-def]
             start_time = datetime.now()
 
             exec_result = func(*args, **kwargs)
