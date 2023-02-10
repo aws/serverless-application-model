@@ -7,7 +7,6 @@ from samtranslator.policy_template_processor.exceptions import InvalidParameterV
 
 class TestTemplateObject(TestCase):
     def test_init_must_check_for_existence_of_all_parameters(self):
-
         template_name = "template_name"
         parameters = {}
         template_definition = {"key": "value"}
@@ -94,17 +93,14 @@ class TestTemplateObject(TestCase):
             template.missing_parameter_values(parameter_values)
 
     def test_is_valid_parameter_values_must_work(self):
-
         parameter_values = {"a": "b"}
         self.assertTrue(Template._is_valid_parameter_values(parameter_values))
 
     def test_is_valid_parameter_values_must_fail_for_none_value(self):
-
         parameter_values = None
         self.assertFalse(Template._is_valid_parameter_values(parameter_values))
 
     def test_is_valid_parameter_values_must_fail_for_non_dict(self):
-
         parameter_values = [1, 2, 3]
         self.assertFalse(Template._is_valid_parameter_values(parameter_values))
 

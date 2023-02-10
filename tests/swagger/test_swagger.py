@@ -17,7 +17,6 @@ _ALLOW_CREDENTALS_TRUE = "'true'"
 
 class TestSwaggerEditor_init(TestCase):
     def test_must_raise_on_invalid_swagger(self):
-
         invalid_swagger = {"paths": {}}  # Missing "Swagger" keyword
         with self.assertRaises(InvalidDocumentException):
             SwaggerEditor(invalid_swagger)
@@ -144,7 +143,6 @@ class TestSwaggerEditor_has_integration(TestCase):
 
 class TestSwaggerEditor_add_path(TestCase):
     def setUp(self):
-
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -163,7 +161,6 @@ class TestSwaggerEditor_add_path(TestCase):
         ]
     )
     def test_must_add_new_path_and_method(self, path, method, case):
-
         self.assertFalse(self.editor.has_path(path, method))
         self.editor.add_path(path, method)
 
@@ -187,7 +184,6 @@ class TestSwaggerEditor_add_path(TestCase):
 
 class TestSwaggerEditor_add_lambda_integration(TestCase):
     def setUp(self):
-
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -261,7 +257,6 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
         self.assertEqual(expected, actual)
 
     def test_must_raise_on_existing_integration(self):
-
         with self.assertRaises(InvalidDocumentException):
             self.editor.add_lambda_integration("/bar", "get", "integrationUri", Py27Dict(), Py27Dict())
 
@@ -291,13 +286,11 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
 
 class TestSwaggerEditor_iter_on_path(TestCase):
     def setUp(self):
-
         self.original_swagger = {"swagger": "2.0", "paths": {"/foo": {}, "/bar": {}}}
 
         self.editor = SwaggerEditor(self.original_swagger)
 
     def test_must_iterate_on_paths(self):
-
         expected = {"/foo", "/bar"}
         actual = set(list(self.editor.iter_on_path()))
 
@@ -306,7 +299,6 @@ class TestSwaggerEditor_iter_on_path(TestCase):
 
 class TestSwaggerEditor_add_cors(TestCase):
     def setUp(self):
-
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -344,13 +336,11 @@ class TestSwaggerEditor_add_cors(TestCase):
         self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
 
     def test_must_fail_for_invalid_allowed_origin(self):
-
         path = "/foo"
         with self.assertRaises(InvalidTemplateException):
             self.editor.add_cors(path, None, "headers", "methods")
 
     def test_must_work_for_optional_allowed_headers(self):
-
         allowed_origins = "origins"
         allowed_headers = None  # No Value
         allowed_methods = "methods"
@@ -373,7 +363,6 @@ class TestSwaggerEditor_add_cors(TestCase):
         )
 
     def test_must_make_default_value_with_optional_allowed_methods(self):
-
         allowed_origins = "origins"
         allowed_headers = "headers"
         allowed_methods = None  # No Value
@@ -632,7 +621,6 @@ class TestSwaggerEditor_normalize_method_name(TestCase):
 
 class TestSwaggerEditor_swagger_property(TestCase):
     def test_must_return_copy_of_swagger(self):
-
         input = {"swagger": "2.0", "paths": {}}
 
         editor = SwaggerEditor(input)
@@ -671,13 +659,11 @@ class TestSwaggerEditor_is_valid(TestCase):
 
 class TestSwaggerEditor_add_models(TestCase):
     def setUp(self):
-
         self.original_swagger = {"swagger": "2.0", "paths": {"/foo": {}}}
 
         self.editor = SwaggerEditor(self.original_swagger)
 
     def test_must_add_definitions(self):
-
         models = {"User": {"type": "object", "properties": {"username": {"type": "string"}}}}
 
         self.editor.add_models(models)
@@ -687,7 +673,6 @@ class TestSwaggerEditor_add_models(TestCase):
         self.assertEqual(expected, self.editor.swagger["definitions"])
 
     def test_must_fail_without_type_in_model(self):
-
         models = {"User": {"properties": {"username": {"type": "string"}}}}
 
         with self.assertRaises(InvalidDocumentException):
@@ -696,7 +681,6 @@ class TestSwaggerEditor_add_models(TestCase):
 
 class TestSwaggerEditor_add_request_model_to_method(TestCase):
     def setUp(self):
-
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {"/foo": {"get": {"x-amazon-apigateway-integration": {"test": "must have integration"}}}},
@@ -705,7 +689,6 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
         self.editor = SwaggerEditor(self.original_swagger)
 
     def test_must_add_body_parameter_to_method_with_required_true(self):
-
         model = {"Model": "User", "Required": True}
 
         self.editor.add_request_model_to_method("/foo", "get", model)
@@ -715,7 +698,6 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
         self.assertEqual(expected, self.editor.swagger["paths"]["/foo"]["get"]["parameters"])
 
     def test_must_add_body_parameter_to_method_with_required_false(self):
-
         model = {"Model": "User", "Required": False}
 
         self.editor.add_request_model_to_method("/foo", "get", model)
@@ -725,7 +707,6 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
         self.assertEqual(expected, self.editor.swagger["paths"]["/foo"]["get"]["parameters"])
 
     def test_must_add_body_parameter_to_existing_method_parameters(self):
-
         original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -752,7 +733,6 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
         self.assertEqual(expected, editor.swagger["paths"]["/foo"]["get"]["parameters"])
 
     def test_must_not_add_body_parameter_to_method_without_integration(self):
-
         original_swagger = {"swagger": "2.0", "paths": {"/foo": {"get": {}}}}
 
         editor = SwaggerEditor(original_swagger)
@@ -766,7 +746,6 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
         self.assertEqual(expected, editor.swagger["paths"]["/foo"]["get"])
 
     def test_must_add_body_parameter_to_method_without_required(self):
-
         model = {"Model": "User"}
 
         self.editor.add_request_model_to_method("/foo", "get", model)
@@ -776,7 +755,6 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
         self.assertEqual(expected, self.editor.swagger["paths"]["/foo"]["get"]["parameters"])
 
     def test_must_add_body_parameter_to_method_openapi_without_required(self):
-
         original_openapi = {
             "openapi": "3.0.1",
             "paths": {"/foo": {"get": {"x-amazon-apigateway-integration": {"test": "must have integration"}}}},
@@ -796,7 +774,6 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
         self.assertEqual(expected, editor.swagger["paths"]["/foo"]["get"]["requestBody"])
 
     def test_must_add_body_parameter_to_method_openapi_required_true(self):
-
         original_openapi = {
             "openapi": "3.0.1",
             "paths": {"/foo": {"get": {"x-amazon-apigateway-integration": {"test": "must have integration"}}}},
@@ -815,7 +792,6 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
 
 class TestSwaggerEditor_add_request_validator_to_method(TestCase):
     def setUp(self):
-
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -831,7 +807,6 @@ class TestSwaggerEditor_add_request_validator_to_method(TestCase):
         self.editor = SwaggerEditor(self.original_swagger)
 
     def test_must_add_validator_parameters_to_method_with_validators_true(self):
-
         self.editor.add_request_validator_to_method("/foo", "get", True, True)
         expected = {"body-and-params": {"validateRequestBody": True, "validateRequestParameters": True}}
 
@@ -841,7 +816,6 @@ class TestSwaggerEditor_add_request_validator_to_method(TestCase):
         )
 
     def test_must_add_validator_parameters_to_method_with_validators_false(self):
-
         self.editor.add_request_validator_to_method("/foo", "get", False, False)
 
         expected = {"no-validation": {"validateRequestBody": False, "validateRequestParameters": False}}
@@ -852,7 +826,6 @@ class TestSwaggerEditor_add_request_validator_to_method(TestCase):
         )
 
     def test_must_add_validator_parameters_to_method_with_validators_mixing(self):
-
         self.editor.add_request_validator_to_method("/foo", "get", True, False)
 
         expected = {"body-only": {"validateRequestBody": True, "validateRequestParameters": False}}
@@ -914,7 +887,6 @@ class TestSwaggerEditor_add_request_validator_to_method(TestCase):
         self.assertEqual(normalized_validator_name_conversion, normalized_name)
 
     def test_must_add_validator_parameters_to_method_with_validators_false_by_default(self):
-
         self.editor.add_request_validator_to_method("/foo", "get")
 
         expected = {"no-validation": {"validateRequestBody": False, "validateRequestParameters": False}}
@@ -927,7 +899,6 @@ class TestSwaggerEditor_add_request_validator_to_method(TestCase):
 
 class TestSwaggerEditor_add_auth(TestCase):
     def setUp(self):
-
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -1011,7 +982,6 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
         self.editor = SwaggerEditor(self.original_swagger)
 
     def test_must_add_parameter_to_method_with_required_and_caching_true(self):
-
         parameters = [{"Name": "method.request.header.Authorization", "Required": True, "Caching": True}]
 
         self.editor.add_request_parameters_to_method("/foo", "get", parameters)
@@ -1024,7 +994,6 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
         self.assertEqual(["method.request.header.Authorization"], method_swagger[_X_INTEGRATION]["cacheKeyParameters"])
 
     def test_must_add_parameter_to_method_with_required_and_caching_false(self):
-
         parameters = [{"Name": "method.request.header.Authorization", "Required": False, "Caching": False}]
 
         self.editor.add_request_parameters_to_method("/foo", "get", parameters)
@@ -1037,7 +1006,6 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
         self.assertNotIn("cacheKeyParameters", method_swagger[_X_INTEGRATION].keys())
 
     def test_must_add_parameter_to_method_with_existing_parameters(self):
-
         original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -1082,13 +1050,11 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
 
 class TestSwaggerEditor_add_resource_policy(TestCase):
     def setUp(self):
-
         self.original_swagger = {"swagger": "2.0", "paths": {"/foo": {"get": {}, "put": {}}}}
 
         self.editor = SwaggerEditor(self.original_swagger)
 
     def test_must_add_custom_statements(self):
-
         resourcePolicy = {
             "CustomStatements": [
                 {"Action": "execute-api:Invoke", "Resource": ["execute-api:/*/*/*"]},
@@ -1109,7 +1075,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     def test_must_add_fn_if_custom_statements(self):
-
         resourcePolicy = {
             "CustomStatements": {
                 "Fn::If": [
@@ -1157,7 +1122,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     def test_must_add_iam_deny(self):
-
         resourcePolicy = {"AwsAccountBlacklist": ["123456"]}
 
         self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
@@ -1178,7 +1142,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     def test_must_add_ip_allow(self):
-
         resourcePolicy = {"IpRangeWhitelist": ["1.2.3.4"]}
 
         self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
@@ -1211,7 +1174,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     def test_must_add_ip_deny(self):
-
         resourcePolicy = {"IpRangeBlacklist": ["1.2.3.4"]}
 
         self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
@@ -1244,7 +1206,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     def test_must_add_vpc_allow_string_only(self):
-
         resourcePolicy = {
             "SourceVpcWhitelist": ["vpc-123", "vpce-345"],
         }
@@ -1296,7 +1257,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             self.editor.add_resource_policy(resource_policy, "/foo", "prod")
 
     def test_must_add_vpc_deny_string_only(self):
-
         resourcePolicy = {
             "SourceVpcBlacklist": ["vpc-123"],
         }
@@ -1331,7 +1291,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     def test_must_add_vpc_allow_string_and_instrinic(self):
-
         resourcePolicy = {
             "SourceVpcWhitelist": ["vpc-123", "vpce-345", "vpc-678"],
             "IntrinsicVpcWhitelist": ["Mock-Allowlist-A", "Mock-Allowlist-B"],
@@ -1413,7 +1372,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     def test_must_not_add_non_valid_string_list(self):
-
         resourcePolicy = {
             "SourceVpcBlacklist": ["non-valid-endpoint-name-a", "non-valid-endpoint-name-b"],
             "SourceVpcWhitelist": ["non-valid-endpoint-name-1", "non-valid-endpoint-name-2"],
@@ -1425,7 +1383,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     def test_must_add_vpc_mixed_lists(self):
-
         resourcePolicy = {
             "SourceVpcWhitelist": ["vpc-123", "vpc-abc", "vpce-123", "vpce-ghi"],
             "IntrinsicVpcWhitelist": ["Mock-Allowlist-A", "Mock-Allowlist-B"],

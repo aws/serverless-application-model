@@ -16,7 +16,6 @@ class TestLogicalIdGenerator(TestCase):
 
     @patch.object(LogicalIdGenerator, "_stringify")
     def test_gen_no_data(self, stringify_mock):
-
         generator = LogicalIdGenerator(self.prefix)
 
         self.assertEqual(self.prefix, generator.gen())

@@ -12,7 +12,6 @@ from samtranslator.model.preferences.deployment_preference import DeploymentPref
 
 class TestVersionsAndAliases(TestCase):
     def setUp(self):
-
         self.intrinsics_resolver_mock = Mock()
         self.intrinsics_resolver_mock.resolve = Mock()
         self.mappings_resolver_mock = Mock()
@@ -105,7 +104,6 @@ class TestVersionsAndAliases(TestCase):
         )
 
     def test_sam_function_with_alias_cannot_be_list(self):
-
         # Alias cannot be a list
         with self.assertRaises(InvalidResourceException):
             self.func_dict["Properties"]["AutoPublishAlias"] = ["a", "b"]
@@ -752,7 +750,6 @@ class TestVersionsAndAliases(TestCase):
             self.sam_func._construct_alias(None, self.lambda_func, self.lambda_version)
 
     def test_get_resolved_alias_name_must_work(self):
-
         property_name = "something"
         alias_value = {"Ref": "param1"}
         alias_name = "AliasName"
@@ -762,7 +759,6 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(alias_name, result)
 
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved(self):
-
         property_name = "something"
         expected_exception_msg = (
             "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter".format(
@@ -781,7 +777,6 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(expected_exception_msg, ex.message)
 
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved_with_list(self):
-
         property_name = "something"
         expected_exception_msg = (
             "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter".format(
@@ -821,7 +816,6 @@ class TestVersionsAndAliases(TestCase):
 
 class TestSupportedResourceReferences(TestCase):
     def test_must_not_break_support(self):
-
         func = SamFunction("LogicalId")
         self.assertEqual(4, len(func.referable_properties))
         self.assertEqual(func.referable_properties["Alias"], "AWS::Lambda::Alias")

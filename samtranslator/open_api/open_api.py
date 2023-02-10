@@ -336,7 +336,6 @@ class OpenApiEditor(BaseEditor):
             authorization_scopes = []
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
-
             security_dict = {}  # type: ignore[var-annotated]
             security_dict[authorizer_name] = []
 

@@ -219,7 +219,6 @@ class TestPolicyTemplateProcessor(TestCase):
 
         open_mock = mock_open()
         with patch("samtranslator.policy_template_processor.processor.open", open_mock):
-
             result = PolicyTemplatesProcessor._read_json(filepath)
             self.assertEqual(result, json_return)
 
