@@ -57,7 +57,6 @@ class TestSamResourceTypeEnum(TestCase):
         self.assertEqual(SamResourceType.SimpleTable.value, "AWS::Serverless::SimpleTable")
 
     def test_has_value_must_work_for_sam_types(self):
-
         self.assertTrue(SamResourceType.has_value("AWS::Serverless::Function"))
         self.assertTrue(SamResourceType.has_value("AWS::Serverless::Api"))
         self.assertTrue(SamResourceType.has_value("AWS::Serverless::SimpleTable"))

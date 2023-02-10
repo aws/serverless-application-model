@@ -384,7 +384,6 @@ class TestSubCanResolveResourceRefs(TestCase):
         self.expected_output_sub_value = "Hello ${value1} ${value2}${value3} ${value1.arn} ${value2.arn.name.foo} ${!id1.prop1} ${unknown} ${some.arn} World"
 
     def test_must_resolve_string_value(self):
-
         input = {"Fn::Sub": self.input_sub_value}
         expected = {"Fn::Sub": self.expected_output_sub_value}
 
@@ -447,7 +446,6 @@ class TestSubCanResolveResourceIdRefs(TestCase):
         self.expected_output_sub_value = "Hello ${newid1} ${newid2}${newid3} ${newid1.arn} ${newid2.arn.name.foo} ${!id1.prop1} ${unknown} ${some.arn} World"
 
     def test_must_resolve_string_value(self):
-
         input = {"Fn::Sub": self.input_sub_value}
         expected = {"Fn::Sub": self.expected_output_sub_value}
 

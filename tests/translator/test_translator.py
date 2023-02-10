@@ -551,7 +551,6 @@ def assert_metric_call(mock, transform, transform_failure=0, invalid_document=0)
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
 @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
 def test_swagger_body_sha_gets_recomputed():
-
     document = {
         "Transform": "AWS::Serverless-2016-10-31",
         "Resources": {
@@ -593,7 +592,6 @@ def test_swagger_body_sha_gets_recomputed():
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
 @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
 def test_swagger_definitionuri_sha_gets_recomputed():
-
     document = {
         "Transform": "AWS::Serverless-2016-10-31",
         "Resources": {
@@ -783,7 +781,6 @@ class TestPluginsUsage(TestCase):
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_prepare_plugins_must_add_required_plugins(self, make_policy_template_for_function_plugin_mock):
-
         # This is currently the only required plugin
         plugin_instance = _SomethingPlugin()
         make_policy_template_for_function_plugin_mock.return_value = plugin_instance
@@ -794,7 +791,6 @@ class TestPluginsUsage(TestCase):
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_prepare_plugins_must_merge_input_plugins(self, make_policy_template_for_function_plugin_mock):
-
         required_plugin = _SomethingPlugin()
         make_policy_template_for_function_plugin_mock.return_value = required_plugin
 
@@ -804,7 +800,6 @@ class TestPluginsUsage(TestCase):
 
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_prepare_plugins_must_handle_empty_input(self):
-
         sam_plugins = prepare_plugins(None)
         self.assertEqual(6, len(sam_plugins))
 
@@ -813,7 +808,6 @@ class TestPluginsUsage(TestCase):
     def test_make_policy_template_for_function_plugin_must_work(
         self, policy_templates_for_function_plugin_mock, policy_templates_processor_mock
     ):
-
         default_templates = {"some": "value"}
         policy_templates_processor_mock.get_default_policy_templates_json.return_value = default_templates
 

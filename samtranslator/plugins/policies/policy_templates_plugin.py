@@ -49,7 +49,6 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
 
         result = []
         for policy_entry in function_policies.get():  # type: ignore[no-untyped-call]
-
             if policy_entry.type is not PolicyTypes.POLICY_TEMPLATE:
                 # If we don't know the type, skip processing and pass to result as is.
                 result.append(policy_entry.data)
@@ -87,13 +86,11 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
         return {"Fn::If": [policy_entry.data["Fn::If"][0], processed_then_statement, processed_else_statement]}
 
     def _process_policy_template(self, logical_id, template_data):  # type: ignore[no-untyped-def]
-
         # We are processing policy templates. We know they have a particular structure:
         # {"templateName": { parameter_values_dict }}
         template_name = list(template_data.keys())[0]
         template_parameters = list(template_data.values())[0]
         try:
-
             # 'convert' will return a list of policy statements
             return self._policy_template_processor.convert(template_name, template_parameters)
 

@@ -55,7 +55,6 @@ class SamResource:
         return isinstance(self.type, str) and SamResourceType.has_value(self.type)
 
     def to_dict(self) -> Dict[str, Any]:
-
         if self.valid():
             # Touch a resource dictionary ONLY if it is valid
             # Modify only Type & Properties section to preserve CloudFormation properties like DependsOn, Conditions etc

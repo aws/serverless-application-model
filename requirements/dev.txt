@@ -11,7 +11,7 @@ pytest~=6.2.5
 parameterized~=0.7.4
 
 # Integration tests
-click~=7.1
+click~=8.0
 dateparser~=0.7
 boto3>=1.23,<2
 tenacity~=7.0.0
@@ -20,7 +20,7 @@ tenacity~=7.0.0
 requests~=2.25.0
 
 # formatter
-black==20.8b1
+black==23.1.0
 ruamel.yaml==0.17.21  # It can parse yaml while perserving comments
 
 # type check
