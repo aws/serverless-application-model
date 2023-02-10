@@ -62,7 +62,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         self.api_update_replace_policies: Dict[str, Any] = {}
 
     @abstractmethod
-    def _process_api_events(
+    def _process_api_events(  # noqa: too-many-arguments
         self,
         function: SamResource,
         api_events: Dict[str, Dict[str, Any]],
@@ -462,7 +462,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
             sam_expect(method, event_id, "Method", is_sam_event=True).to_be_a_string(),
         )
 
-    def _update_resource_attributes_from_api_event(
+    def _update_resource_attributes_from_api_event(  # noqa: too-many-arguments
         self,
         api_id: str,
         path: str,

@@ -114,7 +114,7 @@ class SwaggerEditor(BaseEditor):
                     [InvalidTemplateException(f"Invalid OpenAPI definition: {str(ex)}.")]
                 ) from ex
 
-    def add_lambda_integration(
+    def add_lambda_integration(  # noqa: too-many-arguments
         self,
         path: str,
         method: str,
@@ -175,7 +175,7 @@ class SwaggerEditor(BaseEditor):
             if condition:
                 path_item[method] = make_conditional(condition, path_item[method])
 
-    def add_state_machine_integration(  # type: ignore[no-untyped-def]
+    def add_state_machine_integration(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self,
         path,
         method,
@@ -271,7 +271,7 @@ class SwaggerEditor(BaseEditor):
                     normalized_method_name = self._normalize_method_name(method_name)
                     yield normalized_method_name, method_definition
 
-    def add_cors(  # type: ignore[no-untyped-def]
+    def add_cors(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None, allow_credentials=None
     ):
         """
@@ -521,7 +521,7 @@ class SwaggerEditor(BaseEditor):
         if "api_key" not in self.security_definitions:
             self.security_definitions.update(api_key_security_definition)
 
-    def set_path_default_authorizer(
+    def set_path_default_authorizer(  # noqa: too-many-branches
         self,
         path: str,
         default_authorizer: str,
@@ -937,7 +937,7 @@ class SwaggerEditor(BaseEditor):
             "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
         }
         resource_list = self._get_method_path_uri_list(path, stage)  # type: ignore[no-untyped-call]
-        self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)  # type: ignore[no-untyped-call]
+        self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
 
         if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_whitelist):  # type: ignore[no-untyped-call]
             raise InvalidDocumentException(
@@ -953,7 +953,7 @@ class SwaggerEditor(BaseEditor):
             "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
             "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
         }
-        self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)  # type: ignore[no-untyped-call]
+        self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
@@ -1067,7 +1067,9 @@ class SwaggerEditor(BaseEditor):
                 statement.extend([deny_statement])
             self.resource_policy["Statement"] = statement
 
-    def _add_vpc_resource_policy_for_method(self, endpoint_dict, conditional, resource_list):  # type: ignore[no-untyped-def]
+    def _add_vpc_resource_policy_for_method(  # noqa: too-many-branches
+        self, endpoint_dict: Dict[str, Any], conditional: str, resource_list: PassThrough
+    ) -> None:
         """
         This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`

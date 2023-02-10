@@ -35,7 +35,7 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
     SERVERLESS_API_RESOURCE_TYPE = SamResourceType.Api.value
     EDITOR_CLASS = SwaggerEditor
 
-    def _process_api_events(
+    def _process_api_events(  # noqa: too-many-arguments
         self,
         function: SamResource,
         api_events: Dict[str, Dict[str, Any]],

@@ -20,6 +20,8 @@ ConnectorResourceReference = namedtuple(
     ],
 )
 
+UNSUPPORTED_CONNECTOR_PROFILE_TYPE = "UNSUPPORTED_CONNECTOR_PROFILE_TYPE"
+
 
 class ConnectorResourceError(Exception):
     """

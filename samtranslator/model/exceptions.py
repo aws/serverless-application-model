@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from enum import Enum
-from typing import List, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 
 class ExpectedType(Enum):
@@ -16,12 +17,17 @@ class ExceptionWithMessage(ABC, Exception):
     def message(self) -> str:
         """Return the exception message."""
 
+    @property
+    def metadata(self) -> Optional[Dict[str, Any]]:
+        """Return the exception metadata."""
+
 
 class InvalidDocumentException(ExceptionWithMessage):
     """Exception raised when the given document is invalid and cannot be transformed.
 
     Attributes:
         message -- explanation of the error
+        metadata -- a dictionary of metadata (key, value pair)
         causes -- list of errors which caused this document to be invalid
     """
 
@@ -36,6 +42,17 @@ class InvalidDocumentException(ExceptionWithMessage):
         return "Invalid Serverless Application Specification document. Number of errors found: {}.".format(
             len(self.causes)
         )
+
+    @property
+    def metadata(self) -> Dict[str, List[Any]]:
+        # Merge metadata in each exception to one single metadata dictionary
+        metadata_dict = defaultdict(list)
+        for cause in self.causes:
+            if not cause.metadata:
+                continue
+            for k, v in cause.metadata.items():
+                metadata_dict[k].append(v)
+        return metadata_dict
 
     @property
     def causes(self) -> Sequence[ExceptionWithMessage]:
@@ -86,9 +103,12 @@ class InvalidResourceException(ExceptionWithMessage):
         message -- explanation of the error
     """
 
-    def __init__(self, logical_id: Union[str, List[str]], message: str) -> None:
+    def __init__(
+        self, logical_id: Union[str, List[str]], message: str, metadata: Optional[Dict[str, Any]] = None
+    ) -> None:
         self._logical_id = logical_id
         self._message = message
+        self._metadata = metadata
 
     def __lt__(self, other):  # type: ignore[no-untyped-def]
         return self._logical_id < other._logical_id
@@ -96,6 +116,10 @@ class InvalidResourceException(ExceptionWithMessage):
     @property
     def message(self) -> str:
         return "Resource with id [{}] is invalid. {}".format(self._logical_id, self._message)
+
+    @property
+    def metadata(self) -> Optional[Dict[str, Any]]:
+        return self._metadata
 
 
 class InvalidResourcePropertyTypeException(InvalidResourceException):

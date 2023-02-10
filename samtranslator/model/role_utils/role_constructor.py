@@ -4,7 +4,7 @@ from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_valu
 from samtranslator.model.resource_policies import PolicyTypes
 
 
-def construct_role_for_resource(  # type: ignore[no-untyped-def]
+def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
     resource_logical_id,
     attributes,
     managed_policy_map,

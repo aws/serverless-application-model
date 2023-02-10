@@ -1,16 +1,6 @@
 #!/usr/bin/env python
-"""Automatically create transform tests input and output files given an input template.
-
-Usage:
-    add_transform_test.py --template-file=sam-template.yaml [--disable-api-configuration]
-    add_transform_test.py --template-file=sam-template.yaml
-    add_transform_test.py --template-file=sam-template.yaml [--disable-update-partition]
-
-Options:
-    --template-file=<i>             Location of SAM template to transform [default: template.yaml].
-    --disable-api-configuration     Disable adding REGIONAL configuration to AWS::ApiGateway::RestApi
-    --disable-update-partition      Disable updating the partition of arn to aws-cn/aws-us-gov
-"""
+"""Automatically create transform tests input and output files given an input template."""
+import argparse
 import json
 import os
 import shutil
@@ -20,11 +10,27 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
-from docopt import docopt  # type: ignore
-
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 TRANSFORM_TEST_DIR = os.path.join(SCRIPT_DIR, "..", "tests", "translator")
-CLI_OPTIONS = docopt(__doc__)
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument(
+    "--template-file",
+    help="Location of SAM template to transform [default: template.yaml].",
+    type=Path,
+    default=Path("template.yaml"),
+)
+parser.add_argument(
+    "--disable-api-configuration",
+    help="Disable adding REGIONAL configuration to AWS::ApiGateway::RestApi",
+    action="store_true",
+)
+parser.add_argument(
+    "--disable-update-partition",
+    help="Disable updating the partition of arn to aws-cn/aws-us-gov",
+    action="store_true",
+)
+CLI_OPTIONS = parser.parse_args()
 
 
 def read_json_file(file_path: str) -> Dict[str, Any]:
@@ -83,19 +89,19 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
             "aws-us-gov": os.path.join(TRANSFORM_TEST_DIR, "output/aws-us-gov/", output_file_option),
         }
 
-        if not CLI_OPTIONS.get("--disable-api-configuration"):
+        if not CLI_OPTIONS.disable_api_configuration:
             template = read_json_file(temp_output_file.name)
             template = add_regional_endpoint_configuration_if_needed(template)
             write_json_file(template, temp_output_file.name)
 
         for partition, output_path in regional_transform_test_output_paths.items():
             shutil.copyfile(temp_output_file.name, output_path)
-            if not CLI_OPTIONS.get("--disable-update-partition"):
+            if not CLI_OPTIONS.disable_update_partition:
                 replace_aws_partition(partition, output_path)
 
 
 def get_input_file_path() -> str:
-    input_file_option = CLI_OPTIONS.get("--template-file")
+    input_file_option = str(CLI_OPTIONS.template_file)
     return os.path.join(os.getcwd(), input_file_option)
 
 

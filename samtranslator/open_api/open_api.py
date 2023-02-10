@@ -113,7 +113,7 @@ class OpenApiEditor(BaseEditor):
 
         return True
 
-    def add_lambda_integration(  # type: ignore[no-untyped-def]
+    def add_lambda_integration(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
     ):
         """
@@ -422,7 +422,7 @@ class OpenApiEditor(BaseEditor):
 
         self._doc[self._SERVERS] = servers_configurations
 
-    def add_cors(  # type: ignore[no-untyped-def]
+    def add_cors(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self,
         allow_origins,
         allow_headers=None,
