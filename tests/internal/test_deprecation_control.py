@@ -25,7 +25,9 @@ class TestDeprecationControl(TestCase):
             self.assertEqual(len(w), 1)
             self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
             self.assertIn(
-                "deprecated_function is deprecated, please consider to use replacement_function", str(w[-1].message)
+                "deprecated_function is deprecated and will be removed in a future release, "
+                "please consider to use replacement_function",
+                str(w[-1].message),
             )
 
     def test_pending_deprecation_decorator(self):
