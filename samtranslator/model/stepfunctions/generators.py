@@ -24,7 +24,7 @@ class StateMachineGenerator:
         "Specify either 'Role' or 'Policies' (but not both at the same time) or neither of them"
     )
 
-    def __init__(  # type: ignore[no-untyped-def]
+    def __init__(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self,
         logical_id,
         depends_on,

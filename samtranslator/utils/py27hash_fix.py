@@ -5,7 +5,7 @@ import copy
 import ctypes
 import json
 import logging
-from typing import Any, Dict, Iterator, List, cast
+from typing import Any, Dict, Iterator, List, Optional, cast
 
 from samtranslator.parser.parser import Parser
 from samtranslator.third_party.py27hash.hash import Hash
@@ -20,7 +20,9 @@ unicode_string_type = str  # TODO: remove it, python 2 legacy code
 long_int_type = int  # TODO: remove it, python 2 legacy code
 
 
-def to_py27_compatible_template(template, parameter_values=None):  # type: ignore[no-untyped-def]
+def to_py27_compatible_template(  # noqa: too-many-branches
+    template: Dict[str, Any], parameter_values: Optional[Dict[str, Any]] = None
+) -> None:
     """
     Convert an input template to a py27hash-compatible template. This function has to be run before any
     manipulation occurs for sake of keeping the same initial state. This function modifies the input template,
@@ -127,8 +129,8 @@ class Py27UniStr(unicode_string_type):
     def __deepcopy__(self, memo):  # type: ignore[no-untyped-def]
         return self  # strings are immutable
 
-    def _get_py27_hash(self):  # type: ignore[no-untyped-def]
-        h = getattr(self, "_py27_hash", None)
+    def _get_py27_hash(self) -> int:
+        h: Optional[int] = getattr(self, "_py27_hash", None)
         if h is None:
             self._py27_hash = h = ctypes.c_size_t(Hash.hash(self)).value
         return h
@@ -187,11 +189,7 @@ class Py27Keys:
         """Gets insert location for k"""
 
         # Py27UniStr caches the hash to improve performance so use its method instead of always computing the hash
-        if isinstance(k, Py27UniStr):
-            h = k._get_py27_hash()  # type: ignore[no-untyped-call]
-        else:
-            h = ctypes.c_size_t(Hash.hash(k)).value
-
+        h = k._get_py27_hash() if isinstance(k, Py27UniStr) else ctypes.c_size_t(Hash.hash(k)).value
         i = h & self.mask
 
         if i not in self.keyorder or self.keyorder[i] == k:

@@ -160,7 +160,7 @@ class SharedApiUsagePlan:
 
 
 class ApiGenerator:
-    def __init__(
+    def __init__(  # noqa: too-many-arguments
         self,
         logical_id: str,
         cache_cluster_enabled: Optional[Intrinsicable[bool]],
@@ -425,7 +425,7 @@ class ApiGenerator:
 
         return stage
 
-    def _construct_api_domain(
+    def _construct_api_domain(  # noqa: too-many-branches
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
     ) -> Tuple[Optional[ApiGatewayDomainName], Optional[List[ApiGatewayBasePathMapping]], Any]:
         """
@@ -752,7 +752,7 @@ class ApiGenerator:
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
-    def _construct_usage_plan(self, rest_api_stage: Optional[ApiGatewayStage] = None) -> Any:
+    def _construct_usage_plan(self, rest_api_stage: Optional[ApiGatewayStage] = None) -> Any:  # noqa: too-many-branches
         """Constructs and returns the ApiGateway UsagePlan, ApiGateway UsagePlanKey, ApiGateway ApiKey for Auth.
 
         :param model.apigateway.ApiGatewayStage stage: the stage of rest api
@@ -1015,7 +1015,7 @@ class ApiGenerator:
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
-    def _openapi_postprocess(self, definition_body: Dict[str, Any]) -> Dict[str, Any]:
+    def _openapi_postprocess(self, definition_body: Dict[str, Any]) -> Dict[str, Any]:  # noqa: too-many-branches
         """
         Convert definitions to openapi 3 in definition body if OpenApiVersion flag is specified.
 

@@ -4,7 +4,7 @@ pytest-xdist~=2.5
 pytest-env~=0.6.2
 pytest-rerunfailures~=9.1.1
 pyyaml~=5.4
-ruff==0.0.239  # loose the requirement once it is more stable
+ruff==0.0.244  # loose the requirement once it is more stable
 
 # Test requirements
 pytest~=6.2.5
