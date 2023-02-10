@@ -17,9 +17,7 @@ RT = TypeVar("RT")  # return type
 
 
 def _make_message(message: str, replacement: Optional[str]) -> str:
-    if replacement:
-        return f"{message}, please consider to use {replacement}"
-    return f"{message} and there is no replacement."
+    return f"{message}, please use {replacement}" if replacement else f"{message} and there is no replacement."
 
 
 def deprecated(replacement: Optional[str]) -> Callable[[Callable[..., RT]], Callable[..., RT]]:
