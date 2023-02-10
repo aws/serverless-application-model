@@ -3,7 +3,7 @@ Utils for deprecating our code using warning.warn().
 The warning message is written to stderr when shown.
 
 For the difference between DeprecationWarning
-and PendingDeprecationWarning, refer to
+and other deprecation warning classes, refer to
 https://peps.python.org/pep-0565/#additional-use-case-for-futurewarning
 
 If external packages import deprecated/pending-deprecation
@@ -39,27 +39,6 @@ def deprecated(replacement: Optional[str]) -> Callable[[Callable[..., RT]], Call
             # Setting stacklevel=2 to let Python print the line that calls
             # this wrapper, not the line below.
             warnings.warn(warning_message, DeprecationWarning, stacklevel=2)
-            return func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
-
-def pending_deprecation(replacement: Optional[str]) -> Callable[[Callable[..., RT]], Callable[..., RT]]:
-    """
-    Mark a function/method as pending deprecation.
-
-    The warning is not shown by default in runtime.
-    """
-
-    def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
-        @wraps(func)
-        def wrapper(*args, **kwargs) -> RT:  # type: ignore
-            warning_message = _make_message(f"{func.__name__} will be deprecated", replacement)
-            # Setting stacklevel=2 to let Python print the line that calls
-            # this wrapper, not the line below.
-            warnings.warn(warning_message, PendingDeprecationWarning, stacklevel=2)
             return func(*args, **kwargs)
 
         return wrapper
