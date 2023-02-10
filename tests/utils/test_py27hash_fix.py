@@ -1,17 +1,16 @@
 import copy
-
 from unittest import TestCase
 from unittest.mock import patch
+
+from samtranslator.model.exceptions import InvalidDocumentException
 from samtranslator.utils.py27hash_fix import (
     Py27Dict,
     Py27Keys,
-    Py27UniStr,
     Py27LongInt,
+    Py27UniStr,
     _convert_to_py27_type,
     to_py27_compatible_template,
-    _template_has_api_resource,
 )
-from samtranslator.model.exceptions import InvalidDocumentException
 
 
 class TestPy27UniStr(TestCase):
@@ -377,7 +376,7 @@ class TestPy27Dict(TestCase):
 
         for expected_copied_order in expected_copied_orders:
             py27_dict = copy.deepcopy(py27_dict)
-            key_idx_order = [expected_order.index(i) for i in py27_dict.keys()]
+            key_idx_order = [expected_order.index(i) for i in py27_dict]
             self.assertEqual(key_idx_order, expected_copied_order)
 
     def test_dict_with_any_hashable_keys(self):

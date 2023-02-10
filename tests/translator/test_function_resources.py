@@ -1,13 +1,12 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock
-from parameterized import parameterized
+from unittest.mock import Mock, patch
 
-import os
-from samtranslator.model.sam_resources import SamFunction
-from samtranslator.model.lambda_ import LambdaAlias, LambdaVersion, LambdaFunction
+from parameterized import parameterized
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.update_policy import UpdatePolicy
+from samtranslator.model.lambda_ import LambdaAlias, LambdaFunction, LambdaVersion
 from samtranslator.model.preferences.deployment_preference import DeploymentPreference
+from samtranslator.model.sam_resources import SamFunction
+from samtranslator.model.update_policy import UpdatePolicy
 
 
 class TestVersionsAndAliases(TestCase):

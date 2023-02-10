@@ -1,12 +1,10 @@
 from unittest.case import skipIf
 
+from integration.config.service_names import API_KEY, REST_API
 from integration.helpers.base_test import BaseTest
 from integration.helpers.deployer.utils.retry import retry
 from integration.helpers.exception import StatusCodeError
-
-
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import REST_API, API_KEY
 
 
 @skipIf(current_region_does_not_support([REST_API, API_KEY]), "RestApi/ApiKey is not supported in this testing region")

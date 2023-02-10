@@ -3,9 +3,9 @@ from unittest.case import skipIf
 import pytest
 from parameterized import parameterized
 
+from integration.config.service_names import MQ
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
-from integration.config.service_names import MQ
 
 
 @skipIf(current_region_does_not_support([MQ]), "MQ is not supported in this testing region")

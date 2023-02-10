@@ -1,12 +1,11 @@
 from typing import Any, List
+from unittest import TestCase
+from unittest.mock import Mock
 
 import pytest
-
-from unittest import TestCase
-from unittest.mock import Mock, call, ANY
-from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model import PropertyType, Resource, SamResourceMacro, ResourceTypeResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
+from samtranslator.model import PropertyType, Resource, ResourceTypeResolver, SamResourceMacro
+from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins import LifeCycleEvents
 
 
@@ -131,7 +130,7 @@ class TestResourceAttributes(TestCase):
         self.assertEqual(r.to_dict(), dict_with_attributes2)
 
     def test_invalid_attr(self):
-        with pytest.raises(KeyError) as ex:
+        with pytest.raises(KeyError):
             # Unsupported attributes cannot be added to the resource
             self.MyResource("id", attributes={"foo": "bar"})
 

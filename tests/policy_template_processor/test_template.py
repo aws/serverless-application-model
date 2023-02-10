@@ -1,8 +1,8 @@
 from unittest import TestCase
-from unittest.mock import Mock, patch, ANY
+from unittest.mock import ANY, Mock, patch
 
+from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 from samtranslator.policy_template_processor.template import Template
-from samtranslator.policy_template_processor.exceptions import InvalidParameterValues, InsufficientParameterValues
 
 
 class TestTemplateObject(TestCase):

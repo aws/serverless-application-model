@@ -2,9 +2,9 @@ from unittest.case import skipIf
 
 import pytest
 
+from integration.config.service_names import MSK
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
-from integration.config.service_names import MSK
 
 
 @skipIf(current_region_does_not_support([MSK]), "MSK is not supported in this testing region")

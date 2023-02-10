@@ -1,14 +1,15 @@
-from unittest.mock import patch
 from unittest import TestCase
+from unittest.mock import patch
 
-from samtranslator.model.codedeploy import CodeDeployApplication
-from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
+from samtranslator.model.codedeploy import CodeDeployApplication, CodeDeployDeploymentGroup
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.preferences.deployment_preference import DeploymentPreference
-from samtranslator.model.preferences.deployment_preference_collection import CODEDEPLOY_APPLICATION_LOGICAL_ID
-from samtranslator.model.preferences.deployment_preference_collection import CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID
-from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
+from samtranslator.model.preferences.deployment_preference_collection import (
+    CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID,
+    CODEDEPLOY_APPLICATION_LOGICAL_ID,
+    DeploymentPreferenceCollection,
+)
 
 
 class TestDeploymentPreferenceCollection(TestCase):
@@ -410,11 +411,10 @@ class TestDeploymentPreferenceCollection(TestCase):
         return deployment_preference_yaml_dict
 
     def global_deployment_preference(self):
-        expected_deployment_preference = DeploymentPreference(
+        return DeploymentPreference(
             self.deployment_type_global,
             self.pre_traffic_hook_global,
             self.post_traffic_host_global,
             self.alarms_global,
             True,
         )
-        return expected_deployment_preference

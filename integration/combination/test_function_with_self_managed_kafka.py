@@ -1,11 +1,11 @@
 from unittest.case import skipIf
-import pytest
 
-from integration.helpers.base_test import BaseTest
-from integration.helpers.resource import current_region_not_included
+import pytest
+from parameterized import parameterized
 
 from integration.config.service_names import SELF_MANAGED_KAFKA
-from parameterized import parameterized
+from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_not_included
 
 
 @skipIf(

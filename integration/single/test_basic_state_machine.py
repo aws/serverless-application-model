@@ -1,8 +1,8 @@
 from unittest.case import skipIf
 
+from integration.config.service_names import STATE_MACHINE_INLINE_DEFINITION, XRAY
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import XRAY, STATE_MACHINE_INLINE_DEFINITION
 
 
 class TestBasicLayerVersion(BaseTest):

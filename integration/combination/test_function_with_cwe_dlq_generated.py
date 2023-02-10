@@ -1,10 +1,9 @@
-import json
 from unittest.case import skipIf
 
+from integration.config.service_names import CWE_CWS_DLQ
 from integration.helpers.base_test import BaseTest
 from integration.helpers.common_api import get_queue_policy
-from integration.helpers.resource import first_item_in_dict, current_region_does_not_support
-from integration.config.service_names import CWE_CWS_DLQ
+from integration.helpers.resource import current_region_does_not_support, first_item_in_dict
 
 
 @skipIf(current_region_does_not_support([CWE_CWS_DLQ]), "CweCwsDlq is not supported in this testing region")

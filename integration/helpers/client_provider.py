@@ -1,6 +1,7 @@
+from threading import Lock
+
 import boto3
 from botocore.config import Config
-from threading import Lock
 
 
 class ClientProvider:

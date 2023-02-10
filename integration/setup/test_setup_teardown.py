@@ -1,4 +1,5 @@
 import pytest
+
 from integration.helpers.resource import read_test_config_file
 
 
@@ -14,7 +15,4 @@ def test_teardown(delete_companion_stack_once):
 
 def s3_upload_successful():
     modified_map = read_test_config_file("file_to_s3_map_modified.json")
-    for _, file_info in modified_map.items():
-        if not file_info["uri"]:
-            return False
-    return True
+    return all(file_info["uri"] for _, file_info in modified_map.items())

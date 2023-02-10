@@ -1,17 +1,17 @@
 import json
-import re
 import random
+import re
 import string  # pylint: disable=deprecated-module
-from typing import Any, Callable, Dict, List, Set
+from typing import Any, Callable, Dict, Set
 
 from integration.config.service_names import (
     DYNAMO_DB,
     HTTP_API,
+    LOCATION,
     REST_API,
     S3_EVENTS,
-    SQS,
-    LOCATION,
     SCHEDULE_EVENT,
+    SQS,
     STATE_MACHINE_INLINE_DEFINITION,
 )
 from integration.helpers.yaml_utils import load_yaml
@@ -22,8 +22,7 @@ except ImportError:
     from pathlib2 import Path
 
 import boto3
-from botocore.exceptions import ClientError, NoRegionError
-
+from botocore.exceptions import NoRegionError
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 
 # Length of the random suffix added at the end of the resources we create

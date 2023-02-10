@@ -1,10 +1,10 @@
 """
 Client for uploading files to s3
 """
+import logging
 from typing import Any
 
 from botocore.exceptions import ClientError
-import logging
 
 LOG = logging.getLogger(__name__)
 

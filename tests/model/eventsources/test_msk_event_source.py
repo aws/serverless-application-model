@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from samtranslator.model.eventsources.pull import MSK
 
 

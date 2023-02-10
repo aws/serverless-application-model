@@ -35,14 +35,14 @@ black-check:
 	bin/yaml-format.py --check integration --add-test-metadata
 
 lint:
-	ruff samtranslator bin schema_source
+	ruff samtranslator bin schema_source integration tests
 	# mypy performs type check
 	mypy --strict samtranslator bin schema_source
 	# cfn-lint to make sure generated CloudFormation makes sense
 	bin/run_cfn_lint.sh
 
 lint-fix:
-	ruff --fix samtranslator bin schema_source
+	ruff --fix samtranslator bin schema_source integration tests
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup

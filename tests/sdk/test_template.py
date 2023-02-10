@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from samtranslator.sdk.template import SamTemplate
 from samtranslator.sdk.resource import SamResource
+from samtranslator.sdk.template import SamTemplate
 
 
 class TestSamTemplate(TestCase):

@@ -1,7 +1,8 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
+
 from samtranslator.intrinsics.actions import Action
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import InvalidDocumentException
 
 

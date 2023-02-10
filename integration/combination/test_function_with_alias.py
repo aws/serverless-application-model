@@ -2,10 +2,11 @@ import json
 from unittest.case import skipIf
 
 from botocore.exceptions import ClientError
-from integration.helpers.base_test import BaseTest, LOG
+
+from integration.config.service_names import REST_API
+from integration.helpers.base_test import LOG, BaseTest
 from integration.helpers.common_api import get_function_versions
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import REST_API
 
 
 class TestFunctionWithAlias(BaseTest):
@@ -73,7 +74,6 @@ class TestFunctionWithAlias(BaseTest):
 
     def test_alias_deletion_must_retain_version(self):
         self.create_and_verify_stack("combination/function_with_alias")
-        alias_name = "Live"
         function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
         version_ids = self.get_function_version_by_name(function_name)
         self.assertEqual(["1"], version_ids)
