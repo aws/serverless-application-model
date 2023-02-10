@@ -16,6 +16,10 @@ COLOR_CODES = {
 CEND = "\033[0m"
 
 
+def cprint(text: str, color: SupportedColor) -> None:
+    print(COLOR_CODES[color] + text + CEND)
+
+
 class DeployColor:
     def __init__(self):
         self.changeset_color_map: Dict[str, SupportedColor] = {"Add": "green", "Modify": "yellow", "Remove": "red"}

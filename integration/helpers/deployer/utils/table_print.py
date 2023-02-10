@@ -8,13 +8,9 @@ from itertools import count, zip_longest
 import textwrap
 from functools import wraps
 
-from integration.helpers.deployer.utils.colors import CEND, COLOR_CODES, SupportedColor
+from integration.helpers.deployer.utils.colors import cprint
 
 MIN_OFFSET = 20
-
-
-def cprint(text: str, color: SupportedColor) -> None:
-    print(COLOR_CODES[color] + text + CEND)
 
 
 def pprint_column_names(format_string, format_kwargs, margin=None, table_header=None, color="yellow"):
