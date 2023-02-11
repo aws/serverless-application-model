@@ -1,28 +1,25 @@
-import json
-import itertools
-import os.path
 import hashlib
-import sys
+import itertools
+import json
+import os.path
 import re
-from functools import reduce, cmp_to_key
-
-from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
-from samtranslator.parser.parser import Parser
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException
-from samtranslator.model import Resource
-from samtranslator.model.sam_resources import SamSimpleTable
-from samtranslator.public.plugins import BasePlugin
-
-from tests.translator.helpers import get_template_parameter_values
-from tests.plugins.application.test_serverless_app_plugin import mock_get_region
-from samtranslator.yaml_helper import yaml_parse
-from parameterized import parameterized, param
+from functools import cmp_to_key, reduce
+from unittest import TestCase
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
-import yaml
-from unittest import TestCase
+from parameterized import parameterized
+from samtranslator.model import Resource
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException
+from samtranslator.model.sam_resources import SamSimpleTable
+from samtranslator.parser.parser import Parser
+from samtranslator.public.plugins import BasePlugin
 from samtranslator.translator.transform import transform
-from unittest.mock import Mock, MagicMock, patch
+from samtranslator.translator.translator import Translator, make_policy_template_for_function_plugin, prepare_plugins
+from samtranslator.yaml_helper import yaml_parse
+
+from tests.plugins.application.test_serverless_app_plugin import mock_get_region
+from tests.translator.helpers import get_template_parameter_values
 
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = BASE_PATH + "/input"
@@ -34,9 +31,7 @@ DO_NOT_SORT = ["Layers"]
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = os.path.join(BASE_PATH, "input")
 SUCCESS_FILES_NAMES_FOR_TESTING = [
-    os.path.splitext(f)[0]
-    for f in os.listdir(INPUT_FOLDER)
-    if not (f.startswith("error_") or f.startswith("translate_"))
+    os.path.splitext(f)[0] for f in os.listdir(INPUT_FOLDER) if not (f.startswith(("error_", "translate_")))
 ]
 ERROR_FILES_NAMES_FOR_TESTING = [os.path.splitext(f)[0] for f in os.listdir(INPUT_FOLDER) if f.startswith("error_")]
 OUTPUT_FOLDER = os.path.join(BASE_PATH, "output")
@@ -109,9 +104,7 @@ def mock_sar_service_call(self, service_call_function, logical_id, *args):
     elif application_id == "invalid-semver":
         raise InvalidResourceException(logical_id, "Cannot access application: {}.".format(application_id))
     elif application_id == 1:
-        raise InvalidResourceException(
-            logical_id, "Type of property 'ApplicationId' is invalid.".format(application_id)
-        )
+        raise InvalidResourceException(logical_id, "Type of property 'ApplicationId' is invalid.")
     elif application_id == "preparing" and self._wait_for_template_active_status < 2:
         self._wait_for_template_active_status += 1
         self.SLEEP_TIME_SECONDS = 0
@@ -192,7 +185,7 @@ class AbstractTestTranslator(TestCase):
 
         # Find all RestApis in the template
         for logical_id, resource_dict in output_resources.items():
-            if "AWS::ApiGateway::RestApi" == resource_dict.get("Type"):
+            if resource_dict.get("Type") == "AWS::ApiGateway::RestApi":
                 resource_properties = resource_dict.get("Properties", {})
                 if "Body" in resource_properties:
                     self._generate_new_deployment_hash(
@@ -206,7 +199,7 @@ class AbstractTestTranslator(TestCase):
 
         # Collect all APIGW Deployments LogicalIds and generate the new ones
         for logical_id, resource_dict in output_resources.items():
-            if "AWS::ApiGateway::Deployment" == resource_dict.get("Type"):
+            if resource_dict.get("Type") == "AWS::ApiGateway::Deployment":
                 resource_properties = resource_dict.get("Properties", {})
 
                 rest_id = resource_properties.get("RestApiId").get("Ref")
@@ -224,7 +217,7 @@ class AbstractTestTranslator(TestCase):
 
         # Update References to APIGW Deployments
         for logical_id, resource_dict in output_resources.items():
-            if "AWS::ApiGateway::Stage" == resource_dict.get("Type"):
+            if resource_dict.get("Type") == "AWS::ApiGateway::Stage":
                 resource_properties = resource_dict.get("Properties", {})
 
                 rest_id = resource_properties.get("RestApiId", {}).get("Ref", "")
@@ -243,7 +236,7 @@ class AbstractTestTranslator(TestCase):
             del output_resources[logical_id_to_remove]
 
         # Update any Output References in the template
-        for output_key, output_value in resources.get("Outputs", {}).items():
+        for _output_key, output_value in resources.get("Outputs", {}).items():
             if output_value.get("Value").get("Ref") in deployment_logical_id_dict:
                 output_value["Value"]["Ref"] = deployment_logical_id_dict[output_value.get("Value").get("Ref")]
 
@@ -876,6 +869,7 @@ def get_resource_by_type(template, type):
         value = resources[key]
         if "Type" in value and value.get("Type") == type:
             return key, value
+    return None
 
 
 def get_exception_error_message(e):

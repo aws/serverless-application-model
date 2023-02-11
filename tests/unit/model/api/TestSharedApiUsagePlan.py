@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from parameterized import parameterized, param
-
+from parameterized import parameterized
 from samtranslator.model.api.api_generator import SharedApiUsagePlan
 from samtranslator.model.exceptions import InvalidTemplateException
 

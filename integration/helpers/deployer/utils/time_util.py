@@ -4,8 +4,8 @@ This was ported over from the sam-cli repo
 """
 
 import datetime
-import dateparser
 
+import dateparser
 from dateutil.tz import tzutc
 
 

@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 
 

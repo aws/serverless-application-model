@@ -1,8 +1,7 @@
-from unittest.mock import Mock
 from unittest import TestCase
+from unittest.mock import Mock
 
-from samtranslator.model import ResourceTypeResolver
-from samtranslator.model.exceptions import InvalidResourceException, InvalidEventException
+from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.stepfunctions.events import CloudWatchEvent
 
@@ -144,5 +143,5 @@ class StepFunctionsStateMachine(TestCase):
             }
         }
         self.kwargs["event_resources"] = {"KinesesEvent": {}}
-        with self.assertRaises(InvalidEventException) as error:
+        with self.assertRaises(InvalidEventException):
             StateMachineGenerator(**self.kwargs).to_cloudformation()

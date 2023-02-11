@@ -1,9 +1,9 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock, call
+from unittest.mock import Mock, call, patch
 
+from samtranslator.model.exceptions import InvalidDocumentException
 from samtranslator.parser.parser import Parser
 from samtranslator.plugins import LifeCycleEvents
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceException
 
 
 class TestParser(TestCase):

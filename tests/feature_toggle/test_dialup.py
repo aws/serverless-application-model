@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from parameterized import parameterized, param
-from samtranslator.feature_toggle.dialup import *
+from parameterized import param, parameterized
+from samtranslator.feature_toggle.dialup import DisabledDialup, SimpleAccountPercentileDialup, ToggleDialup
 
 
 class TestDisabledDialup(TestCase):

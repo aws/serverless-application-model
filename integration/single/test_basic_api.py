@@ -2,14 +2,12 @@ import json
 import logging
 from unittest.case import skipIf
 
-import requests
-from tenacity import stop_after_attempt, wait_exponential, retry_if_exception_type, after_log, wait_random
+from tenacity import after_log, retry_if_exception_type, stop_after_attempt, wait_exponential, wait_random
 
+from integration.config.service_names import MODE, REST_API
 from integration.helpers.base_test import BaseTest
 from integration.helpers.exception import StatusCodeError
-
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import MODE, REST_API
 
 LOG = logging.getLogger(__name__)
 

@@ -1,11 +1,12 @@
-import boto3
 import time
 import uuid
 from datetime import datetime, timedelta
 from unittest import TestCase
+
+import boto3
 from samtranslator.metrics.metrics import (
-    Metrics,
     CWMetricsPublisher,
+    Metrics,
 )
 
 

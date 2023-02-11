@@ -1,10 +1,9 @@
 import copy
-
 from unittest import TestCase
-from parameterized import parameterized, param
 
-from samtranslator.open_api.open_api import OpenApiEditor
+from parameterized import param, parameterized
 from samtranslator.model.exceptions import InvalidDocumentException
+from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.utils.py27hash_fix import Py27Dict
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"

@@ -1,8 +1,7 @@
 from unittest import TestCase
-
 from unittest.mock import patch
-from parameterized import parameterized
 
+from parameterized import parameterized
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
 
 

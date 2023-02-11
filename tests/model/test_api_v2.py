@@ -1,7 +1,6 @@
-from unittest import TestCase
-from unittest import mock
-import pytest
+from unittest import TestCase, mock
 
+import pytest
 from samtranslator.model import InvalidResourceException
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Authorizer
 

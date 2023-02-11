@@ -1,11 +1,10 @@
 from unittest.case import skipIf
+
 from parameterized import parameterized
 
-from integration.helpers.base_test import BaseTest
-
-
-from integration.helpers.resource import current_region_does_not_support
 from integration.config.service_names import REST_API
+from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
 
 
 @skipIf(current_region_does_not_support([REST_API]), "RestApi is not supported in this testing region")
@@ -41,7 +40,7 @@ class TestApiWithDisableExecuteApiEndpoint(BaseTest):
             ("combination/api_with_disable_execute_api_endpoint_openapi_3", False),
         ]
     )
-    def test_end_point_configuration(self, file_name, disable_value):
+    def test_end_point_configuration_openapi(self, file_name, disable_value):
         parameters = [
             {
                 "ParameterKey": "DisableExecuteApiEndpointValue",

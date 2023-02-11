@@ -1,15 +1,14 @@
 import copy
-import json
-import pytest
 import itertools
-
+import json
 from pathlib import Path
 from unittest import TestCase
+
+import pytest
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import Draft4Validator
 from parameterized import parameterized
-
 from samtranslator.yaml_helper import yaml_parse
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -62,10 +61,7 @@ SKIPPED_TESTS = [
 
 
 def should_skip_test(s: str) -> bool:
-    for test in SKIPPED_TESTS:
-        if test in s:
-            return True
-    return False
+    return any(test in s for test in SKIPPED_TESTS)
 
 
 def get_all_test_templates():

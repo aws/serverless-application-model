@@ -25,27 +25,26 @@ This was ported over from the sam-cli repo
 #  - Moved UserException to exceptions.py
 #  - Moved DeployColor to colors.py
 #  - Removed unnecessary functions from artifact_exporter
-import sys
-from collections import OrderedDict
 import logging
+import sys
 import time
+from collections import OrderedDict
 from datetime import datetime
-
-from integration.helpers.resource import generate_suffix
 
 import botocore
 
-from integration.helpers.deployer.utils.colors import DeployColor
 from integration.helpers.deployer.exceptions import exceptions as deploy_exceptions
+from integration.helpers.deployer.utils.artifact_exporter import mktempfile
+from integration.helpers.deployer.utils.colors import DeployColor
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.deployer.utils.table_print import (
+    MIN_OFFSET,
+    newline_per_item,
     pprint_column_names,
     pprint_columns,
-    newline_per_item,
-    MIN_OFFSET,
 )
-from integration.helpers.deployer.utils.artifact_exporter import mktempfile, parse_s3_url
 from integration.helpers.deployer.utils.time_util import utc_to_timestamp
+from integration.helpers.resource import generate_suffix
 
 LOG = logging.getLogger(__name__)
 
@@ -373,7 +372,7 @@ class Deployer:
             self.wait_for_changeset(result["Id"], stack_name)
             self.describe_changeset(result["Id"], stack_name)
             return result
-        except deploy_exceptions.ChangeEmptyError as ex:
+        except deploy_exceptions.ChangeEmptyError:
             return {}
         except botocore.exceptions.ClientError as ex:
             raise deploy_exceptions.DeployFailedError(stack_name=stack_name, msg=str(ex))
