@@ -110,6 +110,8 @@ See [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md) for further development instr
 ## Calling from Python
 
 ```python
+import boto3
+
 from samtranslator.translator.translator import Translator
 from samtranslator.parser.parser import Parser
 from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
@@ -117,11 +119,18 @@ from samtranslator.translator.managed_policy_translator import ManagedPolicyLoad
 parser = Parser()
 translator = Translator(None, parser)
 
-sam_template = {}
-
 iam = boto3.client("iam")
 managed_policy_loader = ManagedPolicyLoader(iam)
 get_managed_policy_map = managed_policy_loader.load
+
+sam_template = {
+    "Transform": "AWS::Serverless-2016-10-31",
+    "Resources": {
+        "MyTable": {
+            "Type": "AWS::Serverless::SimpleTable",
+        }
+    },
+}
 
 parameters = {}
 cfn_template = translator.translate(
