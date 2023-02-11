@@ -1,8 +1,8 @@
 from unittest.case import skipIf
-from parameterized import parameterized
+
+from integration.config.service_names import KINESIS
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import KINESIS
 
 
 @skipIf(current_region_does_not_support([KINESIS]), "Kinesis is not supported in this testing region")

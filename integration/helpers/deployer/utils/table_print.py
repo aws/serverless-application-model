@@ -3,10 +3,9 @@ Utilities for table pretty printing
 This was ported over from the sam-cli repo
 """
 import shutil
-from itertools import count, zip_longest
-
 import textwrap
 from functools import wraps
+from itertools import count, zip_longest
 
 from integration.helpers.deployer.utils.colors import cprint
 

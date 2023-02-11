@@ -3,7 +3,6 @@ import logging
 from functools import reduce
 
 import boto3
-
 from samtranslator.model.exceptions import InvalidDocumentException
 from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
 from samtranslator.translator.transform import transform

@@ -1,14 +1,15 @@
-from parameterized import parameterized, param
 from datetime import datetime
 from unittest import TestCase
-from unittest.mock import MagicMock, call, ANY
+from unittest.mock import ANY, MagicMock, call
+
+from parameterized import param, parameterized
 from samtranslator.metrics.metrics import (
-    Metrics,
-    MetricsPublisher,
     CWMetricsPublisher,
     DummyMetricsPublisher,
-    Unit,
     MetricDatum,
+    Metrics,
+    MetricsPublisher,
+    Unit,
 )
 
 

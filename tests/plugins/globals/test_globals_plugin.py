@@ -1,10 +1,10 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from samtranslator.plugins.globals.globals import InvalidGlobalsSectionException
+from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.public.exceptions import InvalidDocumentException
 from samtranslator.public.plugins import BasePlugin
-from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
-from samtranslator.plugins.globals.globals import InvalidGlobalsSectionException
 
 
 class TestGlobalsPlugin(TestCase):

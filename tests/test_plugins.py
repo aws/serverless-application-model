@@ -1,9 +1,9 @@
 from enum import Enum
+from unittest import TestCase
+from unittest.mock import Mock, call
+
 from samtranslator.plugins import BasePlugin, LifeCycleEvents
 from samtranslator.plugins.sam_plugins import SamPlugins
-
-from unittest import TestCase
-from unittest.mock import Mock, patch, call
 
 
 class TestSamPluginsRegistration(TestCase):
@@ -214,7 +214,7 @@ class TestSamPluginsAct(TestCase):
     def test_act_must_fail_on_non_existent_hook_method(self):
         # Create a plugin but setup hook method with wrong name
         plugin1 = _make_mock_plugin("plugin1")
-        setattr(plugin1, "on_unknown_event", Mock())
+        plugin1.on_unknown_event = Mock()
         self.sam_plugins.register(plugin1)
 
         with self.assertRaises(NameError):

@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 from parameterized import parameterized
-
 from samtranslator.model.connector_profiles.profile import (
     get_profile,
     profile_replace,

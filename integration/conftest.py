@@ -1,21 +1,22 @@
+import logging
 import time
+
 import boto3
 import botocore
 import pytest
 from botocore.exceptions import ClientError
-import logging
 
 from integration.helpers.base_test import S3_BUCKET_PREFIX
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.deployer.exceptions.exceptions import S3DoesNotExistException, ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
-from integration.helpers.stack import Stack
-from integration.helpers.yaml_utils import load_yaml
 from integration.helpers.resource import (
+    current_region_does_not_support,
     read_test_config_file,
     write_test_config_file_to_json,
-    current_region_does_not_support,
 )
+from integration.helpers.stack import Stack
+from integration.helpers.yaml_utils import load_yaml
 
 try:
     from pathlib import Path
@@ -110,7 +111,7 @@ def get_serverless_application_repository_app():
     """Create or re-use a simple SAR app"""
     if current_region_does_not_support(["ServerlessRepo"]):
         LOG.info("Creating SAR application is skipped since SAR tests are not supported in this region.")
-        return
+        return None
 
     sar_client = ClientProvider().sar_client
     sar_apps = sar_client.list_applications().get("Applications", [])

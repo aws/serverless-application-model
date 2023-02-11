@@ -1,8 +1,8 @@
 from unittest.case import skipIf
 
+from integration.config.service_names import CWE_CWS_DLQ, STATE_MACHINE_CWE_CWS
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import CWE_CWS_DLQ, STATE_MACHINE_CWE_CWS
 
 
 @skipIf(
