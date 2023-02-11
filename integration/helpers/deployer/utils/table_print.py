@@ -1,18 +1,14 @@
 """
-Utilities for table pretty printing using click
+Utilities for table pretty printing
 This was ported over from the sam-cli repo
 """
 import shutil
-from itertools import count
+from itertools import count, zip_longest
 
-try:
-    from itertools import zip_longest
-except ImportError:  # py2
-    from itertools import izip_longest as zip_longest
 import textwrap
 from functools import wraps
 
-import click
+from integration.helpers.deployer.utils.colors import cprint
 
 MIN_OFFSET = 20
 
@@ -83,10 +79,10 @@ def pprint_column_names(format_string, format_kwargs, margin=None, table_header=
         def wrap(*args, **kwargs):
             # The table is setup with the column names, format_string contains the column names.
             if table_header:
-                click.secho("\n" + table_header)
-            click.secho("-" * usable_width, fg=color)
-            click.secho(format_string.format(*format_args, **format_kwargs), fg=color)
-            click.secho("-" * usable_width, fg=color)
+                print("\n" + table_header)
+            cprint("-" * usable_width, color)
+            cprint(format_string.format(*format_args, **format_kwargs), color)
+            cprint("-" * usable_width, color)
             # format_args which have the minimumwidth set per {} in the format_string is passed to the function
             # which this decorator wraps, so that the function has access to the correct format_args
             kwargs["format_args"] = format_args
@@ -94,7 +90,7 @@ def pprint_column_names(format_string, format_kwargs, margin=None, table_header=
             kwargs["margin"] = margin if margin else min_margin
             result = func(*args, **kwargs)
             # Complete the table
-            click.secho("-" * usable_width, fg=color)
+            cprint("-" * usable_width, color)
             return result
 
         return wrap
@@ -151,7 +147,7 @@ def pprint_columns(columns, width, margin, format_string, format_args, columns_d
         for k, _ in columns_dict.items():
             columns_dict[k] = columns_text[next(counter)]
 
-        click.secho(format_string.format(*format_args, **columns_dict), fg=color)
+        cprint(format_string.format(*format_args, **columns_dict), color)
 
 
 def newline_per_item(iterable, counter):
@@ -166,4 +162,4 @@ def newline_per_item(iterable, counter):
         Current index within the iterable
     """
     if counter < len(iterable) - 1:
-        click.echo(message="", nl=True)
+        print("")
