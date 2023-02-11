@@ -1,6 +1,6 @@
-from parameterized import parameterized
 from unittest import TestCase
 
+from parameterized import parameterized
 from samtranslator.utils.cfn_dynamic_references import is_dynamic_reference
 
 

@@ -1,8 +1,8 @@
 import hashlib
 from unittest.case import skipIf
 
-from integration.helpers.resource import current_region_does_not_support
 from integration.config.service_names import REST_API
+from integration.helpers.resource import current_region_does_not_support
 
 try:
     from pathlib import Path

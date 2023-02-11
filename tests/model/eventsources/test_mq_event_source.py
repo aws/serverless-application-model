@@ -1,7 +1,8 @@
 from unittest import TestCase
+
+from parameterized import parameterized
 from samtranslator.model.eventsources.pull import MQ
 from samtranslator.model.exceptions import InvalidEventException
-from parameterized import parameterized
 
 
 class MQEventSource(TestCase):

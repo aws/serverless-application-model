@@ -1,7 +1,9 @@
 from time import sleep
 from unittest import SkipTest
+
 from parameterized import parameterized
-from tenacity import retry, stop_after_attempt, retry_if_exception
+from tenacity import retry, retry_if_exception, stop_after_attempt
+
 from integration.conftest import clean_bucket
 from integration.helpers.base_test import S3_BUCKET_PREFIX, BaseTest
 from integration.helpers.resource import generate_suffix
@@ -93,7 +95,6 @@ class TestConnectors(BaseTest):
 
         state_machine_arn = self.get_physical_id_by_logical_id("TriggerStateMachine")
         sfn_client = self.client_provider.sfn_client
-        s3_client = self.client_provider.s3_client
 
         response = sfn_client.start_sync_execution(
             stateMachineArn=state_machine_arn,
@@ -149,7 +150,6 @@ class TestConnectors(BaseTest):
 
         lambda_function_name = self.get_physical_id_by_logical_id("TriggerFunction")
         lambda_client = self.client_provider.lambda_client
-        s3_client = self.client_provider.s3_client
 
         request_params = {
             "FunctionName": lambda_function_name,

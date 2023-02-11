@@ -1,7 +1,7 @@
 from unittest import TestCase
-from parameterized import parameterized
 from unittest.mock import Mock, patch
 
+from parameterized import parameterized
 from samtranslator.translator.arn_generator import ArnGenerator, NoRegionFound
 
 

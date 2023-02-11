@@ -11,7 +11,6 @@ pytest~=6.2.5
 parameterized~=0.7.4
 
 # Integration tests
-click~=8.0
 dateparser~=0.7
 boto3>=1.23,<2
 tenacity~=7.0.0

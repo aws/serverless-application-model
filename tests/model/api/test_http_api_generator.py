@@ -1,8 +1,6 @@
 from unittest import TestCase
-from unittest.mock import patch
-import pytest
-from functools import reduce
 
+import pytest
 from samtranslator.model import InvalidResourceException
 from samtranslator.model.api.http_api_generator import HttpApiGenerator
 from samtranslator.open_api.open_api import OpenApiEditor
@@ -356,7 +354,7 @@ class TestCustomDomains(TestCase):
             e.value.message, "Resource with id [HttpApiId] is invalid. " + "Invalid Basepath name provided."
         )
 
-    def test_basepaths(self):
+    def test_basepaths_complex(self):
         self.kwargs["domain"] = {
             "DomainName": "example.com",
             "CertificateArn": "some-url",
@@ -373,7 +371,7 @@ class TestCustomDomains(TestCase):
         self.assertIsNotNone(route, None)
         self.assertEqual(route.HostedZoneName, None)
         self.assertEqual(route.HostedZoneId, "xyz")
-        self.assertEqual(len(route.RecordSets), 2)
+        self.assertEqual(len(route.RecordSets), 4)
         self.assertEqual(
             list(map(lambda base: base.ApiMappingKey, basepath)),
             ["one-1", "two_2", "three", "", "api", "api/v1", "api/v1", "api/v1"],

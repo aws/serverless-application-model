@@ -1,8 +1,8 @@
 import hashlib
 import json
-
 from unittest import TestCase
 from unittest.mock import patch
+
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 
 

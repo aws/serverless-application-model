@@ -1,21 +1,20 @@
 from unittest import TestCase
 from unittest.mock import patch
-import pytest
 
+import pytest
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
-from samtranslator.model import ResourceResolver, InvalidResourceException
+from samtranslator.model import InvalidResourceException, ResourceResolver
+from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestApi, ApiGatewayStage
 from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
-from samtranslator.model.lambda_ import LambdaFunction, LambdaLayerVersion, LambdaVersion, LambdaUrl, LambdaPermission
-from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestApi
-from samtranslator.model.apigateway import ApiGatewayStage
 from samtranslator.model.iam import IAMRole
+from samtranslator.model.lambda_ import LambdaFunction, LambdaLayerVersion, LambdaPermission, LambdaUrl, LambdaVersion
 from samtranslator.model.packagetype import IMAGE, ZIP
 from samtranslator.model.sam_resources import (
+    SamApi,
     SamConnector,
     SamFunction,
-    SamLayerVersion,
-    SamApi,
     SamHttpApi,
+    SamLayerVersion,
 )
 
 
@@ -244,7 +243,6 @@ class TestVersionDescription(TestCase):
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_with_autopublish_bad_hash(self):
         function = SamFunction("foo")
-        test_description = "foobar"
 
         function.Runtime = "foo"
         function.Handler = "bar"
@@ -258,7 +256,6 @@ class TestVersionDescription(TestCase):
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_with_autopublish_good_hash(self):
         function = SamFunction("foo")
-        test_description = "foobar"
 
         function.Runtime = "foo"
         function.Handler = "bar"
@@ -454,7 +451,7 @@ class TestLayers(TestCase):
         layer = SamLayerVersion("foo")
         layer.ContentUri = "s3://foobar/foo.zip"
         cfnResources = layer.to_cloudformation(**self.kwargs)
-        generatedLayerList = [x for x in cfnResources if isinstance(x, LambdaLayerVersion)]
+        [x for x in cfnResources if isinstance(x, LambdaLayerVersion)]
         self.assertEqual(cfnResources.__len__(), 1)
         self.assertTrue(isinstance(cfnResources[0], LambdaLayerVersion))
         self.assertEqual(cfnResources[0].Content, {"S3Key": "foo.zip", "S3Bucket": "foobar"})
@@ -621,7 +618,7 @@ class TestFunctionUrlConfig(TestCase):
         function.FunctionUrlConfig = {"AuthType": None}
 
         with pytest.raises(InvalidResourceException) as e:
-            cfnResources = function.to_cloudformation(**self.kwargs)
+            function.to_cloudformation(**self.kwargs)
         self.assertEqual(
             str(e.value.message),
             "Resource with id [foo] is invalid. AuthType is required to configure function property "

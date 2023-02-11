@@ -1,9 +1,7 @@
 import os.path
+
 from parameterized import parameterized
-import pytest
-from unittest import TestCase
-from samtranslator.yaml_helper import yaml_parse
-from samtranslator.validator.validator import SamTemplateValidator
+
 from tests.validator.test_validator import TestValidatorBase
 
 BASE_PATH = os.path.dirname(__file__)
