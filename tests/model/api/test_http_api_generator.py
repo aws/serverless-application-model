@@ -371,7 +371,7 @@ class TestCustomDomains(TestCase):
         self.assertIsNotNone(route, None)
         self.assertEqual(route.HostedZoneName, None)
         self.assertEqual(route.HostedZoneId, "xyz")
-        self.assertEqual(len(route.RecordSets), 2)
+        self.assertEqual(len(route.RecordSets), 4)
         self.assertEqual(
             list(map(lambda base: base.ApiMappingKey, basepath)),
             ["one-1", "two_2", "three", "", "api", "api/v1", "api/v1", "api/v1"],
