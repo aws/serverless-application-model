@@ -2,20 +2,20 @@ import logging
 from unittest.case import skipIf
 
 import pytest
+from parameterized import parameterized
 
 from integration.config.service_names import (
+    ARM,
+    CODE_DEPLOY,
+    EPHEMERAL_STORAGE,
     EVENT_INVOKE_CONFIG,
+    HTTP_API,
     KMS,
     LAMBDA_URL,
     XRAY,
-    ARM,
-    CODE_DEPLOY,
-    HTTP_API,
-    EPHEMERAL_STORAGE,
 )
-from integration.helpers.resource import current_region_does_not_support
-from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
 
 LOG = logging.getLogger(__name__)
 

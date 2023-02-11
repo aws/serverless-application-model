@@ -2,10 +2,10 @@ from unittest import TestCase
 
 from samtranslator.model.exceptions import (
     DuplicateLogicalIdException,
-    InvalidResourceException,
     InvalidDocumentException,
-    InvalidTemplateException,
     InvalidEventException,
+    InvalidResourceException,
+    InvalidTemplateException,
 )
 
 

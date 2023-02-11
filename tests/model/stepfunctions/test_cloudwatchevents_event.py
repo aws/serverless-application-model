@@ -1,7 +1,8 @@
-from unittest.mock import Mock
 from unittest import TestCase
-from samtranslator.model.stepfunctions.events import CloudWatchEvent
+from unittest.mock import Mock
+
 from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.stepfunctions.events import CloudWatchEvent
 
 
 class CloudWatchEventsEventSource(TestCase):

@@ -1,9 +1,9 @@
 from unittest.case import skipIf
 
+from integration.config.service_names import REST_API
 from integration.helpers.base_test import BaseTest
 from integration.helpers.common_api import get_function_versions
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import REST_API
 
 
 # Tests resource references support of SAM Function resource

@@ -1,12 +1,12 @@
 import copy
-
 from unittest import TestCase
 from unittest.mock import Mock
-from parameterized import parameterized, param
 
-from samtranslator.swagger.swagger import SwaggerEditor
+from parameterized import param, parameterized
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.utils.py27hash_fix import Py27Dict
+
 from tests.translator.test_translator import deep_sort_lists
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
@@ -1474,7 +1474,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
 class TestSwaggerEditor_add_authorization_scopes(TestCase):
     def setUp(self):
-        self.api = api = {
+        self.api = {
             "Auth": {
                 "Authorizers": {"MyOtherCognitoAuth": {}, "MyCognitoAuth": {}},
                 "DefaultAuthorizer": "MyCognitoAuth",

@@ -1,9 +1,9 @@
 import os.path
 from unittest import TestCase
-import pytest
+
 from parameterized import parameterized
+from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.yaml_helper import yaml_parse
-from samtranslator.validator.validator import SamTemplateValidator, sam_schema
 
 BASE_PATH = os.path.dirname(__file__)
 TRANSLATOR_INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "translator", "input")

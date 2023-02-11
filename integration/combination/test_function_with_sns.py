@@ -1,8 +1,8 @@
 from unittest.case import skipIf
 
+from integration.config.service_names import SNS
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import SNS
 
 
 @skipIf(current_region_does_not_support([SNS]), "SNS is not supported in this testing region")
