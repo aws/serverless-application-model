@@ -1,30 +1,65 @@
 Resources:
+  MyApiWithNoDisableDefaultFunctionPermissions:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: Auth
+        Authorizers:
+          Auth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            FunctionInvokeRole: arn:{AWS::Partition}:iam::123456789012:role/test-role
+            Identity:
+              Headers:
+              - Authorization1
 
   MyApiWithLambdaTokenAuth:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
-        DefaultAuthorizer: MyLambdaTokenAuth
+        DefaultAuthorizer: LambdaTokenAuth
         Authorizers:
-          MyLambdaTokenAuth:
+          LambdaTokenAuth:
+            FunctionPayloadType: REQUEST
             FunctionArn: !GetAtt MyAuthFn.Arn
+            FunctionInvokeRole: arn:{AWS::Partition}:iam::123456789012:role/test-role
             DisableDefaultFunctionPermissions: true
+            Identity:
+              Headers:
+              - Authorization1
 
   MyApiWithLambdaRequestAuth:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
-        DefaultAuthorizer: MyLambdaRequestAuth
+        DefaultAuthorizer: LambdaRequestAuth
         Authorizers:
-          MyLambdaRequestAuth:
+          LambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            FunctionInvokeRole: arn:{AWS::Partition}:iam::123456789012:role/test-role
+            DisableDefaultFunctionPermissions: true
+            Identity:
+              Headers:
+              - Authorization1
+
+  MyApiFunctionEvent:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: Auth
+        Authorizers:
+          Auth:
             FunctionPayloadType: REQUEST
             FunctionArn: !GetAtt MyAuthFn.Arn
             DisableDefaultFunctionPermissions: true
             Identity:
               Headers:
-              - Authorization1
+              - Authorization
 
   MyAuthFn:
     Type: AWS::Serverless::Function
@@ -39,9 +74,9 @@ Resources:
       Handler: index.handler
       Runtime: nodejs12.x
       Events:
-        LambdaToken:
+        LambdaEvent:
           Type: Api
           Properties:
-            RestApiId: !Ref MyApiWithLambdaTokenAuth
+            RestApiId: !Ref MyApiFunctionEvent
             Method: get
-            Path: /lambda-token
+            Path: /foo

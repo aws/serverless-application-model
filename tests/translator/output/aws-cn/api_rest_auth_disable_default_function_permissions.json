@@ -1,5 +1,93 @@
 {
   "Resources": {
+    "MyApiFunctionEvent": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/foo": {
+              "get": {
+                "responses": {},
+                "security": [
+                  {
+                    "Auth": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          },
+          "securityDefinitions": {
+            "Auth": {
+              "in": "header",
+              "name": "Unused",
+              "type": "apiKey",
+              "x-amazon-apigateway-authorizer": {
+                "authorizerUri": {
+                  "Fn::Sub": [
+                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    {
+                      "__FunctionArn__": {
+                        "Fn::GetAtt": [
+                          "MyAuthFn",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "identitySource": "method.request.header.Authorization",
+                "type": "request"
+              },
+              "x-amazon-apigateway-authtype": "custom"
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiFunctionEventDeployment746be30be4": {
+      "Properties": {
+        "Description": "RestApi deployment id: 746be30be4ba1a0f5f3832b4a41aeff91a492208",
+        "RestApiId": {
+          "Ref": "MyApiFunctionEvent"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiFunctionEventProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiFunctionEventDeployment746be30be4"
+        },
+        "RestApiId": {
+          "Ref": "MyApiFunctionEvent"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
     "MyApiWithLambdaRequestAuth": {
       "Properties": {
         "Body": {
@@ -11,11 +99,12 @@
           },
           "paths": {},
           "securityDefinitions": {
-            "MyLambdaRequestAuth": {
+            "LambdaRequestAuth": {
               "in": "header",
               "name": "Unused",
               "type": "apiKey",
               "x-amazon-apigateway-authorizer": {
+                "authorizerCredentials": "arn:{AWS::Partition}:iam::123456789012:role/test-role",
                 "authorizerUri": {
                   "Fn::Sub": [
                     "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
@@ -48,9 +137,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithLambdaRequestAuthDeploymentd6ea0f1393": {
+    "MyApiWithLambdaRequestAuthDeploymenta2be588a28": {
       "Properties": {
-        "Description": "RestApi deployment id: d6ea0f1393f4d3308a186ce097c1407df8c1c845",
+        "Description": "RestApi deployment id: a2be588a28255743c834cd7e45dee33af02b093b",
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
         },
@@ -61,7 +150,7 @@
     "MyApiWithLambdaRequestAuthProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaRequestAuthDeploymentd6ea0f1393"
+          "Ref": "MyApiWithLambdaRequestAuthDeploymenta2be588a28"
         },
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
@@ -79,31 +168,14 @@
             },
             "version": "1.0"
           },
-          "paths": {
-            "/lambda-token": {
-              "get": {
-                "responses": {},
-                "security": [
-                  {
-                    "MyLambdaTokenAuth": []
-                  }
-                ],
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
-                  }
-                }
-              }
-            }
-          },
+          "paths": {},
           "securityDefinitions": {
-            "MyLambdaTokenAuth": {
+            "LambdaTokenAuth": {
               "in": "header",
-              "name": "Authorization",
+              "name": "Unused",
               "type": "apiKey",
               "x-amazon-apigateway-authorizer": {
+                "authorizerCredentials": "arn:{AWS::Partition}:iam::123456789012:role/test-role",
                 "authorizerUri": {
                   "Fn::Sub": [
                     "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
@@ -117,7 +189,8 @@
                     }
                   ]
                 },
-                "type": "token"
+                "identitySource": "method.request.header.Authorization1",
+                "type": "request"
               },
               "x-amazon-apigateway-authtype": "custom"
             }
@@ -135,9 +208,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithLambdaTokenAuthDeploymenta48b731095": {
+    "MyApiWithLambdaTokenAuthDeploymentbd8f3faacf": {
       "Properties": {
-        "Description": "RestApi deployment id: a48b7310952ed029bd212c380e89a1bd39c74eae",
+        "Description": "RestApi deployment id: bd8f3faacfde909d87b4ceec48f1fd7a0acdc8d7",
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
         },
@@ -148,10 +221,104 @@
     "MyApiWithLambdaTokenAuthProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaTokenAuthDeploymenta48b731095"
+          "Ref": "MyApiWithLambdaTokenAuthDeploymentbd8f3faacf"
         },
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyApiWithNoDisableDefaultFunctionPermissions": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {},
+          "securityDefinitions": {
+            "Auth": {
+              "in": "header",
+              "name": "Unused",
+              "type": "apiKey",
+              "x-amazon-apigateway-authorizer": {
+                "authorizerCredentials": "arn:{AWS::Partition}:iam::123456789012:role/test-role",
+                "authorizerUri": {
+                  "Fn::Sub": [
+                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    {
+                      "__FunctionArn__": {
+                        "Fn::GetAtt": [
+                          "MyAuthFn",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "identitySource": "method.request.header.Authorization1",
+                "type": "request"
+              },
+              "x-amazon-apigateway-authtype": "custom"
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiWithNoDisableDefaultFunctionPermissionsAuthAuthorizerPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyAuthFn",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
+            {
+              "__ApiId__": {
+                "Ref": "MyApiWithNoDisableDefaultFunctionPermissions"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyApiWithNoDisableDefaultFunctionPermissionsDeployment223dfb9e3e": {
+      "Properties": {
+        "Description": "RestApi deployment id: 223dfb9e3ef3ee64a1ca7bcc7c9379214fb258f0",
+        "RestApiId": {
+          "Ref": "MyApiWithNoDisableDefaultFunctionPermissions"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiWithNoDisableDefaultFunctionPermissionsProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithNoDisableDefaultFunctionPermissionsDeployment223dfb9e3e"
+        },
+        "RestApiId": {
+          "Ref": "MyApiWithNoDisableDefaultFunctionPermissions"
         },
         "StageName": "Prod"
       },
@@ -233,7 +400,7 @@
       },
       "Type": "AWS::Lambda::Function"
     },
-    "MyFnLambdaTokenPermissionProd": {
+    "MyFnLambdaEventPermissionProd": {
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
@@ -242,10 +409,10 @@
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda-token",
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo",
             {
               "__ApiId__": {
-                "Ref": "MyApiWithLambdaTokenAuth"
+                "Ref": "MyApiFunctionEvent"
               },
               "__Stage__": "*"
             }
