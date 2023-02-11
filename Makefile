@@ -18,7 +18,7 @@ integ-test:
 	pytest --no-cov integration/*
 
 black:
-	black setup.py samtranslator/* tests/* integration/* bin/*.py schema_source
+	black setup.py samtranslator tests integration bin schema_source
 	bin/json-format.py --write tests integration samtranslator/policy_templates_data
 	bin/yaml-format.py --write tests
 	bin/yaml-format.py --write integration --add-test-metadata
@@ -29,7 +29,7 @@ black-check:
 	python -m schema_source.schema --sam-schema .tmp/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema .tmp/schema.json
 	diff -u schema_source/sam.schema.json .tmp/sam.schema.json
 	diff -u samtranslator/schema/schema.json .tmp/schema.json
-	black --check setup.py samtranslator/* tests/* integration/* bin/*.py schema_source
+	black --check setup.py samtranslator tests integration bin schema_source
 	bin/json-format.py --check tests integration samtranslator/policy_templates_data
 	bin/yaml-format.py --check tests
 	bin/yaml-format.py --check integration --add-test-metadata
