@@ -107,6 +107,32 @@ make pr
  
 See [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md) for further development instructions, and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contributing guidelines.
 
+## Calling from Python
+
+```python
+from samtranslator.translator.translator import Translator
+from samtranslator.parser.parser import Parser
+from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
+
+parser = Parser()
+translator = Translator(None, parser)
+
+sam_template = {}
+
+iam = boto3.client("iam")
+managed_policy_loader = ManagedPolicyLoader(iam)
+get_managed_policy_map = managed_policy_loader.load
+
+parameters = {}
+cfn_template = translator.translate(
+    sam_template,
+    parameters,
+    get_managed_policy_map=get_managed_policy_map,
+)
+
+print(cfn_template)
+```
+
 ## Getting help
 
 The best way to interact with the team is through GitHub. You can either [create an issue](https://github.com/aws/serverless-application-model/issues/new/choose) or [start a discussion](https://github.com/aws/serverless-application-model/discussions).
