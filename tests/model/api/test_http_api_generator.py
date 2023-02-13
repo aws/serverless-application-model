@@ -216,7 +216,9 @@ class TestCustomDomains(TestCase):
         "passthrough_resource_attributes": None,
         "domain": None,
     }
-    route53_record_set_groups = {}
+
+    def setUp(self) -> None:
+        self.route53_record_set_groups = {}
 
     def test_no_domain(self):
         self.kwargs["domain"] = None
@@ -371,7 +373,7 @@ class TestCustomDomains(TestCase):
         self.assertIsNotNone(route, None)
         self.assertEqual(route.HostedZoneName, None)
         self.assertEqual(route.HostedZoneId, "xyz")
-        self.assertEqual(len(route.RecordSets), 4)
+        self.assertEqual(len(route.RecordSets), 2)
         self.assertEqual(
             list(map(lambda base: base.ApiMappingKey, basepath)),
             ["one-1", "two_2", "three", "", "api", "api/v1", "api/v1", "api/v1"],
