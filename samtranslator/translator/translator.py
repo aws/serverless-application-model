@@ -140,15 +140,6 @@ class Translator:
         macro_resolver = ResourceTypeResolver(sam_resources)
         intrinsics_resolver = IntrinsicsResolver(parameter_values)
 
-        # The available managed policies aren't expected to change during the
-        # run of a transform; cache function return value as it can be called
-        # multiple times
-        @lru_cache(maxsize=None)
-        def cached_get_managed_policy_map() -> Optional[Dict[str, str]]:
-            if not get_managed_policy_map:
-                return None
-            return get_managed_policy_map()
-
         # ResourceResolver is used by connector, its "resources" will be
         # updated in-place by other transforms so connector transform
         # can see the transformed resources.
@@ -169,7 +160,7 @@ class Translator:
 
                 kwargs = macro.resources_to_link(sam_template["Resources"])
                 kwargs["managed_policy_map"] = self.managed_policy_map
-                kwargs["get_managed_policy_map"] = cached_get_managed_policy_map
+                kwargs["get_managed_policy_map"] = get_managed_policy_map
                 kwargs["intrinsics_resolver"] = intrinsics_resolver
                 kwargs["mappings_resolver"] = mappings_resolver
                 kwargs["deployment_preference_collection"] = deployment_preference_collection
