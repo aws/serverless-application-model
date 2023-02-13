@@ -1,8 +1,50 @@
-from samtranslator.internal.managed_policies import get_managed_policy_arn
+from typing import Callable, Dict, Optional
+
+from samtranslator.internal.managed_policies import get_bundled_managed_policy_map
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 from samtranslator.model.resource_policies import PolicyTypes
+from samtranslator.translator.arn_generator import ArnGenerator
+
+
+def _get_managed_policy_arn(
+    name: str,
+    managed_policy_map: Optional[Dict[str, str]],
+    get_managed_policy_map: Optional[Callable[[], Dict[str, str]]],
+) -> str:
+    """
+    Get the ARN of a AWS managed policy name. Used in Policies property of
+    AWS::Serverless::Function and AWS::Serverless::StateMachine.
+
+    The intention is that the bundled managed policy map is used in the majority
+    of cases, avoiding the extra IAM calls (IAM is partition-global; AWS managed
+    policies are the same for any region within a partition).
+
+    Determined in this order:
+      1. Caller-provided managed policy map (can be None, mostly for compatibility)
+      2. Managed policy map bundled with the transform code (fast!)
+      3. Caller-provided managed policy map (lazily called function)
+
+    If it matches no ARN, the name is used as-is.
+    """
+    arn = managed_policy_map and managed_policy_map.get(name)
+    if arn:
+        return arn
+
+    partition = ArnGenerator.get_partition_name()
+    bundled_managed_policy_map = get_bundled_managed_policy_map(partition)
+    arn = bundled_managed_policy_map and bundled_managed_policy_map.get(name)
+    if arn:
+        return arn
+
+    if callable(get_managed_policy_map):
+        fallback_managed_policy_map = get_managed_policy_map()
+        arn = fallback_managed_policy_map and fallback_managed_policy_map.get(name)
+        if arn:
+            return arn
+
+    return name
 
 
 def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
@@ -86,13 +128,11 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: too-man
 
             policy_arn = policy_entry.data
             if isinstance(policy_entry.data, str):
-                arn = get_managed_policy_arn(
+                policy_arn = _get_managed_policy_arn(
                     policy_entry.data,
                     managed_policy_map,
                     get_managed_policy_map,
                 )
-                if arn:
-                    policy_arn = arn
 
             # De-Duplicate managed policy arns before inserting. Mainly useful
             # when customer specifies a managed policy which is already inserted
