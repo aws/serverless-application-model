@@ -15,10 +15,9 @@ class UserException(Exception):
 
 
 class ChangeEmptyError(UserException):
-    def __init__(self, stack_name):
+    def __init__(self, stack_name: str) -> None:
         message_fmt = "No changes to deploy. Stack {stack_name} is up to date"
-        super().__init__(message=message_fmt.format(stack_name=self.stack_name))
-        self.stack_name = stack_name
+        super().__init__(message=message_fmt.format(stack_name=stack_name))
 
 
 class ChangeSetError(UserException):
