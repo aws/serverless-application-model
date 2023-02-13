@@ -10,12 +10,6 @@ with Path(os.path.dirname(os.path.abspath(__file__)), "data", "managed_policies.
     _BUNDLED_MANAGED_POLICIES: Dict[str, Dict[str, str]] = json.load(f)
 
 
-def _dict_get(d: Optional[Dict[str, str]], k: str) -> Optional[str]:
-    if isinstance(d, dict) and k in d:
-        return d[k]
-    return None
-
-
 def get_managed_policy_arn(
     name: str,
     managed_policy_map: Optional[Dict[str, str]],
@@ -35,21 +29,21 @@ def get_managed_policy_arn(
       3. Caller-provided managed policy map (load lazily as last resort)
     """
     # Caller-provided policy map (eager)
-    arn = _dict_get(managed_policy_map, name)
+    arn = managed_policy_map and managed_policy_map.get(name)
     if arn:
         return arn
 
     # Bundled policy map
     partition = ArnGenerator.get_partition_name()
     bundled_managed_policies = _BUNDLED_MANAGED_POLICIES.get(partition)
-    arn = _dict_get(bundled_managed_policies, name)
+    arn = bundled_managed_policies and bundled_managed_policies.get(name)
     if arn:
         return arn
 
     # Caller-provided policy map (lazy)
     if callable(get_managed_policy_map):
         fallback_managed_policies = get_managed_policy_map()
-        arn = _dict_get(fallback_managed_policies, name)
+        arn = fallback_managed_policies and fallback_managed_policies.get(name)
         if arn:
             return arn
 
