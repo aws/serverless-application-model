@@ -724,10 +724,13 @@ class TestTemplateValidation(TestCase):
             {"aws": bundled_managed_policy_map},
         ):
             parameters = {}
-            cfn_template = Translator(managed_policy_map, Parser()).translate(
+            cfn_template = Translator(
+                managed_policy_map,
+                Parser(),
+                get_managed_policy_map=get_managed_policy_map,
+            ).translate(
                 self._MANAGED_POLICIES_TEMPLATE,
                 parameters,
-                get_managed_policy_map=get_managed_policy_map,
             )
 
         function_arn = cfn_template["Resources"]["MyFunctionRole"]["Properties"]["ManagedPolicyArns"][1]

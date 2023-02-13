@@ -39,7 +39,15 @@ from samtranslator.validator.value_validator import sam_expect
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None, metrics=None):  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        managed_policy_map,
+        sam_parser,
+        plugins=None,
+        boto_session=None,
+        metrics=None,
+        get_managed_policy_map=None,
+    ):  # type: ignore[no-untyped-def]
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -56,8 +64,16 @@ class Translator:
         self._translated_resouce_mapping = {}
         self.document_errors = []
 
+        self._get_managed_policy_map = get_managed_policy_map
+        self._fallback_managed_policy_map = None
+
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
+
+    def _get_managed_policy_map(self) -> Optional[Dict[str, str]]:
+        if not self._fallback_managed_policy_map and self._get_managed_policy_map:
+            self._fallback_managed_policy_map = self._get_managed_policy_map()
+        return self._fallback_managed_policy_map
 
     def _get_function_names(
         self, resource_dict: Dict[str, Any], intrinsics_resolver: IntrinsicsResolver
@@ -96,7 +112,6 @@ class Translator:
         parameter_values: Dict[Any, Any],
         feature_toggle: Optional[FeatureToggle] = None,
         passthrough_metadata: Optional[bool] = False,
-        get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
     ) -> Dict[str, Any]:
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
@@ -159,7 +174,7 @@ class Translator:
 
                 kwargs = macro.resources_to_link(sam_template["Resources"])
                 kwargs["managed_policy_map"] = self.managed_policy_map
-                kwargs["get_managed_policy_map"] = get_managed_policy_map
+                kwargs["get_managed_policy_map"] = self._get_managed_policy_map
                 kwargs["intrinsics_resolver"] = intrinsics_resolver
                 kwargs["mappings_resolver"] = mappings_resolver
                 kwargs["deployment_preference_collection"] = deployment_preference_collection
