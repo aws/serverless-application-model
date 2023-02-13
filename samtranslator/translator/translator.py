@@ -5,7 +5,6 @@ from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
     FeatureToggleDefaultConfigProvider,
 )
-from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
@@ -39,7 +38,7 @@ from samtranslator.validator.value_validator import sam_expect
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(
+    def __init__(  # type: ignore[no-untyped-def] # noqa: PLR0913
         self,
         managed_policy_map,
         sam_parser,
@@ -47,7 +46,7 @@ class Translator:
         boto_session=None,
         metrics=None,
         get_managed_policy_map=None,
-    ):  # type: ignore[no-untyped-def]
+    ):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -64,15 +63,15 @@ class Translator:
         self._translated_resouce_mapping = {}
         self.document_errors = []
 
-        self._get_managed_policy_map = get_managed_policy_map
+        self._get_fallback_managed_policy_map = get_managed_policy_map
         self._fallback_managed_policy_map = None
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
 
     def _get_managed_policy_map(self) -> Optional[Dict[str, str]]:
-        if not self._fallback_managed_policy_map and self._get_managed_policy_map:
-            self._fallback_managed_policy_map = self._get_managed_policy_map()
+        if not self._fallback_managed_policy_map and self._get_fallback_managed_policy_map:
+            self._fallback_managed_policy_map = self._get_fallback_managed_policy_map()
         return self._fallback_managed_policy_map
 
     def _get_function_names(
