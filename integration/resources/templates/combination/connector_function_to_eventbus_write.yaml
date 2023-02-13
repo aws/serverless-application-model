@@ -46,7 +46,7 @@ Resources:
   EventBus:
     Type: AWS::Events::EventBus
     Properties:
-      Name: TestEventBus
+      Name: !Sub "${AWS::StackName}-EventBus"
 
   Connector:
     Type: AWS::Serverless::Connector
