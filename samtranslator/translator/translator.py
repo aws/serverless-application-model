@@ -1,5 +1,4 @@
 import copy
-from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 from samtranslator.feature_toggle.feature_toggle import (
