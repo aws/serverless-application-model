@@ -279,7 +279,7 @@ class ApiGatewayAuthorizer:
         function_invoke_role=None,
         is_aws_iam_authorizer=False,
         authorization_scopes=None,
-        disable_default_function_permissions=False,
+        disable_function_default_permissions=False,
     ):
         if authorization_scopes is None:
             authorization_scopes = []
@@ -293,7 +293,7 @@ class ApiGatewayAuthorizer:
         self.function_invoke_role = function_invoke_role
         self.is_aws_iam_authorizer = is_aws_iam_authorizer
         self.authorization_scopes = authorization_scopes
-        self.disable_default_function_permissions = disable_default_function_permissions
+        self.disable_function_default_permissions = disable_function_default_permissions
 
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
             raise InvalidResourceException(
@@ -311,9 +311,9 @@ class ApiGatewayAuthorizer:
         if authorization_scopes is not None:
             sam_expect(authorization_scopes, api_logical_id, f"Authorizers.{name}.AuthorizationScopes").to_be_a_list()
 
-        if disable_default_function_permissions is not None:
+        if disable_function_default_permissions is not None:
             sam_expect(
-                disable_default_function_permissions,
+                disable_function_default_permissions,
                 api_logical_id,
                 f"Authorizers.{name}.DisableFunctionDefaultPermissions",
             ).to_be_a_bool()
