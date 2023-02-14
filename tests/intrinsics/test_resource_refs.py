@@ -1,10 +1,10 @@
 from unittest import TestCase
+
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 
 
 class TestSupportedResourceReferences(TestCase):
     def test_add_multiple_properties_to_one_logicalId(self):
-
         resource_refs = SupportedResourceReferences()
 
         resource_refs.add("logicalId", "property1", "value1")
@@ -27,7 +27,6 @@ class TestSupportedResourceReferences(TestCase):
         self.assertEqual({"property3": "value3"}, resource_refs.get_all("logicalId3"))
 
     def test_add_must_error_on_duplicate_value(self):
-
         resource_refs = SupportedResourceReferences()
 
         resource_refs.add("logicalId", "property", "value1")

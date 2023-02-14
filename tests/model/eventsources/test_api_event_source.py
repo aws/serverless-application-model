@@ -1,5 +1,5 @@
-from unittest.mock import Mock, patch
 from unittest import TestCase
+from unittest.mock import Mock, patch
 
 from samtranslator.model.eventsources.push import Api
 from samtranslator.model.lambda_ import LambdaFunction, LambdaPermission

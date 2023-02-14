@@ -19,20 +19,13 @@ This was ported over from the sam-cli repo
 
 import os
 import tempfile
-import contextlib
-from contextlib import contextmanager
-
-try:
-    from urllib.parse import urlparse, parse_qs
-except ImportError:  # py2
-    from urlparse import urlparse, parse_qs
 import uuid
+from contextlib import contextmanager
+from urllib.parse import parse_qs, urlparse
 
 
 def parse_s3_url(url, bucket_name_property="Bucket", object_key_property="Key", version_property=None):
-
     if isinstance(url, str) and url.startswith("s3://"):
-
         parsed = urlparse(url)
         query = parse_qs(parsed.query)
 

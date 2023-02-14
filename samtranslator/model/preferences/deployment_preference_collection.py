@@ -278,7 +278,7 @@ class DeploymentPreferenceCollection:
                 value[i] = self._replace_deployment_types(v)  # type: ignore[no-untyped-call]
             return value
         if is_intrinsic(value):
-            for (k, v) in value.items():
+            for k, v in value.items():
                 value[k] = self._replace_deployment_types(v, k)  # type: ignore[no-untyped-call]
             return value
         if value in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:

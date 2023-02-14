@@ -1,5 +1,5 @@
-from unittest.mock import Mock
 from unittest import TestCase
+from unittest.mock import Mock
 
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.stepfunctions.events import EventBridgeRule

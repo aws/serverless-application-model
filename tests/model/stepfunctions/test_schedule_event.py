@@ -1,8 +1,9 @@
-from unittest.mock import Mock
 from unittest import TestCase
-from samtranslator.model.stepfunctions.events import Schedule
-from samtranslator.model.exceptions import InvalidEventException
+from unittest.mock import Mock
+
 from parameterized import parameterized
+from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.stepfunctions.events import Schedule
 
 
 class ScheduleEventSource(TestCase):

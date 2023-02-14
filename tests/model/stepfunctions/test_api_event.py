@@ -1,8 +1,8 @@
-from unittest.mock import Mock
 from unittest import TestCase
+from unittest.mock import Mock
 
+from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.stepfunctions.events import Api
-from samtranslator.model.exceptions import InvalidResourceException, InvalidEventException
 
 
 class ApiEventSource(TestCase):
@@ -76,8 +76,8 @@ class ApiEventSource(TestCase):
     def test_resources_to_link_with_undefined_explicit_api(self):
         resources = {}
         self.api_event_source.RestApiId = {"Ref": "MyExplicitApi"}
-        with self.assertRaises(InvalidEventException) as error:
-            resources_to_link = self.api_event_source.resources_to_link(resources)
+        with self.assertRaises(InvalidEventException):
+            self.api_event_source.resources_to_link(resources)
 
     def test_resources_to_link_without_explicit_api(self):
         resources = {}

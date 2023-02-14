@@ -1,14 +1,11 @@
-import boto3
-import itertools
-from botocore.exceptions import ClientError
-
-from unittest.mock import Mock, patch
 from unittest import TestCase
-from parameterized import parameterized, param
+from unittest.mock import Mock, patch
 
+import boto3
+from botocore.exceptions import ClientError
+from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins.application.serverless_app_plugin import ServerlessAppPlugin
 from samtranslator.plugins.exceptions import InvalidPluginException
-from samtranslator.model.exceptions import InvalidResourceException
 
 # TODO: run tests when AWS CLI is not configured (so they can run in brazil)
 
@@ -20,18 +17,17 @@ STATUS_EXPIRED = "EXPIRED"
 
 
 def mock_create_cloud_formation_template(ApplicationId=None, SemanticVersion=None):
-    message = {
+    return {
         "ApplicationId": ApplicationId,
         "SemanticVersion": SemanticVersion,
         "Status": STATUS_ACTIVE,
         "TemplateId": MOCK_TEMPLATE_ID,
         "TemplateUrl": MOCK_TEMPLATE_URL,
     }
-    return message
 
 
 def mock_get_application(ApplicationId=None, SemanticVersion=None):
-    message = {
+    return {
         "ApplicationId": ApplicationId,
         "Author": "AWS",
         "Description": "Application description",
@@ -39,18 +35,16 @@ def mock_get_application(ApplicationId=None, SemanticVersion=None):
         "ParameterDefinitions": [{"Name": "Parameter1", "ReferencedByResources": ["resource1"], "Type": "String"}],
         "SemanticVersion": SemanticVersion,
     }
-    return message
 
 
 def mock_get_cloud_formation_template(ApplicationId=None, TemplateId=None):
-    message = {
+    return {
         "ApplicationId": ApplicationId,
         "SemanticVersion": "1.0.0",
         "Status": STATUS_ACTIVE,
         "TemplateId": TemplateId,
         "TemplateUrl": MOCK_TEMPLATE_URL,
     }
-    return message
 
 
 def mock_get_region(self, service_name, region_name):
@@ -90,7 +84,7 @@ class TestServerlessAppPlugin_init(TestCase):
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_plugin_invalid_configuration_raises_exception(self):
         with self.assertRaises(InvalidPluginException):
-            plugin = ServerlessAppPlugin(wait_for_template_active_status=True, validate_only=True)
+            ServerlessAppPlugin(wait_for_template_active_status=True, validate_only=True)
 
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_plugin_accepts_parameters(self):
@@ -108,7 +102,6 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
     @patch("botocore.client.BaseClient._make_api_call", mock_create_cloud_formation_template)
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_must_process_applications(self, SamTemplateMock):
-
         self.plugin = ServerlessAppPlugin(sar_client=boto3.client("serverlessrepo"))
         template_dict = {"a": "b"}
         app_resources = [
@@ -133,7 +126,6 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
     @patch("botocore.client.BaseClient._make_api_call", mock_get_application)
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_must_process_applications_validate(self, SamTemplateMock):
-
         self.plugin = ServerlessAppPlugin(validate_only=True)
         template_dict = {"a": "b"}
         app_resources = [

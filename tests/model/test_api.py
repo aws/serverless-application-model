@@ -1,6 +1,6 @@
 from unittest import TestCase
-import pytest
 
+import pytest
 from samtranslator.model import InvalidResourceException
 from samtranslator.model.apigateway import ApiGatewayAuthorizer
 from samtranslator.utils.py27hash_fix import Py27Dict

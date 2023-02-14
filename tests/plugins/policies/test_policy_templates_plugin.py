@@ -1,9 +1,9 @@
 from unittest import TestCase
-from unittest.mock import Mock, MagicMock, patch, call
+from unittest.mock import MagicMock, Mock, call, patch
 
-from samtranslator.plugins import BasePlugin
-from samtranslator.model.resource_policies import PolicyTypes, PolicyEntry
 from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.resource_policies import PolicyEntry, PolicyTypes
+from samtranslator.plugins import BasePlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 
@@ -194,7 +194,6 @@ class TestPolicyTemplatesForResourcePlugin(TestCase):
         self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": {"Param1": "value1"}}})
 
     def test_on_before_transform_resource_must_skip_unsupported_resources(self):
-
         is_supported_mock = Mock()
         data_mock = Mock()
 

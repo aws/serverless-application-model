@@ -55,7 +55,6 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
         """
 
         for event_id, event in api_events.items():
-
             event_properties = event.get("Properties", {})
             if not event_properties:
                 continue

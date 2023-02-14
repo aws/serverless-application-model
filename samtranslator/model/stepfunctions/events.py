@@ -316,13 +316,11 @@ class Api(EventSource):
         explicit_api = None
         rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)
         if isinstance(rest_api_id, str):
-
             if (
                 rest_api_id in resources
                 and "Properties" in resources[rest_api_id]
                 and "StageName" in resources[rest_api_id]["Properties"]
             ):
-
                 explicit_api = resources[rest_api_id]["Properties"]
                 permitted_stage = explicit_api["StageName"]
 

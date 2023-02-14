@@ -2,11 +2,10 @@ from typing import cast
 from unittest import TestCase
 from unittest.mock import Mock
 
-from samtranslator.model.eventsources.scheduler import SchedulerEventSource
-from samtranslator.model.lambda_ import LambdaFunction
-from samtranslator.model.exceptions import InvalidEventException
 from parameterized import parameterized
-
+from samtranslator.model.eventsources.scheduler import SchedulerEventSource
+from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.lambda_ import LambdaFunction
 from samtranslator.model.scheduler import SchedulerSchedule
 
 

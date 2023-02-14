@@ -3999,8 +3999,8 @@
               "$ref": "#/definitions/ResourceReference"
             }
           ],
-          "description": "The source resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "The source resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "description": "The source resource\\. Required when using the `AWS::Serverless::Connector` syntax\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The source resource\\. Required when using the `AWS::Serverless::Connector` syntax\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "Source"
         }
       },

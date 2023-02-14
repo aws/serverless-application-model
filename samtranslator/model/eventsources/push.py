@@ -439,7 +439,6 @@ class S3(PushEventSource):
 
         event_mappings = []
         for event_type in event_types:
-
             lambda_event = copy.deepcopy(base_event_mapping)
             lambda_event["Event"] = event_type
             if CONDITION in function.resource_attributes:
@@ -652,13 +651,11 @@ class Api(PushEventSource):
         explicit_api = None
         rest_api_id = self.get_rest_api_id_string(self.RestApiId)
         if isinstance(rest_api_id, str):
-
             if (
                 rest_api_id in resources
                 and "Properties" in resources[rest_api_id]
                 and "StageName" in resources[rest_api_id]["Properties"]
             ):
-
                 explicit_api = resources[rest_api_id]["Properties"]
                 permitted_stage = explicit_api["StageName"]
 
@@ -844,7 +841,6 @@ class Api(PushEventSource):
 
                 # Checking if any of the fields are defined as it can be false we are checking if the field are not None
                 if validate_body is not None or validate_parameters is not None:
-
                     # as we are setting two different fields we are here setting as default False
                     # In case one of them are not defined
                     validate_body = False if validate_body is None else validate_body
@@ -869,14 +865,11 @@ class Api(PushEventSource):
                     )
 
         if self.RequestParameters:
-
             default_value = {"Required": False, "Caching": False}
 
             parameters = []
             for parameter in self.RequestParameters:
-
                 if isinstance(parameter, dict):
-
                     parameter_name, parameter_value = next(iter(parameter.items()))
 
                     if not re.match(r"method\.request\.(querystring|path|header)\.", parameter_name):

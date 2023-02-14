@@ -260,7 +260,6 @@ class Translator:
         resources = sam_template["Resources"]
 
         for logicalId, resource in resources.items():
-
             data = (logicalId, resource)
 
             # Skip over the resource if it is not a SAM defined Resource
