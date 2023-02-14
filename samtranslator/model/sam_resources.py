@@ -9,7 +9,7 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
-from samtranslator.internal.types import GetManagedPolicyMap
+from samtranslator.internal.types import InternalGetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
@@ -566,7 +566,7 @@ class SamFunction(SamResourceMacro):
         self,
         managed_policy_map: Dict[str, Any],
         event_invoke_policies: List[Dict[str, Any]],
-        get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
+        get_managed_policy_map: Optional[InternalGetManagedPolicyMap] = None,
     ) -> IAMRole:
         """Constructs a Lambda execution role based on this SAM function's Policies property.
 
