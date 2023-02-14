@@ -230,7 +230,7 @@
       },
       "Type": "AWS::ApiGateway::Stage"
     },
-    "MyApiWithNoDisableDefaultFunctionPermissions": {
+    "MyApiWithNoDisableFunctionDefaultPermissions": {
       "Properties": {
         "Body": {
           "info": {
@@ -279,7 +279,7 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithNoDisableDefaultFunctionPermissionsAuthAuthorizerPermission": {
+    "MyApiWithNoDisableFunctionDefaultPermissionsAuthAuthorizerPermission": {
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
@@ -294,7 +294,7 @@
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
             {
               "__ApiId__": {
-                "Ref": "MyApiWithNoDisableDefaultFunctionPermissions"
+                "Ref": "MyApiWithNoDisableFunctionDefaultPermissions"
               }
             }
           ]
@@ -302,23 +302,23 @@
       },
       "Type": "AWS::Lambda::Permission"
     },
-    "MyApiWithNoDisableDefaultFunctionPermissionsDeploymenta977c70734": {
+    "MyApiWithNoDisableFunctionDefaultPermissionsDeploymenta977c70734": {
       "Properties": {
         "Description": "RestApi deployment id: a977c7073442209e16eca4c09a957eeee1a05a16",
         "RestApiId": {
-          "Ref": "MyApiWithNoDisableDefaultFunctionPermissions"
+          "Ref": "MyApiWithNoDisableFunctionDefaultPermissions"
         },
         "StageName": "Stage"
       },
       "Type": "AWS::ApiGateway::Deployment"
     },
-    "MyApiWithNoDisableDefaultFunctionPermissionsProdStage": {
+    "MyApiWithNoDisableFunctionDefaultPermissionsProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithNoDisableDefaultFunctionPermissionsDeploymenta977c70734"
+          "Ref": "MyApiWithNoDisableFunctionDefaultPermissionsDeploymenta977c70734"
         },
         "RestApiId": {
-          "Ref": "MyApiWithNoDisableDefaultFunctionPermissions"
+          "Ref": "MyApiWithNoDisableFunctionDefaultPermissions"
         },
         "StageName": "Prod"
       },

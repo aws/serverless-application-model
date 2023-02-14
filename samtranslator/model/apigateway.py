@@ -315,7 +315,7 @@ class ApiGatewayAuthorizer:
             sam_expect(
                 disable_default_function_permissions,
                 api_logical_id,
-                f"Authorizers.{name}.DisableDefaultFunctionPermissions",
+                f"Authorizers.{name}.DisableFunctionDefaultPermissions",
             ).to_be_a_bool()
 
     def _is_missing_identity_source(self, identity: Dict[str, Any]) -> bool:

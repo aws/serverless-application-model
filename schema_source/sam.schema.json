@@ -1593,8 +1593,8 @@
           "title": "AuthorizationScopes",
           "type": "array"
         },
-        "DisableDefaultFunctionPermissions": {
-          "title": "Disabledefaultfunctionpermissions",
+        "DisableFunctionDefaultPermissions": {
+          "title": "Disablefunctiondefaultpermissions",
           "type": "boolean"
         },
         "FunctionArn": {
@@ -1710,8 +1710,8 @@
           "title": "AuthorizationScopes",
           "type": "array"
         },
-        "DisableDefaultFunctionPermissions": {
-          "title": "Disabledefaultfunctionpermissions",
+        "DisableFunctionDefaultPermissions": {
+          "title": "Disablefunctiondefaultpermissions",
           "type": "boolean"
         },
         "FunctionArn": {

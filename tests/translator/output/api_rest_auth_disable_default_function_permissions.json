@@ -206,7 +206,7 @@
       },
       "Type": "AWS::ApiGateway::Stage"
     },
-    "MyApiWithNoDisableDefaultFunctionPermissions": {
+    "MyApiWithNoDisableFunctionDefaultPermissions": {
       "Properties": {
         "Body": {
           "info": {
@@ -247,7 +247,7 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithNoDisableDefaultFunctionPermissionsAuthAuthorizerPermission": {
+    "MyApiWithNoDisableFunctionDefaultPermissionsAuthAuthorizerPermission": {
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
@@ -262,7 +262,7 @@
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
             {
               "__ApiId__": {
-                "Ref": "MyApiWithNoDisableDefaultFunctionPermissions"
+                "Ref": "MyApiWithNoDisableFunctionDefaultPermissions"
               }
             }
           ]
@@ -270,23 +270,23 @@
       },
       "Type": "AWS::Lambda::Permission"
     },
-    "MyApiWithNoDisableDefaultFunctionPermissionsDeploymented3610d673": {
+    "MyApiWithNoDisableFunctionDefaultPermissionsDeploymented3610d673": {
       "Properties": {
         "Description": "RestApi deployment id: ed3610d673c23324febaab2ace7c20e1b7a49e33",
         "RestApiId": {
-          "Ref": "MyApiWithNoDisableDefaultFunctionPermissions"
+          "Ref": "MyApiWithNoDisableFunctionDefaultPermissions"
         },
         "StageName": "Stage"
       },
       "Type": "AWS::ApiGateway::Deployment"
     },
-    "MyApiWithNoDisableDefaultFunctionPermissionsProdStage": {
+    "MyApiWithNoDisableFunctionDefaultPermissionsProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithNoDisableDefaultFunctionPermissionsDeploymented3610d673"
+          "Ref": "MyApiWithNoDisableFunctionDefaultPermissionsDeploymented3610d673"
         },
         "RestApiId": {
-          "Ref": "MyApiWithNoDisableDefaultFunctionPermissions"
+          "Ref": "MyApiWithNoDisableFunctionDefaultPermissions"
         },
         "StageName": "Prod"
       },
