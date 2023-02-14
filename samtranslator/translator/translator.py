@@ -63,6 +63,9 @@ class Translator:
         self._translated_resouce_mapping = {}
         self.document_errors = []
 
+        # Prevent late surprises at runtime
+        if get_managed_policy_map and not callable(get_managed_policy_map):
+            raise Exception("get_managed_policy_map must be callable")
         self._get_fallback_managed_policy_map = get_managed_policy_map
         self._fallback_managed_policy_map = None
 

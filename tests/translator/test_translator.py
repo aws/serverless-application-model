@@ -712,6 +712,17 @@ class TestTemplateValidation(TestCase):
 
         self.assertEqual(self._call_count, 1)
 
+    def test_get_managed_policy_map_callable(self):
+        # get_managed_policy_map() is only called as fallback; make sure
+        # it fails early to avoid late surprises at runtime
+        managed_policy_map = {"foo": "bar"}
+        with self.assertRaises(Exception):
+            Translator(
+                {},
+                Parser(),
+                get_managed_policy_map=managed_policy_map,  # Intentional error
+            )
+
     @parameterized.expand(
         [
             # All combinations, should use first that matches from left
