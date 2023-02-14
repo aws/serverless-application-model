@@ -6,6 +6,7 @@ from schema_source.common import BaseModel, DictStrAny, get_prop
 
 properties = get_prop("sam-resource-graphqlapi")
 
+
 # TODO: add docs
 class Auth(BaseModel):
     Type: str
