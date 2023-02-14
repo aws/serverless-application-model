@@ -685,7 +685,7 @@ class TestTemplateValidation(TestCase):
         }
     }
 
-    def test_get_manage_policy_map_called_once(self):
+    def test_get_managed_policy_map_called_once(self):
         """
         Ensure caller-passed get_managed_policy_map is only called once
         (the result is cached) as it's expected to call IAM.

@@ -28,21 +28,24 @@ def _get_managed_policy_arn(
 
     If it matches no ARN, the name is used as-is.
     """
-    arn = managed_policy_map and managed_policy_map.get(name)
-    if arn:
-        return arn
+    if managed_policy_map:
+        arn = managed_policy_map.get(name)
+        if arn:
+            return arn
 
     partition = ArnGenerator.get_partition_name()
     bundled_managed_policy_map = get_bundled_managed_policy_map(partition)
-    arn = bundled_managed_policy_map and bundled_managed_policy_map.get(name)
-    if arn:
-        return arn
-
-    if callable(get_managed_policy_map):
-        fallback_managed_policy_map = get_managed_policy_map()
-        arn = fallback_managed_policy_map and fallback_managed_policy_map.get(name)
+    if bundled_managed_policy_map:
+        arn = bundled_managed_policy_map.get(name)
         if arn:
             return arn
+
+    if get_managed_policy_map:
+        fallback_managed_policy_map = get_managed_policy_map()
+        if fallback_managed_policy_map:
+            arn = fallback_managed_policy_map.get(name)
+            if arn:
+                return arn
 
     return name
 
