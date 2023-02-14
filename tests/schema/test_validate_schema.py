@@ -105,6 +105,7 @@ class TestValidateUnifiedSchema(TestCase):
     @parameterized.expand(
         [
             (PROJECT_ROOT.joinpath("tests/translator/input/schema_validation_4.yaml"),),
+            (PROJECT_ROOT.joinpath("tests/translator/input/schema_validation_5.yaml"),),
         ]
     )
     def test_validate_unified_schema(self, testcase):
