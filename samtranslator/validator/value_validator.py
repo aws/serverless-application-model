@@ -120,9 +120,9 @@ class _ResourcePropertyValueValidator(Generic[T]):
         """
         return cast(int, self.to_be_a(ExpectedType.INTEGER, message))
 
-    def to_be_a_bool(self, message: Optional[str] = "") -> int:
+    def to_be_a_bool(self, message: Optional[str] = "") -> bool:
         """
-        Return the value with type hint "int".
+        Return the value with type hint "bool".
         Raise InvalidResourceException/InvalidEventException if the value is not.
         """
         return cast(bool, self.to_be_a(ExpectedType.BOOLEAN, message))
