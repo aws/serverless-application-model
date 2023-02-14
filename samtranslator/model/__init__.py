@@ -69,6 +69,7 @@ class GeneratedProperty(PropertyType):
     """
     Property of a generated CloudFormation resource.
     """
+
     def __init__(self) -> None:
         # Intentionally the most lenient; we don't want the risk of potential
         # runtime exceptions, and the object attributes are statically typed
