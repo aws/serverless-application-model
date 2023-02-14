@@ -70,9 +70,8 @@ class Translator:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
 
     def _get_managed_policy_map(self) -> Optional[Dict[str, str]]:
-        if self._fallback_managed_policy_map is None:
-            if self._get_fallback_managed_policy_map:
-                self._fallback_managed_policy_map = self._get_fallback_managed_policy_map()
+        if self._fallback_managed_policy_map is None and self._get_fallback_managed_policy_map:
+            self._fallback_managed_policy_map = self._get_fallback_managed_policy_map()
         return self._fallback_managed_policy_map
 
     def _get_function_names(
