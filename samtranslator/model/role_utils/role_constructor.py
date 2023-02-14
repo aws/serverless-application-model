@@ -131,9 +131,9 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: too-man
             #
 
             policy_arn = policy_entry.data
-            if isinstance(policy_entry.data, str):
+            if isinstance(policy_arn, str):
                 policy_arn = _get_managed_policy_arn(
-                    policy_entry.data,
+                    policy_arn,
                     managed_policy_map,
                     get_managed_policy_map,
                 )
