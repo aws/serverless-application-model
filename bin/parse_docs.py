@@ -13,7 +13,6 @@ Usage:
 import argparse
 import json
 import re
-from contextlib import suppress
 from pathlib import Path
 from typing import Dict, Iterator, Tuple
 
@@ -21,13 +20,14 @@ from typing import Dict, Iterator, Tuple
 def parse(s: str) -> Iterator[Tuple[str, str]]:
     """Parse an AWS docs page in Markdown format, yielding each property."""
     # Prevent from parsing return values accidentally
-    with suppress(ValueError):
-        s = s[: s.index("Return Values")]
+    s = stringbetween(s, "#\s+Properties", "#\s+Return values")
+    if not s:
+        return
     parts = s.split("\n\n")
     for part in parts:
         match = re.match(r"^\s*`(\w+)`\s+<a", part)
         if match:
-            yield match.group(1), part.strip()
+            yield match.group(1), part
 
 
 # TODO: Change in the docs instead?
@@ -57,21 +57,38 @@ def convert_to_full_path(description: str, prefix: str) -> str:
 
 
 def stringbetween(s: str, sep1: str, sep2: str) -> str:
-    return s.split(sep1, 1)[1].split(sep2, 1)[0]
+    """
+    Return string between regexes. Case-insensitive. If sep2 doesn't match,
+    returns to end of string.
+    """
+    start = re.search(sep1, s, re.IGNORECASE)
+    if not start:
+        return ""
+    s = s[start.end() :]
+    end = re.search(sep2, s, re.IGNORECASE)
+    if not end:
+        return s
+    return s[: end.start()]
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", type=Path)
     parser.add_argument("--cfn", action="store_true")
-    parser.add_argument("--with-title", help="use doc title instead of filename as key", action="store_true")
     args = parser.parse_args()
 
     props: Dict[str, Dict[str, str]] = {}
     for path in args.dir.glob("*.md"):
         text = path.read_text()
-        title = stringbetween(text, "# ", "<a")
-        page = title if args.with_title else path.stem
+        title = stringbetween(text, r"#\s+", r"<a")
+        if not title:
+            raise Exception(f"{path} has no title")
+        # In CFN docs, always expect either `AWS::Foo::Bar`, or `AWS::Foo::Bar SomeProperty`,
+        # which maps to the definition names in GoFormation schema
+        # Tangentially related: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-resource-specification-format.html
+        if args.cfn and not re.match(r"^\w+::\w+::\w+( \w+)?$", title):
+            continue
+        page = title if args.cfn else path.stem
         for name, description in parse(text):
             if page not in props:
                 props[page] = {}
@@ -83,7 +100,10 @@ def main() -> None:
                 else "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/"
             )
             description = convert_to_full_path(description, prefix)
-            props[page][name] = description
+            # Assume properties (what we care about) at top, so skip if already exists
+            if name in props[page]:
+                continue
+            props[page][name] = description.strip()
 
     print(
         json.dumps(

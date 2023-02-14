@@ -2,10 +2,11 @@ import json
 from unittest.case import skipIf
 
 from botocore.exceptions import ClientError
-from integration.helpers.base_test import BaseTest, LOG
+
+from integration.config.service_names import REST_API
+from integration.helpers.base_test import LOG, BaseTest
 from integration.helpers.common_api import get_function_versions
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import REST_API
 
 
 class TestFunctionWithAlias(BaseTest):
@@ -35,9 +36,44 @@ class TestFunctionWithAlias(BaseTest):
         self.assertEqual(len(alias), 1)
         self.assertEqual(len(versions), 1)
 
+    def test_updating_version_by_changing_property_value_additional_properties(self):
+        self.create_and_verify_stack("combination/function_with_alias_and_all_properties_property")
+        alias_name = "Live"
+        function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
+        version_ids = self.get_function_version_by_name(function_name)
+        self.assertEqual(["1"], version_ids)
+
+        alias = self.get_alias(function_name, alias_name)
+        self.assertEqual("1", alias["FunctionVersion"])
+
+        # Changing Handler should create a new version, and leave the existing version intact
+        self.set_template_resource_property("MyLambdaFunction", "Handler", "not_index.handler")
+        self.update_stack()
+
+        version_ids = self.get_function_version_by_name(function_name)
+        self.assertEqual(["1", "2"], version_ids)
+
+        alias = self.get_alias(function_name, alias_name)
+        self.assertEqual("2", alias["FunctionVersion"])
+
+        # Changing Description should create a new version, and leave the existing version intact
+        self.set_template_resource_property("MyLambdaFunction", "Description", "bar")
+        self.update_stack()
+
+        version_ids = self.get_function_version_by_name(function_name)
+        self.assertEqual(["1", "2", "3"], version_ids)
+
+        alias = self.get_alias(function_name, alias_name)
+        self.assertEqual("3", alias["FunctionVersion"])
+
+        # Make sure the stack has only One Version & One Alias resource
+        alias = self.get_stack_resources("AWS::Lambda::Alias")
+        versions = self.get_stack_resources("AWS::Lambda::Version")
+        self.assertEqual(len(alias), 1)
+        self.assertEqual(len(versions), 1)
+
     def test_alias_deletion_must_retain_version(self):
         self.create_and_verify_stack("combination/function_with_alias")
-        alias_name = "Live"
         function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
         version_ids = self.get_function_version_by_name(function_name)
         self.assertEqual(["1"], version_ids)

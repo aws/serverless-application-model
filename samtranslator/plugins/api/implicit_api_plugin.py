@@ -62,7 +62,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         self.api_update_replace_policies: Dict[str, Any] = {}
 
     @abstractmethod
-    def _process_api_events(
+    def _process_api_events(  # noqa: too-many-arguments
         self,
         function: SamResource,
         api_events: Dict[str, Dict[str, Any]],
@@ -119,7 +119,6 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         for logicalId, resource in template.iterate(
             {SamResourceType.Function.value, SamResourceType.StateMachine.value}
         ):
-
             api_events = self._get_api_events(resource)  # type: ignore[no-untyped-call]
             condition = resource.condition
             deletion_policy = resource.deletion_policy
@@ -179,7 +178,6 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
 
         api_events = Py27Dict()
         for event_id, event in resource.properties["Events"].items():
-
             if event and isinstance(event, dict) and event.get("Type") == self.API_EVENT_TYPE:
                 api_events[event_id] = event
 
@@ -462,7 +460,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
             sam_expect(method, event_id, "Method", is_sam_event=True).to_be_a_string(),
         )
 
-    def _update_resource_attributes_from_api_event(
+    def _update_resource_attributes_from_api_event(  # noqa: too-many-arguments
         self,
         api_id: str,
         path: str,

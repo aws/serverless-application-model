@@ -1,8 +1,8 @@
 from unittest.case import skipIf
 
+from integration.config.service_names import S3_EVENTS
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import S3_EVENTS
 
 
 @skipIf(current_region_does_not_support([S3_EVENTS]), "S3 Events feature is not supported in this testing region")

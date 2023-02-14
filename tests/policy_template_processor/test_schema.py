@@ -1,7 +1,7 @@
-from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
+from unittest import TestCase
 
 from parameterized import parameterized
-from unittest import TestCase
+from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 
 
 class TestTemplates(object):
@@ -114,12 +114,10 @@ class TestPolicyTemplateSchema(TestCase):
     # Grab all variables of the class TestTemplates
     @parameterized.expand([d for d in dir(TestTemplates) if not d.startswith("__")])
     def test_schema(self, case):
-
         failure_case = case.startswith("fail")
         template = getattr(TestTemplates, case)
 
         if failure_case:
-
             with self.assertRaises(ValueError):
                 PolicyTemplatesProcessor._is_valid_templates_dict(template)
 

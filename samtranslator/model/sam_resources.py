@@ -1,5 +1,6 @@
 ﻿""" SAM macro definitions """
 import copy
+from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 import samtranslator.model.eventsources
@@ -32,6 +33,7 @@ from samtranslator.model.appsync import Auth, GraphQLApi, GraphQLSchema
 from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
+    UNSUPPORTED_CONNECTOR_PROFILE_TYPE,
     ConnectorResourceError,
     ConnectorResourceReference,
     add_depends_on,
@@ -123,6 +125,7 @@ class SamFunction(SamResourceMacro):
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(IS_STR)),
         "AutoPublishCodeSha256": PropertyType(False, one_of(IS_STR)),
+        "AutoPublishAliasAllProperties": Property(False, is_type(bool)),
         "VersionDescription": PropertyType(False, IS_STR),
         "ProvisionedConcurrencyConfig": PropertyType(False, IS_DICT),
         "FileSystemConfigs": PropertyType(False, list_of(IS_DICT)),
@@ -163,6 +166,7 @@ class SamFunction(SamResourceMacro):
     EphemeralStorage: Optional[Dict[str, Any]]
     AutoPublishAlias: Optional[Intrinsicable[str]]
     AutoPublishCodeSha256: Optional[Intrinsicable[str]]
+    AutoPublishAliasAllProperties: Optional[bool]
     VersionDescription: Optional[Intrinsicable[str]]
     ProvisionedConcurrencyConfig: Optional[Dict[str, Any]]
     FileSystemConfigs: Optional[Dict[str, Any]]
@@ -295,7 +299,7 @@ class SamFunction(SamResourceMacro):
 
         return resources
 
-    def _construct_event_invoke_config(
+    def _construct_event_invoke_config(  # noqa: too-many-arguments
         self,
         function_name: str,
         alias_name: str,
@@ -876,11 +880,14 @@ class SamFunction(SamResourceMacro):
         #                 and next hashes. The chances that two subsequent hashes collide is fairly low.
         prefix = "{id}Version".format(id=self.logical_id)
         logical_dict = {}
-        try:
-            logical_dict = code_dict.copy()
-        except (AttributeError, UnboundLocalError):
-            pass  # noqa: try-except-pass
+        # We can't directly change AutoPublishAlias as that would be a breaking change, so we have to add this opt-in
+        # property that when set to true would change the lambda version whenever a property in the lambda function changes
+        if self.AutoPublishAliasAllProperties:
+            properties = function._generate_resource_dict().get("Properties", {})
+            logical_dict = properties
         else:
+            with suppress(AttributeError, UnboundLocalError):
+                logical_dict = code_dict.copy()
             if function.Environment:
                 logical_dict.update(function.Environment)
             if function.MemorySize:
@@ -925,7 +932,7 @@ class SamFunction(SamResourceMacro):
 
         return alias
 
-    def _validate_deployment_preference_and_add_update_policy(
+    def _validate_deployment_preference_and_add_update_policy(  # noqa: too-many-arguments
         self,
         deployment_preference_collection: DeploymentPreferenceCollection,
         lambda_alias: Optional[LambdaAlias],
@@ -1360,7 +1367,7 @@ class SamHttpApi(SamResourceMacro):
         :returns: a list of vanilla CloudFormation Resources, to which this Function expands
         :rtype: list
         """
-        resources = []
+        resources: List[Resource] = []
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.CorsConfiguration = intrinsics_resolver.resolve_parameter_refs(self.CorsConfiguration)
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
@@ -1810,7 +1817,7 @@ class SamConnector(SamResourceMacro):
     }
 
     @cw_timer
-    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:  # type: ignore
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
         resource_resolver: ResourceResolver = kwargs["resource_resolver"]
         original_template = kwargs["original_template"]
 
@@ -1843,7 +1850,7 @@ class SamConnector(SamResourceMacro):
 
         raise InvalidResourceException(self.logical_id, "'Destination' is an empty list")
 
-    def generate_resources(
+    def generate_resources(  # noqa: too-many-branches
         self,
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
@@ -1856,6 +1863,7 @@ class SamConnector(SamResourceMacro):
             raise InvalidResourceException(
                 self.logical_id,
                 f"Unable to create connector from {source.resource_type} to {destination.resource_type}; it's not supported or the template is invalid.",
+                {UNSUPPORTED_CONNECTOR_PROFILE_TYPE: {source.resource_type: destination.resource_type}},
             )
 
         # removing duplicate permissions
@@ -1942,7 +1950,7 @@ class SamConnector(SamResourceMacro):
             "Statement": policy_statements,
         }
 
-    def _construct_iam_policy(
+    def _construct_iam_policy(  # noqa: too-many-arguments
         self,
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
@@ -2149,7 +2157,7 @@ class SamGraphQLApi(SamResourceMacro):
     SchemaUri: Optional[str]
 
     @cw_timer
-    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:  # type: ignore
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
         appsync_api = self._construct_appsync_api()
         appsync_schema = self._construct_appsync_schema(appsync_api.get_runtime_attr("api_id"))
         resources: List[Resource] = [appsync_api, appsync_schema]

@@ -31,7 +31,6 @@ class SamTemplate:
         if resource_types is None:
             resource_types = set()
         for logicalId, resource_dict in self.resources.items():
-
             resource = SamResource(resource_dict)
             needs_filter = resource.valid()
             if resource_types:

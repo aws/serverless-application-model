@@ -1,9 +1,9 @@
 from unittest import TestCase
 
-from samtranslator.model.eventsources.push import Schedule
-from samtranslator.model.lambda_ import LambdaFunction
-from samtranslator.model.exceptions import InvalidEventException
 from parameterized import parameterized
+from samtranslator.model.eventsources.push import Schedule
+from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.lambda_ import LambdaFunction
 
 
 class ScheduleEventSource(TestCase):

@@ -33,7 +33,7 @@ HttpApiTagName = "httpapi:createdBy"
 
 
 class HttpApiGenerator:
-    def __init__(
+    def __init__(  # noqa: too-many-arguments
         self,
         logical_id: str,
         stage_variables: Optional[Dict[str, Intrinsicable[str]]],
@@ -237,7 +237,7 @@ class HttpApiGenerator:
         if DefaultStageName in paths:
             paths[f"/{DefaultStageName}"] = paths.pop(DefaultStageName)
 
-    def _construct_api_domain(
+    def _construct_api_domain(  # noqa: too-many-branches
         self, http_api: ApiGatewayV2HttpApi, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
     ) -> Tuple[
         Optional[ApiGatewayV2DomainName],
@@ -712,7 +712,7 @@ class HttpApiGenerator:
         open_api_editor.add_title(self.name)
         self.definition_body = open_api_editor.openapi
 
-    @cw_timer(prefix="Generator", name="HttpApi")  # type: ignore[misc]
+    @cw_timer(prefix="Generator", name="HttpApi")
     def to_cloudformation(
         self, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
     ) -> Tuple[

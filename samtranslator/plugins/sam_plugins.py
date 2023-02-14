@@ -123,7 +123,6 @@ class SamPlugins:
         method_name = "on_" + event.name
 
         for plugin in self._plugins:
-
             if not hasattr(plugin, method_name):
                 raise NameError(
                     "'{}' method is not found in the plugin with name '{}'".format(method_name, plugin.name)

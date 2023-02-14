@@ -1,10 +1,10 @@
 from unittest import TestCase
-from unittest.mock import Mock, patch, call
+from unittest.mock import Mock, call, patch
 
-from samtranslator.public.sdk.resource import SamResource, SamResourceType
-from samtranslator.public.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException
-from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin, ImplicitApiResource
+from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitApiResource, ImplicitRestApiPlugin
+from samtranslator.public.exceptions import InvalidDocumentException, InvalidEventException, InvalidResourceException
 from samtranslator.public.plugins import BasePlugin
+from samtranslator.public.sdk.resource import SamResource, SamResourceType
 
 IMPLICIT_API_LOGICAL_ID = "ServerlessRestApi"
 
@@ -14,13 +14,11 @@ class TestImplicitRestApiPluginEndtoEnd(TestCase):
         """
         Test the basic case of one function with a few API events
         """
-        pass
 
     def test_must_work_with_multiple_functions(self):
         """
         Test a more advanced case of multiple functions with API events
         """
-        pass
 
     def test_must_work_with_api_events_with_intrinsic_function(self):
         pass
@@ -29,19 +27,16 @@ class TestImplicitRestApiPluginEndtoEnd(TestCase):
         """
         Functions without API events must not be processed
         """
-        pass
 
     def test_must_ignore_api_events_with_restapiid(self):
         """
         API event sources that are already connected to a AWS::Serverless::Api resource must be skipped
         """
-        pass
 
     def test_must_ignore_template_without_function(self):
         """
         Template without function resource must be unmodified
         """
-        pass
 
 
 class TestImplicitRestApiPlugin_init(TestCase):
@@ -69,7 +64,6 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
     def test_must_process_functions(self, SamTemplateMock):
-
         template_dict = {"a": "b"}
         function1 = SamResource({"Type": "AWS::Serverless::Function"})
         function2 = SamResource({"Type": "AWS::Serverless::Function"})
@@ -106,7 +100,6 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
     def test_must_process_state_machines(self, SamTemplateMock):
-
         template_dict = {"a": "b"}
         statemachine1 = SamResource({"Type": "AWS::Serverless::StateMachine"})
         statemachine2 = SamResource({"Type": "AWS::Serverless::StateMachine"})
@@ -143,7 +136,6 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
     def test_must_skip_functions_without_events(self, SamTemplateMock):
-
         template_dict = {"a": "b"}
         function1 = SamResource({"Type": "AWS::Serverless::Function"})
         function2 = SamResource({"Type": "AWS::Serverless::Function"})
@@ -168,7 +160,6 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
     def test_must_skip_state_machines_without_events(self, SamTemplateMock):
-
         template_dict = {"a": "b"}
         statemachine1 = SamResource({"Type": "AWS::Serverless::StateMachine"})
         statemachine2 = SamResource({"Type": "AWS::Serverless::StateMachine"})
@@ -193,7 +184,6 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
     def test_must_skip_without_functions_or_statemachines(self, SamTemplateMock):
-
         template_dict = {"a": "b"}
         # NO FUNCTIONS OR STATE MACHINES
         function_resources = []
@@ -214,7 +204,6 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
     def test_must_collect_errors_and_raise_on_invalid_events(self, SamTemplateMock):
-
         template_dict = {"a": "b"}
         function_resources = [
             ("id1", SamResource({"Type": "AWS::Serverless::Function"})),
@@ -260,7 +249,6 @@ class TestImplicitRestApiPlugin_get_api_events(TestCase):
         self.plugin = ImplicitRestApiPlugin()
 
     def test_must_get_all_api_events_in_function(self):
-
         properties = {
             "Events": {
                 "Api1": {"Type": "Api", "Properties": {"a": "b"}},
@@ -279,7 +267,6 @@ class TestImplicitRestApiPlugin_get_api_events(TestCase):
         self.assertEqual(expected, result)
 
     def test_must_work_with_no_api_events(self):
-
         properties = {
             "Events": {
                 "Event1": {"Type": "some", "Properties": {"a": "b"}},
@@ -295,7 +282,6 @@ class TestImplicitRestApiPlugin_get_api_events(TestCase):
         self.assertEqual(expected, result)
 
     def test_must_skip_with_bad_events_structure(self):
-
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": {"Events": "must not be string"}})
 
         expected = {}
@@ -303,7 +289,6 @@ class TestImplicitRestApiPlugin_get_api_events(TestCase):
         self.assertEqual(expected, result)
 
     def test_must_skip_if_no_events_property(self):
-
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": {"no": "events"}})
 
         expected = {}
@@ -311,7 +296,6 @@ class TestImplicitRestApiPlugin_get_api_events(TestCase):
         self.assertEqual(expected, result)
 
     def test_must_skip_if_no_property_dictionary(self):
-
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": "bad value"})
 
         expected = {}
@@ -333,7 +317,6 @@ class TestImplicitRestApiPlugin_get_api_events(TestCase):
         self.assertTrue(result["Api1"] is function.properties["Events"]["Api1"])
 
     def test_must_skip_if_function_is_not_valid(self):
-
         function = SamResource(
             {
                 # NOT a SAM resource
@@ -383,7 +366,6 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         function_events_mock.update.assert_called_with(api_events)
 
     def test_must_verify_expected_keys_exist(self):
-
         api_events = {"Api1": {"Type": "Api", "Properties": {"Path": "/", "Methid": "POST"}}}
 
         template = Mock()
@@ -391,7 +373,7 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": {"Events": function_events_mock}})
         function_events_mock.update = Mock()
 
-        with self.assertRaises(InvalidEventException) as context:
+        with self.assertRaises(InvalidEventException):
             self.plugin._process_api_events(function, api_events, template)
 
     def test_must_verify_method_is_string(self):
@@ -402,7 +384,7 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": {"Events": function_events_mock}})
         function_events_mock.update = Mock()
 
-        with self.assertRaises(InvalidEventException) as context:
+        with self.assertRaises(InvalidEventException):
             self.plugin._process_api_events(function, api_events, template)
 
     def test_must_verify_rest_api_id_is_string(self):
@@ -422,7 +404,7 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": {"Events": function_events_mock}})
         function_events_mock.update = Mock()
 
-        with self.assertRaises(InvalidEventException) as context:
+        with self.assertRaises(InvalidEventException):
             self.plugin._process_api_events(function, api_events, template)
 
     def test_must_verify_path_is_string(self):
@@ -433,11 +415,10 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": {"Events": function_events_mock}})
         function_events_mock.update = Mock()
 
-        with self.assertRaises(InvalidEventException) as context:
+        with self.assertRaises(InvalidEventException):
             self.plugin._process_api_events(function, api_events, template)
 
     def test_must_skip_events_without_properties(self):
-
         api_events = {
             "Api1": {"Type": "Api", "RestApiId": "RestApi"},
             "Api2": {"Type": "Api", "Properties": {"RestApiId": "RestApi", "Path": "/", "Method": "GET"}},
@@ -544,7 +525,6 @@ class TestImplicitRestApiPlugin_add_implicit_api_id_if_necessary(TestCase):
         self.plugin = ImplicitRestApiPlugin()
 
     def test_must_add_if_not_present(self):
-
         input = {"a": "b"}
 
         expected = {"a": "b", "RestApiId": {"Ref": IMPLICIT_API_LOGICAL_ID}}
@@ -553,7 +533,6 @@ class TestImplicitRestApiPlugin_add_implicit_api_id_if_necessary(TestCase):
         self.assertEqual(input, expected)
 
     def test_must_skip_if_present(self):
-
         input = {"a": "b", "RestApiId": "Something"}
 
         expected = {"a": "b", "RestApiId": "Something"}
@@ -665,7 +644,6 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_skip_invalid_swagger(self, SwaggerEditorMock):
-
         event_id = "id"
         properties = {"RestApiId": {"Ref": "restid"}, "Path": "/hello", "Method": "GET"}
         original_swagger = {"this": "is", "valid": "swagger"}
@@ -691,7 +669,6 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_skip_if_definition_body_is_not_present(self, SwaggerEditorMock):
-
         event_id = "id"
         properties = {"RestApiId": {"Ref": "restid"}, "Path": "/hello", "Method": "GET"}
         mock_api = SamResource({"Type": "AWS::Serverless::Api", "Properties": {"DefinitionUri": "s3://bucket/key"}})
@@ -714,7 +691,6 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_skip_if_api_resource_properties_are_invalid(self, SwaggerEditorMock):
-
         event_id = "id"
         properties = {"RestApiId": {"Ref": "restid"}, "Path": "/hello", "Method": "GET"}
         mock_api = SamResource({"Type": "AWS::Serverless::Api", "Properties": "this is not a valid property"})
@@ -736,7 +712,6 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_skip_if_api_manage_swagger_flag_is_false(self, SwaggerEditorMock):
-
         event_id = "id"
         properties = {"RestApiId": {"Ref": "restid"}, "Path": "/hello", "Method": "GET"}
         original_swagger = {"this": "is a valid swagger"}
@@ -769,7 +744,6 @@ class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_skip_if_api_manage_swagger_flag_is_not_present(self, SwaggerEditorMock):
-
         event_id = "id"
         properties = {"RestApiId": {"Ref": "restid"}, "Path": "/hello", "Method": "GET"}
         original_swagger = {"this": "is a valid swagger"}

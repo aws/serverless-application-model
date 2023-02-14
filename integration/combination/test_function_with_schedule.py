@@ -1,8 +1,8 @@
 from unittest.case import skipIf
 
+from integration.config.service_names import SCHEDULE_EVENT
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
-from integration.config.service_names import SCHEDULE_EVENT
 
 
 @skipIf(current_region_does_not_support([SCHEDULE_EVENT]), "ScheduleEvent is not supported in this testing region")

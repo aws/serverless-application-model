@@ -9,7 +9,7 @@ sys.path.insert(0, my_path + "/..")
 import json
 from typing import Type
 
-from bin._file_formatter import FileFormatter  # noqa: module-import-not-at-top-of-file
+from bin._file_formatter import FileFormatter
 
 
 class JSONFormatter(FileFormatter):

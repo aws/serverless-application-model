@@ -140,7 +140,6 @@ class SharedApiUsagePlan:
             return
 
         if condition and condition not in self.conditions:
-
             if template_conditions is None:
                 raise InvalidTemplateException(
                     "Can't have condition without having 'Conditions' section in the template"
@@ -160,7 +159,7 @@ class SharedApiUsagePlan:
 
 
 class ApiGenerator:
-    def __init__(
+    def __init__(  # noqa: too-many-arguments
         self,
         logical_id: str,
         cache_cluster_enabled: Optional[Intrinsicable[bool]],
@@ -425,10 +424,9 @@ class ApiGenerator:
 
         return stage
 
-    def _construct_api_domain(
+    def _construct_api_domain(  # noqa: too-many-branches
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
     ) -> Tuple[Optional[ApiGatewayDomainName], Optional[List[ApiGatewayBasePathMapping]], Any]:
-        # pylint: disable=duplicate-code
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
@@ -585,7 +583,6 @@ class ApiGenerator:
         return recordset_list
 
     def _construct_alias_target(self, domain: Dict[str, Any], api_domain_name: str, route53: Any) -> Dict[str, Any]:
-        # pylint: disable=duplicate-code
         alias_target = {}
         target_health = route53.get("EvaluateTargetHealth")
 
@@ -643,7 +640,6 @@ class ApiGenerator:
             # Just set Origin property. Others will be defaults
             properties = CorsProperties(AllowOrigin=self.cors)  # type: ignore[call-arg]
         elif isinstance(self.cors, dict):
-
             # Make sure keys in the dict are recognized
             if not all(key in CorsProperties._fields for key in self.cors):
                 raise InvalidResourceException(self.logical_id, INVALID_ERROR)
@@ -754,7 +750,7 @@ class ApiGenerator:
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
-    def _construct_usage_plan(self, rest_api_stage: Optional[ApiGatewayStage] = None) -> Any:
+    def _construct_usage_plan(self, rest_api_stage: Optional[ApiGatewayStage] = None) -> Any:  # noqa: too-many-branches
         """Constructs and returns the ApiGateway UsagePlan, ApiGateway UsagePlanKey, ApiGateway ApiKey for Auth.
 
         :param model.apigateway.ApiGatewayStage stage: the stage of rest api
@@ -1017,7 +1013,7 @@ class ApiGenerator:
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
-    def _openapi_postprocess(self, definition_body: Dict[str, Any]) -> Dict[str, Any]:
+    def _openapi_postprocess(self, definition_body: Dict[str, Any]) -> Dict[str, Any]:  # noqa: too-many-branches
         """
         Convert definitions to openapi 3 in definition body if OpenApiVersion flag is specified.
 

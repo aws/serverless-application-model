@@ -2,11 +2,11 @@ import json
 import logging
 
 from tenacity import (
+    after_log,
     retry,
+    retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception_type,
-    after_log,
     wait_random,
 )
 

@@ -89,7 +89,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         """Return the value to assign to lambda event source mapping's EventSourceArn."""
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: too-many-branches
         """Returns the Lambda EventSourceMapping to which this pull event corresponds. Adds the appropriate managed
         policy to the function's execution role, if such a role is provided.
 

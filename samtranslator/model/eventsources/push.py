@@ -59,7 +59,7 @@ class PushEventSource(ResourceMacro, metaclass=ABCMeta):
     principal: str = None  # type: ignore
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
 
-    def _construct_permission(  # type: ignore[no-untyped-def]
+    def _construct_permission(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None
     ):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
@@ -439,7 +439,6 @@ class S3(PushEventSource):
 
         event_mappings = []
         for event_type in event_types:
-
             lambda_event = copy.deepcopy(base_event_mapping)
             lambda_event["Event"] = event_type
             if CONDITION in function.resource_attributes:
@@ -563,7 +562,7 @@ class SNS(PushEventSource):
         resources.append(subscription)
         return resources
 
-    def _inject_subscription(
+    def _inject_subscription(  # noqa: too-many-arguments
         self,
         protocol: str,
         endpoint: str,
@@ -652,13 +651,11 @@ class Api(PushEventSource):
         explicit_api = None
         rest_api_id = self.get_rest_api_id_string(self.RestApiId)
         if isinstance(rest_api_id, str):
-
             if (
                 rest_api_id in resources
                 and "Properties" in resources[rest_api_id]
                 and "StageName" in resources[rest_api_id]["Properties"]
             ):
-
                 explicit_api = resources[rest_api_id]["Properties"]
                 permitted_stage = explicit_api["StageName"]
 
@@ -750,8 +747,9 @@ class Api(PushEventSource):
 
         return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)  # type: ignore[no-untyped-call]
 
-    def _add_swagger_integration(self, api, api_id, function, intrinsics_resolver):  # type: ignore[no-untyped-def]
-        # pylint: disable=duplicate-code
+    def _add_swagger_integration(  # type: ignore[no-untyped-def] # noqa: too-many-statements
+        self, api, api_id, function, intrinsics_resolver
+    ):
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
@@ -843,7 +841,6 @@ class Api(PushEventSource):
 
                 # Checking if any of the fields are defined as it can be false we are checking if the field are not None
                 if validate_body is not None or validate_parameters is not None:
-
                     # as we are setting two different fields we are here setting as default False
                     # In case one of them are not defined
                     validate_body = False if validate_body is None else validate_body
@@ -868,14 +865,11 @@ class Api(PushEventSource):
                     )
 
         if self.RequestParameters:
-
             default_value = {"Required": False, "Caching": False}
 
             parameters = []
             for parameter in self.RequestParameters:
-
                 if isinstance(parameter, dict):
-
                     parameter_name, parameter_value = next(iter(parameter.items()))
 
                     if not re.match(r"method\.request\.(querystring|path|header)\.", parameter_name):
@@ -939,7 +933,7 @@ class Api(PushEventSource):
         return rest_api_id["Ref"] if isinstance(rest_api_id, dict) and "Ref" in rest_api_id else rest_api_id
 
     @staticmethod
-    def add_auth_to_swagger(
+    def add_auth_to_swagger(  # noqa: too-many-arguments
         event_auth: Dict[str, Any],
         api: Dict[str, Any],
         api_id: str,

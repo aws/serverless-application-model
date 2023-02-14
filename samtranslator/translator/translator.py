@@ -89,7 +89,7 @@ class Translator:
                     self.function_names[api_name] += str(resolved_function_name)
         return self.function_names
 
-    def translate(
+    def translate(  # noqa: too-many-branches
         self,
         sam_template: Dict[str, Any],
         parameter_values: Dict[Any, Any],
@@ -260,7 +260,6 @@ class Translator:
         resources = sam_template["Resources"]
 
         for logicalId, resource in resources.items():
-
             data = (logicalId, resource)
 
             # Skip over the resource if it is not a SAM defined Resource

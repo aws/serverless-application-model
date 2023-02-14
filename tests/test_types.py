@@ -1,6 +1,5 @@
 import pytest
-
-from samtranslator.model.types import is_type, list_of, dict_of, one_of
+from samtranslator.model.types import dict_of, is_type, list_of, one_of
 
 
 class DummyType(object):

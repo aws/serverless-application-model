@@ -1,14 +1,15 @@
-from unittest.mock import patch, Mock
-from parameterized import parameterized, param
+import os
+import sys
 from unittest import TestCase
-import os, sys
+from unittest.mock import Mock, patch
 
+from parameterized import param, parameterized
+from samtranslator.feature_toggle.dialup import DisabledDialup, SimpleAccountPercentileDialup, ToggleDialup
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
-    FeatureToggleLocalConfigProvider,
     FeatureToggleAppConfigConfigProvider,
+    FeatureToggleLocalConfigProvider,
 )
-from samtranslator.feature_toggle.dialup import ToggleDialup, SimpleAccountPercentileDialup, DisabledDialup
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
