@@ -424,6 +424,16 @@
       "title": "Cors",
       "type": "object"
     },
+    "DataSourceConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "DynamoDB": {
+          "$ref": "#/definitions/DynamoDB"
+        }
+      },
+      "title": "DataSourceConfig",
+      "type": "object"
+    },
     "DeadLetterQueue": {
       "additionalProperties": false,
       "properties": {
@@ -449,6 +459,30 @@
         "Type"
       ],
       "title": "DeadLetterQueue",
+      "type": "object"
+    },
+    "DeltaSync": {
+      "additionalProperties": false,
+      "properties": {
+        "BaseTableTTL": {
+          "title": "Basetablettl",
+          "type": "string"
+        },
+        "DeltaSyncTableName": {
+          "title": "Deltasynctablename",
+          "type": "string"
+        },
+        "DeltaSyncTableTTL": {
+          "title": "Deltasynctablettl",
+          "type": "string"
+        }
+      },
+      "required": [
+        "BaseTableTTL",
+        "DeltaSyncTableName",
+        "DeltaSyncTableTTL"
+      ],
+      "title": "DeltaSync",
       "type": "object"
     },
     "DeploymentPreference": {
@@ -544,6 +578,35 @@
         }
       },
       "title": "DeploymentPreference",
+      "type": "object"
+    },
+    "DynamoDB": {
+      "additionalProperties": false,
+      "properties": {
+        "DeltaSync": {
+          "$ref": "#/definitions/DeltaSync"
+        },
+        "Region": {
+          "title": "Region",
+          "type": "string"
+        },
+        "TableName": {
+          "title": "Tablename",
+          "type": "string"
+        },
+        "UseCallerCredentials": {
+          "title": "Usecallercredentials",
+          "type": "boolean"
+        },
+        "Versioned": {
+          "title": "Versioned",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "TableName"
+      ],
+      "title": "DynamoDB",
       "type": "object"
     },
     "DynamoDBEvent": {
@@ -5641,6 +5704,69 @@
       "title": "Resource",
       "type": "object"
     },
+    "schema_source__aws_serverless_graphqldatasource__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiId": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Apiid"
+        },
+        "DataSourceConfig": {
+          "$ref": "#/definitions/DataSourceConfig"
+        },
+        "Description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "ServiceRoleArn": {
+          "title": "Servicerolearn",
+          "type": "string"
+        },
+        "Type": {
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ApiId",
+        "Type",
+        "DataSourceConfig"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "schema_source__aws_serverless_graphqldatasource__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "$ref": "#/definitions/schema_source__aws_serverless_graphqldatasource__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::GraphQLDataSource"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
     "schema_source__aws_serverless_httpapi__Auth": {
       "additionalProperties": false,
       "properties": {
@@ -7333,6 +7459,9 @@
           },
           {
             "$ref": "#/definitions/schema_source__aws_serverless_graphqlapi__Resource"
+          },
+          {
+            "$ref": "#/definitions/schema_source__aws_serverless_graphqldatasource__Resource"
           },
           {
             "$ref": "#/definitions/schema_source__any_cfn_resource__Resource"

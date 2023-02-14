@@ -1,0 +1,29 @@
+{
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 8. Resource with id [NoApiId] is invalid. Missing required property 'ApiId'. Resource with id [NoBaseTableTTL] is invalid. Property 'DataSourceConfig.DeltaSync.BaseTableTTL' should be a string. Resource with id [NoDataSourceConfig] is invalid. Missing required property 'DataSourceConfig'. Resource with id [NoDeltaSyncTableName] is invalid. Property 'DataSourceConfig.DeltaSync.DeltaSyncTableName' should be a string. Resource with id [NoDeltaSyncTableTTL] is invalid. Property 'DataSourceConfig.DeltaSync.DeltaSyncTableTTL' should be a string. Resource with id [NoDynamoDBTableName] is invalid. Property 'DataSourceConfig.DynamoDB.TableName' should be a string. Resource with id [NoType] is invalid. Missing required property 'Type'. Resource with id [UnknownType] is invalid. 'WEIRD_TYPE' is not a supported data source type.",
+  "errors": [
+    {
+      "errorMessage": "Resource with id [NoApiId] is invalid. Missing required property 'ApiId'."
+    },
+    {
+      "errorMessage": "Resource with id [NoType] is invalid. Missing required property 'Type'."
+    },
+    {
+      "errorMessage": "Resource with id [UnknownType] is invalid. 'WEIRD_TYPE' is not a supported data source type."
+    },
+    {
+      "errorMessage": "Resource with id [NoDataSourceConfig] is invalid. Missing required property 'DataSourceConfig'."
+    },
+    {
+      "errorMessage": "Resource with id [NoDynamoDBTableName] is invalid. Property 'DataSourceConfig.DynamoDB.TableName' should be a string."
+    },
+    {
+      "errorMessage": "Resource with id [NoBaseTableTTL] is invalid. Property 'DataSourceConfig.DeltaSync.BaseTableTTL' should be a string."
+    },
+    {
+      "errorMessage": "Resource with id [NoDeltaSyncTableName] is invalid. Property 'DataSourceConfig.DeltaSync.DeltaSyncTableName' should be a string."
+    },
+    {
+      "errorMessage": "Resource with id [NoDeltaSyncTableTTL] is invalid. Property 'DataSourceConfig.DeltaSync.DeltaSyncTableTTL' should be a string."
+    }
+  ]
+}

@@ -29,7 +29,15 @@ from samtranslator.model.apigateway import (
     ApiGatewayUsagePlanKey,
 )
 from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
-from samtranslator.model.appsync import Auth, GraphQLApi, GraphQLSchema
+from samtranslator.model.appsync import (
+    SUPPORTED_DATASOURCES,
+    Auth,
+    DataSource,
+    DataSourceConfig,
+    DynamoDBConfig,
+    GraphQLApi,
+    GraphQLSchema,
+)
 from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
@@ -2194,3 +2202,108 @@ class SamGraphQLApi(SamResourceMacro):
         schema.DefinitionS3Location = self.SchemaUri
 
         return schema
+
+
+class SamGraphQLDataSource(SamResourceMacro):
+    """SAM GraphQL Data Source Macro (WIP)."""
+
+    # TODO: This currently only supports DataSource with a defined ServiceRoleArn.
+    #       The proposed connector change will come in a follow up PR.
+    resource_type = "AWS::Serverless::GraphQLDataSource"
+    property_types = {
+        "ApiId": Property(True, one_of(IS_STR, IS_DICT)),
+        "Name": Property(False, IS_STR),
+        "Type": Property(True, IS_STR),
+        "Description": PassThroughProperty(False),
+        "ServiceRoleArn": Property(False, IS_STR),
+        "Permissions": Property(False, list_of(IS_STR)),
+        "DataSourceConfig": Property(True, IS_DICT),
+    }
+
+    ApiId: Intrinsicable[str]
+    Type: str
+    DataSourceConfig: DataSourceConfig
+    Name: Optional[str]
+    Description: Optional[PassThrough]
+    ServiceRoleArn: Optional[str]
+
+    @cw_timer
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
+        appsync_datasource = self._construct_appsync_datasource()
+        resources: List[Resource] = [appsync_datasource]
+
+        return resources
+
+    def _validate_dynamodb_datasource(self, ddb_properties: Dict[str, Any]) -> DynamoDBConfig:
+        ddb_config = {}
+
+        ddb_config["TableName"] = sam_expect(
+            ddb_properties.get("TableName"),
+            self.logical_id,
+            "DataSourceConfig.DynamoDB.TableName",
+        ).to_be_a_string()
+
+        ddb_config["AwsRegion"] = ddb_properties["Region"] if "Region" in ddb_properties else ref("AWS::Region")
+
+        if "DeltaSync" in ddb_properties:
+            deltasync_properties = ddb_properties["DeltaSync"]
+
+            sam_expect(
+                deltasync_properties.get("BaseTableTTL"), self.logical_id, "DataSourceConfig.DeltaSync.BaseTableTTL"
+            ).to_be_a_string()
+
+            sam_expect(
+                deltasync_properties.get("DeltaSyncTableName"),
+                self.logical_id,
+                "DataSourceConfig.DeltaSync.DeltaSyncTableName",
+            ).to_be_a_string()
+
+            sam_expect(
+                deltasync_properties.get("DeltaSyncTableTTL"),
+                self.logical_id,
+                "DataSourceConfig.DeltaSync.DeltaSyncTableTTL",
+            ).to_be_a_string()
+
+            ddb_config["DeltaSyncConfig"] = deltasync_properties
+
+        if "UseCallerCredentials" in ddb_properties:
+            ddb_config["UseCallerCredentials"] = ddb_properties["UseCallerCredentials"]
+
+        if "Versioned" in ddb_properties:
+            ddb_config["Versioned"] = ddb_properties["Versioned"]
+
+        return cast(DynamoDBConfig, ddb_config)
+
+    def _validate_config_properties(self, datasource: DataSource) -> None:
+        # DataSourceConfig is quite large property so we require a lot of additional validation.
+        # The datasource object is modified by reference.
+
+        if len(self.DataSourceConfig) > 1:
+            raise InvalidResourceException(
+                self.logical_id, "Only one resource can be defined at a time in 'DataSourceConfig'."
+            )
+
+        if datasource.Type == "AMAZON_DYNAMODB":
+            ddb_properties = sam_expect(
+                self.DataSourceConfig.get("DynamoDB"), self.logical_id, "DataSourceConfig.DynamoDB"
+            ).to_be_a_map()
+            datasource.DynamoDBConfig = self._validate_dynamodb_datasource(ddb_properties)
+
+    def _construct_appsync_datasource(self) -> DataSource:
+        datasource = DataSource(
+            logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
+        if self.Type not in SUPPORTED_DATASOURCES:
+            raise InvalidResourceException(self.logical_id, f"'{self.Type}' is not a supported data source type.")
+
+        datasource.Type = self.Type
+        datasource.Name = self.Name if self.Name else self.logical_id
+        datasource.Description = self.Description
+        datasource.ApiId = self.ApiId
+        # I will remove this ignore after, it will be fixed with pseudo-embedded connector implementation.
+        datasource.ServiceRoleArn = self.ServiceRoleArn  # type: ignore
+
+        self._validate_config_properties(datasource)
+
+        return datasource
