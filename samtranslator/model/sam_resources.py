@@ -2149,7 +2149,7 @@ class SamGraphQLApi(SamResourceMacro):
     SchemaUri: Optional[str]
 
     @cw_timer
-    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:  # type: ignore
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
         appsync_api = self._construct_appsync_api()
         appsync_schema = self._construct_appsync_schema(appsync_api.get_runtime_attr("api_id"))
         resources: List[Resource] = [appsync_api, appsync_schema]
