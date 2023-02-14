@@ -688,7 +688,7 @@ class TestTemplateValidation(TestCase):
     def test_get_manage_policy_map_called_once(self):
         """
         Ensure caller-passed get_managed_policy_map is only called once
-        (the result is cached).
+        (the result is cached) as it's expected to call IAM.
         """
         self._call_count = 0
 
@@ -698,7 +698,7 @@ class TestTemplateValidation(TestCase):
 
         with patch(
             "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
-            {"aws": {}}, # Ensure it falls back to get_managed_policy_map
+            {"aws": {}},  # Ensure it falls back to get_managed_policy_map
         ):
             parameters = {}
             translator = Translator(
