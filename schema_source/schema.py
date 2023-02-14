@@ -80,6 +80,9 @@ def json_dumps(obj: Any) -> str:
 
 
 def _add_embedded_connectors(schema: Dict[str, Any]) -> None:
+    """
+    Add embedded Connectors resource attribute to supported CloudFormation resources.
+    """
     # We get the definition from an existing SAM resource
     embedded_connector = schema["definitions"]["schema_source__aws_serverless_function__Resource"]["properties"][
         "Connectors"
