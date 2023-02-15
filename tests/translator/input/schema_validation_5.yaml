@@ -1,0 +1,38 @@
+Resources:
+  # Embedded connector on CloudFormation resource
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Connectors:
+      MyConnector:
+        Properties:
+          Destination:
+            Id: MyFunction
+          Permissions:
+          - Write
+
+  # Embedded connector on SAM resource
+  MyHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Connectors:
+      MyConnector1:
+        Properties:
+          Destination:
+            Type: AWS::Lambda::Function
+            Arn: arn:foo
+          Permissions:
+          - Write
+      MyConnector2:
+        Properties:
+          Destination:
+            Id: MyFunction
+          Permissions:
+          - Write
+    Properties:
+      StageName: Prod
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: foo
+      InlineCode: bar
