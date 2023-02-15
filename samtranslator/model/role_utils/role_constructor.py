@@ -43,7 +43,7 @@ def _get_managed_policy_arn(
         if arn:
             return arn
 
-    # Caller-provided managed policy map (fallback)
+    # Caller-provided function to get managed policy map (fallback)
     if get_managed_policy_map:
         fallback_managed_policy_map = get_managed_policy_map()
         if fallback_managed_policy_map:
