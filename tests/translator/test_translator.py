@@ -781,6 +781,55 @@ class TestTemplateValidation(TestCase):
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_managed_policies_transform_policies_loaded_once(self):
+        """
+        Ensure transform() calls the policy loader load() (i.e. IAM call) only once.
+        """
+
+        class ManagedPolicyLoader:
+            def __init__(self):
+                self.call_count = 0
+
+            def load(self):
+                self.call_count += 1
+                return {}
+
+        managed_policy_loader = ManagedPolicyLoader()
+
+        with patch("samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES", {}):
+            transform(
+                {
+                    "Resources": {
+                        "MyStateMachine1": {
+                            "Type": "AWS::Serverless::StateMachine",
+                            "Properties": {
+                                "DefinitionUri": "s3://foo/bar",
+                                "Policies": [
+                                    "foo",
+                                    "bar",
+                                ],
+                            },
+                        },
+                        "MyStateMachine2": {
+                            "Type": "AWS::Serverless::StateMachine",
+                            "Properties": {
+                                "DefinitionUri": "s3://egg/baz",
+                                "Policies": [
+                                    "egg",
+                                    "baz",
+                                ],
+                            },
+                        },
+                    }
+                },
+                {},
+                managed_policy_loader,
+            )
+
+        self.assertEqual(1, managed_policy_loader.call_count)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_throws_when_resource_not_found(self):
         template = {"foo": "bar"}
 

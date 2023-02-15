@@ -22,7 +22,6 @@ def transform(input_fragment, parameter_values, managed_policy_loader, feature_t
         sam_parser,
     )
 
-    # TODO: Test?
     @lru_cache(maxsize=None)
     def get_managed_policy_map() -> Dict[str, str]:
         return cast(Dict[str, str], managed_policy_loader.load())
