@@ -1,7 +1,7 @@
 from typing import Dict, Optional
 
 from samtranslator.internal.managed_policies import get_bundled_managed_policy_map
-from samtranslator.internal.types import InternalGetManagedPolicyMap
+from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
@@ -12,7 +12,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 def _get_managed_policy_arn(
     name: str,
     managed_policy_map: Optional[Dict[str, str]],
-    get_managed_policy_map: Optional[InternalGetManagedPolicyMap],
+    get_managed_policy_map: Optional[GetManagedPolicyMap],
 ) -> str:
     """
     Get the ARN of a AWS managed policy name. Used in Policies property of
