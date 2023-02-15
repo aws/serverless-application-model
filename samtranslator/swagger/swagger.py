@@ -521,7 +521,7 @@ class SwaggerEditor(BaseEditor):
         if "api_key" not in self.security_definitions:
             self.security_definitions.update(api_key_security_definition)
 
-    def set_path_default_authorizer(  # noqa: too-many-branches
+    def set_path_default_authorizer(
         self,
         path: str,
         default_authorizer: str,
@@ -1063,7 +1063,7 @@ class SwaggerEditor(BaseEditor):
                 statement.extend([deny_statement])
             self.resource_policy["Statement"] = statement
 
-    def _add_vpc_resource_policy_for_method(  # noqa: too-many-branches
+    def _add_vpc_resource_policy_for_method(
         self, endpoint_dict: Dict[str, Any], conditional: str, resource_list: PassThrough
     ) -> None:
         """

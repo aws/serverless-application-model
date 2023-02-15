@@ -20,9 +20,7 @@ unicode_string_type = str  # TODO: remove it, python 2 legacy code
 long_int_type = int  # TODO: remove it, python 2 legacy code
 
 
-def to_py27_compatible_template(  # noqa: too-many-branches
-    template: Dict[str, Any], parameter_values: Optional[Dict[str, Any]] = None
-) -> None:
+def to_py27_compatible_template(template: Dict[str, Any], parameter_values: Optional[Dict[str, Any]] = None) -> None:
     """
     Convert an input template to a py27hash-compatible template. This function has to be run before any
     manipulation occurs for sake of keeping the same initial state. This function modifies the input template,

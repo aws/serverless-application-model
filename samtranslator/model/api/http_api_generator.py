@@ -237,7 +237,7 @@ class HttpApiGenerator:
         if DefaultStageName in paths:
             paths[f"/{DefaultStageName}"] = paths.pop(DefaultStageName)
 
-    def _construct_api_domain(  # noqa: too-many-branches
+    def _construct_api_domain(
         self, http_api: ApiGatewayV2HttpApi, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
     ) -> Tuple[
         Optional[ApiGatewayV2DomainName],
