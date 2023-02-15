@@ -112,10 +112,6 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
-        # Prevent late surprises at runtime
-        if get_managed_policy_map and not callable(get_managed_policy_map):
-            raise TypeError("get_managed_policy_map must be callable")
-
         self.feature_toggle = (
             feature_toggle
             if feature_toggle
