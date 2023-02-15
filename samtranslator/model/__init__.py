@@ -65,6 +65,17 @@ class PassThroughProperty(PropertyType):
         super().__init__(required, any_type(), False)
 
 
+class GeneratedProperty(PropertyType):
+    """
+    Property of a generated CloudFormation resource.
+    """
+
+    def __init__(self) -> None:
+        # Intentionally the most lenient; we don't want the risk of potential
+        # runtime exceptions, and the object attributes are statically typed
+        super().__init__(False, any_type(), False)
+
+
 class Resource(ABC):
     """A Resource object represents an abstract entity that contains a Type and a Properties object. They map well to
     CloudFormation resources as well sub-types like AWS::Lambda::Function or `Events` section of
