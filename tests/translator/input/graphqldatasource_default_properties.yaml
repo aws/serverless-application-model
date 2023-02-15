@@ -19,6 +19,5 @@ Resources:
       ApiId: some-api-id
       Type: AMAZON_DYNAMODB
       ServiceRoleArn: role-arn
-      DataSourceConfig:
-        DynamoDB:
-          TableName: MyNotes-notes-table
+      DynamoDBConfig:
+        TableName: MyNotes-notes-table

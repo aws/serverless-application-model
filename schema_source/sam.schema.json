@@ -424,16 +424,6 @@
       "title": "Cors",
       "type": "object"
     },
-    "DataSourceConfig": {
-      "additionalProperties": false,
-      "properties": {
-        "DynamoDB": {
-          "$ref": "#/definitions/DynamoDB"
-        }
-      },
-      "title": "DataSourceConfig",
-      "type": "object"
-    },
     "DeadLetterQueue": {
       "additionalProperties": false,
       "properties": {
@@ -461,7 +451,7 @@
       "title": "DeadLetterQueue",
       "type": "object"
     },
-    "DeltaSync": {
+    "DeltaSyncConfig": {
       "additionalProperties": false,
       "properties": {
         "BaseTableTTL": {
@@ -482,7 +472,7 @@
         "DeltaSyncTableName",
         "DeltaSyncTableTTL"
       ],
-      "title": "DeltaSync",
+      "title": "DeltaSyncConfig",
       "type": "object"
     },
     "DeploymentPreference": {
@@ -580,11 +570,11 @@
       "title": "DeploymentPreference",
       "type": "object"
     },
-    "DynamoDB": {
+    "DynamoDBConfig": {
       "additionalProperties": false,
       "properties": {
         "DeltaSync": {
-          "$ref": "#/definitions/DeltaSync"
+          "$ref": "#/definitions/DeltaSyncConfig"
         },
         "Region": {
           "title": "Region",
@@ -595,18 +585,16 @@
           "type": "string"
         },
         "UseCallerCredentials": {
-          "title": "Usecallercredentials",
-          "type": "boolean"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Versioned": {
-          "title": "Versioned",
-          "type": "boolean"
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
         "TableName"
       ],
-      "title": "DynamoDB",
+      "title": "DynamoDBConfig",
       "type": "object"
     },
     "DynamoDBEvent": {
@@ -5708,22 +5696,14 @@
       "additionalProperties": false,
       "properties": {
         "ApiId": {
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "type": "string"
-            }
-          ],
-          "title": "Apiid"
-        },
-        "DataSourceConfig": {
-          "$ref": "#/definitions/DataSourceConfig"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Description": {
           "title": "Description",
           "type": "string"
+        },
+        "DynamoDBConfig": {
+          "$ref": "#/definitions/DynamoDBConfig"
         },
         "Name": {
           "title": "Name",
@@ -5741,7 +5721,7 @@
       "required": [
         "ApiId",
         "Type",
-        "DataSourceConfig"
+        "DynamoDBConfig"
       ],
       "title": "Properties",
       "type": "object"

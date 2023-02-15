@@ -21,13 +21,12 @@ Resources:
       Type: AMAZON_DYNAMODB
       Description: This is a datasource
       ServiceRoleArn: role-arn
-      DataSourceConfig:
-        DynamoDB:
-          Region: na-west-2
-          TableName: MyNotes-notes-table
-          UseCallerCredentials: true
-          Versioned: true
-          DeltaSync:
-            BaseTableTTL: '60'
-            DeltaSyncTableName: some-table
-            DeltaSyncTableTTL: '60'
+      DynamoDBConfig:
+        Region: na-west-2
+        TableName: MyNotes-notes-table
+        UseCallerCredentials: true
+        Versioned: true
+        DeltaSync:
+          BaseTableTTL: '60'
+          DeltaSyncTableName: some-table
+          DeltaSyncTableTTL: '60'

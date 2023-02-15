@@ -2,34 +2,30 @@ from typing import Optional
 
 from typing_extensions import Literal
 
-from schema_source.common import BaseModel, SamIntrinsicable, get_prop
+from schema_source.common import BaseModel, PassThroughProp, get_prop
 
 properties = get_prop("sam-resource-graphqldatasource")
 
 
 # TODO: add docs
-class DeltaSync(BaseModel):
+class DeltaSyncConfig(BaseModel):
     BaseTableTTL: str
     DeltaSyncTableName: str
     DeltaSyncTableTTL: str
 
 
-class DynamoDB(BaseModel):
+class DynamoDBConfig(BaseModel):
     TableName: str
     Region: Optional[str]
-    UseCallerCredentials: Optional[bool]
-    Versioned: Optional[bool]
-    DeltaSync: Optional[DeltaSync]
-
-
-class DataSourceConfig(BaseModel):
-    DynamoDB: Optional[DynamoDB]
+    UseCallerCredentials: Optional[PassThroughProp]
+    Versioned: Optional[PassThroughProp]
+    DeltaSync: Optional[DeltaSyncConfig]
 
 
 class Properties(BaseModel):
-    ApiId: SamIntrinsicable[str]
+    ApiId: PassThroughProp
     Type: str
-    DataSourceConfig: DataSourceConfig
+    DynamoDBConfig: DynamoDBConfig
     Name: Optional[str]
     Description: Optional[str]
     ServiceRoleArn: Optional[str]

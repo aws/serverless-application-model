@@ -31,10 +31,9 @@ from samtranslator.model.apigateway import (
 from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
 from samtranslator.model.appsync import (
     SUPPORTED_DATASOURCES,
-    Auth,
     DataSource,
-    DataSourceConfig,
-    DynamoDBConfig,
+    DeltaSyncConfigType,
+    DynamoDBConfigType,
     GraphQLApi,
     GraphQLSchema,
 )
@@ -2157,7 +2156,7 @@ class SamGraphQLApi(SamResourceMacro):
         "SchemaUri": Property(False, IS_STR),
     }
 
-    Auth: Auth
+    Auth: Dict[str, Any]
     Tags: Optional[Dict[str, Any]]
     XrayEnabled: Optional[PassThrough]
     Name: Optional[str]
@@ -2211,18 +2210,17 @@ class SamGraphQLDataSource(SamResourceMacro):
     #       The proposed connector change will come in a follow up PR.
     resource_type = "AWS::Serverless::GraphQLDataSource"
     property_types = {
-        "ApiId": Property(True, one_of(IS_STR, IS_DICT)),
+        "ApiId": PassThroughProperty(True),
         "Name": Property(False, IS_STR),
         "Type": Property(True, IS_STR),
         "Description": PassThroughProperty(False),
         "ServiceRoleArn": Property(False, IS_STR),
-        "Permissions": Property(False, list_of(IS_STR)),
-        "DataSourceConfig": Property(True, IS_DICT),
+        "DynamoDBConfig": Property(False, IS_DICT),
     }
 
-    ApiId: Intrinsicable[str]
+    ApiId: PassThrough
     Type: str
-    DataSourceConfig: DataSourceConfig
+    DynamoDBConfig: Dict[str, Any]
     Name: Optional[str]
     Description: Optional[PassThrough]
     ServiceRoleArn: Optional[str]
@@ -2234,37 +2232,40 @@ class SamGraphQLDataSource(SamResourceMacro):
 
         return resources
 
-    def _validate_dynamodb_datasource(self, ddb_properties: Dict[str, Any]) -> DynamoDBConfig:
-        ddb_config = {}
+    def _parse_deltasync_properties(self, deltasync_properties: Dict[str, Any]) -> DeltaSyncConfigType:
+        sam_expect(
+            deltasync_properties.get("BaseTableTTL"), self.logical_id, "DynamoDBConfig.DeltaSyncConfig.BaseTableTTL"
+        ).to_be_a_string()
+
+        sam_expect(
+            deltasync_properties.get("DeltaSyncTableName"),
+            self.logical_id,
+            "DynamoDBConfig.DeltaSyncConfig.DeltaSyncTableName",
+        ).to_be_a_string()
+
+        sam_expect(
+            deltasync_properties.get("DeltaSyncTableTTL"),
+            self.logical_id,
+            "DynamoDBConfig.DeltaSyncConfig.DeltaSyncTableTTL",
+        ).to_be_a_string()
+
+        return cast(DeltaSyncConfigType, deltasync_properties)
+
+    def _parse_dynamodb_datasource(self, ddb_properties: Dict[str, Any]) -> DynamoDBConfigType:
+        ddb_config: Dict[str, Any] = {}
 
         ddb_config["TableName"] = sam_expect(
             ddb_properties.get("TableName"),
             self.logical_id,
-            "DataSourceConfig.DynamoDB.TableName",
+            "DynamoDBConfig.TableName",
         ).to_be_a_string()
 
         ddb_config["AwsRegion"] = ddb_properties["Region"] if "Region" in ddb_properties else ref("AWS::Region")
 
         if "DeltaSync" in ddb_properties:
             deltasync_properties = ddb_properties["DeltaSync"]
-
-            sam_expect(
-                deltasync_properties.get("BaseTableTTL"), self.logical_id, "DataSourceConfig.DeltaSync.BaseTableTTL"
-            ).to_be_a_string()
-
-            sam_expect(
-                deltasync_properties.get("DeltaSyncTableName"),
-                self.logical_id,
-                "DataSourceConfig.DeltaSync.DeltaSyncTableName",
-            ).to_be_a_string()
-
-            sam_expect(
-                deltasync_properties.get("DeltaSyncTableTTL"),
-                self.logical_id,
-                "DataSourceConfig.DeltaSync.DeltaSyncTableTTL",
-            ).to_be_a_string()
-
-            ddb_config["DeltaSyncConfig"] = deltasync_properties
+            deltasync_config = self._parse_deltasync_properties(deltasync_properties)
+            ddb_config["DeltaSyncConfig"] = deltasync_config
 
         if "UseCallerCredentials" in ddb_properties:
             ddb_config["UseCallerCredentials"] = ddb_properties["UseCallerCredentials"]
@@ -2272,22 +2273,17 @@ class SamGraphQLDataSource(SamResourceMacro):
         if "Versioned" in ddb_properties:
             ddb_config["Versioned"] = ddb_properties["Versioned"]
 
-        return cast(DynamoDBConfig, ddb_config)
+        return cast(DynamoDBConfigType, ddb_config)
 
     def _validate_config_properties(self, datasource: DataSource) -> None:
         # DataSourceConfig is quite large property so we require a lot of additional validation.
         # The datasource object is modified by reference.
-
-        if len(self.DataSourceConfig) > 1:
-            raise InvalidResourceException(
-                self.logical_id, "Only one resource can be defined at a time in 'DataSourceConfig'."
-            )
-
-        if datasource.Type == "AMAZON_DYNAMODB":
-            ddb_properties = sam_expect(
-                self.DataSourceConfig.get("DynamoDB"), self.logical_id, "DataSourceConfig.DynamoDB"
-            ).to_be_a_map()
-            datasource.DynamoDBConfig = self._validate_dynamodb_datasource(ddb_properties)
+        if self.Type == "AMAZON_DYNAMODB":
+            if not self.DynamoDBConfig:
+                raise InvalidResourceException(
+                    self.logical_id, "'DynamoDBConfig' must be defined when 'Type' is 'AMAZON_DYNAMODB'."
+                )
+            datasource.DynamoDBConfig = self._parse_dynamodb_datasource(self.DynamoDBConfig)
 
     def _construct_appsync_datasource(self) -> DataSource:
         datasource = DataSource(

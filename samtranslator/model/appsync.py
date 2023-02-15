@@ -12,37 +12,18 @@ from samtranslator.utils.types import Intrinsicable
 SUPPORTED_DATASOURCES = {"AMAZON_DYNAMODB"}
 
 
-# ====== common types =======
-class DeltaSync(TypedDict):
+class DeltaSyncConfigType(TypedDict):
     BaseTableTTL: str
     DeltaSyncTableName: str
     DeltaSyncTableTTL: str
 
 
-# ====== serverless types ======
-class Auth(TypedDict, total=False):
-    Type: str
-
-
-class DynamoDBDataSource(TypedDict, total=False):
-    Region: str
+class DynamoDBConfigType(TypedDict, total=False):
+    AwsRegion: str
     TableName: str
     UseCallerCredentials: bool
     Versioned: bool
-    DeltaSync: DeltaSync
-
-
-class DataSourceConfig(TypedDict, total=False):
-    DynamoDB: DynamoDBDataSource
-
-
-# ====== cfn types ======
-class DynamoDBConfig(TypedDict, total=False):
-    AwsRegion: Intrinsicable[str]
-    DeltaSyncConfig: DeltaSync
-    TableName: str
-    UseCallerCredentials: bool
-    Versioned: bool
+    DeltaSyncConfig: DeltaSyncConfigType
 
 
 class GraphQLApi(Resource):
@@ -91,4 +72,4 @@ class DataSource(Resource):
     Name: str
     Type: str
     ServiceRoleArn: str
-    DynamoDBConfig: DynamoDBConfig
+    DynamoDBConfig: DynamoDBConfigType
