@@ -1,4 +1,5 @@
 import logging
+from typing import Dict, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 
@@ -30,7 +31,8 @@ class ManagedPolicyLoader:
         LOG.info("Finished loading policies from IAM.")
         self._policy_map = name_to_arn_map
 
-    def load(self):  # type: ignore[no-untyped-def]
+    def load(self) -> Dict[str, str]:
         if self._policy_map is None:
             self._load_policies_from_iam()
-        return self._policy_map
+        # mypy doesn't realize that function above assigns non-None value
+        return cast(Dict[str, str], self._policy_map)
