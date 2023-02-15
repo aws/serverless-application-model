@@ -38,7 +38,14 @@ from samtranslator.validator.value_validator import sam_expect
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None, metrics=None):  # type: ignore[no-untyped-def]
+    def __init__(  # type: ignore[no-untyped-def]
+        self,
+        managed_policy_map,
+        sam_parser,
+        plugins=None,
+        boto_session=None,
+        metrics=None,
+    ):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
