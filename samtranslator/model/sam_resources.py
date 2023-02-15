@@ -9,6 +9,14 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
+from samtranslator.internal.model.appsync import (
+    SUPPORTED_DATASOURCES,
+    DataSource,
+    DeltaSyncConfigType,
+    DynamoDBConfigType,
+    GraphQLApi,
+    GraphQLSchema,
+)
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
@@ -29,14 +37,6 @@ from samtranslator.model.apigateway import (
     ApiGatewayUsagePlanKey,
 )
 from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
-from samtranslator.model.appsync import (
-    SUPPORTED_DATASOURCES,
-    DataSource,
-    DeltaSyncConfigType,
-    DynamoDBConfigType,
-    GraphQLApi,
-    GraphQLSchema,
-)
 from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
@@ -2220,7 +2220,7 @@ class SamGraphQLDataSource(SamResourceMacro):
 
     ApiId: PassThrough
     Type: str
-    DynamoDBConfig: Dict[str, Any]
+    DynamoDBConfig: Optional[Dict[str, Any]]
     Name: Optional[str]
     Description: Optional[PassThrough]
     ServiceRoleArn: Optional[str]
@@ -2295,6 +2295,7 @@ class SamGraphQLDataSource(SamResourceMacro):
 
         datasource.Type = self.Type
         datasource.Name = self.Name if self.Name else self.logical_id
+        print("blahblahblahablahlahl")
         datasource.Description = self.Description
         datasource.ApiId = self.ApiId
         # I will remove this ignore after, it will be fixed with pseudo-embedded connector implementation.
