@@ -66,16 +66,10 @@ class Translator:
         # Prevent late surprises at runtime
         if get_managed_policy_map and not callable(get_managed_policy_map):
             raise TypeError("get_managed_policy_map must be callable")
-        self._get_fallback_managed_policy_map = get_managed_policy_map
-        self._fallback_managed_policy_map = None
+        self._get_managed_policy_map = get_managed_policy_map
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
-
-    def _get_managed_policy_map(self) -> Optional[Dict[str, str]]:
-        if self._fallback_managed_policy_map is None and self._get_fallback_managed_policy_map:
-            self._fallback_managed_policy_map = self._get_fallback_managed_policy_map()
-        return self._fallback_managed_policy_map
 
     def _get_function_names(
         self, resource_dict: Dict[str, Any], intrinsics_resolver: IntrinsicsResolver

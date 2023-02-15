@@ -685,33 +685,6 @@ class TestTemplateValidation(TestCase):
         }
     }
 
-    def test_get_managed_policy_map_called_once(self):
-        """
-        Ensure caller-passed get_managed_policy_map is only called once
-        (the result is cached) as it's expected to call IAM.
-        """
-        self._call_count = 0
-
-        def get_managed_policy_map():
-            self._call_count += 1
-            return {"foo": "bar"}
-
-        with patch(
-            "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
-            {"aws": {}},  # Ensure it falls back to get_managed_policy_map
-        ):
-            parameters = {}
-            translator = Translator(
-                {},
-                Parser(),
-                get_managed_policy_map=get_managed_policy_map,
-            )
-            translator.translate(self._MANAGED_POLICIES_TEMPLATE, parameters)
-            translator.translate(self._MANAGED_POLICIES_TEMPLATE, parameters)
-            translator.translate(self._MANAGED_POLICIES_TEMPLATE, parameters)
-
-        self.assertEqual(self._call_count, 1)
-
     def test_get_managed_policy_map_callable(self):
         # get_managed_policy_map() is only called as fallback; make sure
         # it fails early to avoid late surprises at runtime
