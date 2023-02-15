@@ -117,6 +117,7 @@ ignore_templates:
   - tests/translator/output/**/state_machine_with_schedule_dlq_retry_policy.json
   - tests/translator/output/**/globals_for_function.json  # RuntimeManagementConfig
   - tests/translator/output/**/function_with_runtime_config.json  # RuntimeManagementConfig
+  - tests/translator/output/**/managed_policies_minimal.json  # Intentionally has non-existent managed policy name
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
   - W2531 # EOL runtime; not relevant for transform tests
