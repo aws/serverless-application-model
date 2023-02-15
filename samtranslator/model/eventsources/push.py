@@ -741,7 +741,7 @@ class Api(PushEventSource):
         resource = f"${{__ApiId__}}/${{__Stage__}}/{method}{path}"
         partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
+            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),
             {"__ApiId__": api_id, "__Stage__": stage},
         )
 
@@ -1055,7 +1055,7 @@ class IoTRule(PushEventSource):
 
         partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition=partition, service="iot", resource=resource),  # type: ignore[no-untyped-call]
+            ArnGenerator.generate_arn(partition=partition, service="iot", resource=resource),
             {"RuleName": ref(self.logical_id)},
         )
         source_account = fnSub("${AWS::AccountId}")
@@ -1304,7 +1304,7 @@ class HttpApi(PushEventSource):
 
         # ApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
+            ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),
             {"__ApiId__": api_id, "__Stage__": stage},
         )
 

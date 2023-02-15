@@ -77,6 +77,7 @@ class LambdaTokenAuthorizer(BaseModel):
     FunctionInvokeRole: Optional[str] = lambdatokenauthorizer("FunctionInvokeRole")
     FunctionPayloadType: Optional[Literal["TOKEN"]] = lambdatokenauthorizer("FunctionPayloadType")
     Identity: Optional[LambdaTokenAuthorizerIdentity] = lambdatokenauthorizer("Identity")
+    DisableFunctionDefaultPermissions: Optional[bool]  # TODO Add docs
 
 
 class LambdaRequestAuthorizer(BaseModel):
@@ -85,6 +86,7 @@ class LambdaRequestAuthorizer(BaseModel):
     FunctionInvokeRole: Optional[str] = lambdarequestauthorizer("FunctionInvokeRole")
     FunctionPayloadType: Optional[Literal["REQUEST"]] = lambdarequestauthorizer("FunctionPayloadType")
     Identity: Optional[LambdaRequestAuthorizerIdentity] = lambdarequestauthorizer("Identity")
+    DisableFunctionDefaultPermissions: Optional[bool]  # TODO Add docs
 
 
 class UsagePlan(BaseModel):
