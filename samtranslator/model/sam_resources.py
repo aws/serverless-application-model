@@ -281,7 +281,10 @@ class SamFunction(SamResourceMacro):
 
         execution_role = None
         if lambda_function.Role is None:
-            execution_role = self._construct_role(managed_policy_map, event_invoke_policies)
+            execution_role = self._construct_role(
+                managed_policy_map,
+                event_invoke_policies,
+            )
             lambda_function.Role = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
 
@@ -559,7 +562,9 @@ class SamFunction(SamResourceMacro):
         return {}
 
     def _construct_role(
-        self, managed_policy_map: Dict[str, Any], event_invoke_policies: List[Dict[str, Any]]
+        self,
+        managed_policy_map: Dict[str, Any],
+        event_invoke_policies: List[Dict[str, Any]],
     ) -> IAMRole:
         """Constructs a Lambda execution role based on this SAM function's Policies property.
 
