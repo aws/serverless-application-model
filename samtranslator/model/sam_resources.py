@@ -2233,6 +2233,7 @@ class SamGraphQLDataSource(SamResourceMacro):
         return resources
 
     def _parse_deltasync_properties(self, deltasync_properties: Dict[str, Any]) -> DeltaSyncConfigType:
+        # TODO: add defaults
         sam_expect(
             deltasync_properties.get("BaseTableTTL"), self.logical_id, "DynamoDBConfig.DeltaSyncConfig.BaseTableTTL"
         ).to_be_a_string()
@@ -2252,7 +2253,7 @@ class SamGraphQLDataSource(SamResourceMacro):
         return cast(DeltaSyncConfigType, deltasync_properties)
 
     def _parse_dynamodb_datasource(self, ddb_properties: Dict[str, Any]) -> DynamoDBConfigType:
-        ddb_config: Dict[str, Any] = {}
+        ddb_config: DynamoDBConfigType = {}
 
         ddb_config["TableName"] = sam_expect(
             ddb_properties.get("TableName"),
@@ -2273,7 +2274,7 @@ class SamGraphQLDataSource(SamResourceMacro):
         if "Versioned" in ddb_properties:
             ddb_config["Versioned"] = ddb_properties["Versioned"]
 
-        return cast(DynamoDBConfigType, ddb_config)
+        return ddb_config
 
     def _validate_config_properties(self, datasource: DataSource) -> None:
         # DataSourceConfig is quite large property so we require a lot of additional validation.
@@ -2295,7 +2296,6 @@ class SamGraphQLDataSource(SamResourceMacro):
 
         datasource.Type = self.Type
         datasource.Name = self.Name if self.Name else self.logical_id
-        print("blahblahblahablahlahl")
         datasource.Description = self.Description
         datasource.ApiId = self.ApiId
         # I will remove this ignore after, it will be fixed with pseudo-embedded connector implementation.
