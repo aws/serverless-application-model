@@ -17,13 +17,13 @@ def transform(input_fragment, parameter_values, managed_policy_loader, feature_t
 
     sam_parser = Parser()
     to_py27_compatible_template(input_fragment, parameter_values)
+    translator = Translator(None, sam_parser)  # type: ignore[no-untyped-call]
 
     # TODO: Test?
     @lru_cache(maxsize=None)
     def get_managed_policy_map() -> Dict[str, str]:
         return cast(Dict[str, str], managed_policy_loader.load())
 
-    translator = Translator(None, sam_parser)  # type: ignore[no-untyped-call]
     transformed = translator.translate(
         input_fragment,
         parameter_values=parameter_values,
