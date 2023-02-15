@@ -1,3 +1,6 @@
+from functools import lru_cache
+from typing import Dict, cast
+
 from samtranslator.parser.parser import Parser
 from samtranslator.translator.translator import Translator
 from samtranslator.utils.py27hash_fix import to_py27_compatible_template, undo_mark_unicode_str_in_template
@@ -14,12 +17,18 @@ def transform(input_fragment, parameter_values, managed_policy_loader, feature_t
 
     sam_parser = Parser()
     to_py27_compatible_template(input_fragment, parameter_values)
-    get_managed_policy_map = managed_policy_loader.load
-    translator = Translator(None, sam_parser, get_managed_policy_map=get_managed_policy_map)  # type: ignore[no-untyped-call]
+
+    # TODO: Test?
+    @lru_cache(maxsize=None)
+    def get_managed_policy_map() -> Dict[str, str]:
+        return cast(Dict[str, str], managed_policy_loader.load())
+
+    translator = Translator(None, sam_parser)  # type: ignore[no-untyped-call]
     transformed = translator.translate(
         input_fragment,
         parameter_values=parameter_values,
         feature_toggle=feature_toggle,
         passthrough_metadata=passthrough_metadata,
+        get_managed_policy_map=get_managed_policy_map,
     )
     return undo_mark_unicode_str_in_template(transformed)  # type: ignore[no-untyped-call]

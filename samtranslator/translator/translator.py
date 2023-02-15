@@ -5,6 +5,7 @@ from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
     FeatureToggleDefaultConfigProvider,
 )
+from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
@@ -38,15 +39,7 @@ from samtranslator.validator.value_validator import sam_expect
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(  # type: ignore[no-untyped-def] # noqa: PLR0913
-        self,
-        managed_policy_map,
-        sam_parser,
-        plugins=None,
-        boto_session=None,
-        metrics=None,
-        get_managed_policy_map=None,
-    ):
+    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None, metrics=None):  # type: ignore[no-untyped-def]
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -62,11 +55,6 @@ class Translator:
         MetricsMethodWrapperSingleton.set_instance(self.metrics)
         self._translated_resouce_mapping = {}
         self.document_errors = []
-
-        # Prevent late surprises at runtime
-        if get_managed_policy_map and not callable(get_managed_policy_map):
-            raise TypeError("get_managed_policy_map must be callable")
-        self._get_managed_policy_map = get_managed_policy_map
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
@@ -108,6 +96,7 @@ class Translator:
         parameter_values: Dict[Any, Any],
         feature_toggle: Optional[FeatureToggle] = None,
         passthrough_metadata: Optional[bool] = False,
+        get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
     ) -> Dict[str, Any]:
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
@@ -123,6 +112,10 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
+        # Prevent late surprises at runtime
+        if get_managed_policy_map and not callable(get_managed_policy_map):
+            raise TypeError("get_managed_policy_map must be callable")
+
         self.feature_toggle = (
             feature_toggle
             if feature_toggle
@@ -170,7 +163,7 @@ class Translator:
 
                 kwargs = macro.resources_to_link(sam_template["Resources"])
                 kwargs["managed_policy_map"] = self.managed_policy_map
-                kwargs["get_managed_policy_map"] = self._get_managed_policy_map
+                kwargs["get_managed_policy_map"] = get_managed_policy_map
                 kwargs["intrinsics_resolver"] = intrinsics_resolver
                 kwargs["mappings_resolver"] = mappings_resolver
                 kwargs["deployment_preference_collection"] = deployment_preference_collection
