@@ -1,0 +1,169 @@
+Resources:
+  NotesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: notes-table
+      AttributeDefinitions:
+      - AttributeName: UserId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: NoteId
+        KeyType: HASH
+
+  DynamoDBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: appsync-dynamodb-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - sts:AssumeRole
+          Principal:
+            Service:
+            - appsync.amazonaws.com
+
+  AppSyncApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      AuthenticationType: API_KEY
+      Name: AppSyncApi
+
+  ApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+
+  ApiSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Definition: |
+        type Note {
+          NoteId: ID!
+          title: String
+          content: String
+        }
+        type Query {
+          getNote(NoteId: ID!): Note
+        }
+        type Mutation {
+          saveNote(NoteId: ID!, title: String!, content: String!): Note!
+        }
+        type Schema {
+          query: Query
+          mutation: Mutation
+        }
+
+  NotesTableDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: NotesTableDataSource
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt DynamoDBRole.Arn
+      DynamoDBConfig:
+        TableName: !Ref NotesTable
+        AwsRegion: !Sub ${AWS::Region}
+
+  DataSourceToTableConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: NotesTableDataSource
+      Destination:
+        Id: NotesTable
+      Permissions:
+      - Read
+      - Write
+
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          API_KEY: !GetAtt ApiKey.ApiKey
+          GRAPHQL_URL: !GetAtt AppSyncApi.GraphQLUrl
+      Runtime: nodejs18.x
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = async (_) => {
+          const getNote = /* GraphQL */ `
+            query {
+              getNote(NoteId: "1") {
+                title
+                content
+              }
+            }
+          `;
+
+          const saveNote = /* GraphQL */ `
+            mutation {
+              saveNote(content: "some note", NoteId: "1", title: "1st note") {
+                title
+                content
+              }
+            }
+          `;
+
+          const doRequest = async (query) => {
+            const options = {
+              method: "POST",
+              headers: {
+                "x-api-key": process.env.API_KEY,
+              },
+              body: JSON.stringify({ query }),
+            };
+
+            let statusCode = 200;
+            let body;
+            let response;
+
+            try {
+              /*global fetch*/
+              response = await fetch(process.env.GRAPHQL_URL, options);
+              body = await response.json();
+              if (body.errors) statusCode = 400;
+            } catch (error) {
+              statusCode = 400;
+              body = {
+                errors: [
+                  {
+                    status: response.status,
+                    message: error.message,
+                    stack: error.stack,
+                  },
+                ],
+              };
+            }
+            return {
+              statusCode,
+              body,
+            };
+          };
+
+          let response = await doRequest(saveNote);
+          if (response.statusCode !== 200) {
+            return {
+              StatusCode: response.statusCode,
+              Body: JSON.stringify(response.body),
+            };
+          }
+          let body = {
+            saveNote: response.body,
+          };
+
+          response = await doRequest(getNote);
+          body = {
+            ...body,
+            getNote: response.body,
+          };
+
+          return {
+            StatusCode: response.statusCode,
+            Body: JSON.stringify(body),
+          };
+        };
+Metadata:
+  SamTransformTest: true

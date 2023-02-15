@@ -719,6 +719,55 @@
           }
         }
       }
+    },
+    "AWS::AppSync::DataSource": {
+      "AWS::DynamoDB::Table": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "dynamodb:BatchGetItem",
+                    "dynamodb:ConditionCheckItem",
+                    "dynamodb:PartiQLSelect"
+                  ],
+                  "Resource": [
+                    "%{Destination.Arn}",
+                    "%{Destination.Arn}/index/*"
+                  ]
+                }
+              ]
+            },
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:BatchWriteItem",
+                    "dynamodb:PartiQLDelete",
+                    "dynamodb:PartiQLInsert",
+                    "dynamodb:PartiQLUpdate"
+                  ],
+                  "Resource": [
+                    "%{Destination.Arn}",
+                    "%{Destination.Arn}/index/*"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
     }
   }
 }
