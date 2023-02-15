@@ -1593,6 +1593,10 @@
           "title": "AuthorizationScopes",
           "type": "array"
         },
+        "DisableFunctionDefaultPermissions": {
+          "title": "Disablefunctiondefaultpermissions",
+          "type": "boolean"
+        },
         "FunctionArn": {
           "anyOf": [
             {
@@ -1705,6 +1709,10 @@
           "markdownDescription": "List of authorization scopes for this authorizer\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "AuthorizationScopes",
           "type": "array"
+        },
+        "DisableFunctionDefaultPermissions": {
+          "title": "Disablefunctiondefaultpermissions",
+          "type": "boolean"
         },
         "FunctionArn": {
           "anyOf": [
