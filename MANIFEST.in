@@ -8,6 +8,7 @@ recursive-include samtranslator/validator/sam_schema *.json
 include samtranslator/policy_templates_data/policy_templates.json
 include samtranslator/policy_templates_data/schema.json
 include samtranslator/model/connector_profiles/profiles.json
+include samtranslator/internal/data/aws_managed_policies.json
 include README.md
 include THIRD_PARTY_LICENSES
 
