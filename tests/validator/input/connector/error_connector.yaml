@@ -1,0 +1,55 @@
+Resources:
+  NoSourceConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Destination:
+        Id: MyQueue1
+      Permissions:
+      - Write
+
+  NoDestConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyQueue1
+      Permissions:
+      - Write
+
+  NoPermissionConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyQueue1
+      Destination:
+        Id: MyTable
+
+  InvalidPermissionConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyQueue1
+      Destination:
+        Id: MyTable
+      Permissions:
+      - Invoke
+
+  InvalidPermissionTypeConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyQueue1
+      Destination:
+        Id: MyTable
+      Permissions:
+        Hello: World
+
+  InvalidIdTypeConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id:
+          Key: Value
+      Destination:
+        Id: MyTable
+      Permissions:
+      - Read
