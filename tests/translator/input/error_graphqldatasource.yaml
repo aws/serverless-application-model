@@ -1,0 +1,130 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  NoApiId:
+    Type: AWS::Serverless::GraphQLDataSource
+    Properties:
+      Name: CoolName
+      Type: AMAZON_DYNAMODB
+      Description: This is a datasource
+      ServiceRoleArn: role-arn
+      DynamoDBConfig:
+        Region: na-west-2
+        TableName: MyNotes-notes-table
+        UseCallerCredentials: true
+        Versioned: true
+        DeltaSync:
+          BaseTableTTL: '60'
+          DeltaSyncTableName: some-table
+          DeltaSyncTableTTL: '60'
+
+  NoType:
+    Type: AWS::Serverless::GraphQLDataSource
+    Properties:
+      ApiId: some-api-id
+      Name: CoolName
+      Description: This is a datasource
+      ServiceRoleArn: role-arn
+      DynamoDBConfig:
+        Region: na-west-2
+        TableName: MyNotes-notes-table
+        UseCallerCredentials: true
+        Versioned: true
+        DeltaSync:
+          BaseTableTTL: '60'
+          DeltaSyncTableName: some-table
+          DeltaSyncTableTTL: '60'
+
+  UnknownType:
+    Type: AWS::Serverless::GraphQLDataSource
+    Properties:
+      ApiId: some-api-id
+      Name: CoolName
+      Type: WEIRD_TYPE
+      Description: This is a datasource
+      ServiceRoleArn: role-arn
+      DynamoDBConfig:
+        Region: na-west-2
+        TableName: MyNotes-notes-table
+        UseCallerCredentials: true
+        Versioned: true
+        DeltaSync:
+          BaseTableTTL: '60'
+          DeltaSyncTableName: some-table
+          DeltaSyncTableTTL: '60'
+
+  NoConfigPropertyDefined:
+    Type: AWS::Serverless::GraphQLDataSource
+    Properties:
+      ApiId: some-api-id
+      Name: CoolName
+      Type: AMAZON_DYNAMODB
+      Description: This is a datasource
+      ServiceRoleArn: role-arn
+
+  NoDynamoDBTableName:
+    Type: AWS::Serverless::GraphQLDataSource
+    Properties:
+      ApiId: some-api-id
+      Name: CoolName
+      Type: AMAZON_DYNAMODB
+      Description: This is a datasource
+      ServiceRoleArn: role-arn
+      DynamoDBConfig:
+        Region: na-west-2
+        UseCallerCredentials: true
+        Versioned: true
+        DeltaSync:
+          BaseTableTTL: '60'
+          DeltaSyncTableName: some-table
+          DeltaSyncTableTTL: '60'
+
+  NoBaseTableTTL:
+    Type: AWS::Serverless::GraphQLDataSource
+    Properties:
+      ApiId: some-api-id
+      Name: CoolName
+      Type: AMAZON_DYNAMODB
+      Description: This is a datasource
+      ServiceRoleArn: role-arn
+      DynamoDBConfig:
+        Region: na-west-2
+        TableName: MyNotes-notes-table
+        UseCallerCredentials: true
+        Versioned: true
+        DeltaSync:
+          DeltaSyncTableName: some-table
+          DeltaSyncTableTTL: '60'
+
+  NoDeltaSyncTableName:
+    Type: AWS::Serverless::GraphQLDataSource
+    Properties:
+      ApiId: some-api-id
+      Name: CoolName
+      Type: AMAZON_DYNAMODB
+      Description: This is a datasource
+      ServiceRoleArn: role-arn
+      DynamoDBConfig:
+        Region: na-west-2
+        TableName: MyNotes-notes-table
+        UseCallerCredentials: true
+        Versioned: true
+        DeltaSync:
+          BaseTableTTL: '60'
+          DeltaSyncTableTTL: '60'
+
+  NoDeltaSyncTableTTL:
+    Type: AWS::Serverless::GraphQLDataSource
+    Properties:
+      ApiId: some-api-id
+      Name: CoolName
+      Type: AMAZON_DYNAMODB
+      Description: This is a datasource
+      ServiceRoleArn: role-arn
+      DynamoDBConfig:
+        Region: na-west-2
+        TableName: MyNotes-notes-table
+        UseCallerCredentials: true
+        Versioned: true
+        DeltaSync:
+          BaseTableTTL: '60'
+          DeltaSyncTableName: some-table

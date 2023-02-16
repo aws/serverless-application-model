@@ -1,0 +1,32 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+  SuperCoolDataSource:
+    Type: AWS::Serverless::GraphQLDataSource
+    Properties:
+      ApiId: !GetAtt SuperCoolAPI.ApiId
+      Name: CoolName
+      Type: AMAZON_DYNAMODB
+      Description: This is a datasource
+      ServiceRoleArn: role-arn
+      DynamoDBConfig:
+        Region: na-west-2
+        TableName: MyNotes-notes-table
+        UseCallerCredentials: true
+        Versioned: true
+        DeltaSync:
+          BaseTableTTL: '60'
+          DeltaSyncTableName: some-table
+          DeltaSyncTableTTL: '60'

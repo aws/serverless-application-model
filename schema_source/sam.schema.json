@@ -451,6 +451,30 @@
       "title": "DeadLetterQueue",
       "type": "object"
     },
+    "DeltaSyncConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "BaseTableTTL": {
+          "title": "Basetablettl",
+          "type": "string"
+        },
+        "DeltaSyncTableName": {
+          "title": "Deltasynctablename",
+          "type": "string"
+        },
+        "DeltaSyncTableTTL": {
+          "title": "Deltasynctablettl",
+          "type": "string"
+        }
+      },
+      "required": [
+        "BaseTableTTL",
+        "DeltaSyncTableName",
+        "DeltaSyncTableTTL"
+      ],
+      "title": "DeltaSyncConfig",
+      "type": "object"
+    },
     "DeploymentPreference": {
       "additionalProperties": false,
       "properties": {
