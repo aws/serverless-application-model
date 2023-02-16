@@ -223,7 +223,7 @@ class ApiGatewayV2Authorizer:
             partition = ArnGenerator.get_partition_name()
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
             authorizer_uri = fnSub(
-                ArnGenerator.generate_arn(  # type: ignore[no-untyped-call]
+                ArnGenerator.generate_arn(
                     partition=partition, service="apigateway", resource=resource, include_account_id=False
                 ),
                 {"__FunctionArn__": self.function_arn},

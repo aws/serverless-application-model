@@ -9,6 +9,7 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
+from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
@@ -276,14 +277,14 @@ class SamFunction(SamResourceMacro):
             resources.extend(event_invoke_resources)
 
         managed_policy_map = kwargs.get("managed_policy_map", {})
-        if not managed_policy_map:
-            raise Exception("Managed policy map is empty, but should not be.")
+        get_managed_policy_map = kwargs.get("get_managed_policy_map")
 
         execution_role = None
         if lambda_function.Role is None:
             execution_role = self._construct_role(
                 managed_policy_map,
                 event_invoke_policies,
+                get_managed_policy_map,
             )
             lambda_function.Role = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
@@ -565,6 +566,7 @@ class SamFunction(SamResourceMacro):
         self,
         managed_policy_map: Dict[str, Any],
         event_invoke_policies: List[Dict[str, Any]],
+        get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
     ) -> IAMRole:
         """Constructs a Lambda execution role based on this SAM function's Policies property.
 
@@ -617,6 +619,7 @@ class SamFunction(SamResourceMacro):
             role_path=self.RolePath,
             permissions_boundary=self.PermissionsBoundary,
             tags=self._construct_tag_list(self.Tags),
+            get_managed_policy_map=get_managed_policy_map,
         )
 
     def _validate_package_type(self, lambda_function: LambdaFunction) -> None:
@@ -1753,6 +1756,7 @@ class SamStateMachine(SamResourceMacro):
     @cw_timer
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         managed_policy_map = kwargs.get("managed_policy_map", {})
+        get_managed_policy_map = kwargs.get("get_managed_policy_map")
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         event_resources = kwargs["event_resources"]
 
@@ -1778,6 +1782,7 @@ class SamStateMachine(SamResourceMacro):
             tags=self.Tags,
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+            get_managed_policy_map=get_managed_policy_map,
         )
 
         return state_machine_generator.to_cloudformation()

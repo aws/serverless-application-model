@@ -47,6 +47,7 @@ class StateMachineGenerator:
         tags=None,
         resource_attributes=None,
         passthrough_resource_attributes=None,
+        get_managed_policy_map=None,
     ):
         """
         Constructs an State Machine Generator class that generates a State Machine resource
@@ -98,6 +99,7 @@ class StateMachineGenerator:
             logical_id, depends_on=depends_on, attributes=resource_attributes
         )
         self.substitution_counter = 1
+        self.get_managed_policy_map = get_managed_policy_map
 
     @cw_timer(prefix="Generator", name="StateMachine")
     def to_cloudformation(self):  # type: ignore[no-untyped-def]
@@ -138,8 +140,6 @@ class StateMachineGenerator:
         if self.role:
             self.state_machine.RoleArn = self.role
         else:
-            if self.policies and not self.managed_policy_map:
-                raise Exception("Managed policy map is empty, but should not be.")
             if not self.policies:
                 self.policies = []
             execution_role = self._construct_role()
@@ -228,6 +228,7 @@ class StateMachineGenerator:
             resource_policies=state_machine_policies,
             tags=self._construct_tag_list(),
             permissions_boundary=self.permissions_boundary,
+            get_managed_policy_map=self.get_managed_policy_map,
         )
 
     def _construct_tag_list(self) -> List[Dict[str, Any]]:

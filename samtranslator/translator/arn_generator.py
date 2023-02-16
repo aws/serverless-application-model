@@ -33,7 +33,9 @@ class ArnGenerator:
     BOTO_SESSION_REGION_NAME = None
 
     @classmethod
-    def generate_arn(cls, partition, service, resource, include_account_id=True):  # type: ignore[no-untyped-def]
+    def generate_arn(
+        cls, partition: str, service: str, resource: str, include_account_id: Optional[bool] = True
+    ) -> str:
         if not service or not resource:
             raise RuntimeError("Could not construct ARN for resource.")
 
