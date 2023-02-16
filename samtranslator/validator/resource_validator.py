@@ -20,7 +20,7 @@ class ResourceModel:
             return ResourceModel(attr_value)
         return attr_value
 
-    def __getitem__(self, attr):
+    def __getitem__(self, attr: str) -> Any:
         attr_value = self.model.__dict__[attr]
         if isinstance(attr_value, BaseModel):
             if "__root__" in attr_value.__dict__:
