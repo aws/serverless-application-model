@@ -111,7 +111,8 @@
                       "AWS::Serverless::SimpleTable",
                       "AWS::Serverless::StateMachine",
                       "AWS::Serverless::Connector",
-                      "AWS::Serverless::GraphQLApi"
+                      "AWS::Serverless::GraphQLApi",
+                      "AWS::Serverless::GraphQLDataSource"
                     ]
                   }
                 }

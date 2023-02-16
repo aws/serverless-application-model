@@ -9,6 +9,14 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
+from samtranslator.internal.model.appsync import (
+    SUPPORTED_DATASOURCES,
+    DataSource,
+    DeltaSyncConfigType,
+    DynamoDBConfigType,
+    GraphQLApi,
+    GraphQLSchema,
+)
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
@@ -29,7 +37,6 @@ from samtranslator.model.apigateway import (
     ApiGatewayUsagePlanKey,
 )
 from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
-from samtranslator.model.appsync import Auth, GraphQLApi, GraphQLSchema
 from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
@@ -2149,7 +2156,7 @@ class SamGraphQLApi(SamResourceMacro):
         "SchemaUri": Property(False, IS_STR),
     }
 
-    Auth: Auth
+    Auth: Dict[str, Any]
     Tags: Optional[Dict[str, Any]]
     XrayEnabled: Optional[PassThrough]
     Name: Optional[str]
@@ -2194,3 +2201,106 @@ class SamGraphQLApi(SamResourceMacro):
         schema.DefinitionS3Location = self.SchemaUri
 
         return schema
+
+
+class SamGraphQLDataSource(SamResourceMacro):
+    """SAM GraphQL Data Source Macro (WIP)."""
+
+    # TODO: This currently only supports DataSource with a defined ServiceRoleArn.
+    #       The proposed connector change will come in a follow up PR.
+    resource_type = "AWS::Serverless::GraphQLDataSource"
+    property_types = {
+        "ApiId": PassThroughProperty(True),
+        "Name": Property(False, IS_STR),
+        "Type": Property(True, IS_STR),
+        "Description": PassThroughProperty(False),
+        "ServiceRoleArn": Property(False, IS_STR),
+        "DynamoDBConfig": Property(False, IS_DICT),
+    }
+
+    ApiId: PassThrough
+    Type: str
+    DynamoDBConfig: Optional[Dict[str, Any]]
+    Name: Optional[str]
+    Description: Optional[PassThrough]
+    ServiceRoleArn: Optional[str]
+
+    @cw_timer
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
+        appsync_datasource = self._construct_appsync_datasource()
+        resources: List[Resource] = [appsync_datasource]
+
+        return resources
+
+    def _parse_deltasync_properties(self, deltasync_properties: Dict[str, Any]) -> DeltaSyncConfigType:
+        # TODO: add defaults
+        sam_expect(
+            deltasync_properties.get("BaseTableTTL"), self.logical_id, "DynamoDBConfig.DeltaSyncConfig.BaseTableTTL"
+        ).to_be_a_string()
+
+        sam_expect(
+            deltasync_properties.get("DeltaSyncTableName"),
+            self.logical_id,
+            "DynamoDBConfig.DeltaSyncConfig.DeltaSyncTableName",
+        ).to_be_a_string()
+
+        sam_expect(
+            deltasync_properties.get("DeltaSyncTableTTL"),
+            self.logical_id,
+            "DynamoDBConfig.DeltaSyncConfig.DeltaSyncTableTTL",
+        ).to_be_a_string()
+
+        return cast(DeltaSyncConfigType, deltasync_properties)
+
+    def _parse_dynamodb_datasource(self, ddb_properties: Dict[str, Any]) -> DynamoDBConfigType:
+        ddb_config: DynamoDBConfigType = {}
+
+        ddb_config["TableName"] = sam_expect(
+            ddb_properties.get("TableName"),
+            self.logical_id,
+            "DynamoDBConfig.TableName",
+        ).to_be_a_string()
+
+        ddb_config["AwsRegion"] = ddb_properties["Region"] if "Region" in ddb_properties else ref("AWS::Region")
+
+        if "DeltaSync" in ddb_properties:
+            deltasync_properties = ddb_properties["DeltaSync"]
+            deltasync_config = self._parse_deltasync_properties(deltasync_properties)
+            ddb_config["DeltaSyncConfig"] = deltasync_config
+
+        if "UseCallerCredentials" in ddb_properties:
+            ddb_config["UseCallerCredentials"] = ddb_properties["UseCallerCredentials"]
+
+        if "Versioned" in ddb_properties:
+            ddb_config["Versioned"] = ddb_properties["Versioned"]
+
+        return ddb_config
+
+    def _validate_config_properties(self, datasource: DataSource) -> None:
+        # DataSourceConfig is quite large property so we require a lot of additional validation.
+        # The datasource object is modified by reference.
+        if self.Type == "AMAZON_DYNAMODB":
+            if not self.DynamoDBConfig:
+                raise InvalidResourceException(
+                    self.logical_id, "'DynamoDBConfig' must be defined when 'Type' is 'AMAZON_DYNAMODB'."
+                )
+            datasource.DynamoDBConfig = self._parse_dynamodb_datasource(self.DynamoDBConfig)
+
+    def _construct_appsync_datasource(self) -> DataSource:
+        datasource = DataSource(
+            logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
+        if self.Type not in SUPPORTED_DATASOURCES:
+            raise InvalidResourceException(self.logical_id, f"'{self.Type}' is not a supported data source type.")
+
+        datasource.Type = self.Type
+        datasource.Name = self.Name if self.Name else self.logical_id
+        datasource.Description = self.Description
+        datasource.ApiId = self.ApiId
+        # I will remove this ignore after, it will be fixed with pseudo-embedded connector implementation.
+        datasource.ServiceRoleArn = self.ServiceRoleArn  # type: ignore
+
+        self._validate_config_properties(datasource)
+
+        return datasource

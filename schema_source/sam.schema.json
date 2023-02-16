@@ -451,6 +451,30 @@
       "title": "DeadLetterQueue",
       "type": "object"
     },
+    "DeltaSyncConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "BaseTableTTL": {
+          "title": "Basetablettl",
+          "type": "string"
+        },
+        "DeltaSyncTableName": {
+          "title": "Deltasynctablename",
+          "type": "string"
+        },
+        "DeltaSyncTableTTL": {
+          "title": "Deltasynctablettl",
+          "type": "string"
+        }
+      },
+      "required": [
+        "BaseTableTTL",
+        "DeltaSyncTableName",
+        "DeltaSyncTableTTL"
+      ],
+      "title": "DeltaSyncConfig",
+      "type": "object"
+    },
     "DeploymentPreference": {
       "additionalProperties": false,
       "properties": {
@@ -544,6 +568,33 @@
         }
       },
       "title": "DeploymentPreference",
+      "type": "object"
+    },
+    "DynamoDBConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "DeltaSync": {
+          "$ref": "#/definitions/DeltaSyncConfig"
+        },
+        "Region": {
+          "title": "Region",
+          "type": "string"
+        },
+        "TableName": {
+          "title": "Tablename",
+          "type": "string"
+        },
+        "UseCallerCredentials": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Versioned": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "TableName"
+      ],
+      "title": "DynamoDBConfig",
       "type": "object"
     },
     "DynamoDBEvent": {
@@ -5641,6 +5692,61 @@
       "title": "Resource",
       "type": "object"
     },
+    "schema_source__aws_serverless_graphqldatasource__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiId": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "DynamoDBConfig": {
+          "$ref": "#/definitions/DynamoDBConfig"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "ServiceRoleArn": {
+          "title": "Servicerolearn",
+          "type": "string"
+        },
+        "Type": {
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ApiId",
+        "Type",
+        "DynamoDBConfig"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "schema_source__aws_serverless_graphqldatasource__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "$ref": "#/definitions/schema_source__aws_serverless_graphqldatasource__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::GraphQLDataSource"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
     "schema_source__aws_serverless_httpapi__Auth": {
       "additionalProperties": false,
       "properties": {
@@ -7333,6 +7439,9 @@
           },
           {
             "$ref": "#/definitions/schema_source__aws_serverless_graphqlapi__Resource"
+          },
+          {
+            "$ref": "#/definitions/schema_source__aws_serverless_graphqldatasource__Resource"
           },
           {
             "$ref": "#/definitions/schema_source__any_cfn_resource__Resource"
