@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, Type, Union
 
 import pydantic
 
-from samtranslator.schema_source import (
+from samtranslator.internal.schema_source import (
     any_cfn_resource,
     aws_serverless_api,
     aws_serverless_application,
@@ -18,7 +18,7 @@ from samtranslator.schema_source import (
     aws_serverless_simpletable,
     aws_serverless_statemachine,
 )
-from samtranslator.schema_source.common import BaseModel, LenientBaseModel
+from samtranslator.internal.schema_source.common import BaseModel, LenientBaseModel
 
 
 class Globals(BaseModel):
@@ -84,9 +84,9 @@ def _add_embedded_connectors(schema: Dict[str, Any]) -> None:
     Add embedded Connectors resource attribute to supported CloudFormation resources.
     """
     # We get the definition from an existing SAM resource
-    embedded_connector = schema["definitions"]["samtranslator__schema_source__aws_serverless_function__Resource"][
-        "properties"
-    ]["Connectors"]
+    embedded_connector = schema["definitions"][
+        "samtranslator__internal__schema_source__aws_serverless_function__Resource"
+    ]["properties"]["Connectors"]
 
     profiles = json.loads(Path("samtranslator/model/connector_profiles/profiles.json").read_text())
 

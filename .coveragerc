@@ -3,7 +3,7 @@ branch = True
 omit =
     # Schema tested by `make check-black`
     samtranslator/schema/*
-    samtranslator/schema_source/*
+    samtranslator/internal/schema_source/*
 [report]
 exclude_lines =
     pragma: no cover

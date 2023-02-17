@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Union
 
 from typing_extensions import Literal
 
-from samtranslator.schema_source.common import (
+from samtranslator.internal.schema_source.common import (
     BaseModel,
     PassThroughProp,
     ResourceAttributes,
