@@ -141,9 +141,9 @@ class TestValidateUnifiedSchema(TestCase):
         assert len(UNIFIED_SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]) > 1000
         assert (
             "The set of properties must conform to the defined `Type`"
-            in UNIFIED_SCHEMA["definitions"]["samtranslator__internal__schema_source__aws_serverless_statemachine__ApiEvent"][
-                "properties"
-            ]["Properties"]["markdownDescription"]
+            in UNIFIED_SCHEMA["definitions"][
+                "samtranslator__internal__schema_source__aws_serverless_statemachine__ApiEvent"
+            ]["properties"]["Properties"]["markdownDescription"]
         )
 
         # Contains all definitions from SAM-only schema (except rule that ignores non-SAM)
