@@ -5,7 +5,7 @@ from unittest import TestCase
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 from samtranslator.internal.schema_source.aws_serverless_connector import Properties as ConnectorProperties
-from samtranslator.validator.resource_validator import to_model
+from samtranslator.internal.resource_validator import to_model
 from samtranslator.yaml_helper import yaml_parse
 
 BASE_PATH = os.path.dirname(__file__)
