@@ -13,6 +13,7 @@ from integration.config.service_names import (
     SCHEDULE_EVENT,
     SQS,
     STATE_MACHINE_INLINE_DEFINITION,
+    QLDB
 )
 from integration.helpers.yaml_utils import load_yaml
 
