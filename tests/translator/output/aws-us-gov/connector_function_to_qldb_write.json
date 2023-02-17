@@ -1,0 +1,115 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Resources": {
+    "MyConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector": {
+            "Destination": {
+              "Type": "AWS::QLDB::Ledger"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "qldb:PartiQLDelete",
+                "qldb:PartiQLInsert",
+                "qldb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${DestinationName}/table/*",
+                    {
+                      "DestinationName": {
+                        "Ref": "MyLedger"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "qldb:SendCommand"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${DestinationName}",
+                    {
+                      "DestinationName": {
+                        "Ref": "MyLedger"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRole1"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyLedger": {
+      "Properties": {
+        "PermissionsMode": "STANDARD"
+      },
+      "Type": "AWS::QLDB::Ledger"
+    },
+    "MyRole1": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "TriggerFunction": {
+      "Properties": {
+        "Code": {
+          "InlineCode": "exports.handler = async (event) => {\n  console.log(\"Hello world!\")\n};\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyRole1",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x"
+      },
+      "Type": "AWS::Lambda::Function"
+    }
+  }
+}

@@ -223,6 +223,7 @@ SERVICE_DETECTORS: Dict[str, Callable[[Dict[str, Any], Set[str]], bool]] = {
         _resource_using_s3_events(resource) for resource in template_dict.get("Resources", {}).values()
     ),
     LOCATION: lambda template_dict, cfn_resource_types: "AWS::Location::PlaceIndex" in cfn_resource_types,
+    QLDB: lambda template_dict, cfn_resource_types: "AWS::QLDB::Ledger" in cfn_resource_types,
 }
 
 
