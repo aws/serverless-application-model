@@ -1,0 +1,18 @@
+[
+  {
+    "LogicalResourceId": "MyRole1",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLedger",
+    "ResourceType": "AWS::QLDB::Ledger"
+  },
+  {
+    "LogicalResourceId": "MyConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  }
+]

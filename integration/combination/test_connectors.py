@@ -36,6 +36,8 @@ class TestConnectors(BaseTest):
             ("combination/connector_function_to_table_write",),
             ("combination/connector_function_to_sfn_read",),
             ("combination/connector_function_to_sfn_write",),
+            ("combination/connector_function_to_qldb_write",),
+            ("combination/connector_function_to_qldb_read",),
             ("combination/connector_function_to_queue_write",),
             ("combination/connector_function_to_queue_read",),
             ("combination/connector_function_to_topic_write",),

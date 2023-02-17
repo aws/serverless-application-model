@@ -230,6 +230,62 @@
           }
         }
       },
+      "AWS::QLDB::Ledger": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "qldb:PartiQLDelete",
+                    "qldb:PartiQLInsert",
+                    "qldb:PartiQLUpdate"
+                  ],
+                  "Resource": [
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination}/table/*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "qldb:SendCommand"
+                  ],
+                  "Resource": [
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination}"
+                  ]
+                }
+              ]
+            },
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "qldb:PartiQLSelect",
+                    "qldb:PartiQLHistoryFunction"
+                  ],
+                  "Resource": [
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination}/table/*",
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination}/information_schema/user_tables"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "qldb:SendCommand"
+                  ],
+                  "Resource": [
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination}"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
       "AWS::SQS::Queue": {
         "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
         "Properties": {
