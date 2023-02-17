@@ -245,7 +245,7 @@
                     "qldb:PartiQLUpdate"
                   ],
                   "Resource": [
-                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination}/table/*"
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination.Name}/table/*"
                   ]
                 },
                 {
@@ -254,7 +254,7 @@
                     "qldb:SendCommand"
                   ],
                   "Resource": [
-                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination}"
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination.Name}"
                   ]
                 }
               ]
@@ -268,8 +268,8 @@
                     "qldb:PartiQLHistoryFunction"
                   ],
                   "Resource": [
-                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination}/table/*",
-                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination}/information_schema/user_tables"
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination.Name}/table/*",
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination.Name}/information_schema/user_tables"
                   ]
                 },
                 {
@@ -278,7 +278,7 @@
                     "qldb:SendCommand"
                   ],
                   "Resource": [
-                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination}"
+                    "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/%{Destination.Name}"
                   ]
                 }
               ]
