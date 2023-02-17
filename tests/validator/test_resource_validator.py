@@ -4,9 +4,9 @@ from unittest import TestCase
 
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
+from samtranslator.internal.schema_source.aws_serverless_connector import Properties as ConnectorProperties
 from samtranslator.validator.resource_validator import to_model
 from samtranslator.yaml_helper import yaml_parse
-from schema_source.aws_serverless_connector import Properties as ConnectorProperties
 
 BASE_PATH = os.path.dirname(__file__)
 CONNECTOR_INPUT_FOLDER = os.path.join(BASE_PATH, "input", "connector")
@@ -65,32 +65,24 @@ class TestModel(TestCase):
             self.connector_template,
             ConnectorProperties,
         )
-        self.assertEqual(connector_model.get("Source").get("Arn"), "random-arn")
-        self.assertEqual(connector_model.get("Source").get("Type"), "random-type")
-        self.assertEqual(connector_model.get("Source").get("Id"), None)
-        self.assertEqual(connector_model.get("Destination").get("Id"), "MyTable")
-        self.assertEqual(connector_model.get("Permissions"), ["Read"])
-        self.assertEqual(connector_model.get("FakeProperty"), None)
-
-        self.assertEqual(connector_model["Source"]["Arn"], "random-arn")
-        self.assertEqual(connector_model["Source"]["Type"], "random-type")
-        self.assertEqual(connector_model["Destination"]["Id"], "MyTable")
-        self.assertEqual(connector_model["Permissions"], ["Read"])
+        self.assertEqual(connector_model.Source.Arn, "random-arn")
+        self.assertEqual(connector_model.Source.Type, "random-type")
+        self.assertEqual(connector_model.Source.Id, None)
+        self.assertEqual(connector_model.Destination.Id, "MyTable")
+        self.assertEqual(connector_model.Permissions, ["Read"])
 
     def test_model_get_operation(self):
         model = to_model(self.model_template, ValidatiorBaseModel)
-        self.assertEqual(model["Properties"]["Key"], {"A": {"value": 10}})
-        self.assertEqual(model["Properties"]["Key"]["A"], {"value": 10})
-        self.assertEqual(model["Properties"]["Hello"], ["1", "2", "3"])
-        self.assertEqual(model.get("Properties").get("Random")["value"], 5)
-        self.assertEqual(model.get("DoNotExist"), None)
+        self.assertEqual(model.Properties.Key, {"A": {"value": 10}})
+        self.assertEqual(model.Properties.Key["A"], {"value": 10})
+        self.assertEqual(model.Properties.Hello, ["1", "2", "3"])
+        self.assertEqual(model.Properties.Random.value, 5)
 
-        self.assertEqual(len(model["Contents"]), 3)
-        self.assertEqual(model["Contents"][0]["Content"]["Tags"]["A"], "hello")
-        self.assertEqual(model["Contents"][0]["Content"]["Tags"]["B"], 5)
-        self.assertEqual(model["Contents"][1]["Content"]["Tags"]["A"], "wow")
-        self.assertEqual(model["Contents"][0]["Content"]["Tags"].get("C"), None)
-        self.assertEqual(model["Contents"][2]["Content"]["Tags"]["B"], -5)
+        self.assertEqual(len(model.Contents), 3)
+        self.assertEqual(model.Contents[0].Content.Tags.A, "hello")
+        self.assertEqual(model.Contents[0].Content.Tags.B, 5)
+        self.assertEqual(model.Contents[1].Content.Tags.A, "wow")
+        self.assertEqual(model.Contents[2].Content.Tags.B, -5)
 
 
 class TestModelValidatorFailure(TestCase):

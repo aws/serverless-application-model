@@ -56,6 +56,15 @@ class BaseModel(LenientBaseModel):
     class Config:
         extra = Extra.forbid
 
+    def __getattribute__(self, __name: str) -> Any:
+        """Overloading get attribute operation"""
+        attr_value = super().__getattribute__(__name)
+        if isinstance(attr_value, PassThroughProp):
+            # Access __root__ attribute to get actual value from PassThroughProp
+            # See https://github.com/aws/serverless-application-model/blob/develop/samtranslator/internal/schema_source/common.py#L19
+            return attr_value.__root__
+        return attr_value
+
 
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html
 class Ref(BaseModel):
