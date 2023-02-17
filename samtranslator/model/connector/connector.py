@@ -203,6 +203,9 @@ def _get_resource_id(logical_id: str, resource_type: str) -> Optional[Dict[str, 
 def _get_resource_name(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
     if resource_type == "AWS::StepFunctions::StateMachine":
         return fnGetAtt(logical_id, "Name")
+    if resource_type == "AWS::QLDB::Ledger":
+        # Why are we doing this instead under "Name"? Potential compatibility with other IaCs
+        return ref(logical_id)
     return None
 
 
