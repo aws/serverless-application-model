@@ -2,13 +2,19 @@
 import inspect
 import re
 from abc import ABC, ABCMeta, abstractmethod
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from contextlib import suppress
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
+
+from pydantic import BaseModel
+from pydantic.error_wrappers import ValidationError
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
+
+RT = TypeVar("RT", bound=BaseModel)  # return type
 
 
 class PropertyType:
@@ -311,6 +317,25 @@ class Resource(ABC):
                 resource_type=self.resource_type, property_name=name
             ),
         )
+
+    # Note: For compabitliy issue, we should ONLY use this with new abstraction/resources.
+    def validate_properties_and_return_model(self, cls: Type[RT]) -> RT:
+        """
+        Given a resource properties, return a typed object from the definitions of SAM schema model
+
+        param:
+            resource_properties: properties from input template
+            cls: schema models
+        """
+        try:
+            return cls.parse_obj(self._generate_resource_dict()["Properties"])
+        except ValidationError as e:
+            error_properties: str = ""
+            with suppress(KeyError):
+                error_properties = ", ".join([str(error["loc"][0]) for error in e.errors()])
+            raise InvalidResourceException(
+                self.logical_id, f"Given resource property '{error_properties}' is invalid"
+            ) from e
 
     def validate_properties(self) -> None:
         """Validates that the required properties for this Resource have been populated, and that all properties have
