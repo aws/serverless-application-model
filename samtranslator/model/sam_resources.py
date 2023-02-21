@@ -666,36 +666,6 @@ class SamFunction(SamResourceMacro):
         # Call appropriate validation function based on the package type.
         return _validate_per_package_type[packagetype]()
 
-    def _validate_architectures(self, lambda_function: LambdaFunction) -> None:
-        """
-        Validates Function based on the existence of architecture type
-
-        parameters
-        ----------
-        lambda_function: LambdaFunction
-            Object of function properties supported on AWS Lambda
-
-        Raises
-        ------
-        InvalidResourceException
-            Raised when the Architectures property is invalid
-        """
-
-        architectures = [X86_64] if lambda_function.Architectures is None else lambda_function.Architectures
-
-        if is_intrinsic(architectures):
-            return
-
-        if (
-            not isinstance(architectures, list)
-            or len(architectures) != 1
-            or (not is_intrinsic(architectures[0]) and (architectures[0] not in [X86_64, ARM64]))
-        ):
-            raise InvalidResourceException(
-                lambda_function.logical_id,
-                "Architectures needs to be a list with one string, either `{}` or `{}`.".format(X86_64, ARM64),
-            )
-
     def _validate_dlq(self, dead_letter_queue: Dict[str, Any]) -> None:
         """Validates whether the DeadLetterQueue LogicalId is validation
         :raise: InvalidResourceException
