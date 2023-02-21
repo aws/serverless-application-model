@@ -104,7 +104,7 @@ class SamFunction(SamResourceMacro):
         "InlineCode": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "DeadLetterQueue": PropertyType(False, IS_DICT),
         "Description": PropertyType(False, IS_STR),
-        "MemorySize": PropertyType(False, is_type(int)),
+        "MemorySize": PassThroughProperty(False),
         "Timeout": PropertyType(False, is_type(int)),
         "VpcConfig": PropertyType(False, IS_DICT),
         "Role": PropertyType(False, IS_STR),
