@@ -543,7 +543,6 @@ class SamFunction(SamResourceMacro):
 
         lambda_function.RuntimeManagementConfig = self.RuntimeManagementConfig  # type: ignore[attr-defined]
         self._validate_package_type(lambda_function)
-        self._validate_architectures(lambda_function)
         return lambda_function
 
     def _add_event_invoke_managed_policy(
