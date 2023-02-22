@@ -167,7 +167,7 @@ Integration tests are covered in detail in the [INTEGRATION_TESTS.md file](INTEG
 
    For new properties of SAM resources, use [`Property`](https://github.com/aws/serverless-application-model/blob/c5830b63857f52e540fec13b29f029458edc539a/samtranslator/model/__init__.py#L36-L45) or [`PassThroughProperty`](https://github.com/aws/serverless-application-model/blob/dd79f535500158baa8e367f081d6a12113497e45/samtranslator/model/__init__.py#L48-L56) instead of [`PropertyType`](https://github.com/aws/serverless-application-model/blob/c39c2807bbf327255de8abed8b8150b18c60f053/samtranslator/model/__init__.py#L13-L33). This avoids [sneaky bugs](https://github.com/aws/serverless-application-model/pull/2495#discussion_r976715242) and ensures valid templates do not cause transform failures.
 
-   For new properties of CloudFormation resources, use `GeneratedProperty`. It performs no runtime validation, reducing the risk of valid values causing transform failures.
+   For new properties of CloudFormation resources, use [`GeneratedProperty`](https://github.com/aws/serverless-application-model/blob/79452f69bc1fcf918b8625c2f9005c74ab874801/samtranslator/model/__init__.py#L74-L82). It performs no runtime validation, reducing the risk of valid values causing transform failures.
 
 Code conventions
 ----------------
