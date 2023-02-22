@@ -1964,7 +1964,7 @@
           "Description": "Identity to give permissions to"
         },
         "TemplateName": {
-          "Description": "Template of the email"
+          "Description": "Name of the email template"
         }
       }
     },
