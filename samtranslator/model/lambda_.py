@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Union
 
-from samtranslator.model import GeneratedProperty, GeneratedProperty, Resource
+from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
 from samtranslator.utils.types import Intrinsicable
 
@@ -8,30 +8,30 @@ from samtranslator.utils.types import Intrinsicable
 class LambdaFunction(Resource):
     resource_type = "AWS::Lambda::Function"
     property_types = {
-        "Code": GeneratedProperty(True),
-        "PackageType": GeneratedProperty(False),
-        "DeadLetterConfig": GeneratedProperty(False),
-        "Description": GeneratedProperty(False),
-        "FunctionName": GeneratedProperty(False),
-        "Handler": GeneratedProperty(False),
-        "MemorySize": GeneratedProperty(False),
-        "Role": GeneratedProperty(False),
-        "Runtime": GeneratedProperty(False),
-        "Timeout": GeneratedProperty(False),
-        "VpcConfig": GeneratedProperty(False),
-        "Environment": GeneratedProperty(False),
-        "Tags": GeneratedProperty(False),
-        "TracingConfig": GeneratedProperty(False),
-        "KmsKeyArn": GeneratedProperty(False),
-        "Layers": GeneratedProperty(False),
-        "ReservedConcurrentExecutions": GeneratedProperty(False),
-        "FileSystemConfigs": GeneratedProperty(False),
-        "CodeSigningConfigArn": GeneratedProperty(False),
-        "ImageConfig": GeneratedProperty(False),
-        "Architectures": GeneratedProperty(False),
-        "SnapStart": GeneratedProperty(False),
-        "EphemeralStorage": GeneratedProperty(False),
-        "RuntimeManagementConfig": GeneratedProperty(False),
+        "Code": GeneratedProperty(),
+        "PackageType": GeneratedProperty(),
+        "DeadLetterConfig": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "FunctionName": GeneratedProperty(),
+        "Handler": GeneratedProperty(),
+        "MemorySize": GeneratedProperty(),
+        "Role": GeneratedProperty(),
+        "Runtime": GeneratedProperty(),
+        "Timeout": GeneratedProperty(),
+        "VpcConfig": GeneratedProperty(),
+        "Environment": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+        "TracingConfig": GeneratedProperty(),
+        "KmsKeyArn": GeneratedProperty(),
+        "Layers": GeneratedProperty(),
+        "ReservedConcurrentExecutions": GeneratedProperty(),
+        "FileSystemConfigs": GeneratedProperty(),
+        "CodeSigningConfigArn": GeneratedProperty(),
+        "ImageConfig": GeneratedProperty(),
+        "Architectures": GeneratedProperty(),
+        "SnapStart": GeneratedProperty(),
+        "EphemeralStorage": GeneratedProperty(),
+        "RuntimeManagementConfig": GeneratedProperty(),
     }
 
     Code: Dict[str, Any]
@@ -65,10 +65,10 @@ class LambdaFunction(Resource):
 class LambdaVersion(Resource):
     resource_type = "AWS::Lambda::Version"
     property_types = {
-        "CodeSha256": GeneratedProperty(False),
-        "Description": GeneratedProperty(False),
-        "FunctionName": GeneratedProperty(True),
-        "RuntimeManagementConfig": GeneratedProperty(False),
+        "CodeSha256": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "FunctionName": GeneratedProperty(),
+        "RuntimeManagementConfig": GeneratedProperty(),
     }
 
     runtime_attrs = {
@@ -80,11 +80,11 @@ class LambdaVersion(Resource):
 class LambdaAlias(Resource):
     resource_type = "AWS::Lambda::Alias"
     property_types = {
-        "Description": GeneratedProperty(False),
-        "Name": GeneratedProperty(False),
-        "FunctionName": GeneratedProperty(True),
-        "FunctionVersion": GeneratedProperty(True),
-        "ProvisionedConcurrencyConfig": GeneratedProperty(False),
+        "Description": GeneratedProperty(),
+        "Name": GeneratedProperty(),
+        "FunctionName": GeneratedProperty(),
+        "FunctionVersion": GeneratedProperty(),
+        "ProvisionedConcurrencyConfig": GeneratedProperty(),
     }
 
     runtime_attrs = {"arn": lambda self: ref(self.logical_id)}
@@ -93,28 +93,28 @@ class LambdaAlias(Resource):
 class LambdaEventSourceMapping(Resource):
     resource_type = "AWS::Lambda::EventSourceMapping"
     property_types = {
-        "BatchSize": GeneratedProperty(False),
-        "Enabled": GeneratedProperty(False),
-        "EventSourceArn": GeneratedProperty(False),
-        "FunctionName": GeneratedProperty(True),
-        "MaximumBatchingWindowInSeconds": GeneratedProperty(False),
-        "MaximumRetryAttempts": GeneratedProperty(False),
-        "BisectBatchOnFunctionError": GeneratedProperty(False),
-        "MaximumRecordAgeInSeconds": GeneratedProperty(False),
-        "DestinationConfig": GeneratedProperty(False),
-        "ParallelizationFactor": GeneratedProperty(False),
-        "StartingPosition": GeneratedProperty(False),
-        "StartingPositionTimestamp": GeneratedProperty(False),
-        "Topics": GeneratedProperty(False),
-        "Queues": GeneratedProperty(False),
-        "SourceAccessConfigurations": GeneratedProperty(False),
-        "TumblingWindowInSeconds": GeneratedProperty(False),
-        "FunctionResponseTypes": GeneratedProperty(False),
-        "SelfManagedEventSource": GeneratedProperty(False),
-        "FilterCriteria": GeneratedProperty(False),
-        "AmazonManagedKafkaEventSourceConfig": GeneratedProperty(False),
-        "SelfManagedKafkaEventSourceConfig": GeneratedProperty(False),
-        "ScalingConfig": GeneratedProperty(False),
+        "BatchSize": GeneratedProperty(),
+        "Enabled": GeneratedProperty(),
+        "EventSourceArn": GeneratedProperty(),
+        "FunctionName": GeneratedProperty(),
+        "MaximumBatchingWindowInSeconds": GeneratedProperty(),
+        "MaximumRetryAttempts": GeneratedProperty(),
+        "BisectBatchOnFunctionError": GeneratedProperty(),
+        "MaximumRecordAgeInSeconds": GeneratedProperty(),
+        "DestinationConfig": GeneratedProperty(),
+        "ParallelizationFactor": GeneratedProperty(),
+        "StartingPosition": GeneratedProperty(),
+        "StartingPositionTimestamp": GeneratedProperty(),
+        "Topics": GeneratedProperty(),
+        "Queues": GeneratedProperty(),
+        "SourceAccessConfigurations": GeneratedProperty(),
+        "TumblingWindowInSeconds": GeneratedProperty(),
+        "FunctionResponseTypes": GeneratedProperty(),
+        "SelfManagedEventSource": GeneratedProperty(),
+        "FilterCriteria": GeneratedProperty(),
+        "AmazonManagedKafkaEventSourceConfig": GeneratedProperty(),
+        "SelfManagedKafkaEventSourceConfig": GeneratedProperty(),
+        "ScalingConfig": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
@@ -123,24 +123,24 @@ class LambdaEventSourceMapping(Resource):
 class LambdaPermission(Resource):
     resource_type = "AWS::Lambda::Permission"
     property_types = {
-        "Action": GeneratedProperty(True),
-        "FunctionName": GeneratedProperty(True),
-        "Principal": GeneratedProperty(True),
-        "SourceAccount": GeneratedProperty(False),
-        "SourceArn": GeneratedProperty(False),
-        "EventSourceToken": GeneratedProperty(False),
-        "FunctionUrlAuthType": GeneratedProperty(False),
+        "Action": GeneratedProperty(),
+        "FunctionName": GeneratedProperty(),
+        "Principal": GeneratedProperty(),
+        "SourceAccount": GeneratedProperty(),
+        "SourceArn": GeneratedProperty(),
+        "EventSourceToken": GeneratedProperty(),
+        "FunctionUrlAuthType": GeneratedProperty(),
     }
 
 
 class LambdaEventInvokeConfig(Resource):
     resource_type = "AWS::Lambda::EventInvokeConfig"
     property_types = {
-        "DestinationConfig": GeneratedProperty(False),
-        "FunctionName": GeneratedProperty(True),
-        "MaximumEventAgeInSeconds": GeneratedProperty(False),
-        "MaximumRetryAttempts": GeneratedProperty(False),
-        "Qualifier": GeneratedProperty(True),
+        "DestinationConfig": GeneratedProperty(),
+        "FunctionName": GeneratedProperty(),
+        "MaximumEventAgeInSeconds": GeneratedProperty(),
+        "MaximumRetryAttempts": GeneratedProperty(),
+        "Qualifier": GeneratedProperty(),
     }
 
 
@@ -149,12 +149,12 @@ class LambdaLayerVersion(Resource):
 
     resource_type = "AWS::Lambda::LayerVersion"
     property_types = {
-        "Content": GeneratedProperty(True),
-        "Description": GeneratedProperty(False),
-        "LayerName": GeneratedProperty(False),
-        "CompatibleArchitectures": GeneratedProperty(False),
-        "CompatibleRuntimes": GeneratedProperty(False),
-        "LicenseInfo": GeneratedProperty(False),
+        "Content": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "LayerName": GeneratedProperty(),
+        "CompatibleArchitectures": GeneratedProperty(),
+        "CompatibleRuntimes": GeneratedProperty(),
+        "LicenseInfo": GeneratedProperty(),
     }
 
     Content: Dict[str, Any]
@@ -170,7 +170,7 @@ class LambdaLayerVersion(Resource):
 class LambdaUrl(Resource):
     resource_type = "AWS::Lambda::Url"
     property_types = {
-        "TargetFunctionArn": GeneratedProperty(True),
-        "AuthType": GeneratedProperty(True),
-        "Cors": GeneratedProperty(False),
+        "TargetFunctionArn": GeneratedProperty(),
+        "AuthType": GeneratedProperty(),
+        "Cors": GeneratedProperty(),
     }
