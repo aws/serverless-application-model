@@ -13,7 +13,6 @@ from samtranslator.model.intrinsics import fnSub
 from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
-from samtranslator.validator.value_validator import sam_expect
 
 CONDITION = "Condition"
 SFN_EVETSOURCE_METRIC_PREFIX = "SFNEventSource"
