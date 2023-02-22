@@ -134,7 +134,7 @@ class Resource(ABC):
         :param depends_on Value of DependsOn resource attribute
         :param attributes Dictionary of resource attributes and their values
         """
-        self._validate_logical_id(logical_id)  # type: ignore[no-untyped-call]
+        self._validate_logical_id(logical_id)
         self.logical_id = logical_id
         self.relative_id = relative_id
         self.depends_on = depends_on
@@ -215,7 +215,7 @@ class Resource(ABC):
         return resource
 
     @classmethod
-    def _validate_logical_id(cls, logical_id):  # type: ignore[no-untyped-def]
+    def _validate_logical_id(cls, logical_id: Optional[Any]) -> None:
         """Validates that the provided logical id is an alphanumeric string.
 
         :param str logical_id: the logical id to validate
@@ -224,8 +224,8 @@ class Resource(ABC):
         :raises TypeError: if the logical id is invalid
         """
         pattern = re.compile(r"^[A-Za-z0-9]+$")
-        if logical_id is not None and pattern.match(logical_id):
-            return True
+        if isinstance(logical_id, str) and pattern.match(logical_id):
+            return
         raise InvalidResourceException(logical_id, "Logical ids must be alphanumeric.")
 
     @classmethod
