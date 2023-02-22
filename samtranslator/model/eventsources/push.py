@@ -655,12 +655,12 @@ class Api(PushEventSource):
         explicit_api_resource_properties = None
         rest_api_id = Api.get_rest_api_id_string(raw_rest_api_id)
         if isinstance(rest_api_id, str):
-            rest_api_resource = resources.get(rest_api_id)
+            rest_api_resource = resources.get(rest_api_id, {})
             sam_expect(rest_api_resource, relative_id, "RestApiId", is_sam_event=True).to_be_a_map(
                 "RestApiId property of Api event must reference a valid resource in the same template."
             )
 
-            explicit_api_resource_properties = rest_api_resource.get("Properties")
+            explicit_api_resource_properties = rest_api_resource.get("Properties", {})
             sam_expect(
                 explicit_api_resource_properties, rest_api_id, "Properties", is_resource_attribute=True
             ).to_be_a_map()
