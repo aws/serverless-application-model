@@ -1,38 +1,37 @@
 from typing import Any, Dict, List, Optional, Union
 
-from samtranslator.model import PassThroughProperty, PropertyType, Resource
+from samtranslator.model import PassThroughProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
-from samtranslator.model.types import IS_DICT, IS_STR, any_type, is_type, list_of, one_of
 from samtranslator.utils.types import Intrinsicable
 
 
 class LambdaFunction(Resource):
     resource_type = "AWS::Lambda::Function"
     property_types = {
-        "Code": PropertyType(True, IS_DICT),
-        "PackageType": PropertyType(False, IS_STR),
-        "DeadLetterConfig": PropertyType(False, IS_DICT),
-        "Description": PropertyType(False, IS_STR),
-        "FunctionName": PropertyType(False, IS_STR),
-        "Handler": PropertyType(False, IS_STR),
-        "MemorySize": PropertyType(False, is_type(int)),
-        "Role": PropertyType(False, IS_STR),
-        "Runtime": PropertyType(False, IS_STR),
-        "Timeout": PropertyType(False, is_type(int)),
-        "VpcConfig": PropertyType(False, IS_DICT),
-        "Environment": PropertyType(False, IS_DICT),
-        "Tags": PropertyType(False, list_of(IS_DICT)),
-        "TracingConfig": PropertyType(False, IS_DICT),
-        "KmsKeyArn": PropertyType(False, one_of(IS_DICT, IS_STR)),
-        "Layers": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
-        "ReservedConcurrentExecutions": PropertyType(False, any_type()),
-        "FileSystemConfigs": PropertyType(False, list_of(IS_DICT)),
-        "CodeSigningConfigArn": PropertyType(False, IS_STR),
-        "ImageConfig": PropertyType(False, IS_DICT),
-        "Architectures": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
-        "SnapStart": PropertyType(False, IS_DICT),
-        "EphemeralStorage": PropertyType(False, IS_DICT),
-        "RuntimeManagementConfig": PropertyType(False, IS_DICT),
+        "Code": PassThroughProperty(True),
+        "PackageType": PassThroughProperty(False),
+        "DeadLetterConfig": PassThroughProperty(False),
+        "Description": PassThroughProperty(False),
+        "FunctionName": PassThroughProperty(False),
+        "Handler": PassThroughProperty(False),
+        "MemorySize": PassThroughProperty(False),
+        "Role": PassThroughProperty(False),
+        "Runtime": PassThroughProperty(False),
+        "Timeout": PassThroughProperty(False),
+        "VpcConfig": PassThroughProperty(False),
+        "Environment": PassThroughProperty(False),
+        "Tags": PassThroughProperty(False),
+        "TracingConfig": PassThroughProperty(False),
+        "KmsKeyArn": PassThroughProperty(False),
+        "Layers": PassThroughProperty(False),
+        "ReservedConcurrentExecutions": PassThroughProperty(False),
+        "FileSystemConfigs": PassThroughProperty(False),
+        "CodeSigningConfigArn": PassThroughProperty(False),
+        "ImageConfig": PassThroughProperty(False),
+        "Architectures": PassThroughProperty(False),
+        "SnapStart": PassThroughProperty(False),
+        "EphemeralStorage": PassThroughProperty(False),
+        "RuntimeManagementConfig": PassThroughProperty(False),
     }
 
     Code: Dict[str, Any]
@@ -66,10 +65,10 @@ class LambdaFunction(Resource):
 class LambdaVersion(Resource):
     resource_type = "AWS::Lambda::Version"
     property_types = {
-        "CodeSha256": PropertyType(False, IS_STR),
-        "Description": PropertyType(False, IS_STR),
-        "FunctionName": PropertyType(True, one_of(IS_STR, IS_DICT)),
-        "RuntimeManagementConfig": PropertyType(False, IS_DICT),
+        "CodeSha256": PassThroughProperty(False),
+        "Description": PassThroughProperty(False),
+        "FunctionName": PassThroughProperty(True),
+        "RuntimeManagementConfig": PassThroughProperty(False),
     }
 
     runtime_attrs = {
@@ -81,11 +80,11 @@ class LambdaVersion(Resource):
 class LambdaAlias(Resource):
     resource_type = "AWS::Lambda::Alias"
     property_types = {
-        "Description": PropertyType(False, IS_STR),
-        "Name": PropertyType(False, IS_STR),
-        "FunctionName": PropertyType(True, one_of(IS_STR, IS_DICT)),
-        "FunctionVersion": PropertyType(True, one_of(IS_STR, IS_DICT)),
-        "ProvisionedConcurrencyConfig": PropertyType(False, IS_DICT),
+        "Description": PassThroughProperty(False),
+        "Name": PassThroughProperty(False),
+        "FunctionName": PassThroughProperty(True),
+        "FunctionVersion": PassThroughProperty(True),
+        "ProvisionedConcurrencyConfig": PassThroughProperty(False),
     }
 
     runtime_attrs = {"arn": lambda self: ref(self.logical_id)}
@@ -94,28 +93,28 @@ class LambdaAlias(Resource):
 class LambdaEventSourceMapping(Resource):
     resource_type = "AWS::Lambda::EventSourceMapping"
     property_types = {
-        "BatchSize": PropertyType(False, is_type(int)),
-        "Enabled": PropertyType(False, is_type(bool)),
-        "EventSourceArn": PropertyType(False, IS_STR),
-        "FunctionName": PropertyType(True, IS_STR),
-        "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
-        "MaximumRetryAttempts": PropertyType(False, is_type(int)),
-        "BisectBatchOnFunctionError": PropertyType(False, is_type(bool)),
-        "MaximumRecordAgeInSeconds": PropertyType(False, is_type(int)),
-        "DestinationConfig": PropertyType(False, IS_DICT),
-        "ParallelizationFactor": PropertyType(False, is_type(int)),
-        "StartingPosition": PropertyType(False, IS_STR),
+        "BatchSize": PassThroughProperty(False),
+        "Enabled": PassThroughProperty(False),
+        "EventSourceArn": PassThroughProperty(False),
+        "FunctionName": PassThroughProperty(True),
+        "MaximumBatchingWindowInSeconds": PassThroughProperty(False),
+        "MaximumRetryAttempts": PassThroughProperty(False),
+        "BisectBatchOnFunctionError": PassThroughProperty(False),
+        "MaximumRecordAgeInSeconds": PassThroughProperty(False),
+        "DestinationConfig": PassThroughProperty(False),
+        "ParallelizationFactor": PassThroughProperty(False),
+        "StartingPosition": PassThroughProperty(False),
         "StartingPositionTimestamp": PassThroughProperty(False),
-        "Topics": PropertyType(False, is_type(list)),
-        "Queues": PropertyType(False, is_type(list)),
-        "SourceAccessConfigurations": PropertyType(False, is_type(list)),
-        "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
-        "FunctionResponseTypes": PropertyType(False, is_type(list)),
-        "SelfManagedEventSource": PropertyType(False, IS_DICT),
-        "FilterCriteria": PropertyType(False, IS_DICT),
-        "AmazonManagedKafkaEventSourceConfig": PropertyType(False, IS_DICT),
-        "SelfManagedKafkaEventSourceConfig": PropertyType(False, IS_DICT),
-        "ScalingConfig": PropertyType(False, IS_DICT),
+        "Topics": PassThroughProperty(False),
+        "Queues": PassThroughProperty(False),
+        "SourceAccessConfigurations": PassThroughProperty(False),
+        "TumblingWindowInSeconds": PassThroughProperty(False),
+        "FunctionResponseTypes": PassThroughProperty(False),
+        "SelfManagedEventSource": PassThroughProperty(False),
+        "FilterCriteria": PassThroughProperty(False),
+        "AmazonManagedKafkaEventSourceConfig": PassThroughProperty(False),
+        "SelfManagedKafkaEventSourceConfig": PassThroughProperty(False),
+        "ScalingConfig": PassThroughProperty(False),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
@@ -124,24 +123,24 @@ class LambdaEventSourceMapping(Resource):
 class LambdaPermission(Resource):
     resource_type = "AWS::Lambda::Permission"
     property_types = {
-        "Action": PropertyType(True, IS_STR),
-        "FunctionName": PropertyType(True, IS_STR),
-        "Principal": PropertyType(True, IS_STR),
-        "SourceAccount": PropertyType(False, IS_STR),
-        "SourceArn": PropertyType(False, IS_STR),
-        "EventSourceToken": PropertyType(False, IS_STR),
-        "FunctionUrlAuthType": PropertyType(False, IS_STR),
+        "Action": PassThroughProperty(True),
+        "FunctionName": PassThroughProperty(True),
+        "Principal": PassThroughProperty(True),
+        "SourceAccount": PassThroughProperty(False),
+        "SourceArn": PassThroughProperty(False),
+        "EventSourceToken": PassThroughProperty(False),
+        "FunctionUrlAuthType": PassThroughProperty(False),
     }
 
 
 class LambdaEventInvokeConfig(Resource):
     resource_type = "AWS::Lambda::EventInvokeConfig"
     property_types = {
-        "DestinationConfig": PropertyType(False, IS_DICT),
-        "FunctionName": PropertyType(True, IS_STR),
-        "MaximumEventAgeInSeconds": PropertyType(False, is_type(int)),
-        "MaximumRetryAttempts": PropertyType(False, is_type(int)),
-        "Qualifier": PropertyType(True, IS_STR),
+        "DestinationConfig": PassThroughProperty(False),
+        "FunctionName": PassThroughProperty(True),
+        "MaximumEventAgeInSeconds": PassThroughProperty(False),
+        "MaximumRetryAttempts": PassThroughProperty(False),
+        "Qualifier": PassThroughProperty(True),
     }
 
 
@@ -150,12 +149,12 @@ class LambdaLayerVersion(Resource):
 
     resource_type = "AWS::Lambda::LayerVersion"
     property_types = {
-        "Content": PropertyType(True, IS_DICT),
-        "Description": PropertyType(False, IS_STR),
-        "LayerName": PropertyType(False, IS_STR),
-        "CompatibleArchitectures": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
-        "CompatibleRuntimes": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
-        "LicenseInfo": PropertyType(False, IS_STR),
+        "Content": PassThroughProperty(True),
+        "Description": PassThroughProperty(False),
+        "LayerName": PassThroughProperty(False),
+        "CompatibleArchitectures": PassThroughProperty(False),
+        "CompatibleRuntimes": PassThroughProperty(False),
+        "LicenseInfo": PassThroughProperty(False),
     }
 
     Content: Dict[str, Any]
@@ -171,7 +170,7 @@ class LambdaLayerVersion(Resource):
 class LambdaUrl(Resource):
     resource_type = "AWS::Lambda::Url"
     property_types = {
-        "TargetFunctionArn": PropertyType(True, one_of(IS_STR, IS_DICT)),
-        "AuthType": PropertyType(True, IS_STR),
-        "Cors": PropertyType(False, IS_DICT),
+        "TargetFunctionArn": PassThroughProperty(True),
+        "AuthType": PassThroughProperty(True),
+        "Cors": PassThroughProperty(False),
     }
