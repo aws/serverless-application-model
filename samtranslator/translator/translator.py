@@ -328,16 +328,17 @@ class Translator:
 
             for connector_logical_id, connector_dict in resource["Connectors"].items():
                 try:
-                    connector_logical_id = source_logical_id + connector_logical_id
+                    full_connector_logical_id = source_logical_id + connector_logical_id
                     # can't use sam_expect since this is neither a property nor a resource attribute
                     if not isinstance(connector_dict, dict):
                         raise InvalidResourceException(
-                            connector_logical_id, f"{source_logical_id}.{connector_logical_id} should be a map."
+                            full_connector_logical_id,
+                            f"{source_logical_id}.{full_connector_logical_id} should be a map.",
                         )
 
                     generated_connector = self._get_generated_connector(
                         source_logical_id,
-                        connector_logical_id,
+                        full_connector_logical_id,
                         connector_dict,
                     )
 

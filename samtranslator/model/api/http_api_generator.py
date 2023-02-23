@@ -401,15 +401,13 @@ class HttpApiGenerator:
                 if re.search(invalid_regex, path) is not None:
                     raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
 
-                # ignore leading and trailing `/` in the path name
-                path = path.strip("/")
-
                 logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-_/]+", "", path), "ApiMapping")
                 basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)
                 basepath_mapping.DomainName = ref(api_domain_name)
                 basepath_mapping.ApiId = ref(http_api.logical_id)
                 basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
-                basepath_mapping.ApiMappingKey = path
+                # ignore leading and trailing `/` in the path name
+                basepath_mapping.ApiMappingKey = path.strip("/")
                 basepath_resource_list.extend([basepath_mapping])
         return basepath_resource_list
 
