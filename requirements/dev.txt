@@ -13,6 +13,7 @@ parameterized~=0.7
 # Integration tests
 dateparser~=1.1
 boto3>=1.23,<2
+tenacity~=8.0
 
 # Requirements for examples
 requests~=2.28
