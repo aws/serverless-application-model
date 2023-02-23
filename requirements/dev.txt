@@ -1,14 +1,14 @@
-coverage~=7.2
-pytest-cov~=4.0
-pytest-xdist~=3.2
-pytest-env~=0.8.1
-pytest-rerunfailures~=11.1
+coverage>=5.3,<8
+pytest-cov>=2.10,<5
+pytest-xdist>=2.5,<4
+pytest-env>=0.6,<1
+pytest-rerunfailures>=9.1,<12
 pyyaml~=6.0
 ruff==0.0.252  # loose the requirement once it is more stable
 
 # Test requirements
-pytest~=7.2
-parameterized~=0.8.1
+pytest>=6.2,<8
+parameterized~=0.7
 
 # Integration tests
 dateparser~=1.1
