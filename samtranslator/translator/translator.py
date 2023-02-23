@@ -344,7 +344,7 @@ class Translator:
 
                     if not verify_unique_logical_id(generated_connector, resources):
                         raise DuplicateLogicalIdException(
-                            source_logical_id, connector_logical_id, generated_connector.resource_type
+                            source_logical_id, full_connector_logical_id, generated_connector.resource_type
                         )
                     connectors.append(generated_connector)
                 except (InvalidResourceException, DuplicateLogicalIdException) as e:
