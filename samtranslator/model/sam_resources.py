@@ -1167,6 +1167,7 @@ class SamApi(SamResourceMacro):
         "Mode": PropertyType(False, IS_STR),
         "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
         "ApiKeySourceType": PropertyType(False, IS_STR),
+        "AlwaysDeploy": Property(False, is_type(bool)),
     }
 
     Name: Optional[Intrinsicable[str]]
@@ -1195,6 +1196,7 @@ class SamApi(SamResourceMacro):
     Mode: Optional[Intrinsicable[str]]
     DisableExecuteApiEndpoint: Optional[Intrinsicable[bool]]
     ApiKeySourceType: Optional[Intrinsicable[str]]
+    AlwaysDeploy: Optional[bool]
 
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
@@ -1225,8 +1227,13 @@ class SamApi(SamResourceMacro):
         template_conditions = kwargs.get("conditions")
         route53_record_set_groups = kwargs.get("route53_record_set_groups", {})
 
+        logical_id = self.logical_id
+        if self.AlwaysDeploy:
+            original_template = kwargs["original_template"]
+            logical_id = logical_id_generator.LogicalIdGenerator(self.logical_id, original_template).gen()
+
         api_generator = ApiGenerator(
-            self.logical_id,
+            logical_id,
             self.CacheClusterEnabled,
             self.CacheClusterSize,
             self.Variables,
