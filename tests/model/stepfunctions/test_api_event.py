@@ -75,6 +75,7 @@ class ApiEventSource(TestCase):
 
     def test_resources_to_link_with_undefined_explicit_api(self):
         resources = {}
+        self.api_event_source.relative_id = "event_id"
         self.api_event_source.RestApiId = {"Ref": "MyExplicitApi"}
         with self.assertRaises(InvalidEventException):
             self.api_event_source.resources_to_link(resources)
