@@ -32,9 +32,8 @@ DictStrAny = Dict[str, Any]
 
 LenientBaseModel = pydantic.BaseModel
 
-_packagedir = os.path.dirname(os.path.abspath(__package__))
-_docdir = os.path.join(_packagedir, "schema_source")
-_DOCS = json.loads(Path(_docdir, "docs.json").read_bytes())
+_docdir = os.path.dirname(os.path.abspath(__file__))
+_DOCS = json.loads(Path(_docdir, "sam-docs.json").read_bytes())
 
 
 def get_prop(stem: str) -> Any:
