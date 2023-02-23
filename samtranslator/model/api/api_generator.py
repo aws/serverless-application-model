@@ -172,6 +172,7 @@ class ApiGenerator:
         stage_name: Optional[Intrinsicable[str]],
         shared_api_usage_plan: Any,
         template_conditions: Any,
+        merge_definitions: Optional[bool] = None,
         tags: Optional[Dict[str, Any]] = None,
         endpoint_configuration: Optional[Dict[str, Any]] = None,
         method_settings: Optional[List[Any]] = None,
@@ -221,6 +222,7 @@ class ApiGenerator:
         self.depends_on = depends_on
         self.definition_body = definition_body
         self.definition_uri = definition_uri
+        self.merge_definitions = merge_definitions
         self.name = name
         self.stage_name = stage_name
         self.tags = tags
@@ -254,6 +256,7 @@ class ApiGenerator:
         :returns: the RestApi to which this SAM Api corresponds
         :rtype: model.apigateway.ApiGatewayRestApi
         """
+        self._validate_properties()
         rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         # NOTE: For backwards compatibility we need to retain BinaryMediaTypes on the CloudFormation Property
         # Removing this and only setting x-amazon-apigateway-binary-media-types results in other issues.
@@ -267,16 +270,6 @@ class ApiGenerator:
             # Since this region does not support EDGE configuration, we explicitly set the endpoint type
             # to Regional which is the only supported config.
             self._set_endpoint_configuration(rest_api, "REGIONAL")
-
-        if self.definition_uri and self.definition_body:
-            raise InvalidResourceException(
-                self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
-            )
-
-        if self.open_api_version and not SwaggerEditor.safe_compare_regex_with_string(
-            SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
-        ):
-            raise InvalidResourceException(self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'.")
 
         self._add_cors()
         self._add_auth()
@@ -310,6 +303,22 @@ class ApiGenerator:
             rest_api.ApiKeySourceType = self.api_key_source_type
 
         return rest_api
+
+    def _validate_properties(self) -> None:
+        if self.definition_uri and self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
+            )
+
+        if self.definition_uri and self.merge_definitions:
+            raise InvalidResourceException(
+                self.logical_id, "Cannot set 'MergeDefinitions' to True when using `DefinitionUri`."
+            )
+
+        if self.open_api_version and not SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
+        ):
+            raise InvalidResourceException(self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'.")
 
     def _add_endpoint_extension(self) -> None:
         """Add disableExecuteApiEndpoint if it is set in SAM
