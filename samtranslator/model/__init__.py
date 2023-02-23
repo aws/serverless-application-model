@@ -13,7 +13,6 @@ from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidResourceException,
     InvalidResourcePropertyTypeException,
-    InvalidTemplateException,
 )
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
@@ -230,9 +229,10 @@ class Resource(ABC):
         pattern = re.compile(r"^[A-Za-z0-9]+$")
         if isinstance(logical_id, str) and pattern.match(logical_id):
             return logical_id
-        # TODO: we should move this validation to where
-        # the logical ID is created to provide more actionable error messages.
-        raise InvalidTemplateException(f"Logical id ({logical_id}) must be alphanumeric")
+        # TODO: Doing validation in this class is kind of off,
+        # we need to surface this validation to where the template is loaded
+        # or the logical IDs are generated.
+        raise InvalidResourceException(str(logical_id), "Logical ids must be alphanumeric.")
 
     @classmethod
     def _validate_resource_dict(cls, logical_id, resource_dict):  # type: ignore[no-untyped-def]
