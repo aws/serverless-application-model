@@ -1925,12 +1925,10 @@
         "Statement": [
           {
             "Action": [
-              "ses:GetIdentityVerificationAttributes",
               "ses:SendEmail",
               "ses:SendRawEmail",
               "ses:SendTemplatedEmail",
-              "ses:SendBulkTemplatedEmail",
-              "ses:VerifyEmailIdentity"
+              "ses:SendBulkTemplatedEmail"
             ],
             "Effect": "Allow",
             "Resource": [
@@ -1955,6 +1953,14 @@
                 ]
               }
             ]
+          },
+          {
+            "Action": [
+              "ses:GetIdentityVerificationAttributes",
+              "ses:VerifyEmailIdentity"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
           }
         ]
       },
