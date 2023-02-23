@@ -11,5 +11,6 @@ include samtranslator/model/connector_profiles/profiles.json
 include samtranslator/internal/data/aws_managed_policies.json
 include README.md
 include THIRD_PARTY_LICENSES
+include samtranslator/internal/schema_source/sam-docs.json
 
 prune tests
