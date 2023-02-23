@@ -1,21 +1,20 @@
-from samtranslator.model import PropertyType, Resource
+from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
-from samtranslator.model.types import IS_DICT, IS_STR, dict_of, is_type, list_of, one_of
 
 
 class DynamoDBTable(Resource):
     resource_type = "AWS::DynamoDB::Table"
     property_types = {
-        "AttributeDefinitions": PropertyType(True, list_of(IS_DICT)),
-        "GlobalSecondaryIndexes": PropertyType(False, list_of(IS_DICT)),
-        "KeySchema": PropertyType(False, list_of(IS_DICT)),
-        "LocalSecondaryIndexes": PropertyType(False, list_of(IS_DICT)),
-        "ProvisionedThroughput": PropertyType(False, dict_of(IS_STR, one_of(is_type(int), IS_DICT))),
-        "StreamSpecification": PropertyType(False, IS_DICT),
-        "TableName": PropertyType(False, one_of(IS_STR, IS_DICT)),
-        "Tags": PropertyType(False, list_of(IS_DICT)),
-        "SSESpecification": PropertyType(False, IS_DICT),
-        "BillingMode": PropertyType(False, IS_STR),
+        "AttributeDefinitions": GeneratedProperty(),
+        "GlobalSecondaryIndexes": GeneratedProperty(),
+        "KeySchema": GeneratedProperty(),
+        "LocalSecondaryIndexes": GeneratedProperty(),
+        "ProvisionedThroughput": GeneratedProperty(),
+        "StreamSpecification": GeneratedProperty(),
+        "TableName": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+        "SSESpecification": GeneratedProperty(),
+        "BillingMode": GeneratedProperty(),
     }
 
     runtime_attrs = {

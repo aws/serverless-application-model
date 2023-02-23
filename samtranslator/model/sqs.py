@@ -1,8 +1,7 @@
 from typing import Dict
 
-from samtranslator.model import PropertyType, Resource
+from samtranslator.model import GeneratedProperty, PropertyType, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
-from samtranslator.model.types import IS_DICT, list_of
 
 
 class SQSQueue(Resource):
@@ -16,7 +15,10 @@ class SQSQueue(Resource):
 
 class SQSQueuePolicy(Resource):
     resource_type = "AWS::SQS::QueuePolicy"
-    property_types = {"PolicyDocument": PropertyType(True, IS_DICT), "Queues": PropertyType(True, list_of(str))}
+    property_types = {
+        "PolicyDocument": GeneratedProperty(),
+        "Queues": GeneratedProperty(),
+    }
     runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
 

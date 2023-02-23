@@ -1,26 +1,30 @@
-from samtranslator.model import PropertyType, Resource
+from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import ref
-from samtranslator.model.types import IS_DICT, IS_STR, list_of
 
 
 class SNSSubscription(Resource):
     resource_type = "AWS::SNS::Subscription"
     property_types = {
-        "Endpoint": PropertyType(True, IS_STR),
-        "Protocol": PropertyType(True, IS_STR),
-        "TopicArn": PropertyType(True, IS_STR),
-        "Region": PropertyType(False, IS_STR),
-        "FilterPolicy": PropertyType(False, IS_DICT),
-        "RedrivePolicy": PropertyType(False, IS_DICT),
+        "Endpoint": GeneratedProperty(),
+        "Protocol": GeneratedProperty(),
+        "TopicArn": GeneratedProperty(),
+        "Region": GeneratedProperty(),
+        "FilterPolicy": GeneratedProperty(),
+        "RedrivePolicy": GeneratedProperty(),
     }
 
 
 class SNSTopicPolicy(Resource):
     resource_type = "AWS::SNS::TopicPolicy"
-    property_types = {"PolicyDocument": PropertyType(True, IS_DICT), "Topics": PropertyType(True, list_of(str))}
+    property_types = {
+        "PolicyDocument": GeneratedProperty(),
+        "Topics": GeneratedProperty(),
+    }
 
 
 class SNSTopic(Resource):
     resource_type = "AWS::SNS::Topic"
-    property_types = {"TopicName": PropertyType(False, IS_STR)}
+    property_types = {
+        "TopicName": GeneratedProperty(),
+    }
     runtime_attrs = {"arn": lambda self: ref(self.logical_id)}
