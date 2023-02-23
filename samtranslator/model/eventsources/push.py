@@ -634,47 +634,49 @@ class Api(PushEventSource):
     RequestModel: Optional[Dict[str, Any]]
     RequestParameters: Optional[List[Any]]
 
-    def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
+    def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         """
         If this API Event Source refers to an explicit API resource, resolve the reference and grab
         necessary data from the explicit API
         """
+        return self.resources_to_link_for_rest_api(resources, self.relative_id, self.RestApiId)
 
+    @staticmethod
+    def resources_to_link_for_rest_api(
+        resources: Dict[str, Any], relative_id: str, raw_rest_api_id: Optional[Any]
+    ) -> Dict[str, Any]:
         # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
         # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
         # allow this stage to invoke the Lambda function. If we are unable to resolve the stage name, we will
         # simply permit all stages to invoke this Lambda function
         # This hack is necessary because customers could use !ImportValue, !Ref or other intrinsic functions which
         # can be sometimes impossible to resolve (ie. when it has cross-stack references)
-        permitted_stage = "*"
         stage_suffix = "AllStages"
-        explicit_api = None
-        rest_api_id = self.get_rest_api_id_string(self.RestApiId)
+        explicit_api_resource_properties = None
+        rest_api_id = Api.get_rest_api_id_string(raw_rest_api_id)
         if isinstance(rest_api_id, str):
-            if (
-                rest_api_id in resources
-                and "Properties" in resources[rest_api_id]
-                and "StageName" in resources[rest_api_id]["Properties"]
-            ):
-                explicit_api = resources[rest_api_id]["Properties"]
-                permitted_stage = explicit_api["StageName"]
+            rest_api_resource = sam_expect(
+                resources.get(rest_api_id), relative_id, "RestApiId", is_sam_event=True
+            ).to_be_a_map("RestApiId property of Api event must reference a valid resource in the same template.")
 
-                # Stage could be a intrinsic, in which case leave the suffix to default value
-                if isinstance(permitted_stage, str):
-                    if not permitted_stage:
-                        raise InvalidResourceException(rest_api_id, "StageName cannot be empty.")
-                    stage_suffix = permitted_stage
-                else:
-                    stage_suffix = "Stage"  # type: ignore[unreachable]
+            explicit_api_resource_properties = sam_expect(
+                rest_api_resource.get("Properties", {}), rest_api_id, "Properties", is_resource_attribute=True
+            ).to_be_a_map()
+            permitted_stage = explicit_api_resource_properties.get("StageName")
 
+            # Stage could be an intrinsic, in which case leave the suffix to default value
+            if isinstance(permitted_stage, str):
+                if not permitted_stage:
+                    raise InvalidResourceException(rest_api_id, "StageName cannot be empty.")
+                stage_suffix = permitted_stage
             else:
-                # RestApiId is a string, not an intrinsic, but we did not find a valid API resource for this ID
-                raise InvalidEventException(
-                    self.relative_id,
-                    "RestApiId property of Api event must reference a valid resource in the same template.",
-                )
+                stage_suffix = "Stage"
 
-        return {"explicit_api": explicit_api, "api_id": rest_api_id, "explicit_api_stage": {"suffix": stage_suffix}}
+        return {
+            "explicit_api": explicit_api_resource_properties,
+            "api_id": rest_api_id,
+            "explicit_api_stage": {"suffix": stage_suffix},
+        }
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
