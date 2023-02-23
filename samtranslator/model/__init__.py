@@ -9,7 +9,11 @@ from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
-from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
+from samtranslator.model.exceptions import (
+    ExpectedType,
+    InvalidResourceException,
+    InvalidResourcePropertyTypeException,
+)
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
@@ -121,7 +125,7 @@ class Resource(ABC):
 
     def __init__(
         self,
-        logical_id: str,
+        logical_id: Optional[Any],
         relative_id: Optional[str] = None,
         depends_on: Optional[List[str]] = None,
         attributes: Optional[Dict[str, Any]] = None,
@@ -134,8 +138,7 @@ class Resource(ABC):
         :param depends_on Value of DependsOn resource attribute
         :param attributes Dictionary of resource attributes and their values
         """
-        self._validate_logical_id(logical_id)  # type: ignore[no-untyped-call]
-        self.logical_id = logical_id
+        self.logical_id = self._validate_logical_id(logical_id)
         self.relative_id = relative_id
         self.depends_on = depends_on
 
@@ -214,8 +217,8 @@ class Resource(ABC):
         resource.validate_properties()
         return resource
 
-    @classmethod
-    def _validate_logical_id(cls, logical_id):  # type: ignore[no-untyped-def]
+    @staticmethod
+    def _validate_logical_id(logical_id: Optional[Any]) -> str:
         """Validates that the provided logical id is an alphanumeric string.
 
         :param str logical_id: the logical id to validate
@@ -224,9 +227,12 @@ class Resource(ABC):
         :raises TypeError: if the logical id is invalid
         """
         pattern = re.compile(r"^[A-Za-z0-9]+$")
-        if logical_id is not None and pattern.match(logical_id):
-            return True
-        raise InvalidResourceException(logical_id, "Logical ids must be alphanumeric.")
+        if isinstance(logical_id, str) and pattern.match(logical_id):
+            return logical_id
+        # TODO: Doing validation in this class is kind of off,
+        # we need to surface this validation to where the template is loaded
+        # or the logical IDs are generated.
+        raise InvalidResourceException(str(logical_id), "Logical ids must be alphanumeric.")
 
     @classmethod
     def _validate_resource_dict(cls, logical_id, resource_dict):  # type: ignore[no-untyped-def]
