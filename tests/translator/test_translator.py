@@ -664,50 +664,29 @@ class TestApiAlwaysDeploy(TestCase):
     AlwaysDeploy is used to force API Gateway to redeploy at every deployment.
     See https://github.com/aws/serverless-application-model/issues/660
 
-    Since it relies on the system time to generate the template, testing this way
-    so time.time() can be patched.
+    Since it relies on the system time to generate the template, need to patch
+    time.time() for deterministic tests.
     """
 
-    @parameterized.expand(
-        [
-            (PROJECT_ROOT.joinpath("tests/translator/input/translate_always_deploy.yaml"),),
-        ]
-    )
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_always_deploy(self, filepath):
-        obj = yaml_parse(filepath.read_text())
-        print(obj)
-        sam_template = {
-            "Resources": {
-                "MyApi": {
-                    "Type": "AWS::Serverless::Api",
-                    "Properties": {
-                        "StageName": "MyStage",
-                        "AlwaysDeploy": True,
-                    },
-                }
-            }
-        }
+    def test_always_deploy(self):
         with patch("time.time", lambda: 13.37):
-            cfn_template = Translator(None, Parser()).translate(
-                sam_template,
-                {},
-            )
+            path = "tests/translator/input/translate_always_deploy_time_13.37.yaml"
+            obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
+            cfn_template = Translator(None, Parser()).translate(obj, {})
             self.assertIn("MyApiDeployment5a1e8668b1", cfn_template["Resources"])
 
         with patch("time.time", lambda: 42.123):
-            cfn_template = Translator(None, Parser()).translate(
-                sam_template,
-                {},
-            )
+            path = "tests/translator/input/translate_always_deploy_time_42.123.yaml"
+            obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
+            cfn_template = Translator(None, Parser()).translate(obj, {})
             self.assertIn("MyApiDeployment84fc3726d4", cfn_template["Resources"])
 
         with patch("time.time", lambda: 42.1337):
-            cfn_template = Translator(None, Parser()).translate(
-                sam_template,
-                {},
-            )
+            path = "tests/translator/input/translate_always_deploy_time_42.123.yaml"
+            obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
+            cfn_template = Translator(None, Parser()).translate(obj, {})
             self.assertIn("MyApiDeployment84fc3726d4", cfn_template["Resources"])
 
 
