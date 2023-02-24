@@ -124,7 +124,8 @@ class ApiGatewayDeployment(Resource):
         if domain:
             hash_input.append(json.dumps(domain))
         if always_deploy:
-            hash_input.append(str(time.time()))
+            # Using int so tests are a little more robust; don't think the Python spec defines default precision
+            hash_input.append(str(int(time.time())))
         function_names = redeploy_restapi_parameters.get("function_names") if redeploy_restapi_parameters else None
         # The deployment logical id is <api logicalId> + "Deployment"
         # The keyword "Deployment" is removed and all the function names associated with api is obtained
