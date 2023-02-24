@@ -35,7 +35,7 @@ Resources:
           Type: MSK
           Properties:
             StartingPosition: LATEST
-            Stream: arn:aws:kafka:us-west-2:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            Stream: !Sub 'arn:${AWS::Partition}:kafka:us-west-2:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2'
             Topics:
             - MyDummyTestTopic
             FilterCriteria:
@@ -50,7 +50,7 @@ Resources:
             - Topic1
             SourceAccessConfigurations:
             - Type: SASL_SCRAM_512_AUTH
-              URI: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c
+              URI: !Sub 'arn:${AWS::Partition}:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c'
             - Type: VPC_SUBNET
               URI: subnet:subnet-12345
             - Type: VPC_SECURITY_GROUP
@@ -61,12 +61,12 @@ Resources:
         MyMQQueue:
           Type: MQ
           Properties:
-            Broker: arn:aws:mq:us-east-2:123456789012:broker:MyBroker:b-1234a5b6-78cd-901e-2fgh-3i45j6k178l9
+            Broker: !Sub 'arn:${AWS::Partition}:mq:us-east-2:123456789012:broker:MyBroker:b-1234a5b6-78cd-901e-2fgh-3i45j6k178l9'
             Queues:
             - Queue1
             SourceAccessConfigurations:
             - Type: BASIC_AUTH
-              URI: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c
+              URI: !Sub 'arn:${AWS::Partition}:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c'
             SecretsManagerKmsKeyId: 1abc23d4-567f-8ab9-cde0-1fab234c5d67
             FilterCriteria:
               Filters:
