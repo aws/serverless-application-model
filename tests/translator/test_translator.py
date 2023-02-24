@@ -3,8 +3,8 @@ import itertools
 import json
 import os.path
 import re
-from pathlib import Path
 from functools import cmp_to_key, reduce
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, Mock, patch
 
