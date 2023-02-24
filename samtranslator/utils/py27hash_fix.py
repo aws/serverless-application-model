@@ -406,12 +406,13 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         """
         for arg in args:
             # Cast to dict if applicable. Otherwise, assume it's an iterable of (key, value) pairs
+            _arg = arg
             if isinstance(arg, dict):
                 # Merge incoming keys into keylist
                 self.keylist.merge(arg.keys())  # type: ignore[no-untyped-call]
-                arg = arg.items()
+                _arg = arg.items()
 
-            for k, v in arg:
+            for k, v in _arg:
                 self[k] = v
 
         for k, v in dict(**kwargs).items():

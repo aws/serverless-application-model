@@ -78,8 +78,7 @@ class Hash:
         for y in value:
             length -= 1
 
-            y = Hash.hash(y)
-            x = (x ^ y) * mult
+            x = (x ^ Hash.hash(y)) * mult
             mult += 82520 + length + length
 
         x += 97531
