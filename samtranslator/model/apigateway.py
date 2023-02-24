@@ -1,4 +1,5 @@
 import json
+import time
 from re import match
 from typing import Any, Dict, List, Optional, Union
 
@@ -89,13 +90,14 @@ class ApiGatewayDeployment(Resource):
 
     runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}
 
-    def make_auto_deployable(
+    def make_auto_deployable(  # noqa: too-many-arguments
         self,
         stage: ApiGatewayStage,
         openapi_version: Optional[Union[Dict[str, Any], str]] = None,
         swagger: Optional[Dict[str, Any]] = None,
         domain: Optional[Dict[str, Any]] = None,
         redeploy_restapi_parameters: Optional[Any] = None,
+        always_deploy: Optional[bool] = False,
     ) -> None:
         """
         Sets up the resource such that it will trigger a re-deployment when Swagger changes
@@ -121,6 +123,8 @@ class ApiGatewayDeployment(Resource):
             hash_input.append(str(openapi_version))
         if domain:
             hash_input.append(json.dumps(domain))
+        if always_deploy:
+            hash_input.append(str(time.time()))
         function_names = redeploy_restapi_parameters.get("function_names") if redeploy_restapi_parameters else None
         # The deployment logical id is <api logicalId> + "Deployment"
         # The keyword "Deployment" is removed and all the function names associated with api is obtained

@@ -1227,13 +1227,8 @@ class SamApi(SamResourceMacro):
         template_conditions = kwargs.get("conditions")
         route53_record_set_groups = kwargs.get("route53_record_set_groups", {})
 
-        logical_id = self.logical_id
-        if self.AlwaysDeploy:
-            original_template = kwargs["original_template"]
-            logical_id = logical_id_generator.LogicalIdGenerator(self.logical_id, original_template).gen()
-
         api_generator = ApiGenerator(
-            logical_id,
+            self.logical_id,
             self.CacheClusterEnabled,
             self.CacheClusterSize,
             self.Variables,
@@ -1265,6 +1260,7 @@ class SamApi(SamResourceMacro):
             description=self.Description,
             mode=self.Mode,
             api_key_source_type=self.ApiKeySourceType,
+            always_deploy=self.AlwaysDeploy,
         )
 
         (
