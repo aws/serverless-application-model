@@ -672,19 +672,19 @@ class TestApiAlwaysDeploy(TestCase):
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_always_deploy(self):
         with patch("time.time", lambda: 13.37):
-            path = "tests/translator/input/translate_always_deploy_time_13.37.yaml"
+            path = "tests/translator/input/translate_always_deploy.yaml"
             obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
             cfn_template = Translator(None, Parser()).translate(obj, {})
             self.assertIn("MyApiDeployment5a1e8668b1", cfn_template["Resources"])
 
         with patch("time.time", lambda: 42.123):
-            path = "tests/translator/input/translate_always_deploy_time_42.123.yaml"
+            path = "tests/translator/input/translate_always_deploy.yaml"
             obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
             cfn_template = Translator(None, Parser()).translate(obj, {})
             self.assertIn("MyApiDeployment84fc3726d4", cfn_template["Resources"])
 
         with patch("time.time", lambda: 42.1337):
-            path = "tests/translator/input/translate_always_deploy_time_42.123.yaml"
+            path = "tests/translator/input/translate_always_deploy.yaml"
             obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
             cfn_template = Translator(None, Parser()).translate(obj, {})
             self.assertIn("MyApiDeployment84fc3726d4", cfn_template["Resources"])
