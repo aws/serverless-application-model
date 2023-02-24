@@ -1,0 +1,41 @@
+{
+  "Resources": {
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {},
+          "swagger": "2.0"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiDeployment2fa710971c": {
+      "Properties": {
+        "Description": "RestApi deployment id: 2fa710971cba32952dae53915bb424dec167e611",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiMyStageStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment2fa710971c"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "MyStage"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    }
+  }
+}

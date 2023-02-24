@@ -200,6 +200,7 @@ class Properties(BaseModel):
     Tags: Optional[DictStrAny] = properties("Tags")
     TracingEnabled: Optional[TracingEnabled] = properties("TracingEnabled")
     Variables: Optional[Variables] = properties("Variables")
+    AlwaysDeploy: Optional[bool]  # TODO: Add docs
 
 
 class Globals(BaseModel):
