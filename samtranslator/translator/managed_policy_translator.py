@@ -1,5 +1,7 @@
 import logging
-from typing import Dict, cast
+from typing import Dict, Optional, cast
+
+from botocore.client import BaseClient
 
 from samtranslator.metrics.method_decorator import cw_timer
 
@@ -7,13 +9,13 @@ LOG = logging.getLogger(__name__)
 
 
 class ManagedPolicyLoader:
-    def __init__(self, iam_client):  # type: ignore[no-untyped-def]
+    def __init__(self, iam_client: BaseClient) -> None:
         self._iam_client = iam_client
-        self._policy_map = None
+        self._policy_map: Optional[Dict[str, str]] = None
         self.max_items = 1000
 
     @cw_timer(prefix="External", name="IAM")
-    def _load_policies_from_iam(self):  # type: ignore[no-untyped-def]
+    def _load_policies_from_iam(self) -> None:
         LOG.info("Loading policies from IAM...")
 
         paginator = self._iam_client.get_paginator("list_policies")
@@ -23,7 +25,7 @@ class ManagedPolicyLoader:
         # Note(jfuss): boto3 PaginationConfig MaxItems does not control the number of items returned from the API
         # call. This is actually controlled by PageSize.
         page_iterator = paginator.paginate(Scope="AWS", PaginationConfig={"PageSize": self.max_items})
-        name_to_arn_map = {}  # type: ignore[var-annotated]
+        name_to_arn_map: Dict[str, str] = {}
 
         for page in page_iterator:
             name_to_arn_map.update(map(lambda x: (x["PolicyName"], x["Arn"]), page["Policies"]))
