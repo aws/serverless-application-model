@@ -1,19 +1,14 @@
 Resources:
   NotesTable:
-    Type: AWS::DynamoDB::Table
+    Type: AWS::Serverless::SimpleTable
     Properties:
-      TableName: notes-table
-      AttributeDefinitions:
-      - AttributeName: UserId
-        AttributeType: S
-      KeySchema:
-      - AttributeName: NoteId
-        KeyType: HASH
+      PrimaryKey:
+        Name: NoteId
+        Type: String
 
   DynamoDBRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: appsync-dynamodb-role
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
