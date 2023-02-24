@@ -3,6 +3,7 @@ import itertools
 import json
 import os.path
 import re
+from pathlib import Path
 from functools import cmp_to_key, reduce
 from unittest import TestCase
 from unittest.mock import MagicMock, Mock, patch
@@ -21,6 +22,7 @@ from samtranslator.yaml_helper import yaml_parse
 from tests.plugins.application.test_serverless_app_plugin import mock_get_region
 from tests.translator.helpers import get_template_parameter_values
 
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = BASE_PATH + "/input"
 OUTPUT_FOLDER = BASE_PATH + "/output"
@@ -666,9 +668,16 @@ class TestApiAlwaysDeploy(TestCase):
     so time.time() can be patched.
     """
 
+    @parameterized.expand(
+        [
+            (PROJECT_ROOT.joinpath("tests/translator/input/translate_always_deploy.yaml"),),
+        ]
+    )
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_always_deploy(self):
+    def test_always_deploy(self, filepath):
+        obj = yaml_parse(filepath.read_text())
+        print(obj)
         sam_template = {
             "Resources": {
                 "MyApi": {
