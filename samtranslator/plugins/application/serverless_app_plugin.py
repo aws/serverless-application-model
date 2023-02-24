@@ -2,9 +2,10 @@ import copy
 import json
 import logging
 from time import sleep
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import boto3
+from botocore.client import BaseClient
 from botocore.config import Config
 from botocore.exceptions import ClientError, EndpointConnectionError
 
@@ -50,7 +51,13 @@ class ServerlessAppPlugin(BasePlugin):
     LOCATION_KEY = "Location"
     TEMPLATE_URL_KEY = "TemplateUrl"
 
-    def __init__(self, sar_client=None, wait_for_template_active_status=False, validate_only=False, parameters=None):  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        sar_client: Optional[BaseClient] = None,
+        wait_for_template_active_status: bool = False,
+        validate_only: bool = False,
+        parameters: Optional[Dict[str, Any]] = None,
+    ):
         """
         Initialize the plugin.
 
@@ -62,9 +69,9 @@ class ServerlessAppPlugin(BasePlugin):
         super().__init__()
         if parameters is None:
             parameters = {}
-        self._applications = {}
-        self._in_progress_templates = []
-        self._sar_client = sar_client
+        self._applications: Dict[Tuple[str, str], Any] = {}
+        self._in_progress_templates: List[Tuple[str, str]] = []
+        self.__sar_client = sar_client
         self._wait_for_template_active_status = wait_for_template_active_status
         self._validate_only = validate_only
         self._parameters = parameters
@@ -74,6 +81,15 @@ class ServerlessAppPlugin(BasePlugin):
         if self._validate_only is True and self._wait_for_template_active_status is True:
             message = "Cannot set both validate_only and wait_for_template_active_status flags to True."
             raise InvalidPluginException(ServerlessAppPlugin.__name__, message)
+
+    @property
+    def _sar_client(self) -> BaseClient:
+        # Lazy initialization of the client- create it when it is needed
+        if not self.__sar_client:
+            # a SAR call could take a while to finish, leaving the read_timeout default (60s).
+            client_config = Config(connect_timeout=BOTO3_CONNECT_TIMEOUT)
+            self.__sar_client = boto3.client("serverlessrepo", config=client_config)
+        return self.__sar_client
 
     @staticmethod
     def _make_app_key(app_id: Any, semver: Any) -> Tuple[str, str]:
@@ -127,11 +143,6 @@ class ServerlessAppPlugin(BasePlugin):
                         raise InvalidResourceException(
                             logical_id, "Serverless Application Repository is not available in this region."
                         )
-                    # Lazy initialization of the client- create it when it is needed
-                    if not self._sar_client:
-                        # a SAR call could take a while to finish, leaving the read_timeout default (60s).
-                        client_config = Config(connect_timeout=BOTO3_CONNECT_TIMEOUT)
-                        self._sar_client = boto3.client("serverlessrepo", config=client_config)
                     self._make_service_call_with_retry(service_call, app_id, semver, key, logical_id)  # type: ignore[no-untyped-call]
                 except InvalidResourceException as e:
                     # Catch all InvalidResourceExceptions, raise those in the before_resource_transform target.
@@ -421,17 +432,17 @@ class ServerlessAppPlugin(BasePlugin):
         return resource_type == self.SUPPORTED_RESOURCE_TYPE
 
     def _get_application(self, app_id, semver):  # type: ignore[no-untyped-def]
-        return self._sar_client.get_application(
+        return self._sar_client.get_application(  # type: ignore[attr-defined]
             ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)  # type: ignore[no-untyped-call]
         )
 
     def _create_cfn_template(self, app_id, semver):  # type: ignore[no-untyped-def]
-        return self._sar_client.create_cloud_formation_template(
+        return self._sar_client.create_cloud_formation_template(  # type: ignore[attr-defined]
             ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)  # type: ignore[no-untyped-call]
         )
 
     def _get_cfn_template(self, app_id, template_id):  # type: ignore[no-untyped-def]
-        return self._sar_client.get_cloud_formation_template(
+        return self._sar_client.get_cloud_formation_template(  # type: ignore[attr-defined]
             ApplicationId=self._sanitize_sar_str_param(app_id),  # type: ignore[no-untyped-call]
             TemplateId=self._sanitize_sar_str_param(template_id),  # type: ignore[no-untyped-call]
         )

@@ -4,6 +4,7 @@ from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_valu
 from samtranslator.model.resource_policies import PolicyTypes, ResourcePolicies
 from samtranslator.plugins import BasePlugin
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
+from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 
 
 class PolicyTemplatesForResourcePlugin(BasePlugin):
@@ -17,7 +18,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
     _plugin_name = ""
     SUPPORTED_RESOURCE_TYPE = {"AWS::Serverless::Function", "AWS::Serverless::StateMachine"}
 
-    def __init__(self, policy_template_processor):  # type: ignore[no-untyped-def]
+    def __init__(self, policy_template_processor: PolicyTemplatesProcessor) -> None:
         """
         Initialize the plugin.
 

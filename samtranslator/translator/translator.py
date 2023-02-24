@@ -1,6 +1,8 @@
 import copy
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
+from boto3 import Session
+
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
     FeatureToggleDefaultConfigProvider,
@@ -16,6 +18,7 @@ from samtranslator.model.api.api_generator import SharedApiUsagePlan
 from samtranslator.model.eventsources.push import Api
 from samtranslator.model.exceptions import (
     DuplicateLogicalIdException,
+    ExceptionWithMessage,
     InvalidDocumentException,
     InvalidEventException,
     InvalidResourceException,
@@ -23,7 +26,8 @@ from samtranslator.model.exceptions import (
 )
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
 from samtranslator.model.sam_resources import SamConnector
-from samtranslator.plugins import LifeCycleEvents
+from samtranslator.parser.parser import Parser
+from samtranslator.plugins import BasePlugin, LifeCycleEvents
 from samtranslator.plugins.api.default_definition_body_plugin import DefaultDefinitionBodyPlugin
 from samtranslator.plugins.application.serverless_app_plugin import ServerlessAppPlugin
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
@@ -39,14 +43,14 @@ from samtranslator.validator.value_validator import sam_expect
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(  # type: ignore[no-untyped-def]
+    def __init__(
         self,
-        managed_policy_map,
-        sam_parser,
-        plugins=None,
-        boto_session=None,
-        metrics=None,
-    ):
+        managed_policy_map: Optional[Dict[str, str]],
+        sam_parser: Parser,
+        plugins: Optional[List[BasePlugin]] = None,
+        boto_session: Optional[Session] = None,
+        metrics: Optional[Metrics] = None,
+    ) -> None:
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -56,12 +60,11 @@ class Translator:
         self.managed_policy_map = managed_policy_map
         self.plugins = plugins
         self.sam_parser = sam_parser
-        self.feature_toggle = None
+        self.feature_toggle: Optional[FeatureToggle] = None
         self.boto_session = boto_session
-        self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())  # type: ignore[no-untyped-call, no-untyped-call]
+        self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
         MetricsMethodWrapperSingleton.set_instance(self.metrics)
-        self._translated_resouce_mapping = {}
-        self.document_errors = []
+        self.document_errors: List[ExceptionWithMessage] = []
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
@@ -100,7 +103,7 @@ class Translator:
     def translate(  # noqa: too-many-branches
         self,
         sam_template: Dict[str, Any],
-        parameter_values: Dict[Any, Any],
+        parameter_values: Dict[str, Any],
         feature_toggle: Optional[FeatureToggle] = None,
         passthrough_metadata: Optional[bool] = False,
         get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
@@ -119,16 +122,14 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
-        self.feature_toggle = (
-            feature_toggle
-            if feature_toggle
-            else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)  # type: ignore[no-untyped-call, no-untyped-call]
+        self.feature_toggle = feature_toggle or FeatureToggle(
+            FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None
         )
         self.function_names: Dict[Any, Any] = {}
         self.redeploy_restapi_parameters = {}
         sam_parameter_values = SamParameterValues(parameter_values)
         sam_parameter_values.add_default_parameter_values(sam_template)
-        sam_parameter_values.add_pseudo_parameter_values(self.boto_session)  # type: ignore[no-untyped-call]
+        sam_parameter_values.add_pseudo_parameter_values(self.boto_session)
         parameter_values = sam_parameter_values.parameter_values
         # Create & Install plugins
         sam_plugins = prepare_plugins(self.plugins, parameter_values)
@@ -389,7 +390,7 @@ class Translator:
         return SamConnector.from_dict(connector_logical_id, connector)
 
 
-def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:
+def prepare_plugins(plugins: Optional[List[BasePlugin]], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
     we will also install a few "required" plugins that are necessary to provide complete support for SAM template spec.
@@ -409,11 +410,11 @@ def prepare_plugins(plugins: List[Any], parameters: Optional[Dict[str, Any]] = N
         make_policy_template_for_function_plugin(),
     ]
 
-    plugins = plugins if plugins else []
+    plugins = plugins or []
 
     # If a ServerlessAppPlugin does not yet exist, create one and add to the beginning of the required plugins list.
     if not any(isinstance(plugin, ServerlessAppPlugin) for plugin in plugins):
-        required_plugins.insert(0, ServerlessAppPlugin(parameters=parameters))  # type: ignore[no-untyped-call]
+        required_plugins.insert(0, ServerlessAppPlugin(parameters=parameters))
 
     # Execute customer's plugins first before running SAM plugins. It is very important to retain this order because
     # other plugins will be dependent on this ordering.
@@ -448,4 +449,4 @@ def make_policy_template_for_function_plugin() -> PolicyTemplatesForResourcePlug
 
     policy_templates = PolicyTemplatesProcessor.get_default_policy_templates_json()
     processor = PolicyTemplatesProcessor(policy_templates)
-    return PolicyTemplatesForResourcePlugin(processor)  # type: ignore[no-untyped-call]
+    return PolicyTemplatesForResourcePlugin(processor)
