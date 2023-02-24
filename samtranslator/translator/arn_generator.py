@@ -30,7 +30,7 @@ def _region_to_partition(region: str) -> str:
 
 
 class ArnGenerator:
-    BOTO_SESSION_REGION_NAME = None
+    BOTO_SESSION_REGION_NAME: Optional[str] = None
 
     @classmethod
     def generate_arn(

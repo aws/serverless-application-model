@@ -96,8 +96,8 @@ def to_py27_compatible_template(  # noqa: too-many-branches
             parameter_values[key] = _convert_to_py27_type(val)  # type: ignore[no-untyped-call]
 
 
-def undo_mark_unicode_str_in_template(template_dict):  # type: ignore[no-untyped-def]
-    return json.loads(json.dumps(template_dict))
+def undo_mark_unicode_str_in_template(template_dict: Dict[str, Any]) -> Dict[str, Any]:
+    return cast(Dict[str, Any], json.loads(json.dumps(template_dict)))
 
 
 class Py27UniStr(unicode_string_type):
