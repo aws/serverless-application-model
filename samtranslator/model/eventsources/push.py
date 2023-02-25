@@ -25,6 +25,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
 
 CONDITION = "Condition"
@@ -705,7 +706,7 @@ class Api(PushEventSource):
 
         explicit_api = kwargs["explicit_api"]
         api_id = kwargs["api_id"]
-        if explicit_api.get("__MANAGE_SWAGGER"):
+        if explicit_api.get("__MANAGE_SWAGGER") or explicit_api.get("MergeDefinitions"):
             self._add_swagger_integration(explicit_api, api_id, function, intrinsics_resolver)  # type: ignore[no-untyped-call]
 
         return resources
@@ -757,8 +758,13 @@ class Api(PushEventSource):
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
         """
         swagger_body = api.get("DefinitionBody")
+        merge_definitions = api.get("MergeDefinitions")
         if swagger_body is None:
             return
+        if merge_definitions:
+            # Use a skeleton swagger body for API event source to make sure the generated definition body
+            # is unaffected by the inline/customer defined DefinitionBody
+            swagger_body = SwaggerEditor.gen_skeleton()
 
         partition = ArnGenerator.get_partition_name()
         uri = _build_apigw_integration_uri(function, partition)  # type: ignore[no-untyped-call]
@@ -921,7 +927,38 @@ class Api(PushEventSource):
                 path=self.Path, method_name=self.Method, request_parameters=parameters
             )
 
-        api["DefinitionBody"] = editor.swagger
+        if merge_definitions:
+            api["DefinitionBody"] = self._get_merged_definitions(api_id, api["DefinitionBody"], editor.swagger)
+        else:
+            api["DefinitionBody"] = editor.swagger
+
+    def _get_merged_definitions(
+        self, api_id: str, source_definition_body: Dict[str, Any], dest_definition_body: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Merge SAM generated swagger definition(dest_definition_body) into inline DefinitionBody(source_definition_body):
+        - for a conflicting key, use SAM generated value
+        - otherwise include key-value pairs from both definitions
+        """
+        merged_definition_body = source_definition_body.copy()
+        source_body_paths = merged_definition_body.get("paths", {})
+
+        try:
+            path_method_body = dict_deep_get(source_body_paths, [self.Path, self.Method]) or {}
+        except InvalidValueType as e:
+            raise InvalidResourceException(api_id, f"Property 'DefinitionBody' is invalid: {str(e)}") from e
+
+        sam_expect(path_method_body, api_id, f"DefinitionBody.paths.{self.Path}.{self.Method}").to_be_a_map()
+
+        generated_path_method_body = dest_definition_body["paths"][self.Path][self.Method]
+        # this guarantees that the merged definition use SAM generated value for a conflicting key
+        merged_path_method_body = {**path_method_body, **generated_path_method_body}
+
+        if self.Path not in source_body_paths:
+            source_body_paths[self.Path] = {self.Method: merged_path_method_body}
+        source_body_paths[self.Path][self.Method] = merged_path_method_body
+
+        return merged_definition_body
 
     @staticmethod
     def get_rest_api_id_string(rest_api_id: Any) -> Any:

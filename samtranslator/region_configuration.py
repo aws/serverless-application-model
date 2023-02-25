@@ -47,7 +47,7 @@ class RegionConfiguration:
             # need to handle when region is None so that it won't break
             if region is None:
                 if ArnGenerator.BOTO_SESSION_REGION_NAME is not None:
-                    region = ArnGenerator.BOTO_SESSION_REGION_NAME  # type: ignore[unreachable]
+                    region = ArnGenerator.BOTO_SESSION_REGION_NAME
                 else:
                     raise NoRegionFound("AWS Region cannot be found")
 
