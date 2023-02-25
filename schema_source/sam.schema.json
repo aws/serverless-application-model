@@ -3256,6 +3256,10 @@
           "title": "GatewayResponses",
           "type": "object"
         },
+        "MergeDefinitions": {
+          "title": "Mergedefinitions",
+          "type": "boolean"
+        },
         "MethodSettings": {
           "allOf": [
             {
@@ -3489,6 +3493,10 @@
           "markdownDescription": "Configures Gateway Responses for an API\\. Gateway Responses are responses returned by API Gateway, either directly or through the use of Lambda Authorizers\\. For more information, see the documentation for the [Api Gateway OpenApi extension for Gateway Responses](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-gateway-responses.html)\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "GatewayResponses",
           "type": "object"
+        },
+        "MergeDefinitions": {
+          "title": "Mergedefinitions",
+          "type": "boolean"
         },
         "MethodSettings": {
           "allOf": [
@@ -4122,17 +4130,23 @@
           "title": "RequestModel"
         },
         "RequestParameters": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "$ref": "#/definitions/RequestParameters"
-            }
-          ],
           "description": "Request parameters configuration for this specific Api\\+Path\\+Method\\. All parameter names must start with `method.request` and must be limited to `method.request.header`, `method.request.querystring`, or `method.request.path`\\.  \nIf a parameter is a string and not a Function Request Parameter Object, then `Required` and `Caching` will default to false\\.  \n*Type*: String \\| [RequestParameter](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-requestparameter.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/definitions/RequestParameters"
+                },
+                "type": "object"
+              }
+            ]
+          },
           "markdownDescription": "Request parameters configuration for this specific Api\\+Path\\+Method\\. All parameter names must start with `method.request` and must be limited to `method.request.header`, `method.request.querystring`, or `method.request.path`\\.  \nIf a parameter is a string and not a Function Request Parameter Object, then `Required` and `Caching` will default to false\\.  \n*Type*: String \\| [RequestParameter](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-requestparameter.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "RequestParameters"
+          "title": "RequestParameters",
+          "type": "array"
         },
         "RestApiId": {
           "anyOf": [

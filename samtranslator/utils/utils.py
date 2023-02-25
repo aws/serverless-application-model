@@ -1,5 +1,5 @@
 import copy
-from typing import Any, List, Optional, cast
+from typing import Any, List, Optional, Union, cast
 
 
 def as_array(x: Any) -> List[Any]:
@@ -31,7 +31,7 @@ class InvalidValueType(Exception):
             super().__init__("It should be a map")
 
 
-def dict_deep_get(d: Any, path: str) -> Optional[Any]:
+def dict_deep_get(d: Any, path: Union[str, List[str]]) -> Optional[Any]:
     """
     Get the value deep in the dict.
 
@@ -39,7 +39,7 @@ def dict_deep_get(d: Any, path: str) -> Optional[Any]:
     If any parent node exists but is not a dict, raise InvalidValueType.
     """
     relative_path = ""
-    _path_nodes = path.split(".")
+    _path_nodes = path.split(".") if isinstance(path, str) else path
     while _path_nodes:
         if d is None:
             return None

@@ -233,12 +233,17 @@ class RequestParameters(BaseModel):
     Required: Optional[bool] = requestparameters("Required")
 
 
+# TODO: docs says either str or RequestParameter but implementation is an array of str or RequestParameter
+# remove this comment once updated documentation
+RequestModelProperty = List[Union[str, Dict[str, RequestParameters]]]
+
+
 class ApiEventProperties(BaseModel):
     Auth: Optional[ApiAuth] = apieventproperties("Auth")
     Method: str = apieventproperties("Method")
     Path: str = apieventproperties("Path")
     RequestModel: Optional[RequestModel] = apieventproperties("RequestModel")
-    RequestParameters: Optional[Union[str, RequestParameters]] = apieventproperties("RequestParameters")
+    RequestParameters: Optional[RequestModelProperty] = apieventproperties("RequestParameters")
     RestApiId: Optional[Union[str, Ref]] = apieventproperties("RestApiId")
 
 

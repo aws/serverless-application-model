@@ -1,0 +1,72 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: Example
+          version: '1'
+        paths:
+          /test:
+            get:
+              parameters:
+              - name: proxy
+                in: path
+              x-amazon-apigateway-integration:
+                httpMethod: GET
+                type: aws_proxy
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+              security:
+                MyAuthorizer: []
+              responses:
+                '200':
+                  description: Success
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      required:
+                      - readoutId
+                      - status
+                      type: object
+      MergeDefinitions: true
+      Auth:
+        Authorizers:
+          MyAuthorizer:
+            UserPoolArn: !GetAtt MyCognitoUserPool.Arn
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Events:
+        MyEventV1:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /test
+            Method: get
+
+
+  MyCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MyCognitoUserPoolRandomName
