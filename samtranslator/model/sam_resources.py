@@ -1146,6 +1146,7 @@ class SamApi(SamResourceMacro):
         "Tags": PropertyType(False, IS_DICT),
         "DefinitionBody": PropertyType(False, IS_DICT),
         "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "MergeDefinitions": Property(False, is_type(bool)),
         "CacheClusterEnabled": PropertyType(False, is_type(bool)),
         "CacheClusterSize": PropertyType(False, IS_STR),
         "Variables": PropertyType(False, IS_DICT),
@@ -1174,6 +1175,7 @@ class SamApi(SamResourceMacro):
     Tags: Optional[Dict[str, Any]]
     DefinitionBody: Optional[Dict[str, Any]]
     DefinitionUri: Optional[Intrinsicable[str]]
+    MergeDefinitions: Optional[bool]
     CacheClusterEnabled: Optional[Intrinsicable[bool]]
     CacheClusterSize: Optional[Intrinsicable[str]]
     Variables: Optional[Dict[str, Any]]
@@ -1239,6 +1241,7 @@ class SamApi(SamResourceMacro):
             template_conditions,
             tags=self.Tags,
             endpoint_configuration=self.EndpointConfiguration,
+            merge_definitions=self.MergeDefinitions,
             method_settings=self.MethodSettings,
             binary_media=self.BinaryMediaTypes,
             minimum_compression_size=self.MinimumCompressionSize,
