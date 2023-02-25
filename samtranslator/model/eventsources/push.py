@@ -948,8 +948,7 @@ class Api(PushEventSource):
         except InvalidValueType as e:
             raise InvalidResourceException(api_id, f"Property 'DefinitionBody' is invalid: {str(e)}") from e
 
-        if not isinstance(path_method_body, dict):
-            raise InvalidResourceException(api_id, "Property 'DefinitionBody' is invalid")
+        sam_expect(path_method_body, api_id, f"DefinitionBody.paths.{self.Path}.{self.Method}").to_be_a_map()
 
         generated_path_method_body = dest_definition_body["paths"][self.Path][self.Method]
         # this guarantees that the merged definition use SAM generated value for a conflicting key
