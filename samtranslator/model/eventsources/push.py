@@ -928,12 +928,12 @@ class Api(PushEventSource):
             )
 
         if merge_definitions:
-            api["DefinitionBody"] = self._get_merged_definitions(api["DefinitionBody"], editor.swagger)
+            api["DefinitionBody"] = self._get_merged_definitions(api_id, api["DefinitionBody"], editor.swagger)
         else:
             api["DefinitionBody"] = editor.swagger
 
     def _get_merged_definitions(
-        self, source_definition_body: Dict[str, Any], dest_definition_body: Dict[str, Any]
+        self, api_id: str, source_definition_body: Dict[str, Any], dest_definition_body: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
         Merge SAM generated swagger definition(dest_definition_body) into inline DefinitionBody(source_definition_body):
@@ -946,7 +946,10 @@ class Api(PushEventSource):
         try:
             path_method_body = dict_deep_get(source_body_paths, [self.Path, self.Method]) or {}
         except InvalidValueType as e:
-            raise InvalidResourceException(self.logical_id, f"Property 'DefinitionBody' is invalid: {str(e)}") from e
+            raise InvalidResourceException(api_id, f"Property 'DefinitionBody' is invalid: {str(e)}") from e
+
+        if not isinstance(path_method_body, dict):
+            raise InvalidResourceException(api_id, "Property 'DefinitionBody' is invalid")
 
         generated_path_method_body = dest_definition_body["paths"][self.Path][self.Method]
         # this guarantees that the merged definition use SAM generated value for a conflicting key
