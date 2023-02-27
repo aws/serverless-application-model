@@ -148,9 +148,6 @@ Resources:
       - StepFunctionsExecutionPolicy:
           StateMachineName: name
 
-      - StepFunctionsExecutionPolicy_v2:
-          StateMachineName: name
-
       - CodeCommitCrudPolicy:
           RepositoryName: name
 
@@ -180,3 +177,6 @@ Resources:
 
       - SSMParameterWithSlashPrefixReadPolicy:
           ParameterName: /name
+
+      - StepFunctionsExecutionPolicy_v2:
+          StateMachineName: name
