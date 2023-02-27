@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional, cast
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
-from samtranslator.model.events import EventsRule
+from samtranslator.model.events import EventsRule, generate_valid_target_id
 from samtranslator.model.eventsources.push import Api as PushApi
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
@@ -16,6 +16,7 @@ from samtranslator.translator import logical_id_generator
 
 CONDITION = "Condition"
 SFN_EVETSOURCE_METRIC_PREFIX = "SFNEventSource"
+EVENT_RULE_SFN_TARGET_SUFFIX = "StepFunctionsTarget"
 
 
 class EventSource(ResourceMacro, metaclass=ABCMeta):
@@ -156,7 +157,9 @@ class Schedule(EventSource):
         :rtype: dict
         """
         target_id = (
-            self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "StepFunctionsTarget"
+            self.Target["Id"]
+            if self.Target and "Id" in self.Target
+            else generate_valid_target_id(self.logical_id, EVENT_RULE_SFN_TARGET_SUFFIX)
         )
         target = {
             "Arn": resource.get_runtime_attr("arn"),
@@ -249,7 +252,9 @@ class CloudWatchEvent(EventSource):
         :rtype: dict
         """
         target_id = (
-            self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "StepFunctionsTarget"
+            self.Target["Id"]
+            if self.Target and "Id" in self.Target
+            else generate_valid_target_id(self.logical_id, EVENT_RULE_SFN_TARGET_SUFFIX)
         )
         target = {
             "Arn": resource.get_runtime_attr("arn"),
