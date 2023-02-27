@@ -736,6 +736,61 @@ class TestTemplateValidation(TestCase):
         self.assertEqual(function_arn, expected_arn)
         self.assertEqual(sfn_arn, expected_arn)
 
+    # test to make sure with arn it doesnt load, with non-arn it does
+    @parameterized.expand(
+        [
+            ([""], 1),
+            (["SomeNonArnThing"], 1),
+            (["SomeNonArnThing", "AnotherNonArnThing"], 1),
+            (["aws:looks:like:an:ARN:but-not-really"], 1),
+            (["arn:looks:like:an:ARN:foo", "Mixing_things_v2"], 1),
+            (["arn:looks:like:an:ARN:foo"], 0),
+            ([{"Ref": "Foo"}], 0),
+            ([{"SQSPollerPolicy": {"QueueName": "Bar"}}], 0),
+            (["arn:looks:like:an:ARN", "arn:aws:ec2:us-east-1:123456789012:vpc/vpc-0e9801d129EXAMPLE"], 0),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_managed_policies_arn_not_loaded(self, policies, load_policy_count):
+        class ManagedPolicyLoader:
+            def __init__(self):
+                self.call_count = 0
+
+            def load(self):
+                self.call_count += 1
+                return {}
+
+        managed_policy_loader = ManagedPolicyLoader()
+
+        with patch("samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES", {}):
+            transform(
+                {
+                    "Resources": {
+                        "MyFunction": {
+                            "Type": "AWS::Serverless::Function",
+                            "Properties": {
+                                "Handler": "foo",
+                                "InlineCode": "bar",
+                                "Runtime": "nodejs14.x",
+                                "Policies": policies,
+                            },
+                        },
+                        "MyStateMachine": {
+                            "Type": "AWS::Serverless::StateMachine",
+                            "Properties": {
+                                "DefinitionUri": "s3://egg/baz",
+                                "Policies": policies,
+                            },
+                        },
+                    }
+                },
+                {},
+                managed_policy_loader,
+            )
+
+        self.assertEqual(load_policy_count, managed_policy_loader.call_count)
+
     @parameterized.expand(
         [
             # All combinations, bundled map takes precedence
