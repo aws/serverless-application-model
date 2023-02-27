@@ -367,25 +367,28 @@ class Translator:
         connector = copy.deepcopy(connector_dict)
         connector["Type"] = SamConnector.resource_type
 
-        # No need to raise an error for this instance as the error will be caught by the parser
-        if "Properties" in connector_dict and isinstance(connector_dict["Properties"], dict):
-            properties = connector["Properties"]
-            properties["Source"] = {"Id": source_logical_id}
-            if "SourceReference" in properties:
-                sam_expect(
-                    properties.get("SourceReference"),
-                    connector_logical_id,
-                    f"{connector_logical_id}.Properties.SourceReference",
-                ).to_be_a_map()
+        sam_expect(
+            connector_dict.get("Properties"),
+            connector_logical_id,
+            f"{connector_logical_id}.Properties",
+            is_resource_attribute=True,
+        ).to_be_a_map()
 
-                # can't allow user to override the Id using SourceReference
-                if "Id" in properties["SourceReference"]:
-                    raise InvalidResourceException(
-                        connector_logical_id, "'Id' shouldn't be defined in 'SourceReference'."
-                    )
+        properties = connector["Properties"]
+        properties["Source"] = {"Id": source_logical_id}
+        if "SourceReference" in properties:
+            sam_expect(
+                properties.get("SourceReference"),
+                connector_logical_id,
+                f"{connector_logical_id}.Properties.SourceReference",
+            ).to_be_a_map()
 
-                properties["Source"].update(properties["SourceReference"])
-                del properties["SourceReference"]
+            # can't allow user to override the Id using SourceReference
+            if "Id" in properties["SourceReference"]:
+                raise InvalidResourceException(connector_logical_id, "'Id' shouldn't be defined in 'SourceReference'.")
+
+            properties["Source"].update(properties["SourceReference"])
+            del properties["SourceReference"]
 
         return SamConnector.from_dict(connector_logical_id, connector)
 
