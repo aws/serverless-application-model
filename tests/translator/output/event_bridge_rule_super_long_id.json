@@ -1,0 +1,285 @@
+{
+  "Resources": {
+    "QueryForAvailabilityWithUserExceptionQueryForAvailabilityWiEvent": {
+      "Properties": {
+        "ScheduleExpression": "cron(05 12 * * ? *)",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "QueryForAvailabilityWithUserExceptionQueryForAvailabilityWithUserException",
+                "Arn"
+              ]
+            },
+            "Id": "QueryForAvailabilityWithUserExceptionQueryForAvailabLambdaTarget"
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "QueryForAvailabilityWithUserExceptionQueryForAvailabilityWithUserException": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n  return {\n    statusCode: 200,\n    body: 'Success'\n  }\n}\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "QueryForAvailabilityWithUserExceptionQueryForAvailabilityWithUserExceptionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "QueryForAvailabilityWithUserExceptionQueryForAvailabilityWithUserExceptionQueryForAvailabilityWithUserExceptionEventPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "QueryForAvailabilityWithUserExceptionQueryForAvailabilityWithUserException"
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "QueryForAvailabilityWithUserExceptionQueryForAvailabilityWiEvent",
+            "Arn"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "QueryForAvailabilityWithUserExceptionQueryForAvailabilityWithUserExceptionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ServerlessRestApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/startMyExecution": {
+              "post": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "SuperSuperSuperSuperLongNameForStepFunctionMyApiEventRole",
+                      "Arn"
+                    ]
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${SuperSuperSuperSuperLongNameForStepFunction}\"}"
+                    }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
+                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
+                }
+              }
+            }
+          },
+          "swagger": "2.0"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ServerlessRestApiDeploymentb7a8629302": {
+      "Properties": {
+        "Description": "RestApi deployment id: b7a86293027a9011b54502735b263ec03b6f17fd",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ServerlessRestApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeploymentb7a8629302"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "SuperSuperSuperSuperLongNameForStepFunction": {
+      "Properties": {
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "my-state-machine.asl.json",
+          "Version": 3
+        },
+        "RoleArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:iam::123456123456:role/service-role/SampleRole"
+        },
+        "StateMachineName": "MyStateMachine",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "SuperSuperSuperSuperLongNameForStepFunctionMyApiEventRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "SuperSuperSuperSuperLongNameForStepFunction"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "SuperSuperSuperSuperLongNameForStepFunctionMyApiEventRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperSuperSuperSuperLongNameForStepFunctionSuperSuperSuperSEvent": {
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "state": [
+              "terminated"
+            ]
+          }
+        },
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "SuperSuperSuperSuperLongNameForStepFunction"
+            },
+            "Id": "SuperSuperSuperSuperLongNameForStepFunctionSuStepFunctionsTarget",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "SuperSuperSuperSuperLongNameForStepFunctionSuperSuperSuperSuperLongNameForStepFunctionCWEventEventRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "SuperSuperSuperSuperLongNameForStepFunctionSuperSuperSuperSuperLongNameForStepFunctionCWEventEventRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "SuperSuperSuperSuperLongNameForStepFunction"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "SuperSuperSuperSuperLongNameForStepFunctionSuperSuperSuperSuperLongNameForStepFunctionCWEventEventRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
