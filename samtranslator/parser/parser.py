@@ -9,7 +9,6 @@ from samtranslator.model.exceptions import (
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.plugins.sam_plugins import SamPlugins
 from samtranslator.public.sdk.template import SamTemplate
-from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)
@@ -66,12 +65,3 @@ class Parser:
             raise ValueError("`parameter_values` argument is required")
 
         Parser.validate_datatypes(sam_template)  # type: ignore[no-untyped-call]
-
-        try:
-            validator = SamTemplateValidator()  # type: ignore[no-untyped-call]
-            validation_errors = validator.validate(sam_template)  # type: ignore[no-untyped-call]
-            if validation_errors:
-                LOG.warning("Template schema validation reported the following errors: %s", validation_errors)
-        except Exception as e:
-            # Catching any exception and not re-raising to make sure any validation process won't break transform
-            LOG.exception("Exception from SamTemplateValidator: %s", e)
