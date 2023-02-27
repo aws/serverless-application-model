@@ -1,9 +1,0 @@
-Transform: AWS::Serverless-2016-10-31
-Resources:
-  SuperCoolAPI:
-    Type: AWS::Serverless::GraphQLApi
-    Properties:
-      XrayEnabled: true
-      Tags:
-        Key1: Value1
-        Key2: Value2

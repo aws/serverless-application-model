@@ -1958,6 +1958,24 @@
       "title": "Location",
       "type": "object"
     },
+    "Logging": {
+      "additionalProperties": false,
+      "properties": {
+        "CloudWatchLogsRoleArn": {
+          "title": "Cloudwatchlogsrolearn",
+          "type": "string"
+        },
+        "ExcludeVerboseContent": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FieldLogLevel": {
+          "title": "Fieldloglevel",
+          "type": "string"
+        }
+      },
+      "title": "Logging",
+      "type": "object"
+    },
     "MQEvent": {
       "additionalProperties": false,
       "properties": {
@@ -5747,6 +5765,17 @@
       "properties": {
         "Auth": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
+        },
+        "Logging": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Logging"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Logging"
         },
         "Name": {
           "title": "Name",

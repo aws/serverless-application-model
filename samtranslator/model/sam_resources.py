@@ -16,6 +16,7 @@ from samtranslator.internal.model.appsync import (
     DynamoDBConfigType,
     GraphQLApi,
     GraphQLSchema,
+    LogConfigType,
 )
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
@@ -59,6 +60,7 @@ from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMManagedPolicy, IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import (
+    fnGetAtt,
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
@@ -2136,6 +2138,7 @@ class SamGraphQLApi(SamResourceMacro):
         "Auth": Property(True, IS_DICT),
         "SchemaInline": Property(False, IS_STR),
         "SchemaUri": Property(False, IS_STR),
+        "Logging": Property(False, one_of(IS_DICT, is_type(bool))),
     }
 
     Auth: Dict[str, Any]
@@ -2144,26 +2147,76 @@ class SamGraphQLApi(SamResourceMacro):
     Name: Optional[str]
     SchemaInline: Optional[str]
     SchemaUri: Optional[str]
+    Logging: Optional[Union[Dict[str, Any], bool]]
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
-        appsync_api = self._construct_appsync_api()
+        appsync_api, cloudwatch_role = self._construct_appsync_api_resources()
         appsync_schema = self._construct_appsync_schema(appsync_api.get_runtime_attr("api_id"))
+
         resources: List[Resource] = [appsync_api, appsync_schema]
+
+        if cloudwatch_role:
+            resources.append(cloudwatch_role)
 
         return resources
 
-    def _construct_appsync_api(self) -> GraphQLApi:
+    def _construct_appsync_api_resources(self) -> Tuple[GraphQLApi, Optional[IAMRole]]:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         api.AuthenticationType = sam_expect(self.Auth.get("Type"), self.logical_id, "Auth.Type").to_be_a_string()
         api.Name = self.Name if self.Name else self.logical_id
         api.XrayEnabled = self.XrayEnabled
 
+        cloudwatch_role = None  # conditionally generated, if left as None then its not added to resources
+
+        # Logging has 3 possible types: dict, bool, and None.
+        # GraphQLApi will not include logging if and only if the user explicity sets Logging as false boolean.
+        # It will for every other value (including true boolean which is essentially same as None).
+        if type(self.Logging) != bool or self.Logging is True:
+            api.LogConfig = self._parse_logging_properties()
+
+            # We create a CloudWatch role for the user if the Logging property is not a dictionary
+            # that contains the "CloudWatchLogsRoleArn" property.
+            if type(self.Logging) != dict or "CloudWatchLogsRoleArn" not in self.Logging:
+                cloudwatch_role = self._construct_cloudwatch_role()
+
         if self.Tags:
             api.Tags = get_tag_list(self.Tags)
 
-        return api
+        return api, cloudwatch_role
+
+    def _parse_logging_properties(self) -> LogConfigType:
+        log_config: LogConfigType = {}
+
+        if type(self.Logging) == dict and "CloudWatchLogsRoleArn" in self.Logging:
+            log_config["CloudWatchLogsRoleArn"] = self.Logging["CloudWatchLogsRoleArn"]
+        else:
+            log_config["CloudWatchLogsRoleArn"] = fnGetAtt(f"{self.logical_id}CloudWatchRole", "Arn")
+
+        if type(self.Logging) == dict and "ExcludeVerboseContent" in self.Logging:
+            log_config["ExcludeVerboseContent"] = self.Logging["ExcludeVerboseContent"]
+
+        if type(self.Logging) == dict and "FieldLogLevel" in self.Logging:
+            log_config["FieldLogLevel"] = self.Logging["FieldLogLevel"]
+        else:
+            log_config["FieldLogLevel"] = "ALL"
+
+        return log_config
+
+    def _construct_cloudwatch_role(self) -> IAMRole:
+        role = IAMRole(
+            logical_id=f"{self.logical_id}CloudWatchRole",
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
+        role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+            "appsync.amazonaws.com"
+        )
+        role.ManagedPolicyArns = [
+            f"arn:{ArnGenerator.get_partition_name()}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+        ]
+        return role
 
     def _construct_appsync_schema(self, api_id: Intrinsicable[str]) -> GraphQLSchema:
         schema = GraphQLSchema(

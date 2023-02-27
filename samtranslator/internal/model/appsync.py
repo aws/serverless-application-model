@@ -25,6 +25,12 @@ class DynamoDBConfigType(TypedDict, total=False):
     DeltaSyncConfig: DeltaSyncConfigType
 
 
+class LogConfigType(TypedDict, total=False):
+    CloudWatchLogsRoleArn: Intrinsicable[str]
+    ExcludeVerboseContent: bool
+    FieldLogLevel: str
+
+
 class GraphQLApi(Resource):
     resource_type = "AWS::AppSync::GraphQLApi"
     property_types = {
@@ -32,12 +38,14 @@ class GraphQLApi(Resource):
         "Tags": GeneratedProperty(),
         "XrayEnabled": GeneratedProperty(),
         "AuthenticationType": GeneratedProperty(),
+        "LogConfig": GeneratedProperty(),
     }
 
     Name: str
     AuthenticationType: str
     Tags: Optional[List[Dict[str, Any]]]
     XrayEnabled: Optional[bool]
+    LogConfig: Optional[LogConfigType]
 
     runtime_attrs = {"api_id": lambda self: fnGetAtt(self.logical_id, "ApiId")}
 
