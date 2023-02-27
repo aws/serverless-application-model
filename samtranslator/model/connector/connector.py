@@ -163,6 +163,8 @@ def _get_resource_role_property(
         return properties.get("Role")
     if resource_type == "AWS::StepFunctions::StateMachine":
         return properties.get("RoleArn")
+    if resource_type == "AWS::AppSync::DataSource":
+        return properties.get("ServiceRoleArn")
     if resource_type == "AWS::Events::Rule":
         for target in properties.get("Targets", []):
             target_arn = target.get("Arn")

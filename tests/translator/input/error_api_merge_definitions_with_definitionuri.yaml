@@ -1,0 +1,53 @@
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Bucket:
+    Type: String
+  SwaggerKey:
+    Type: String
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri:
+        Bucket:
+          Ref: Bucket
+        Key:
+          Ref: SwaggerKey
+      MergeDefinitions: true
+      Auth:
+        Authorizers:
+          MyAuthorizer:
+            UserPoolArn: !GetAtt MyCognitoUserPool.Arn
+
+          MyAuthorizer2:
+            UserPoolArn: !GetAtt MyCognitoUserPool2.Arn
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Events:
+        MyEventV1:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /test
+            Method: get
+            Auth:
+              Authorizer: MyAuthorizer
+
+  MyCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MyCognitoUserPoolRandomName

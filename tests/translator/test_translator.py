@@ -489,36 +489,6 @@ def test_transform_invalid_document(testcase):
     assert error_message == expected.get("errorMessage")
 
 
-@patch("boto3.session.Session.region_name", "ap-southeast-1")
-@patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-def test_transform_unhandled_failure_empty_managed_policy_map():
-    document = {
-        "Transform": "AWS::Serverless-2016-10-31",
-        "Resources": {
-            "Resource": {
-                "Type": "AWS::Serverless::Function",
-                "Properties": {
-                    "CodeUri": "s3://bucket/key",
-                    "Handler": "index.handler",
-                    "Runtime": "nodejs12.x",
-                    "Policies": "AmazonS3FullAccess",
-                },
-            }
-        },
-    }
-
-    parameter_values = get_template_parameter_values()
-    mock_policy_loader = MagicMock()
-    mock_policy_loader.load.return_value = {}
-
-    with pytest.raises(Exception) as e:
-        transform(document, parameter_values, mock_policy_loader)
-
-    error_message = str(e.value)
-
-    assert error_message == "Managed policy map is empty, but should not be."
-
-
 def assert_metric_call(mock, transform, transform_failure=0, invalid_document=0):
     metric_dimensions = [{"Name": "Transform", "Value": transform}]
 
@@ -688,6 +658,231 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
 
 class TestTemplateValidation(TestCase):
+    _MANAGED_POLICIES_TEMPLATE = {
+        "Resources": {
+            "MyFunction": {
+                "Type": "AWS::Serverless::Function",
+                "Properties": {
+                    "Runtime": "python3.8",
+                    "Handler": "foo",
+                    "InlineCode": "bar",
+                    "Policies": [
+                        "foo",
+                        "bar",
+                    ],
+                },
+            },
+            "MyStateMachine": {
+                "Type": "AWS::Serverless::StateMachine",
+                "Properties": {
+                    "DefinitionUri": "s3://foo/bar",
+                    "Policies": [
+                        "foo",
+                        "bar",
+                    ],
+                },
+            },
+        }
+    }
+
+    @parameterized.expand(
+        [
+            # All combinations, should use first that matches from left
+            ({"foo": "a1"}, {"foo": "a2"}, {"foo": "a3"}, "a1"),
+            (None, None, {"foo": "a3"}, "a3"),
+            (None, {"foo": "a2"}, None, "a2"),
+            ({"foo": "a1"}, {"foo": "a2"}, None, "a1"),
+            (None, None, {"foo": "a3"}, "a3"),
+            (None, {"foo": "a2"}, None, "a2"),
+            ({"foo": "a1"}, None, None, "a1"),
+            (None, None, None, "foo"),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_managed_policies_translator_translate(
+        self,
+        managed_policy_map,
+        bundled_managed_policy_map,
+        get_managed_policy_map_value,
+        expected_arn,
+    ):
+        """
+        Ensure expectd ARN is derived from managed policy name when transforming
+        with Translator.translate() (used in actual transform).
+
+        This tests the fallback logic, but in practice managed_policy_map and
+        get_managed_policy_map() are expected to be the same. They must both be
+        currently supported managed policies for the Policies property to work.
+        """
+
+        def get_managed_policy_map():
+            return get_managed_policy_map_value
+
+        with patch(
+            "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
+            {"aws": bundled_managed_policy_map},
+        ):
+            parameters = {}
+            cfn_template = Translator(managed_policy_map, Parser()).translate(
+                self._MANAGED_POLICIES_TEMPLATE,
+                parameters,
+                get_managed_policy_map=get_managed_policy_map,
+            )
+
+        function_arn = cfn_template["Resources"]["MyFunctionRole"]["Properties"]["ManagedPolicyArns"][1]
+        sfn_arn = cfn_template["Resources"]["MyStateMachineRole"]["Properties"]["ManagedPolicyArns"][0]
+
+        self.assertEqual(function_arn, expected_arn)
+        self.assertEqual(sfn_arn, expected_arn)
+
+    # test to make sure with arn it doesnt load, with non-arn it does
+    @parameterized.expand(
+        [
+            ([""], 1),
+            (["SomeNonArnThing"], 1),
+            (["SomeNonArnThing", "AnotherNonArnThing"], 1),
+            (["aws:looks:like:an:ARN:but-not-really"], 1),
+            (["arn:looks:like:an:ARN:foo", "Mixing_things_v2"], 1),
+            (["arn:looks:like:an:ARN:foo"], 0),
+            ([{"Ref": "Foo"}], 0),
+            ([{"SQSPollerPolicy": {"QueueName": "Bar"}}], 0),
+            (["arn:looks:like:an:ARN", "arn:aws:ec2:us-east-1:123456789012:vpc/vpc-0e9801d129EXAMPLE"], 0),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_managed_policies_arn_not_loaded(self, policies, load_policy_count):
+        class ManagedPolicyLoader:
+            def __init__(self):
+                self.call_count = 0
+
+            def load(self):
+                self.call_count += 1
+                return {}
+
+        managed_policy_loader = ManagedPolicyLoader()
+
+        with patch("samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES", {}):
+            transform(
+                {
+                    "Resources": {
+                        "MyFunction": {
+                            "Type": "AWS::Serverless::Function",
+                            "Properties": {
+                                "Handler": "foo",
+                                "InlineCode": "bar",
+                                "Runtime": "nodejs14.x",
+                                "Policies": policies,
+                            },
+                        },
+                        "MyStateMachine": {
+                            "Type": "AWS::Serverless::StateMachine",
+                            "Properties": {
+                                "DefinitionUri": "s3://egg/baz",
+                                "Policies": policies,
+                            },
+                        },
+                    }
+                },
+                {},
+                managed_policy_loader,
+            )
+
+        self.assertEqual(load_policy_count, managed_policy_loader.call_count)
+
+    @parameterized.expand(
+        [
+            # All combinations, bundled map takes precedence
+            ({"foo": "a1"}, {"foo": "a2"}, "a2"),
+            ({"foo": "a1"}, None, "a1"),
+            (None, {"foo": "a2"}, "a2"),
+            (None, None, "foo"),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_managed_policies_transform(
+        self,
+        managed_policy_map,
+        bundled_managed_policy_map,
+        expected_arn,
+    ):
+        """
+        Ensure expectd ARN is derived from managed policy name when transforming
+        with transform(). It calls Translator.translate() under the hood.
+        """
+
+        class ManagedPolicyLoader:
+            def load(self):
+                return managed_policy_map
+
+        with patch(
+            "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
+            {"aws": bundled_managed_policy_map},
+        ):
+            parameters = {}
+            cfn_template = transform(
+                self._MANAGED_POLICIES_TEMPLATE,
+                parameters,
+                ManagedPolicyLoader(),
+            )
+
+        function_arn = cfn_template["Resources"]["MyFunctionRole"]["Properties"]["ManagedPolicyArns"][1]
+        sfn_arn = cfn_template["Resources"]["MyStateMachineRole"]["Properties"]["ManagedPolicyArns"][0]
+
+        self.assertEqual(function_arn, expected_arn)
+        self.assertEqual(sfn_arn, expected_arn)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_managed_policies_transform_policies_loaded_once(self):
+        """
+        Ensure transform() calls the policy loader load() (i.e. IAM call) only once.
+        """
+
+        class ManagedPolicyLoader:
+            def __init__(self):
+                self.call_count = 0
+
+            def load(self):
+                self.call_count += 1
+                return {}
+
+        managed_policy_loader = ManagedPolicyLoader()
+
+        with patch("samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES", {}):
+            transform(
+                {
+                    "Resources": {
+                        "MyStateMachine1": {
+                            "Type": "AWS::Serverless::StateMachine",
+                            "Properties": {
+                                "DefinitionUri": "s3://foo/bar",
+                                "Policies": [
+                                    "foo",
+                                    "bar",
+                                ],
+                            },
+                        },
+                        "MyStateMachine2": {
+                            "Type": "AWS::Serverless::StateMachine",
+                            "Properties": {
+                                "DefinitionUri": "s3://egg/baz",
+                                "Policies": [
+                                    "egg",
+                                    "baz",
+                                ],
+                            },
+                        },
+                    }
+                },
+                {},
+                managed_policy_loader,
+            )
+
+        self.assertEqual(1, managed_policy_loader.call_count)
+
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_throws_when_resource_not_found(self):
@@ -736,10 +931,8 @@ class TestTemplateValidation(TestCase):
         with open(os.path.join(OUTPUT_FOLDER, "translate_convert_no_metadata.json"), "r") as f:
             expected = json.loads(f.read())
 
-        mock_policy_loader = get_policy_mock()
-
         sam_parser = Parser()
-        translator = Translator(mock_policy_loader, sam_parser)
+        translator = Translator(None, sam_parser)
         actual = translator.translate(template, {})
         self.assertEqual(expected, actual)
 
@@ -752,10 +945,8 @@ class TestTemplateValidation(TestCase):
         with open(os.path.join(OUTPUT_FOLDER, "translate_convert_metadata.json"), "r") as f:
             expected = json.loads(f.read())
 
-        mock_policy_loader = get_policy_mock()
-
         sam_parser = Parser()
-        translator = Translator(mock_policy_loader, sam_parser)
+        translator = Translator(None, sam_parser)
         actual = translator.translate(template, {}, passthrough_metadata=True)
         self.assertEqual(expected, actual)
 

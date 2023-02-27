@@ -35,6 +35,7 @@ SKIPPED_TESTS = [
     "api_with_aws_iam_auth_overrides",  # null for invokeRole
     "eventbridgerule",  # missing required field 'Patterns'
     "self_managed_kafka_with_intrinsics",  # 'EnableValue' is of type bool but defined as string
+    "documentdb_with_intrinsics",  # 'EnableValue' is of type bool but defined as string
     "api_with_resource_policy_global",  # 'ResourcePolicy CustomStatements' output expects a List
     "api_with_resource_policy",  # 'ResourcePolicy CustomStatements' output expects a List
     "api_with_if_conditional_with_resource_policy",  # 'ResourcePolicy CustomStatements' output expects a List
@@ -141,20 +142,20 @@ class TestValidateUnifiedSchema(TestCase):
         assert len(UNIFIED_SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]) > 1000
         assert (
             "The set of properties must conform to the defined `Type`"
-            in UNIFIED_SCHEMA["definitions"]["schema_source__aws_serverless_statemachine__ApiEvent"]["properties"][
-                "Properties"
-            ]["markdownDescription"]
+            in UNIFIED_SCHEMA["definitions"][
+                "samtranslator__internal__schema_source__aws_serverless_statemachine__ApiEvent"
+            ]["properties"]["Properties"]["markdownDescription"]
         )
 
         # Contains all definitions from SAM-only schema (except rule that ignores non-SAM)
         sam_defs = copy.deepcopy(SCHEMA["definitions"])
-        del sam_defs["schema_source__any_cfn_resource__Resource"]
+        del sam_defs["samtranslator__internal__schema_source__any_cfn_resource__Resource"]
         assert sam_defs.items() <= UNIFIED_SCHEMA["definitions"].items()
 
         # Contains all resources from SAM-only schema (except rule that ignores non-SAM)
         unified_resources = UNIFIED_SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]
         for v in SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]:
-            if v["$ref"] != "#/definitions/schema_source__any_cfn_resource__Resource":
+            if v["$ref"] != "#/definitions/samtranslator__internal__schema_source__any_cfn_resource__Resource":
                 assert v in unified_resources
 
     @parameterized.expand(

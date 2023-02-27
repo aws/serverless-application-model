@@ -1,0 +1,38 @@
+[
+  {
+    "LogicalResourceId": "NotesTable",
+    "ResourceType": "AWS::DynamoDB::Table"
+  },
+  {
+    "LogicalResourceId": "DynamoDBRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "AppSyncApi",
+    "ResourceType": "AWS::AppSync::GraphQLApi"
+  },
+  {
+    "LogicalResourceId": "ApiKey",
+    "ResourceType": "AWS::AppSync::ApiKey"
+  },
+  {
+    "LogicalResourceId": "ApiSchema",
+    "ResourceType": "AWS::AppSync::GraphQLSchema"
+  },
+  {
+    "LogicalResourceId": "NotesTableDataSource",
+    "ResourceType": "AWS::AppSync::DataSource"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "TriggerFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "DataSourceToTableConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  }
+]

@@ -1,14 +1,13 @@
-from samtranslator.model import PropertyType, Resource
+from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
-from samtranslator.model.types import IS_STR
 
 
 class SubscriptionFilter(Resource):
     resource_type = "AWS::Logs::SubscriptionFilter"
     property_types = {
-        "LogGroupName": PropertyType(True, IS_STR),
-        "FilterPattern": PropertyType(True, IS_STR),
-        "DestinationArn": PropertyType(True, IS_STR),
+        "LogGroupName": GeneratedProperty(),
+        "FilterPattern": GeneratedProperty(),
+        "DestinationArn": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
