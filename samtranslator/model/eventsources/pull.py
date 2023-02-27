@@ -362,7 +362,7 @@ class MQ(PullEventSource):
     DynamicPolicyName: Optional[bool]
 
     @property
-    def policy_name(self) -> str:
+    def _policy_name(self) -> str:
         """Generate policy name based on DynamicPolicyName flag and MQ logical ID.
 
         Policy name is required though its update is "No interuption".
@@ -443,7 +443,7 @@ class MQ(PullEventSource):
                 "No BASIC_AUTH property specified in SourceAccessConfigurations for Amazon MQ event.",
             )
         document = {
-            "PolicyName": self.policy_name,
+            "PolicyName": self._policy_name,
             "PolicyDocument": {
                 "Statement": [
                     {

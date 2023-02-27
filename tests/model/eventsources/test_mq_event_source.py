@@ -21,7 +21,7 @@ class MQEventSource(TestCase):
         policy_statements = self.mq_event_source.get_policy_statements()
         expected_policy_document = [
             {
-                "PolicyName": self.mq_event_source.policy_name,
+                "PolicyName": self.mq_event_source._policy_name,
                 "PolicyDocument": {
                     "Statement": [
                         {
@@ -68,7 +68,7 @@ class MQEventSource(TestCase):
         policy_statements = self.mq_event_source.get_policy_statements()
         expected_policy_document = [
             {
-                "PolicyName": self.mq_event_source.policy_name,
+                "PolicyName": self.mq_event_source._policy_name,
                 "PolicyDocument": {
                     "Statement": [
                         {
