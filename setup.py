@@ -72,7 +72,8 @@ setup(
     extras_require={"dev": read_requirements("dev.txt")},
     keywords="AWS SAM Serverless Application Model",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        # https://pypi.org/classifiers/
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Environment :: Other Environment",
         "Intended Audience :: Developers",
