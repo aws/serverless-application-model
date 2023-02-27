@@ -57,6 +57,7 @@ ignore_templates:
   - tests/translator/output/**/connector_sfn_to_function.json
   - tests/translator/output/**/connector_sns_to_function.json
   - tests/translator/output/**/connector_table_to_function.json
+  - tests/translator/output/**/documentdb_with_intrinsics.json  # TODO: remove once DocumentDDB is available
   - tests/translator/output/**/eventbridgerule_with_dlq.json
   - tests/translator/output/**/function_event_conditions.json
   - tests/translator/output/**/function_with_alias_and_code_sha256.json
@@ -77,6 +78,8 @@ ignore_templates:
   - tests/translator/output/**/function_with_deployment_preference_multiple_combinations_conditions_without_passthrough.json
   - tests/translator/output/**/function_with_deployment_preference_passthrough_condition_with_supported_intrinsics.json
   - tests/translator/output/**/function_with_dlq.json
+  - tests/translator/output/**/function_with_documentdb_with_kms.json  # TODO: remove once DocumentDDB is available
+  - tests/translator/output/**/function_with_documentdb.json  # TODO: remove once DocumentDDB is available
   - tests/translator/output/**/function_with_event_dest.json
   - tests/translator/output/**/function_with_event_dest_basic.json
   - tests/translator/output/**/function_with_event_dest_conditional.json

@@ -1,8 +1,8 @@
 from unittest.case import skipIf
 
+from integration.config.service_names import CODE_DEPLOY
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
-from integration.config.service_names import CODE_DEPLOY
 
 CODEDEPLOY_APPLICATION_LOGICAL_ID = "ServerlessDeploymentApplication"
 LAMBDA_FUNCTION_NAME = "MyLambdaFunction"

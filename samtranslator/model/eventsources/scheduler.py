@@ -3,14 +3,13 @@ from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, Resource, ResourceMacro
-from samtranslator.model.iam import IAMRole
+from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
+from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
+from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.iam import IAMRole, IAMRolePolicies
+from samtranslator.model.scheduler import SchedulerSchedule
 from samtranslator.model.sqs import SQSQueue
 from samtranslator.model.types import IS_DICT, IS_STR
-from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
-from samtranslator.model.exceptions import InvalidEventException
-from samtranslator.model.iam import IAMRolePolicies
-from samtranslator.model.scheduler import SchedulerSchedule
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 
 
@@ -74,7 +73,7 @@ class SchedulerEventSource(ResourceMacro):
 
     DEFAULT_FLEXIBLE_TIME_WINDOW = {"Mode": "OFF"}
 
-    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)  # type: ignore
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs: Dict[str, Any]) -> List[Resource]:
         """Returns the Scheduler Schedule and an IAM role.
 

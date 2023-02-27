@@ -1,5 +1,4 @@
 import yaml
-
 from samtranslator.yaml_helper import yaml_parse
 
 

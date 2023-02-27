@@ -1,11 +1,22 @@
 import json
 import logging
 import os
-import requests
 import shutil
 
 import botocore
 import pytest
+import requests
+from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.yaml_helper import yaml_parse
+from tenacity import (
+    after_log,
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+    wait_fixed,
+    wait_random,
+)
 
 from integration.config.logger_configurations import LoggingConfiguration
 from integration.helpers.client_provider import ClientProvider
@@ -17,22 +28,11 @@ from integration.helpers.resource import (
     current_region_does_not_support,
     detect_services,
     generate_suffix,
+    read_test_config_file,
     verify_stack_resources,
 )
 from integration.helpers.s3_uploader import S3Uploader
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
-from integration.helpers.resource import read_test_config_file
-from samtranslator.yaml_helper import yaml_parse
-
-from tenacity import (
-    retry,
-    stop_after_attempt,
-    wait_exponential,
-    wait_fixed,
-    retry_if_exception_type,
-    after_log,
-    wait_random,
-)
 
 try:
     from pathlib import Path
@@ -41,9 +41,9 @@ except ImportError:
 from unittest.case import TestCase
 
 import boto3
+
 from integration.helpers.deployer.deployer import Deployer
 from integration.helpers.template import transform_template
-
 
 LOG = logging.getLogger(__name__)
 
@@ -96,7 +96,7 @@ class BaseTest(TestCase):
         cls.code_dir = Path(cls.resources_dir, "code")
         cls.session = boto3.session.Session()
         cls.my_region = cls.session.region_name
-        cls.partition = cls.session.get_partition_for_region(cls.my_region)
+        cls.partition = ArnGenerator.get_partition_name(cls.my_region)
         cls.client_provider = ClientProvider()
         cls.file_to_s3_uri_map = read_test_config_file("file_to_s3_map_modified.json")
         cls.code_key_to_file = read_test_config_file("code_key_to_file_map.json")
@@ -118,7 +118,7 @@ class BaseTest(TestCase):
 
     @retry(
         stop=stop_after_attempt(5),
-        wait=wait_fixed(30),
+        wait=wait_fixed(30) + wait_random(0, 15),
         retry=retry_if_exception_type(Exception),
     )
     def tearDown(self):

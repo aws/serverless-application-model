@@ -1,20 +1,19 @@
-from parameterized import parameterized
 from unittest import TestCase
 
+from parameterized import parameterized
 from samtranslator.model.intrinsics import (
-    is_intrinsic,
-    make_shorthand,
-    is_intrinsic_if,
-    validate_intrinsic_if_items,
-    is_intrinsic_no_value,
     get_logical_id_from_intrinsic,
+    is_intrinsic,
+    is_intrinsic_if,
+    is_intrinsic_no_value,
+    make_shorthand,
+    validate_intrinsic_if_items,
 )
 
 
 class TestIntrinsics(TestCase):
     @parameterized.expand(["Ref", "Condition", "Fn::foo", "Fn::sub", "Fn::something"])
     def test_is_intrinsic_must_detect_intrinsics(self, intrinsic_name):
-
         input = {intrinsic_name: ["some value"]}
 
         self.assertTrue(is_intrinsic(input))

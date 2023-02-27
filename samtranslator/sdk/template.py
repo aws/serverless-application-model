@@ -31,7 +31,6 @@ class SamTemplate:
         if resource_types is None:
             resource_types = set()
         for logicalId, resource_dict in self.resources.items():
-
             resource = SamResource(resource_dict)
             needs_filter = resource.valid()
             if resource_types:
@@ -40,7 +39,9 @@ class SamTemplate:
             if needs_filter:
                 yield logicalId, resource
 
-    def set(self, logical_id: str, resource: Union[SamResource, Dict[str, Any]]) -> None:
+    def set(  # noqa: builtin-attribute-shadowing
+        self, logical_id: str, resource: Union[SamResource, Dict[str, Any]]
+    ) -> None:
         """
         Adds the resource to dictionary with given logical Id. It will overwrite, if the logical_id is already used.
 

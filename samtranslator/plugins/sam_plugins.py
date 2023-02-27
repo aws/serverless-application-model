@@ -1,6 +1,7 @@
 import logging
-from typing import Optional, Any, List, Union
-from samtranslator.model.exceptions import InvalidResourceException, InvalidDocumentException, InvalidTemplateException
+from typing import Any, List, Optional, Union
+
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, InvalidTemplateException
 from samtranslator.plugins import BasePlugin, LifeCycleEvents
 
 LOG = logging.getLogger(__name__)
@@ -122,7 +123,6 @@ class SamPlugins:
         method_name = "on_" + event.name
 
         for plugin in self._plugins:
-
             if not hasattr(plugin, method_name):
                 raise NameError(
                     "'{}' method is not found in the plugin with name '{}'".format(method_name, plugin.name)

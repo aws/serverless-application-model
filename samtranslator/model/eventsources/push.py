@@ -5,27 +5,25 @@ from typing import Any, Dict, List, Optional, Union, cast
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import ResourceMacro, PropertyType
+from samtranslator.model import PropertyType, ResourceMacro
+from samtranslator.model.cognito import CognitoUserPool
+from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
+from samtranslator.model.events import EventsRule
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import IS_DICT, is_type, list_of, dict_of, one_of, IS_STR
-from samtranslator.model.intrinsics import is_intrinsic, ref, fnGetAtt, fnSub, make_shorthand, make_conditional
-from samtranslator.model.tags.resource_tagging import get_tag_list
-
+from samtranslator.model.eventsources.pull import SQS
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidEventException, InvalidResourceException
+from samtranslator.model.intrinsics import fnGetAtt, fnSub, is_intrinsic, make_conditional, make_shorthand, ref
+from samtranslator.model.iot import IotTopicRule
+from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
-from samtranslator.model.lambda_ import LambdaPermission
-from samtranslator.model.events import EventsRule
-from samtranslator.model.eventsources.pull import SQS
-from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
-from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
-from samtranslator.model.iot import IotTopicRule
-from samtranslator.model.cognito import CognitoUserPool
-from samtranslator.schema.common import PassThrough
+from samtranslator.model.sqs import SQSQueue, SQSQueuePolicies, SQSQueuePolicy
+from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, dict_of, is_type, list_of, one_of
+from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException
-from samtranslator.swagger.swagger import SwaggerEditor
-from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.validator.value_validator import sam_expect
 
@@ -61,7 +59,7 @@ class PushEventSource(ResourceMacro, metaclass=ABCMeta):
     principal: str = None  # type: ignore
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
 
-    def _construct_permission(  # type: ignore[no-untyped-def]
+    def _construct_permission(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None
     ):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
@@ -441,7 +439,6 @@ class S3(PushEventSource):
 
         event_mappings = []
         for event_type in event_types:
-
             lambda_event = copy.deepcopy(base_event_mapping)
             lambda_event["Event"] = event_type
             if CONDITION in function.resource_attributes:
@@ -565,7 +562,7 @@ class SNS(PushEventSource):
         resources.append(subscription)
         return resources
 
-    def _inject_subscription(
+    def _inject_subscription(  # noqa: too-many-arguments
         self,
         protocol: str,
         endpoint: str,
@@ -600,7 +597,7 @@ class SNS(PushEventSource):
         )
         event_source.Queue = queue_arn
         event_source.BatchSize = batch_size or 10
-        event_source.Enabled = enabled or True
+        event_source.Enabled = True
         return event_source.to_cloudformation(function=function, role=role)
 
     def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, function, logical_id=None):  # type: ignore[no-untyped-def]
@@ -654,13 +651,11 @@ class Api(PushEventSource):
         explicit_api = None
         rest_api_id = self.get_rest_api_id_string(self.RestApiId)
         if isinstance(rest_api_id, str):
-
             if (
                 rest_api_id in resources
                 and "Properties" in resources[rest_api_id]
                 and "StageName" in resources[rest_api_id]["Properties"]
             ):
-
                 explicit_api = resources[rest_api_id]["Properties"]
                 permitted_stage = explicit_api["StageName"]
 
@@ -743,7 +738,7 @@ class Api(PushEventSource):
         api_id = self.RestApiId
 
         # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
-        resource = "${__ApiId__}/" + "${__Stage__}/" + method + path
+        resource = f"${{__ApiId__}}/${{__Stage__}}/{method}{path}"
         partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(
             ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
@@ -752,8 +747,9 @@ class Api(PushEventSource):
 
         return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)  # type: ignore[no-untyped-call]
 
-    def _add_swagger_integration(self, api, api_id, function, intrinsics_resolver):  # type: ignore[no-untyped-def]
-        # pylint: disable=duplicate-code
+    def _add_swagger_integration(  # type: ignore[no-untyped-def] # noqa: too-many-statements
+        self, api, api_id, function, intrinsics_resolver
+    ):
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
@@ -845,7 +841,6 @@ class Api(PushEventSource):
 
                 # Checking if any of the fields are defined as it can be false we are checking if the field are not None
                 if validate_body is not None or validate_parameters is not None:
-
                     # as we are setting two different fields we are here setting as default False
                     # In case one of them are not defined
                     validate_body = False if validate_body is None else validate_body
@@ -870,14 +865,11 @@ class Api(PushEventSource):
                     )
 
         if self.RequestParameters:
-
             default_value = {"Required": False, "Caching": False}
 
             parameters = []
             for parameter in self.RequestParameters:
-
                 if isinstance(parameter, dict):
-
                     parameter_name, parameter_value = next(iter(parameter.items()))
 
                     if not re.match(r"method\.request\.(querystring|path|header)\.", parameter_name):
@@ -889,7 +881,7 @@ class Api(PushEventSource):
                         )
 
                     if not isinstance(parameter_value, dict) or not all(
-                        key in REQUEST_PARAMETER_PROPERTIES for key in parameter_value.keys()
+                        key in REQUEST_PARAMETER_PROPERTIES for key in parameter_value
                     ):
                         raise InvalidEventException(
                             self.relative_id,
@@ -941,7 +933,7 @@ class Api(PushEventSource):
         return rest_api_id["Ref"] if isinstance(rest_api_id, dict) and "Ref" in rest_api_id else rest_api_id
 
     @staticmethod
-    def add_auth_to_swagger(
+    def add_auth_to_swagger(  # noqa: too-many-arguments
         event_auth: Dict[str, Any],
         api: Dict[str, Any],
         api_id: str,
@@ -1290,14 +1282,14 @@ class HttpApi(PushEventSource):
             # Case where default exists for this function, and so the permissions for that will apply here as well
             # This can save us several CFN resources (not duplicating permissions)
             return None
-        else:
-            path = OpenApiEditor.get_path_without_trailing_slash(path)  # type: ignore[no-untyped-call]
+        path = OpenApiEditor.get_path_without_trailing_slash(path)  # type: ignore[no-untyped-call]
 
         # Handle case where Method is already the ANY ApiGateway extension
-        if self._method.lower() == "any" or self._method.lower() == OpenApiEditor._X_ANY_METHOD:
-            method = "*"
-        else:
-            method = self._method.upper()
+        method = (
+            "*"
+            if self._method.lower() == "any" or self._method.lower() == OpenApiEditor._X_ANY_METHOD
+            else self._method.upper()
+        )
 
         api_id = self.ApiId
 

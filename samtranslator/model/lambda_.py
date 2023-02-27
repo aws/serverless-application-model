@@ -1,7 +1,8 @@
-from typing import Optional, Dict, Any, List, Union
-from samtranslator.model import PropertyType, Resource, PassThroughProperty
-from samtranslator.model.types import IS_DICT, is_type, one_of, IS_STR, list_of, any_type
+from typing import Any, Dict, List, Optional, Union
+
+from samtranslator.model import PassThroughProperty, PropertyType, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
+from samtranslator.model.types import IS_DICT, IS_STR, any_type, is_type, list_of, one_of
 from samtranslator.utils.types import Intrinsicable
 
 
@@ -94,6 +95,7 @@ class LambdaEventSourceMapping(Resource):
     resource_type = "AWS::Lambda::EventSourceMapping"
     property_types = {
         "BatchSize": PropertyType(False, is_type(int)),
+        "DocumentDBEventSourceConfig": PropertyType(False, IS_DICT),
         "Enabled": PropertyType(False, is_type(bool)),
         "EventSourceArn": PropertyType(False, IS_STR),
         "FunctionName": PropertyType(True, IS_STR),

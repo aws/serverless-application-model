@@ -5,8 +5,7 @@ from typing import Any, Dict, List, Optional
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.intrinsics import fnSub, ref
-from samtranslator.model.types import IS_DICT, IS_STR, is_type, list_of, one_of
-from samtranslator.schema.common import PassThrough
+from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type, list_of, one_of
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
@@ -114,10 +113,7 @@ class ApiGatewayDeployment(Resource):
             hash_input.append(str(openapi_version))
         if domain:
             hash_input.append(json.dumps(domain))
-        if redeploy_restapi_parameters:
-            function_names = redeploy_restapi_parameters.get("function_names")
-        else:
-            function_names = None
+        function_names = redeploy_restapi_parameters.get("function_names") if redeploy_restapi_parameters else None
         # The deployment logical id is <api logicalId> + "Deployment"
         # The keyword "Deployment" is removed and all the function names associated with api is obtained
         if function_names and function_names.get(self.logical_id[:-10], None):
@@ -142,7 +138,7 @@ class ApiGatewayResponse:
     ) -> None:
         if response_parameters:
             # response_parameters has been validated in ApiGenerator._add_gateway_responses()
-            for response_parameter_key in response_parameters.keys():
+            for response_parameter_key in response_parameters:
                 if response_parameter_key not in ApiGatewayResponse.ResponseParameterProperties:
                     raise InvalidResourceException(
                         api_logical_id, "Invalid gateway response parameter '{}'".format(response_parameter_key)
@@ -266,7 +262,7 @@ class ApiGatewayApiKey(Resource):
 class ApiGatewayAuthorizer:
     _VALID_FUNCTION_PAYLOAD_TYPES = [None, "TOKEN", "REQUEST"]
 
-    def __init__(  # type: ignore[no-untyped-def]
+    def __init__(  # type: ignore[no-untyped-def]# noqa: too-many-arguments
         self,
         api_logical_id=None,
         name=None,
@@ -392,7 +388,7 @@ class ApiGatewayAuthorizer:
     def _build_identity_source_item(item_prefix: str, prop_value: str) -> str:
         item = item_prefix + prop_value
         if isinstance(prop_value, Py27UniStr):
-            item = Py27UniStr(item)
+            return Py27UniStr(item)
         return item
 
     def _build_identity_source_item_array(self, prop_key: str, item_prefix: str) -> List[str]:
@@ -421,7 +417,7 @@ class ApiGatewayAuthorizer:
         identity_source = ", ".join(identity_source_array)
         if any(isinstance(i, Py27UniStr) for i in identity_source_array):
             # Convert identity_source to Py27UniStr if any part of it is Py27UniStr
-            identity_source = Py27UniStr(identity_source)
+            return Py27UniStr(identity_source)
 
         return identity_source
 

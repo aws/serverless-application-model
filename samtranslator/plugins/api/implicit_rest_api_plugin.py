@@ -1,8 +1,8 @@
 from typing import Any, Dict, Optional, Type
 
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
+from samtranslator.public.sdk.resource import SamResource, SamResourceType
 from samtranslator.public.swagger import SwaggerEditor
-from samtranslator.public.sdk.resource import SamResourceType, SamResource
 from samtranslator.sdk.template import SamTemplate
 from samtranslator.validator.value_validator import sam_expect
 
@@ -35,7 +35,7 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
     SERVERLESS_API_RESOURCE_TYPE = SamResourceType.Api.value
     EDITOR_CLASS = SwaggerEditor
 
-    def _process_api_events(
+    def _process_api_events(  # noqa: too-many-arguments
         self,
         function: SamResource,
         api_events: Dict[str, Dict[str, Any]],
@@ -55,7 +55,6 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
         """
 
         for event_id, event in api_events.items():
-
             event_properties = event.get("Properties", {})
             if not event_properties:
                 continue

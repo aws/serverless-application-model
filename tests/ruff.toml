@@ -1,0 +1,23 @@
+# black formatter takes care of the line length
+line-length = 999
+
+# The code quality of tests can be a bit lower compared to samtranslator
+select = [
+    "E",  # Pyflakes
+    "F",  # Pyflakes
+    "PL", # pylint
+    "I", # isort
+    "ICN", # flake8-import-conventions
+    "PIE", # flake8-pie
+    "Q", # flake8-quotes
+    "TID", # flake8-tidy-imports
+    "RUF", # Ruff-specific rules
+]
+
+[per-file-ignores]
+
+# The code quality of tests can be a bit lower:
+"**/*.py" = [
+    "S101", # Use of `assert` detected
+    "PLR", # pylint-refactor
+]

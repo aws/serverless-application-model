@@ -1,9 +1,9 @@
-from unittest.mock import Mock, patch
 from unittest import TestCase
+from unittest.mock import Mock, patch
 
-from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes, PolicyEntry
 from samtranslator.model.exceptions import InvalidTemplateException
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
+from samtranslator.model.resource_policies import PolicyEntry, PolicyTypes, ResourcePolicies
 
 
 class TestResourcePolicies(TestCase):

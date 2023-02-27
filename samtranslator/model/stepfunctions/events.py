@@ -3,17 +3,16 @@ from abc import ABCMeta
 from typing import Any, Dict, Optional, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import Property, PropertyType, ResourceMacro, Resource
-from samtranslator.model.events import EventsRule
-from samtranslator.model.iam import IAMRole, IAMRolePolicies
-from samtranslator.model.types import IS_DICT, IS_STR, is_type
-from samtranslator.model.intrinsics import fnSub
-from samtranslator.schema.common import PassThrough
-from samtranslator.translator import logical_id_generator
-from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
+from samtranslator.model.events import EventsRule
 from samtranslator.model.eventsources.push import Api as PushApi
+from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.iam import IAMRole, IAMRolePolicies
+from samtranslator.model.intrinsics import fnSub
+from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type
 from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.translator import logical_id_generator
 
 CONDITION = "Condition"
 SFN_EVETSOURCE_METRIC_PREFIX = "SFNEventSource"
@@ -46,11 +45,9 @@ class EventSource(ResourceMacro, metaclass=ABCMeta):
         if prefix is None:
             prefix = self.logical_id
         if suffix.isalnum():
-            logical_id = prefix + resource_type + suffix
-        else:
-            generator = logical_id_generator.LogicalIdGenerator(prefix + resource_type, suffix)
-            logical_id = generator.gen()
-        return logical_id
+            return prefix + resource_type + suffix
+        generator = logical_id_generator.LogicalIdGenerator(prefix + resource_type, suffix)
+        return generator.gen()
 
     def _construct_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):  # type: ignore[no-untyped-def]
         """Constructs the IAM Role resource allowing the event service to invoke
@@ -319,21 +316,16 @@ class Api(EventSource):
         explicit_api = None
         rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)
         if isinstance(rest_api_id, str):
-
             if (
                 rest_api_id in resources
                 and "Properties" in resources[rest_api_id]
                 and "StageName" in resources[rest_api_id]["Properties"]
             ):
-
                 explicit_api = resources[rest_api_id]["Properties"]
                 permitted_stage = explicit_api["StageName"]
 
                 # Stage could be a intrinsic, in which case leave the suffix to default value
-                if isinstance(permitted_stage, str):
-                    stage_suffix = permitted_stage
-                else:
-                    stage_suffix = "Stage"  # type: ignore[unreachable]
+                stage_suffix = permitted_stage if isinstance(permitted_stage, str) else "Stage"
 
             else:
                 # RestApiId is a string, not an intrinsic, but we did not find a valid API resource for this ID
@@ -441,7 +433,7 @@ class Api(EventSource):
         :returns: a body mapping request which passes the Api input to the state machine execution
         :rtype: dict
         """
-        request_templates = {
+        return {
             "application/json": fnSub(
                 json.dumps(
                     {
@@ -451,7 +443,6 @@ class Api(EventSource):
                 )
             )
         }
-        return request_templates
 
     def _generate_request_template_unescaped(self, resource: Resource) -> Dict[str, Any]:
         """Generates the Body mapping request template for the Api. This allows for the input
@@ -465,7 +456,7 @@ class Api(EventSource):
         :returns: a body mapping request which passes the Api input to the state machine execution
         :rtype: dict
         """
-        request_templates = {
+        return {
             "application/json": fnSub(
                 # Need to unescape single quotes escaped by escapeJavaScript.
                 # Also the mapping template isn't valid JSON, so can't use json.dumps().
@@ -475,4 +466,3 @@ class Api(EventSource):
                 + """}"}"""
             )
         }
-        return request_templates

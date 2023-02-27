@@ -1,19 +1,16 @@
 coverage~=5.3
-flake8~=3.8.4
-tox~=3.24
 pytest-cov~=2.10.1
 pytest-xdist~=2.5
 pytest-env~=0.6.2
 pytest-rerunfailures~=9.1.1
-pylint~=2.15.0
 pyyaml~=5.4
+ruff==0.0.244  # loose the requirement once it is more stable
 
 # Test requirements
 pytest~=6.2.5
 parameterized~=0.7.4
 
 # Integration tests
-click~=7.1
 dateparser~=0.7
 boto3>=1.23,<2
 tenacity~=7.0.0
@@ -21,17 +18,17 @@ tenacity~=7.0.0
 # Requirements for examples
 requests~=2.25.0
 
-# CLI requirements
-docopt~=0.6.2
-
 # formatter
-black==20.8b1
+black==23.1.0
 ruamel.yaml==0.17.21  # It can parse yaml while perserving comments
 
 # type check
-mypy==0.971
+mypy~=1.0.0
 
 # types
 boto3-stubs[appconfig,serverlessrepo]>=1.19.5,==1.*
 types-PyYAML~=5.4
 types-jsonschema~=3.2
+
+# schema generation, requiring features in >=1.10
+pydantic~=1.10

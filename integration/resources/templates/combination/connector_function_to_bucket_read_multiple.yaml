@@ -1,0 +1,57 @@
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  TriggerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          var head_params = {
+            Bucket: process.env.BUCKET,
+          };
+          var head_params_2 = {
+            Bucket: process.env.BUCKET2,
+          }
+          exports.handler = async (event) => {
+            console.log('REQUEST RECEIVED:', JSON.stringify(event));
+            var s3 = new AWS.S3();
+            await s3.headBucket(head_params).promise();
+            await s3.headBucket(head_params_2).promise();
+          };
+      Environment:
+        Variables:
+          BUCKET: !Ref Bucket
+          BUCKET2: !Ref Bucket2
+
+  Bucket:
+    Type: AWS::S3::Bucket
+
+  Bucket2:
+    Type: AWS::S3::Bucket
+
+  Connector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerFunction
+      Destination:
+      - Id: Bucket
+      - Id: Bucket2
+      Permissions:
+      - Read
+Metadata:
+  SamTransformTest: true

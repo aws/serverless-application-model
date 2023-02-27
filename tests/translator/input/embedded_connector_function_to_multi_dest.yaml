@@ -1,0 +1,25 @@
+Resources:
+  MyServerlessFunction:
+    Type: AWS::Serverless::Function
+    Connectors:
+      MixedDestConnector:
+        Properties:
+          Destination:
+          - Id: MyBucket
+          - Id: MyQueue
+          Permissions:
+          - Read
+          - Write
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+        };
+
+  MyBucket:
+    Type: AWS::S3::Bucket
+  MyQueue:
+    Type: AWS::SQS::Queue

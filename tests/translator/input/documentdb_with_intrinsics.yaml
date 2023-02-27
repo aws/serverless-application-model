@@ -1,0 +1,33 @@
+%YAML 1.1
+---
+Parameters:
+  BatchSizeValue:
+    Type: Number
+    Default: 100
+
+  EnableValue:
+    Type: String
+    Default: true
+
+Resources:
+  DocumentDBFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-app-test-156327056618/lambda-function.zip
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      Events:
+        MyDocumentDBEvent:
+          Type: DocumentDB
+          Properties:
+            Enabled:
+              Ref: EnableValue
+            BatchSize:
+              Ref: BatchSizeValue
+            Cluster: !Sub arn:${AWS::Partition}:rds:us-east-1:156327056618:cluster:docdb-2022-11-08-00-10-05r
+            SourceAccessConfigurations:
+            - Type: BASIC_AUTH
+              URI: !Sub arn:${AWS::Partition}:secretsmanager:us-east-1:156327056618:secret:abc-sy7Vjx
+            DatabaseName: db1
+            CollectionName: collection1
+            FullDocument: UpdateLookup

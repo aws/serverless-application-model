@@ -1,0 +1,80 @@
+Resources:
+  Queue:
+    Type: AWS::SQS::Queue
+
+  InvokedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          const sqs = new AWS.SQS();
+          await sqs.sendMessage({
+            QueueUrl: process.env.VERIFICATION_QUEUE_URL,
+            MessageBody: "test"
+          }).promise();
+        };
+      Environment:
+        Variables:
+          VERIFICATION_QUEUE_URL: !Ref VerificationQueue
+      Policies:
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
+
+  InvokedFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          const sqs = new AWS.SQS();
+          await sqs.sendMessage({
+            QueueUrl: process.env.VERIFICATION_QUEUE_URL,
+            MessageBody: "test"
+          }).promise();
+        };
+      Environment:
+        Variables:
+          VERIFICATION_QUEUE_URL: !Ref VerificationQueue
+      Policies:
+      - SQSSendMessagePolicy:
+          QueueName: !GetAtt VerificationQueue.QueueName
+
+  SQSEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !Ref InvokedFunction
+      EventSourceArn:
+        Fn::GetAtt:
+        - Queue
+        - Arn
+      BatchSize: 10
+
+  SQSEventSourceMapping2:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !Ref InvokedFunction2
+      EventSourceArn:
+        Fn::GetAtt:
+        - Queue
+        - Arn
+      BatchSize: 10
+
+  VerificationQueue:
+    Type: AWS::SQS::Queue
+
+  Connector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: Queue
+      Destination:
+      - Id: InvokedFunction
+      - Id: InvokedFunction2
+      Permissions:
+      - Read
+      - Write

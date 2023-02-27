@@ -1,13 +1,13 @@
-﻿import copy
+import copy
 import re
-from typing import Callable, Dict, Any, Optional, TypeVar
+from typing import Any, Callable, Dict, Optional, TypeVar
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigateway import ApiGatewayAuthorizer
-from samtranslator.model.intrinsics import ref, make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.model.intrinsics import fnSub, make_conditional, ref
+from samtranslator.model.types import PassThrough
 from samtranslator.open_api.base_editor import BaseEditor
-from samtranslator.schema.common import PassThrough
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.utils.utils import InvalidValueType, dict_deep_set
@@ -114,7 +114,7 @@ class SwaggerEditor(BaseEditor):
                     [InvalidTemplateException(f"Invalid OpenAPI definition: {str(ex)}.")]
                 ) from ex
 
-    def add_lambda_integration(
+    def add_lambda_integration(  # noqa: too-many-arguments
         self,
         path: str,
         method: str,
@@ -175,7 +175,7 @@ class SwaggerEditor(BaseEditor):
             if condition:
                 path_item[method] = make_conditional(condition, path_item[method])
 
-    def add_state_machine_integration(  # type: ignore[no-untyped-def]
+    def add_state_machine_integration(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self,
         path,
         method,
@@ -271,7 +271,7 @@ class SwaggerEditor(BaseEditor):
                     normalized_method_name = self._normalize_method_name(method_name)
                     yield normalized_method_name, method_definition
 
-    def add_cors(  # type: ignore[no-untyped-def]
+    def add_cors(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
         self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None, allow_credentials=None
     ):
         """
@@ -521,7 +521,7 @@ class SwaggerEditor(BaseEditor):
         if "api_key" not in self.security_definitions:
             self.security_definitions.update(api_key_security_definition)
 
-    def set_path_default_authorizer(
+    def set_path_default_authorizer(  # noqa: too-many-branches
         self,
         path: str,
         default_authorizer: str,
@@ -582,7 +582,7 @@ class SwaggerEditor(BaseEditor):
             # applied (Function Api Events first; then Api Resource) complicates it.
             # Check if Function/Path/Method specified 'NONE' for Authorizer
             for idx, security in enumerate(existing_non_authorizer_security):
-                is_none = any(key == "NONE" for key in security.keys())
+                is_none = any(key == "NONE" for key in security)
 
                 if is_none:
                     none_idx = idx
@@ -655,7 +655,7 @@ class SwaggerEditor(BaseEditor):
             # Check if Function/Path/Method specified 'False' for ApiKeyRequired
             apikeyfalse_idx = -1
             for idx, security in enumerate(existing_apikey_security):
-                is_none = any(key == "api_key_false" for key in security.keys())
+                is_none = any(key == "api_key_false" for key in security)
 
                 if is_none:
                     apikeyfalse_idx = idx
@@ -712,7 +712,6 @@ class SwaggerEditor(BaseEditor):
             authorizers = Py27Dict()
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
-
             security_dict = Py27Dict()
             security_dict[authorizer_name] = []
             authorizer_security = [security_dict]
@@ -755,7 +754,6 @@ class SwaggerEditor(BaseEditor):
         :param bool apikey_required: Whether the apikey security is required
         """
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
-
             if apikey_required:
                 # We want to enable apikey required security
                 security_dict = Py27Dict()
@@ -825,7 +823,6 @@ class SwaggerEditor(BaseEditor):
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
             if self._doc.get("swagger") is not None:
-
                 existing_parameters = method_definition.get("parameters", [])
 
                 # construct parameter as py27 dict
@@ -874,7 +871,6 @@ class SwaggerEditor(BaseEditor):
         self.definitions = self.definitions or Py27Dict()
 
         for model_name, schema in models.items():
-
             model_type = schema.get("type")
 
             if not model_type:
@@ -937,7 +933,7 @@ class SwaggerEditor(BaseEditor):
             "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
         }
         resource_list = self._get_method_path_uri_list(path, stage)  # type: ignore[no-untyped-call]
-        self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)  # type: ignore[no-untyped-call]
+        self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
 
         if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_whitelist):  # type: ignore[no-untyped-call]
             raise InvalidDocumentException(
@@ -953,7 +949,7 @@ class SwaggerEditor(BaseEditor):
             "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
             "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
         }
-        self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)  # type: ignore[no-untyped-call]
+        self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
@@ -1067,7 +1063,9 @@ class SwaggerEditor(BaseEditor):
                 statement.extend([deny_statement])
             self.resource_policy["Statement"] = statement
 
-    def _add_vpc_resource_policy_for_method(self, endpoint_dict, conditional, resource_list):  # type: ignore[no-untyped-def]
+    def _add_vpc_resource_policy_for_method(  # noqa: too-many-branches
+        self, endpoint_dict: Dict[str, Any], conditional: str, resource_list: PassThrough
+    ) -> None:
         """
         This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
@@ -1166,7 +1164,6 @@ class SwaggerEditor(BaseEditor):
             existing_parameters = method_definition.get("parameters", [])
 
             for request_parameter in request_parameters:
-
                 parameter_name = request_parameter["Name"]
                 location_name = parameter_name.replace("method.request.", "")
 
@@ -1203,7 +1200,7 @@ class SwaggerEditor(BaseEditor):
 
         # Make sure any changes to the paths are reflected back in output
         # iterate keys to make sure if "paths" is of Py27UniStr type, it won't be overriden as str
-        for key in self._doc.keys():
+        for key in self._doc:
             if key == "paths":
                 self._doc[key] = self.paths
 
@@ -1255,8 +1252,7 @@ class SwaggerEditor(BaseEditor):
 
     @staticmethod
     def get_openapi_versions_supported_regex() -> str:
-        openapi_version_supported_regex = r"\A[2-3](\.\d)(\.\d)?$"
-        return openapi_version_supported_regex
+        return r"\A[2-3](\.\d)(\.\d)?$"
 
     @staticmethod
     def get_path_without_trailing_slash(path):  # type: ignore[no-untyped-def]

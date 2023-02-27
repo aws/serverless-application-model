@@ -1,0 +1,173 @@
+{
+  "Conditions": {
+    "Cond": {
+      "Fn::Equals": [
+        {
+          "Ref": "Param"
+        },
+        "test1"
+      ]
+    }
+  },
+  "Parameters": {
+    "Param": {
+      "AllowedValues": [
+        "test1",
+        "test2"
+      ],
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "foo"
+        },
+        "Handler": "foo",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.9",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionMyConnectorPolicy": {
+      "Condition": "Cond",
+      "DeletionPolicy": "Retain",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyFunctionMyConnector": {
+            "Destination": {
+              "Type": "AWS::Serverless::Function"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        },
+        "foo": "bar"
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "lambda:InvokeAsync",
+                "lambda:InvokeFunction"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyOtherFunction",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyOtherFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "foo"
+        },
+        "Handler": "foo",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyOtherFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.9",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyOtherFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

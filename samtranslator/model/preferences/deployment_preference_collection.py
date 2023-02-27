@@ -1,23 +1,23 @@
-from typing import Any, Dict, Optional, cast, List, Union
+import copy
+from typing import Any, Dict, List, Optional, Union, cast
 
-from .deployment_preference import DeploymentPreference
-from samtranslator.model.codedeploy import CodeDeployApplication
-from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
+from samtranslator.model.codedeploy import CodeDeployApplication, CodeDeployDeploymentGroup
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.intrinsics import (
+    fnGetAtt,
     fnSub,
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
-    validate_intrinsic_if_items,
     make_combined_condition,
     ref,
-    fnGetAtt,
+    validate_intrinsic_if_items,
 )
 from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
-import copy
+
+from .deployment_preference import DeploymentPreference
 
 CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID = "CodeDeployServiceRole"
 CODEDEPLOY_APPLICATION_LOGICAL_ID = "ServerlessDeploymentApplication"
@@ -278,7 +278,7 @@ class DeploymentPreferenceCollection:
                 value[i] = self._replace_deployment_types(v)  # type: ignore[no-untyped-call]
             return value
         if is_intrinsic(value):
-            for (k, v) in value.items():
+            for k, v in value.items():
                 value[k] = self._replace_deployment_types(v, k)  # type: ignore[no-untyped-call]
             return value
         if value in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:

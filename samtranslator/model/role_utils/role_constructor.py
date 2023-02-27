@@ -1,10 +1,10 @@
-from samtranslator.model.iam import IAMRole
-from samtranslator.model.resource_policies import PolicyTypes
-from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.iam import IAMRole
+from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
+from samtranslator.model.resource_policies import PolicyTypes
 
 
-def construct_role_for_resource(  # type: ignore[no-untyped-def]
+def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
     resource_logical_id,
     attributes,
     managed_policy_map,
@@ -44,9 +44,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
 
     for index, policy_entry in enumerate(resource_policies.get()):
         if policy_entry.type is PolicyTypes.POLICY_STATEMENT:
-
             if is_intrinsic_if(policy_entry.data):
-
                 intrinsic_if = policy_entry.data
                 then_statement = intrinsic_if["Fn::If"][1]
                 else_statement = intrinsic_if["Fn::If"][2]
@@ -76,7 +74,6 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def]
                 )
 
         elif policy_entry.type is PolicyTypes.MANAGED_POLICY:
-
             # There are three options:
             #   Managed Policy Name (string): Try to convert to Managed Policy ARN
             #   Managed Policy Arn (string): Insert it directly into the list

@@ -1,0 +1,30 @@
+# black formatter takes care of the line length
+line-length = 999
+
+select = [
+    "E",  # Pyflakes
+    "F",  # Pyflakes
+    "PL", # pylint
+    "I", # isort
+    "B", # flake8-bugbear
+    "A", # flake8-builtins
+    "S", # flake8-bandit
+    "ISC", # flake8-implicit-str-concat
+    "ICN", # flake8-import-conventions
+    "PIE", # flake8-pie
+    "Q", # flake8-quotes
+    "RET", # flake8-return
+    "SIM", # flake8-simplify
+    "TID", # flake8-tidy-imports
+    "RUF", # Ruff-specific rules
+]
+
+# Mininal python version we support is 3.7
+target-version = "py37"
+
+[per-file-ignores]
+# python scripts in bin/ needs some python path configurations before import
+"bin/*.py" = ["E402"]  # E402: module-import-not-at-top-of-file
+
+[pylint]
+max-args = 6  # We have many functions reaching 6 args

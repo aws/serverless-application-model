@@ -1,10 +1,9 @@
 from collections import namedtuple
-from typing import Any, Dict, List, Optional, Iterable
+from typing import Any, Dict, Iterable, List, Optional
 
 from samtranslator.model import ResourceResolver
-from samtranslator.model.intrinsics import get_logical_id_from_intrinsic, ref, fnGetAtt
+from samtranslator.model.intrinsics import fnGetAtt, get_logical_id_from_intrinsic, ref
 from samtranslator.utils.utils import as_array, insert_unique
-
 
 # TODO: Switch to dataclass
 ConnectorResourceReference = namedtuple(
@@ -20,6 +19,8 @@ ConnectorResourceReference = namedtuple(
         "qualifier",
     ],
 )
+
+UNSUPPORTED_CONNECTOR_PROFILE_TYPE = "UNSUPPORTED_CONNECTOR_PROFILE_TYPE"
 
 
 class ConnectorResourceError(Exception):
@@ -83,7 +84,7 @@ def get_event_source_mappings(
 def _is_valid_resource_reference(obj: Dict[str, Any]) -> bool:
     id_provided = "Id" in obj
     # Every property in ResourceReference can be implied using 'Id', except for 'Qualifier', so users should be able to combine 'Id' and 'Qualifier'
-    non_id_provided = len([k for k in obj.keys() if k not in ["Id", "Qualifier"]]) > 0
+    non_id_provided = len([k for k in obj if k not in ["Id", "Qualifier"]]) > 0
     # Must provide Id (with optional Qualifier) or a supported combination of other properties.
     return id_provided != non_id_provided
 

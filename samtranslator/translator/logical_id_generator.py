@@ -4,7 +4,6 @@ from typing import Any, Optional
 
 
 class LogicalIdGenerator:
-
     # NOTE: Changing the length of the hash will change backwards compatibility. This will break the stability contract
     #       given by this class
     HASH_LENGTH = 10
@@ -63,7 +62,7 @@ class LogicalIdGenerator:
             return data_hash
 
         encoded_data_str = self.data_str.encode("utf-8")
-        data_hash = hashlib.sha1(encoded_data_str).hexdigest()
+        data_hash = hashlib.sha1(encoded_data_str).hexdigest()  # noqa: hashlib-insecure-hash-function
 
         return data_hash[:length]
 

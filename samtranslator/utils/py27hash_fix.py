@@ -1,16 +1,14 @@
 """
 """
 
-import ctypes
 import copy
+import ctypes
 import json
 import logging
-
-from typing import Any, Dict, Iterator, List, cast
+from typing import Any, Dict, Iterator, List, Optional, cast
 
 from samtranslator.parser.parser import Parser
 from samtranslator.third_party.py27hash.hash import Hash
-
 
 LOG = logging.getLogger(__name__)
 # Constants based on Python2.7 dictionary
@@ -22,7 +20,9 @@ unicode_string_type = str  # TODO: remove it, python 2 legacy code
 long_int_type = int  # TODO: remove it, python 2 legacy code
 
 
-def to_py27_compatible_template(template, parameter_values=None):  # type: ignore[no-untyped-def]
+def to_py27_compatible_template(  # noqa: too-many-branches
+    template: Dict[str, Any], parameter_values: Optional[Dict[str, Any]] = None
+) -> None:
     """
     Convert an input template to a py27hash-compatible template. This function has to be run before any
     manipulation occurs for sake of keeping the same initial state. This function modifies the input template,
@@ -129,8 +129,8 @@ class Py27UniStr(unicode_string_type):
     def __deepcopy__(self, memo):  # type: ignore[no-untyped-def]
         return self  # strings are immutable
 
-    def _get_py27_hash(self):  # type: ignore[no-untyped-def]
-        h = getattr(self, "_py27_hash", None)
+    def _get_py27_hash(self) -> int:
+        h: Optional[int] = getattr(self, "_py27_hash", None)
         if h is None:
             self._py27_hash = h = ctypes.c_size_t(Hash.hash(self)).value
         return h
@@ -165,6 +165,7 @@ class Py27Keys:
     # marker for deleted keys
     # we use DUMMY for a dummy key, force it to be treated as a str to avoid mypy unhappy
     DUMMY: str = cast(str, ["dummy"])
+    _LARGE_DICT_SIZE_THRESHOLD = 50000
 
     def __init__(self) -> None:
         super().__init__()
@@ -178,7 +179,7 @@ class Py27Keys:
         # add keys in the py2 order -- we can't do a straigh-up deep copy of keyorder because
         # in py2 copy.deepcopy of a dict may result in reordering of the keys
         ret = Py27Keys()
-        for k in self.keys():
+        for k in self:
             if k is self.DUMMY:
                 continue
             ret.add(copy.deepcopy(k, memo))  # type: ignore[no-untyped-call]
@@ -188,11 +189,7 @@ class Py27Keys:
         """Gets insert location for k"""
 
         # Py27UniStr caches the hash to improve performance so use its method instead of always computing the hash
-        if isinstance(k, Py27UniStr):
-            h = k._get_py27_hash()  # type: ignore[no-untyped-call]
-        else:
-            h = ctypes.c_size_t(Hash.hash(k)).value
-
+        h = k._get_py27_hash() if isinstance(k, Py27UniStr) else ctypes.c_size_t(Hash.hash(k)).value
         i = h & self.mask
 
         if i not in self.keyorder or self.keyorder[i] == k:
@@ -241,10 +238,9 @@ class Py27Keys:
     def remove(self, key):  # type: ignore[no-untyped-def]
         """Removes key"""
         i = self._get_key_idx(key)  # type: ignore[no-untyped-call]
-        if i in self.keyorder:
-            if self.keyorder[i] is not self.DUMMY:
-                self.keyorder[i] = self.DUMMY
-                self.size -= 1
+        if i in self.keyorder and self.keyorder[i] is not self.DUMMY:
+            self.keyorder[i] = self.DUMMY
+            self.size -= 1
 
     def add(self, key):  # type: ignore[no-untyped-def]
         """Adds key"""
@@ -264,7 +260,7 @@ class Py27Keys:
         # Resize if 2/3 capacity
         if self.size > start_size and self.fill * 3 >= ((self.mask + 1) * 2):
             # Python2 dict increases size by a factor of 4 for small dict, and 2 for large dict
-            self._resize(self.size * (2 if self.size > 50000 else 4))  # type: ignore[no-untyped-call]
+            self._resize(self.size * (2 if self.size > self._LARGE_DICT_SIZE_THRESHOLD else 4))  # type: ignore[no-untyped-call]
 
     def keys(self) -> List[str]:
         """Return keys in Python2 order"""
@@ -374,7 +370,6 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         """
         Method necessary to fully pickle Python 3 subclassed dict objects with attribute fields.
         """
-        # pylint: disable = W0235
         return super().__reduce__()
 
     def __setitem__(self, key, value):  # type: ignore[no-untyped-def]
@@ -552,8 +547,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         list
             list of values
         """
-        # pylint: disable=consider-using-dict-items
-        return [self[k] for k in self.keys()]  # type: ignore[no-untyped-call]
+        return [self[k] for k in self]
 
     def items(self):  # type: ignore[no-untyped-def]
         """
@@ -564,8 +558,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         list
             list of items
         """
-        # pylint: disable=consider-using-dict-items
-        return [(k, self[k]) for k in self.keys()]  # type: ignore[no-untyped-call]
+        return [(k, self[k]) for k in self]
 
     def setdefault(self, key, default):  # type: ignore[no-untyped-def]
         """

@@ -1,8 +1,8 @@
 from typing import Any, Dict, Optional
 
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import IS_DICT, IS_STR
 from samtranslator.model.intrinsics import fnGetAtt
+from samtranslator.model.types import IS_DICT, IS_STR
 
 
 class SchedulerSchedule(Resource):

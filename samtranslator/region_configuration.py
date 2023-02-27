@@ -52,6 +52,6 @@ class RegionConfiguration:
                     raise NoRegionFound("AWS Region cannot be found")
 
         # check if the service is available in region
-        partition = session.get_partition_for_region(region)
+        partition = ArnGenerator.get_partition_name(region)
         available_regions = session.get_available_regions(service, partition_name=partition)
         return region in available_regions

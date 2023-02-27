@@ -1,13 +1,12 @@
+import json
 from unittest import TestCase
-from unittest.mock import mock_open, Mock, patch
+from unittest.mock import Mock, mock_open, patch
 
 import jsonschema
-import json
-
 from jsonschema.exceptions import ValidationError
+from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.policy_template_processor.template import Template
-from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
 
 
 class TestPolicyTemplateProcessor(TestCase):
@@ -219,7 +218,6 @@ class TestPolicyTemplateProcessor(TestCase):
 
         open_mock = mock_open()
         with patch("samtranslator.policy_template_processor.processor.open", open_mock):
-
             result = PolicyTemplatesProcessor._read_json(filepath)
             self.assertEqual(result, json_return)
 

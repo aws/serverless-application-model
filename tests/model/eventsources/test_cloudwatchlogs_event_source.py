@@ -1,5 +1,6 @@
-from unittest.mock import Mock, patch
 from unittest import TestCase
+from unittest.mock import Mock, patch
+
 from samtranslator.model.eventsources.cloudwatchlogs import CloudWatchLogs
 
 

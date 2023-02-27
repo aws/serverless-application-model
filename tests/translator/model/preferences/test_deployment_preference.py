@@ -19,7 +19,6 @@ class TestDeploymentPreference(TestCase):
         self.condition = "condition"
 
     def test_from_dict_with_intrinsic_function_type(self):
-
         type = {"Ref": "SomeType"}
         expected_deployment_preference = DeploymentPreference(
             type,

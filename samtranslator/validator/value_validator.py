@@ -4,9 +4,9 @@ from typing import Any, Dict, Generic, Optional, TypeVar, cast
 from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidEventException,
+    InvalidResourceAttributeTypeException,
     InvalidResourceException,
     InvalidResourcePropertyTypeException,
-    InvalidResourceAttributeTypeException,
 )
 
 T = TypeVar("T")

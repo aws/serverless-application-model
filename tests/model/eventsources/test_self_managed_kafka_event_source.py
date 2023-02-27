@@ -1,13 +1,15 @@
 from unittest import TestCase
+
+from parameterized import parameterized
 from samtranslator.model.eventsources.pull import SelfManagedKafka
 from samtranslator.model.exceptions import InvalidEventException
-from parameterized import parameterized
 
 
 class SelfManagedKafkaEventSource(TestCase):
     def setUp(self):
         self.logical_id = "SelfManagedKafkaEvent"
         self.kafka_event_source = SelfManagedKafka(self.logical_id)
+        self.kafka_event_source.relative_id = "EventId"
 
     def test_get_policy_arn(self):
         arn = self.kafka_event_source.get_policy_arn()
@@ -315,7 +317,7 @@ class SelfManagedKafkaEventSource(TestCase):
         self.kafka_event_source.Enabled = True
         self.kafka_event_source.BatchSize = 1
         self.kafka_event_source.SecretsManagerKmsKeyId = kms_key_id_value
-        error_message = "(None, 'Provided SecretsManagerKmsKeyId should be of type str.')"
+        error_message = "('EventId', \"Property 'SecretsManagerKmsKeyId' should be a string.\")"
         with self.assertRaises(InvalidEventException) as error:
             self.kafka_event_source.get_policy_statements()
         self.assertEqual(error_message, str(error.exception))

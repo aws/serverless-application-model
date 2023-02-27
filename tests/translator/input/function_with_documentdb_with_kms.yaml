@@ -1,0 +1,19 @@
+%YAML 1.1
+---
+Resources:
+  DocumentDBFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/documentdb.zip
+      Handler: index.documentdb_handler
+      Runtime: python3.9
+      Events:
+        MyDocumentDBEvent:
+          Type: DocumentDB
+          Properties:
+            Cluster: !Sub arn:${AWS::Partition}:rds:us-west-2:123456789012:cluster:sample-cluster
+            SourceAccessConfigurations:
+            - Type: BASIC_AUTH
+              URI: !Sub arn:${AWS::Partition}:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c
+            DatabaseName: db1
+            SecretsManagerKmsKeyId: myKeyId

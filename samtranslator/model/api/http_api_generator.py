@@ -3,20 +3,19 @@ from collections import namedtuple
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model.intrinsics import ref, fnGetAtt
 from samtranslator.model.apigatewayv2 import (
-    ApiGatewayV2HttpApi,
-    ApiGatewayV2Stage,
+    ApiGatewayV2ApiMapping,
     ApiGatewayV2Authorizer,
     ApiGatewayV2DomainName,
-    ApiGatewayV2ApiMapping,
+    ApiGatewayV2HttpApi,
+    ApiGatewayV2Stage,
 )
 from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.intrinsics import fnGetAtt, is_intrinsic, is_intrinsic_no_value, ref
+from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
-from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
-from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
@@ -34,7 +33,7 @@ HttpApiTagName = "httpapi:createdBy"
 
 
 class HttpApiGenerator:
-    def __init__(
+    def __init__(  # noqa: too-many-arguments
         self,
         logical_id: str,
         stage_variables: Optional[Dict[str, Intrinsicable[str]]],
@@ -186,7 +185,7 @@ class HttpApiGenerator:
 
         elif isinstance(self.cors_configuration, dict):
             # Make sure keys in the dict are recognized
-            if not all(key in CorsProperties._fields for key in self.cors_configuration.keys()):
+            if not all(key in CorsProperties._fields for key in self.cors_configuration):
                 raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")
 
             properties = CorsProperties(**self.cors_configuration)
@@ -238,7 +237,7 @@ class HttpApiGenerator:
         if DefaultStageName in paths:
             paths[f"/{DefaultStageName}"] = paths.pop(DefaultStageName)
 
-    def _construct_api_domain(
+    def _construct_api_domain(  # noqa: too-many-branches
         self, http_api: ApiGatewayV2HttpApi, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
     ) -> Tuple[
         Optional[ApiGatewayV2DomainName],
@@ -297,7 +296,7 @@ class HttpApiGenerator:
             if isinstance(mutual_tls_auth, dict):
                 if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
                     invalid_keys = []
-                    for key in mutual_tls_auth.keys():
+                    for key in mutual_tls_auth:
                         if key not in {"TruststoreUri", "TruststoreVersion"}:
                             invalid_keys.append(key)
                     invalid_keys.sort()
@@ -467,7 +466,7 @@ class HttpApiGenerator:
             )
 
         # Make sure keys in the dict are recognized
-        if not all(key in AuthProperties._fields for key in self.auth.keys()):
+        if not all(key in AuthProperties._fields for key in self.auth):
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
 
         if not OpenApiEditor.is_valid(self.definition_body):
@@ -713,7 +712,7 @@ class HttpApiGenerator:
         open_api_editor.add_title(self.name)
         self.definition_body = open_api_editor.openapi
 
-    @cw_timer(prefix="Generator", name="HttpApi")  # type: ignore[misc]
+    @cw_timer(prefix="Generator", name="HttpApi")
     def to_cloudformation(
         self, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
     ) -> Tuple[

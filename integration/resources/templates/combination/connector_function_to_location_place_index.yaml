@@ -1,0 +1,57 @@
+Transform: AWS::Serverless-2016-10-31-test
+
+Resources:
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.8
+      Handler: index.handler
+      InlineCode: |
+        import boto3
+        import os
+        client = boto3.client('location')
+
+        def handler(event, context):
+          indexName = os.environ['LOCATION_INDEX']
+          response = client.describe_place_index(
+            IndexName=indexName
+          )
+          response = client.search_place_index_for_position(
+            IndexName=indexName,
+            MaxResults=10,
+            Language='en',
+            Position=[
+                -123.12,
+                49.28
+            ]
+          )
+          response = client.search_place_index_for_text(
+            IndexName=indexName,
+            Text="effiel tow"
+          )
+          response = client.search_place_index_for_suggestions(
+            IndexName=indexName,
+            Text="effiel tow"
+          )
+      Environment:
+        Variables:
+          LOCATION_INDEX: !Sub ${AWS::StackName}-PI
+
+
+  MyPlace:
+    Type: AWS::Location::PlaceIndex
+    Properties:
+      DataSource: Here
+      IndexName: !Sub ${AWS::StackName}-PI
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerFunction
+      Destination:
+        Id: MyPlace
+      Permissions:
+      - Read
+Metadata:
+  SamTransformTest: true

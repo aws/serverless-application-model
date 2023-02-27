@@ -42,7 +42,7 @@ class BaseEditor:
                     [InvalidTemplateException(f"Value of {BaseEditor._CONDITIONAL_IF} must be a list.")]
                 )
             contents = if_parameters[1:]
-            contents = [content for content in contents if not is_intrinsic_no_value(content)]
+            return [content for content in contents if not is_intrinsic_no_value(content)]
         return contents
 
     @staticmethod

@@ -1,0 +1,45 @@
+name: Update schema
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 1-5" # Weekdays
+
+jobs:
+  update:
+    if: github.repository == 'aws/serverless-application-model'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Update schema
+        id: schema
+        run: |
+          make init
+          make schema-all
+          # Sets condition steps.schema.outputs.changed to true if anything changed
+          git diff --exit-code || echo "changed=true" >> $GITHUB_OUTPUT
+    
+      - name: Push change to temporary branch
+        if: steps.schema.outputs.changed
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout -b tmp/schema/$GITHUB_RUN_ID/$GITHUB_RUN_ATTEMPT
+          git add -u
+          git commit -m "chore(schema): update"
+          git push --set-upstream origin tmp/schema/$GITHUB_RUN_ID/$GITHUB_RUN_ATTEMPT
+
+      - name: Create PR
+        if: steps.schema.outputs.changed
+        run: printf '> **Note**\n> If checks do not start, close then reopen this pull request.\n\nCreated by the [`schema.yml`](https://github.com/aws/serverless-application-model/blob/develop/.github/workflows/schema.yml) workflow.\n' | gh pr create --fill --base develop --body-file -
+        env:
+          GH_TOKEN: ${{ github.token }}
