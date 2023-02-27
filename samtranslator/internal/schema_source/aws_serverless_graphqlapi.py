@@ -2,7 +2,11 @@ from typing import Optional
 
 from typing_extensions import Literal
 
+<<<<<<<< HEAD:samtranslator/schema/aws_serverless_graphqlapi.py
 from samtranslator.schema.common import BaseModel, get_prop, DictStrAny
+========
+from samtranslator.internal.schema_source.common import BaseModel, DictStrAny, get_prop
+>>>>>>>> cb9be389 (move schema files over):samtranslator/internal/schema_source/aws_serverless_graphqlapi.py
 
 properties = get_prop("sam-resource-graphqlapi")
 
