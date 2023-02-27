@@ -9,6 +9,7 @@ class MQEventSource(TestCase):
     def setUp(self):
         self.logical_id = "MQEvent"
         self.mq_event_source = MQ(self.logical_id)
+        self.mq_event_source.relative_id = "EventId"
 
     def test_get_policy_arn(self):
         source_arn = self.mq_event_source.get_policy_arn()
@@ -56,7 +57,7 @@ class MQEventSource(TestCase):
         self.mq_event_source.SourceAccessConfigurations = [{"Type": "BASIC_AUTH", "URI": "SECRET_URI"}]
         self.mq_event_source.Broker = "BROKER_ARN"
         self.mq_event_source.SecretsManagerKmsKeyId = kms_key_id_value
-        error_message = "(None, 'Provided SecretsManagerKmsKeyId should be of type str.')"
+        error_message = "('EventId', \"Property 'SecretsManagerKmsKeyId' should be a string.\")"
         with self.assertRaises(InvalidEventException) as error:
             self.mq_event_source.get_policy_statements()
         self.assertEqual(error_message, str(error.exception))
