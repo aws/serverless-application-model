@@ -445,7 +445,7 @@ class MQ(PullEventSource):
         because customers might have code which relys on that policy name consistancy.
 
         To support both old policy name and ability to have more than one MQ event source, we introduce new field
-        `DynamicPolicyName` which when set to true will use MQ logical ID to genertae policy name.
+        `DynamicPolicyName` which when set to true will use MQ logical ID to generate policy name.
 
         Q: Why to introduce a new field and not to make policy name dynamic by default if there are multiple
         MQ event sources?
