@@ -5,6 +5,7 @@ import string  # pylint: disable=deprecated-module
 from typing import Any, Callable, Dict, Set
 
 from integration.config.service_names import (
+    APP_SYNC,
     DYNAMO_DB,
     HTTP_API,
     LOCATION,
@@ -223,6 +224,7 @@ SERVICE_DETECTORS: Dict[str, Callable[[Dict[str, Any], Set[str]], bool]] = {
         _resource_using_s3_events(resource) for resource in template_dict.get("Resources", {}).values()
     ),
     LOCATION: lambda template_dict, cfn_resource_types: "AWS::Location::PlaceIndex" in cfn_resource_types,
+    APP_SYNC: lambda template_dict, cfn_resource_types: "AWS::AppSync::GraphQLApi" in cfn_resource_types,
 }
 
 
