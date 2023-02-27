@@ -35,6 +35,7 @@ SKIPPED_TESTS = [
     "api_with_aws_iam_auth_overrides",  # null for invokeRole
     "eventbridgerule",  # missing required field 'Patterns'
     "self_managed_kafka_with_intrinsics",  # 'EnableValue' is of type bool but defined as string
+    "documentdb_with_intrinsics",  # 'EnableValue' is of type bool but defined as string
     "api_with_resource_policy_global",  # 'ResourcePolicy CustomStatements' output expects a List
     "api_with_resource_policy",  # 'ResourcePolicy CustomStatements' output expects a List
     "api_with_if_conditional_with_resource_policy",  # 'ResourcePolicy CustomStatements' output expects a List

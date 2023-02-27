@@ -95,6 +95,7 @@ class LambdaEventSourceMapping(Resource):
     resource_type = "AWS::Lambda::EventSourceMapping"
     property_types = {
         "BatchSize": PropertyType(False, is_type(int)),
+        "DocumentDBEventSourceConfig": PropertyType(False, IS_DICT),
         "Enabled": PropertyType(False, is_type(bool)),
         "EventSourceArn": PropertyType(False, IS_STR),
         "FunctionName": PropertyType(True, IS_STR),
