@@ -90,7 +90,7 @@ schema-all: fetch-schema-data update-schema-data schema
 dev: test
 
 # Verifications to run before sending a pull request
-pr: black-check lint init dev
+pr: format-check lint init dev
 
 clean:
 	rm -rf .tmp
