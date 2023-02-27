@@ -63,7 +63,7 @@ class EventSource(ResourceMacro, metaclass=ABCMeta):
         """
         role_logical_id = self._generate_logical_id(prefix=prefix, suffix=suffix, resource_type="Role")  # type: ignore[no-untyped-call]
         event_role = IAMRole(role_logical_id, attributes=resource.get_passthrough_resource_attributes())
-        event_role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(  # type: ignore[no-untyped-call]
+        event_role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
             self.principal
         )
         state_machine_arn = resource.get_runtime_attr("arn")
