@@ -2,13 +2,23 @@
 import inspect
 import re
 from abc import ABC, ABCMeta, abstractmethod
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from contextlib import suppress
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
+
+from pydantic import BaseModel
+from pydantic.error_wrappers import ValidationError
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
-from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
+from samtranslator.model.exceptions import (
+    ExpectedType,
+    InvalidResourceException,
+    InvalidResourcePropertyTypeException,
+)
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
+
+RT = TypeVar("RT", bound=BaseModel)  # return type
 
 
 class PropertyType:
@@ -65,6 +75,17 @@ class PassThroughProperty(PropertyType):
         super().__init__(required, any_type(), False)
 
 
+class GeneratedProperty(PropertyType):
+    """
+    Property of a generated CloudFormation resource.
+    """
+
+    def __init__(self) -> None:
+        # Intentionally the most lenient; we don't want the risk of potential
+        # runtime exceptions, and the object attributes are statically typed
+        super().__init__(False, any_type(), False)
+
+
 class Resource(ABC):
     """A Resource object represents an abstract entity that contains a Type and a Properties object. They map well to
     CloudFormation resources as well sub-types like AWS::Lambda::Function or `Events` section of
@@ -104,7 +125,7 @@ class Resource(ABC):
 
     def __init__(
         self,
-        logical_id: str,
+        logical_id: Optional[Any],
         relative_id: Optional[str] = None,
         depends_on: Optional[List[str]] = None,
         attributes: Optional[Dict[str, Any]] = None,
@@ -117,8 +138,7 @@ class Resource(ABC):
         :param depends_on Value of DependsOn resource attribute
         :param attributes Dictionary of resource attributes and their values
         """
-        self._validate_logical_id(logical_id)  # type: ignore[no-untyped-call]
-        self.logical_id = logical_id
+        self.logical_id = self._validate_logical_id(logical_id)
         self.relative_id = relative_id
         self.depends_on = depends_on
 
@@ -197,8 +217,8 @@ class Resource(ABC):
         resource.validate_properties()
         return resource
 
-    @classmethod
-    def _validate_logical_id(cls, logical_id):  # type: ignore[no-untyped-def]
+    @staticmethod
+    def _validate_logical_id(logical_id: Optional[Any]) -> str:
         """Validates that the provided logical id is an alphanumeric string.
 
         :param str logical_id: the logical id to validate
@@ -207,9 +227,12 @@ class Resource(ABC):
         :raises TypeError: if the logical id is invalid
         """
         pattern = re.compile(r"^[A-Za-z0-9]+$")
-        if logical_id is not None and pattern.match(logical_id):
-            return True
-        raise InvalidResourceException(logical_id, "Logical ids must be alphanumeric.")
+        if isinstance(logical_id, str) and pattern.match(logical_id):
+            return logical_id
+        # TODO: Doing validation in this class is kind of off,
+        # we need to surface this validation to where the template is loaded
+        # or the logical IDs are generated.
+        raise InvalidResourceException(str(logical_id), "Logical ids must be alphanumeric.")
 
     @classmethod
     def _validate_resource_dict(cls, logical_id, resource_dict):  # type: ignore[no-untyped-def]
@@ -300,6 +323,25 @@ class Resource(ABC):
                 resource_type=self.resource_type, property_name=name
             ),
         )
+
+    # Note: For compabitliy issue, we should ONLY use this with new abstraction/resources.
+    def validate_properties_and_return_model(self, cls: Type[RT]) -> RT:
+        """
+        Given a resource properties, return a typed object from the definitions of SAM schema model
+
+        param:
+            resource_properties: properties from input template
+            cls: schema models
+        """
+        try:
+            return cls.parse_obj(self._generate_resource_dict()["Properties"])
+        except ValidationError as e:
+            error_properties: str = ""
+            with suppress(KeyError):
+                error_properties = ", ".join([str(error["loc"][0]) for error in e.errors()])
+            raise InvalidResourceException(
+                self.logical_id, f"Given resource property '{error_properties}' is invalid"
+            ) from e
 
     def validate_properties(self) -> None:
         """Validates that the required properties for this Resource have been populated, and that all properties have

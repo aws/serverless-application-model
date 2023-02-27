@@ -9,6 +9,7 @@ class ExpectedType(Enum):
     LIST = ("list", list)
     STRING = ("string", str)
     INTEGER = ("integer", int)
+    BOOLEAN = ("boolean", bool)
 
 
 class ExceptionWithMessage(ABC, Exception):

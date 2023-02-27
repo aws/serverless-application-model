@@ -4,8 +4,8 @@ from typing import Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
-from schema_source.aws_serverless_connector import EmbeddedConnector
-from schema_source.common import (
+from samtranslator.internal.schema_source.aws_serverless_connector import EmbeddedConnector
+from samtranslator.internal.schema_source.common import (
     BaseModel,
     DictStrAny,
     PassThroughProp,

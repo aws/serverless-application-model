@@ -2,7 +2,7 @@ from typing import List, Optional, Union
 
 from typing_extensions import Literal
 
-from schema_source.common import BaseModel, PassThroughProp, ResourceAttributes, get_prop
+from samtranslator.internal.schema_source.common import BaseModel, PassThroughProp, ResourceAttributes, get_prop
 
 resourcereference = get_prop("sam-property-connector-resourcereference")
 properties = get_prop("sam-resource-connector")

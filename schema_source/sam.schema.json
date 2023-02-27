@@ -83,7 +83,7 @@
         "ResourcePolicy": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_function__ResourcePolicy"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__ResourcePolicy"
             }
           ],
           "description": "Configure Resource Policy for this path on an API\\.  \n*Type*: [ResourcePolicyStatement](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-resourcepolicystatement.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -1029,7 +1029,7 @@
         "DeadLetterConfig": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_function__DeadLetterConfig"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__DeadLetterConfig"
             }
           ],
           "description": "Configure the Amazon Simple Queue Service \\(Amazon SQS\\) queue where EventBridge sends events after a failed target invocation\\. Invocation can fail, for example, when sending an event to a Lambda function that doesn't exist, or when EventBridge has insufficient permissions to invoke the Lambda function\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \nThe [AWS::Serverless::Function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html) resource type has a similar data type, `DeadLetterQueue`, which handles failures that occur after successful invocation of the target Lambda function\\. Examples of these types of failures include Lambda throttling, or errors returned by the Lambda target function\\. For more information about the function `DeadLetterQueue` property, see [AWS Lambda function dead\\-letter queues](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#dlq) in the *AWS Lambda Developer Guide*\\.\n*Type*: [DeadLetterConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-scheduledeadletterconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`DeadLetterConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-deadletterconfig) property of the `AWS::Events::Rule` `Target` data type\\. The AWS SAM version of this property includes additional subproperties, in case you want AWS SAM to create the dead\\-letter queue for you\\.",
@@ -1672,6 +1672,10 @@
           "title": "AuthorizationScopes",
           "type": "array"
         },
+        "DisableFunctionDefaultPermissions": {
+          "title": "Disablefunctiondefaultpermissions",
+          "type": "boolean"
+        },
         "FunctionArn": {
           "anyOf": [
             {
@@ -1784,6 +1788,10 @@
           "markdownDescription": "List of authorization scopes for this authorizer\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "AuthorizationScopes",
           "type": "array"
+        },
+        "DisableFunctionDefaultPermissions": {
+          "title": "Disablefunctiondefaultpermissions",
+          "type": "boolean"
         },
         "FunctionArn": {
           "anyOf": [
@@ -2597,7 +2605,7 @@
         "DeadLetterConfig": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_statemachine__DeadLetterConfig"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__DeadLetterConfig"
             }
           ],
           "description": "Configure the Amazon Simple Queue Service \\(Amazon SQS\\) queue where EventBridge sends events after a failed target invocation\\. Invocation can fail, for example, when sending an event to a Lambda function that doesn't exist, or when EventBridge has insufficient permissions to invoke the Lambda function\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [DeadLetterConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinescheduledeadletterconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`DeadLetterConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-deadletterconfig) property of the `AWS::Events::Rule` `Target` data type\\. The AWS SAM version of this property includes additional subproperties, in case you want AWS SAM to create the dead\\-letter queue for you\\.",
@@ -2968,22 +2976,22 @@
       "additionalProperties": false,
       "properties": {
         "Api": {
-          "$ref": "#/definitions/schema_source__aws_serverless_api__Globals"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__Globals"
         },
         "Function": {
-          "$ref": "#/definitions/schema_source__aws_serverless_function__Globals"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__Globals"
         },
         "HttpApi": {
-          "$ref": "#/definitions/schema_source__aws_serverless_httpapi__Globals"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__Globals"
         },
         "SimpleTable": {
-          "$ref": "#/definitions/schema_source__aws_serverless_simpletable__Globals"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_simpletable__Globals"
         }
       },
       "title": "Globals",
       "type": "object"
     },
-    "schema_source__any_cfn_resource__Resource": {
+    "samtranslator__internal__schema_source__any_cfn_resource__Resource": {
       "properties": {
         "Type": {
           "pattern": "^(?!AWS::Serverless::).+$",
@@ -2997,7 +3005,7 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_api__Auth": {
+    "samtranslator__internal__schema_source__aws_serverless_api__Auth": {
       "additionalProperties": false,
       "properties": {
         "AddDefaultAuthorizerToCorsPreflight": {
@@ -3046,7 +3054,7 @@
         "ResourcePolicy": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_api__ResourcePolicy"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__ResourcePolicy"
             }
           ],
           "description": "Configure Resource Policy for all methods and paths on an API\\.  \n*Type*: [ResourcePolicyStatement](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-resourcepolicystatement.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: This setting can also be defined on individual `AWS::Serverless::Function` using the [ApiFunctionAuth](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-apifunctionauth.html)\\. This is required for APIs with `EndpointConfiguration: PRIVATE`\\.",
@@ -3067,7 +3075,7 @@
       "title": "Auth",
       "type": "object"
     },
-    "schema_source__aws_serverless_api__DefinitionUri": {
+    "samtranslator__internal__schema_source__aws_serverless_api__DefinitionUri": {
       "additionalProperties": false,
       "properties": {
         "Bucket": {
@@ -3108,7 +3116,7 @@
       "title": "DefinitionUri",
       "type": "object"
     },
-    "schema_source__aws_serverless_api__Domain": {
+    "samtranslator__internal__schema_source__aws_serverless_api__Domain": {
       "additionalProperties": false,
       "properties": {
         "BasePath": {
@@ -3187,7 +3195,7 @@
         "Route53": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_api__Route53"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__Route53"
             }
           ],
           "description": "Defines an Amazon Route\u00a053 configuration\\.  \n*Type*: [Route53Configuration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-route53configuration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3212,7 +3220,7 @@
       "title": "Domain",
       "type": "object"
     },
-    "schema_source__aws_serverless_api__Globals": {
+    "samtranslator__internal__schema_source__aws_serverless_api__Globals": {
       "additionalProperties": false,
       "properties": {
         "AccessLogSetting": {
@@ -3228,7 +3236,7 @@
         "Auth": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_api__Auth"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__Auth"
             }
           ],
           "description": "Configure authorization to control access to your API Gateway API\\.  \nFor more information about configuring access using AWS SAM see [Controlling access to API Gateway APIs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-controlling-access-to-apis.html)\\.  \n*Type*: [ApiAuth](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-apiauth.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3304,7 +3312,7 @@
         "Domain": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_api__Domain"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__Domain"
             }
           ],
           "description": "Configures a custom domain for this API Gateway API\\.  \n*Type*: [DomainConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-domainconfiguration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3326,6 +3334,10 @@
           "markdownDescription": "Configures Gateway Responses for an API\\. Gateway Responses are responses returned by API Gateway, either directly or through the use of Lambda Authorizers\\. For more information, see the documentation for the [Api Gateway OpenApi extension for Gateway Responses](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-gateway-responses.html)\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "GatewayResponses",
           "type": "object"
+        },
+        "MergeDefinitions": {
+          "title": "Mergedefinitions",
+          "type": "boolean"
         },
         "MethodSettings": {
           "allOf": [
@@ -3394,7 +3406,7 @@
       "title": "Globals",
       "type": "object"
     },
-    "schema_source__aws_serverless_api__Properties": {
+    "samtranslator__internal__schema_source__aws_serverless_api__Properties": {
       "additionalProperties": false,
       "properties": {
         "AccessLogSetting": {
@@ -3420,7 +3432,7 @@
         "Auth": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_api__Auth"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__Auth"
             }
           ],
           "description": "Configure authorization to control access to your API Gateway API\\.  \nFor more information about configuring access using AWS SAM see [Controlling access to API Gateway APIs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-controlling-access-to-apis.html)\\.  \n*Type*: [ApiAuth](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-apiauth.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3495,7 +3507,7 @@
               "type": "string"
             },
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_api__DefinitionUri"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__DefinitionUri"
             }
           ],
           "description": "Amazon S3 Uri, local file path, or location object of the the OpenAPI document defining the API\\. The Amazon S3 object this property references must be a valid OpenAPI file\\. If neither `DefinitionUri` nor `DefinitionBody` are specified, SAM will generate a `DefinitionBody` for you based on your template configuration\\.  \nIf a local file path is provided, the template must go through the workflow that includes the `sam deploy` or `sam package` command, in order for the definition to be transformed properly\\.  \nIntrinsic functions are not supported in external OpenApi files referenced by `DefinitionUri`\\. Use instead the `DefinitionBody` property with the [Include Transform](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/create-reusable-transform-function-snippets-and-add-to-your-template-with-aws-include-transform.html) to import an OpenApi definition into the template\\.  \n*Type*: String \\| [ApiDefinition](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-apidefinition.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`BodyS3Location`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-bodys3location) property of an `AWS::ApiGateway::RestApi` resource\\. The nested Amazon S3 properties are named differently\\.",
@@ -3525,7 +3537,7 @@
         "Domain": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_api__Domain"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__Domain"
             }
           ],
           "description": "Configures a custom domain for this API Gateway API\\.  \n*Type*: [DomainConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-domainconfiguration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3560,6 +3572,10 @@
           "markdownDescription": "Configures Gateway Responses for an API\\. Gateway Responses are responses returned by API Gateway, either directly or through the use of Lambda Authorizers\\. For more information, see the documentation for the [Api Gateway OpenApi extension for Gateway Responses](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-gateway-responses.html)\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "GatewayResponses",
           "type": "object"
+        },
+        "MergeDefinitions": {
+          "title": "Mergedefinitions",
+          "type": "boolean"
         },
         "MethodSettings": {
           "allOf": [
@@ -3666,7 +3682,7 @@
       "title": "Properties",
       "type": "object"
     },
-    "schema_source__aws_serverless_api__Resource": {
+    "samtranslator__internal__schema_source__aws_serverless_api__Resource": {
       "additionalProperties": false,
       "properties": {
         "Condition": {
@@ -3689,7 +3705,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Properties": {
-          "$ref": "#/definitions/schema_source__aws_serverless_api__Properties"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__Properties"
         },
         "Type": {
           "enum": [
@@ -3709,7 +3725,7 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_api__ResourcePolicy": {
+    "samtranslator__internal__schema_source__aws_serverless_api__ResourcePolicy": {
       "additionalProperties": false,
       "properties": {
         "AwsAccountBlacklist": {
@@ -3892,7 +3908,7 @@
       "title": "ResourcePolicy",
       "type": "object"
     },
-    "schema_source__aws_serverless_api__Route53": {
+    "samtranslator__internal__schema_source__aws_serverless_api__Route53": {
       "additionalProperties": false,
       "properties": {
         "DistributionDomainName": {
@@ -3945,7 +3961,7 @@
       "title": "Route53",
       "type": "object"
     },
-    "schema_source__aws_serverless_application__Properties": {
+    "samtranslator__internal__schema_source__aws_serverless_application__Properties": {
       "additionalProperties": false,
       "properties": {
         "Location": {
@@ -4004,7 +4020,7 @@
       "title": "Properties",
       "type": "object"
     },
-    "schema_source__aws_serverless_application__Resource": {
+    "samtranslator__internal__schema_source__aws_serverless_application__Resource": {
       "additionalProperties": false,
       "properties": {
         "Condition": {
@@ -4020,7 +4036,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Properties": {
-          "$ref": "#/definitions/schema_source__aws_serverless_application__Properties"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_application__Properties"
         },
         "Type": {
           "enum": [
@@ -4040,7 +4056,7 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_connector__Properties": {
+    "samtranslator__internal__schema_source__aws_serverless_connector__Properties": {
       "additionalProperties": false,
       "properties": {
         "Destination": {
@@ -4091,7 +4107,7 @@
       "title": "Properties",
       "type": "object"
     },
-    "schema_source__aws_serverless_connector__Resource": {
+    "samtranslator__internal__schema_source__aws_serverless_connector__Resource": {
       "additionalProperties": false,
       "properties": {
         "Condition": {
@@ -4107,7 +4123,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Properties": {
-          "$ref": "#/definitions/schema_source__aws_serverless_connector__Properties"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_connector__Properties"
         },
         "Type": {
           "enum": [
@@ -4127,13 +4143,13 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__ApiEvent": {
+    "samtranslator__internal__schema_source__aws_serverless_function__ApiEvent": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_function__ApiEventProperties"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__ApiEventProperties"
             }
           ],
           "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-s3.html) \\| [SNS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sns.html) \\| [Kinesis](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-kinesis.html) \\| [DynamoDB](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-dynamodb.html) \\| [SQS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sqs.html) \\| [Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html) \\| [Schedule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedule.html) \\| [ScheduleV2](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedulev2.html) \\| [CloudWatchEvent](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchevent.html) \\| [EventBridgeRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-eventbridgerule.html) \\| [CloudWatchLogs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchlogs.html) \\| [IoTRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-iotrule.html) \\| [AlexaSkill](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-alexaskill.html) \\| [Cognito](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cognito.html) \\| [HttpApi](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-httpapi.html) \\| [MSK](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-msk.html) \\| [MQ](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-mq.html) \\| [SelfManagedKafka](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -4157,7 +4173,7 @@
       "title": "ApiEvent",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__ApiEventProperties": {
+    "samtranslator__internal__schema_source__aws_serverless_function__ApiEventProperties": {
       "additionalProperties": false,
       "properties": {
         "Auth": {
@@ -4193,17 +4209,23 @@
           "title": "RequestModel"
         },
         "RequestParameters": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "$ref": "#/definitions/RequestParameters"
-            }
-          ],
           "description": "Request parameters configuration for this specific Api\\+Path\\+Method\\. All parameter names must start with `method.request` and must be limited to `method.request.header`, `method.request.querystring`, or `method.request.path`\\.  \nIf a parameter is a string and not a Function Request Parameter Object, then `Required` and `Caching` will default to false\\.  \n*Type*: String \\| [RequestParameter](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-requestparameter.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/definitions/RequestParameters"
+                },
+                "type": "object"
+              }
+            ]
+          },
           "markdownDescription": "Request parameters configuration for this specific Api\\+Path\\+Method\\. All parameter names must start with `method.request` and must be limited to `method.request.header`, `method.request.querystring`, or `method.request.path`\\.  \nIf a parameter is a string and not a Function Request Parameter Object, then `Required` and `Caching` will default to false\\.  \n*Type*: String \\| [RequestParameter](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-requestparameter.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "RequestParameters"
+          "title": "RequestParameters",
+          "type": "array"
         },
         "RestApiId": {
           "anyOf": [
@@ -4226,13 +4248,13 @@
       "title": "ApiEventProperties",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__CloudWatchEvent": {
+    "samtranslator__internal__schema_source__aws_serverless_function__CloudWatchEvent": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_function__CloudWatchEventProperties"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__CloudWatchEventProperties"
             }
           ],
           "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-s3.html) \\| [SNS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sns.html) \\| [Kinesis](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-kinesis.html) \\| [DynamoDB](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-dynamodb.html) \\| [SQS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sqs.html) \\| [Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html) \\| [Schedule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedule.html) \\| [ScheduleV2](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedulev2.html) \\| [CloudWatchEvent](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchevent.html) \\| [EventBridgeRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-eventbridgerule.html) \\| [CloudWatchLogs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchlogs.html) \\| [IoTRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-iotrule.html) \\| [AlexaSkill](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-alexaskill.html) \\| [Cognito](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cognito.html) \\| [HttpApi](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-httpapi.html) \\| [MSK](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-msk.html) \\| [MQ](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-mq.html) \\| [SelfManagedKafka](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -4256,7 +4278,7 @@
       "title": "CloudWatchEvent",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__CloudWatchEventProperties": {
+    "samtranslator__internal__schema_source__aws_serverless_function__CloudWatchEventProperties": {
       "additionalProperties": false,
       "properties": {
         "Enabled": {
@@ -4319,7 +4341,7 @@
       "title": "CloudWatchEventProperties",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__DeadLetterConfig": {
+    "samtranslator__internal__schema_source__aws_serverless_function__DeadLetterConfig": {
       "additionalProperties": false,
       "properties": {
         "Arn": {
@@ -4351,13 +4373,13 @@
       "title": "DeadLetterConfig",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__EventBridgeRuleEvent": {
+    "samtranslator__internal__schema_source__aws_serverless_function__EventBridgeRuleEvent": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_function__EventBridgeRuleEventProperties"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__EventBridgeRuleEventProperties"
             }
           ],
           "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-s3.html) \\| [SNS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sns.html) \\| [Kinesis](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-kinesis.html) \\| [DynamoDB](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-dynamodb.html) \\| [SQS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sqs.html) \\| [Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html) \\| [Schedule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedule.html) \\| [ScheduleV2](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedulev2.html) \\| [CloudWatchEvent](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchevent.html) \\| [EventBridgeRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-eventbridgerule.html) \\| [CloudWatchLogs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchlogs.html) \\| [IoTRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-iotrule.html) \\| [AlexaSkill](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-alexaskill.html) \\| [Cognito](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cognito.html) \\| [HttpApi](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-httpapi.html) \\| [MSK](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-msk.html) \\| [MQ](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-mq.html) \\| [SelfManagedKafka](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -4381,13 +4403,13 @@
       "title": "EventBridgeRuleEvent",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__EventBridgeRuleEventProperties": {
+    "samtranslator__internal__schema_source__aws_serverless_function__EventBridgeRuleEventProperties": {
       "additionalProperties": false,
       "properties": {
         "DeadLetterConfig": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_function__DeadLetterConfig"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__DeadLetterConfig"
             }
           ],
           "description": "Configure the Amazon Simple Queue Service \\(Amazon SQS\\) queue where EventBridge sends events after a failed target invocation\\. Invocation can fail, for example, when sending an event to a Lambda function that doesn't exist, or when EventBridge has insufficient permissions to invoke the Lambda function\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \nThe [AWS::Serverless::Function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html) resource type has a similar data type, `DeadLetterQueue`, which handles failures that occur after successful invocation of the target Lambda function\\. Examples of these types of failures include Lambda throttling, or errors returned by the Lambda target function\\. For more information about the function `DeadLetterQueue` property, see [AWS Lambda function dead\\-letter queues](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#dlq) in the *AWS Lambda Developer Guide*\\.\n*Type*: [DeadLetterConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-deadletterconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`DeadLetterConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-deadletterconfig) property of the `AWS::Events::Rule` `Target` data type\\. The AWS SAM version of this property includes additional subproperties, in case you want AWS SAM to create the dead\\-letter queue for you\\.",
@@ -4447,7 +4469,7 @@
         "Target": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_function__EventBridgeRuleTarget"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__EventBridgeRuleTarget"
             }
           ],
           "description": "The AWS resource that EventBridge invokes when a rule is triggered\\. You can use this property to specify the logical ID of the target\\. If this property is not specified, then AWS SAM generates the logical ID of the target\\.  \n*Type*: [Target](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-target.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Targets`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-targets) property of an `AWS::Events::Rule` resource\\. The AWS SAM version of this property only allows you to specify the logical ID of a single target\\.",
@@ -4461,7 +4483,7 @@
       "title": "EventBridgeRuleEventProperties",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__EventBridgeRuleTarget": {
+    "samtranslator__internal__schema_source__aws_serverless_function__EventBridgeRuleTarget": {
       "additionalProperties": false,
       "properties": {
         "Id": {
@@ -4481,7 +4503,7 @@
       "title": "EventBridgeRuleTarget",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__Globals": {
+    "samtranslator__internal__schema_source__aws_serverless_function__Globals": {
       "additionalProperties": false,
       "properties": {
         "Architectures": {
@@ -4739,7 +4761,7 @@
       "title": "Globals",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__Properties": {
+    "samtranslator__internal__schema_source__aws_serverless_function__Properties": {
       "additionalProperties": false,
       "properties": {
         "Architectures": {
@@ -4899,19 +4921,19 @@
                 "$ref": "#/definitions/SQSEvent"
               },
               {
-                "$ref": "#/definitions/schema_source__aws_serverless_function__ApiEvent"
+                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__ApiEvent"
               },
               {
-                "$ref": "#/definitions/schema_source__aws_serverless_function__ScheduleEvent"
+                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__ScheduleEvent"
               },
               {
-                "$ref": "#/definitions/schema_source__aws_serverless_function__ScheduleV2Event"
+                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__ScheduleV2Event"
               },
               {
-                "$ref": "#/definitions/schema_source__aws_serverless_function__CloudWatchEvent"
+                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__CloudWatchEvent"
               },
               {
-                "$ref": "#/definitions/schema_source__aws_serverless_function__EventBridgeRuleEvent"
+                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__EventBridgeRuleEvent"
               },
               {
                 "$ref": "#/definitions/CloudWatchLogsEvent"
@@ -5213,7 +5235,7 @@
       "title": "Properties",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__Resource": {
+    "samtranslator__internal__schema_source__aws_serverless_function__Resource": {
       "additionalProperties": false,
       "properties": {
         "Condition": {
@@ -5236,7 +5258,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Properties": {
-          "$ref": "#/definitions/schema_source__aws_serverless_function__Properties"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__Properties"
         },
         "Type": {
           "enum": [
@@ -5255,7 +5277,7 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__ResourcePolicy": {
+    "samtranslator__internal__schema_source__aws_serverless_function__ResourcePolicy": {
       "additionalProperties": false,
       "properties": {
         "AwsAccountBlacklist": {
@@ -5438,7 +5460,7 @@
       "title": "ResourcePolicy",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__ScheduleEvent": {
+    "samtranslator__internal__schema_source__aws_serverless_function__ScheduleEvent": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
@@ -5468,13 +5490,13 @@
       "title": "ScheduleEvent",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__ScheduleV2Event": {
+    "samtranslator__internal__schema_source__aws_serverless_function__ScheduleV2Event": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_function__ScheduleV2EventProperties"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__ScheduleV2EventProperties"
             }
           ],
           "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-s3.html) \\| [SNS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sns.html) \\| [Kinesis](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-kinesis.html) \\| [DynamoDB](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-dynamodb.html) \\| [SQS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sqs.html) \\| [Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html) \\| [Schedule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedule.html) \\| [ScheduleV2](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedulev2.html) \\| [CloudWatchEvent](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchevent.html) \\| [EventBridgeRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-eventbridgerule.html) \\| [CloudWatchLogs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchlogs.html) \\| [IoTRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-iotrule.html) \\| [AlexaSkill](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-alexaskill.html) \\| [Cognito](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cognito.html) \\| [HttpApi](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-httpapi.html) \\| [MSK](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-msk.html) \\| [MQ](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-mq.html) \\| [SelfManagedKafka](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -5498,13 +5520,13 @@
       "title": "ScheduleV2Event",
       "type": "object"
     },
-    "schema_source__aws_serverless_function__ScheduleV2EventProperties": {
+    "samtranslator__internal__schema_source__aws_serverless_function__ScheduleV2EventProperties": {
       "additionalProperties": false,
       "properties": {
         "DeadLetterConfig": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_function__DeadLetterConfig"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__DeadLetterConfig"
             }
           ],
           "description": "Configure the Amazon Simple Queue Service \\(Amazon SQS\\) queue where EventBridge sends events after a failed target invocation\\. Invocation can fail, for example, when sending an event to a Lambda function that doesn't exist, or when EventBridge has insufficient permissions to invoke the Lambda function\\. For more information, see [Configuring a dead\\-letter queue for EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/configuring-schedule-dlq.html) in the *EventBridge Scheduler User Guide*\\.  \nThe [AWS::Serverless::Function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html) resource type has a similar data type, `DeadLetterQueue`, which handles failures that occur after successful invocation of the target Lambda function\\. Examples of these types of failures include Lambda throttling, or errors returned by the Lambda target function\\. For more information about the function `DeadLetterQueue` property, see [AWS Lambda function dead\\-letter queues](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#dlq) in the *AWS Lambda Developer Guide*\\.\n*Type*: [DeadLetterConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-scheduledeadletterconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`DeadLetterConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-deadletterconfig) property of the `AWS::Scheduler::Schedule`  `Target` data type\\. The AWS SAM version of this property includes additional subproperties, in case you want AWS SAM to create the dead\\-letter queue for you\\.",
@@ -5655,7 +5677,7 @@
       "title": "ScheduleV2EventProperties",
       "type": "object"
     },
-    "schema_source__aws_serverless_httpapi__Auth": {
+    "samtranslator__internal__schema_source__aws_serverless_httpapi__Auth": {
       "additionalProperties": false,
       "properties": {
         "Authorizers": {
@@ -5690,7 +5712,7 @@
       "title": "Auth",
       "type": "object"
     },
-    "schema_source__aws_serverless_httpapi__DefinitionUri": {
+    "samtranslator__internal__schema_source__aws_serverless_httpapi__DefinitionUri": {
       "additionalProperties": false,
       "properties": {
         "Bucket": {
@@ -5719,7 +5741,7 @@
       "title": "DefinitionUri",
       "type": "object"
     },
-    "schema_source__aws_serverless_httpapi__Domain": {
+    "samtranslator__internal__schema_source__aws_serverless_httpapi__Domain": {
       "additionalProperties": false,
       "properties": {
         "BasePath": {
@@ -5790,7 +5812,7 @@
         "Route53": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_httpapi__Route53"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__Route53"
             }
           ],
           "description": "Defines an Amazon Route\u00a053 configuration\\.  \n*Type*: [Route53Configuration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-httpapi-route53configuration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -5815,7 +5837,7 @@
       "title": "Domain",
       "type": "object"
     },
-    "schema_source__aws_serverless_httpapi__Globals": {
+    "samtranslator__internal__schema_source__aws_serverless_httpapi__Globals": {
       "additionalProperties": false,
       "properties": {
         "AccessLogSettings": {
@@ -5831,7 +5853,7 @@
         "Auth": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_httpapi__Auth"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__Auth"
             }
           ],
           "description": "Configures authorization for controlling access to your API Gateway HTTP API\\.  \nFor more information, see [Controlling access to HTTP APIs with JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html) in the *API Gateway Developer Guide*\\.  \n*Type*: [HttpApiAuth](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-httpapi-httpapiauth.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -5861,7 +5883,7 @@
         "Domain": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_httpapi__Domain"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__Domain"
             }
           ],
           "description": "Configures a custom domain for this API Gateway HTTP API\\.  \n*Type*: [HttpApiDomainConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-httpapi-httpapidomainconfiguration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -5908,7 +5930,7 @@
       "title": "Globals",
       "type": "object"
     },
-    "schema_source__aws_serverless_httpapi__Properties": {
+    "samtranslator__internal__schema_source__aws_serverless_httpapi__Properties": {
       "additionalProperties": false,
       "properties": {
         "AccessLogSettings": {
@@ -5924,7 +5946,7 @@
         "Auth": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_httpapi__Auth"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__Auth"
             }
           ],
           "description": "Configures authorization for controlling access to your API Gateway HTTP API\\.  \nFor more information, see [Controlling access to HTTP APIs with JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html) in the *API Gateway Developer Guide*\\.  \n*Type*: [HttpApiAuth](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-httpapi-httpapiauth.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -5963,7 +5985,7 @@
               "type": "string"
             },
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_httpapi__DefinitionUri"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__DefinitionUri"
             }
           ],
           "description": "The Amazon Simple Storage Service \\(Amazon S3\\) URI, local file path, or location object of the the OpenAPI definition that defines the HTTP API\\. The Amazon S3 object that this property references must be a valid OpenAPI definition file\\. If you don't specify a `DefinitionUri` or a `DefinitionBody` are specified, AWS SAM generates a `DefinitionBody` for you based on your template configuration\\.  \nIf you provide a local file path, the template must go through the workflow that includes the `sam deploy` or `sam package` command for the definition to be transformed properly\\.  \nIntrinsic functions are not supported in external OpenApi definition files that you reference with `DefinitionUri`\\. To import an OpenApi definition into the template, use the `DefinitionBody` property with the [Include transform](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/create-reusable-transform-function-snippets-and-add-to-your-template-with-aws-include-transform.html)\\.  \n*Type*: String \\| [HttpApiDefinition](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-httpapi-httpapidefinition.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`BodyS3Location`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-bodys3location) property of an `AWS::ApiGatewayV2::Api` resource\\. The nested Amazon S3 properties are named differently\\.",
@@ -5989,7 +6011,7 @@
         "Domain": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_httpapi__Domain"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__Domain"
             }
           ],
           "description": "Configures a custom domain for this API Gateway HTTP API\\.  \n*Type*: [HttpApiDomainConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-httpapi-httpapidomainconfiguration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -6049,7 +6071,7 @@
       "title": "Properties",
       "type": "object"
     },
-    "schema_source__aws_serverless_httpapi__Resource": {
+    "samtranslator__internal__schema_source__aws_serverless_httpapi__Resource": {
       "additionalProperties": false,
       "properties": {
         "Condition": {
@@ -6072,7 +6094,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Properties": {
-          "$ref": "#/definitions/schema_source__aws_serverless_httpapi__Properties"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__Properties"
         },
         "Type": {
           "enum": [
@@ -6091,7 +6113,7 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_httpapi__Route53": {
+    "samtranslator__internal__schema_source__aws_serverless_httpapi__Route53": {
       "additionalProperties": false,
       "properties": {
         "DistributionDomainName": {
@@ -6144,7 +6166,7 @@
       "title": "Route53",
       "type": "object"
     },
-    "schema_source__aws_serverless_layerversion__Properties": {
+    "samtranslator__internal__schema_source__aws_serverless_layerversion__Properties": {
       "additionalProperties": false,
       "properties": {
         "CompatibleArchitectures": {
@@ -6230,7 +6252,7 @@
       "title": "Properties",
       "type": "object"
     },
-    "schema_source__aws_serverless_layerversion__Resource": {
+    "samtranslator__internal__schema_source__aws_serverless_layerversion__Resource": {
       "additionalProperties": false,
       "properties": {
         "Condition": {
@@ -6246,7 +6268,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Properties": {
-          "$ref": "#/definitions/schema_source__aws_serverless_layerversion__Properties"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_layerversion__Properties"
         },
         "Type": {
           "enum": [
@@ -6266,7 +6288,7 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_simpletable__Globals": {
+    "samtranslator__internal__schema_source__aws_serverless_simpletable__Globals": {
       "additionalProperties": false,
       "properties": {
         "SSESpecification": {
@@ -6283,7 +6305,7 @@
       "title": "Globals",
       "type": "object"
     },
-    "schema_source__aws_serverless_simpletable__Properties": {
+    "samtranslator__internal__schema_source__aws_serverless_simpletable__Properties": {
       "additionalProperties": false,
       "properties": {
         "PrimaryKey": {
@@ -6336,7 +6358,7 @@
       "title": "Properties",
       "type": "object"
     },
-    "schema_source__aws_serverless_simpletable__Resource": {
+    "samtranslator__internal__schema_source__aws_serverless_simpletable__Resource": {
       "additionalProperties": false,
       "properties": {
         "Condition": {
@@ -6359,7 +6381,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Properties": {
-          "$ref": "#/definitions/schema_source__aws_serverless_simpletable__Properties"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_simpletable__Properties"
         },
         "Type": {
           "enum": [
@@ -6378,13 +6400,13 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__ApiEvent": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__ApiEvent": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_statemachine__ApiEventProperties"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__ApiEventProperties"
             }
           ],
           "description": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineschedule.html) \\| [ScheduleV2](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineschedulev2.html) \\| [CloudWatchEvent](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinecloudwatchevent.html) \\| [EventBridgeRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineeventbridgerule.html) \\| [Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineapi.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -6408,13 +6430,13 @@
       "title": "ApiEvent",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__ApiEventProperties": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__ApiEventProperties": {
       "additionalProperties": false,
       "properties": {
         "Auth": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_statemachine__Auth"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__Auth"
             }
           ],
           "description": "The authorization configuration for this API, path, and method\\.  \nUse this property to override the API's `DefaultAuthorizer` setting for an individual path, when no `DefaultAuthorizer` is specified, or to override the default `ApiKeyRequired` setting\\.  \n*Type*: [ApiStateMachineAuth](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-apistatemachineauth.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -6458,7 +6480,7 @@
       "title": "ApiEventProperties",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__Auth": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__Auth": {
       "additionalProperties": false,
       "properties": {
         "ApiKeyRequired": {
@@ -6485,7 +6507,7 @@
         "ResourcePolicy": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_statemachine__ResourcePolicy"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__ResourcePolicy"
             }
           ],
           "description": "Configure the resource policy for this API and path\\.  \n*Type*: [ResourcePolicyStatement](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-resourcepolicystatement.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -6496,13 +6518,13 @@
       "title": "Auth",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__CloudWatchEvent": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__CloudWatchEvent": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_statemachine__CloudWatchEventProperties"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__CloudWatchEventProperties"
             }
           ],
           "description": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineschedule.html) \\| [ScheduleV2](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineschedulev2.html) \\| [CloudWatchEvent](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinecloudwatchevent.html) \\| [EventBridgeRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineeventbridgerule.html) \\| [Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineapi.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -6526,7 +6548,7 @@
       "title": "CloudWatchEvent",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__CloudWatchEventProperties": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__CloudWatchEventProperties": {
       "additionalProperties": false,
       "properties": {
         "EventBusName": {
@@ -6573,7 +6595,7 @@
       "title": "CloudWatchEventProperties",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__DeadLetterConfig": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__DeadLetterConfig": {
       "additionalProperties": false,
       "properties": {
         "Arn": {
@@ -6605,13 +6627,13 @@
       "title": "DeadLetterConfig",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__EventBridgeRuleEvent": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__EventBridgeRuleEvent": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_statemachine__EventBridgeRuleEventProperties"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__EventBridgeRuleEventProperties"
             }
           ],
           "description": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineschedule.html) \\| [ScheduleV2](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineschedulev2.html) \\| [CloudWatchEvent](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinecloudwatchevent.html) \\| [EventBridgeRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineeventbridgerule.html) \\| [Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineapi.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -6635,13 +6657,13 @@
       "title": "EventBridgeRuleEvent",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__EventBridgeRuleEventProperties": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__EventBridgeRuleEventProperties": {
       "additionalProperties": false,
       "properties": {
         "DeadLetterConfig": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_statemachine__DeadLetterConfig"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__DeadLetterConfig"
             }
           ],
           "description": "Configure the Amazon Simple Queue Service \\(Amazon SQS\\) queue where EventBridge sends events after a failed target invocation\\. Invocation can fail, for example, when sending an event to a Lambda function that doesn't exist, or when EventBridge has insufficient permissions to invoke the Lambda function\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [DeadLetterConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinedeadletterconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`DeadLetterConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-deadletterconfig) property of the `AWS::Events::Rule` `Target` data type\\. The AWS SAM version of this property includes additional subproperties, in case you want AWS SAM to create the dead\\-letter queue for you\\.",
@@ -6699,13 +6721,13 @@
           "title": "RetryPolicy"
         },
         "Target": {
-          "$ref": "#/definitions/schema_source__aws_serverless_statemachine__EventBridgeRuleTarget"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__EventBridgeRuleTarget"
         }
       },
       "title": "EventBridgeRuleEventProperties",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__EventBridgeRuleTarget": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__EventBridgeRuleTarget": {
       "additionalProperties": false,
       "properties": {
         "Id": {
@@ -6718,7 +6740,7 @@
       "title": "EventBridgeRuleTarget",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__Properties": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__Properties": {
       "additionalProperties": false,
       "properties": {
         "Definition": {
@@ -6750,19 +6772,19 @@
           "additionalProperties": {
             "anyOf": [
               {
-                "$ref": "#/definitions/schema_source__aws_serverless_statemachine__ScheduleEvent"
+                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__ScheduleEvent"
               },
               {
-                "$ref": "#/definitions/schema_source__aws_serverless_statemachine__ScheduleV2Event"
+                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__ScheduleV2Event"
               },
               {
-                "$ref": "#/definitions/schema_source__aws_serverless_statemachine__CloudWatchEvent"
+                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__CloudWatchEvent"
               },
               {
-                "$ref": "#/definitions/schema_source__aws_serverless_statemachine__EventBridgeRuleEvent"
+                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__EventBridgeRuleEvent"
               },
               {
-                "$ref": "#/definitions/schema_source__aws_serverless_statemachine__ApiEvent"
+                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__ApiEvent"
               }
             ]
           },
@@ -6870,7 +6892,7 @@
       "title": "Properties",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__Resource": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__Resource": {
       "additionalProperties": false,
       "properties": {
         "Condition": {
@@ -6893,7 +6915,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Properties": {
-          "$ref": "#/definitions/schema_source__aws_serverless_statemachine__Properties"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__Properties"
         },
         "Type": {
           "enum": [
@@ -6913,7 +6935,7 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__ResourcePolicy": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__ResourcePolicy": {
       "additionalProperties": false,
       "properties": {
         "AwsAccountBlacklist": {
@@ -7096,7 +7118,7 @@
       "title": "ResourcePolicy",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__ScheduleEvent": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__ScheduleEvent": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
@@ -7126,13 +7148,13 @@
       "title": "ScheduleEvent",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__ScheduleV2Event": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__ScheduleV2Event": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_statemachine__ScheduleV2EventProperties"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__ScheduleV2EventProperties"
             }
           ],
           "description": "An object describing the properties of this event mapping\\. The set of properties must conform to the defined `Type`\\.  \n*Type*: [Schedule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineschedule.html) \\| [ScheduleV2](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineschedulev2.html) \\| [CloudWatchEvent](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinecloudwatchevent.html) \\| [EventBridgeRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineeventbridgerule.html) \\| [Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachineapi.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -7156,13 +7178,13 @@
       "title": "ScheduleV2Event",
       "type": "object"
     },
-    "schema_source__aws_serverless_statemachine__ScheduleV2EventProperties": {
+    "samtranslator__internal__schema_source__aws_serverless_statemachine__ScheduleV2EventProperties": {
       "additionalProperties": false,
       "properties": {
         "DeadLetterConfig": {
           "allOf": [
             {
-              "$ref": "#/definitions/schema_source__aws_serverless_statemachine__DeadLetterConfig"
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__DeadLetterConfig"
             }
           ],
           "description": "Configure the Amazon Simple Queue Service \\(Amazon SQS\\) queue where EventBridge sends events after a failed target invocation\\. Invocation can fail, for example, when sending an event to a Lambda function that doesn't exist, or when EventBridge has insufficient permissions to invoke the Lambda function\\. For more information, see [Configuring a dead\\-letter queue for EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/configuring-schedule-dlq.html) in the *EventBridge Scheduler User Guide*\\.  \n*Type*: [DeadLetterConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinescheduledeadletterconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`DeadLetterConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-deadletterconfig) property of the `AWS::Scheduler::Schedule` `Target` data type\\. The AWS SAM version of this property includes additional subproperties, in case you want AWS SAM to create the dead\\-letter queue for you\\.",
@@ -7322,31 +7344,31 @@
       "additionalProperties": {
         "anyOf": [
           {
-            "$ref": "#/definitions/schema_source__aws_serverless_connector__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_connector__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__aws_serverless_function__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__aws_serverless_simpletable__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_simpletable__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__aws_serverless_statemachine__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__aws_serverless_layerversion__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_layerversion__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__aws_serverless_api__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__aws_serverless_httpapi__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__aws_serverless_application__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_application__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__any_cfn_resource__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__any_cfn_resource__Resource"
           }
         ]
       },
