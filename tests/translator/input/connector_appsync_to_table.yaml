@@ -1,0 +1,78 @@
+Resources:
+  NotesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: notes-table
+      AttributeDefinitions:
+      - AttributeName: NoteId
+        AttributeType: S
+      - AttributeName: UserId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: UserId
+        KeyType: HASH
+      - AttributeName: NoteId
+        KeyType: RANGE
+
+  DynamoDBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: appsync-dynamodb-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - sts:AssumeRole
+          Principal:
+            Service:
+            - appsync.amazonaws.com
+
+  AppSyncApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      AuthenticationType: AWS_IAM
+      Name: AppSyncApi
+
+  ApiSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Definition: |
+        type Note {
+          NoteId: ID!
+          title: String
+          content: String
+        }
+        type Query {
+          getNote(NoteId: ID!): Note
+        }
+        type Mutation {
+          saveNote(NoteId: ID!, title: String!, content: String!): Note!
+        }
+        type Schema {
+          query: Query
+          mutation: Mutation
+        }
+
+  NotesTableDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: NotesTableDataSource
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt DynamoDBRole.Arn
+      DynamoDBConfig:
+        TableName: !Ref NotesTable
+        AwsRegion: !Sub ${AWS::Region}
+
+  DataSourceToTableConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: NotesTableDataSource
+      Destination:
+        Id: NotesTable
+      Permissions:
+      - Read
+      - Write

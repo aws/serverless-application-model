@@ -1,0 +1,110 @@
+{
+  "Resources": {
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "bar"
+        },
+        "Handler": "foo",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "AnyNonOfficialManagedPolicy",
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyStateMachine": {
+      "Properties": {
+        "DefinitionS3Location": {
+          "Bucket": "foo",
+          "Key": "bar"
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MyStateMachineRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "MyStateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "AnyNonOfficialManagedPolicy",
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

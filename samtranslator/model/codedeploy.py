@@ -1,11 +1,12 @@
-from samtranslator.model import PropertyType, Resource
+from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import ref
-from samtranslator.model.types import IS_DICT, IS_STR, is_type, one_of
 
 
 class CodeDeployApplication(Resource):
     resource_type = "AWS::CodeDeploy::Application"
-    property_types = {"ComputePlatform": PropertyType(False, one_of(IS_STR, IS_DICT))}
+    property_types = {
+        "ComputePlatform": GeneratedProperty(),
+    }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
 
@@ -13,13 +14,13 @@ class CodeDeployApplication(Resource):
 class CodeDeployDeploymentGroup(Resource):
     resource_type = "AWS::CodeDeploy::DeploymentGroup"
     property_types = {
-        "AlarmConfiguration": PropertyType(False, IS_DICT),
-        "ApplicationName": PropertyType(True, one_of(IS_STR, IS_DICT)),
-        "AutoRollbackConfiguration": PropertyType(False, IS_DICT),
-        "DeploymentConfigName": PropertyType(False, one_of(IS_STR, IS_DICT)),
-        "DeploymentStyle": PropertyType(False, IS_DICT),
-        "ServiceRoleArn": PropertyType(True, one_of(IS_STR, IS_DICT)),
-        "TriggerConfigurations": PropertyType(False, is_type(list)),
+        "AlarmConfiguration": GeneratedProperty(),
+        "ApplicationName": GeneratedProperty(),
+        "AutoRollbackConfiguration": GeneratedProperty(),
+        "DeploymentConfigName": GeneratedProperty(),
+        "DeploymentStyle": GeneratedProperty(),
+        "ServiceRoleArn": GeneratedProperty(),
+        "TriggerConfigurations": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}

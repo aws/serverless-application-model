@@ -26,7 +26,7 @@ black:
 black-check:
 	# Checking latest schema was generated (run `make schema` if this fails)
 	mkdir -p .tmp
-	python -m schema_source.schema --sam-schema .tmp/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema .tmp/schema.json
+	python -m samtranslator.internal.schema_source.schema --sam-schema .tmp/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema .tmp/schema.json
 	diff -u schema_source/sam.schema.json .tmp/sam.schema.json
 	diff -u samtranslator/schema/schema.json .tmp/schema.json
 	black --check setup.py samtranslator tests integration bin schema_source
@@ -60,14 +60,14 @@ fetch-schema-data:
 
 update-schema-data:
 	# Parse docs
-	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > schema_source/docs.json
+	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > samtranslator/internal/schema_source/sam-docs.json
 	bin/parse_docs.py --cfn .tmp/aws-cloudformation-user-guide/doc_source > schema_source/cloudformation-docs.json
 
 	# Add CloudFormation docs to CloudFormation schema
 	python bin/add_docs_cfn_schema.py --schema .tmp/cloudformation.schema.json --docs schema_source/cloudformation-docs.json > schema_source/cloudformation.schema.json
 
 schema:
-	python -m schema_source.schema --sam-schema schema_source/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema samtranslator/schema/schema.json
+	python -m samtranslator.internal.schema_source.schema --sam-schema schema_source/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema samtranslator/schema/schema.json
 
 # Update all schema data and schemas
 schema-all: fetch-schema-data update-schema-data schema

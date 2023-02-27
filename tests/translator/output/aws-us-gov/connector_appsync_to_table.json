@@ -1,0 +1,190 @@
+{
+  "Resources": {
+    "ApiSchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "AppSyncApi",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Note {\n  NoteId: ID!\n  title: String\n  content: String\n}\ntype Query {\n  getNote(NoteId: ID!): Note\n}\ntype Mutation {\n  saveNote(NoteId: ID!, title: String!, content: String!): Note!\n}\ntype Schema {\n  query: Query\n  mutation: Mutation\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    },
+    "AppSyncApi": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "Name": "AppSyncApi"
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "DataSourceToTableConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "DataSourceToTableConnector": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::DataSource"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "NotesTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "NotesTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "NotesTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "NotesTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "DynamoDBRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "DynamoDBRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "RoleName": "appsync-dynamodb-role"
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "NotesTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "NoteId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "UserId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "UserId",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "NoteId",
+            "KeyType": "RANGE"
+          }
+        ],
+        "TableName": "notes-table"
+      },
+      "Type": "AWS::DynamoDB::Table"
+    },
+    "NotesTableDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "AppSyncApi",
+            "ApiId"
+          ]
+        },
+        "DynamoDBConfig": {
+          "AwsRegion": {
+            "Fn::Sub": "${AWS::Region}"
+          },
+          "TableName": {
+            "Ref": "NotesTable"
+          }
+        },
+        "Name": "NotesTableDataSource",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "DynamoDBRole",
+            "Arn"
+          ]
+        },
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    }
+  }
+}

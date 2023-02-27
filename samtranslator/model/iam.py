@@ -1,19 +1,18 @@
 from typing import Any, Dict
 
-from samtranslator.model import PropertyType, Resource
+from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
-from samtranslator.model.types import IS_DICT, IS_STR, is_type, list_of
 
 
 class IAMRole(Resource):
     resource_type = "AWS::IAM::Role"
     property_types = {
-        "AssumeRolePolicyDocument": PropertyType(True, IS_DICT),
-        "ManagedPolicyArns": PropertyType(False, is_type(list)),
-        "Path": PropertyType(False, IS_STR),
-        "Policies": PropertyType(False, is_type(list)),
-        "PermissionsBoundary": PropertyType(False, IS_STR),
-        "Tags": PropertyType(False, list_of(IS_DICT)),
+        "AssumeRolePolicyDocument": GeneratedProperty(),
+        "ManagedPolicyArns": GeneratedProperty(),
+        "Path": GeneratedProperty(),
+        "Policies": GeneratedProperty(),
+        "PermissionsBoundary": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
@@ -22,19 +21,19 @@ class IAMRole(Resource):
 class IAMManagedPolicy(Resource):
     resource_type = "AWS::IAM::ManagedPolicy"
     property_types = {
-        "Description": PropertyType(False, IS_STR),
-        "Groups": PropertyType(False, IS_STR),
-        "PolicyDocument": PropertyType(True, IS_DICT),
-        "ManagedPolicyName": PropertyType(False, IS_STR),
-        "Path": PropertyType(False, IS_STR),
-        "Roles": PropertyType(False, is_type(list)),
-        "Users": PropertyType(False, list_of(IS_STR)),
+        "Description": GeneratedProperty(),
+        "Groups": GeneratedProperty(),
+        "PolicyDocument": GeneratedProperty(),
+        "ManagedPolicyName": GeneratedProperty(),
+        "Path": GeneratedProperty(),
+        "Roles": GeneratedProperty(),
+        "Users": GeneratedProperty(),
     }
 
 
 class IAMRolePolicies:
     @classmethod
-    def construct_assume_role_policy_for_service_principal(cls, service_principal):  # type: ignore[no-untyped-def]
+    def construct_assume_role_policy_for_service_principal(cls, service_principal: str) -> Dict[str, Any]:
         return {
             "Version": "2012-10-17",
             "Statement": [

@@ -250,3 +250,13 @@ Resources:
       Auth:
         Authorizers:
           MyAuth: AWS_IAM # It should be a dict
+
+  AuthorizerWithBadDisableFunctionDefaultPermissionsType:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyAuth:
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            DisableFunctionDefaultPermissions: foo
