@@ -570,6 +570,85 @@
       "title": "DeploymentPreference",
       "type": "object"
     },
+    "DocumentDBEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/DocumentDBEventProperties"
+            }
+          ],
+          "description": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-s3.html) \\| [SNS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sns.html) \\| [Kinesis](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-kinesis.html) \\| [DynamoDB](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-dynamodb.html) \\| [SQS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sqs.html) \\| [Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html) \\| [Schedule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedule.html) \\| [ScheduleV2](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedulev2.html) \\| [CloudWatchEvent](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchevent.html) \\| [EventBridgeRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-eventbridgerule.html) \\| [CloudWatchLogs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchlogs.html) \\| [IoTRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-iotrule.html) \\| [AlexaSkill](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-alexaskill.html) \\| [Cognito](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cognito.html) \\| [HttpApi](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-httpapi.html) \\| [MSK](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-msk.html) \\| [MQ](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-mq.html) \\| [SelfManagedKafka](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Object describing properties of this event mapping\\. The set of properties must conform to the defined Type\\.  \n*Type*: [S3](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-s3.html) \\| [SNS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sns.html) \\| [Kinesis](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-kinesis.html) \\| [DynamoDB](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-dynamodb.html) \\| [SQS](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sqs.html) \\| [Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html) \\| [Schedule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedule.html) \\| [ScheduleV2](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-schedulev2.html) \\| [CloudWatchEvent](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchevent.html) \\| [EventBridgeRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-eventbridgerule.html) \\| [CloudWatchLogs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchlogs.html) \\| [IoTRule](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-iotrule.html) \\| [AlexaSkill](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-alexaskill.html) \\| [Cognito](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cognito.html) \\| [HttpApi](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-httpapi.html) \\| [MSK](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-msk.html) \\| [MQ](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-mq.html) \\| [SelfManagedKafka](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Properties"
+        },
+        "Type": {
+          "description": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "enum": [
+            "DocumentDB"
+          ],
+          "markdownDescription": "The event type\\.  \n*Valid values*: `S3`, `SNS`, `Kinesis`, `DynamoDB`, `SQS`, `Api`, `Schedule`, `ScheduleV2`, `CloudWatchEvent`, `CloudWatchLogs`, `IoTRule`, `AlexaSkill`, `Cognito`, `EventBridgeRule`, `HttpApi`, `MSK`, `MQ`, `SelfManagedKafka`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "DocumentDBEvent",
+      "type": "object"
+    },
+    "DocumentDBEventProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "BatchSize": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Cluster": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "CollectionName": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DatabaseName": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Enabled": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FilterCriteria": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FullDocument": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "MaximumBatchingWindowInSeconds": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "SecretsManagerKmsKeyId": {
+          "title": "Secretsmanagerkmskeyid",
+          "type": "string"
+        },
+        "SourceAccessConfigurations": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "StartingPosition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "StartingPositionTimestamp": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Cluster",
+        "DatabaseName",
+        "SourceAccessConfigurations"
+      ],
+      "title": "DocumentDBEventProperties",
+      "type": "object"
+    },
     "DynamoDBConfig": {
       "additionalProperties": false,
       "properties": {
@@ -5649,7 +5728,7 @@
       "title": "ScheduleV2EventProperties",
       "type": "object"
     },
-    "schema_source__aws_serverless_graphqlapi__Auth": {
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth": {
       "additionalProperties": false,
       "properties": {
         "Type": {
@@ -5663,11 +5742,11 @@
       "title": "Auth",
       "type": "object"
     },
-    "schema_source__aws_serverless_graphqlapi__Properties": {
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties": {
       "additionalProperties": false,
       "properties": {
         "Auth": {
-          "$ref": "#/definitions/schema_source__aws_serverless_graphqlapi__Auth"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
         },
         "Name": {
           "title": "Name",
@@ -5696,11 +5775,11 @@
       "title": "Properties",
       "type": "object"
     },
-    "schema_source__aws_serverless_graphqlapi__Resource": {
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
-          "$ref": "#/definitions/schema_source__aws_serverless_graphqlapi__Properties"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties"
         },
         "Type": {
           "enum": [
@@ -5717,7 +5796,7 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_graphqldatasource__Properties": {
+    "samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Properties": {
       "additionalProperties": false,
       "properties": {
         "ApiId": {
@@ -5751,11 +5830,11 @@
       "title": "Properties",
       "type": "object"
     },
-    "schema_source__aws_serverless_graphqldatasource__Resource": {
+    "samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Resource": {
       "additionalProperties": false,
       "properties": {
         "Properties": {
-          "$ref": "#/definitions/schema_source__aws_serverless_graphqldatasource__Properties"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Properties"
         },
         "Type": {
           "enum": [
@@ -5772,7 +5851,7 @@
       "title": "Resource",
       "type": "object"
     },
-    "schema_source__aws_serverless_httpapi__Auth": {
+    "samtranslator__internal__schema_source__aws_serverless_httpapi__Auth": {
       "additionalProperties": false,
       "properties": {
         "Authorizers": {
@@ -7463,13 +7542,13 @@
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_application__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__aws_serverless_graphqlapi__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__aws_serverless_graphqldatasource__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Resource"
           },
           {
-            "$ref": "#/definitions/schema_source__any_cfn_resource__Resource"
+            "$ref": "#/definitions/samtranslator__internal__schema_source__any_cfn_resource__Resource"
           }
         ]
       },
