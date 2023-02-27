@@ -1960,6 +1960,10 @@
           "markdownDescription": "The Amazon Resource Name \\(ARN\\) of the Amazon MQ broker\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventSourceArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-eventsourcearn) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "Broker"
         },
+        "DynamicPolicyName": {
+          "title": "Dynamicpolicyname",
+          "type": "boolean"
+        },
         "Enabled": {
           "allOf": [
             {
