@@ -19,6 +19,7 @@ integ-test:
 
 black:
 	black setup.py samtranslator tests integration bin schema_source
+	bin/transform-test-error-json-format.py --write tests/translator/output/error_*.json
 	bin/json-format.py --write tests integration samtranslator/policy_templates_data
 	bin/yaml-format.py --write tests
 	bin/yaml-format.py --write integration --add-test-metadata
@@ -30,6 +31,7 @@ black-check:
 	diff -u schema_source/sam.schema.json .tmp/sam.schema.json
 	diff -u samtranslator/schema/schema.json .tmp/schema.json
 	black --check setup.py samtranslator tests integration bin schema_source
+	bin/transform-test-error-json-format.py --check tests/translator/output/error_*.json
 	bin/json-format.py --check tests integration samtranslator/policy_templates_data
 	bin/yaml-format.py --check tests
 	bin/yaml-format.py --check integration --add-test-metadata
