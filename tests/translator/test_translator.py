@@ -739,11 +739,14 @@ class TestTemplateValidation(TestCase):
     # test to make sure with arn it doesnt load, with non-arn it does
     @parameterized.expand(
         [
+            ([""], 1),
             (["SomeNonArnThing"], 1),
             (["SomeNonArnThing", "AnotherNonArnThing"], 1),
             (["aws:looks:like:an:ARN:but-not-really"], 1),
-            (["arn:looks:like:an:ARN:foo"], 0),
             (["arn:looks:like:an:ARN:foo", "Mixing_things_v2"], 1),
+            (["arn:looks:like:an:ARN:foo"], 0),
+            ([{"Ref": "Foo"}], 0),
+            ([{"SQSPollerPolicy": {"QueueName": "Bar"}}], 0),
             (["arn:looks:like:an:ARN", "arn:aws:ec2:us-east-1:123456789012:vpc/vpc-0e9801d129EXAMPLE"], 0),
         ]
     )
