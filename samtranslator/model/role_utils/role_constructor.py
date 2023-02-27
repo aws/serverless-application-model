@@ -43,6 +43,12 @@ def _get_managed_policy_arn(
         if arn:
             return arn
 
+    # If it's already an ARN, we're done
+    # https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
+    is_arn = name.startswith("arn:")
+    if is_arn:
+        return name
+
     # Caller-provided function to get managed policy map (fallback)
     if get_managed_policy_map:
         fallback_managed_policy_map = get_managed_policy_map()
