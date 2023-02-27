@@ -33,7 +33,7 @@ class IAMManagedPolicy(Resource):
 
 class IAMRolePolicies:
     @classmethod
-    def construct_assume_role_policy_for_service_principal(cls, service_principal):  # type: ignore[no-untyped-def]
+    def construct_assume_role_policy_for_service_principal(cls, service_principal: str) -> Dict[str, Any]:
         return {
             "Version": "2012-10-17",
             "Statement": [
