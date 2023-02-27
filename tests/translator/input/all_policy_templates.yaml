@@ -148,6 +148,9 @@ Resources:
       - StepFunctionsExecutionPolicy:
           StateMachineName: name
 
+      - StepFunctionsExecutionPolicy_v2:
+          StateMachineName: name
+
       - CodeCommitCrudPolicy:
           RepositoryName: name
 
