@@ -9,6 +9,7 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
+from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
@@ -1574,11 +1575,17 @@ class SamLayerVersion(SamResourceMacro):
         :rtype: list
         """
         # Resolve intrinsics if applicable:
-        self.LayerName = self._resolve_string_parameter(intrinsics_resolver, self.LayerName, "LayerName")
-        self.LicenseInfo = self._resolve_string_parameter(intrinsics_resolver, self.LicenseInfo, "LicenseInfo")
-        self.Description = self._resolve_string_parameter(intrinsics_resolver, self.Description, "Description")
-        self.RetentionPolicy = self._resolve_string_parameter(
-            intrinsics_resolver, self.RetentionPolicy, "RetentionPolicy"
+        self.LayerName = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.LayerName, "LayerName"
+        )
+        self.LicenseInfo = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.LicenseInfo, "LicenseInfo"
+        )
+        self.Description = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.Description, "Description"
+        )
+        self.RetentionPolicy = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.RetentionPolicy, "RetentionPolicy"
         )
 
         # If nothing defined, this will be set to Retain
