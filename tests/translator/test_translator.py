@@ -3,6 +3,7 @@ import itertools
 import json
 import os.path
 import re
+import time
 from functools import cmp_to_key, reduce
 from pathlib import Path
 from unittest import TestCase
@@ -668,6 +669,15 @@ class TestApiAlwaysDeploy(TestCase):
     time.time() for deterministic tests.
     """
 
+    @staticmethod
+    def get_deployment_ids(template):
+        cfn_template = Translator({}, Parser()).translate(template, {})
+        deployment_ids = set()
+        for k, v in cfn_template["Resources"].items():
+            if v["Type"] == "AWS::ApiGateway::Deployment":
+                deployment_ids.add(k)
+        return deployment_ids
+
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_always_deploy(self):
@@ -688,6 +698,53 @@ class TestApiAlwaysDeploy(TestCase):
             obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
             cfn_template = Translator(None, Parser()).translate(obj, {})
             self.assertIn("MyApiDeployment84fc3726d4", cfn_template["Resources"])
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_without_alwaysdeploy_never_changes(self):
+        sam_template = {
+            "Resources": {
+                "MyApi": {
+                    "Type": "AWS::Serverless::Api",
+                    "Properties": {
+                        "StageName": "prod",
+                    },
+                }
+            },
+        }
+
+        deployment_ids = set()
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+
+        self.assertEqual(len(deployment_ids), 1)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_with_alwaysdeploy_always_changes(self):
+        sam_template = {
+            "Resources": {
+                "MyApi": {
+                    "Type": "AWS::Serverless::Api",
+                    "Properties": {
+                        "StageName": "prod",
+                        "AlwaysDeploy": True,
+                    },
+                }
+            },
+        }
+
+        deployment_ids = set()
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+
+        self.assertEqual(len(deployment_ids), 3)
 
 
 class TestTemplateValidation(TestCase):
