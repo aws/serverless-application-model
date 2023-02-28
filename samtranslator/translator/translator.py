@@ -340,6 +340,7 @@ class Translator:
                     generated_connector = self._get_generated_connector(
                         source_logical_id,
                         full_connector_logical_id,
+                        connector_logical_id,
                         connector_dict,
                     )
 
@@ -354,13 +355,18 @@ class Translator:
         return connectors
 
     def _get_generated_connector(
-        self, source_logical_id: str, connector_logical_id: str, connector_dict: Dict[str, Any]
+        self,
+        source_logical_id: str,
+        full_connector_logical_id: str,
+        connector_logical_id: str,
+        connector_dict: Dict[str, Any],
     ) -> Resource:
         """
         Generates the connector resource from the embedded connector
 
         :param str source_logical_id: Logical id of the resource the connector is attached to
-        :param str connector_logical_id: Logical id of the connector
+        :param str full_connector_logical_id: source_logical_id + connector_logical_id
+        :param str connector_logical_id: Logical id of the connector defined by the user
         :param dict connector_dict: The properties of the connector including the Destination, Permissions and optionally the SourceReference
         :return: The generated SAMConnector resource
         """
@@ -369,7 +375,7 @@ class Translator:
 
         sam_expect(
             connector_dict.get("Properties"),
-            connector_logical_id,
+            source_logical_id,
             f"{connector_logical_id}.Properties",
             is_resource_attribute=True,
         ).to_be_a_map()
@@ -379,7 +385,7 @@ class Translator:
         if "SourceReference" in properties:
             sam_expect(
                 properties.get("SourceReference"),
-                connector_logical_id,
+                source_logical_id,
                 f"{connector_logical_id}.Properties.SourceReference",
             ).to_be_a_map()
 
@@ -390,7 +396,7 @@ class Translator:
             properties["Source"].update(properties["SourceReference"])
             del properties["SourceReference"]
 
-        return SamConnector.from_dict(connector_logical_id, connector)
+        return SamConnector.from_dict(full_connector_logical_id, connector)
 
 
 def prepare_plugins(plugins: Optional[List[BasePlugin]], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:
