@@ -8,7 +8,7 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, ResourceMacro
 from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
-from samtranslator.model.events import EventsRule
+from samtranslator.model.events import EventsRule, generate_valid_target_id
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.eventsources.pull import SQS
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidEventException, InvalidResourceException
@@ -31,6 +31,7 @@ from samtranslator.validator.value_validator import sam_expect
 CONDITION = "Condition"
 
 REQUEST_PARAMETER_PROPERTIES = ["Required", "Caching"]
+EVENT_RULE_LAMBDA_TARGET_SUFFIX = "LambdaTarget"
 
 
 class PushEventSource(ResourceMacro, metaclass=ABCMeta):
@@ -176,7 +177,8 @@ class Schedule(PushEventSource):
         :returns: the Target property
         :rtype: dict
         """
-        target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
+        target_id = generate_valid_target_id(self.logical_id, EVENT_RULE_LAMBDA_TARGET_SUFFIX)
+        target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
         if self.Input is not None:
             target["Input"] = self.Input
 
@@ -271,7 +273,11 @@ class CloudWatchEvent(PushEventSource):
         :returns: the Target property
         :rtype: dict
         """
-        target_id = self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "LambdaTarget"
+        target_id = (
+            self.Target["Id"]
+            if self.Target and "Id" in self.Target
+            else generate_valid_target_id(self.logical_id, EVENT_RULE_LAMBDA_TARGET_SUFFIX)
+        )
         target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
         if self.Input is not None:
             target["Input"] = self.Input

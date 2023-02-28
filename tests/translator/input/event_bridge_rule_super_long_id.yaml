@@ -1,0 +1,43 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  QueryForAvailabilityWithUserExceptionQueryForAvailabilityWithUserException:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Events:
+        QueryForAvailabilityWithUserExceptionEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(05 12 * * ? *)
+
+  SuperSuperSuperSuperLongNameForStepFunction:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachine
+      Events:
+        SuperSuperSuperSuperLongNameForStepFunctionCWEventEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail:
+                state:
+                - terminated
+        MyApiEvent:
+          Type: Api
+          Properties:
+            Path: /startMyExecution
+            Method: post
+      DefinitionUri:
+        Bucket: sam-demo-bucket
+        Key: my-state-machine.asl.json
+        Version: 3
+      Role: !Sub 'arn:${AWS::Partition}:iam::123456123456:role/service-role/SampleRole'
