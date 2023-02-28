@@ -1,0 +1,178 @@
+{
+ "Resources": {
+  "MyFunction": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "exports.handler = async (event, context, callback) => {\n  return {\n    statusCode: 200,\n    body: 'Success'\n  }\n}\n"
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "MyFunctionRole",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs14.x",
+    "Tags": [
+     {
+      "Key": "lambda:createdBy",
+      "Value": "SAM"
+     }
+    ]
+   }
+  },
+  "MyCognitoUserPool": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "UserPoolName": "MyCognitoUserPoolRandomName"
+   }
+  },
+  "MyCognitoUserPool2": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "UserPoolName": "MyCognitoUserPoolRandomName2"
+   }
+  },
+  "MyFunctionMyEventV1PermissionProd": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Ref": "MyFunction"
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Sub": [
+      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/test",
+      {
+       "__ApiId__": {
+        "Ref": "MyApi"
+       },
+       "__Stage__": "*"
+      }
+     ]
+    }
+   }
+  },
+  "MyApiProdStage": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "MyApiDeploymentf4bf62db4c"
+    },
+    "RestApiId": {
+     "Ref": "MyApi"
+    },
+    "StageName": "Prod"
+   }
+  },
+  "MyFunctionRole": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": [
+        "sts:AssumeRole"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "Service": [
+         "lambda.amazonaws.com"
+        ]
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+    ],
+    "Tags": [
+     {
+      "Key": "lambda:createdBy",
+      "Value": "SAM"
+     }
+    ]
+   }
+  },
+  "MyApiDeploymentf4bf62db4c": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "RestApi deployment id: f4bf62db4c8bd0cbd8276f47c4280a81f4adec16",
+    "RestApiId": {
+     "Ref": "MyApi"
+    },
+    "StageName": "Stage"
+   }
+  },
+  "MyApi": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Body": {
+     "info": {
+      "version": "1",
+      "title": "Example"
+     },
+     "paths": {
+      "/test": {
+       "get": {
+        "security": [
+         {
+          "MyAuthorizer": []
+         }
+        ],
+        "x-amazon-apigateway-integration": {
+         "httpMethod": "POST",
+         "type": "aws_proxy",
+         "uri": {
+          "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+         }
+        },
+        "responses": {}
+       }
+      }
+     },
+     "swagger": "2.0",
+     "securityDefinitions": {
+      "MyAuthorizer2": {
+       "in": "header",
+       "type": "apiKey",
+       "name": "Authorization",
+       "x-amazon-apigateway-authorizer": {
+        "providerARNs": [
+         {
+          "Fn::GetAtt": [
+           "MyCognitoUserPool2",
+           "Arn"
+          ]
+         }
+        ],
+        "type": "cognito_user_pools"
+       },
+       "x-amazon-apigateway-authtype": "cognito_user_pools"
+      },
+      "MyAuthorizer": {
+       "in": "header",
+       "type": "apiKey",
+       "name": "Authorization",
+       "x-amazon-apigateway-authorizer": {
+        "providerARNs": [
+         {
+          "Fn::GetAtt": [
+           "MyCognitoUserPool",
+           "Arn"
+          ]
+         }
+        ],
+        "type": "cognito_user_pools"
+       },
+       "x-amazon-apigateway-authtype": "cognito_user_pools"
+      }
+     }
+    }
+   }
+  }
+ }
+}
