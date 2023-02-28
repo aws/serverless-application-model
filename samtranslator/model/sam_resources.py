@@ -60,7 +60,6 @@ from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMManagedPolicy, IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import (
-    fnGetAtt,
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
@@ -2171,38 +2170,49 @@ class SamGraphQLApi(SamResourceMacro):
         if self.Tags:
             api.Tags = get_tag_list(self.Tags)
 
-        cloudwatch_role = None  # conditionally generated, if left as None then its not added to resources
-
         # Logging has 3 possible types: dict, bool, and None.
         # GraphQLApi will not include logging if and only if the user explicity sets Logging as false boolean.
         # It will for every other value (including true boolean which is essentially same as None).
-        if not isinstance(self.Logging, bool) or self.Logging is True:
-            api.LogConfig = self._parse_logging_properties()
+        if isinstance(self.Logging, bool) and self.Logging is False:
+            return api, None
 
-            # We create a CloudWatch role for the user if the Logging property is not a dictionary
-            # that contains the "CloudWatchLogsRoleArn" property.
-            if not isinstance(self.Logging, dict) or "CloudWatchLogsRoleArn" not in self.Logging:
-                cloudwatch_role = self._construct_cloudwatch_role()
+        api.LogConfig, cloudwatch_role = (
+            self._parse_logging_properties() if isinstance(self.Logging, dict) else self._create_logging_default()
+        )
 
         return api, cloudwatch_role
 
-    def _parse_logging_properties(self) -> LogConfigType:
+    def _create_logging_default(self) -> Tuple[LogConfigType, IAMRole]:
+        """
+        Create a default logging configuration.
+
+        This function should only be called when "Logging" property is a False boolean or NoneType.
+        """
+        log_config: LogConfigType = {}
+        log_config["FieldLogLevel"] = "ALL"
+        cloudwatch_role = self._construct_cloudwatch_role()
+        log_config["CloudWatchLogsRoleArn"] = cloudwatch_role.get_runtime_attr("arn")
+
+        return log_config, cloudwatch_role
+
+    def _parse_logging_properties(self) -> Tuple[LogConfigType, Optional[IAMRole]]:
+        """
+        Parse logging properties from SAM template, and use defaults if required keys dont exist.
+
+        This function should only be called when "Logging" property is a dictionary type.
+        """
+        logging = cast(Dict[str, Any], self.Logging)
         log_config: LogConfigType = {}
 
-        if isinstance(self.Logging, dict) and "CloudWatchLogsRoleArn" in self.Logging:
-            log_config["CloudWatchLogsRoleArn"] = self.Logging["CloudWatchLogsRoleArn"]
-        else:
-            log_config["CloudWatchLogsRoleArn"] = fnGetAtt(f"{self.logical_id}CloudWatchRole", "Arn")
+        log_config["FieldLogLevel"] = logging["FieldLogLevel"] if "FieldLogLevel" in logging else "ALL"
+        if "ExcludeVerboseContent" in logging:
+            log_config["ExcludeVerboseContent"] = logging["ExcludeVerboseContent"]
 
-        if isinstance(self.Logging, dict) and "FieldLogLevel" in self.Logging:
-            log_config["FieldLogLevel"] = self.Logging["FieldLogLevel"]
-        else:
-            log_config["FieldLogLevel"] = "ALL"
-
-        if isinstance(self.Logging, dict) and "ExcludeVerboseContent" in self.Logging:
-            log_config["ExcludeVerboseContent"] = self.Logging["ExcludeVerboseContent"]
-
-        return log_config
+        cloudwatch_role = self._construct_cloudwatch_role() if "CloudWatchLogsRoleArn" not in logging else None
+        log_config["CloudWatchLogsRoleArn"] = (
+            cloudwatch_role.get_runtime_attr("arn") if cloudwatch_role else logging["CloudWatchLogsRoleArn"]
+        )
+        return log_config, cloudwatch_role
 
     def _construct_cloudwatch_role(self) -> IAMRole:
         role = IAMRole(

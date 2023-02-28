@@ -7,6 +7,7 @@ Resources:
       Tags:
         Key1: Value1
         Key2: Value2
+
   NoSchemaPropertiesAPI:
     Type: AWS::Serverless::GraphQLApi
     Properties:
@@ -16,6 +17,7 @@ Resources:
       Tags:
         key1: value1
         key2: value2
+
   BothSchemaInlineAndUriAPI:
     Type: AWS::Serverless::GraphQLApi
     Properties:
