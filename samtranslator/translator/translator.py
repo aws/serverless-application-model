@@ -373,27 +373,26 @@ class Translator:
         connector = copy.deepcopy(connector_dict)
         connector["Type"] = SamConnector.resource_type
 
-        sam_expect(
-            connector_dict.get("Properties"),
+        properties = sam_expect(
+            connector.get("Properties"),
             source_logical_id,
             f"Connectors.{connector_logical_id}.Properties",
             is_resource_attribute=True,
         ).to_be_a_map()
 
-        properties = connector["Properties"]
         properties["Source"] = {"Id": source_logical_id}
         if "SourceReference" in properties:
-            sam_expect(
+            source_reference = sam_expect(
                 properties.get("SourceReference"),
                 source_logical_id,
                 f"Connectors.{connector_logical_id}.Properties.SourceReference",
             ).to_be_a_map()
 
             # can't allow user to override the Id using SourceReference
-            if "Id" in properties["SourceReference"]:
+            if "Id" in source_reference:
                 raise InvalidResourceException(connector_logical_id, "'Id' shouldn't be defined in 'SourceReference'.")
 
-            properties["Source"].update(properties["SourceReference"])
+            properties["Source"].update(source_reference)
             del properties["SourceReference"]
 
         return SamConnector.from_dict(full_connector_logical_id, connector)
