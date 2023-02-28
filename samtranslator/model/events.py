@@ -3,7 +3,7 @@ from samtranslator.model.intrinsics import fnGetAtt, ref
 
 # Event Rule Targets Id and Logical Id has maximum 64 characters limit
 # https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_Target.html
-EVENT_RULE_TARGET_ID_MAX_LENGTH = 64
+_EVENT_RULE_TARGET_ID_MAX_LENGTH = 64
 
 
 class EventsRule(Resource):
@@ -24,10 +24,10 @@ class EventsRule(Resource):
 
 def generate_valid_target_id(logical_id: str, suffix: str) -> str:
     """Truncate Target Id if it is exceeding EVENT_RULE_ID_MAX_LENGTH limi."""
-    if len(logical_id) + len(suffix) <= EVENT_RULE_TARGET_ID_MAX_LENGTH:
+    if len(logical_id) + len(suffix) <= _EVENT_RULE_TARGET_ID_MAX_LENGTH:
         return logical_id + suffix
 
-    return _truncate_with_suffix(logical_id, EVENT_RULE_TARGET_ID_MAX_LENGTH, suffix)
+    return _truncate_with_suffix(logical_id, _EVENT_RULE_TARGET_ID_MAX_LENGTH, suffix)
 
 
 def _truncate_with_suffix(s: str, length: int, suffix: str) -> str:
