@@ -100,7 +100,7 @@ class ApiGatewayDeployment(Resource):
         always_deploy: Optional[bool] = False,
     ) -> None:
         """
-        Sets up the resource such that it will trigger a re-deployment when Swagger changes
+        Sets up the resource such that it will trigger a re-deployment when Swagger changes or always_deploy is true
         or the openapi version changes or a domain resource changes.
 
         :param stage: The ApiGatewayStage object which will be re-deployed
