@@ -3237,6 +3237,10 @@
           "markdownDescription": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "AccessLogSetting"
         },
+        "AlwaysDeploy": {
+          "title": "Alwaysdeploy",
+          "type": "boolean"
+        },
         "Auth": {
           "allOf": [
             {
@@ -3422,6 +3426,10 @@
           "description": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
           "markdownDescription": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "AccessLogSetting"
+        },
+        "AlwaysDeploy": {
+          "title": "Alwaysdeploy",
+          "type": "boolean"
         },
         "ApiKeySourceType": {
           "allOf": [

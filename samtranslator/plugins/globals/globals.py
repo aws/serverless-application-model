@@ -75,6 +75,7 @@ class Globals:
             "TracingEnabled",
             "OpenApiVersion",
             "Domain",
+            "AlwaysDeploy",
         ],
         SamResourceType.HttpApi.value: [
             "Auth",
