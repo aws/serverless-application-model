@@ -86,6 +86,7 @@ from .api.http_api_generator import HttpApiGenerator
 from .packagetype import IMAGE, ZIP
 from .s3_utils.uri_parser import construct_image_code_object, construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
+from ..internal.intrinsics import resolve_string_parameter_in_resource
 
 _CONDITION_CHAR_LIMIT = 255
 
@@ -1571,11 +1572,17 @@ class SamLayerVersion(SamResourceMacro):
         :rtype: list
         """
         # Resolve intrinsics if applicable:
-        self.LayerName = self._resolve_string_parameter(intrinsics_resolver, self.LayerName, "LayerName")
-        self.LicenseInfo = self._resolve_string_parameter(intrinsics_resolver, self.LicenseInfo, "LicenseInfo")
-        self.Description = self._resolve_string_parameter(intrinsics_resolver, self.Description, "Description")
-        self.RetentionPolicy = self._resolve_string_parameter(
-            intrinsics_resolver, self.RetentionPolicy, "RetentionPolicy"
+        self.LayerName = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.LayerName, "LayerName"
+        )
+        self.LicenseInfo = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.LicenseInfo, "LicenseInfo"
+        )
+        self.Description = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.Description, "Description"
+        )
+        self.RetentionPolicy = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.RetentionPolicy, "RetentionPolicy"
         )
 
         # If nothing defined, this will be set to Retain
