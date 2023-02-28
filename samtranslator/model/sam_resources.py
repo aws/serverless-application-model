@@ -9,6 +9,7 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
+from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
@@ -86,7 +87,6 @@ from .api.http_api_generator import HttpApiGenerator
 from .packagetype import IMAGE, ZIP
 from .s3_utils.uri_parser import construct_image_code_object, construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
-from ..internal.intrinsics import resolve_string_parameter_in_resource
 
 _CONDITION_CHAR_LIMIT = 255
 

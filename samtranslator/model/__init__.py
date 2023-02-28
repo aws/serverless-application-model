@@ -3,7 +3,7 @@ import inspect
 import re
 from abc import ABC, ABCMeta, abstractmethod
 from contextlib import suppress
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
