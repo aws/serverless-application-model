@@ -22,6 +22,6 @@ def scan_modules_recursively(module_name: str = "samtranslator") -> List[str]:
 class TestImport(TestCase):
     @parameterized.expand([(module_path,) for module_path in scan_modules_recursively()])
     def test_import(self, module_path: str):
-        pipe = subprocess.Popen([sys.executable, "-c", f"import {module_path}"])
+        pipe = subprocess.Popen([sys.executable, "-c", f"import {module_path}"], stderr=subprocess.PIPE)
         _, stderr = pipe.communicate()
         self.assertEqual(pipe.returncode, 0, stderr.decode("utf-8"))
