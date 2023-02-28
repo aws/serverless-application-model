@@ -3,7 +3,9 @@ import itertools
 import json
 import os.path
 import re
+import time
 from functools import cmp_to_key, reduce
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, Mock, patch
 
@@ -21,6 +23,7 @@ from samtranslator.yaml_helper import yaml_parse
 from tests.plugins.application.test_serverless_app_plugin import mock_get_region
 from tests.translator.helpers import get_template_parameter_values
 
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = BASE_PATH + "/input"
 OUTPUT_FOLDER = BASE_PATH + "/output"
@@ -35,6 +38,10 @@ SUCCESS_FILES_NAMES_FOR_TESTING = [
 ]
 ERROR_FILES_NAMES_FOR_TESTING = [os.path.splitext(f)[0] for f in os.listdir(INPUT_FOLDER) if f.startswith("error_")]
 OUTPUT_FOLDER = os.path.join(BASE_PATH, "output")
+
+
+def _parse_yaml(path):
+    return yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
 
 
 def deep_sort_lists(value):
@@ -655,6 +662,90 @@ class TestFunctionVersionWithParameterReferences(TestCase):
         print(json.dumps(output_fragment, indent=2))
 
         return output_fragment
+
+
+class TestApiAlwaysDeploy(TestCase):
+    """
+    AlwaysDeploy is used to force API Gateway to redeploy at every deployment.
+    See https://github.com/aws/serverless-application-model/issues/660
+
+    Since it relies on the system time to generate the template, need to patch
+    time.time() for deterministic tests.
+    """
+
+    @staticmethod
+    def get_deployment_ids(template):
+        cfn_template = Translator({}, Parser()).translate(template, {})
+        deployment_ids = set()
+        for k, v in cfn_template["Resources"].items():
+            if v["Type"] == "AWS::ApiGateway::Deployment":
+                deployment_ids.add(k)
+        return deployment_ids
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_always_deploy(self):
+        with patch("time.time", lambda: 13.37):
+            obj = _parse_yaml("tests/translator/input/translate_always_deploy.yaml")
+            deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
+            self.assertEqual(deployment_ids, {"MyApiDeploymentbd307a3ec3"})
+
+        with patch("time.time", lambda: 42.123):
+            obj = _parse_yaml("tests/translator/input/translate_always_deploy.yaml")
+            deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
+            self.assertEqual(deployment_ids, {"MyApiDeployment92cfceb39d"})
+
+        with patch("time.time", lambda: 42.1337):
+            obj = _parse_yaml("tests/translator/input/translate_always_deploy.yaml")
+            deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
+            self.assertEqual(deployment_ids, {"MyApiDeployment92cfceb39d"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_without_alwaysdeploy_never_changes(self):
+        sam_template = {
+            "Resources": {
+                "MyApi": {
+                    "Type": "AWS::Serverless::Api",
+                    "Properties": {
+                        "StageName": "prod",
+                    },
+                }
+            },
+        }
+
+        deployment_ids = set()
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+
+        self.assertEqual(len(deployment_ids), 1)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_with_alwaysdeploy_always_changes(self):
+        sam_template = {
+            "Resources": {
+                "MyApi": {
+                    "Type": "AWS::Serverless::Api",
+                    "Properties": {
+                        "StageName": "prod",
+                        "AlwaysDeploy": True,
+                    },
+                }
+            },
+        }
+
+        deployment_ids = set()
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+
+        self.assertEqual(len(deployment_ids), 3)
 
 
 class TestTemplateValidation(TestCase):
