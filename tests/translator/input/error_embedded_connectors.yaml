@@ -84,6 +84,13 @@ Resources:
             Id: MyQueue
           Permissions:
           - Write
+      NonDictSourceReference:
+        Properties:
+          SourceReference: foo
+          Destination:
+            Id: MyQueue
+          Permissions:
+          - Write
     Properties:
       Runtime: python3.9
       InlineCode: foo

@@ -376,7 +376,7 @@ class Translator:
         sam_expect(
             connector_dict.get("Properties"),
             source_logical_id,
-            f"{connector_logical_id}.Properties",
+            f"Connectors.{connector_logical_id}.Properties",
             is_resource_attribute=True,
         ).to_be_a_map()
 
@@ -386,7 +386,7 @@ class Translator:
             sam_expect(
                 properties.get("SourceReference"),
                 source_logical_id,
-                f"{connector_logical_id}.Properties.SourceReference",
+                f"Connectors.{connector_logical_id}.Properties.SourceReference",
             ).to_be_a_map()
 
             # can't allow user to override the Id using SourceReference
