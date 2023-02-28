@@ -99,6 +99,12 @@
                 ],
                 "$ref": "#definitions/AWS::Serverless::Api.S3Location"
               },
+              "MergeDefinitions": {
+                "type": [
+                  "boolean",
+                  "intrinsic"
+                ]
+              },
               "Description": {
                 "type": [
                   "string",

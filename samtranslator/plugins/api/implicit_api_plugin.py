@@ -207,7 +207,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
             and template.get(api_id).type != self.SERVERLESS_API_RESOURCE_TYPE
         )
 
-        # RestApiId is not pointing to a valid  API resource
+        # RestApiId is not pointing to a valid API resource
         if isinstance(api_id, dict) or is_referencing_http_from_api_event:
             raise InvalidEventException(
                 event_id,

@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      Events:
+        Event1:
+          Type: Api
+          Properties:
+            Path: /channel/limit-validate
+            RestApiId: RestApi
+            Method: OPTIONS

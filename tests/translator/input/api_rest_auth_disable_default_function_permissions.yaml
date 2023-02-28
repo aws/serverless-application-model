@@ -1,0 +1,82 @@
+Resources:
+  MyApiWithNoDisableFunctionDefaultPermissions:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: Auth
+        Authorizers:
+          Auth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            FunctionInvokeRole: arn:{AWS::Partition}:iam::123456789012:role/test-role
+            Identity:
+              Headers:
+              - Authorization1
+
+  MyApiWithLambdaTokenAuth:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: LambdaTokenAuth
+        Authorizers:
+          LambdaTokenAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            FunctionInvokeRole: arn:{AWS::Partition}:iam::123456789012:role/test-role
+            DisableFunctionDefaultPermissions: true
+            Identity:
+              Headers:
+              - Authorization1
+
+  MyApiWithLambdaRequestAuth:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: LambdaRequestAuth
+        Authorizers:
+          LambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            FunctionInvokeRole: arn:{AWS::Partition}:iam::123456789012:role/test-role
+            DisableFunctionDefaultPermissions: true
+            Identity:
+              Headers:
+              - Authorization1
+
+  MyApiFunctionEvent:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: Auth
+        Authorizers:
+          Auth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            DisableFunctionDefaultPermissions: true
+            Identity:
+              Headers:
+              - Authorization
+
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+  MyFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        LambdaEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiFunctionEvent
+            Method: get
+            Path: /foo

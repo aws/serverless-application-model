@@ -17,22 +17,36 @@ test-cov-report:
 integ-test:
 	pytest --no-cov integration/
 
-black:
+format:
 	black setup.py samtranslator tests integration bin schema_source
+	bin/transform-test-error-json-format.py --write tests/translator/output/error_*.json
 	bin/json-format.py --write tests integration samtranslator/policy_templates_data
 	bin/yaml-format.py --write tests
 	bin/yaml-format.py --write integration --add-test-metadata
 
-black-check:
+black:
+	$(warning `make black` is deprecated, please use `make format`)
+	# sleep for 5 seconds so the message can be seen.
+	sleep 5
+	make format
+
+format-check:
 	# Checking latest schema was generated (run `make schema` if this fails)
 	mkdir -p .tmp
-	python -m schema_source.schema --sam-schema .tmp/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema .tmp/schema.json
+	python -m samtranslator.internal.schema_source.schema --sam-schema .tmp/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema .tmp/schema.json
 	diff -u schema_source/sam.schema.json .tmp/sam.schema.json
 	diff -u samtranslator/schema/schema.json .tmp/schema.json
 	black --check setup.py samtranslator tests integration bin schema_source
+	bin/transform-test-error-json-format.py --check tests/translator/output/error_*.json
 	bin/json-format.py --check tests integration samtranslator/policy_templates_data
 	bin/yaml-format.py --check tests
 	bin/yaml-format.py --check integration --add-test-metadata
+
+black-check:
+	$(warning `make black-check` is deprecated, please use `make format-check`)
+	# sleep for 5 seconds so the message can be seen.
+	sleep 5
+	make format-check
 
 lint:
 	ruff samtranslator bin schema_source integration tests
@@ -60,14 +74,14 @@ fetch-schema-data:
 
 update-schema-data:
 	# Parse docs
-	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > schema_source/docs.json
+	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > samtranslator/internal/schema_source/sam-docs.json
 	bin/parse_docs.py --cfn .tmp/aws-cloudformation-user-guide/doc_source > schema_source/cloudformation-docs.json
 
 	# Add CloudFormation docs to CloudFormation schema
 	python bin/add_docs_cfn_schema.py --schema .tmp/cloudformation.schema.json --docs schema_source/cloudformation-docs.json > schema_source/cloudformation.schema.json
 
 schema:
-	python -m schema_source.schema --sam-schema schema_source/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema samtranslator/schema/schema.json
+	python -m samtranslator.internal.schema_source.schema --sam-schema schema_source/sam.schema.json --cfn-schema schema_source/cloudformation.schema.json --unified-schema samtranslator/schema/schema.json
 
 # Update all schema data and schemas
 schema-all: fetch-schema-data update-schema-data schema
@@ -76,7 +90,7 @@ schema-all: fetch-schema-data update-schema-data schema
 dev: test
 
 # Verifications to run before sending a pull request
-pr: black-check lint init dev
+pr: format-check lint init dev
 
 clean:
 	rm -rf .tmp

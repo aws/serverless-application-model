@@ -1,7 +1,7 @@
 import json
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, cast
+from typing import Any, Dict, Optional, cast
 
 import boto3
 from botocore.config import Config
@@ -28,7 +28,13 @@ class FeatureToggle:
         "account-percentile": SimpleAccountPercentileDialup,
     }
 
-    def __init__(self, config_provider, stage, account_id, region):  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        config_provider: "FeatureToggleConfigProvider",
+        stage: Optional[str],
+        account_id: Optional[str],
+        region: Optional[str],
+    ) -> None:
         self.feature_config = config_provider.config
         self.stage = stage
         self.account_id = account_id

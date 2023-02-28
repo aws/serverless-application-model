@@ -1,11 +1,12 @@
 import json
+import time
 from re import match
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
-from samtranslator.model import PropertyType, Resource
+from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.intrinsics import fnSub, ref
-from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type, list_of, one_of
+from samtranslator.model.types import PassThrough
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
@@ -15,18 +16,18 @@ from samtranslator.validator.value_validator import sam_expect
 class ApiGatewayRestApi(Resource):
     resource_type = "AWS::ApiGateway::RestApi"
     property_types = {
-        "Body": PropertyType(False, IS_DICT),
-        "BodyS3Location": PropertyType(False, IS_DICT),
-        "CloneFrom": PropertyType(False, IS_STR),
-        "Description": PropertyType(False, IS_STR),
-        "FailOnWarnings": PropertyType(False, is_type(bool)),
-        "Name": PropertyType(False, IS_STR),
-        "Parameters": PropertyType(False, IS_DICT),
-        "EndpointConfiguration": PropertyType(False, IS_DICT),
-        "BinaryMediaTypes": PropertyType(False, is_type(list)),
-        "MinimumCompressionSize": PropertyType(False, is_type(int)),
-        "Mode": PropertyType(False, IS_STR),
-        "ApiKeySourceType": PropertyType(False, IS_STR),
+        "Body": GeneratedProperty(),
+        "BodyS3Location": GeneratedProperty(),
+        "CloneFrom": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "FailOnWarnings": GeneratedProperty(),
+        "Name": GeneratedProperty(),
+        "Parameters": GeneratedProperty(),
+        "EndpointConfiguration": GeneratedProperty(),
+        "BinaryMediaTypes": GeneratedProperty(),
+        "MinimumCompressionSize": GeneratedProperty(),
+        "Mode": GeneratedProperty(),
+        "ApiKeySourceType": GeneratedProperty(),
     }
 
     Body: Optional[Dict[str, Any]]
@@ -48,30 +49,32 @@ class ApiGatewayRestApi(Resource):
 class ApiGatewayStage(Resource):
     resource_type = "AWS::ApiGateway::Stage"
     property_types = {
-        "AccessLogSetting": PropertyType(False, IS_DICT),
-        "CacheClusterEnabled": PropertyType(False, is_type(bool)),
-        "CacheClusterSize": PropertyType(False, IS_STR),
-        "CanarySetting": PropertyType(False, IS_DICT),
-        "ClientCertificateId": PropertyType(False, IS_STR),
-        "DeploymentId": PropertyType(True, IS_STR),
-        "Description": PropertyType(False, IS_STR),
-        "RestApiId": PropertyType(True, IS_STR),
-        "StageName": PropertyType(True, one_of(IS_STR, IS_DICT)),
-        "Tags": PropertyType(False, list_of(IS_DICT)),
-        "TracingEnabled": PropertyType(False, is_type(bool)),
-        "Variables": PropertyType(False, IS_DICT),
-        "MethodSettings": PropertyType(False, is_type(list)),
+        "AccessLogSetting": GeneratedProperty(),
+        "CacheClusterEnabled": GeneratedProperty(),
+        "CacheClusterSize": GeneratedProperty(),
+        "CanarySetting": GeneratedProperty(),
+        "ClientCertificateId": GeneratedProperty(),
+        "DeploymentId": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "RestApiId": GeneratedProperty(),
+        "StageName": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+        "TracingEnabled": GeneratedProperty(),
+        "Variables": GeneratedProperty(),
+        "MethodSettings": GeneratedProperty(),
     }
 
     runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
 
-    def update_deployment_ref(self, deployment_logical_id):  # type: ignore[no-untyped-def]
+    def update_deployment_ref(self, deployment_logical_id: str) -> None:
         self.DeploymentId = ref(deployment_logical_id)
 
 
 class ApiGatewayAccount(Resource):
     resource_type = "AWS::ApiGateway::Account"
-    property_types = {"CloudWatchRoleArn": PropertyType(False, one_of(IS_STR, IS_DICT))}
+    property_types = {
+        "CloudWatchRoleArn": GeneratedProperty(),
+    }
 
 
 class ApiGatewayDeployment(Resource):
@@ -79,21 +82,28 @@ class ApiGatewayDeployment(Resource):
 
     resource_type = "AWS::ApiGateway::Deployment"
     property_types = {
-        "Description": PropertyType(False, IS_STR),
-        "RestApiId": PropertyType(True, IS_STR),
-        "StageDescription": PropertyType(False, IS_DICT),
-        "StageName": PropertyType(False, IS_STR),
+        "Description": GeneratedProperty(),
+        "RestApiId": GeneratedProperty(),
+        "StageDescription": GeneratedProperty(),
+        "StageName": GeneratedProperty(),
     }
 
     runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}
 
-    def make_auto_deployable(  # type: ignore[no-untyped-def]
-        self, stage, openapi_version=None, swagger=None, domain=None, redeploy_restapi_parameters=None
-    ):
+    def make_auto_deployable(  # noqa: too-many-arguments
+        self,
+        stage: ApiGatewayStage,
+        openapi_version: Optional[Union[Dict[str, Any], str]] = None,
+        swagger: Optional[Dict[str, Any]] = None,
+        domain: Optional[Dict[str, Any]] = None,
+        redeploy_restapi_parameters: Optional[Any] = None,
+        always_deploy: Optional[bool] = False,
+    ) -> None:
         """
-        Sets up the resource such that it will trigger a re-deployment when Swagger changes
+        Sets up the resource such that it will trigger a re-deployment when Swagger changes or always_deploy is true
         or the openapi version changes or a domain resource changes.
 
+        :param stage: The ApiGatewayStage object which will be re-deployed
         :param swagger: Dictionary containing the Swagger definition of the API
         :param openapi_version: string containing value of OpenApiVersion flag in the template
         :param domain: Dictionary containing the custom domain configuration for the API
@@ -118,6 +128,10 @@ class ApiGatewayDeployment(Resource):
         # The keyword "Deployment" is removed and all the function names associated with api is obtained
         if function_names and function_names.get(self.logical_id[:-10], None):
             hash_input.append(function_names.get(self.logical_id[:-10], ""))
+        if always_deploy:
+            # We just care that the hash changes every time
+            # Using int so tests are a little more robust; don't think the Python spec defines default precision
+            hash_input = [str(int(time.time()))]
         data = self._X_HASH_DELIMITER.join(hash_input)
         generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)
         self.logical_id = generator.gen()
@@ -158,7 +172,7 @@ class ApiGatewayResponse:
     def generate_swagger(self) -> Py27Dict:
         # Applying Py27Dict here as this goes into swagger
         swagger = Py27Dict()
-        swagger["responseParameters"] = self._add_prefixes(self.response_parameters)  # type: ignore[no-untyped-call]
+        swagger["responseParameters"] = self._add_prefixes(self.response_parameters)
         swagger["responseTemplates"] = self.response_templates
 
         # Prevent "null" being written.
@@ -167,7 +181,7 @@ class ApiGatewayResponse:
 
         return swagger
 
-    def _add_prefixes(self, response_parameters):  # type: ignore[no-untyped-def]
+    def _add_prefixes(self, response_parameters: Dict[str, Any]) -> Dict[str, str]:
         GATEWAY_RESPONSE_PREFIX = "gatewayresponse."
         # applying Py27Dict as this is part of swagger
         prefixed_parameters = Py27Dict()
@@ -194,13 +208,13 @@ class ApiGatewayResponse:
 class ApiGatewayDomainName(Resource):
     resource_type = "AWS::ApiGateway::DomainName"
     property_types = {
-        "RegionalCertificateArn": PropertyType(False, IS_STR),
-        "DomainName": PropertyType(True, IS_STR),
-        "EndpointConfiguration": PropertyType(False, IS_DICT),
-        "MutualTlsAuthentication": PropertyType(False, IS_DICT),
-        "SecurityPolicy": PropertyType(False, IS_STR),
-        "CertificateArn": PropertyType(False, IS_STR),
-        "OwnershipVerificationCertificateArn": PropertyType(False, IS_STR),
+        "RegionalCertificateArn": GeneratedProperty(),
+        "DomainName": GeneratedProperty(),
+        "EndpointConfiguration": GeneratedProperty(),
+        "MutualTlsAuthentication": GeneratedProperty(),
+        "SecurityPolicy": GeneratedProperty(),
+        "CertificateArn": GeneratedProperty(),
+        "OwnershipVerificationCertificateArn": GeneratedProperty(),
     }
 
     RegionalCertificateArn: Optional[PassThrough]
@@ -215,22 +229,22 @@ class ApiGatewayDomainName(Resource):
 class ApiGatewayBasePathMapping(Resource):
     resource_type = "AWS::ApiGateway::BasePathMapping"
     property_types = {
-        "BasePath": PropertyType(False, IS_STR),
-        "DomainName": PropertyType(True, IS_STR),
-        "RestApiId": PropertyType(False, IS_STR),
-        "Stage": PropertyType(False, IS_STR),
+        "BasePath": GeneratedProperty(),
+        "DomainName": GeneratedProperty(),
+        "RestApiId": GeneratedProperty(),
+        "Stage": GeneratedProperty(),
     }
 
 
 class ApiGatewayUsagePlan(Resource):
     resource_type = "AWS::ApiGateway::UsagePlan"
     property_types = {
-        "ApiStages": PropertyType(False, is_type(list)),
-        "Description": PropertyType(False, IS_STR),
-        "Quota": PropertyType(False, IS_DICT),
-        "Tags": PropertyType(False, list_of(dict)),
-        "Throttle": PropertyType(False, IS_DICT),
-        "UsagePlanName": PropertyType(False, IS_STR),
+        "ApiStages": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "Quota": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+        "Throttle": GeneratedProperty(),
+        "UsagePlanName": GeneratedProperty(),
     }
     runtime_attrs = {"usage_plan_id": lambda self: ref(self.logical_id)}
 
@@ -238,22 +252,22 @@ class ApiGatewayUsagePlan(Resource):
 class ApiGatewayUsagePlanKey(Resource):
     resource_type = "AWS::ApiGateway::UsagePlanKey"
     property_types = {
-        "KeyId": PropertyType(True, IS_STR),
-        "KeyType": PropertyType(True, IS_STR),
-        "UsagePlanId": PropertyType(True, IS_STR),
+        "KeyId": GeneratedProperty(),
+        "KeyType": GeneratedProperty(),
+        "UsagePlanId": GeneratedProperty(),
     }
 
 
 class ApiGatewayApiKey(Resource):
     resource_type = "AWS::ApiGateway::ApiKey"
     property_types = {
-        "CustomerId": PropertyType(False, IS_STR),
-        "Description": PropertyType(False, IS_STR),
-        "Enabled": PropertyType(False, is_type(bool)),
-        "GenerateDistinctId": PropertyType(False, is_type(bool)),
-        "Name": PropertyType(False, IS_STR),
-        "StageKeys": PropertyType(False, is_type(list)),
-        "Value": PropertyType(False, IS_STR),
+        "CustomerId": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "Enabled": GeneratedProperty(),
+        "GenerateDistinctId": GeneratedProperty(),
+        "Name": GeneratedProperty(),
+        "StageKeys": GeneratedProperty(),
+        "Value": GeneratedProperty(),
     }
 
     runtime_attrs = {"api_key_id": lambda self: ref(self.logical_id)}
@@ -273,6 +287,7 @@ class ApiGatewayAuthorizer:
         function_invoke_role=None,
         is_aws_iam_authorizer=False,
         authorization_scopes=None,
+        disable_function_default_permissions=False,
     ):
         if authorization_scopes is None:
             authorization_scopes = []
@@ -286,6 +301,7 @@ class ApiGatewayAuthorizer:
         self.function_invoke_role = function_invoke_role
         self.is_aws_iam_authorizer = is_aws_iam_authorizer
         self.authorization_scopes = authorization_scopes
+        self.disable_function_default_permissions = disable_function_default_permissions
 
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
             raise InvalidResourceException(
@@ -300,8 +316,15 @@ class ApiGatewayAuthorizer:
                 "of Headers, QueryStrings, StageVariables, or Context.",
             )
 
-        if authorization_scopes is not None and not isinstance(authorization_scopes, list):
-            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
+        if authorization_scopes is not None:
+            sam_expect(authorization_scopes, api_logical_id, f"Authorizers.{name}.AuthorizationScopes").to_be_a_list()
+
+        if disable_function_default_permissions is not None:
+            sam_expect(
+                disable_function_default_permissions,
+                api_logical_id,
+                f"Authorizers.{name}.DisableFunctionDefaultPermissions",
+            ).to_be_a_bool()
 
     def _is_missing_identity_source(self, identity: Dict[str, Any]) -> bool:
         if not identity:
@@ -349,7 +372,7 @@ class ApiGatewayAuthorizer:
             partition = ArnGenerator.get_partition_name()
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
             authorizer_uri = fnSub(
-                ArnGenerator.generate_arn(  # type: ignore[no-untyped-call]
+                ArnGenerator.generate_arn(
                     partition=partition, service="apigateway", resource=resource, include_account_id=False
                 ),
                 {"__FunctionArn__": self.function_arn},

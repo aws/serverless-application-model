@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional, cast
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
-from samtranslator.model.events import EventsRule
+from samtranslator.model.events import EventsRule, generate_valid_target_id
 from samtranslator.model.eventsources.push import Api as PushApi
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
@@ -16,6 +16,7 @@ from samtranslator.translator import logical_id_generator
 
 CONDITION = "Condition"
 SFN_EVETSOURCE_METRIC_PREFIX = "SFNEventSource"
+EVENT_RULE_SFN_TARGET_SUFFIX = "StepFunctionsTarget"
 
 
 class EventSource(ResourceMacro, metaclass=ABCMeta):
@@ -63,7 +64,7 @@ class EventSource(ResourceMacro, metaclass=ABCMeta):
         """
         role_logical_id = self._generate_logical_id(prefix=prefix, suffix=suffix, resource_type="Role")  # type: ignore[no-untyped-call]
         event_role = IAMRole(role_logical_id, attributes=resource.get_passthrough_resource_attributes())
-        event_role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(  # type: ignore[no-untyped-call]
+        event_role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
             self.principal
         )
         state_machine_arn = resource.get_runtime_attr("arn")
@@ -156,7 +157,9 @@ class Schedule(EventSource):
         :rtype: dict
         """
         target_id = (
-            self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "StepFunctionsTarget"
+            self.Target["Id"]
+            if self.Target and "Id" in self.Target
+            else generate_valid_target_id(self.logical_id, EVENT_RULE_SFN_TARGET_SUFFIX)
         )
         target = {
             "Arn": resource.get_runtime_attr("arn"),
@@ -249,7 +252,9 @@ class CloudWatchEvent(EventSource):
         :rtype: dict
         """
         target_id = (
-            self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "StepFunctionsTarget"
+            self.Target["Id"]
+            if self.Target and "Id" in self.Target
+            else generate_valid_target_id(self.logical_id, EVENT_RULE_SFN_TARGET_SUFFIX)
         )
         target = {
             "Arn": resource.get_runtime_attr("arn"),
@@ -299,42 +304,12 @@ class Api(EventSource):
     Auth: Optional[Dict[str, Any]]
     UnescapeMappingTemplate: Optional[bool]
 
-    def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
+    def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         """
         If this API Event Source refers to an explicit API resource, resolve the reference and grab
         necessary data from the explicit API
         """
-
-        # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
-        # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
-        # allow this stage to invoke the State Machine. If we are unable to resolve the stage name, we will
-        # simply permit all stages to invoke this State Machine
-        # This hack is necessary because customers could use !ImportValue, !Ref or other intrinsic functions which
-        # can be sometimes impossible to resolve (ie. when it has cross-stack references)
-        permitted_stage = "*"
-        stage_suffix = "AllStages"
-        explicit_api = None
-        rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)
-        if isinstance(rest_api_id, str):
-            if (
-                rest_api_id in resources
-                and "Properties" in resources[rest_api_id]
-                and "StageName" in resources[rest_api_id]["Properties"]
-            ):
-                explicit_api = resources[rest_api_id]["Properties"]
-                permitted_stage = explicit_api["StageName"]
-
-                # Stage could be a intrinsic, in which case leave the suffix to default value
-                stage_suffix = permitted_stage if isinstance(permitted_stage, str) else "Stage"
-
-            else:
-                # RestApiId is a string, not an intrinsic, but we did not find a valid API resource for this ID
-                raise InvalidEventException(
-                    self.relative_id,
-                    "RestApiId property of Api event must reference a valid resource in the same template.",
-                )
-
-        return {"explicit_api": explicit_api, "api_id": rest_api_id, "explicit_api_stage": {"suffix": stage_suffix}}
+        return PushApi.resources_to_link_for_rest_api(resources, self.relative_id, self.RestApiId)
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]

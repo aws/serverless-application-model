@@ -172,6 +172,7 @@ class ApiGenerator:
         stage_name: Optional[Intrinsicable[str]],
         shared_api_usage_plan: Any,
         template_conditions: Any,
+        merge_definitions: Optional[bool] = None,
         tags: Optional[Dict[str, Any]] = None,
         endpoint_configuration: Optional[Dict[str, Any]] = None,
         method_settings: Optional[List[Any]] = None,
@@ -193,6 +194,7 @@ class ApiGenerator:
         description: Optional[Intrinsicable[str]] = None,
         mode: Optional[Intrinsicable[str]] = None,
         api_key_source_type: Optional[Intrinsicable[str]] = None,
+        always_deploy: Optional[bool] = False,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -221,6 +223,7 @@ class ApiGenerator:
         self.depends_on = depends_on
         self.definition_body = definition_body
         self.definition_uri = definition_uri
+        self.merge_definitions = merge_definitions
         self.name = name
         self.stage_name = stage_name
         self.tags = tags
@@ -247,6 +250,7 @@ class ApiGenerator:
         self.template_conditions = template_conditions
         self.mode = mode
         self.api_key_source_type = api_key_source_type
+        self.always_deploy = always_deploy
 
     def _construct_rest_api(self) -> ApiGatewayRestApi:
         """Constructs and returns the ApiGateway RestApi.
@@ -254,6 +258,7 @@ class ApiGenerator:
         :returns: the RestApi to which this SAM Api corresponds
         :rtype: model.apigateway.ApiGatewayRestApi
         """
+        self._validate_properties()
         rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         # NOTE: For backwards compatibility we need to retain BinaryMediaTypes on the CloudFormation Property
         # Removing this and only setting x-amazon-apigateway-binary-media-types results in other issues.
@@ -267,16 +272,6 @@ class ApiGenerator:
             # Since this region does not support EDGE configuration, we explicitly set the endpoint type
             # to Regional which is the only supported config.
             self._set_endpoint_configuration(rest_api, "REGIONAL")
-
-        if self.definition_uri and self.definition_body:
-            raise InvalidResourceException(
-                self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
-            )
-
-        if self.open_api_version and not SwaggerEditor.safe_compare_regex_with_string(
-            SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
-        ):
-            raise InvalidResourceException(self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'.")
 
         self._add_cors()
         self._add_auth()
@@ -310,6 +305,22 @@ class ApiGenerator:
             rest_api.ApiKeySourceType = self.api_key_source_type
 
         return rest_api
+
+    def _validate_properties(self) -> None:
+        if self.definition_uri and self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
+            )
+
+        if self.definition_uri and self.merge_definitions:
+            raise InvalidResourceException(
+                self.logical_id, "Cannot set 'MergeDefinitions' to True when using `DefinitionUri`."
+            )
+
+        if self.open_api_version and not SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
+        ):
+            raise InvalidResourceException(self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'.")
 
     def _add_endpoint_extension(self) -> None:
         """Add disableExecuteApiEndpoint if it is set in SAM
@@ -404,7 +415,7 @@ class ApiGenerator:
             stage_logical_id = generator.gen()
         stage = ApiGatewayStage(stage_logical_id, attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
-        stage.update_deployment_ref(deployment.logical_id)  # type: ignore[no-untyped-call]
+        stage.update_deployment_ref(deployment.logical_id)
         stage.StageName = self.stage_name
         stage.CacheClusterEnabled = self.cache_cluster_enabled
         stage.CacheClusterSize = self.cache_cluster_size
@@ -415,8 +426,13 @@ class ApiGenerator:
         stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
-            deployment.make_auto_deployable(  # type: ignore[no-untyped-call]
-                stage, self.remove_extra_stage, swagger, self.domain, redeploy_restapi_parameters
+            deployment.make_auto_deployable(
+                stage,
+                self.remove_extra_stage,
+                swagger,
+                self.domain,
+                redeploy_restapi_parameters,
+                self.always_deploy,
             )
 
         if self.tags is not None:
@@ -521,7 +537,6 @@ class ApiGenerator:
                 # Remove possible leading and trailing '/' because a base path may only
                 # contain letters, numbers, and one of "$-_.+!*'()"
                 path = "".join(e for e in basepath if e.isalnum())
-                basepath = path if normalize_basepath else basepath
                 logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
                 basepath_mapping = ApiGatewayBasePathMapping(
                     logical_id, attributes=self.passthrough_resource_attributes
@@ -529,7 +544,7 @@ class ApiGenerator:
                 basepath_mapping.DomainName = ref(api_domain_name)
                 basepath_mapping.RestApiId = ref(rest_api.logical_id)
                 basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
-                basepath_mapping.BasePath = basepath
+                basepath_mapping.BasePath = path if normalize_basepath else basepath
                 basepath_resource_list.extend([basepath_mapping])
 
         # Create the Route53 RecordSetGroup resource
@@ -1125,6 +1140,7 @@ class ApiGenerator:
                 function_payload_type=authorizer.get("FunctionPayloadType"),
                 function_invoke_role=authorizer.get("FunctionInvokeRole"),
                 authorization_scopes=authorizer.get("AuthorizationScopes"),
+                disable_function_default_permissions=authorizer.get("DisableFunctionDefaultPermissions"),
             )
         return authorizers
 
@@ -1140,7 +1156,7 @@ class ApiGenerator:
         partition = ArnGenerator.get_partition_name()
         resource = "${__ApiId__}/authorizers/*"
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
+            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),
             {"__ApiId__": api_id},
         )
 
@@ -1168,7 +1184,7 @@ class ApiGenerator:
 
         for authorizer_name, authorizer in authorizers.items():
             # Construct permissions for Lambda Authorizers only
-            if not authorizer.function_arn:
+            if not authorizer.function_arn or authorizer.disable_function_default_permissions:
                 continue
 
             permission = self._get_permission(authorizer_name, authorizer.function_arn)  # type: ignore[no-untyped-call]

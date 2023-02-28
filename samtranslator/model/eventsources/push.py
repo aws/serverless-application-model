@@ -8,7 +8,7 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, ResourceMacro
 from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
-from samtranslator.model.events import EventsRule
+from samtranslator.model.events import EventsRule, generate_valid_target_id
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.eventsources.pull import SQS
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidEventException, InvalidResourceException
@@ -25,11 +25,13 @@ from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
+from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
 
 CONDITION = "Condition"
 
 REQUEST_PARAMETER_PROPERTIES = ["Required", "Caching"]
+EVENT_RULE_LAMBDA_TARGET_SUFFIX = "LambdaTarget"
 
 
 class PushEventSource(ResourceMacro, metaclass=ABCMeta):
@@ -175,7 +177,8 @@ class Schedule(PushEventSource):
         :returns: the Target property
         :rtype: dict
         """
-        target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
+        target_id = generate_valid_target_id(self.logical_id, EVENT_RULE_LAMBDA_TARGET_SUFFIX)
+        target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
         if self.Input is not None:
             target["Input"] = self.Input
 
@@ -270,7 +273,11 @@ class CloudWatchEvent(PushEventSource):
         :returns: the Target property
         :rtype: dict
         """
-        target_id = self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "LambdaTarget"
+        target_id = (
+            self.Target["Id"]
+            if self.Target and "Id" in self.Target
+            else generate_valid_target_id(self.logical_id, EVENT_RULE_LAMBDA_TARGET_SUFFIX)
+        )
         target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
         if self.Input is not None:
             target["Input"] = self.Input
@@ -634,47 +641,49 @@ class Api(PushEventSource):
     RequestModel: Optional[Dict[str, Any]]
     RequestParameters: Optional[List[Any]]
 
-    def resources_to_link(self, resources):  # type: ignore[no-untyped-def]
+    def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         """
         If this API Event Source refers to an explicit API resource, resolve the reference and grab
         necessary data from the explicit API
         """
+        return self.resources_to_link_for_rest_api(resources, self.relative_id, self.RestApiId)
 
+    @staticmethod
+    def resources_to_link_for_rest_api(
+        resources: Dict[str, Any], relative_id: str, raw_rest_api_id: Optional[Any]
+    ) -> Dict[str, Any]:
         # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
         # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
         # allow this stage to invoke the Lambda function. If we are unable to resolve the stage name, we will
         # simply permit all stages to invoke this Lambda function
         # This hack is necessary because customers could use !ImportValue, !Ref or other intrinsic functions which
         # can be sometimes impossible to resolve (ie. when it has cross-stack references)
-        permitted_stage = "*"
         stage_suffix = "AllStages"
-        explicit_api = None
-        rest_api_id = self.get_rest_api_id_string(self.RestApiId)
+        explicit_api_resource_properties = None
+        rest_api_id = Api.get_rest_api_id_string(raw_rest_api_id)
         if isinstance(rest_api_id, str):
-            if (
-                rest_api_id in resources
-                and "Properties" in resources[rest_api_id]
-                and "StageName" in resources[rest_api_id]["Properties"]
-            ):
-                explicit_api = resources[rest_api_id]["Properties"]
-                permitted_stage = explicit_api["StageName"]
+            rest_api_resource = sam_expect(
+                resources.get(rest_api_id), relative_id, "RestApiId", is_sam_event=True
+            ).to_be_a_map("RestApiId property of Api event must reference a valid resource in the same template.")
 
-                # Stage could be a intrinsic, in which case leave the suffix to default value
-                if isinstance(permitted_stage, str):
-                    if not permitted_stage:
-                        raise InvalidResourceException(rest_api_id, "StageName cannot be empty.")
-                    stage_suffix = permitted_stage
-                else:
-                    stage_suffix = "Stage"  # type: ignore[unreachable]
+            explicit_api_resource_properties = sam_expect(
+                rest_api_resource.get("Properties", {}), rest_api_id, "Properties", is_resource_attribute=True
+            ).to_be_a_map()
+            permitted_stage = explicit_api_resource_properties.get("StageName")
 
+            # Stage could be an intrinsic, in which case leave the suffix to default value
+            if isinstance(permitted_stage, str):
+                if not permitted_stage:
+                    raise InvalidResourceException(rest_api_id, "StageName cannot be empty.")
+                stage_suffix = permitted_stage
             else:
-                # RestApiId is a string, not an intrinsic, but we did not find a valid API resource for this ID
-                raise InvalidEventException(
-                    self.relative_id,
-                    "RestApiId property of Api event must reference a valid resource in the same template.",
-                )
+                stage_suffix = "Stage"
 
-        return {"explicit_api": explicit_api, "api_id": rest_api_id, "explicit_api_stage": {"suffix": stage_suffix}}
+        return {
+            "explicit_api": explicit_api_resource_properties,
+            "api_id": rest_api_id,
+            "explicit_api_stage": {"suffix": stage_suffix},
+        }
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -703,7 +712,7 @@ class Api(PushEventSource):
 
         explicit_api = kwargs["explicit_api"]
         api_id = kwargs["api_id"]
-        if explicit_api.get("__MANAGE_SWAGGER"):
+        if explicit_api.get("__MANAGE_SWAGGER") or explicit_api.get("MergeDefinitions"):
             self._add_swagger_integration(explicit_api, api_id, function, intrinsics_resolver)  # type: ignore[no-untyped-call]
 
         return resources
@@ -741,7 +750,7 @@ class Api(PushEventSource):
         resource = f"${{__ApiId__}}/${{__Stage__}}/{method}{path}"
         partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
+            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),
             {"__ApiId__": api_id, "__Stage__": stage},
         )
 
@@ -755,8 +764,13 @@ class Api(PushEventSource):
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
         """
         swagger_body = api.get("DefinitionBody")
+        merge_definitions = api.get("MergeDefinitions")
         if swagger_body is None:
             return
+        if merge_definitions:
+            # Use a skeleton swagger body for API event source to make sure the generated definition body
+            # is unaffected by the inline/customer defined DefinitionBody
+            swagger_body = SwaggerEditor.gen_skeleton()
 
         partition = ArnGenerator.get_partition_name()
         uri = _build_apigw_integration_uri(function, partition)  # type: ignore[no-untyped-call]
@@ -919,7 +933,38 @@ class Api(PushEventSource):
                 path=self.Path, method_name=self.Method, request_parameters=parameters
             )
 
-        api["DefinitionBody"] = editor.swagger
+        if merge_definitions:
+            api["DefinitionBody"] = self._get_merged_definitions(api_id, api["DefinitionBody"], editor.swagger)
+        else:
+            api["DefinitionBody"] = editor.swagger
+
+    def _get_merged_definitions(
+        self, api_id: str, source_definition_body: Dict[str, Any], dest_definition_body: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Merge SAM generated swagger definition(dest_definition_body) into inline DefinitionBody(source_definition_body):
+        - for a conflicting key, use SAM generated value
+        - otherwise include key-value pairs from both definitions
+        """
+        merged_definition_body = source_definition_body.copy()
+        source_body_paths = merged_definition_body.get("paths", {})
+
+        try:
+            path_method_body = dict_deep_get(source_body_paths, [self.Path, self.Method]) or {}
+        except InvalidValueType as e:
+            raise InvalidResourceException(api_id, f"Property 'DefinitionBody' is invalid: {str(e)}") from e
+
+        sam_expect(path_method_body, api_id, f"DefinitionBody.paths.{self.Path}.{self.Method}").to_be_a_map()
+
+        generated_path_method_body = dest_definition_body["paths"][self.Path][self.Method]
+        # this guarantees that the merged definition use SAM generated value for a conflicting key
+        merged_path_method_body = {**path_method_body, **generated_path_method_body}
+
+        if self.Path not in source_body_paths:
+            source_body_paths[self.Path] = {self.Method: merged_path_method_body}
+        source_body_paths[self.Path][self.Method] = merged_path_method_body
+
+        return merged_definition_body
 
     @staticmethod
     def get_rest_api_id_string(rest_api_id: Any) -> Any:
@@ -1055,7 +1100,7 @@ class IoTRule(PushEventSource):
 
         partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition=partition, service="iot", resource=resource),  # type: ignore[no-untyped-call]
+            ArnGenerator.generate_arn(partition=partition, service="iot", resource=resource),
             {"RuleName": ref(self.logical_id)},
         )
         source_account = fnSub("${AWS::AccountId}")
@@ -1304,7 +1349,7 @@ class HttpApi(PushEventSource):
 
         # ApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),  # type: ignore[no-untyped-call]
+            ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),
             {"__ApiId__": api_id, "__Stage__": stage},
         )
 

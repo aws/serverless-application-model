@@ -1,0 +1,194 @@
+{
+  "Resources": {
+    "MyBucket": {
+      "Type": "AWS::S3::Bucket"
+    },
+    "MyBucketMyConnectorWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyBucketMyConnector": {
+            "Destination": {
+              "Type": "AWS::Serverless::Function"
+            },
+            "Source": {
+              "Type": "AWS::S3::Bucket"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {
+          "Fn::Sub": "${AWS::AccountId}"
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "MyBucket",
+            "Arn"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "bar"
+        },
+        "Handler": "foo",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyHttpApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {},
+          "tags": [
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "MyHttpApiMyConnector1WriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyHttpApiMyConnector1": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::HttpApi"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": "arn:foo",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceQualifier": "*",
+              "SourceResourceId": {
+                "Ref": "MyHttpApi"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyHttpApiMyConnector2WriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyHttpApiMyConnector2": {
+            "Destination": {
+              "Type": "AWS::Serverless::Function"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::HttpApi"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceQualifier": "*",
+              "SourceResourceId": {
+                "Ref": "MyHttpApi"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyHttpApiProdStage": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyHttpApi"
+        },
+        "AutoDeploy": true,
+        "StageName": "Prod",
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    }
+  }
+}

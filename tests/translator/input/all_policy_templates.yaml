@@ -177,3 +177,6 @@ Resources:
 
       - SSMParameterWithSlashPrefixReadPolicy:
           ParameterName: /name
+
+      - StepFunctionsExecutionPolicy_v2:
+          StateMachineName: name
