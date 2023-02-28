@@ -62,6 +62,7 @@ class Globals:
             "DefinitionUri",
             "CacheClusterEnabled",
             "CacheClusterSize",
+            "MergeDefinitions",
             "Variables",
             "EndpointConfiguration",
             "MethodSettings",
