@@ -123,14 +123,15 @@ class ApiGatewayDeployment(Resource):
             hash_input.append(str(openapi_version))
         if domain:
             hash_input.append(json.dumps(domain))
-        if always_deploy:
-            # Using int so tests are a little more robust; don't think the Python spec defines default precision
-            hash_input.append(str(int(time.time())))
         function_names = redeploy_restapi_parameters.get("function_names") if redeploy_restapi_parameters else None
         # The deployment logical id is <api logicalId> + "Deployment"
         # The keyword "Deployment" is removed and all the function names associated with api is obtained
         if function_names and function_names.get(self.logical_id[:-10], None):
             hash_input.append(function_names.get(self.logical_id[:-10], ""))
+        if always_deploy:
+            # We just care that the hash changes every time
+            # Using int so tests are a little more robust; don't think the Python spec defines default precision
+            hash_input = [str(int(time.time()))]
         data = self._X_HASH_DELIMITER.join(hash_input)
         generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)
         self.logical_id = generator.gen()

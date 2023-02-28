@@ -685,19 +685,19 @@ class TestApiAlwaysDeploy(TestCase):
             path = "tests/translator/input/translate_always_deploy.yaml"
             obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
             deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
-            self.assertEqual(deployment_ids, {"MyApiDeployment5a1e8668b1"})
+            self.assertEqual(deployment_ids, {"MyApiDeploymentbd307a3ec3"})
 
         with patch("time.time", lambda: 42.123):
             path = "tests/translator/input/translate_always_deploy.yaml"
             obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
             deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
-            self.assertEqual(deployment_ids, {"MyApiDeployment84fc3726d4"})
+            self.assertEqual(deployment_ids, {"MyApiDeployment92cfceb39d"})
 
         with patch("time.time", lambda: 42.1337):
             path = "tests/translator/input/translate_always_deploy.yaml"
             obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
             deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
-            self.assertEqual(deployment_ids, {"MyApiDeployment84fc3726d4"})
+            self.assertEqual(deployment_ids, {"MyApiDeployment92cfceb39d"})
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
