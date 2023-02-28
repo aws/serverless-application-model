@@ -2168,39 +2168,39 @@ class SamGraphQLApi(SamResourceMacro):
         api.Name = self.Name if self.Name else self.logical_id
         api.XrayEnabled = self.XrayEnabled
 
+        if self.Tags:
+            api.Tags = get_tag_list(self.Tags)
+
         cloudwatch_role = None  # conditionally generated, if left as None then its not added to resources
 
         # Logging has 3 possible types: dict, bool, and None.
         # GraphQLApi will not include logging if and only if the user explicity sets Logging as false boolean.
         # It will for every other value (including true boolean which is essentially same as None).
-        if type(self.Logging) != bool or self.Logging is True:
+        if not isinstance(self.Logging, bool) or self.Logging is True:
             api.LogConfig = self._parse_logging_properties()
 
             # We create a CloudWatch role for the user if the Logging property is not a dictionary
             # that contains the "CloudWatchLogsRoleArn" property.
-            if type(self.Logging) != dict or "CloudWatchLogsRoleArn" not in self.Logging:
+            if not isinstance(self.Logging, dict) or "CloudWatchLogsRoleArn" not in self.Logging:
                 cloudwatch_role = self._construct_cloudwatch_role()
-
-        if self.Tags:
-            api.Tags = get_tag_list(self.Tags)
 
         return api, cloudwatch_role
 
     def _parse_logging_properties(self) -> LogConfigType:
         log_config: LogConfigType = {}
 
-        if type(self.Logging) == dict and "CloudWatchLogsRoleArn" in self.Logging:
+        if isinstance(self.Logging, dict) and "CloudWatchLogsRoleArn" in self.Logging:
             log_config["CloudWatchLogsRoleArn"] = self.Logging["CloudWatchLogsRoleArn"]
         else:
             log_config["CloudWatchLogsRoleArn"] = fnGetAtt(f"{self.logical_id}CloudWatchRole", "Arn")
 
-        if type(self.Logging) == dict and "ExcludeVerboseContent" in self.Logging:
-            log_config["ExcludeVerboseContent"] = self.Logging["ExcludeVerboseContent"]
-
-        if type(self.Logging) == dict and "FieldLogLevel" in self.Logging:
+        if isinstance(self.Logging, dict) and "FieldLogLevel" in self.Logging:
             log_config["FieldLogLevel"] = self.Logging["FieldLogLevel"]
         else:
             log_config["FieldLogLevel"] = "ALL"
+
+        if isinstance(self.Logging, dict) and "ExcludeVerboseContent" in self.Logging:
+            log_config["ExcludeVerboseContent"] = self.Logging["ExcludeVerboseContent"]
 
         return log_config
 
@@ -2214,7 +2214,7 @@ class SamGraphQLApi(SamResourceMacro):
             "appsync.amazonaws.com"
         )
         role.ManagedPolicyArns = [
-            f"arn:{ArnGenerator.get_partition_name()}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+            {"Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"}
         ]
         return role
 

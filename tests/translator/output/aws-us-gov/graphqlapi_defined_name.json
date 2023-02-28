@@ -35,7 +35,9 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
         ]
       },
       "Type": "AWS::IAM::Role"
