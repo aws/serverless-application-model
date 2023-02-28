@@ -23,7 +23,7 @@ class EventsRule(Resource):
 
 
 def generate_valid_target_id(logical_id: str, suffix: str) -> str:
-    """Truncate Target Id if it is exceeding EVENT_RULE_ID_MAX_LENGTH limi."""
+    """Truncate Target Id if it is exceeding _EVENT_RULE_TARGET_ID_MAX_LENGTH limit."""
     if len(logical_id) + len(suffix) <= _EVENT_RULE_TARGET_ID_MAX_LENGTH:
         return logical_id + suffix
 
