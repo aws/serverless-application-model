@@ -40,6 +40,10 @@ ERROR_FILES_NAMES_FOR_TESTING = [os.path.splitext(f)[0] for f in os.listdir(INPU
 OUTPUT_FOLDER = os.path.join(BASE_PATH, "output")
 
 
+def _parse_yaml(path):
+    return yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
+
+
 def deep_sort_lists(value):
     """
     Custom sorting implemented as a wrapper on top of Python's built-in ``sorted`` method. This is necessary because
@@ -682,20 +686,17 @@ class TestApiAlwaysDeploy(TestCase):
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_always_deploy(self):
         with patch("time.time", lambda: 13.37):
-            path = "tests/translator/input/translate_always_deploy.yaml"
-            obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
+            obj = _parse_yaml("tests/translator/input/translate_always_deploy.yaml")
             deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
             self.assertEqual(deployment_ids, {"MyApiDeploymentbd307a3ec3"})
 
         with patch("time.time", lambda: 42.123):
-            path = "tests/translator/input/translate_always_deploy.yaml"
-            obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
+            obj = _parse_yaml("tests/translator/input/translate_always_deploy.yaml")
             deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
             self.assertEqual(deployment_ids, {"MyApiDeployment92cfceb39d"})
 
         with patch("time.time", lambda: 42.1337):
-            path = "tests/translator/input/translate_always_deploy.yaml"
-            obj = yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
+            obj = _parse_yaml("tests/translator/input/translate_always_deploy.yaml")
             deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
             self.assertEqual(deployment_ids, {"MyApiDeployment92cfceb39d"})
 
