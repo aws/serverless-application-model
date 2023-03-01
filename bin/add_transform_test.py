@@ -75,10 +75,10 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
     output_file_option = file_basename + ".json"
 
     with open(os.path.join(input_file_path), "r") as f:
-        manifest = yaml_parse(f) # type: ignore[no-untyped-call]
+        manifest = yaml_parse(f)  # type: ignore[no-untyped-call]
 
     transform_test_output_paths = {
-        "aws": ("us-west-2", os.path.join(TRANSFORM_TEST_DIR, "output", output_file_option)), 
+        "aws": ("us-west-2", os.path.join(TRANSFORM_TEST_DIR, "output", output_file_option)),
         "aws-cn": ("cn-north-1 ", os.path.join(TRANSFORM_TEST_DIR, "output/aws-cn/", output_file_option)),
         "aws-us-gov": ("us-gov-west-1", os.path.join(TRANSFORM_TEST_DIR, "output/aws-us-gov/", output_file_option)),
     }
@@ -115,24 +115,15 @@ def verify_input_template(input_file_path: str):  # type: ignore[no-untyped-def]
             file=sys.stderr,
         )
 
+
 def format_test_files() -> None:
     subprocess.run(
-        [
-            sys.executable,
-            os.path.join(SCRIPT_DIR, "json-format.py"),
-            "--write",
-            "tests"
-        ],
+        [sys.executable, os.path.join(SCRIPT_DIR, "json-format.py"), "--write", "tests"],
         check=True,
     )
-    
+
     subprocess.run(
-        [
-            sys.executable,
-            os.path.join(SCRIPT_DIR, "yaml-format.py"),
-            "--write",
-            "tests"
-        ],
+        [sys.executable, os.path.join(SCRIPT_DIR, "yaml-format.py"), "--write", "tests"],
         check=True,
     )
 
