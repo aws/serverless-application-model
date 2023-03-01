@@ -18,7 +18,7 @@ class SamTemplateValidator:
     # Example: "u'integer'" -> "'integer'"
     UNICODE_TYPE_REGEX = re.compile("u('[^']+')")
 
-    def __init__(self, schema=None):  # type: ignore[no-untyped-def]
+    def __init__(self, schema=None) -> None:  # type: ignore[no-untyped-def]
         """
         Constructor
 

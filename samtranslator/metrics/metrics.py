@@ -25,7 +25,7 @@ class MetricsPublisher(ABC):
 class CWMetricsPublisher(MetricsPublisher):
     BATCH_SIZE = 20
 
-    def __init__(self, cloudwatch_client):  # type: ignore[no-untyped-def]
+    def __init__(self, cloudwatch_client) -> None:  # type: ignore[no-untyped-def]
         """
         Constructor
 
@@ -90,7 +90,7 @@ class MetricDatum:
     Class to hold Metric data.
     """
 
-    def __init__(self, name, value, unit, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
+    def __init__(self, name, value, unit, dimensions=None, timestamp=None) -> None:  # type: ignore[no-untyped-def]
         """
         Constructor
 

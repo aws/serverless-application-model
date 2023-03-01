@@ -50,7 +50,7 @@ class PolicyTemplatesProcessor:
     # ./policy_templates.json
     DEFAULT_POLICY_TEMPLATES_FILE = policy_templates_data.POLICY_TEMPLATES_FILE
 
-    def __init__(self, policy_templates_dict: Dict[str, Any], schema: Optional[Dict[str, Any]] = None):
+    def __init__(self, policy_templates_dict: Dict[str, Any], schema: Optional[Dict[str, Any]] = None) -> None:
         """
         Initialize the class
 

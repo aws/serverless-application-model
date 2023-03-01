@@ -12,7 +12,7 @@ class Template:
     Class representing a single policy template. It includes the name, parameters and template dictionary.
     """
 
-    def __init__(self, template_name, parameters, template_definition):  # type: ignore[no-untyped-def]
+    def __init__(self, template_name, parameters, template_definition) -> None:  # type: ignore[no-untyped-def]
         """
         Initialize a template.
         For simplicity, this method assumes that inputs have already been validated against the JSON Schema. So no

@@ -95,7 +95,7 @@ class Globals:
         SamResourceType.Function.value: ["RuntimeManagementConfig"],
     }
 
-    def __init__(self, template):  # type: ignore[no-untyped-def]
+    def __init__(self, template) -> None:  # type: ignore[no-untyped-def]
         """
         Constructs an instance of this object
 
@@ -349,7 +349,7 @@ class GlobalProperties:
 
     """
 
-    def __init__(self, global_properties):  # type: ignore[no-untyped-def]
+    def __init__(self, global_properties) -> None:  # type: ignore[no-untyped-def]
         self.global_properties = global_properties
 
     def merge(self, local_properties):  # type: ignore[no-untyped-def]
@@ -471,7 +471,7 @@ class InvalidGlobalsSectionException(ExceptionWithMessage):
         message -- explanation of the error
     """
 
-    def __init__(self, logical_id, message):  # type: ignore[no-untyped-def]
+    def __init__(self, logical_id, message) -> None:  # type: ignore[no-untyped-def]
         self._logical_id = logical_id
         self._message = message
 
