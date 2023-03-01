@@ -20,12 +20,8 @@ from samtranslator.internal.model.appsync import (
 )
 from samtranslator.internal.schema_source.aws_serverless_graphqlapi import Logging as GraphQLApiLogging
 from samtranslator.internal.schema_source.aws_serverless_graphqlapi import Properties as GraphQLApiProperties
-from samtranslator.internal.schema_source.aws_serverless_graphqldatasource import (
-    DynamoDBConfig as DynamoDBConfigProperties,
-)
-from samtranslator.internal.schema_source.aws_serverless_graphqldatasource import (
-    Properties as GraphQLDataSourceProperties,
-)
+from samtranslator.internal.schema_source.aws_serverless_graphqldatasource import DynamoDBConfig as DynamoDBConfigProperties
+from samtranslator.internal.schema_source.aws_serverless_graphqldatasource import Properties as GraphQLDataSourceProperties
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
