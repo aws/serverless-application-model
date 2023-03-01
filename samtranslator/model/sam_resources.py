@@ -18,6 +18,14 @@ from samtranslator.internal.model.appsync import (
     GraphQLSchema,
     LogConfigType,
 )
+from samtranslator.internal.schema_source.aws_serverless_graphqlapi import Logging as GraphQLApiLogging
+from samtranslator.internal.schema_source.aws_serverless_graphqlapi import Properties as GraphQLApiProperties
+from samtranslator.internal.schema_source.aws_serverless_graphqldatasource import (
+    DynamoDBConfig as DynamoDBConfigProperties,
+)
+from samtranslator.internal.schema_source.aws_serverless_graphqldatasource import (
+    Properties as GraphQLDataSourceProperties,
+)
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
@@ -2150,8 +2158,10 @@ class SamGraphQLApi(SamResourceMacro):
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
-        appsync_api, cloudwatch_role = self._construct_appsync_api_resources()
-        appsync_schema = self._construct_appsync_schema(appsync_api.get_runtime_attr("api_id"))
+        model = self.validate_properties_and_return_model(GraphQLApiProperties)
+
+        appsync_api, cloudwatch_role = self._construct_appsync_api_resources(model)
+        appsync_schema = self._construct_appsync_schema(model, appsync_api.get_runtime_attr("api_id"))
 
         resources: List[Resource] = [appsync_api, appsync_schema]
 
@@ -2160,23 +2170,23 @@ class SamGraphQLApi(SamResourceMacro):
 
         return resources
 
-    def _construct_appsync_api_resources(self) -> Tuple[GraphQLApi, Optional[IAMRole]]:
+    def _construct_appsync_api_resources(self, model: GraphQLApiProperties) -> Tuple[GraphQLApi, Optional[IAMRole]]:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
-        api.AuthenticationType = sam_expect(self.Auth.get("Type"), self.logical_id, "Auth.Type").to_be_a_string()
-        api.Name = self.Name if self.Name else self.logical_id
-        api.XrayEnabled = self.XrayEnabled
+        api.AuthenticationType = model.Auth.Type
+        api.Name = model.Name or self.logical_id
+        api.XrayEnabled = model.XrayEnabled
 
-        if self.Tags:
-            api.Tags = get_tag_list(self.Tags)
+        if model.Tags:
+            api.Tags = get_tag_list(model.Tags)
 
         # Logging has 3 possible types: dict, bool, and None.
         # GraphQLApi will not include logging if and only if the user explicity sets Logging as false boolean.
         # It will for every other value (including true boolean which is essentially same as None).
-        if isinstance(self.Logging, bool) and self.Logging is False:
+        if isinstance(model.Logging, bool) and model.Logging is False:
             return api, None
 
-        api.LogConfig, cloudwatch_role = self._parse_logging_properties()
+        api.LogConfig, cloudwatch_role = self._parse_logging_properties(model)
 
         return api, cloudwatch_role
 
@@ -2193,18 +2203,20 @@ class SamGraphQLApi(SamResourceMacro):
 
         return log_config, cloudwatch_role
 
-    def _parse_logging_properties(self) -> Tuple[LogConfigType, Optional[IAMRole]]:
+    def _parse_logging_properties(self, model: GraphQLApiProperties) -> Tuple[LogConfigType, Optional[IAMRole]]:
         """Parse logging properties from SAM template, and use defaults if required keys dont exist."""
-        if not isinstance(self.Logging, dict):
+        if not isinstance(model.Logging, GraphQLApiLogging):
             return self._create_logging_default()
 
         log_config: LogConfigType = {}
 
-        if "ExcludeVerboseContent" in self.Logging:
-            log_config["ExcludeVerboseContent"] = self.Logging["ExcludeVerboseContent"]
+        if model.Logging.ExcludeVerboseContent:
+            log_config["ExcludeVerboseContent"] = cast(
+                bool, model.Logging.ExcludeVerboseContent
+            )  # TODO: better handling PassThroughProp
 
-        log_config["FieldLogLevel"] = self.Logging.get("FieldLogLevel", "ALL")
-        log_config["CloudWatchLogsRoleArn"] = self.Logging.get("CloudWatchLogsRoleArn", None)
+        log_config["FieldLogLevel"] = model.Logging.FieldLogLevel or "ALL"
+        log_config["CloudWatchLogsRoleArn"] = model.Logging.CloudWatchLogsRoleArn
 
         if log_config["CloudWatchLogsRoleArn"]:
             return log_config, None
@@ -2228,22 +2240,22 @@ class SamGraphQLApi(SamResourceMacro):
         ]
         return role
 
-    def _construct_appsync_schema(self, api_id: Intrinsicable[str]) -> GraphQLSchema:
+    def _construct_appsync_schema(self, model: GraphQLApiProperties, api_id: Intrinsicable[str]) -> GraphQLSchema:
         schema = GraphQLSchema(
             logical_id=f"{self.logical_id}Schema", depends_on=self.depends_on, attributes=self.resource_attributes
         )
 
-        if not self.SchemaInline and not self.SchemaUri:
+        if not model.SchemaInline and not model.SchemaUri:
             raise InvalidResourceException(self.logical_id, "One of 'SchemaInline' or 'SchemaUri' must be set.")
 
-        if self.SchemaInline and self.SchemaUri:
+        if model.SchemaInline and model.SchemaUri:
             raise InvalidResourceException(
                 self.logical_id, "Both 'SchemaInline' and 'SchemaUri' cannot be defined at the same time."
             )
 
         schema.ApiId = api_id
-        schema.Definition = self.SchemaInline
-        schema.DefinitionS3Location = self.SchemaUri
+        schema.Definition = model.SchemaInline
+        schema.DefinitionS3Location = model.SchemaUri
 
         return schema
 
@@ -2272,80 +2284,60 @@ class SamGraphQLDataSource(SamResourceMacro):
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
-        appsync_datasource = self._construct_appsync_datasource()
+        model = self.validate_properties_and_return_model(GraphQLDataSourceProperties)
+
+        appsync_datasource = self._construct_appsync_datasource(model)
         resources: List[Resource] = [appsync_datasource]
 
         return resources
 
-    def _parse_deltasync_properties(self, deltasync_properties: Dict[str, Any]) -> DeltaSyncConfigType:
-        # TODO: add defaults
-        sam_expect(
-            deltasync_properties.get("BaseTableTTL"), self.logical_id, "DynamoDBConfig.DeltaSyncConfig.BaseTableTTL"
-        ).to_be_a_string()
-
-        sam_expect(
-            deltasync_properties.get("DeltaSyncTableName"),
-            self.logical_id,
-            "DynamoDBConfig.DeltaSyncConfig.DeltaSyncTableName",
-        ).to_be_a_string()
-
-        sam_expect(
-            deltasync_properties.get("DeltaSyncTableTTL"),
-            self.logical_id,
-            "DynamoDBConfig.DeltaSyncConfig.DeltaSyncTableTTL",
-        ).to_be_a_string()
-
-        return cast(DeltaSyncConfigType, deltasync_properties)
-
-    def _parse_dynamodb_datasource(self, ddb_properties: Dict[str, Any]) -> DynamoDBConfigType:
+    def _parse_dynamodb_datasource(self, ddb_properties: DynamoDBConfigProperties) -> DynamoDBConfigType:
         ddb_config: DynamoDBConfigType = {}
 
-        ddb_config["TableName"] = sam_expect(
-            ddb_properties.get("TableName"),
-            self.logical_id,
-            "DynamoDBConfig.TableName",
-        ).to_be_a_string()
+        ddb_config["TableName"] = ddb_properties.TableName
+        ddb_config["AwsRegion"] = ddb_properties.Region or ref("AWS::Region")
 
-        ddb_config["AwsRegion"] = ddb_properties["Region"] if "Region" in ddb_properties else ref("AWS::Region")
+        if ddb_properties.DeltaSync:
+            deltasync_properties = ddb_properties.DeltaSync.dict()
+            ddb_config["DeltaSyncConfig"] = cast(
+                DeltaSyncConfigType, deltasync_properties
+            )  # TODO: better handling PassThroughProp
 
-        if "DeltaSync" in ddb_properties:
-            deltasync_properties = ddb_properties["DeltaSync"]
-            deltasync_config = self._parse_deltasync_properties(deltasync_properties)
-            ddb_config["DeltaSyncConfig"] = deltasync_config
+        if ddb_properties.UseCallerCredentials:
+            ddb_config["UseCallerCredentials"] = cast(
+                bool, ddb_properties.UseCallerCredentials
+            )  # TODO: better handling PassThroughProp
 
-        if "UseCallerCredentials" in ddb_properties:
-            ddb_config["UseCallerCredentials"] = ddb_properties["UseCallerCredentials"]
-
-        if "Versioned" in ddb_properties:
-            ddb_config["Versioned"] = ddb_properties["Versioned"]
+        if ddb_properties.Versioned:
+            ddb_config["Versioned"] = cast(bool, ddb_properties.Versioned)  # TODO: better handling PassThroughProp
 
         return ddb_config
 
-    def _validate_config_properties(self, datasource: DataSource) -> None:
+    def _validate_config_properties(self, model: GraphQLDataSourceProperties, datasource: DataSource) -> None:
         # DataSourceConfig is quite large property so we require a lot of additional validation.
         # The datasource object is modified by reference.
-        if self.Type == "AMAZON_DYNAMODB":
-            if not self.DynamoDBConfig:
+        if model.Type == "AMAZON_DYNAMODB":
+            if not model.DynamoDBConfig:
                 raise InvalidResourceException(
                     self.logical_id, "'DynamoDBConfig' must be defined when 'Type' is 'AMAZON_DYNAMODB'."
                 )
-            datasource.DynamoDBConfig = self._parse_dynamodb_datasource(self.DynamoDBConfig)
+            datasource.DynamoDBConfig = self._parse_dynamodb_datasource(model.DynamoDBConfig)
 
-    def _construct_appsync_datasource(self) -> DataSource:
+    def _construct_appsync_datasource(self, model: GraphQLDataSourceProperties) -> DataSource:
         datasource = DataSource(
             logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
         )
 
-        if self.Type not in SUPPORTED_DATASOURCES:
-            raise InvalidResourceException(self.logical_id, f"'{self.Type}' is not a supported data source type.")
+        if model.Type not in SUPPORTED_DATASOURCES:
+            raise InvalidResourceException(self.logical_id, f"'{model.Type}' is not a supported data source type.")
 
-        datasource.Type = self.Type
-        datasource.Name = self.Name if self.Name else self.logical_id
-        datasource.Description = self.Description
-        datasource.ApiId = self.ApiId
+        datasource.Type = model.Type
+        datasource.Name = model.Name or self.logical_id
+        datasource.Description = model.Description
+        datasource.ApiId = cast(Intrinsicable[str], model.ApiId)  # TODO: better handling PassThroughProp
         # I will remove this ignore after, it will be fixed with pseudo-embedded connector implementation.
-        datasource.ServiceRoleArn = self.ServiceRoleArn  # type: ignore
+        datasource.ServiceRoleArn = model.ServiceRoleArn  # type: ignore
 
-        self._validate_config_properties(datasource)
+        self._validate_config_properties(model, datasource)
 
         return datasource
