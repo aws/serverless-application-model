@@ -2176,9 +2176,7 @@ class SamGraphQLApi(SamResourceMacro):
         if isinstance(self.Logging, bool) and self.Logging is False:
             return api, None
 
-        api.LogConfig, cloudwatch_role = (
-            self._parse_logging_properties() if isinstance(self.Logging, dict) else self._create_logging_default()
-        )
+        api.LogConfig, cloudwatch_role = self._parse_logging_properties()
 
         return api, cloudwatch_role
 
@@ -2186,7 +2184,7 @@ class SamGraphQLApi(SamResourceMacro):
         """
         Create a default logging configuration.
 
-        This function should only be called when "Logging" property is a False boolean or NoneType.
+        This function is used when "Logging" property is a False boolean or NoneType.
         """
         log_config: LogConfigType = {}
         log_config["FieldLogLevel"] = "ALL"
@@ -2196,22 +2194,24 @@ class SamGraphQLApi(SamResourceMacro):
         return log_config, cloudwatch_role
 
     def _parse_logging_properties(self) -> Tuple[LogConfigType, Optional[IAMRole]]:
-        """
-        Parse logging properties from SAM template, and use defaults if required keys dont exist.
+        """Parse logging properties from SAM template, and use defaults if required keys dont exist."""
+        if not isinstance(self.Logging, dict):
+            return self._create_logging_default()
 
-        This function should only be called when "Logging" property is a dictionary type.
-        """
-        logging = cast(Dict[str, Any], self.Logging)
         log_config: LogConfigType = {}
 
-        log_config["FieldLogLevel"] = logging["FieldLogLevel"] if "FieldLogLevel" in logging else "ALL"
-        if "ExcludeVerboseContent" in logging:
-            log_config["ExcludeVerboseContent"] = logging["ExcludeVerboseContent"]
+        if "ExcludeVerboseContent" in self.Logging:
+            log_config["ExcludeVerboseContent"] = self.Logging["ExcludeVerboseContent"]
 
-        cloudwatch_role = self._construct_cloudwatch_role() if "CloudWatchLogsRoleArn" not in logging else None
-        log_config["CloudWatchLogsRoleArn"] = (
-            cloudwatch_role.get_runtime_attr("arn") if cloudwatch_role else logging["CloudWatchLogsRoleArn"]
-        )
+        log_config["FieldLogLevel"] = self.Logging.get("FieldLogLevel", "ALL")
+        log_config["CloudWatchLogsRoleArn"] = self.Logging.get("CloudWatchLogsRoleArn", None)
+
+        if log_config["CloudWatchLogsRoleArn"]:
+            return log_config, None
+
+        cloudwatch_role = self._construct_cloudwatch_role()
+        log_config["CloudWatchLogsRoleArn"] = cloudwatch_role.get_runtime_attr("arn")
+
         return log_config, cloudwatch_role
 
     def _construct_cloudwatch_role(self) -> IAMRole:
