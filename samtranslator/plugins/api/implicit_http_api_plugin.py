@@ -84,7 +84,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin[Type[OpenApiEditor]]):
         # We could have made changes to the Events structure. Write it back to function
         function.properties["Events"].update(api_events)
 
-    def _generate_implicit_api_resource(self, _: SamResource) -> Dict[str, Any]:
+    def _generate_implicit_api_resource(self, _: Optional[SamResource]) -> Dict[str, Any]:
         """
         Uses the implicit API in this file to generate an Implicit API resource
         """
