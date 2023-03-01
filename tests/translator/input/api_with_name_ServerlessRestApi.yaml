@@ -3,7 +3,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: AWS Api Gateway
-      StageName: !Ref ApiGatewayStageName
+      StageName: Prod
       FailOnWarnings: true
       Auth:
         DefaultAuthorizer: BasicAuthorizer

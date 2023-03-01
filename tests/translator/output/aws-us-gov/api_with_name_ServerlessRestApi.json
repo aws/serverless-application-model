@@ -26,7 +26,7 @@
       },
       "Type": "AWS::Lambda::Function"
     },
-    "MyFunctionApiPermissionStage": {
+    "MyFunctionApiPermissionProd": {
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
@@ -179,7 +179,7 @@
       },
       "Type": "AWS::ApiGateway::Deployment"
     },
-    "ServerlessRestApiStage": {
+    "ServerlessRestApiProdStage": {
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeployment13f1733bb3"
@@ -187,9 +187,7 @@
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
-        "StageName": {
-          "Ref": "ApiGatewayStageName"
-        }
+        "StageName": "Prod"
       },
       "Type": "AWS::ApiGateway::Stage"
     }

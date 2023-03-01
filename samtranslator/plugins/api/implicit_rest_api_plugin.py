@@ -83,7 +83,7 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
         # to correctly generate CloudFormation API resource.
         """
         return (
-            resource
+            resource.to_dict()
             if resource and resource.type == self.SERVERLESS_API_RESOURCE_TYPE
             else ImplicitApiResource().to_dict()
         )

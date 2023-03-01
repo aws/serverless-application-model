@@ -88,7 +88,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def _generate_implicit_api_resource(self) -> Dict[str, Any]:
+    def _generate_implicit_api_resource(self, resource: Optional[SamResource]) -> Dict[str, Any]:
         """
         Helper function implemented by child classes that create a new implicit API resource
         """
