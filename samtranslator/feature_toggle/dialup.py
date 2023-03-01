@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 class BaseDialup(ABC):
     """BaseDialup class to provide an interface for all dialup classes"""
 
-    def __init__(self, region_config, **kwargs):  # type: ignore[no-untyped-def]
+    def __init__(self, region_config, **kwargs) -> None:  # type: ignore[no-untyped-def]
         self.region_config = region_config
 
     @abstractmethod
@@ -23,8 +23,8 @@ class DisabledDialup(BaseDialup):
     A dialup that is never enabled
     """
 
-    def __init__(self, region_config, **kwargs):  # type: ignore[no-untyped-def]
-        super().__init__(region_config)  # type: ignore[no-untyped-call]
+    def __init__(self, region_config, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        super().__init__(region_config)
 
     def is_enabled(self) -> bool:
         return False
@@ -36,8 +36,8 @@ class ToggleDialup(BaseDialup):
     Example of region_config: { "type": "toggle", "enabled": True }
     """
 
-    def __init__(self, region_config, **kwargs):  # type: ignore[no-untyped-def]
-        super().__init__(region_config)  # type: ignore[no-untyped-call]
+    def __init__(self, region_config, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        super().__init__(region_config)
         self.region_config = region_config
 
     def is_enabled(self):  # type: ignore[no-untyped-def]
@@ -50,8 +50,8 @@ class SimpleAccountPercentileDialup(BaseDialup):
     Example of region_config: { "type": "account-percentile", "enabled-%": 20 }
     """
 
-    def __init__(self, region_config, account_id, feature_name, **kwargs):  # type: ignore[no-untyped-def]
-        super().__init__(region_config)  # type: ignore[no-untyped-call]
+    def __init__(self, region_config, account_id, feature_name, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        super().__init__(region_config)
         self.account_id = account_id
         self.feature_name = feature_name
 

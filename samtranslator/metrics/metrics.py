@@ -25,7 +25,7 @@ class MetricsPublisher(ABC):
 class CWMetricsPublisher(MetricsPublisher):
     BATCH_SIZE = 20
 
-    def __init__(self, cloudwatch_client):  # type: ignore[no-untyped-def]
+    def __init__(self, cloudwatch_client) -> None:  # type: ignore[no-untyped-def]
         """
         Constructor
 
@@ -90,7 +90,7 @@ class MetricDatum:
     Class to hold Metric data.
     """
 
-    def __init__(self, name, value, unit, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
+    def __init__(self, name, value, unit, dimensions=None, timestamp=None) -> None:  # type: ignore[no-untyped-def]
         """
         Constructor
 
@@ -148,7 +148,7 @@ class Metrics:
         :param dimensions: array of dimensions applied to the metric
         :param timestamp: timestamp of metric (datetime.datetime object)
         """
-        self.metrics_cache.setdefault(name, []).append(MetricDatum(name, value, unit, dimensions, timestamp))  # type: ignore[no-untyped-call]
+        self.metrics_cache.setdefault(name, []).append(MetricDatum(name, value, unit, dimensions, timestamp))
 
     def record_count(self, name, value, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
         """
