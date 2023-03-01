@@ -75,11 +75,18 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
         # We could have made changes to the Events structure. Write it back to function
         function.properties["Events"].update(api_events)
 
-    def _generate_implicit_api_resource(self) -> Dict[str, Any]:
+    def _generate_implicit_api_resource(self, resource: Optional[SamResource]) -> Dict[str, Any]:
         """
-        Uses the implicit API in this file to generate an Implicit API resource
+        # If the customer has explicitly defined a SAM API resource with the id of "ServerlessRestApi",
+        # we cannot simply generate a implicit API resource with empty swagger since the customer
+        # defined API resource may contains properties like Auth and we need these properties
+        # to correctly generate CloudFormation API resource.
         """
-        return ImplicitApiResource().to_dict()
+        return (
+            resource
+            if resource and resource.type == self.SERVERLESS_API_RESOURCE_TYPE
+            else ImplicitApiResource().to_dict()
+        )
 
     def _get_api_definition_from_editor(self, editor: SwaggerEditor) -> Dict[str, Any]:
         """

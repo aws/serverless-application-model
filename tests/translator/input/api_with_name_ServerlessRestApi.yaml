@@ -1,0 +1,43 @@
+Resources:
+  ServerlessRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: AWS Api Gateway
+      StageName: !Ref ApiGatewayStageName
+      FailOnWarnings: true
+      Auth:
+        DefaultAuthorizer: BasicAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          BasicAuthorizer:
+            FunctionPayloadType: TOKEN
+            FunctionArn: !GetAtt MyFunction.Arn
+            Identity:
+              Header: Authorization
+              ValidationExpression: ^[Bb]earer [-0-9a-zA-z\.]*$
+              ReauthorizeEvery: 0
+
+  #### Division ####
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs18.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Architectures:
+      - x86_64
+      MemorySize: 128
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ServerlessRestApi
+            Path: /divisions
+            Method: GET

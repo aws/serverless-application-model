@@ -109,11 +109,14 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         # If there are no implicit APIs, we will remove from the template later.
 
         # If the customer has explicitly defined a resource with the id of "ServerlessRestApi",
-        # capture it.  If the template ends up not defining any implicit api's, instead of just
+        # capture it. If the template ends up not defining any implicit api's, instead of just
         # removing the "ServerlessRestApi" resource, we just restore what the author defined.
-        self.existing_implicit_api_resource = copy.deepcopy(template.get(self.IMPLICIT_API_LOGICAL_ID))
+        # If the template also defines implicit api, we will need to build upon the explicitly
+        # defined api resource to make sure we don't lose information like Auth.
+        implicit_api_resource = template.get(self.IMPLICIT_API_LOGICAL_ID)
+        self.existing_implicit_api_resource = copy.deepcopy(implicit_api_resource)
 
-        template.set(self.IMPLICIT_API_LOGICAL_ID, self._generate_implicit_api_resource())
+        template.set(self.IMPLICIT_API_LOGICAL_ID, self._generate_implicit_api_resource(implicit_api_resource))
 
         errors = []
         for logicalId, resource in template.iterate(
