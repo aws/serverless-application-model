@@ -42,7 +42,7 @@ class Template:
         missing = self.missing_parameter_values(parameter_values)  # type: ignore[no-untyped-call]
         if len(missing) > 0:
             # str() of elements of list to prevent any `u` prefix from being displayed in user-facing error message
-            raise InsufficientParameterValues(  # type: ignore[no-untyped-call]
+            raise InsufficientParameterValues(
                 f"Following required parameters of template '{self.name}' don't have values: {[str(m) for m in missing]}"
             )
 
@@ -107,7 +107,7 @@ class Template:
         """
 
         if not self._is_valid_parameter_values(parameter_values):  # type: ignore[no-untyped-call]
-            raise InvalidParameterValues("Parameter values are required to process a policy template")  # type: ignore[no-untyped-call]
+            raise InvalidParameterValues("Parameter values are required to process a policy template")
 
         return list(set(self.parameters.keys()) - set(parameter_values.keys()))
 
@@ -134,4 +134,4 @@ class Template:
         parameters = template_values_dict.get("Parameters", {})
         definition = template_values_dict.get("Definition", {})
 
-        return Template(template_name, parameters, definition)  # type: ignore[no-untyped-call]
+        return Template(template_name, parameters, definition)

@@ -96,7 +96,7 @@ class PolicyTemplatesProcessor:
         """
 
         if not self.has(template_name):  # type: ignore[no-untyped-call]
-            raise TemplateNotFoundException(template_name)  # type: ignore[no-untyped-call]
+            raise TemplateNotFoundException(template_name)
 
         template = self.get(template_name)  # type: ignore[no-untyped-call]
         return template.to_statement(parameter_values)

@@ -24,7 +24,7 @@ class DisabledDialup(BaseDialup):
     """
 
     def __init__(self, region_config, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        super().__init__(region_config)  # type: ignore[no-untyped-call]
+        super().__init__(region_config)
 
     def is_enabled(self) -> bool:
         return False
@@ -37,7 +37,7 @@ class ToggleDialup(BaseDialup):
     """
 
     def __init__(self, region_config, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        super().__init__(region_config)  # type: ignore[no-untyped-call]
+        super().__init__(region_config)
         self.region_config = region_config
 
     def is_enabled(self):  # type: ignore[no-untyped-def]
@@ -51,7 +51,7 @@ class SimpleAccountPercentileDialup(BaseDialup):
     """
 
     def __init__(self, region_config, account_id, feature_name, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        super().__init__(region_config)  # type: ignore[no-untyped-call]
+        super().__init__(region_config)
         self.account_id = account_id
         self.feature_name = feature_name
 

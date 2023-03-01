@@ -56,7 +56,7 @@ class FeatureToggle:
                 region_config, account_id=self.account_id, feature_name=feature_name
             )
         LOG.warning("Dialup type '{}' is None or is not supported.".format(dialup_type))
-        return DisabledDialup(region_config)  # type: ignore[no-untyped-call]
+        return DisabledDialup(region_config)
 
     def is_enabled(self, feature_name: str) -> bool:
         """

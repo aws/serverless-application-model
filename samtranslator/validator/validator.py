@@ -77,7 +77,7 @@ class SamTemplateValidator:
         str
             Validation errors separated by commas ","
         """
-        validator = SamTemplateValidator(schema)  # type: ignore[no-untyped-call]
+        validator = SamTemplateValidator(schema)
 
         return ", ".join(validator.get_errors(template_dict))  # type: ignore[no-untyped-call]
 

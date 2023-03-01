@@ -148,7 +148,7 @@ class Metrics:
         :param dimensions: array of dimensions applied to the metric
         :param timestamp: timestamp of metric (datetime.datetime object)
         """
-        self.metrics_cache.setdefault(name, []).append(MetricDatum(name, value, unit, dimensions, timestamp))  # type: ignore[no-untyped-call]
+        self.metrics_cache.setdefault(name, []).append(MetricDatum(name, value, unit, dimensions, timestamp))
 
     def record_count(self, name, value, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
         """
