@@ -1931,6 +1931,24 @@
       "title": "Location",
       "type": "object"
     },
+    "Logging": {
+      "additionalProperties": false,
+      "properties": {
+        "CloudWatchLogsRoleArn": {
+          "title": "Cloudwatchlogsrolearn",
+          "type": "string"
+        },
+        "ExcludeVerboseContent": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FieldLogLevel": {
+          "title": "Fieldloglevel",
+          "type": "string"
+        }
+      },
+      "title": "Logging",
+      "type": "object"
+    },
     "MQEvent": {
       "additionalProperties": false,
       "properties": {

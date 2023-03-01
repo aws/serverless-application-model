@@ -1,12 +1,7 @@
-from typing import Optional
+from typing import Optional, Union
 
 from typing_extensions import Literal
-
-<<<<<<<< HEAD:samtranslator/schema/aws_serverless_graphqlapi.py
-from samtranslator.schema.common import BaseModel, get_prop, DictStrAny
-========
-from samtranslator.internal.schema_source.common import BaseModel, DictStrAny, get_prop
->>>>>>>> cb9be389 (move schema files over):samtranslator/internal/schema_source/aws_serverless_graphqlapi.py
+from samtranslator.internal.schema_source.common import BaseModel, DictStrAny, PassThroughProp, get_prop
 
 properties = get_prop("sam-resource-graphqlapi")
 
@@ -16,6 +11,12 @@ class Auth(BaseModel):
     Type: str
 
 
+class Logging(BaseModel):
+    CloudWatchLogsRoleArn: Optional[str]
+    ExcludeVerboseContent: Optional[PassThroughProp]
+    FieldLogLevel: Optional[str]
+
+
 class Properties(BaseModel):
     Auth: Auth
     Tags: Optional[DictStrAny]
@@ -23,6 +24,7 @@ class Properties(BaseModel):
     XrayEnabled: Optional[bool]
     SchemaInline: Optional[str]
     SchemaUri: Optional[str]
+    Logging: Optional[Union[Logging, bool]]
 
 
 class Resource(BaseModel):

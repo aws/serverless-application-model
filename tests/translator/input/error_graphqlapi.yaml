@@ -1,0 +1,34 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  NoAuthAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      XrayEnabled: true
+      Tags:
+        Key1: Value1
+        Key2: Value2
+
+  NoSchemaPropertiesAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+
+  BothSchemaInlineAndUriAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      SchemaUri: https://bucket-name.s3.region-code.amazonaws.com/key-name
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
