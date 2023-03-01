@@ -173,6 +173,7 @@ AccessLogSetting = Optional[PassThroughProp]
 CanarySetting = Optional[PassThroughProp]
 TracingEnabled = Optional[PassThroughProp]
 OpenApiVersion = Optional[Union[float, str]]  # TODO: float doesn't exist in documentation
+AlwaysDeploy = Optional[bool]
 
 
 class Properties(BaseModel):
@@ -203,6 +204,7 @@ class Properties(BaseModel):
     Tags: Optional[DictStrAny] = properties("Tags")
     TracingEnabled: Optional[TracingEnabled] = properties("TracingEnabled")
     Variables: Optional[Variables] = properties("Variables")
+    AlwaysDeploy: Optional[AlwaysDeploy]  # TODO: Add docs
 
 
 class Globals(BaseModel):
@@ -224,6 +226,7 @@ class Globals(BaseModel):
     TracingEnabled: Optional[TracingEnabled] = properties("TracingEnabled")
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
     Domain: Optional[Domain] = properties("Domain")
+    AlwaysDeploy: Optional[AlwaysDeploy]  # TODO: Add docs
 
 
 class Resource(ResourceAttributes):

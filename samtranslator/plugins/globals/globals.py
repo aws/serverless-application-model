@@ -62,6 +62,7 @@ class Globals:
             "DefinitionUri",
             "CacheClusterEnabled",
             "CacheClusterSize",
+            "MergeDefinitions",
             "Variables",
             "EndpointConfiguration",
             "MethodSettings",
@@ -74,6 +75,7 @@ class Globals:
             "TracingEnabled",
             "OpenApiVersion",
             "Domain",
+            "AlwaysDeploy",
         ],
         SamResourceType.HttpApi.value: [
             "Auth",

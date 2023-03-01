@@ -2303,6 +2303,35 @@
         }
       }
     },
+    "StepFunctionsExecutionPolicy_v2": {
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "states:StartExecution",
+              "states:StartSyncExecution"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  "stateMachineName": {
+                    "Ref": "StateMachineName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Description": "Gives permission to start a Step Functions state machine execution",
+      "Parameters": {
+        "StateMachineName": {
+          "Description": "The name of the state machine to execute."
+        }
+      }
+    },
     "TextractDetectAnalyzePolicy": {
       "Definition": {
         "Statement": [

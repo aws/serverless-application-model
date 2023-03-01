@@ -199,6 +199,26 @@ class DynamoDBEvent(BaseModel):
     Properties: DynamoDBEventProperties = event("Properties")
 
 
+class DocumentDBEventProperties(BaseModel):
+    BatchSize: Optional[PassThroughProp]  # TODO: add documentation
+    Cluster: PassThroughProp  # TODO: add documentation
+    CollectionName: Optional[PassThroughProp]  # TODO: add documentation
+    DatabaseName: PassThroughProp  # TODO: add documentation
+    Enabled: Optional[PassThroughProp]  # TODO: add documentation
+    FilterCriteria: Optional[PassThroughProp]  # TODO: add documentation
+    FullDocument: Optional[PassThroughProp]  # TODO: add documentation
+    MaximumBatchingWindowInSeconds: Optional[PassThroughProp]  # TODO: add documentation
+    SecretsManagerKmsKeyId: Optional[str]  # TODO: add documentation
+    SourceAccessConfigurations: PassThroughProp  # TODO: add documentation
+    StartingPosition: Optional[PassThroughProp]  # TODO: add documentation
+    StartingPositionTimestamp: Optional[PassThroughProp]  # TODO: add documentation
+
+
+class DocumentDBEvent(BaseModel):
+    Type: Literal["DocumentDB"] = event("Type")
+    Properties: DocumentDBEventProperties = event("Properties")
+
+
 class SQSEventProperties(BaseModel):
     BatchSize: Optional[PassThroughProp] = sqseventproperties("BatchSize")
     Enabled: Optional[PassThroughProp] = sqseventproperties("Enabled")
@@ -385,6 +405,7 @@ class MSKEvent(BaseModel):
 class MQEventProperties(BaseModel):
     BatchSize: Optional[PassThroughProp] = mqeventproperties("BatchSize")
     Broker: PassThroughProp = mqeventproperties("Broker")
+    DynamicPolicyName: Optional[bool]  # TODO: add docs
     Enabled: Optional[PassThroughProp] = mqeventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = mqeventproperties("FilterCriteria")
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mqeventproperties("MaximumBatchingWindowInSeconds")
@@ -487,6 +508,7 @@ class Properties(BaseModel):
                 SNSEvent,
                 KinesisEvent,
                 DynamoDBEvent,
+                DocumentDBEvent,
                 SQSEvent,
                 ApiEvent,
                 ScheduleEvent,
