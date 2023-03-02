@@ -3596,6 +3596,10 @@
           "title": "GatewayResponses",
           "type": "object"
         },
+        "IndividualRecordSet": {
+          "title": "Individualrecordset",
+          "type": "boolean"
+        },
         "MergeDefinitions": {
           "title": "Mergedefinitions",
           "type": "boolean"

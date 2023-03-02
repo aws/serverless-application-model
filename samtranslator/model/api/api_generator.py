@@ -23,7 +23,7 @@ from samtranslator.model.exceptions import (
 )
 from samtranslator.model.intrinsics import fnGetAtt, fnSub, is_intrinsic, make_or_condition, ref
 from samtranslator.model.lambda_ import LambdaPermission
-from samtranslator.model.route53 import Route53RecordSetGroup
+from samtranslator.model.route53 import Route53RecordSet, Route53RecordSetGroup
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import PassThrough
@@ -196,6 +196,7 @@ class ApiGenerator:
         mode: Optional[Intrinsicable[str]] = None,
         api_key_source_type: Optional[Intrinsicable[str]] = None,
         always_deploy: Optional[bool] = False,
+        individual_recordset: Optional[bool] = False,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -252,6 +253,7 @@ class ApiGenerator:
         self.mode = mode
         self.api_key_source_type = api_key_source_type
         self.always_deploy = always_deploy
+        self.individual_recordset = individual_recordset
 
     def _construct_rest_api(self) -> ApiGatewayRestApi:
         """Constructs and returns the ApiGateway RestApi.
@@ -443,12 +445,12 @@ class ApiGenerator:
 
     def _construct_api_domain(  # noqa: too-many-branches
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
-    ) -> Tuple[Optional[ApiGatewayDomainName], Optional[List[ApiGatewayBasePathMapping]], Any]:
+    ) -> Tuple[Optional[ApiGatewayDomainName], Optional[List[ApiGatewayBasePathMapping]], Any, Any]:
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
         if self.domain is None:
-            return None, None, None
+            return None, None, None, None
 
         sam_expect(self.domain, self.logical_id, "Domain").to_be_a_map()
         domain_name: PassThrough = sam_expect(
@@ -565,6 +567,15 @@ class ApiGenerator:
             logical_id = "RecordSetGroup" + logical_id_suffix
 
             record_set_group = route53_record_set_groups.get(logical_id)
+
+            if self.individual_recordset:
+                return (
+                    domain,
+                    basepath_resource_list,
+                    None,
+                    self._construct_individual_record_set(self.domain, api_domain_name, route53),
+                )
+
             if not record_set_group:
                 record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
                 if "HostedZoneId" in route53:
@@ -576,7 +587,39 @@ class ApiGenerator:
 
             record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, api_domain_name, route53)
 
-        return domain, basepath_resource_list, record_set_group
+        return domain, basepath_resource_list, record_set_group, None
+
+    def _construct_individual_record_set(
+        self, domain: Dict[str, Any], api_domain_name: str, route53: Any
+    ) -> List[Route53RecordSet]:
+        logical_id_suffix = LogicalIdGenerator(
+            "", [route53.get("HostedZoneId") or route53.get("HostedZoneName"), domain.get("DomainName")]
+        ).gen()
+        logical_id = "RecordSet" + logical_id_suffix
+        logical_id_ipv6 = "RecordSetIpv6" + logical_id_suffix
+
+        recordset_list = []
+
+        recordset = Route53RecordSet(logical_id, attributes=self.passthrough_resource_attributes)
+        recordset.Name = domain.get("DomainName")
+        recordset.Type = "A"
+        recordset.AliasTarget = self._construct_alias_target(domain, api_domain_name, route53)
+
+        if route53.get("HostedZoneId"):
+            recordset.HostedZoneId = route53.get("HostedZoneId")
+        else:
+            recordset.HostedZoneName = route53.get("HostedZoneName")
+
+        recordset_list.extend([recordset])
+
+        if route53.get("IpV6"):
+            recordset_ipv6 = Route53RecordSet(logical_id_ipv6, attributes=self.passthrough_resource_attributes)
+            recordset_ipv6.Name = domain.get("DomainName")
+            recordset_ipv6.Type = "AAAA"
+            recordset_ipv6.AliasTarget = self._construct_alias_target(domain, api_domain_name, route53)
+            recordset_list.extend([recordset_ipv6])
+
+        return recordset_list
 
     def _construct_record_sets_for_domain(
         self, custom_domain_config: Dict[str, Any], api_domain_name: str, route53_config: Dict[str, Any]
@@ -633,7 +676,9 @@ class ApiGenerator:
         :rtype: tuple
         """
         rest_api = self._construct_rest_api()
-        domain, basepath_mapping, route53 = self._construct_api_domain(rest_api, route53_record_set_groups)
+        domain, basepath_mapping, route53, individual_route53 = self._construct_api_domain(
+            rest_api, route53_record_set_groups
+        )
         deployment = self._construct_deployment(rest_api)
 
         swagger = None
@@ -646,7 +691,17 @@ class ApiGenerator:
         permissions = self._construct_authorizer_lambda_permission()
         usage_plan = self._construct_usage_plan(rest_api_stage=stage)
 
-        return rest_api, deployment, stage, permissions, domain, basepath_mapping, route53, usage_plan
+        return (
+            rest_api,
+            deployment,
+            stage,
+            permissions,
+            domain,
+            basepath_mapping,
+            route53,
+            usage_plan,
+            individual_route53,
+        )
 
     def _add_cors(self) -> None:
         """

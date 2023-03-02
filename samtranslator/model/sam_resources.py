@@ -1179,6 +1179,7 @@ class SamApi(SamResourceMacro):
         "DisableExecuteApiEndpoint": PropertyType(False, IS_BOOL),
         "ApiKeySourceType": PropertyType(False, IS_STR),
         "AlwaysDeploy": Property(False, IS_BOOL),
+        "IndividualRecordSet": Property(False, IS_BOOL),
     }
 
     Name: Optional[Intrinsicable[str]]
@@ -1209,6 +1210,7 @@ class SamApi(SamResourceMacro):
     DisableExecuteApiEndpoint: Optional[Intrinsicable[bool]]
     ApiKeySourceType: Optional[Intrinsicable[str]]
     AlwaysDeploy: Optional[bool]
+    IndividualRecordSet: Optional[bool]
 
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
@@ -1274,6 +1276,7 @@ class SamApi(SamResourceMacro):
             mode=self.Mode,
             api_key_source_type=self.ApiKeySourceType,
             always_deploy=self.AlwaysDeploy,
+            individual_recordset=self.IndividualRecordSet,
         )
 
         (
@@ -1285,6 +1288,7 @@ class SamApi(SamResourceMacro):
             basepath_mapping,
             route53,
             usage_plan_resources,
+            individual_route53,
         ) = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
 
         resources.extend([rest_api, deployment, stage])
@@ -1298,6 +1302,8 @@ class SamApi(SamResourceMacro):
         # contains usage plan, api key and usageplan key resources
         if usage_plan_resources:
             resources.extend(usage_plan_resources)
+        if individual_route53:
+            resources.extend(individual_route53)
         return resources
 
 
