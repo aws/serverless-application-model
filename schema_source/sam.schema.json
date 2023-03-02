@@ -649,6 +649,33 @@
       "title": "DocumentDBEventProperties",
       "type": "object"
     },
+    "DynamoDBConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "DeltaSync": {
+          "$ref": "#/definitions/DeltaSyncConfig"
+        },
+        "Region": {
+          "title": "Region",
+          "type": "string"
+        },
+        "TableName": {
+          "title": "Tablename",
+          "type": "string"
+        },
+        "UseCallerCredentials": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Versioned": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "TableName"
+      ],
+      "title": "DynamoDBConfig",
+      "type": "object"
+    },
     "DynamoDBEvent": {
       "additionalProperties": false,
       "properties": {
@@ -5731,6 +5758,140 @@
       "title": "ScheduleV2EventProperties",
       "type": "object"
     },
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth": {
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "title": "Auth",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "Auth": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
+        },
+        "Logging": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Logging"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Logging"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "SchemaInline": {
+          "title": "Schemainline",
+          "type": "string"
+        },
+        "SchemaUri": {
+          "title": "Schemauri",
+          "type": "string"
+        },
+        "Tags": {
+          "title": "Tags",
+          "type": "object"
+        },
+        "XrayEnabled": {
+          "title": "Xrayenabled",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "Auth"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::GraphQLApi"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiId": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "DynamoDBConfig": {
+          "$ref": "#/definitions/DynamoDBConfig"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "ServiceRoleArn": {
+          "title": "Servicerolearn",
+          "type": "string"
+        },
+        "Type": {
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ApiId",
+        "Type",
+        "DynamoDBConfig"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::GraphQLDataSource"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
     "samtranslator__internal__schema_source__aws_serverless_httpapi__Auth": {
       "additionalProperties": false,
       "properties": {
@@ -7420,6 +7581,12 @@
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_application__Resource"
+          },
+          {
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource"
+          },
+          {
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Resource"
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__any_cfn_resource__Resource"
