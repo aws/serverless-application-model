@@ -701,7 +701,7 @@ class SwaggerEditor(BaseEditor):
 
         method_apikey_required = auth and auth.get("ApiKeyRequired")
 
-        if not auth.get("AddApiKeyRequiredToCorsPreflight") and method_name == "options":
+        if method_name == "options" and not auth.get("AddApiKeyRequiredToCorsPreflight"):
             method_apikey_required = False
 
         if method_apikey_required is not None:
