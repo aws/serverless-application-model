@@ -40,7 +40,7 @@ parser.add_argument(
     "--output-template",
     help="Location to store resulting CloudFormation template [default: transformed-template.json].",
     type=Path,
-    default=Path("transformed-template.yaml"),
+    default=Path("transformed-template.json"),
 )
 parser.add_argument(
     "--s3-bucket",
