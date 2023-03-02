@@ -486,7 +486,7 @@ class SNS(PushEventSource):
         "Topic": PropertyType(True, IS_STR),
         "Region": PropertyType(False, IS_STR),
         "FilterPolicy": PropertyType(False, dict_of(IS_STR, list_of(one_of(IS_STR, IS_DICT)))),
-        "FilterPolicyScope": PropertyType(False, IS_STR),
+        "FilterPolicyScope": PassThroughProperty(False),
         "SqsSubscription": PropertyType(False, one_of(IS_BOOL, IS_DICT)),
         "RedrivePolicy": PropertyType(False, IS_DICT),
     }
