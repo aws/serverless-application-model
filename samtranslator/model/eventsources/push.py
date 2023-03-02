@@ -535,7 +535,14 @@ class SNS(PushEventSource):
 
             queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function)  # type: ignore[no-untyped-call]
             subscription = self._inject_subscription(
-                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.FilterPolicyScope, self.RedrivePolicy, function
+                "sqs",
+                queue_arn,
+                self.Topic,
+                self.Region,
+                self.FilterPolicy,
+                self.FilterPolicyScope,
+                self.RedrivePolicy,
+                function,
             )
             event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)  # type: ignore[no-untyped-call]
 
@@ -563,7 +570,14 @@ class SNS(PushEventSource):
             self.Topic, queue_arn, queue_url, function, queue_policy_logical_id
         )
         subscription = self._inject_subscription(
-            "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.FilterPolicyScope, self.RedrivePolicy, function
+            "sqs",
+            queue_arn,
+            self.Topic,
+            self.Region,
+            self.FilterPolicy,
+            self.FilterPolicyScope,
+            self.RedrivePolicy,
+            function,
         )
         event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)  # type: ignore[no-untyped-call]
 
