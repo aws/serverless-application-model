@@ -486,6 +486,7 @@ class SNS(PushEventSource):
         "Topic": PropertyType(True, IS_STR),
         "Region": PropertyType(False, IS_STR),
         "FilterPolicy": PropertyType(False, dict_of(IS_STR, list_of(one_of(IS_STR, IS_DICT)))),
+        "FilterPolicyScope": PropertyType(False, IS_STR),
         "SqsSubscription": PropertyType(False, one_of(is_type(bool), IS_DICT)),
         "RedrivePolicy": PropertyType(False, IS_DICT),
     }
@@ -493,6 +494,7 @@ class SNS(PushEventSource):
     Topic: str
     Region: Optional[str]
     FilterPolicy: Optional[Dict[str, Any]]
+    FilterPolicyScope: Optional[str]
     SqsSubscription: Optional[Any]
     RedrivePolicy: Optional[Dict[str, Any]]
 
@@ -518,6 +520,7 @@ class SNS(PushEventSource):
                 self.Topic,
                 self.Region,
                 self.FilterPolicy,
+                self.FilterPolicyScope,
                 self.RedrivePolicy,
                 function,
             )
@@ -532,7 +535,7 @@ class SNS(PushEventSource):
 
             queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function)  # type: ignore[no-untyped-call]
             subscription = self._inject_subscription(
-                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function
+                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.FilterPolicyScope, self.RedrivePolicy, function
             )
             event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)  # type: ignore[no-untyped-call]
 
@@ -560,7 +563,7 @@ class SNS(PushEventSource):
             self.Topic, queue_arn, queue_url, function, queue_policy_logical_id
         )
         subscription = self._inject_subscription(
-            "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function
+            "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.FilterPolicyScope, self.RedrivePolicy, function
         )
         event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)  # type: ignore[no-untyped-call]
 
@@ -576,6 +579,7 @@ class SNS(PushEventSource):
         topic: str,
         region: Optional[str],
         filterPolicy: Optional[Dict[str, Any]],
+        filterPolicyScope: Optional[str],
         redrivePolicy: Optional[Dict[str, Any]],
         function: Any,
     ) -> SNSSubscription:
@@ -589,6 +593,9 @@ class SNS(PushEventSource):
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
+
+        if filterPolicyScope is not None:
+            subscription.FilterPolicyScope = filterPolicyScope
 
         if redrivePolicy is not None:
             subscription.RedrivePolicy = redrivePolicy

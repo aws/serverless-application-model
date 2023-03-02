@@ -138,6 +138,7 @@ class SqsSubscription(BaseModel):
 
 class SNSEventProperties(BaseModel):
     FilterPolicy: Optional[PassThroughProp] = snseventproperties("FilterPolicy")
+    FilterPolicyScope: Optional[PassThroughProp] = snseventproperties("FilterPolicyScope")
     Region: Optional[PassThroughProp] = snseventproperties("Region")
     SqsSubscription: Optional[Union[bool, SqsSubscription]] = snseventproperties("SqsSubscription")
     Topic: PassThroughProp = snseventproperties("Topic")
