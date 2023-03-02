@@ -612,7 +612,7 @@ class SwaggerEditor(BaseEditor):
                 if "AWS_IAM" in method_definition["security"][0]:
                     self.add_awsiam_security_definition()
 
-    def set_path_default_apikey_required(self, path: str, AddApiKeyRequiredToCorsPreflight=True) -> None:
+    def set_path_default_apikey_required(self, path: str, AddApiKeyRequiredToCorsPreflight: bool = True) -> None:
         """
         Add the ApiKey security as required for each method on this path unless ApiKeyRequired
         was defined at the Function/Path/Method level. This is intended to be used to set the

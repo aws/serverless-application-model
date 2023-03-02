@@ -195,7 +195,6 @@ class ApiGenerator:
         description: Optional[Intrinsicable[str]] = None,
         mode: Optional[Intrinsicable[str]] = None,
         api_key_source_type: Optional[Intrinsicable[str]] = None,
-        always_deploy: Optional[bool] = False,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -251,7 +250,6 @@ class ApiGenerator:
         self.template_conditions = template_conditions
         self.mode = mode
         self.api_key_source_type = api_key_source_type
-        self.always_deploy = always_deploy
 
     def _construct_rest_api(self) -> ApiGatewayRestApi:
         """Constructs and returns the ApiGateway RestApi.
@@ -428,12 +426,7 @@ class ApiGenerator:
 
         if swagger is not None:
             deployment.make_auto_deployable(
-                stage,
-                self.remove_extra_stage,
-                swagger,
-                self.domain,
-                redeploy_restapi_parameters,
-                self.always_deploy,
+                stage, self.remove_extra_stage, swagger, self.domain, redeploy_restapi_parameters
             )
 
         if self.tags is not None:
@@ -1225,9 +1218,7 @@ class ApiGenerator:
                 add_default_auth_to_preflight=add_default_auth_to_preflight,
             )
 
-    def _set_default_apikey_required(
-        self, swagger_editor: SwaggerEditor, AddApiKeyRequiredToCorsPreflight: bool
-    ) -> None:
+    def _set_default_apikey_required(self, swagger_editor: SwaggerEditor, AddApiKeyRequiredToCorsPreflight: bool) -> None:
         for path in swagger_editor.iter_on_path():
             swagger_editor.set_path_default_apikey_required(path, AddApiKeyRequiredToCorsPreflight)
 

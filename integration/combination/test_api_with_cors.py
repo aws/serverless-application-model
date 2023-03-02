@@ -12,10 +12,7 @@ ALL_METHODS = "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT"
 @skipIf(current_region_does_not_support([REST_API]), "Rest API is not supported in this testing region")
 class TestApiWithCors(BaseTest):
     @parameterized.expand(
-        [
-            "combination/api_with_cors",
-            "combination/api_with_cors_openapi",
-        ]
+        ["combination/api_with_cors", "combination/api_with_cors_openapi", "combination/api_with_cors_and_apikey"]
     )
     def test_cors(self, file_name):
         self.create_and_verify_stack(file_name)
