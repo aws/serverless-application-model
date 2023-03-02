@@ -19,7 +19,7 @@ from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
 from samtranslator.model.sqs import SQSQueue, SQSQueuePolicies, SQSQueuePolicy
 from samtranslator.model.tags.resource_tagging import get_tag_list
-from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, dict_of, is_type, list_of, one_of
+from samtranslator.model.types import IS_BOOL, IS_DICT, IS_INT, IS_LIST, IS_STR, PassThrough, dict_of, list_of, one_of
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
@@ -105,7 +105,7 @@ class Schedule(PushEventSource):
         "Schedule": PropertyType(True, IS_STR),
         "RuleName": PropertyType(False, IS_STR),
         "Input": PropertyType(False, IS_STR),
-        "Enabled": PropertyType(False, is_type(bool)),
+        "Enabled": PropertyType(False, IS_BOOL),
         "State": PropertyType(False, IS_STR),
         "Name": PropertyType(False, IS_STR),
         "Description": PropertyType(False, IS_STR),
@@ -205,7 +205,7 @@ class CloudWatchEvent(PushEventSource):
         "Input": PropertyType(False, IS_STR),
         "InputPath": PropertyType(False, IS_STR),
         "Target": PropertyType(False, IS_DICT),
-        "Enabled": PropertyType(False, is_type(bool)),
+        "Enabled": PropertyType(False, IS_BOOL),
         "State": PropertyType(False, IS_STR),
     }
 
@@ -486,7 +486,7 @@ class SNS(PushEventSource):
         "Topic": PropertyType(True, IS_STR),
         "Region": PropertyType(False, IS_STR),
         "FilterPolicy": PropertyType(False, dict_of(IS_STR, list_of(one_of(IS_STR, IS_DICT)))),
-        "SqsSubscription": PropertyType(False, one_of(is_type(bool), IS_DICT)),
+        "SqsSubscription": PropertyType(False, one_of(IS_BOOL, IS_DICT)),
         "RedrivePolicy": PropertyType(False, IS_DICT),
     }
 
@@ -630,7 +630,7 @@ class Api(PushEventSource):
         "Stage": PropertyType(False, IS_STR),
         "Auth": PropertyType(False, IS_DICT),
         "RequestModel": PropertyType(False, IS_DICT),
-        "RequestParameters": PropertyType(False, is_type(list)),
+        "RequestParameters": PropertyType(False, IS_LIST),
     }
 
     Path: str
@@ -1220,7 +1220,7 @@ class HttpApi(PushEventSource):
         "ApiId": PropertyType(False, IS_STR),
         "Stage": PropertyType(False, IS_STR),
         "Auth": PropertyType(False, IS_DICT),
-        "TimeoutInMillis": PropertyType(False, is_type(int)),
+        "TimeoutInMillis": PropertyType(False, IS_INT),
         "RouteSettings": PropertyType(False, IS_DICT),
         "PayloadFormatVersion": PropertyType(False, IS_STR),
     }
