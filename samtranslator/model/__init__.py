@@ -548,7 +548,7 @@ class ResourceTypeResolver:
     """ResourceTypeResolver maps Resource Types to Resource classes, e.g. AWS::Serverless::Function to
     samtranslator.model.sam_resources.SamFunction."""
 
-    def __init__(self, *modules: Any):
+    def __init__(self, *modules: Any) -> None:
         """Initializes the ResourceTypeResolver from the given modules.
 
         :param modules: one or more Python modules containing Resource definitions
@@ -589,7 +589,7 @@ class ResourceTypeResolver:
 
 
 class ResourceResolver:
-    def __init__(self, resources: Dict[str, Any]):
+    def __init__(self, resources: Dict[str, Any]) -> None:
         """
         Instantiate the resolver
         :param dict resources: Map of resource

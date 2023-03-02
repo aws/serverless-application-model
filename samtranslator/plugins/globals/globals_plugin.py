@@ -21,7 +21,7 @@ class GlobalsPlugin(BasePlugin):
         :param dict template_dict: SAM template as a dictionary
         """
         try:
-            global_section = Globals(template_dict)  # type: ignore[no-untyped-call]
+            global_section = Globals(template_dict)
         except InvalidGlobalsSectionException as ex:
             raise InvalidDocumentException([ex]) from ex
 

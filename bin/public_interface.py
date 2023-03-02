@@ -161,10 +161,8 @@ def _only_new_optional_arguments_or_existing_arguments_optionalized_or_var_argum
         return False
     # it is an optional argument when it has a default value:
     return all(
-        [
-            "default" in argument or argument["kind"] in ("VAR_KEYWORD", "VAR_POSITIONAL")
-            for argument in arguments[len(original_arguments) :]
-        ]
+        "default" in argument or argument["kind"] in ("VAR_KEYWORD", "VAR_POSITIONAL")
+        for argument in arguments[len(original_arguments) :]
     )
 
 
