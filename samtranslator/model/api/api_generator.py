@@ -1225,7 +1225,9 @@ class ApiGenerator:
                 add_default_auth_to_preflight=add_default_auth_to_preflight,
             )
 
-    def _set_default_apikey_required(self, swagger_editor: SwaggerEditor, AddApiKeyRequiredToCorsPreflight: bool) -> None:
+    def _set_default_apikey_required(
+        self, swagger_editor: SwaggerEditor, AddApiKeyRequiredToCorsPreflight: bool
+    ) -> None:
         for path in swagger_editor.iter_on_path():
             swagger_editor.set_path_default_apikey_required(path, AddApiKeyRequiredToCorsPreflight)
 
