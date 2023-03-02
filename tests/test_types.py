@@ -1,5 +1,5 @@
 import pytest
-from samtranslator.model.types import dict_of, is_type, list_of, one_of
+from samtranslator.model.types import IS_INT, dict_of, is_type, list_of, one_of
 
 
 class DummyType(object):
@@ -83,11 +83,11 @@ def test_dict_of_validator(value, key_type, value_type, should_pass):
     "value,validators,should_pass",
     [
         # Value of first expected type
-        (1, [is_type(int), list_of(is_type(int))], True),
+        (1, [IS_INT, list_of(IS_INT)], True),
         # Value of second expected type
-        ([1, 2, 3], [is_type(int), list_of(is_type(int))], True),
+        ([1, 2, 3], [IS_INT, list_of(IS_INT)], True),
         # Value of neither expected type
-        ("Hello, World!", [is_type(int), list_of(is_type(int))], False),
+        ("Hello, World!", [IS_INT, list_of(IS_INT)], False),
     ],
 )
 def test_one_of_validator(value, validators, should_pass):
