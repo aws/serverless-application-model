@@ -612,7 +612,7 @@ class SwaggerEditor(BaseEditor):
                 if "AWS_IAM" in method_definition["security"][0]:
                     self.add_awsiam_security_definition()
 
-    def set_path_default_apikey_required(self, path: str, AddApiKeyRequiredToCorsPreflight: bool = True) -> None:
+    def set_path_default_apikey_required(self, path: str, required_options_api_key: bool = True) -> None:
         """
         Add the ApiKey security as required for each method on this path unless ApiKeyRequired
         was defined at the Function/Path/Method level. This is intended to be used to set the
@@ -620,7 +620,7 @@ class SwaggerEditor(BaseEditor):
         Serverless API.
 
         :param string path: Path name
-        :param bool AddApiKeyRequiredToCorsPreflight: Bool of whether to add the ApiKeyRequired
+        :param bool required_options_api_key: Bool of whether to add the ApiKeyRequired
          to OPTIONS preflight requests.
         """
 
@@ -675,7 +675,7 @@ class SwaggerEditor(BaseEditor):
 
             security = existing_non_apikey_security + apikey_security
 
-            if method_name == "options" and not AddApiKeyRequiredToCorsPreflight:
+            if method_name == "options" and not required_options_api_key:
                 security = existing_non_apikey_security
 
             if security != existing_security:
@@ -701,7 +701,7 @@ class SwaggerEditor(BaseEditor):
 
         method_apikey_required = auth and auth.get("ApiKeyRequired")
 
-        if auth.get("AddApiKeyRequiredToCorsPreflight") and method_name == "options":
+        if not auth.get("AddApiKeyRequiredToCorsPreflight") and method_name == "options":
             method_apikey_required = False
 
         if method_apikey_required is not None:

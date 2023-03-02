@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Resources:
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = async function (event) {
+          return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Hello, SAM!" }),
+          }
+        }
+      Runtime: nodejs16.x
+
+  ApiGatewayLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal: {Service: apigateway.amazonaws.com}
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: AllowInvokeLambdaFunctions
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: lambda:InvokeFunction
+            Resource: '*'
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Cors: "'*'"
+      Auth:
+        ApiKeyRequired: true
+        AddApiKeyRequiredToCorsPreflight: false
+      StageName: dev
+      DefinitionBody:
+        openapi: 3.0.1
+        paths:
+          /hello:
+            get:
+              x-amazon-apigateway-integration:
+                credentials:
+                  Fn::Sub: ${ApiGatewayLambdaRole.Arn}
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+
+
+
+Outputs:
+  WebEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/dev/hello"
