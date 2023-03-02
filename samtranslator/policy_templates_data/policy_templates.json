@@ -1920,6 +1920,60 @@
         }
       }
     },
+    "SESBulkTemplatedCrudPolicy_v2": {
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "ses:SendEmail",
+              "ses:SendRawEmail",
+              "ses:SendTemplatedEmail",
+              "ses:SendBulkTemplatedEmail"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}",
+                  {
+                    "identityName": {
+                      "Ref": "IdentityName"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:template/${templateName}",
+                  {
+                    "templateName": {
+                      "Ref": "TemplateName"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Action": [
+              "ses:GetIdentityVerificationAttributes",
+              "ses:VerifyEmailIdentity"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+          }
+        ]
+      },
+      "Description": "Gives permission to send email, templated email, templated bulk emails and verify identity",
+      "Parameters": {
+        "IdentityName": {
+          "Description": "Identity to give permissions to"
+        },
+        "TemplateName": {
+          "Description": "Name of the email template"
+        }
+      }
+    },
     "SESCrudPolicy": {
       "Definition": {
         "Statement": [
