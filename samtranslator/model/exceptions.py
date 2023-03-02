@@ -32,7 +32,7 @@ class InvalidDocumentException(ExceptionWithMessage):
         causes -- list of errors which caused this document to be invalid
     """
 
-    def __init__(self, causes: Sequence[ExceptionWithMessage]):
+    def __init__(self, causes: Sequence[ExceptionWithMessage]) -> None:
         self._causes = list(causes)
         # Sometimes, the same error could be raised from different plugins,
         # so here we do a deduplicate based on the message:

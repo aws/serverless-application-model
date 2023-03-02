@@ -96,8 +96,8 @@ def to_py27_compatible_template(  # noqa: too-many-branches
             parameter_values[key] = _convert_to_py27_type(val)  # type: ignore[no-untyped-call]
 
 
-def undo_mark_unicode_str_in_template(template_dict):  # type: ignore[no-untyped-def]
-    return json.loads(json.dumps(template_dict))
+def undo_mark_unicode_str_in_template(template_dict: Dict[str, Any]) -> Dict[str, Any]:
+    return cast(Dict[str, Any], json.loads(json.dumps(template_dict)))
 
 
 class Py27UniStr(unicode_string_type):
@@ -406,12 +406,13 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         """
         for arg in args:
             # Cast to dict if applicable. Otherwise, assume it's an iterable of (key, value) pairs
+            _arg = arg
             if isinstance(arg, dict):
                 # Merge incoming keys into keylist
                 self.keylist.merge(arg.keys())  # type: ignore[no-untyped-call]
-                arg = arg.items()
+                _arg = arg.items()
 
-            for k, v in arg:
+            for k, v in _arg:
                 self[k] = v
 
         for k, v in dict(**kwargs).items():

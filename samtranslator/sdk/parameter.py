@@ -1,7 +1,8 @@
 import copy
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import boto3
+from boto3 import Session
 
 from samtranslator.translator.arn_generator import ArnGenerator, NoRegionFound
 
@@ -11,7 +12,7 @@ class SamParameterValues:
     Class representing SAM parameter values.
     """
 
-    def __init__(self, parameter_values: Dict[Any, Any]):
+    def __init__(self, parameter_values: Dict[Any, Any]) -> None:
         """
         Initialize the object given the parameter values as a dictionary
 
@@ -64,7 +65,7 @@ class SamParameterValues:
 
         return None
 
-    def add_pseudo_parameter_values(self, session=None):  # type: ignore[no-untyped-def]
+    def add_pseudo_parameter_values(self, session: Optional[Session] = None) -> None:
         """
         Add pseudo parameter values
         :return: parameter values that have pseudo parameter in it

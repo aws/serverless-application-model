@@ -1,23 +1,22 @@
 from typing import Any, Dict, List, Optional
 
-from samtranslator.model import PropertyType, Resource
+from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
-from samtranslator.model.types import IS_DICT, IS_STR, list_of
 
 
 class StepFunctionsStateMachine(Resource):
     resource_type = "AWS::StepFunctions::StateMachine"
     property_types = {
-        "Definition": PropertyType(False, IS_DICT),
-        "DefinitionString": PropertyType(False, IS_STR),
-        "DefinitionS3Location": PropertyType(False, IS_DICT),
-        "LoggingConfiguration": PropertyType(False, IS_DICT),
-        "RoleArn": PropertyType(True, IS_STR),
-        "StateMachineName": PropertyType(False, IS_STR),
-        "StateMachineType": PropertyType(False, IS_STR),
-        "Tags": PropertyType(False, list_of(IS_DICT)),
-        "DefinitionSubstitutions": PropertyType(False, IS_DICT),
-        "TracingConfiguration": PropertyType(False, IS_DICT),
+        "Definition": GeneratedProperty(),
+        "DefinitionString": GeneratedProperty(),
+        "DefinitionS3Location": GeneratedProperty(),
+        "LoggingConfiguration": GeneratedProperty(),
+        "RoleArn": GeneratedProperty(),
+        "StateMachineName": GeneratedProperty(),
+        "StateMachineType": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+        "DefinitionSubstitutions": GeneratedProperty(),
+        "TracingConfiguration": GeneratedProperty(),
     }
 
     Definition: Optional[Dict[str, Any]]

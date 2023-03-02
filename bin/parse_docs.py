@@ -20,7 +20,7 @@ from typing import Dict, Iterator, Tuple
 def parse(s: str) -> Iterator[Tuple[str, str]]:
     """Parse an AWS docs page in Markdown format, yielding each property."""
     # Prevent from parsing return values accidentally
-    s = stringbetween(s, "#\s+Properties", "#\s+Return values")
+    s = stringbetween(s, "#\\s+Properties", "#\\s+Return values")
     if not s:
         return
     parts = s.split("\n\n")
@@ -44,7 +44,7 @@ def remove_first_line(s: str) -> str:
 
 
 def convert_to_full_path(description: str, prefix: str) -> str:
-    pattern = re.compile("\(([#\.a-zA-Z0-9_-]+)\)")
+    pattern = re.compile("\\(([#\\.a-zA-Z0-9_-]+)\\)")
     matched_content = pattern.findall(description)
 
     for path in matched_content:
@@ -89,10 +89,10 @@ def main() -> None:
         if args.cfn and not re.match(r"^\w+::\w+::\w+( \w+)?$", title):
             continue
         page = title if args.cfn else path.stem
-        for name, description in parse(text):
+        for name, raw_description in parse(text):
             if page not in props:
                 props[page] = {}
-            description = remove_first_line(description)  # Remove property name; already in the schema title
+            description = remove_first_line(raw_description)  # Remove property name; already in the schema title
             description = fix_markdown_code_link(description)
             prefix = (
                 "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/"

@@ -3,13 +3,16 @@ import inspect
 import re
 from abc import ABC, ABCMeta, abstractmethod
 from contextlib import suppress
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
-from samtranslator.model.exceptions import ExpectedType, InvalidResourceException, InvalidResourcePropertyTypeException
+from samtranslator.model.exceptions import (
+    ExpectedType,
+    InvalidResourceException,
+    InvalidResourcePropertyTypeException,
+)
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
@@ -121,7 +124,7 @@ class Resource(ABC):
 
     def __init__(
         self,
-        logical_id: str,
+        logical_id: Optional[Any],
         relative_id: Optional[str] = None,
         depends_on: Optional[List[str]] = None,
         attributes: Optional[Dict[str, Any]] = None,
@@ -134,8 +137,7 @@ class Resource(ABC):
         :param depends_on Value of DependsOn resource attribute
         :param attributes Dictionary of resource attributes and their values
         """
-        self._validate_logical_id(logical_id)  # type: ignore[no-untyped-call]
-        self.logical_id = logical_id
+        self.logical_id = self._validate_logical_id(logical_id)
         self.relative_id = relative_id
         self.depends_on = depends_on
 
@@ -214,8 +216,8 @@ class Resource(ABC):
         resource.validate_properties()
         return resource
 
-    @classmethod
-    def _validate_logical_id(cls, logical_id):  # type: ignore[no-untyped-def]
+    @staticmethod
+    def _validate_logical_id(logical_id: Optional[Any]) -> str:
         """Validates that the provided logical id is an alphanumeric string.
 
         :param str logical_id: the logical id to validate
@@ -224,9 +226,12 @@ class Resource(ABC):
         :raises TypeError: if the logical id is invalid
         """
         pattern = re.compile(r"^[A-Za-z0-9]+$")
-        if logical_id is not None and pattern.match(logical_id):
-            return True
-        raise InvalidResourceException(logical_id, "Logical ids must be alphanumeric.")
+        if isinstance(logical_id, str) and pattern.match(logical_id):
+            return logical_id
+        # TODO: Doing validation in this class is kind of off,
+        # we need to surface this validation to where the template is loaded
+        # or the logical IDs are generated.
+        raise InvalidResourceException(str(logical_id), "Logical ids must be alphanumeric.")
 
     @classmethod
     def _validate_resource_dict(cls, logical_id, resource_dict):  # type: ignore[no-untyped-def]
@@ -538,29 +543,12 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
                 "input.",
             )
 
-    def _resolve_string_parameter(
-        self,
-        intrinsics_resolver: IntrinsicsResolver,
-        parameter_value: Optional[Union[str, Dict[str, Any]]],
-        parameter_name: str,
-    ) -> Optional[Union[str, Dict[str, Any]]]:
-        if not parameter_value:
-            return parameter_value
-        value = intrinsics_resolver.resolve_parameter_refs(parameter_value)
-
-        if not isinstance(value, str) and not isinstance(value, dict):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Could not resolve parameter for '{}' or parameter is not a String.".format(parameter_name),
-            )
-        return value
-
 
 class ResourceTypeResolver:
     """ResourceTypeResolver maps Resource Types to Resource classes, e.g. AWS::Serverless::Function to
     samtranslator.model.sam_resources.SamFunction."""
 
-    def __init__(self, *modules: Any):
+    def __init__(self, *modules: Any) -> None:
         """Initializes the ResourceTypeResolver from the given modules.
 
         :param modules: one or more Python modules containing Resource definitions
@@ -601,7 +589,7 @@ class ResourceTypeResolver:
 
 
 class ResourceResolver:
-    def __init__(self, resources: Dict[str, Any]):
+    def __init__(self, resources: Dict[str, Any]) -> None:
         """
         Instantiate the resolver
         :param dict resources: Map of resource

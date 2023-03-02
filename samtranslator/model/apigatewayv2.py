@@ -1,9 +1,9 @@
 from typing import Any, Dict, List, Optional, Union
 
-from samtranslator.model import PropertyType, Resource
+from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException
 from samtranslator.model.intrinsics import fnSub, ref
-from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type, list_of, one_of
+from samtranslator.model.types import PassThrough
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect
@@ -14,13 +14,13 @@ APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
 class ApiGatewayV2HttpApi(Resource):
     resource_type = "AWS::ApiGatewayV2::Api"
     property_types = {
-        "Body": PropertyType(False, IS_DICT),
-        "BodyS3Location": PropertyType(False, IS_DICT),
-        "Description": PropertyType(False, IS_STR),
-        "FailOnWarnings": PropertyType(False, is_type(bool)),
-        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
-        "BasePath": PropertyType(False, IS_STR),
-        "CorsConfiguration": PropertyType(False, IS_DICT),
+        "Body": GeneratedProperty(),
+        "BodyS3Location": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "FailOnWarnings": GeneratedProperty(),
+        "DisableExecuteApiEndpoint": GeneratedProperty(),
+        "BasePath": GeneratedProperty(),
+        "CorsConfiguration": GeneratedProperty(),
     }
 
     runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}
@@ -29,16 +29,16 @@ class ApiGatewayV2HttpApi(Resource):
 class ApiGatewayV2Stage(Resource):
     resource_type = "AWS::ApiGatewayV2::Stage"
     property_types = {
-        "AccessLogSettings": PropertyType(False, IS_DICT),
-        "DefaultRouteSettings": PropertyType(False, IS_DICT),
-        "RouteSettings": PropertyType(False, IS_DICT),
-        "ClientCertificateId": PropertyType(False, IS_STR),
-        "Description": PropertyType(False, IS_STR),
-        "ApiId": PropertyType(True, IS_STR),
-        "StageName": PropertyType(False, one_of(IS_STR, IS_DICT)),
-        "Tags": PropertyType(False, IS_DICT),
-        "StageVariables": PropertyType(False, IS_DICT),
-        "AutoDeploy": PropertyType(False, is_type(bool)),
+        "AccessLogSettings": GeneratedProperty(),
+        "DefaultRouteSettings": GeneratedProperty(),
+        "RouteSettings": GeneratedProperty(),
+        "ClientCertificateId": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "ApiId": GeneratedProperty(),
+        "StageName": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+        "StageVariables": GeneratedProperty(),
+        "AutoDeploy": GeneratedProperty(),
     }
 
     runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
@@ -47,10 +47,10 @@ class ApiGatewayV2Stage(Resource):
 class ApiGatewayV2DomainName(Resource):
     resource_type = "AWS::ApiGatewayV2::DomainName"
     property_types = {
-        "DomainName": PropertyType(True, IS_STR),
-        "DomainNameConfigurations": PropertyType(False, list_of(IS_DICT)),
-        "MutualTlsAuthentication": PropertyType(False, IS_DICT),
-        "Tags": PropertyType(False, IS_DICT),
+        "DomainName": GeneratedProperty(),
+        "DomainNameConfigurations": GeneratedProperty(),
+        "MutualTlsAuthentication": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
     }
 
     DomainName: Intrinsicable[str]
@@ -62,10 +62,10 @@ class ApiGatewayV2DomainName(Resource):
 class ApiGatewayV2ApiMapping(Resource):
     resource_type = "AWS::ApiGatewayV2::ApiMapping"
     property_types = {
-        "ApiId": PropertyType(True, IS_STR),
-        "ApiMappingKey": PropertyType(False, IS_STR),
-        "DomainName": PropertyType(True, IS_STR),
-        "Stage": PropertyType(True, IS_STR),
+        "ApiId": GeneratedProperty(),
+        "ApiMappingKey": GeneratedProperty(),
+        "DomainName": GeneratedProperty(),
+        "Stage": GeneratedProperty(),
     }
 
 

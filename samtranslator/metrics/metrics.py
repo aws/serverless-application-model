@@ -4,7 +4,7 @@ Helper classes to publish metrics
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 LOG = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ class MetricsPublisher(ABC):
     """Interface for all MetricPublishers"""
 
     @abstractmethod
-    def publish(self, namespace, metrics):  # type: ignore[no-untyped-def]
+    def publish(self, namespace: str, metrics: List["MetricDatum"]) -> None:
         """
         Abstract method to publish all metrics to CloudWatch
 
@@ -25,7 +25,7 @@ class MetricsPublisher(ABC):
 class CWMetricsPublisher(MetricsPublisher):
     BATCH_SIZE = 20
 
-    def __init__(self, cloudwatch_client):  # type: ignore[no-untyped-def]
+    def __init__(self, cloudwatch_client) -> None:  # type: ignore[no-untyped-def]
         """
         Constructor
 
@@ -90,7 +90,7 @@ class MetricDatum:
     Class to hold Metric data.
     """
 
-    def __init__(self, name, value, unit, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
+    def __init__(self, name, value, unit, dimensions=None, timestamp=None) -> None:  # type: ignore[no-untyped-def]
         """
         Constructor
 
@@ -117,7 +117,9 @@ class MetricDatum:
 
 
 class Metrics:
-    def __init__(self, namespace="ServerlessTransform", metrics_publisher=None):  # type: ignore[no-untyped-def]
+    def __init__(
+        self, namespace: str = "ServerlessTransform", metrics_publisher: Optional[MetricsPublisher] = None
+    ) -> None:
         """
         Constructor
 
@@ -125,7 +127,7 @@ class Metrics:
         :param metrics_publisher: publisher to publish all metrics
         """
         self.metrics_publisher = metrics_publisher if metrics_publisher else DummyMetricsPublisher()
-        self.metrics_cache = {}
+        self.metrics_cache: Dict[str, List[MetricDatum]] = {}
         self.namespace = namespace
 
     def __del__(self) -> None:
@@ -146,7 +148,7 @@ class Metrics:
         :param dimensions: array of dimensions applied to the metric
         :param timestamp: timestamp of metric (datetime.datetime object)
         """
-        self.metrics_cache.setdefault(name, []).append(MetricDatum(name, value, unit, dimensions, timestamp))  # type: ignore[no-untyped-call]
+        self.metrics_cache.setdefault(name, []).append(MetricDatum(name, value, unit, dimensions, timestamp))
 
     def record_count(self, name, value, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
         """

@@ -9,6 +9,7 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
+from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
@@ -74,7 +75,18 @@ from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.sns import SNSTopic, SNSTopicPolicy
 from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy
 from samtranslator.model.stepfunctions import StateMachineGenerator
-from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, any_type, dict_of, is_type, list_of, one_of
+from samtranslator.model.types import (
+    IS_BOOL,
+    IS_DICT,
+    IS_INT,
+    IS_LIST,
+    IS_STR,
+    PassThrough,
+    any_type,
+    dict_of,
+    list_of,
+    one_of,
+)
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -125,7 +137,7 @@ class SamFunction(SamResourceMacro):
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(IS_STR)),
         "AutoPublishCodeSha256": PropertyType(False, one_of(IS_STR)),
-        "AutoPublishAliasAllProperties": Property(False, is_type(bool)),
+        "AutoPublishAliasAllProperties": Property(False, IS_BOOL),
         "VersionDescription": PassThroughProperty(False),
         "ProvisionedConcurrencyConfig": PassThroughProperty(False),
         "FileSystemConfigs": PassThroughProperty(False),
@@ -1140,33 +1152,35 @@ class SamApi(SamResourceMacro):
         # Implicit APIs. For Explicit APIs, customer is expected to set integration URI themselves.
         # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
         # Swagger.
-        "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
+        "__MANAGE_SWAGGER": PropertyType(False, IS_BOOL),
         "Name": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "StageName": PropertyType(True, one_of(IS_STR, IS_DICT)),
         "Tags": PropertyType(False, IS_DICT),
         "DefinitionBody": PropertyType(False, IS_DICT),
         "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
-        "CacheClusterEnabled": PropertyType(False, is_type(bool)),
+        "MergeDefinitions": Property(False, IS_BOOL),
+        "CacheClusterEnabled": PropertyType(False, IS_BOOL),
         "CacheClusterSize": PropertyType(False, IS_STR),
         "Variables": PropertyType(False, IS_DICT),
         "EndpointConfiguration": PropertyType(False, one_of(IS_STR, IS_DICT)),
-        "MethodSettings": PropertyType(False, is_type(list)),
-        "BinaryMediaTypes": PropertyType(False, is_type(list)),
-        "MinimumCompressionSize": PropertyType(False, is_type(int)),
+        "MethodSettings": PropertyType(False, IS_LIST),
+        "BinaryMediaTypes": PropertyType(False, IS_LIST),
+        "MinimumCompressionSize": PropertyType(False, IS_INT),
         "Cors": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "Auth": PropertyType(False, IS_DICT),
         "GatewayResponses": PropertyType(False, IS_DICT),
         "AccessLogSetting": PropertyType(False, IS_DICT),
         "CanarySetting": PropertyType(False, IS_DICT),
-        "TracingEnabled": PropertyType(False, is_type(bool)),
+        "TracingEnabled": PropertyType(False, IS_BOOL),
         "OpenApiVersion": PropertyType(False, IS_STR),
         "Models": PropertyType(False, IS_DICT),
         "Domain": PropertyType(False, IS_DICT),
-        "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "FailOnWarnings": PropertyType(False, IS_BOOL),
         "Description": PropertyType(False, IS_STR),
         "Mode": PropertyType(False, IS_STR),
-        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
+        "DisableExecuteApiEndpoint": PropertyType(False, IS_BOOL),
         "ApiKeySourceType": PropertyType(False, IS_STR),
+        "AlwaysDeploy": Property(False, IS_BOOL),
     }
 
     Name: Optional[Intrinsicable[str]]
@@ -1174,6 +1188,7 @@ class SamApi(SamResourceMacro):
     Tags: Optional[Dict[str, Any]]
     DefinitionBody: Optional[Dict[str, Any]]
     DefinitionUri: Optional[Intrinsicable[str]]
+    MergeDefinitions: Optional[bool]
     CacheClusterEnabled: Optional[Intrinsicable[bool]]
     CacheClusterSize: Optional[Intrinsicable[str]]
     Variables: Optional[Dict[str, Any]]
@@ -1195,6 +1210,7 @@ class SamApi(SamResourceMacro):
     Mode: Optional[Intrinsicable[str]]
     DisableExecuteApiEndpoint: Optional[Intrinsicable[bool]]
     ApiKeySourceType: Optional[Intrinsicable[str]]
+    AlwaysDeploy: Optional[bool]
 
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
@@ -1239,6 +1255,7 @@ class SamApi(SamResourceMacro):
             template_conditions,
             tags=self.Tags,
             endpoint_configuration=self.EndpointConfiguration,
+            merge_definitions=self.MergeDefinitions,
             method_settings=self.MethodSettings,
             binary_media=self.BinaryMediaTypes,
             minimum_compression_size=self.MinimumCompressionSize,
@@ -1258,6 +1275,7 @@ class SamApi(SamResourceMacro):
             description=self.Description,
             mode=self.Mode,
             api_key_source_type=self.ApiKeySourceType,
+            always_deploy=self.AlwaysDeploy,
         )
 
         (
@@ -1295,22 +1313,22 @@ class SamHttpApi(SamResourceMacro):
         # Implicit APIs. For Explicit APIs, this is managed by the DefaultDefinitionBody Plugin.
         # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
         # Swagger.
-        "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
+        "__MANAGE_SWAGGER": PropertyType(False, IS_BOOL),
         "Name": PassThroughProperty(False),
         "StageName": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "Tags": PropertyType(False, IS_DICT),
         "DefinitionBody": PropertyType(False, IS_DICT),
         "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "StageVariables": PropertyType(False, IS_DICT),
-        "CorsConfiguration": PropertyType(False, one_of(is_type(bool), IS_DICT)),
+        "CorsConfiguration": PropertyType(False, one_of(IS_BOOL, IS_DICT)),
         "AccessLogSettings": PropertyType(False, IS_DICT),
         "DefaultRouteSettings": PropertyType(False, IS_DICT),
         "Auth": PropertyType(False, IS_DICT),
         "RouteSettings": PropertyType(False, IS_DICT),
         "Domain": PropertyType(False, IS_DICT),
-        "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "FailOnWarnings": PropertyType(False, IS_BOOL),
         "Description": PropertyType(False, IS_STR),
-        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
+        "DisableExecuteApiEndpoint": PropertyType(False, IS_BOOL),
     }
 
     Name: Optional[Any]
@@ -1399,7 +1417,7 @@ class SamSimpleTable(SamResourceMacro):
     resource_type = "AWS::Serverless::SimpleTable"
     property_types = {
         "PrimaryKey": PropertyType(False, dict_of(IS_STR, IS_STR)),
-        "ProvisionedThroughput": PropertyType(False, dict_of(IS_STR, one_of(is_type(int), IS_DICT))),
+        "ProvisionedThroughput": PropertyType(False, dict_of(IS_STR, one_of(IS_INT, IS_DICT))),
         "TableName": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "Tags": PropertyType(False, IS_DICT),
         "SSESpecification": PropertyType(False, IS_DICT),
@@ -1477,7 +1495,7 @@ class SamApplication(SamResourceMacro):
         "Parameters": PropertyType(False, IS_DICT),
         "NotificationARNs": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
         "Tags": PropertyType(False, IS_DICT),
-        "TimeoutInMinutes": PropertyType(False, is_type(int)),
+        "TimeoutInMinutes": PropertyType(False, IS_INT),
     }
 
     Location: Union[str, Dict[str, Any]]
@@ -1568,11 +1586,17 @@ class SamLayerVersion(SamResourceMacro):
         :rtype: list
         """
         # Resolve intrinsics if applicable:
-        self.LayerName = self._resolve_string_parameter(intrinsics_resolver, self.LayerName, "LayerName")
-        self.LicenseInfo = self._resolve_string_parameter(intrinsics_resolver, self.LicenseInfo, "LicenseInfo")
-        self.Description = self._resolve_string_parameter(intrinsics_resolver, self.Description, "Description")
-        self.RetentionPolicy = self._resolve_string_parameter(
-            intrinsics_resolver, self.RetentionPolicy, "RetentionPolicy"
+        self.LayerName = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.LayerName, "LayerName"
+        )
+        self.LicenseInfo = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.LicenseInfo, "LicenseInfo"
+        )
+        self.Description = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.Description, "Description"
+        )
+        self.RetentionPolicy = resolve_string_parameter_in_resource(
+            self.logical_id, intrinsics_resolver, self.RetentionPolicy, "RetentionPolicy"
         )
 
         # If nothing defined, this will be set to Retain

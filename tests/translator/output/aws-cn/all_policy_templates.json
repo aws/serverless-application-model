@@ -1645,6 +1645,28 @@
               "Statement": [
                 {
                   "Action": [
+                    "states:StartExecution",
+                    "states:StartSyncExecution"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                      {
+                        "stateMachineName": "name"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "KitchenSinkFunctionRolePolicy61"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
                     "ses:SendEmail",
                     "ses:SendRawEmail",
                     "ses:SendTemplatedEmail",
@@ -1680,7 +1702,7 @@
                 }
               ]
             },
-            "PolicyName": "KitchenSinkFunctionRolePolicy61"
+            "PolicyName": "KitchenSinkFunctionRolePolicy62"
           }
         ],
         "Tags": [

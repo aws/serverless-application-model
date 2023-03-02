@@ -3,7 +3,9 @@ import itertools
 import json
 import os.path
 import re
+import time
 from functools import cmp_to_key, reduce
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, Mock, patch
 
@@ -21,6 +23,7 @@ from samtranslator.yaml_helper import yaml_parse
 from tests.plugins.application.test_serverless_app_plugin import mock_get_region
 from tests.translator.helpers import get_template_parameter_values
 
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = BASE_PATH + "/input"
 OUTPUT_FOLDER = BASE_PATH + "/output"
@@ -35,6 +38,10 @@ SUCCESS_FILES_NAMES_FOR_TESTING = [
 ]
 ERROR_FILES_NAMES_FOR_TESTING = [os.path.splitext(f)[0] for f in os.listdir(INPUT_FOLDER) if f.startswith("error_")]
 OUTPUT_FOLDER = os.path.join(BASE_PATH, "output")
+
+
+def _parse_yaml(path):
+    return yaml_parse(PROJECT_ROOT.joinpath(path).read_text())
 
 
 def deep_sort_lists(value):
@@ -657,6 +664,90 @@ class TestFunctionVersionWithParameterReferences(TestCase):
         return output_fragment
 
 
+class TestApiAlwaysDeploy(TestCase):
+    """
+    AlwaysDeploy is used to force API Gateway to redeploy at every deployment.
+    See https://github.com/aws/serverless-application-model/issues/660
+
+    Since it relies on the system time to generate the template, need to patch
+    time.time() for deterministic tests.
+    """
+
+    @staticmethod
+    def get_deployment_ids(template):
+        cfn_template = Translator({}, Parser()).translate(template, {})
+        deployment_ids = set()
+        for k, v in cfn_template["Resources"].items():
+            if v["Type"] == "AWS::ApiGateway::Deployment":
+                deployment_ids.add(k)
+        return deployment_ids
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_always_deploy(self):
+        with patch("time.time", lambda: 13.37):
+            obj = _parse_yaml("tests/translator/input/translate_always_deploy.yaml")
+            deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
+            self.assertEqual(deployment_ids, {"MyApiDeploymentbd307a3ec3"})
+
+        with patch("time.time", lambda: 42.123):
+            obj = _parse_yaml("tests/translator/input/translate_always_deploy.yaml")
+            deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
+            self.assertEqual(deployment_ids, {"MyApiDeployment92cfceb39d"})
+
+        with patch("time.time", lambda: 42.1337):
+            obj = _parse_yaml("tests/translator/input/translate_always_deploy.yaml")
+            deployment_ids = TestApiAlwaysDeploy.get_deployment_ids(obj)
+            self.assertEqual(deployment_ids, {"MyApiDeployment92cfceb39d"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_without_alwaysdeploy_never_changes(self):
+        sam_template = {
+            "Resources": {
+                "MyApi": {
+                    "Type": "AWS::Serverless::Api",
+                    "Properties": {
+                        "StageName": "prod",
+                    },
+                }
+            },
+        }
+
+        deployment_ids = set()
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+
+        self.assertEqual(len(deployment_ids), 1)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_with_alwaysdeploy_always_changes(self):
+        sam_template = {
+            "Resources": {
+                "MyApi": {
+                    "Type": "AWS::Serverless::Api",
+                    "Properties": {
+                        "StageName": "prod",
+                        "AlwaysDeploy": True,
+                    },
+                }
+            },
+        }
+
+        deployment_ids = set()
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+        time.sleep(2)
+        deployment_ids.update(TestApiAlwaysDeploy.get_deployment_ids(sam_template))
+
+        self.assertEqual(len(deployment_ids), 3)
+
+
 class TestTemplateValidation(TestCase):
     _MANAGED_POLICIES_TEMPLATE = {
         "Resources": {
@@ -735,6 +826,61 @@ class TestTemplateValidation(TestCase):
 
         self.assertEqual(function_arn, expected_arn)
         self.assertEqual(sfn_arn, expected_arn)
+
+    # test to make sure with arn it doesnt load, with non-arn it does
+    @parameterized.expand(
+        [
+            ([""], 1),
+            (["SomeNonArnThing"], 1),
+            (["SomeNonArnThing", "AnotherNonArnThing"], 1),
+            (["aws:looks:like:an:ARN:but-not-really"], 1),
+            (["arn:looks:like:an:ARN:foo", "Mixing_things_v2"], 1),
+            (["arn:looks:like:an:ARN:foo"], 0),
+            ([{"Ref": "Foo"}], 0),
+            ([{"SQSPollerPolicy": {"QueueName": "Bar"}}], 0),
+            (["arn:looks:like:an:ARN", "arn:aws:ec2:us-east-1:123456789012:vpc/vpc-0e9801d129EXAMPLE"], 0),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_managed_policies_arn_not_loaded(self, policies, load_policy_count):
+        class ManagedPolicyLoader:
+            def __init__(self):
+                self.call_count = 0
+
+            def load(self):
+                self.call_count += 1
+                return {}
+
+        managed_policy_loader = ManagedPolicyLoader()
+
+        with patch("samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES", {}):
+            transform(
+                {
+                    "Resources": {
+                        "MyFunction": {
+                            "Type": "AWS::Serverless::Function",
+                            "Properties": {
+                                "Handler": "foo",
+                                "InlineCode": "bar",
+                                "Runtime": "nodejs14.x",
+                                "Policies": policies,
+                            },
+                        },
+                        "MyStateMachine": {
+                            "Type": "AWS::Serverless::StateMachine",
+                            "Properties": {
+                                "DefinitionUri": "s3://egg/baz",
+                                "Policies": policies,
+                            },
+                        },
+                    }
+                },
+                {},
+                managed_policy_loader,
+            )
+
+        self.assertEqual(load_policy_count, managed_policy_loader.call_count)
 
     @parameterized.expand(
         [

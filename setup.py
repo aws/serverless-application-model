@@ -59,7 +59,19 @@ setup(
     license="Apache License 2.0",
     # Exclude all but the code folders
     packages=find_packages(
-        exclude=("bin", "bin.*", "tests", "tests.*", "integration", "integration.*", "docs", "examples", "versions")
+        exclude=(
+            "bin",
+            "bin.*",
+            "docs",
+            "examples",
+            "integration",
+            "integration.*",
+            "schema_source",
+            "schema_source.*",
+            "tests",
+            "tests.*",
+            "versions",
+        )
     ),
     license_files=(
         "LICENSE",
@@ -72,7 +84,8 @@ setup(
     extras_require={"dev": read_requirements("dev.txt")},
     keywords="AWS SAM Serverless Application Model",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        # https://pypi.org/classifiers/
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Environment :: Other Environment",
         "Intended Audience :: Developers",

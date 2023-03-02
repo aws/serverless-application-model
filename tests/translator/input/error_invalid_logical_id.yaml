@@ -5,3 +5,9 @@ Resources:
       Runtime: python2.7
       Handler: hello.handler
       CodeUri: s3://bucket/code.zip
+  0:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python2.7
+      Handler: hello.handler
+      CodeUri: s3://bucket/code.zip

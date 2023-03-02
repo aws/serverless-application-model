@@ -1,7 +1,7 @@
 import json
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, cast
+from typing import Any, Dict, Optional, cast
 
 import boto3
 from botocore.config import Config
@@ -28,7 +28,13 @@ class FeatureToggle:
         "account-percentile": SimpleAccountPercentileDialup,
     }
 
-    def __init__(self, config_provider, stage, account_id, region):  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        config_provider: "FeatureToggleConfigProvider",
+        stage: Optional[str],
+        account_id: Optional[str],
+        region: Optional[str],
+    ) -> None:
         self.feature_config = config_provider.config
         self.stage = stage
         self.account_id = account_id
@@ -50,7 +56,7 @@ class FeatureToggle:
                 region_config, account_id=self.account_id, feature_name=feature_name
             )
         LOG.warning("Dialup type '{}' is None or is not supported.".format(dialup_type))
-        return DisabledDialup(region_config)  # type: ignore[no-untyped-call]
+        return DisabledDialup(region_config)
 
     def is_enabled(self, feature_name: str) -> bool:
         """
@@ -113,7 +119,7 @@ class FeatureToggleDefaultConfigProvider(FeatureToggleConfigProvider):
 class FeatureToggleLocalConfigProvider(FeatureToggleConfigProvider):
     """Feature toggle config provider which uses a local file. This is to facilitate local testing."""
 
-    def __init__(self, local_config_path):  # type: ignore[no-untyped-def]
+    def __init__(self, local_config_path) -> None:  # type: ignore[no-untyped-def]
         FeatureToggleConfigProvider.__init__(self)
         with open(local_config_path, "r", encoding="utf-8") as f:
             config_json = f.read()
@@ -128,7 +134,7 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
     """Feature toggle config provider which loads config from AppConfig."""
 
     @cw_timer(prefix="External", name="AppConfig")
-    def __init__(self, application_id, environment_id, configuration_profile_id, app_config_client=None):  # type: ignore[no-untyped-def]
+    def __init__(self, application_id, environment_id, configuration_profile_id, app_config_client=None) -> None:  # type: ignore[no-untyped-def]
         FeatureToggleConfigProvider.__init__(self)
         try:
             LOG.info("Loading feature toggle config from AppConfig...")

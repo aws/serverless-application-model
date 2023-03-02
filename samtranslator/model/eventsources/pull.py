@@ -1,14 +1,15 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Optional
 
+from samtranslator.internal.deprecation_control import deprecated
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import PassThroughProperty, PropertyType, ResourceMacro
+from samtranslator.model import PassThroughProperty, Property, PropertyType, ResourceMacro
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRolePolicies
 from samtranslator.model.intrinsics import is_intrinsic
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
-from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type
+from samtranslator.model.types import IS_BOOL, IS_DICT, IS_INT, IS_LIST, IS_STR, PassThrough
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect
@@ -17,7 +18,7 @@ from samtranslator.validator.value_validator import sam_expect
 class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     """Base class for pull event sources for SAM Functions.
 
-    The pull events are Kinesis Streams, DynamoDB Streams, Kafka Topics, Amazon MQ Queues and SQS Queues. All of these correspond to an
+    The pull events are Kinesis Streams, DynamoDB Streams, Kafka Topics, Amazon MQ Queues, SQS Queues, and DocumentDB Clusters. All of these correspond to an
     EventSourceMapping in Lambda, and require that the execution role be given to Kinesis Streams, DynamoDB
     Streams, or SQS Queues, respectively.
 
@@ -25,7 +26,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     """
 
     # Event types that support `FilterCriteria`, stored as a list to keep the alphabetical order
-    RESOURCE_TYPES_WITH_EVENT_FILTERING = ["DynamoDB", "Kinesis", "MQ", "MSK", "SelfManagedKafka", "SQS"]
+    RESOURCE_TYPES_WITH_EVENT_FILTERING = ["DocumentDB", "DynamoDB", "Kinesis", "MQ", "MSK", "SelfManagedKafka", "SQS"]
 
     # Note(xinhol): `PullEventSource` should have been an abstract class. Disabling the type check for the next
     # line to avoid any potential behavior change.
@@ -33,23 +34,23 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     resource_type: str = None  # type: ignore
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
     property_types: Dict[str, PropertyType] = {
-        "BatchSize": PropertyType(False, is_type(int)),
+        "BatchSize": PropertyType(False, IS_INT),
         "StartingPosition": PassThroughProperty(False),
         "StartingPositionTimestamp": PassThroughProperty(False),
-        "Enabled": PropertyType(False, is_type(bool)),
-        "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
-        "MaximumRetryAttempts": PropertyType(False, is_type(int)),
-        "BisectBatchOnFunctionError": PropertyType(False, is_type(bool)),
-        "MaximumRecordAgeInSeconds": PropertyType(False, is_type(int)),
+        "Enabled": PropertyType(False, IS_BOOL),
+        "MaximumBatchingWindowInSeconds": PropertyType(False, IS_INT),
+        "MaximumRetryAttempts": PropertyType(False, IS_INT),
+        "BisectBatchOnFunctionError": PropertyType(False, IS_BOOL),
+        "MaximumRecordAgeInSeconds": PropertyType(False, IS_INT),
         "DestinationConfig": PropertyType(False, IS_DICT),
-        "ParallelizationFactor": PropertyType(False, is_type(int)),
-        "Topics": PropertyType(False, is_type(list)),
-        "Queues": PropertyType(False, is_type(list)),
-        "SourceAccessConfigurations": PropertyType(False, is_type(list)),
+        "ParallelizationFactor": PropertyType(False, IS_INT),
+        "Topics": PropertyType(False, IS_LIST),
+        "Queues": PropertyType(False, IS_LIST),
+        "SourceAccessConfigurations": PropertyType(False, IS_LIST),
         "SecretsManagerKmsKeyId": PropertyType(False, IS_STR),
-        "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
-        "FunctionResponseTypes": PropertyType(False, is_type(list)),
-        "KafkaBootstrapServers": PropertyType(False, is_type(list)),
+        "TumblingWindowInSeconds": PropertyType(False, IS_INT),
+        "FunctionResponseTypes": PropertyType(False, IS_LIST),
+        "KafkaBootstrapServers": PropertyType(False, IS_LIST),
         "FilterCriteria": PropertyType(False, IS_DICT),
         "ConsumerGroupId": PropertyType(False, IS_STR),
         "ScalingConfig": PropertyType(False, IS_DICT),
@@ -87,6 +88,14 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     @abstractmethod
     def get_event_source_arn(self) -> Optional[PassThrough]:
         """Return the value to assign to lambda event source mapping's EventSourceArn."""
+
+    def add_extra_eventsourcemapping_fields(self, _lambda_eventsourcemapping: LambdaEventSourceMapping) -> None:
+        """Adds extra fields to the CloudFormation ESM resource.
+        This method can be overriden by a subclass if it has extra fields specific to that subclass.
+
+        :param LambdaEventSourceMapping lambda_eventsourcemapping: the Event source mapping resource to add the fields to.
+        """
+        return
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: too-many-branches
@@ -183,6 +192,8 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
 
             lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig
 
+        self.add_extra_eventsourcemapping_fields(lambda_eventsourcemapping)
+
         if "role" in kwargs:
             self._link_policy(kwargs["role"], destination_config_policy)  # type: ignore[no-untyped-call]
 
@@ -232,12 +243,70 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         if list(self.FilterCriteria.keys()) not in [[], ["Filters"]]:
             raise InvalidEventException(self.relative_id, "FilterCriteria field has a wrong format")
 
-    def validate_secrets_manager_kms_key_id(self):  # type: ignore[no-untyped-def]
-        if self.SecretsManagerKmsKeyId and not isinstance(self.SecretsManagerKmsKeyId, str):
+    def validate_secrets_manager_kms_key_id(self) -> None:
+        if self.SecretsManagerKmsKeyId:
+            sam_expect(
+                self.SecretsManagerKmsKeyId, self.relative_id, "SecretsManagerKmsKeyId", is_sam_event=True
+            ).to_be_a_string()
+
+    def _validate_source_access_configurations(self, supported_types: List[str], required_type: str) -> str:
+        """
+        Validate the SourceAccessConfigurations parameter and return the URI to
+        be used for policy statement creation.
+        """
+
+        if not self.SourceAccessConfigurations:
             raise InvalidEventException(
                 self.relative_id,
-                "Provided SecretsManagerKmsKeyId should be of type str.",
+                f"No SourceAccessConfigurations for Amazon {self.resource_type} event provided.",
             )
+        if not isinstance(self.SourceAccessConfigurations, list):
+            raise InvalidEventException(
+                self.relative_id,
+                "Provided SourceAccessConfigurations cannot be parsed into a list.",
+            )
+
+        required_type_uri: Optional[str] = None
+        for index, conf in enumerate(self.SourceAccessConfigurations):
+            sam_expect(conf, self.relative_id, f"SourceAccessConfigurations[{index}]", is_sam_event=True).to_be_a_map()
+            event_type: str = sam_expect(
+                conf.get("Type"), self.relative_id, f"SourceAccessConfigurations[{index}].Type", is_sam_event=True
+            ).to_be_a_string()
+            if event_type not in supported_types:
+                raise InvalidEventException(
+                    self.relative_id,
+                    f"Invalid property Type specified in SourceAccessConfigurations. The supported values are: {supported_types}.",
+                )
+            if event_type == required_type:
+                if required_type_uri:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        f"Multiple {required_type} properties specified in SourceAccessConfigurations.",
+                    )
+                required_type_uri = conf.get("URI")
+                if not required_type_uri:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        f"No {required_type} URI property specified in SourceAccessConfigurations.",
+                    )
+
+        if not required_type_uri:
+            raise InvalidEventException(
+                self.relative_id,
+                f"No {required_type} property specified in SourceAccessConfigurations.",
+            )
+        return required_type_uri
+
+    @staticmethod
+    def _get_kms_decrypt_policy(secrets_manager_kms_key_id: str) -> Dict[str, Any]:
+        return {
+            "Action": ["kms:Decrypt"],
+            "Effect": "Allow",
+            "Resource": {
+                "Fn::Sub": "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/"
+                + secrets_manager_kms_key_id
+            },
+        }
 
 
 class Kinesis(PullEventSource):
@@ -355,9 +424,46 @@ class MQ(PullEventSource):
     property_types: Dict[str, PropertyType] = {
         **PullEventSource.property_types,
         "Broker": PassThroughProperty(True),
+        "DynamicPolicyName": Property(False, IS_BOOL),
     }
 
     Broker: PassThrough
+    DynamicPolicyName: Optional[bool]
+
+    @property
+    def _policy_name(self) -> str:
+        """Generate policy name based on DynamicPolicyName flag and MQ logical ID.
+
+        Policy name is required though its update is "No interuption".
+        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html#cfn-iam-policy-policyname #noqa
+
+        Historically, policy name was hardcoded as `SamAutoGeneratedAMQPolicy` but it led to a policy name clash
+        and failure to deploy, if a Function had at least 2 MQ event sources.
+        Since policy is attached to the Lambda execution role,
+        policy name should be based on MQ logical ID not to clash with policy names of other MQ event sources.
+        However, to support backwards compatibility, we need to keep policy `SamAutoGeneratedAMQPolicy` by default,
+        because customers might have code which relys on that policy name consistancy.
+
+        To support both old policy name and ability to have more than one MQ event source, we introduce new field
+        `DynamicPolicyName` which when set to true will use MQ logical ID to generate policy name.
+
+        Q: Why to introduce a new field and not to make policy name dynamic by default if there are multiple
+        MQ event sources?
+        A: Since a customer could have a single MQ source and rely on it's policy name in their code. If that customer
+        decides to add a new MQ source, they don't want to change the policy name for the first MQ all over their
+        code base. But they can opt in using a dynamic policy name for all other MQ sources they add.
+
+        Q: Why not use dynamic policy names automatically for all MQ event sources but first?
+        A: SAM-T doesn't have state and doesn't know what was the CFN resource attribute in a previous transformation.
+        Hence, trying to "use dynamic policy names automatically for all MQ event sources but first" can rely only
+        on event source order. If a customer added a new MQ source __before__ an old one, an old one would receive
+        a dynamic name and would break (potentially) customer's code.
+
+        Returns
+        -------
+            Name of the policy which will be attached to the Lambda Execution role.
+        """
+        return f"{self.logical_id}AMQPolicy" if self.DynamicPolicyName else "SamAutoGeneratedAMQPolicy"
 
     def get_event_source_arn(self) -> Optional[PassThrough]:
         return self.Broker
@@ -366,47 +472,10 @@ class MQ(PullEventSource):
         return None
 
     def get_policy_statements(self) -> Optional[List[Dict[str, Any]]]:
-        if not self.SourceAccessConfigurations:
-            raise InvalidEventException(
-                self.relative_id,
-                "No SourceAccessConfigurations for Amazon MQ event provided.",
-            )
-        if not isinstance(self.SourceAccessConfigurations, list):
-            raise InvalidEventException(
-                self.relative_id,
-                "Provided SourceAccessConfigurations cannot be parsed into a list.",
-            )
-        basic_auth_uri = None
-        for index, conf in enumerate(self.SourceAccessConfigurations):
-            sam_expect(conf, self.relative_id, f"SourceAccessConfigurations[{index}]", is_sam_event=True).to_be_a_map()
-            event_type: str = sam_expect(
-                conf.get("Type"), self.relative_id, f"SourceAccessConfigurations[{index}].Type", is_sam_event=True
-            ).to_be_a_string()
-            if event_type not in ("BASIC_AUTH", "VIRTUAL_HOST"):
-                raise InvalidEventException(
-                    self.relative_id,
-                    "Invalid property specified in SourceAccessConfigurations for Amazon MQ event.",
-                )
-            if event_type == "BASIC_AUTH":
-                if basic_auth_uri:
-                    raise InvalidEventException(
-                        self.relative_id,
-                        "Multiple BASIC_AUTH properties specified in SourceAccessConfigurations for Amazon MQ event.",
-                    )
-                basic_auth_uri = conf.get("URI")
-                if not basic_auth_uri:
-                    raise InvalidEventException(
-                        self.relative_id,
-                        "No BASIC_AUTH URI property specified in SourceAccessConfigurations for Amazon MQ event.",
-                    )
+        basic_auth_uri = self._validate_source_access_configurations(["BASIC_AUTH", "VIRTUAL_HOST"], "BASIC_AUTH")
 
-        if not basic_auth_uri:
-            raise InvalidEventException(
-                self.relative_id,
-                "No BASIC_AUTH property specified in SourceAccessConfigurations for Amazon MQ event.",
-            )
         document = {
-            "PolicyName": "SamAutoGeneratedAMQPolicy",
+            "PolicyName": self._policy_name,
             "PolicyDocument": {
                 "Statement": [
                     {
@@ -427,7 +496,7 @@ class MQ(PullEventSource):
             },
         }
         if self.SecretsManagerKmsKeyId:
-            self.validate_secrets_manager_kms_key_id()  # type: ignore[no-untyped-call]
+            self.validate_secrets_manager_kms_key_id()
             kms_policy = {
                 "Action": "kms:Decrypt",
                 "Effect": "Allow",
@@ -499,8 +568,8 @@ class SelfManagedKafka(PullEventSource):
             statements.append(vpc_permissions)
 
         if self.SecretsManagerKmsKeyId:
-            self.validate_secrets_manager_kms_key_id()  # type: ignore[no-untyped-call]
-            kms_policy = self.get_kms_policy(self.SecretsManagerKmsKeyId)
+            self.validate_secrets_manager_kms_key_id()
+            kms_policy = self._get_kms_decrypt_policy(self.SecretsManagerKmsKeyId)
             statements.append(kms_policy)
 
         return {
@@ -590,6 +659,7 @@ class SelfManagedKafka(PullEventSource):
         }
 
     @staticmethod
+    @deprecated(None)
     def get_kms_policy(secrets_manager_kms_key_id: str) -> Dict[str, Any]:
         return {
             "Action": ["kms:Decrypt"],
@@ -599,3 +669,94 @@ class SelfManagedKafka(PullEventSource):
                 + secrets_manager_kms_key_id
             },
         }
+
+
+class DocumentDB(PullEventSource):
+    """DocumentDB event source."""
+
+    resource_type = "DocumentDB"
+    property_types: Dict[str, PropertyType] = {
+        **PullEventSource.property_types,
+        "Cluster": PassThroughProperty(True),
+        "DatabaseName": PassThroughProperty(True),
+        "CollectionName": PassThroughProperty(False),
+        "FullDocument": PassThroughProperty(False),
+    }
+
+    Cluster: PassThrough
+    DatabaseName: PassThrough
+    CollectionName: Optional[PassThrough]
+    FullDocument: Optional[PassThrough]
+
+    def add_extra_eventsourcemapping_fields(self, lambda_eventsourcemapping: LambdaEventSourceMapping) -> None:
+        lambda_eventsourcemapping.DocumentDBEventSourceConfig = {
+            "DatabaseName": self.DatabaseName,
+        }
+        if self.CollectionName:
+            lambda_eventsourcemapping.DocumentDBEventSourceConfig["CollectionName"] = self.CollectionName  # type: ignore[attr-defined]
+        if self.FullDocument:
+            lambda_eventsourcemapping.DocumentDBEventSourceConfig["FullDocument"] = self.FullDocument  # type: ignore[attr-defined]
+
+    def get_event_source_arn(self) -> Optional[PassThrough]:
+        return self.Cluster
+
+    def get_policy_arn(self) -> Optional[str]:
+        return None
+
+    def get_policy_statements(self) -> List[Dict[str, Any]]:
+        basic_auth_uri = self._validate_source_access_configurations(["BASIC_AUTH"], "BASIC_AUTH")
+
+        statements = [
+            {
+                "Action": [
+                    "secretsmanager:GetSecretValue",
+                ],
+                "Effect": "Allow",
+                "Resource": basic_auth_uri,
+            },
+            {
+                "Action": [
+                    "rds:DescribeDBClusterParameters",
+                ],
+                "Effect": "Allow",
+                "Resource": {"Fn::Sub": "arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:cluster-pg:*"},
+            },
+            {
+                "Action": [
+                    "rds:DescribeDBSubnetGroups",
+                ],
+                "Effect": "Allow",
+                "Resource": {"Fn::Sub": "arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:subgrp:*"},
+            },
+            {
+                "Action": [
+                    "rds:DescribeDBClusters",
+                ],
+                "Effect": "Allow",
+                "Resource": self.Cluster,
+            },
+            {
+                "Action": [
+                    "ec2:CreateNetworkInterface",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DescribeVpcs",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeSecurityGroups",
+                ],
+                "Effect": "Allow",
+                "Resource": "*",
+            },
+        ]
+
+        if self.SecretsManagerKmsKeyId:
+            self.validate_secrets_manager_kms_key_id()
+            kms_policy = self._get_kms_decrypt_policy(self.SecretsManagerKmsKeyId)
+            statements.append(kms_policy)
+
+        document = {
+            "PolicyName": "SamAutoGeneratedDocumentDBPolicy",
+            "PolicyDocument": {"Statement": statements},
+        }
+
+        return [document]

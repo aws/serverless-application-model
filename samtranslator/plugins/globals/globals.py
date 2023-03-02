@@ -62,6 +62,7 @@ class Globals:
             "DefinitionUri",
             "CacheClusterEnabled",
             "CacheClusterSize",
+            "MergeDefinitions",
             "Variables",
             "EndpointConfiguration",
             "MethodSettings",
@@ -74,6 +75,7 @@ class Globals:
             "TracingEnabled",
             "OpenApiVersion",
             "Domain",
+            "AlwaysDeploy",
         ],
         SamResourceType.HttpApi.value: [
             "Auth",
@@ -93,7 +95,7 @@ class Globals:
         SamResourceType.Function.value: ["RuntimeManagementConfig"],
     }
 
-    def __init__(self, template):  # type: ignore[no-untyped-def]
+    def __init__(self, template) -> None:  # type: ignore[no-untyped-def]
         """
         Constructs an instance of this object
 
@@ -187,13 +189,13 @@ class Globals:
 
         _globals = {}
         if not isinstance(globals_dict, dict):
-            raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary")  # type: ignore[no-untyped-call]
+            raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary")
 
         for section_name, properties in globals_dict.items():
             resource_type = self._make_resource_type(section_name)  # type: ignore[no-untyped-call]
 
             if resource_type not in self.supported_properties:
-                raise InvalidGlobalsSectionException(  # type: ignore[no-untyped-call]
+                raise InvalidGlobalsSectionException(
                     self._KEYWORD,
                     "'{section}' is not supported. "
                     "Must be one of the following values - {supported}".format(
@@ -202,7 +204,7 @@ class Globals:
                 )
 
             if not isinstance(properties, dict):
-                raise InvalidGlobalsSectionException(self._KEYWORD, "Value of ${section} must be a dictionary")  # type: ignore[no-untyped-call]
+                raise InvalidGlobalsSectionException(self._KEYWORD, "Value of ${section} must be a dictionary")
 
             supported = self.supported_properties[resource_type]
             supported_displayed = [
@@ -210,7 +212,7 @@ class Globals:
             ]
             for key, _ in properties.items():
                 if key not in supported:
-                    raise InvalidGlobalsSectionException(  # type: ignore[no-untyped-call]
+                    raise InvalidGlobalsSectionException(
                         self._KEYWORD,
                         "'{key}' is not a supported property of '{section}'. "
                         "Must be one of the following values - {supported}".format(
@@ -219,7 +221,7 @@ class Globals:
                     )
 
             # Store all Global properties in a map with key being the AWS::Serverless::* resource type
-            _globals[resource_type] = GlobalProperties(properties)  # type: ignore[no-untyped-call]
+            _globals[resource_type] = GlobalProperties(properties)
 
         return _globals
 
@@ -347,7 +349,7 @@ class GlobalProperties:
 
     """
 
-    def __init__(self, global_properties):  # type: ignore[no-untyped-def]
+    def __init__(self, global_properties) -> None:  # type: ignore[no-untyped-def]
         self.global_properties = global_properties
 
     def merge(self, local_properties):  # type: ignore[no-untyped-def]
@@ -469,7 +471,7 @@ class InvalidGlobalsSectionException(ExceptionWithMessage):
         message -- explanation of the error
     """
 
-    def __init__(self, logical_id, message):  # type: ignore[no-untyped-def]
+    def __init__(self, logical_id, message) -> None:  # type: ignore[no-untyped-def]
         self._logical_id = logical_id
         self._message = message
 

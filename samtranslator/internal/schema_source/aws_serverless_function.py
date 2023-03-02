@@ -199,6 +199,26 @@ class DynamoDBEvent(BaseModel):
     Properties: DynamoDBEventProperties = event("Properties")
 
 
+class DocumentDBEventProperties(BaseModel):
+    BatchSize: Optional[PassThroughProp]  # TODO: add documentation
+    Cluster: PassThroughProp  # TODO: add documentation
+    CollectionName: Optional[PassThroughProp]  # TODO: add documentation
+    DatabaseName: PassThroughProp  # TODO: add documentation
+    Enabled: Optional[PassThroughProp]  # TODO: add documentation
+    FilterCriteria: Optional[PassThroughProp]  # TODO: add documentation
+    FullDocument: Optional[PassThroughProp]  # TODO: add documentation
+    MaximumBatchingWindowInSeconds: Optional[PassThroughProp]  # TODO: add documentation
+    SecretsManagerKmsKeyId: Optional[str]  # TODO: add documentation
+    SourceAccessConfigurations: PassThroughProp  # TODO: add documentation
+    StartingPosition: Optional[PassThroughProp]  # TODO: add documentation
+    StartingPositionTimestamp: Optional[PassThroughProp]  # TODO: add documentation
+
+
+class DocumentDBEvent(BaseModel):
+    Type: Literal["DocumentDB"] = event("Type")
+    Properties: DocumentDBEventProperties = event("Properties")
+
+
 class SQSEventProperties(BaseModel):
     BatchSize: Optional[PassThroughProp] = sqseventproperties("BatchSize")
     Enabled: Optional[PassThroughProp] = sqseventproperties("Enabled")
@@ -233,12 +253,17 @@ class RequestParameters(BaseModel):
     Required: Optional[bool] = requestparameters("Required")
 
 
+# TODO: docs says either str or RequestParameter but implementation is an array of str or RequestParameter
+# remove this comment once updated documentation
+RequestModelProperty = List[Union[str, Dict[str, RequestParameters]]]
+
+
 class ApiEventProperties(BaseModel):
     Auth: Optional[ApiAuth] = apieventproperties("Auth")
     Method: str = apieventproperties("Method")
     Path: str = apieventproperties("Path")
     RequestModel: Optional[RequestModel] = apieventproperties("RequestModel")
-    RequestParameters: Optional[Union[str, RequestParameters]] = apieventproperties("RequestParameters")
+    RequestParameters: Optional[RequestModelProperty] = apieventproperties("RequestParameters")
     RestApiId: Optional[Union[str, Ref]] = apieventproperties("RestApiId")
 
 
@@ -380,6 +405,7 @@ class MSKEvent(BaseModel):
 class MQEventProperties(BaseModel):
     BatchSize: Optional[PassThroughProp] = mqeventproperties("BatchSize")
     Broker: PassThroughProp = mqeventproperties("Broker")
+    DynamicPolicyName: Optional[bool]  # TODO: add docs
     Enabled: Optional[PassThroughProp] = mqeventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = mqeventproperties("FilterCriteria")
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mqeventproperties("MaximumBatchingWindowInSeconds")
@@ -482,6 +508,7 @@ class Properties(BaseModel):
                 SNSEvent,
                 KinesisEvent,
                 DynamoDBEvent,
+                DocumentDBEvent,
                 SQSEvent,
                 ApiEvent,
                 ScheduleEvent,
