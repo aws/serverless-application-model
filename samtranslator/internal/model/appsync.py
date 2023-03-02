@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from typing_extensions import TypedDict
 
@@ -18,7 +18,7 @@ class DeltaSyncConfigType(TypedDict):
 
 
 class DynamoDBConfigType(TypedDict, total=False):
-    AwsRegion: str
+    AwsRegion: Union[str, Dict[str, str]]
     TableName: str
     UseCallerCredentials: bool
     Versioned: bool

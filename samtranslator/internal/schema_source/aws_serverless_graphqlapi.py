@@ -2,7 +2,12 @@ from typing import Optional, Union
 
 from typing_extensions import Literal
 
-from samtranslator.internal.schema_source.common import BaseModel, DictStrAny, PassThroughProp, get_prop
+from samtranslator.internal.schema_source.common import (
+    BaseModel,
+    DictStrAny,
+    PassThroughProp,
+    get_prop,
+)
 
 properties = get_prop("sam-resource-graphqlapi")
 
@@ -13,7 +18,7 @@ class Auth(BaseModel):
 
 
 class Logging(BaseModel):
-    CloudWatchLogsRoleArn: Optional[str]
+    CloudWatchLogsRoleArn: Optional[PassThroughProp]
     ExcludeVerboseContent: Optional[PassThroughProp]
     FieldLogLevel: Optional[str]
 
