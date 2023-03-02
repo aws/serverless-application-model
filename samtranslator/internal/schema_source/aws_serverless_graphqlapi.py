@@ -6,7 +6,6 @@ from samtranslator.internal.schema_source.common import (
     BaseModel,
     DictStrAny,
     PassThroughProp,
-    SamIntrinsicable,
     get_prop,
 )
 
@@ -19,7 +18,7 @@ class Auth(BaseModel):
 
 
 class Logging(BaseModel):
-    CloudWatchLogsRoleArn: Optional[SamIntrinsicable[str]]
+    CloudWatchLogsRoleArn: Optional[PassThroughProp]
     ExcludeVerboseContent: Optional[PassThroughProp]
     FieldLogLevel: Optional[str]
 

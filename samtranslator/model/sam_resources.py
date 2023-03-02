@@ -18,10 +18,7 @@ from samtranslator.internal.model.appsync import (
     GraphQLSchema,
     LogConfigType,
 )
-from samtranslator.internal.schema_source.aws_serverless_graphqlapi import Logging as GraphQLApiLogging
-from samtranslator.internal.schema_source.aws_serverless_graphqlapi import Properties as GraphQLApiProperties
-from samtranslator.internal.schema_source.aws_serverless_graphqldatasource import DynamoDBConfig as DynamoDBConfigProperties
-from samtranslator.internal.schema_source.aws_serverless_graphqldatasource import Properties as GraphQLDataSourceProperties
+from samtranslator.internal.schema_source import aws_serverless_graphqlapi, aws_serverless_graphqldatasource
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
@@ -2154,7 +2151,7 @@ class SamGraphQLApi(SamResourceMacro):
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
-        model = self.validate_properties_and_return_model(GraphQLApiProperties)
+        model = self.validate_properties_and_return_model(aws_serverless_graphqlapi.GraphQLApiProperties)
 
         appsync_api, cloudwatch_role = self._construct_appsync_api_resources(model)
         appsync_schema = self._construct_appsync_schema(model, appsync_api.get_runtime_attr("api_id"))
@@ -2166,7 +2163,9 @@ class SamGraphQLApi(SamResourceMacro):
 
         return resources
 
-    def _construct_appsync_api_resources(self, model: GraphQLApiProperties) -> Tuple[GraphQLApi, Optional[IAMRole]]:
+    def _construct_appsync_api_resources(
+        self, model: aws_serverless_graphqlapi.GraphQLApiProperties
+    ) -> Tuple[GraphQLApi, Optional[IAMRole]]:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         api.AuthenticationType = model.Auth.Type
@@ -2199,9 +2198,11 @@ class SamGraphQLApi(SamResourceMacro):
 
         return log_config, cloudwatch_role
 
-    def _parse_logging_properties(self, model: GraphQLApiProperties) -> Tuple[LogConfigType, Optional[IAMRole]]:
+    def _parse_logging_properties(
+        self, model: aws_serverless_graphqlapi.GraphQLApiProperties
+    ) -> Tuple[LogConfigType, Optional[IAMRole]]:
         """Parse logging properties from SAM template, and use defaults if required keys dont exist."""
-        if not isinstance(model.Logging, GraphQLApiLogging):
+        if not isinstance(model.Logging, aws_serverless_graphqlapi.GraphQLApiLogging):
             return self._create_logging_default()
 
         log_config: LogConfigType = {}
@@ -2212,7 +2213,7 @@ class SamGraphQLApi(SamResourceMacro):
             )  # TODO: better handling PassThroughProp
 
         log_config["FieldLogLevel"] = model.Logging.FieldLogLevel or "ALL"
-        log_config["CloudWatchLogsRoleArn"] = model.Logging.CloudWatchLogsRoleArn
+        log_config["CloudWatchLogsRoleArn"] = cast(Intrinsicable[str], model.Logging.CloudWatchLogsRoleArn)
 
         if log_config["CloudWatchLogsRoleArn"]:
             return log_config, None
@@ -2236,7 +2237,9 @@ class SamGraphQLApi(SamResourceMacro):
         ]
         return role
 
-    def _construct_appsync_schema(self, model: GraphQLApiProperties, api_id: Intrinsicable[str]) -> GraphQLSchema:
+    def _construct_appsync_schema(
+        self, model: aws_serverless_graphqlapi.GraphQLApiProperties, api_id: Intrinsicable[str]
+    ) -> GraphQLSchema:
         schema = GraphQLSchema(
             logical_id=f"{self.logical_id}Schema", depends_on=self.depends_on, attributes=self.resource_attributes
         )
@@ -2280,14 +2283,16 @@ class SamGraphQLDataSource(SamResourceMacro):
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
-        model = self.validate_properties_and_return_model(GraphQLDataSourceProperties)
+        model = self.validate_properties_and_return_model(aws_serverless_graphqldatasource.GraphQLDataSourceProperties)
 
         appsync_datasource = self._construct_appsync_datasource(model)
         resources: List[Resource] = [appsync_datasource]
 
         return resources
 
-    def _parse_dynamodb_datasource(self, ddb_properties: DynamoDBConfigProperties) -> DynamoDBConfigType:
+    def _parse_dynamodb_datasource(
+        self, ddb_properties: aws_serverless_graphqldatasource.GraphQLDataSourceDynamoDBConfig
+    ) -> DynamoDBConfigType:
         ddb_config: DynamoDBConfigType = {}
 
         ddb_config["TableName"] = ddb_properties.TableName
@@ -2309,7 +2314,9 @@ class SamGraphQLDataSource(SamResourceMacro):
 
         return ddb_config
 
-    def _validate_config_properties(self, model: GraphQLDataSourceProperties, datasource: DataSource) -> None:
+    def _validate_config_properties(
+        self, model: aws_serverless_graphqldatasource.GraphQLDataSourceProperties, datasource: DataSource
+    ) -> None:
         # DataSourceConfig is quite large property so we require a lot of additional validation.
         # The datasource object is modified by reference.
         if model.Type == "AMAZON_DYNAMODB":
@@ -2319,7 +2326,9 @@ class SamGraphQLDataSource(SamResourceMacro):
                 )
             datasource.DynamoDBConfig = self._parse_dynamodb_datasource(model.DynamoDBConfig)
 
-    def _construct_appsync_datasource(self, model: GraphQLDataSourceProperties) -> DataSource:
+    def _construct_appsync_datasource(
+        self, model: aws_serverless_graphqldatasource.GraphQLDataSourceProperties
+    ) -> DataSource:
         datasource = DataSource(
             logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
         )

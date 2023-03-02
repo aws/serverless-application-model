@@ -128,3 +128,13 @@ Resources:
         DeltaSync:
           BaseTableTTL: '60'
           DeltaSyncTableName: some-table
+
+  NonExistencePropertyAuth:
+    Type: AWS::Serverless::GraphQLDataSource
+    Properties:
+      Hello: World
+      ApiId: some-api-id
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: role-arn
+      DynamoDBConfig:
+        TableName: MyNotes-notes-table

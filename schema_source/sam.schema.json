@@ -1962,15 +1962,7 @@
       "additionalProperties": false,
       "properties": {
         "CloudWatchLogsRoleArn": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
-          ],
-          "title": "Cloudwatchlogsrolearn"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "ExcludeVerboseContent": {
           "$ref": "#/definitions/PassThroughProp"

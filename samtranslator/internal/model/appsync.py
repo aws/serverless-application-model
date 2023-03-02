@@ -26,7 +26,7 @@ class DynamoDBConfigType(TypedDict, total=False):
 
 
 class LogConfigType(TypedDict, total=False):
-    CloudWatchLogsRoleArn: Optional[Intrinsicable[str]]
+    CloudWatchLogsRoleArn: Intrinsicable[str]
     ExcludeVerboseContent: bool
     FieldLogLevel: str
 

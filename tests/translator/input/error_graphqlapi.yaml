@@ -32,3 +32,22 @@ Resources:
       Tags:
         key1: value1
         key2: value2
+
+  GraphQLNonExistenceProp:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      Logging:
+        CloudWatchLogsRoleArn: some-arn
+        FieldLogLevel: ERROR
+        ExcludeVerboseContent: true
+      Hello: World
