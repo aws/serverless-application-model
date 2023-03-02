@@ -10,7 +10,7 @@ from samtranslator.model.eventsources.push import Api as PushApi
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import fnSub
-from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type
+from samtranslator.model.types import IS_BOOL, IS_DICT, IS_STR, PassThrough
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
 
@@ -86,7 +86,7 @@ class Schedule(EventSource):
     property_types = {
         "Schedule": PropertyType(True, IS_STR),
         "Input": PropertyType(False, IS_STR),
-        "Enabled": PropertyType(False, is_type(bool)),
+        "Enabled": PropertyType(False, IS_BOOL),
         "State": PropertyType(False, IS_STR),
         "Name": PropertyType(False, IS_STR),
         "Description": PropertyType(False, IS_STR),
@@ -294,7 +294,7 @@ class Api(EventSource):
         "RestApiId": PropertyType(True, IS_STR),
         "Stage": PropertyType(False, IS_STR),
         "Auth": PropertyType(False, IS_DICT),
-        "UnescapeMappingTemplate": Property(False, is_type(bool)),
+        "UnescapeMappingTemplate": Property(False, IS_BOOL),
     }
 
     Path: str
