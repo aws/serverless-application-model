@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union, cast
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import PropertyType, PassThroughProperty, ResourceMacro
+from samtranslator.model import PassThroughProperty, PropertyType, ResourceMacro
 from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.model.events import EventsRule, generate_valid_target_id
