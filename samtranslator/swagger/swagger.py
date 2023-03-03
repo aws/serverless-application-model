@@ -696,12 +696,13 @@ class SwaggerEditor(BaseEditor):
         method_scopes = auth and auth.get("AuthorizationScopes")
         api_auth = api and api.get("Auth")
         authorizers = api_auth and api_auth.get("Authorizers")
+        required_options_api_key = method_name == "options" and (auth.get("AddApiKeyRequiredToCorsPreflight") is False)
         if method_authorizer:
             self._set_method_authorizer(path, method_name, method_authorizer, authorizers, method_scopes)  # type: ignore[no-untyped-call]
 
         method_apikey_required = auth and auth.get("ApiKeyRequired")
 
-        if method_name == "options" and not auth.get("AddApiKeyRequiredToCorsPreflight"):
+        if required_options_api_key:
             method_apikey_required = False
 
         if method_apikey_required is not None:
