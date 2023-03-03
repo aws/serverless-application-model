@@ -2471,14 +2471,7 @@
           "title": "FilterPolicy"
         },
         "FilterPolicyScope": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "description": "This attribute lets you choose the filtering scope by using one of the following string value types:  \n+ `MessageAttributes` \\(default\\) \\- The filter is applied on the message attributes\\.\n+ `MessageBody` \\- The filter is applied on the message body\\.\n*Required*: No  \n*Type*: String  \n*Update requires*: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)",
-          "markdownDescription": "This attribute lets you choose the filtering scope by using one of the following string value types:  \n+ `MessageAttributes` \\(default\\) \\- The filter is applied on the message attributes\\.\n+ `MessageBody` \\- The filter is applied on the message body\\.\n*Required*: No  \n*Type*: String  \n*Update requires*: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)",
-          "title": "FilterPolicyScope"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Region": {
           "allOf": [
