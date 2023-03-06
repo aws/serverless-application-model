@@ -1,18 +1,17 @@
 Parameters:
-  MyRestRegionalDomainName:
+  DomainName:
     Type: String
-  MyRestRegionalDomainCert:
+    Default: example.com
+  ACMCertificateArn:
     Type: String
-  HostedZoneId:
-    Type: String
-
+    Default: cert-arn-in-us-east-1
 Globals:
   Api:
     Domain:
       DomainName:
-        Ref: MyRestRegionalDomainName
+        Ref: DomainName
       CertificateArn:
-        Ref: MyRestRegionalDomainCert
+        Ref: ACMCertificateArn
       EndpointConfiguration: REGIONAL
       MutualTlsAuthentication:
         TruststoreUri: ${mtlsuri}
@@ -22,8 +21,7 @@ Globals:
       - /get
       - /post
       Route53:
-        HostedZoneId:
-          Ref: HostedZoneId
+        HostedZoneId: ZQ1UAL4EFZVME
         Region: eu-west-2
         SetIdentifier: eu-west-2
         DistributionDomainName: test.domain.com
