@@ -553,7 +553,7 @@ class HttpApiGenerator:
 
         for authorizer_name, authorizer in authorizers.items():
             # Construct permissions for Lambda Authorizers only
-            # Http Api shouldn't create the permissions by default
+            # Http Api shouldn't create the permissions by default (when its none)
             if (
                 not authorizer.function_arn
                 or authorizer.disable_function_default_permissions is None
