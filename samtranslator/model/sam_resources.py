@@ -11,7 +11,6 @@ import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
-    SUPPORTED_DATASOURCES,
     DataSource,
     DeltaSyncConfigType,
     DynamoDBConfigType,
@@ -19,7 +18,7 @@ from samtranslator.internal.model.appsync import (
     GraphQLSchema,
     LogConfigType,
 )
-from samtranslator.internal.schema_source import aws_serverless_graphqlapi, aws_serverless_graphqldatasource
+from samtranslator.internal.schema_source import aws_serverless_graphqlapi
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
@@ -2160,6 +2159,7 @@ class SamGraphQLApi(SamResourceMacro):
         "SchemaInline": Property(False, IS_STR),
         "SchemaUri": Property(False, IS_STR),
         "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
+        "DynamoDBDataSources": Property(False, IS_DICT),
     }
 
     Auth: Dict[str, Any]
@@ -2169,18 +2169,23 @@ class SamGraphQLApi(SamResourceMacro):
     SchemaInline: Optional[str]
     SchemaUri: Optional[str]
     Logging: Optional[Union[Dict[str, Any], bool]]
+    DynamoDBDataSources: Optional[List[Dict[str, Any]]]
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
         model = self.validate_properties_and_return_model(aws_serverless_graphqlapi.Properties)
-
         appsync_api, cloudwatch_role = self._construct_appsync_api_resources(model)
-        appsync_schema = self._construct_appsync_schema(model, appsync_api.get_runtime_attr("api_id"))
+        api_id = appsync_api.get_runtime_attr("api_id")
+        appsync_schema = self._construct_appsync_schema(model, api_id)
 
         resources: List[Resource] = [appsync_api, appsync_schema]
 
         if cloudwatch_role:
             resources.append(cloudwatch_role)
+
+        if model.DynamoDBDataSources:
+            ddb_datasources = self._construct_ddb_datasources(model.DynamoDBDataSources, api_id)
+            resources.extend(ddb_datasources)
 
         return resources
 
@@ -2279,89 +2284,43 @@ class SamGraphQLApi(SamResourceMacro):
 
         return schema
 
+    def _construct_ddb_datasources(
+        self, ddb_datasources: Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource], api_id: Intrinsicable[str]
+    ) -> List[DataSource]:
+        datasources: List[DataSource] = []
 
-class SamGraphQLDataSource(SamResourceMacro):
-    """SAM GraphQL Data Source Macro (WIP)."""
+        for relative_id, ddb_datasource in ddb_datasources.items():
+            cfn_datasource = DataSource(
+                logical_id=relative_id, depends_on=self.depends_on, attributes=self.resource_attributes
+            )
 
-    # TODO: This currently only supports DataSource with a defined ServiceRoleArn.
-    #       The proposed connector change will come in a follow up PR.
-    resource_type = "AWS::Serverless::GraphQLDataSource"
-    property_types = {
-        "ApiId": PassThroughProperty(True),
-        "Name": Property(False, IS_STR),
-        "Type": Property(True, IS_STR),
-        "Description": PassThroughProperty(False),
-        "ServiceRoleArn": Property(False, IS_STR),
-        "DynamoDBConfig": Property(False, IS_DICT),
-    }
+            cfn_datasource.ServiceRoleArn = ddb_datasource.ServiceRoleArn
+            cfn_datasource.Name = ddb_datasource.Name if ddb_datasource.Name else relative_id
+            cfn_datasource.Type = "AMAZON_DYNAMODB"
+            cfn_datasource.ApiId = api_id
 
-    ApiId: PassThrough
-    Type: str
-    DynamoDBConfig: Optional[Dict[str, Any]]
-    Name: Optional[str]
-    Description: Optional[PassThrough]
-    ServiceRoleArn: Optional[str]
+            if ddb_datasource.Description:
+                cfn_datasource.Description = cast(str, ddb_datasource.Description)
 
-    @cw_timer
-    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
-        model = self.validate_properties_and_return_model(aws_serverless_graphqldatasource.Properties)
+            cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
+            datasources.append(cfn_datasource)
 
-        appsync_datasource = self._construct_appsync_datasource(model)
-        resources: List[Resource] = [appsync_datasource]
+        return datasources
 
-        return resources
-
-    def _parse_dynamodb_datasource(
-        self, ddb_properties: aws_serverless_graphqldatasource.DynamoDBConfig
-    ) -> DynamoDBConfigType:
+    def _parse_ddb_config(self, ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource) -> DynamoDBConfigType:
         ddb_config: DynamoDBConfigType = {}
 
-        ddb_config["TableName"] = ddb_properties.TableName
-        ddb_config["AwsRegion"] = ddb_properties.Region or ref("AWS::Region")
+        ddb_config["AwsRegion"] = cast(str, ddb_datasource.Region) or ref("AWS::Region")
+        ddb_config["TableName"] = ddb_datasource.TableName
 
-        if ddb_properties.DeltaSync:
-            deltasync_properties = ddb_properties.DeltaSync.dict()
-            ddb_config["DeltaSyncConfig"] = cast(
-                DeltaSyncConfigType, deltasync_properties
-            )  # TODO: better handling PassThroughProp
+        if ddb_datasource.UseCallerCredentials:
+            ddb_config["UseCallerCredentials"] = cast(bool, ddb_datasource.UseCallerCredentials)
 
-        if ddb_properties.UseCallerCredentials:
-            ddb_config["UseCallerCredentials"] = cast(
-                bool, ddb_properties.UseCallerCredentials
-            )  # TODO: better handling PassThroughProp
+        if ddb_datasource.Versioned:
+            ddb_config["Versioned"] = cast(bool, ddb_datasource.Versioned)
 
-        if ddb_properties.Versioned:
-            ddb_config["Versioned"] = cast(bool, ddb_properties.Versioned)  # TODO: better handling PassThroughProp
+        if ddb_datasource.DeltaSync:
+            deltasync_properties = ddb_datasource.DeltaSync.dict()
+            ddb_config["DeltaSyncConfig"] = cast(DeltaSyncConfigType, deltasync_properties)
 
         return ddb_config
-
-    def _validate_config_properties(
-        self, model: aws_serverless_graphqldatasource.Properties, datasource: DataSource
-    ) -> None:
-        # DataSourceConfig is quite large property so we require a lot of additional validation.
-        # The datasource object is modified by reference.
-        if model.Type == "AMAZON_DYNAMODB":
-            if not model.DynamoDBConfig:
-                raise InvalidResourceException(
-                    self.logical_id, "'DynamoDBConfig' must be defined when 'Type' is 'AMAZON_DYNAMODB'."
-                )
-            datasource.DynamoDBConfig = self._parse_dynamodb_datasource(model.DynamoDBConfig)
-
-    def _construct_appsync_datasource(self, model: aws_serverless_graphqldatasource.Properties) -> DataSource:
-        datasource = DataSource(
-            logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
-        )
-
-        if model.Type not in SUPPORTED_DATASOURCES:
-            raise InvalidResourceException(self.logical_id, f"'{model.Type}' is not a supported data source type.")
-
-        datasource.Type = model.Type
-        datasource.Name = model.Name or self.logical_id
-        datasource.Description = model.Description
-        datasource.ApiId = cast(Intrinsicable[str], model.ApiId)  # TODO: better handling PassThroughProp
-        # I will remove this ignore after, it will be fixed with pseudo-embedded connector implementation.
-        datasource.ServiceRoleArn = model.ServiceRoleArn  # type: ignore
-
-        self._validate_config_properties(model, datasource)
-
-        return datasource

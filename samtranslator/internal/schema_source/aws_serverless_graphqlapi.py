@@ -1,13 +1,8 @@
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
 from typing_extensions import Literal
 
-from samtranslator.internal.schema_source.common import (
-    BaseModel,
-    DictStrAny,
-    PassThroughProp,
-    get_prop,
-)
+from samtranslator.internal.schema_source.common import BaseModel, DictStrAny, PassThroughProp, get_prop
 
 properties = get_prop("sam-resource-graphqlapi")
 
@@ -18,9 +13,27 @@ class Auth(BaseModel):
 
 
 class Logging(BaseModel):
-    CloudWatchLogsRoleArn: Optional[PassThroughProp]
+    CloudWatchLogsRoleArn: Optional[str]
     ExcludeVerboseContent: Optional[PassThroughProp]
     FieldLogLevel: Optional[str]
+
+
+class DeltaSync(BaseModel):
+    BaseTableTTL: str
+    DeltaSyncTableName: str
+    DeltaSyncTableTTL: str
+
+
+class DynamoDBDataSource(BaseModel):
+    # TableArn, Permissions properties for connector
+    ServiceRoleArn: str  # TODO: make optional when we ship connector changes
+    TableName: str
+    Name: Optional[str]
+    Description: Optional[PassThroughProp]
+    Region: Optional[PassThroughProp]
+    DeltaSync: Optional[DeltaSync]
+    UseCallerCredentials: Optional[PassThroughProp]
+    Versioned: Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
@@ -31,6 +44,7 @@ class Properties(BaseModel):
     SchemaInline: Optional[str]
     SchemaUri: Optional[str]
     Logging: Optional[Union[Logging, bool]]
+    DynamoDBDataSources: Optional[Dict[str, DynamoDBDataSource]]
 
 
 class Resource(BaseModel):

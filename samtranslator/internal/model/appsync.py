@@ -6,10 +6,6 @@ from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt
 from samtranslator.utils.types import Intrinsicable
 
-# Data source constants can be found here under "Type" property:
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-datasource.html
-SUPPORTED_DATASOURCES = {"AMAZON_DYNAMODB"}
-
 
 class DeltaSyncConfigType(TypedDict):
     BaseTableTTL: str

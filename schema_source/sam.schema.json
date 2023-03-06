@@ -451,7 +451,7 @@
       "title": "DeadLetterQueue",
       "type": "object"
     },
-    "DeltaSyncConfig": {
+    "DeltaSync": {
       "additionalProperties": false,
       "properties": {
         "BaseTableTTL": {
@@ -472,7 +472,7 @@
         "DeltaSyncTableName",
         "DeltaSyncTableTTL"
       ],
-      "title": "DeltaSyncConfig",
+      "title": "DeltaSync",
       "type": "object"
     },
     "DeploymentPreference": {
@@ -649,14 +649,24 @@
       "title": "DocumentDBEventProperties",
       "type": "object"
     },
-    "DynamoDBConfig": {
+    "DynamoDBDataSource": {
       "additionalProperties": false,
       "properties": {
         "DeltaSync": {
-          "$ref": "#/definitions/DeltaSyncConfig"
+          "$ref": "#/definitions/DeltaSync"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
         },
         "Region": {
-          "title": "Region",
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ServiceRoleArn": {
+          "title": "Servicerolearn",
           "type": "string"
         },
         "TableName": {
@@ -671,9 +681,10 @@
         }
       },
       "required": [
+        "ServiceRoleArn",
         "TableName"
       ],
-      "title": "DynamoDBConfig",
+      "title": "DynamoDBDataSource",
       "type": "object"
     },
     "DynamoDBEvent": {
@@ -1962,7 +1973,8 @@
       "additionalProperties": false,
       "properties": {
         "CloudWatchLogsRoleArn": {
-          "$ref": "#/definitions/PassThroughProp"
+          "title": "Cloudwatchlogsrolearn",
+          "type": "string"
         },
         "ExcludeVerboseContent": {
           "$ref": "#/definitions/PassThroughProp"
@@ -5777,6 +5789,13 @@
         "Auth": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
         },
+        "DynamoDBDataSources": {
+          "additionalProperties": {
+            "$ref": "#/definitions/DynamoDBDataSource"
+          },
+          "title": "Dynamodbdatasources",
+          "type": "object"
+        },
         "Logging": {
           "anyOf": [
             {
@@ -5824,61 +5843,6 @@
         "Type": {
           "enum": [
             "AWS::Serverless::GraphQLApi"
-          ],
-          "title": "Type",
-          "type": "string"
-        }
-      },
-      "required": [
-        "Type",
-        "Properties"
-      ],
-      "title": "Resource",
-      "type": "object"
-    },
-    "samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Properties": {
-      "additionalProperties": false,
-      "properties": {
-        "ApiId": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
-        "Description": {
-          "title": "Description",
-          "type": "string"
-        },
-        "DynamoDBConfig": {
-          "$ref": "#/definitions/DynamoDBConfig"
-        },
-        "Name": {
-          "title": "Name",
-          "type": "string"
-        },
-        "ServiceRoleArn": {
-          "title": "Servicerolearn",
-          "type": "string"
-        },
-        "Type": {
-          "title": "Type",
-          "type": "string"
-        }
-      },
-      "required": [
-        "ApiId",
-        "Type",
-        "DynamoDBConfig"
-      ],
-      "title": "Properties",
-      "type": "object"
-    },
-    "samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Resource": {
-      "additionalProperties": false,
-      "properties": {
-        "Properties": {
-          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Properties"
-        },
-        "Type": {
-          "enum": [
-            "AWS::Serverless::GraphQLDataSource"
           ],
           "title": "Type",
           "type": "string"
@@ -7583,9 +7547,6 @@
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource"
-          },
-          {
-            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqldatasource__Resource"
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__any_cfn_resource__Resource"

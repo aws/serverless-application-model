@@ -17,7 +17,6 @@ do_not_verify = {
     "AWS::ApiGateway::BasePathMapping": "AWS::ApiGateway::BasePathMapping",
     "AWS::StepFunctions::StateMachine": "AWS::Serverless::StateMachine",
     "AWS::AppSync::GraphQLApi": "AWS::Serverless::GraphQLApi",
-    "AWS::AppSync::DataSource": "AWS::Serverless::GraphQLDataSource",
 }
 
 

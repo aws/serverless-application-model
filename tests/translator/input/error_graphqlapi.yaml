@@ -33,7 +33,7 @@ Resources:
         key1: value1
         key2: value2
 
-  GraphQLNonExistenceProp:
+  GraphQLApiInvalidFieldInLogging:
     Type: AWS::Serverless::GraphQLApi
     Properties:
       SchemaInline: |
@@ -50,4 +50,4 @@ Resources:
         CloudWatchLogsRoleArn: some-arn
         FieldLogLevel: ERROR
         ExcludeVerboseContent: true
-      Hello: World
+        NotSupposedToBeHere: yo
