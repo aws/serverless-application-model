@@ -12,7 +12,6 @@ from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
     DataSource,
-    DeltaSyncConfigType,
     DynamoDBConfigType,
     GraphQLApi,
     GraphQLSchema,
@@ -2234,12 +2233,10 @@ class SamGraphQLApi(SamResourceMacro):
         log_config: LogConfigType = {}
 
         if model.Logging.ExcludeVerboseContent:
-            log_config["ExcludeVerboseContent"] = cast(
-                bool, model.Logging.ExcludeVerboseContent
-            )  # TODO: better handling PassThroughProp
+            log_config["ExcludeVerboseContent"] = cast(PassThrough, model.Logging.ExcludeVerboseContent)
 
         log_config["FieldLogLevel"] = model.Logging.FieldLogLevel or "ALL"
-        log_config["CloudWatchLogsRoleArn"] = cast(Intrinsicable[str], model.Logging.CloudWatchLogsRoleArn)
+        log_config["CloudWatchLogsRoleArn"] = cast(PassThrough, model.Logging.CloudWatchLogsRoleArn)
 
         if log_config["CloudWatchLogsRoleArn"]:
             return log_config, None
@@ -2294,13 +2291,13 @@ class SamGraphQLApi(SamResourceMacro):
                 logical_id=relative_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
 
-            cfn_datasource.ServiceRoleArn = ddb_datasource.ServiceRoleArn
-            cfn_datasource.Name = ddb_datasource.Name if ddb_datasource.Name else relative_id
+            cfn_datasource.ServiceRoleArn = cast(PassThrough, ddb_datasource.ServiceRoleArn)
+            cfn_datasource.Name = ddb_datasource.Name or relative_id
             cfn_datasource.Type = "AMAZON_DYNAMODB"
             cfn_datasource.ApiId = api_id
 
             if ddb_datasource.Description:
-                cfn_datasource.Description = cast(str, ddb_datasource.Description)
+                cfn_datasource.Description = cast(PassThrough, ddb_datasource.Description)
 
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
             datasources.append(cfn_datasource)
@@ -2310,17 +2307,17 @@ class SamGraphQLApi(SamResourceMacro):
     def _parse_ddb_config(self, ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource) -> DynamoDBConfigType:
         ddb_config: DynamoDBConfigType = {}
 
-        ddb_config["AwsRegion"] = cast(str, ddb_datasource.Region) or ref("AWS::Region")
+        ddb_config["AwsRegion"] = cast(PassThrough, ddb_datasource.Region) or ref("AWS::Region")
         ddb_config["TableName"] = ddb_datasource.TableName
 
         if ddb_datasource.UseCallerCredentials:
-            ddb_config["UseCallerCredentials"] = cast(bool, ddb_datasource.UseCallerCredentials)
+            ddb_config["UseCallerCredentials"] = cast(PassThrough, ddb_datasource.UseCallerCredentials)
 
         if ddb_datasource.Versioned:
-            ddb_config["Versioned"] = cast(bool, ddb_datasource.Versioned)
+            ddb_config["Versioned"] = cast(PassThrough, ddb_datasource.Versioned)
 
         if ddb_datasource.DeltaSync:
             deltasync_properties = ddb_datasource.DeltaSync.dict()
-            ddb_config["DeltaSyncConfig"] = cast(DeltaSyncConfigType, deltasync_properties)
+            ddb_config["DeltaSyncConfig"] = cast(PassThrough, deltasync_properties)
 
         return ddb_config

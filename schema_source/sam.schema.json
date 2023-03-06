@@ -666,8 +666,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "ServiceRoleArn": {
-          "title": "Servicerolearn",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "TableName": {
           "title": "Tablename",

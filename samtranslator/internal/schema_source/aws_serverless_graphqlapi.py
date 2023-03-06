@@ -26,7 +26,7 @@ class DeltaSync(BaseModel):
 
 class DynamoDBDataSource(BaseModel):
     # TableArn, Permissions properties for connector
-    ServiceRoleArn: str  # TODO: make optional when we ship connector changes
+    ServiceRoleArn: PassThroughProp  # TODO: make optional when we ship connector changes
     TableName: str
     Name: Optional[str]
     Description: Optional[PassThroughProp]
