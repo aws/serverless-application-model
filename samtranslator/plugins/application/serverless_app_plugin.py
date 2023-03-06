@@ -57,7 +57,7 @@ class ServerlessAppPlugin(BasePlugin):
         wait_for_template_active_status: bool = False,
         validate_only: bool = False,
         parameters: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> None:
         """
         Initialize the plugin.
 

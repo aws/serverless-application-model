@@ -194,6 +194,7 @@ class ApiGenerator:
         description: Optional[Intrinsicable[str]] = None,
         mode: Optional[Intrinsicable[str]] = None,
         api_key_source_type: Optional[Intrinsicable[str]] = None,
+        always_deploy: Optional[bool] = False,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -249,6 +250,7 @@ class ApiGenerator:
         self.template_conditions = template_conditions
         self.mode = mode
         self.api_key_source_type = api_key_source_type
+        self.always_deploy = always_deploy
 
     def _construct_rest_api(self) -> ApiGatewayRestApi:
         """Constructs and returns the ApiGateway RestApi.
@@ -425,7 +427,12 @@ class ApiGenerator:
 
         if swagger is not None:
             deployment.make_auto_deployable(
-                stage, self.remove_extra_stage, swagger, self.domain, redeploy_restapi_parameters
+                stage,
+                self.remove_extra_stage,
+                swagger,
+                self.domain,
+                redeploy_restapi_parameters,
+                self.always_deploy,
             )
 
         if self.tags is not None:

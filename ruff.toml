@@ -2,7 +2,8 @@
 line-length = 999
 
 select = [
-    "E",  # Pyflakes
+    "E",  # pycodestyle
+    "W",  # pycodestyle
     "F",  # Pyflakes
     "PL", # pylint
     "I", # isort
@@ -17,6 +18,7 @@ select = [
     "SIM", # flake8-simplify
     "TID", # flake8-tidy-imports
     "RUF", # Ruff-specific rules
+    "YTT", # flake8-2020
 ]
 
 # Mininal python version we support is 3.7

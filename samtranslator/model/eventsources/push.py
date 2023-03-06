@@ -8,7 +8,7 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, ResourceMacro
 from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
-from samtranslator.model.events import EventsRule
+from samtranslator.model.events import EventsRule, generate_valid_target_id
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.eventsources.pull import SQS
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidEventException, InvalidResourceException
@@ -19,7 +19,7 @@ from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
 from samtranslator.model.sqs import SQSQueue, SQSQueuePolicies, SQSQueuePolicy
 from samtranslator.model.tags.resource_tagging import get_tag_list
-from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, dict_of, is_type, list_of, one_of
+from samtranslator.model.types import IS_BOOL, IS_DICT, IS_INT, IS_LIST, IS_STR, PassThrough, dict_of, list_of, one_of
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
@@ -31,6 +31,7 @@ from samtranslator.validator.value_validator import sam_expect
 CONDITION = "Condition"
 
 REQUEST_PARAMETER_PROPERTIES = ["Required", "Caching"]
+EVENT_RULE_LAMBDA_TARGET_SUFFIX = "LambdaTarget"
 
 
 class PushEventSource(ResourceMacro, metaclass=ABCMeta):
@@ -104,7 +105,7 @@ class Schedule(PushEventSource):
         "Schedule": PropertyType(True, IS_STR),
         "RuleName": PropertyType(False, IS_STR),
         "Input": PropertyType(False, IS_STR),
-        "Enabled": PropertyType(False, is_type(bool)),
+        "Enabled": PropertyType(False, IS_BOOL),
         "State": PropertyType(False, IS_STR),
         "Name": PropertyType(False, IS_STR),
         "Description": PropertyType(False, IS_STR),
@@ -176,7 +177,8 @@ class Schedule(PushEventSource):
         :returns: the Target property
         :rtype: dict
         """
-        target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
+        target_id = generate_valid_target_id(self.logical_id, EVENT_RULE_LAMBDA_TARGET_SUFFIX)
+        target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
         if self.Input is not None:
             target["Input"] = self.Input
 
@@ -203,7 +205,7 @@ class CloudWatchEvent(PushEventSource):
         "Input": PropertyType(False, IS_STR),
         "InputPath": PropertyType(False, IS_STR),
         "Target": PropertyType(False, IS_DICT),
-        "Enabled": PropertyType(False, is_type(bool)),
+        "Enabled": PropertyType(False, IS_BOOL),
         "State": PropertyType(False, IS_STR),
     }
 
@@ -271,7 +273,11 @@ class CloudWatchEvent(PushEventSource):
         :returns: the Target property
         :rtype: dict
         """
-        target_id = self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "LambdaTarget"
+        target_id = (
+            self.Target["Id"]
+            if self.Target and "Id" in self.Target
+            else generate_valid_target_id(self.logical_id, EVENT_RULE_LAMBDA_TARGET_SUFFIX)
+        )
         target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
         if self.Input is not None:
             target["Input"] = self.Input
@@ -480,7 +486,7 @@ class SNS(PushEventSource):
         "Topic": PropertyType(True, IS_STR),
         "Region": PropertyType(False, IS_STR),
         "FilterPolicy": PropertyType(False, dict_of(IS_STR, list_of(one_of(IS_STR, IS_DICT)))),
-        "SqsSubscription": PropertyType(False, one_of(is_type(bool), IS_DICT)),
+        "SqsSubscription": PropertyType(False, one_of(IS_BOOL, IS_DICT)),
         "RedrivePolicy": PropertyType(False, IS_DICT),
     }
 
@@ -624,7 +630,7 @@ class Api(PushEventSource):
         "Stage": PropertyType(False, IS_STR),
         "Auth": PropertyType(False, IS_DICT),
         "RequestModel": PropertyType(False, IS_DICT),
-        "RequestParameters": PropertyType(False, is_type(list)),
+        "RequestParameters": PropertyType(False, IS_LIST),
     }
 
     Path: str
@@ -1214,7 +1220,7 @@ class HttpApi(PushEventSource):
         "ApiId": PropertyType(False, IS_STR),
         "Stage": PropertyType(False, IS_STR),
         "Auth": PropertyType(False, IS_DICT),
-        "TimeoutInMillis": PropertyType(False, is_type(int)),
+        "TimeoutInMillis": PropertyType(False, IS_INT),
         "RouteSettings": PropertyType(False, IS_DICT),
         "PayloadFormatVersion": PropertyType(False, IS_STR),
     }

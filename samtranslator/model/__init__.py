@@ -3,12 +3,11 @@ import inspect
 import re
 from abc import ABC, ABCMeta, abstractmethod
 from contextlib import suppress
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidResourceException,
@@ -542,29 +541,12 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
                 "input.",
             )
 
-    def _resolve_string_parameter(
-        self,
-        intrinsics_resolver: IntrinsicsResolver,
-        parameter_value: Optional[Union[str, Dict[str, Any]]],
-        parameter_name: str,
-    ) -> Optional[Union[str, Dict[str, Any]]]:
-        if not parameter_value:
-            return parameter_value
-        value = intrinsics_resolver.resolve_parameter_refs(parameter_value)
-
-        if not isinstance(value, str) and not isinstance(value, dict):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Could not resolve parameter for '{}' or parameter is not a String.".format(parameter_name),
-            )
-        return value
-
 
 class ResourceTypeResolver:
     """ResourceTypeResolver maps Resource Types to Resource classes, e.g. AWS::Serverless::Function to
     samtranslator.model.sam_resources.SamFunction."""
 
-    def __init__(self, *modules: Any):
+    def __init__(self, *modules: Any) -> None:
         """Initializes the ResourceTypeResolver from the given modules.
 
         :param modules: one or more Python modules containing Resource definitions
@@ -605,7 +587,7 @@ class ResourceTypeResolver:
 
 
 class ResourceResolver:
-    def __init__(self, resources: Dict[str, Any]):
+    def __init__(self, resources: Dict[str, Any]) -> None:
         """
         Instantiate the resolver
         :param dict resources: Map of resource
