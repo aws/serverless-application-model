@@ -49,4 +49,3 @@ class TestApiGenerator(TestCase):
         with self.assertRaises(InvalidResourceException) as cm:
             api_generator._construct_usage_plan()
             self.assertIn("Invalid property for", str(cm.exception))
-
