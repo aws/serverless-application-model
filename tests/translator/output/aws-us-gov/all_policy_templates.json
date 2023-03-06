@@ -1639,6 +1639,70 @@
               ]
             },
             "PolicyName": "KitchenSinkFunctionRolePolicy60"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "states:StartExecution",
+                    "states:StartSyncExecution"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                      {
+                        "stateMachineName": "name"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "KitchenSinkFunctionRolePolicy61"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ses:SendEmail",
+                    "ses:SendRawEmail",
+                    "ses:SendTemplatedEmail",
+                    "ses:SendBulkTemplatedEmail"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}",
+                        {
+                          "identityName": "name"
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:template/${templateName}",
+                        {
+                          "templateName": "template_name"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Action": [
+                    "ses:GetIdentityVerificationAttributes",
+                    "ses:VerifyEmailIdentity"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": "KitchenSinkFunctionRolePolicy62"
           }
         ],
         "Tags": [

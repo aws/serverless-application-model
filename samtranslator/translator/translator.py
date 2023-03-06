@@ -340,6 +340,7 @@ class Translator:
                     generated_connector = self._get_generated_connector(
                         source_logical_id,
                         full_connector_logical_id,
+                        connector_logical_id,
                         connector_dict,
                     )
 
@@ -354,40 +355,47 @@ class Translator:
         return connectors
 
     def _get_generated_connector(
-        self, source_logical_id: str, connector_logical_id: str, connector_dict: Dict[str, Any]
+        self,
+        source_logical_id: str,
+        full_connector_logical_id: str,
+        connector_logical_id: str,
+        connector_dict: Dict[str, Any],
     ) -> Resource:
         """
         Generates the connector resource from the embedded connector
 
         :param str source_logical_id: Logical id of the resource the connector is attached to
-        :param str connector_logical_id: Logical id of the connector
+        :param str full_connector_logical_id: source_logical_id + connector_logical_id
+        :param str connector_logical_id: Logical id of the connector defined by the user
         :param dict connector_dict: The properties of the connector including the Destination, Permissions and optionally the SourceReference
         :return: The generated SAMConnector resource
         """
         connector = copy.deepcopy(connector_dict)
         connector["Type"] = SamConnector.resource_type
 
-        # No need to raise an error for this instance as the error will be caught by the parser
-        if "Properties" in connector_dict and isinstance(connector_dict["Properties"], dict):
-            properties = connector["Properties"]
-            properties["Source"] = {"Id": source_logical_id}
-            if "SourceReference" in properties:
-                sam_expect(
-                    properties.get("SourceReference"),
-                    connector_logical_id,
-                    f"{connector_logical_id}.Properties.SourceReference",
-                ).to_be_a_map()
+        properties = sam_expect(
+            connector.get("Properties"),
+            source_logical_id,
+            f"Connectors.{connector_logical_id}.Properties",
+            is_resource_attribute=True,
+        ).to_be_a_map()
 
-                # can't allow user to override the Id using SourceReference
-                if "Id" in properties["SourceReference"]:
-                    raise InvalidResourceException(
-                        connector_logical_id, "'Id' shouldn't be defined in 'SourceReference'."
-                    )
+        properties["Source"] = {"Id": source_logical_id}
+        if "SourceReference" in properties:
+            source_reference = sam_expect(
+                properties.get("SourceReference"),
+                source_logical_id,
+                f"Connectors.{connector_logical_id}.Properties.SourceReference",
+            ).to_be_a_map()
 
-                properties["Source"].update(properties["SourceReference"])
-                del properties["SourceReference"]
+            # can't allow user to override the Id using SourceReference
+            if "Id" in source_reference:
+                raise InvalidResourceException(connector_logical_id, "'Id' shouldn't be defined in 'SourceReference'.")
 
-        return SamConnector.from_dict(connector_logical_id, connector)
+            properties["Source"].update(source_reference)
+            del properties["SourceReference"]
+
+        return SamConnector.from_dict(full_connector_logical_id, connector)
 
 
 def prepare_plugins(plugins: Optional[List[BasePlugin]], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:

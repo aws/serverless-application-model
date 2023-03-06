@@ -10,6 +10,11 @@ Resources:
   MyFunction:
     Type: AWS::Serverless::Function
     Connectors:
+      NoProperties:
+        Destination:
+          Id: MyQueue
+        Permissions:
+        - Write
       NonDictProperties:
         Properties: foo
       EmptyProperties:
@@ -75,6 +80,13 @@ Resources:
         Properties:
           SourceReference:
             Id: foo
+          Destination:
+            Id: MyQueue
+          Permissions:
+          - Write
+      NonDictSourceReference:
+        Properties:
+          SourceReference: foo
           Destination:
             Id: MyQueue
           Permissions:

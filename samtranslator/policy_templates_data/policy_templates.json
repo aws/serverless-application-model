@@ -1920,6 +1920,60 @@
         }
       }
     },
+    "SESBulkTemplatedCrudPolicy_v2": {
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "ses:SendEmail",
+              "ses:SendRawEmail",
+              "ses:SendTemplatedEmail",
+              "ses:SendBulkTemplatedEmail"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}",
+                  {
+                    "identityName": {
+                      "Ref": "IdentityName"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:template/${templateName}",
+                  {
+                    "templateName": {
+                      "Ref": "TemplateName"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Action": [
+              "ses:GetIdentityVerificationAttributes",
+              "ses:VerifyEmailIdentity"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+          }
+        ]
+      },
+      "Description": "Gives permission to send email, templated email, templated bulk emails and verify identity",
+      "Parameters": {
+        "IdentityName": {
+          "Description": "Identity to give permissions to"
+        },
+        "TemplateName": {
+          "Description": "Name of the email template"
+        }
+      }
+    },
     "SESCrudPolicy": {
       "Definition": {
         "Statement": [
@@ -2281,6 +2335,35 @@
           {
             "Action": [
               "states:StartExecution"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  "stateMachineName": {
+                    "Ref": "StateMachineName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Description": "Gives permission to start a Step Functions state machine execution",
+      "Parameters": {
+        "StateMachineName": {
+          "Description": "The name of the state machine to execute."
+        }
+      }
+    },
+    "StepFunctionsExecutionPolicy_v2": {
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "states:StartExecution",
+              "states:StartSyncExecution"
             ],
             "Effect": "Allow",
             "Resource": {

@@ -29,7 +29,7 @@ class ResourcePolicies:
 
     POLICIES_PROPERTY_NAME = "Policies"
 
-    def __init__(self, resource_properties: Dict[str, Any], policy_template_processor: Any = None):
+    def __init__(self, resource_properties: Dict[str, Any], policy_template_processor: Any = None) -> None:
         """
         Initialize with policies data from resource's properties
 
