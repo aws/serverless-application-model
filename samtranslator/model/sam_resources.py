@@ -9,6 +9,7 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
+from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
     SUPPORTED_DATASOURCES,
     DataSource,
@@ -19,7 +20,6 @@ from samtranslator.internal.model.appsync import (
     LogConfigType,
 )
 from samtranslator.internal.schema_source import aws_serverless_graphqlapi, aws_serverless_graphqldatasource
-from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
@@ -2159,7 +2159,7 @@ class SamGraphQLApi(SamResourceMacro):
         "Auth": Property(True, IS_DICT),
         "SchemaInline": Property(False, IS_STR),
         "SchemaUri": Property(False, IS_STR),
-        "Logging": Property(False, one_of(IS_DICT, is_type(bool))),
+        "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
     }
 
     Auth: Dict[str, Any]
