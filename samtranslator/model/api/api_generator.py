@@ -581,21 +581,35 @@ class ApiGenerator:
         self, domain: Dict[str, Any], api_domain_name: str, route53: Any
     ) -> List[Dict[str, Any]]:
         recordset_list = []
-        recordset = {}
 
+        recordset = self._construct_route53_routing_policy_properties(route53, {})
         recordset["Name"] = domain.get("DomainName")
         recordset["Type"] = "A"
         recordset["AliasTarget"] = self._construct_alias_target(domain, api_domain_name, route53)
         recordset_list.extend([recordset])
 
-        recordset_ipv6 = {}
         if route53.get("IpV6") is not None and route53.get("IpV6") is True:
+            recordset_ipv6 = self._construct_route53_routing_policy_properties(route53, {})
             recordset_ipv6["Name"] = domain.get("DomainName")
             recordset_ipv6["Type"] = "AAAA"
             recordset_ipv6["AliasTarget"] = self._construct_alias_target(domain, api_domain_name, route53)
             recordset_list.extend([recordset_ipv6])
 
         return recordset_list
+
+    def _construct_route53_routing_policy_properties(
+        self, route53_config: Dict[str, Any], recordset: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        if route53_config.get("Region") is not None:
+            if route53_config.get("SetIdentifier") is None:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "SetIdentifier is required in order to enable latency based routing on Route53 recordsets.",
+                )
+            recordset["Region"] = route53_config.get("Region")
+            recordset["SetIdentifier"] = route53_config.get("SetIdentifier")
+
+        return recordset
 
     def _construct_alias_target(self, domain: Dict[str, Any], api_domain_name: str, route53: Any) -> Dict[str, Any]:
         alias_target = {}

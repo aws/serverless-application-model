@@ -415,15 +415,15 @@ class HttpApiGenerator:
         self, custom_domain_config: Dict[str, Any], route53_config: Dict[str, Any], api_domain_name: str
     ) -> List[Dict[str, Any]]:
         recordset_list = []
-        recordset = {}
 
+        recordset = self._construct_route53_routing_policy_properties(route53_config, {})
         recordset["Name"] = custom_domain_config.get("DomainName")
         recordset["Type"] = "A"
         recordset["AliasTarget"] = self._construct_alias_target(custom_domain_config, route53_config, api_domain_name)
         recordset_list.extend([recordset])
 
-        recordset_ipv6 = {}
-        if route53_config.get("IpV6"):
+        if route53_config.get("IpV6") is not None and route53_config.get("IpV6") is True:
+            recordset_ipv6 = self._construct_route53_routing_policy_properties(route53_config, {})
             recordset_ipv6["Name"] = custom_domain_config.get("DomainName")
             recordset_ipv6["Type"] = "AAAA"
             recordset_ipv6["AliasTarget"] = self._construct_alias_target(
@@ -432,6 +432,16 @@ class HttpApiGenerator:
             recordset_list.extend([recordset_ipv6])
 
         return recordset_list
+
+    def _construct_route53_routing_policy_properties(
+        self, route53_config: Dict[str, Any], recordset: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        if route53_config.get("Region") is not None:
+            recordset["Region"] = route53_config.get("Region")
+        if route53_config.get("SetIdentifier") is not None:
+            recordset["SetIdentifier"] = route53_config.get("SetIdentifier")
+
+        return recordset
 
     def _construct_alias_target(
         self, domain_config: Dict[str, Any], route53_config: Dict[str, Any], api_domain_name: str
