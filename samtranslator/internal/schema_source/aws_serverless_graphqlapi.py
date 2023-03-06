@@ -13,7 +13,7 @@ class Auth(BaseModel):
 
 
 class Logging(BaseModel):
-    CloudWatchLogsRoleArn: Optional[str]
+    CloudWatchLogsRoleArn: Optional[PassThroughProp]
     ExcludeVerboseContent: Optional[PassThroughProp]
     FieldLogLevel: Optional[str]
 
