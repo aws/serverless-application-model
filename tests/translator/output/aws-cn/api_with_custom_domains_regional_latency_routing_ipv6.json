@@ -14,26 +14,6 @@
     }
   },
   "Resources": {
-    "ApiGatewayDomainName1a01391c0c": {
-      "Properties": {
-        "DomainName": {
-          "Ref": "MyRestRegionalDomainName"
-        },
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        },
-        "MutualTlsAuthentication": {
-          "TruststoreUri": "${mtlsuri}"
-        },
-        "RegionalCertificateArn": {
-          "Ref": "MyRestRegionalDomainCert"
-        },
-        "SecurityPolicy": "TLS_1_2"
-      },
-      "Type": "AWS::ApiGateway::DomainName"
-    },
     "MyFunction": {
       "Properties": {
         "Code": {
@@ -128,60 +108,6 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "RecordSetGroup1194dea82a": {
-      "Properties": {
-        "HostedZoneId": {
-          "Ref": "HostedZoneId"
-        },
-        "RecordSets": [
-          {
-            "AliasTarget": {
-              "DNSName": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainName1a01391c0c",
-                  "RegionalDomainName"
-                ]
-              },
-              "HostedZoneId": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainName1a01391c0c",
-                  "RegionalHostedZoneId"
-                ]
-              }
-            },
-            "Name": {
-              "Ref": "MyRestRegionalDomainName"
-            },
-            "Region": "eu-west-2",
-            "SetIdentifier": "eu-west-2",
-            "Type": "A"
-          },
-          {
-            "AliasTarget": {
-              "DNSName": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainName1a01391c0c",
-                  "RegionalDomainName"
-                ]
-              },
-              "HostedZoneId": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainName1a01391c0c",
-                  "RegionalHostedZoneId"
-                ]
-              }
-            },
-            "Name": {
-              "Ref": "MyRestRegionalDomainName"
-            },
-            "Region": "eu-west-2",
-            "SetIdentifier": "eu-west-2",
-            "Type": "AAAA"
-          }
-        ]
-      },
-      "Type": "AWS::Route53::RecordSetGroup"
-    },
     "ServerlessRestApi": {
       "Properties": {
         "Body": {
@@ -230,9 +156,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "ServerlessRestApiDeploymentd7cef5b922": {
+    "ServerlessRestApiDeployment153978bb20": {
       "Properties": {
-        "Description": "RestApi deployment id: d7cef5b9229f2c92a6d262ac75017b45637a36eb",
+        "Description": "RestApi deployment id: 153978bb206310512b68a143f50ef28668a2f77d",
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
@@ -243,7 +169,7 @@
     "ServerlessRestApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentd7cef5b922"
+          "Ref": "ServerlessRestApiDeployment153978bb20"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -251,36 +177,6 @@
         "StageName": "Prod"
       },
       "Type": "AWS::ApiGateway::Stage"
-    },
-    "ServerlessRestApigetBasePathMapping": {
-      "Properties": {
-        "BasePath": "get",
-        "DomainName": {
-          "Ref": "ApiGatewayDomainName1a01391c0c"
-        },
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Stage": {
-          "Ref": "ServerlessRestApiProdStage"
-        }
-      },
-      "Type": "AWS::ApiGateway::BasePathMapping"
-    },
-    "ServerlessRestApipostBasePathMapping": {
-      "Properties": {
-        "BasePath": "post",
-        "DomainName": {
-          "Ref": "ApiGatewayDomainName1a01391c0c"
-        },
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Stage": {
-          "Ref": "ServerlessRestApiProdStage"
-        }
-      },
-      "Type": "AWS::ApiGateway::BasePathMapping"
     }
   }
 }
