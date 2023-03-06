@@ -2169,7 +2169,7 @@ class SamGraphQLApi(SamResourceMacro):
     SchemaInline: Optional[str]
     SchemaUri: Optional[str]
     Logging: Optional[Union[Dict[str, Any], bool]]
-    DynamoDBDataSources: Optional[Dict[str, Any]]
+    DynamoDBDataSources: Optional[Dict[str, Dict[str, Any]]]
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
