@@ -23,6 +23,7 @@ Resources:
               - numeric:
                 - '>='
                 - 100
+            FilterPolicyScope: MessageAttributes
 
   Notifications:
     Type: AWS::SNS::Topic

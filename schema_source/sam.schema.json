@@ -2470,6 +2470,9 @@
           "markdownDescription": "The filter policy JSON assigned to the subscription\\. For more information, see [GetSubscriptionAttributes](https://docs.aws.amazon.com/sns/latest/api/API_GetSubscriptionAttributes.html) in the Amazon Simple Notification Service API Reference\\.  \n*Type*: [SnsFilterPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-subscription.html#cfn-sns-subscription-filterpolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FilterPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-subscription.html#cfn-sns-subscription-filterpolicy) property of an `AWS::SNS::Subscription` resource\\.",
           "title": "FilterPolicy"
         },
+        "FilterPolicyScope": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Region": {
           "allOf": [
             {

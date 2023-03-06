@@ -68,6 +68,7 @@
             "example_corp"
           ]
         },
+        "FilterPolicyScope": "MessageAttributes",
         "Protocol": "sqs",
         "TopicArn": {
           "Ref": "Notifications"
