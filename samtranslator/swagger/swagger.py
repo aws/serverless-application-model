@@ -1,4 +1,4 @@
-import copy
+﻿import copy
 import re
 from typing import Any, Callable, Dict, Optional, TypeVar
 
@@ -11,6 +11,7 @@ from samtranslator.open_api.base_editor import BaseEditor
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 from samtranslator.utils.utils import InvalidValueType, dict_deep_set
+from samtranslator.validator.value_validator import sam_expect
 
 T = TypeVar("T")
 
@@ -696,14 +697,11 @@ class SwaggerEditor(BaseEditor):
         method_scopes = auth and auth.get("AuthorizationScopes")
         api_auth = api and api.get("Auth")
         authorizers = api_auth and api_auth.get("Authorizers")
-        required_options_api_key = method_name == "options" and (auth.get("AddApiKeyRequiredToCorsPreflight") is False)
+        
         if method_authorizer:
             self._set_method_authorizer(path, method_name, method_authorizer, authorizers, method_scopes)  # type: ignore[no-untyped-call]
 
         method_apikey_required = auth and auth.get("ApiKeyRequired")
-
-        if required_options_api_key:
-            method_apikey_required = False
 
         if method_apikey_required is not None:
             self._set_method_apikey_handling(path, method_name, method_apikey_required)  # type: ignore[no-untyped-call]
