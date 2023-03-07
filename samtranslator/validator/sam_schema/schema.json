@@ -783,6 +783,9 @@
         },
         "FilterPolicy": {
           "type": "object"
+        },
+        "FilterPolicyScope": {
+          "type": "string"
         }
       },
       "required": [
