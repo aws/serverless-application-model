@@ -412,14 +412,14 @@ class HttpApiGenerator:
         return basepath_resource_list
 
     def _construct_record_sets_for_domain(
-        self, custom_domain_config: Dict[str, Any], route53_config: Dict[str, Any], api_domain_name: str
+        self, custom_domain_config: Dict[str, Any], api_domain_name: str, route53_config: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         recordset_list = []
 
         recordset = {}
         recordset["Name"] = custom_domain_config.get("DomainName")
         recordset["Type"] = "A"
-        recordset["AliasTarget"] = self._construct_alias_target(custom_domain_config, route53_config, api_domain_name)
+        recordset["AliasTarget"] = self._construct_alias_target(custom_domain_config, api_domain_name, route53_config)
         self._update_route53_routing_policy_properties(route53_config, recordset)
         recordset_list.append(recordset)
 
@@ -428,7 +428,7 @@ class HttpApiGenerator:
             recordset_ipv6["Name"] = custom_domain_config.get("DomainName")
             recordset_ipv6["Type"] = "AAAA"
             recordset_ipv6["AliasTarget"] = self._construct_alias_target(
-                custom_domain_config, route53_config, api_domain_name
+                custom_domain_config, api_domain_name, route53_config
             )
             self._update_route53_routing_policy_properties(route53_config, recordset_ipv6)
             recordset_list.append(recordset_ipv6)
