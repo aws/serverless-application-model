@@ -524,7 +524,7 @@ class HttpApiGenerator:
 
         resource = "${__ApiId__}/authorizers/*"
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition="${AWS::Region}", service="execute-api", resource=resource),
+            ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),
             {"__ApiId__": api_arn},
         )
 
