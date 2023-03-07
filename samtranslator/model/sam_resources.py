@@ -1388,9 +1388,14 @@ class SamHttpApi(SamResourceMacro):
             disable_execute_api_endpoint=self.DisableExecuteApiEndpoint,
         )
 
-        (http_api, stage, domain, basepath_mapping, route53, permissions) = api_generator.to_cloudformation(
-            kwargs.get("route53_record_set_groups", {})
-        )
+        (
+            http_api,
+            stage,
+            domain,
+            basepath_mapping,
+            route53,
+            permissions,
+        ) = api_generator.to_cloudformation(kwargs.get("route53_record_set_groups", {}))
 
         resources.append(http_api)
         if permissions:

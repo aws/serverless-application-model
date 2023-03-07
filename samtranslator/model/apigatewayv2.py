@@ -175,7 +175,7 @@ class ApiGatewayV2Authorizer:
                 self.api_logical_id, "EnableSimpleResponses must be defined only for Lambda Authorizer."
             )
 
-        if self.disable_function_default_permissions is not None and not authorizer_type == "REQUEST":
+        if self.disable_function_default_permissions is not None and authorizer_type != "REQUEST":
             raise InvalidResourceException(
                 self.api_logical_id, "DisableFunctionDefaultPermissions must be defined only for Lambda Authorizer."
             )

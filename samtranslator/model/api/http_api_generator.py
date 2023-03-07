@@ -522,10 +522,9 @@ class HttpApiGenerator:
         :rtype: model.lambda_.LambdaPermission
         """
 
-        partition = ArnGenerator.get_partition_name()
         resource = "${__ApiId__}/authorizers/*"
         source_arn = fnSub(
-            ArnGenerator.generate_arn(partition=partition, service="execute-api", resource=resource),
+            ArnGenerator.generate_arn(partition="${AWS::Region}", service="execute-api", resource=resource),
             {"__ApiId__": api_arn},
         )
 
