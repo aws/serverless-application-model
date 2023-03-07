@@ -14,7 +14,6 @@ from samtranslator.internal.schema_source import (
     aws_serverless_connector,
     aws_serverless_function,
     aws_serverless_graphqlapi,
-    aws_serverless_graphqldatasource,
     aws_serverless_httpapi,
     aws_serverless_layerversion,
     aws_serverless_simpletable,
@@ -40,7 +39,6 @@ Resources = Union[
     aws_serverless_httpapi.Resource,
     aws_serverless_application.Resource,
     aws_serverless_graphqlapi.Resource,
-    aws_serverless_graphqldatasource.Resource,
 ]
 
 
