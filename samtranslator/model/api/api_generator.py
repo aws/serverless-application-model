@@ -602,9 +602,7 @@ class ApiGenerator:
         return recordset_list
 
     @staticmethod
-    def _update_route53_routing_policy_properties(
-        route53_config: Dict[str, Any], recordset: Dict[str, Any]
-    ) -> None:
+    def _update_route53_routing_policy_properties(route53_config: Dict[str, Any], recordset: Dict[str, Any]) -> None:
         if route53_config.get("Region") is not None:
             recordset["Region"] = route53_config.get("Region")
         if route53_config.get("SetIdentifier") is not None:
