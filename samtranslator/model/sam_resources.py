@@ -2309,7 +2309,7 @@ class SamGraphQLApi(SamResourceMacro):
 
             if role:
                 resources.append(role)
-    
+
             if connector_resources:
                 resources.extend(connector_resources)
 
