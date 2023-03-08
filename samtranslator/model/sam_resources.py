@@ -2338,11 +2338,10 @@ class SamGraphQLApi(SamResourceMacro):
         role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
             "appsync.amazonaws.com"
         )
-        role.RoleName = role_id
         role_arn = role.get_runtime_attr("arn")
 
         connector_resources = self._construct_ddb_datasource_connector_resources(
-            relative_id, datasource_arn, table_arn, permissions, role_id, kwargs
+            relative_id, datasource_arn, table_arn, permissions, role.get_runtime_attr("name"), kwargs
         )
 
         return role_arn, [role, *connector_resources]
@@ -2371,7 +2370,7 @@ class SamGraphQLApi(SamResourceMacro):
         source_arn: Intrinsicable[str],
         destination_arn: str,
         permissions: PermissionsType,
-        role_name: str,
+        role_name: Intrinsicable[str],
         kwargs: Dict[str, Any],
     ) -> List[Resource]:
         logical_id = f"{datasource_id}ToTableConnector"

@@ -42,8 +42,7 @@
             }
           ],
           "Version": "2012-10-17"
-        },
-        "RoleName": "AnotherDataSourceRole"
+        }
       },
       "Type": "AWS::IAM::Role"
     },
@@ -112,7 +111,9 @@
           "Version": "2012-10-17"
         },
         "Roles": [
-          "AnotherDataSourceRole"
+          {
+            "Ref": "AnotherDataSourceRole"
+          }
         ]
       },
       "Type": "AWS::IAM::ManagedPolicy"
@@ -159,8 +160,7 @@
             }
           ],
           "Version": "2012-10-17"
-        },
-        "RoleName": "MyDataSourceRole"
+        }
       },
       "Type": "AWS::IAM::Role"
     },
@@ -229,7 +229,9 @@
           "Version": "2012-10-17"
         },
         "Roles": [
-          "MyDataSourceRole"
+          {
+            "Ref": "MyDataSourceRole"
+          }
         ]
       },
       "Type": "AWS::IAM::ManagedPolicy"

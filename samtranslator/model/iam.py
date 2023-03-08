@@ -13,7 +13,6 @@ class IAMRole(Resource):
         "Policies": GeneratedProperty(),
         "PermissionsBoundary": GeneratedProperty(),
         "Tags": GeneratedProperty(),
-        "RoleName": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
