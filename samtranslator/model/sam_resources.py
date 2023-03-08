@@ -2319,7 +2319,7 @@ class SamGraphQLApi(SamResourceMacro):
         relative_id: str,
         kwargs: Dict[str, Any],
     ) -> Tuple[str, List[Resource]]:
-        # If the user defined a role, then there's no need to generate role/policy for them, so we assign and move to next object.
+        # If the user defined a role, then there's no need to generate role/policy for them, so we return fast.
         if ddb_datasource.ServiceRoleArn:
             return cast(PassThrough, ddb_datasource.ServiceRoleArn), []
 
