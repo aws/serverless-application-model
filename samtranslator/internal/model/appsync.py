@@ -1,10 +1,12 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from typing_extensions import TypedDict
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt
 from samtranslator.utils.types import Intrinsicable
+
+ConnectorIdAndProperties = Tuple[str, Dict[str, Any]]
 
 
 class DeltaSyncConfigType(TypedDict):
@@ -76,3 +78,5 @@ class DataSource(Resource):
     Type: str
     ServiceRoleArn: str
     DynamoDBConfig: DynamoDBConfigType
+
+    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "DataSourceArn")}

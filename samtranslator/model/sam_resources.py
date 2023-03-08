@@ -2183,8 +2183,8 @@ class SamGraphQLApi(SamResourceMacro):
             resources.append(cloudwatch_role)
 
         if model.DynamoDBDataSources:
-            ddb_datasources = self._construct_ddb_datasources(model.DynamoDBDataSources, api_id)
-            resources.extend(ddb_datasources)
+            ddb_datasource_resources = self._construct_ddb_datasources(model.DynamoDBDataSources, api_id, kwargs)
+            resources.extend(ddb_datasource_resources)
 
         return resources
 
@@ -2282,16 +2282,17 @@ class SamGraphQLApi(SamResourceMacro):
         return schema
 
     def _construct_ddb_datasources(
-        self, ddb_datasources: Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource], api_id: Intrinsicable[str]
-    ) -> List[DataSource]:
-        datasources: List[DataSource] = []
+        self,
+        ddb_datasources: Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource],
+        api_id: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        resources: List[Resource] = []
 
         for relative_id, ddb_datasource in ddb_datasources.items():
             cfn_datasource = DataSource(
                 logical_id=relative_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
-
-            cfn_datasource.ServiceRoleArn = cast(PassThrough, ddb_datasource.ServiceRoleArn)
             cfn_datasource.Name = ddb_datasource.Name or relative_id
             cfn_datasource.Type = "AMAZON_DYNAMODB"
             cfn_datasource.ApiId = api_id
@@ -2300,9 +2301,43 @@ class SamGraphQLApi(SamResourceMacro):
                 cfn_datasource.Description = cast(PassThrough, ddb_datasource.Description)
 
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
-            datasources.append(cfn_datasource)
 
-        return datasources
+            if ddb_datasource.ServiceRoleArn:
+                cfn_datasource.ServiceRoleArn = cast(PassThrough, ddb_datasource.ServiceRoleArn)
+            else:
+                # If the user doesn't have their own role, then we will create for them if TableArn and Permissions is defined.
+                table_arn = sam_expect(
+                    ddb_datasource.TableArn, relative_id, f"DynamoDBDataSources.{relative_id}.TableArn"
+                ).to_not_be_none(
+                    "'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined."
+                )
+                permissions = ddb_datasource.Permissions or ["Read", "Write"]
+
+                role_id = f"{relative_id}Role"
+                role = IAMRole(
+                    logical_id=role_id,
+                    depends_on=self.depends_on,
+                    attributes=self.resource_attributes,
+                )
+                role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+                    "appsync.amazonaws.com"
+                )
+                role.RoleName = role_id
+
+                role_arn = role.get_runtime_attr("arn")
+                datasource_arn = cfn_datasource.get_runtime_attr("arn")
+
+                connector_resources = self._construct_ddb_datasource_connector_resources(
+                    relative_id, datasource_arn, table_arn, permissions, role_id, kwargs
+                )
+                resources.extend(connector_resources)
+
+                cfn_datasource.ServiceRoleArn = role_arn
+                resources.append(role)
+
+            resources.append(cfn_datasource)
+
+        return resources
 
     def _parse_ddb_config(self, ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource) -> DynamoDBConfigType:
         ddb_config: DynamoDBConfigType = {}
@@ -2321,3 +2356,32 @@ class SamGraphQLApi(SamResourceMacro):
             ddb_config["DeltaSyncConfig"] = cast(PassThrough, deltasync_properties)
 
         return ddb_config
+
+    def _construct_ddb_datasource_connector_resources(  # noqa: PLR0913
+        self,
+        datasource_id: str,
+        source_arn: str,
+        destination_arn: str,
+        permissions: List[str],
+        role_name: str,
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        logical_id = f"{datasource_id}ToTableConnector"
+        connector_dict = {
+            "Type": "AWS::Serverless::Connector",
+            "Properties": {
+                "Source": {"Type": "AWS::AppSync::DataSource", "Arn": source_arn, "RoleName": role_name},
+                "Destination": {
+                    "Type": "AWS::DynamoDB::Table",
+                    "Arn": destination_arn,
+                },
+                "Permissions": permissions,
+            },
+        }
+
+        # mypy thinks from_dict method returns "Resource" class instead of the inheriting parent class "SamResourceMacro"
+        connector = cast(
+            SamConnector,
+            SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
+        )
+        return connector.to_cloudformation(**kwargs)

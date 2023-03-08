@@ -662,11 +662,22 @@
           "title": "Name",
           "type": "string"
         },
+        "Permissions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
         "Region": {
           "$ref": "#/definitions/PassThroughProp"
         },
         "ServiceRoleArn": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "TableArn": {
+          "title": "Tablearn",
+          "type": "string"
         },
         "TableName": {
           "title": "Tablename",
@@ -680,7 +691,6 @@
         }
       },
       "required": [
-        "ServiceRoleArn",
         "TableName"
       ],
       "title": "DynamoDBDataSource",

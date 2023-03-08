@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
@@ -25,9 +25,10 @@ class DeltaSync(BaseModel):
 
 
 class DynamoDBDataSource(BaseModel):
-    # TableArn, Permissions properties for connector
-    ServiceRoleArn: PassThroughProp  # TODO: make optional when we ship connector changes
     TableName: str
+    ServiceRoleArn: Optional[PassThroughProp]
+    TableArn: Optional[str]
+    Permissions: Optional[List[str]]
     Name: Optional[str]
     Description: Optional[PassThroughProp]
     Region: Optional[PassThroughProp]
