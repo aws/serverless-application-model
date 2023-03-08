@@ -18,6 +18,7 @@ from samtranslator.internal.model.appsync import (
     LogConfigType,
 )
 from samtranslator.internal.schema_source import aws_serverless_graphqlapi
+from samtranslator.internal.schema_source.common import PermissionsType
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
@@ -2302,42 +2303,54 @@ class SamGraphQLApi(SamResourceMacro):
 
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
 
-            if ddb_datasource.ServiceRoleArn:
-                cfn_datasource.ServiceRoleArn = cast(PassThrough, ddb_datasource.ServiceRoleArn)
-            else:
-                # If the user doesn't have their own role, then we will create for them if TableArn and Permissions is defined.
-                table_arn = sam_expect(
-                    ddb_datasource.TableArn, relative_id, f"DynamoDBDataSources.{relative_id}.TableArn"
-                ).to_not_be_none(
-                    "'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined."
-                )
-                permissions = ddb_datasource.Permissions or ["Read", "Write"]
+            cfn_datasource.ServiceRoleArn, role, connector_resources = self.parse_datasource_role(
+                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, kwargs
+            )
 
-                role_id = f"{relative_id}Role"
-                role = IAMRole(
-                    logical_id=role_id,
-                    depends_on=self.depends_on,
-                    attributes=self.resource_attributes,
-                )
-                role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
-                    "appsync.amazonaws.com"
-                )
-                role.RoleName = role_id
-
-                role_arn = role.get_runtime_attr("arn")
-                datasource_arn = cfn_datasource.get_runtime_attr("arn")
-
-                connector_resources = self._construct_ddb_datasource_connector_resources(
-                    relative_id, datasource_arn, table_arn, permissions, role_id, kwargs
-                )
-                resources.extend(connector_resources)
-
-                cfn_datasource.ServiceRoleArn = role_arn
+            if role:
                 resources.append(role)
+    
+            if connector_resources:
+                resources.extend(connector_resources)
 
             resources.append(cfn_datasource)
 
         return resources
+
+    def parse_datasource_role(
+        self,
+        ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource,
+        datasource_arn: Intrinsicable[str],
+        relative_id: str,
+        kwargs: Dict[str, Any],
+    ) -> Tuple[str, Optional[IAMRole], Optional[List[Resource]]]:
+        # If the user defined a role, then there's no need to generate role/policy for them, so we return fast.
+        if ddb_datasource.ServiceRoleArn:
+            return cast(PassThrough, ddb_datasource.ServiceRoleArn), None, None
+
+        # If the user doesn't have their own role, then we will create for them if TableArn is defined.
+        table_arn = sam_expect(
+            ddb_datasource.TableArn, relative_id, f"DynamoDBDataSources.{relative_id}.TableArn"
+        ).to_not_be_none("'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined.")
+        permissions = ddb_datasource.Permissions or ["Read", "Write"]
+
+        role_id = f"{relative_id}Role"
+        role = IAMRole(
+            logical_id=role_id,
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
+        role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+            "appsync.amazonaws.com"
+        )
+        role.RoleName = role_id
+        role_arn = role.get_runtime_attr("arn")
+
+        connector_resources = self._construct_ddb_datasource_connector_resources(
+            relative_id, datasource_arn, table_arn, permissions, role_id, kwargs
+        )
+
+        return role_arn, role, connector_resources
 
     def _parse_ddb_config(self, ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource) -> DynamoDBConfigType:
         ddb_config: DynamoDBConfigType = {}
@@ -2357,12 +2370,12 @@ class SamGraphQLApi(SamResourceMacro):
 
         return ddb_config
 
-    def _construct_ddb_datasource_connector_resources(  # noqa: PLR0913
-        self,
+    @staticmethod
+    def _construct_ddb_datasource_connector_resources(
         datasource_id: str,
-        source_arn: str,
+        source_arn: Intrinsicable[str],
         destination_arn: str,
-        permissions: List[str],
+        permissions: PermissionsType,
         role_name: str,
         kwargs: Dict[str, Any],
     ) -> List[Resource]:

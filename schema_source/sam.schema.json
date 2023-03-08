@@ -664,6 +664,10 @@
         },
         "Permissions": {
           "items": {
+            "enum": [
+              "Read",
+              "Write"
+            ],
             "type": "string"
           },
           "title": "Permissions",

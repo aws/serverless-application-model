@@ -1,8 +1,14 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional, Union
 
 from typing_extensions import Literal
 
-from samtranslator.internal.schema_source.common import BaseModel, DictStrAny, PassThroughProp, get_prop
+from samtranslator.internal.schema_source.common import (
+    BaseModel,
+    DictStrAny,
+    PassThroughProp,
+    PermissionsType,
+    get_prop,
+)
 
 properties = get_prop("sam-resource-graphqlapi")
 
@@ -28,7 +34,7 @@ class DynamoDBDataSource(BaseModel):
     TableName: str
     ServiceRoleArn: Optional[PassThroughProp]
     TableArn: Optional[str]
-    Permissions: Optional[List[str]]
+    Permissions: Optional[PermissionsType]
     Name: Optional[str]
     Description: Optional[PassThroughProp]
     Region: Optional[PassThroughProp]
