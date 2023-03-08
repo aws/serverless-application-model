@@ -2294,6 +2294,7 @@ class SamGraphQLApi(SamResourceMacro):
             cfn_datasource = DataSource(
                 logical_id=relative_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
+
             cfn_datasource.Name = ddb_datasource.Name or relative_id
             cfn_datasource.Type = "AMAZON_DYNAMODB"
             cfn_datasource.ApiId = api_id
@@ -2303,30 +2304,24 @@ class SamGraphQLApi(SamResourceMacro):
 
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
 
-            cfn_datasource.ServiceRoleArn, role, connector_resources = self.parse_datasource_role(
+            cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_datasource_role(
                 ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, kwargs
             )
 
-            if role:
-                resources.append(role)
-
-            if connector_resources:
-                resources.extend(connector_resources)
-
-            resources.append(cfn_datasource)
+            resources.extend([cfn_datasource, *permissions_resources])
 
         return resources
 
-    def parse_datasource_role(
+    def _parse_datasource_role(
         self,
         ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource,
         datasource_arn: Intrinsicable[str],
         relative_id: str,
         kwargs: Dict[str, Any],
-    ) -> Tuple[str, Optional[IAMRole], Optional[List[Resource]]]:
-        # If the user defined a role, then there's no need to generate role/policy for them, so we return fast.
+    ) -> Tuple[str, List[Resource]]:
+        # If the user defined a role, then there's no need to generate role/policy for them, so we assign and move to next object.
         if ddb_datasource.ServiceRoleArn:
-            return cast(PassThrough, ddb_datasource.ServiceRoleArn), None, None
+            return cast(PassThrough, ddb_datasource.ServiceRoleArn), []
 
         # If the user doesn't have their own role, then we will create for them if TableArn is defined.
         table_arn = sam_expect(
@@ -2350,7 +2345,7 @@ class SamGraphQLApi(SamResourceMacro):
             relative_id, datasource_arn, table_arn, permissions, role_id, kwargs
         )
 
-        return role_arn, role, connector_resources
+        return role_arn, [role, *connector_resources]
 
     def _parse_ddb_config(self, ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource) -> DynamoDBConfigType:
         ddb_config: DynamoDBConfigType = {}
