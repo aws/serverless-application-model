@@ -2,10 +2,11 @@ import json
 import os
 from functools import partial
 from pathlib import Path
-from typing import Any, Dict, Optional, TypeVar, Union
+from typing import Any, Dict, List, Optional, TypeVar, Union
 
 import pydantic
 from pydantic import Extra, Field
+from typing_extensions import Literal
 
 from samtranslator.model.types import PassThrough
 
@@ -34,6 +35,10 @@ LenientBaseModel = pydantic.BaseModel
 
 _docdir = os.path.dirname(os.path.abspath(__file__))
 _DOCS = json.loads(Path(_docdir, "sam-docs.json").read_bytes())
+
+
+# Connector Permissions
+PermissionsType = List[Literal["Read", "Write"]]
 
 
 def get_prop(stem: str) -> Any:

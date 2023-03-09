@@ -76,3 +76,5 @@ class DataSource(Resource):
     Type: str
     ServiceRoleArn: str
     DynamoDBConfig: DynamoDBConfigType
+
+    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "DataSourceArn")}

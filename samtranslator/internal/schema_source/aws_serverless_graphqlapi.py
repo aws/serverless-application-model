@@ -2,7 +2,13 @@ from typing import Dict, Optional, Union
 
 from typing_extensions import Literal
 
-from samtranslator.internal.schema_source.common import BaseModel, DictStrAny, PassThroughProp, get_prop
+from samtranslator.internal.schema_source.common import (
+    BaseModel,
+    DictStrAny,
+    PassThroughProp,
+    PermissionsType,
+    get_prop,
+)
 
 properties = get_prop("sam-resource-graphqlapi")
 
@@ -25,9 +31,10 @@ class DeltaSync(BaseModel):
 
 
 class DynamoDBDataSource(BaseModel):
-    # TableArn, Permissions properties for connector
-    ServiceRoleArn: PassThroughProp  # TODO: make optional when we ship connector changes
     TableName: str
+    ServiceRoleArn: Optional[PassThroughProp]
+    TableArn: Optional[str]
+    Permissions: Optional[PermissionsType]
     Name: Optional[str]
     Description: Optional[PassThroughProp]
     Region: Optional[PassThroughProp]
