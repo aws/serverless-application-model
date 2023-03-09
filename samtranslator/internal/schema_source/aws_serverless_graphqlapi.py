@@ -49,7 +49,7 @@ class Runtime(BaseModel):
 
 
 # TODO: Add FileNamePatterns once we have resources that can test defaults
-class MappingConfig(BaseModel):
+class ResolverCodeSettings(BaseModel):
     PathToCode: str
     Runtime: Runtime
     ResolversFolder: Optional[str]
@@ -65,7 +65,7 @@ class Properties(BaseModel):
     SchemaUri: Optional[str]
     Logging: Optional[Union[Logging, bool]]
     DynamoDBDataSources: Optional[Dict[str, DynamoDBDataSource]]
-    MappingConfig: Optional[MappingConfig]
+    ResolverCodeSettings: Optional[ResolverCodeSettings]
 
 
 class Resource(BaseModel):

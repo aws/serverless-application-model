@@ -2235,32 +2235,6 @@
       "title": "MSKEventProperties",
       "type": "object"
     },
-    "MappingConfig": {
-      "additionalProperties": false,
-      "properties": {
-        "FunctionsFolder": {
-          "title": "Functionsfolder",
-          "type": "string"
-        },
-        "PathToCode": {
-          "title": "Pathtocode",
-          "type": "string"
-        },
-        "ResolversFolder": {
-          "title": "Resolversfolder",
-          "type": "string"
-        },
-        "Runtime": {
-          "$ref": "#/definitions/Runtime"
-        }
-      },
-      "required": [
-        "PathToCode",
-        "Runtime"
-      ],
-      "title": "MappingConfig",
-      "type": "object"
-    },
     "OAuth2Authorizer": {
       "additionalProperties": false,
       "properties": {
@@ -2390,6 +2364,32 @@
         }
       },
       "title": "RequestParameters",
+      "type": "object"
+    },
+    "ResolverCodeSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "FunctionsFolder": {
+          "title": "Functionsfolder",
+          "type": "string"
+        },
+        "PathToCode": {
+          "title": "Pathtocode",
+          "type": "string"
+        },
+        "ResolversFolder": {
+          "title": "Resolversfolder",
+          "type": "string"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        }
+      },
+      "required": [
+        "PathToCode",
+        "Runtime"
+      ],
+      "title": "ResolverCodeSettings",
       "type": "object"
     },
     "ResourceReference": {
@@ -5867,12 +5867,12 @@
           ],
           "title": "Logging"
         },
-        "MappingConfig": {
-          "$ref": "#/definitions/MappingConfig"
-        },
         "Name": {
           "title": "Name",
           "type": "string"
+        },
+        "ResolverCodeSettings": {
+          "$ref": "#/definitions/ResolverCodeSettings"
         },
         "SchemaInline": {
           "title": "Schemainline",
