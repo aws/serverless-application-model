@@ -2235,6 +2235,32 @@
       "title": "MSKEventProperties",
       "type": "object"
     },
+    "MappingConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "FunctionsFolder": {
+          "title": "Functionsfolder",
+          "type": "string"
+        },
+        "PathToCode": {
+          "title": "Pathtocode",
+          "type": "string"
+        },
+        "ResolversFolder": {
+          "title": "Resolversfolder",
+          "type": "string"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        }
+      },
+      "required": [
+        "PathToCode",
+        "Runtime"
+      ],
+      "title": "MappingConfig",
+      "type": "object"
+    },
     "OAuth2Authorizer": {
       "additionalProperties": false,
       "properties": {
@@ -2443,6 +2469,25 @@
         }
       },
       "title": "ResourceReference",
+      "type": "object"
+    },
+    "Runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "Version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Name",
+        "Version"
+      ],
+      "title": "Runtime",
       "type": "object"
     },
     "S3Event": {
@@ -5821,6 +5866,9 @@
             }
           ],
           "title": "Logging"
+        },
+        "MappingConfig": {
+          "$ref": "#/definitions/MappingConfig"
         },
         "Name": {
           "title": "Name",

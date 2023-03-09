@@ -2160,6 +2160,7 @@ class SamGraphQLApi(SamResourceMacro):
         "SchemaUri": Property(False, IS_STR),
         "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
         "DynamoDBDataSources": Property(False, IS_DICT),
+        "MappingConfig": Property(False, IS_DICT),
     }
 
     Auth: Dict[str, Any]
@@ -2170,6 +2171,7 @@ class SamGraphQLApi(SamResourceMacro):
     SchemaUri: Optional[str]
     Logging: Optional[Union[Dict[str, Any], bool]]
     DynamoDBDataSources: Optional[Dict[str, Dict[str, Any]]]
+    MappingConfig: Optional[Dict[str, Any]]
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
@@ -2186,6 +2188,9 @@ class SamGraphQLApi(SamResourceMacro):
         if model.DynamoDBDataSources:
             ddb_datasource_resources = self._construct_ddb_datasources(model.DynamoDBDataSources, api_id, kwargs)
             resources.extend(ddb_datasource_resources)
+
+        if model.MappingConfig:
+            self._set_mapping_config(model.MappingConfig)
 
         return resources
 
@@ -2392,3 +2397,9 @@ class SamGraphQLApi(SamResourceMacro):
             SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
         )
         return connector.to_cloudformation(**kwargs)
+
+
+    def _set_mapping_config(mapping_config: aws_serverless_graphqlapi.MappingConfig):
+        # TODO: Add FileNamePatterns defaults once implemented
+        mapping_config.FunctionsFolder = mapping_config.FunctionsFolder or "functions"
+        mapping_config.ResolversFolder = mapping_config.ResolversFolder or "resolvers"

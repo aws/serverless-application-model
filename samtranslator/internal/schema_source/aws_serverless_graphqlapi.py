@@ -48,6 +48,7 @@ class Runtime(BaseModel):
     Version: str
 
 
+# TODO: Add FileNamePatterns once we have resources that can test defaults
 class MappingConfig(BaseModel):
     PathToCode: str
     Runtime: Runtime
@@ -64,6 +65,7 @@ class Properties(BaseModel):
     SchemaUri: Optional[str]
     Logging: Optional[Union[Logging, bool]]
     DynamoDBDataSources: Optional[Dict[str, DynamoDBDataSource]]
+    MappingConfig: Optional[MappingConfig]
 
 
 class Resource(BaseModel):
