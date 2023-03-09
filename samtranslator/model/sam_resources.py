@@ -2399,7 +2399,7 @@ class SamGraphQLApi(SamResourceMacro):
         return connector.to_cloudformation(**kwargs)
 
     @staticmethod
-    def _set_resolver_code_settings(resolver_code_settings: aws_serverless_graphqlapi.ResolverCodeSettings):
+    def _set_resolver_code_settings(resolver_code_settings: aws_serverless_graphqlapi.ResolverCodeSettings) -> None:
         # TODO: Add FileNamePatterns defaults once implemented
         resolver_code_settings.FunctionsFolder = resolver_code_settings.FunctionsFolder or "functions"
         resolver_code_settings.ResolversFolder = resolver_code_settings.ResolversFolder or "resolvers"
