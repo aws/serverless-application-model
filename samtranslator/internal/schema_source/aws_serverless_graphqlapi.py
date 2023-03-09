@@ -48,7 +48,6 @@ class Runtime(BaseModel):
     Version: str
 
 
-# TODO: Add FileNamePatterns once we have resources that can test defaults
 class ResolverCodeSettings(BaseModel):
     PathToCode: str
     Runtime: Runtime
