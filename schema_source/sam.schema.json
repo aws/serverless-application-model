@@ -2369,12 +2369,12 @@
     "ResolverCodeSettings": {
       "additionalProperties": false,
       "properties": {
-        "FunctionsFolder": {
-          "title": "Functionsfolder",
+        "CodeRootPath": {
+          "title": "Coderootpath",
           "type": "string"
         },
-        "PathToCode": {
-          "title": "Pathtocode",
+        "FunctionsFolder": {
+          "title": "Functionsfolder",
           "type": "string"
         },
         "ResolversFolder": {
@@ -2386,7 +2386,7 @@
         }
       },
       "required": [
-        "PathToCode",
+        "CodeRootPath",
         "Runtime"
       ],
       "title": "ResolverCodeSettings",

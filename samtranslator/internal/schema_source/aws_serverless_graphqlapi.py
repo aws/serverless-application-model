@@ -49,7 +49,7 @@ class Runtime(BaseModel):
 
 
 class ResolverCodeSettings(BaseModel):
-    PathToCode: str
+    CodeRootPath: str
     Runtime: Runtime
     ResolversFolder: Optional[str]
     FunctionsFolder: Optional[str]
