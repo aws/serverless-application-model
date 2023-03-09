@@ -43,6 +43,18 @@ class DynamoDBDataSource(BaseModel):
     Versioned: Optional[PassThroughProp]
 
 
+class Runtime(BaseModel):
+    Name: str
+    Version: str
+
+
+class ResolverCodeSettings(BaseModel):
+    CodeRootPath: str
+    Runtime: Runtime
+    ResolversFolder: Optional[str]
+    FunctionsFolder: Optional[str]
+
+
 class Properties(BaseModel):
     Auth: Auth
     Tags: Optional[DictStrAny]
@@ -52,6 +64,7 @@ class Properties(BaseModel):
     SchemaUri: Optional[str]
     Logging: Optional[Union[Logging, bool]]
     DynamoDBDataSources: Optional[Dict[str, DynamoDBDataSource]]
+    ResolverCodeSettings: Optional[ResolverCodeSettings]
 
 
 class Resource(BaseModel):

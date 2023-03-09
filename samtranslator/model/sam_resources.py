@@ -2160,6 +2160,7 @@ class SamGraphQLApi(SamResourceMacro):
         "SchemaUri": Property(False, IS_STR),
         "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
         "DynamoDBDataSources": Property(False, IS_DICT),
+        "ResolverCodeSettings": Property(False, IS_DICT),
     }
 
     Auth: Dict[str, Any]
@@ -2170,6 +2171,7 @@ class SamGraphQLApi(SamResourceMacro):
     SchemaUri: Optional[str]
     Logging: Optional[Union[Dict[str, Any], bool]]
     DynamoDBDataSources: Optional[Dict[str, Dict[str, Any]]]
+    ResolverCodeSettings: Optional[Dict[str, Any]]
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
@@ -2186,6 +2188,9 @@ class SamGraphQLApi(SamResourceMacro):
         if model.DynamoDBDataSources:
             ddb_datasource_resources = self._construct_ddb_datasources(model.DynamoDBDataSources, api_id, kwargs)
             resources.extend(ddb_datasource_resources)
+
+        if model.ResolverCodeSettings:
+            self._set_resolver_code_settings(model.ResolverCodeSettings)
 
         return resources
 
@@ -2392,3 +2397,9 @@ class SamGraphQLApi(SamResourceMacro):
             SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
         )
         return connector.to_cloudformation(**kwargs)
+
+    @staticmethod
+    def _set_resolver_code_settings(resolver_code_settings: aws_serverless_graphqlapi.ResolverCodeSettings) -> None:
+        # TODO: Add FileNamePatterns defaults once implemented
+        resolver_code_settings.FunctionsFolder = resolver_code_settings.FunctionsFolder or "functions"
+        resolver_code_settings.ResolversFolder = resolver_code_settings.ResolversFolder or "resolvers"
