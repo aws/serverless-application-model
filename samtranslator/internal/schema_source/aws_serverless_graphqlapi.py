@@ -42,6 +42,20 @@ class DynamoDBDataSource(BaseModel):
     UseCallerCredentials: Optional[PassThroughProp]
     Versioned: Optional[PassThroughProp]
 
+class Runtime(BaseModel):
+    Name: str
+    Version: str
+
+class FileNamePatterns(BaseModel):
+    ResolverCode: Optional[str]
+    FunctionCode: Optional[str]
+class MappingConfig(BaseModel):
+    PathToCode: str
+    Runtime: Runtime
+    ResolversFolder: Optional[str]
+    FunctionsFolder: Optional[str]
+    FileNamePatterns: Optional[FileNamePatterns]
+    
 
 class Properties(BaseModel):
     Auth: Auth
