@@ -6,6 +6,7 @@ import os
 import shutil
 import subprocess
 import sys
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict
 
@@ -86,7 +87,8 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
     for partition, (region, output_path) in transform_test_output_paths.items():
         # Set Boto Session Region to guarantee the same hash input as transform tests for API deployment id
         ArnGenerator.BOTO_SESSION_REGION_NAME = region
-        output_fragment = transform(manifest, {}, ManagedPolicyLoader(iam_client))
+        # Implicit API Plugin may alter input template file, thus passing a copy here.
+        output_fragment = transform(deepcopy(manifest), {}, ManagedPolicyLoader(iam_client))
 
         if not CLI_OPTIONS.disable_api_configuration and partition != "aws":
             output_fragment = add_regional_endpoint_configuration_if_needed(output_fragment)
