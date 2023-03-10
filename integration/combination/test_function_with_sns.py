@@ -51,3 +51,4 @@ class TestFunctionWithSns(BaseTest):
         subscription_arn = subscription["SubscriptionArn"]
         subscription_attributes = sns_client.get_subscription_attributes(SubscriptionArn=subscription_arn)
         self.assertEqual(subscription_attributes["Attributes"]["FilterPolicy"], '{"price_usd":[{"numeric":["<",100]}]}')
+        self.assertEqual(subscription_attributes["Attributes"]["FilterPolicyScope"], "MessageAttributes")

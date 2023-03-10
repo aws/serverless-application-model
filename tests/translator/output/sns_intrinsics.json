@@ -73,6 +73,7 @@
             }
           ]
         },
+        "FilterPolicyScope": "MessageAttributes",
         "Protocol": "sqs",
         "Region": {
           "Ref": "SnsRegion"
