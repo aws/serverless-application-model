@@ -1,5 +1,6 @@
 import logging
 import time
+from pathlib import Path
 
 import boto3
 import botocore
@@ -17,11 +18,6 @@ from integration.helpers.resource import (
 )
 from integration.helpers.stack import Stack
 from integration.helpers.yaml_utils import load_yaml
-
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
 
 LOG = logging.getLogger(__name__)
 
