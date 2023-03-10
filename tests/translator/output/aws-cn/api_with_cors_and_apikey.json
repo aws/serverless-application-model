@@ -1,0 +1,305 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Outputs": {
+    "ApiUrl": {
+      "Description": "URL of your API endpoint",
+      "Value": {
+        "Fn::Sub": "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+      }
+    }
+  },
+  "Resources": {
+    "ApiGatewayLambdaRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "apigateway.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "lambda:InvokeFunction",
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "AllowInvokeLambdaFunctions"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "components": {
+            "securitySchemes": {
+              "api_key": {
+                "in": "header",
+                "name": "x-api-key",
+                "type": "apiKey"
+              }
+            }
+          },
+          "openapi": "3.0.1",
+          "paths": {
+            "/apione": {
+              "get": {
+                "security": [
+                  {
+                    "api_key": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::Sub": "${ApiGatewayLambdaRole.Arn}"
+                  },
+                  "httpMethod": "POST",
+                  "passthroughBehavior": "when_no_match",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }
+              },
+              "options": {
+                "responses": {
+                  "200": {
+                    "description": "Default response for CORS method",
+                    "headers": {
+                      "Access-Control-Allow-Headers": {
+                        "schema": {
+                          "schema": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "Access-Control-Allow-Methods": {
+                        "schema": {
+                          "schema": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "Access-Control-Allow-Origin": {
+                        "schema": {
+                          "schema": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "Access-Control-Max-Age": {
+                        "schema": {
+                          "schema": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "summary": "CORS support",
+                "x-amazon-apigateway-integration": {
+                  "requestTemplates": {
+                    "application/json": "{\n  \"statusCode\" : 200\n}\n"
+                  },
+                  "responses": {
+                    "default": {
+                      "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Headers": "'headers'",
+                        "method.response.header.Access-Control-Allow-Methods": "'methods'",
+                        "method.response.header.Access-Control-Allow-Origin": "'origins'",
+                        "method.response.header.Access-Control-Max-Age": "'600'"
+                      },
+                      "responseTemplates": {
+                        "application/json": "{}\n"
+                      },
+                      "statusCode": "200"
+                    }
+                  },
+                  "type": "mock"
+                }
+              }
+            },
+            "/apitwo": {
+              "get": {
+                "security": [
+                  {
+                    "api_key": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::Sub": "${ApiGatewayLambdaRole.Arn}"
+                  },
+                  "httpMethod": "POST",
+                  "passthroughBehavior": "when_no_match",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }
+              },
+              "options": {
+                "responses": {
+                  "200": {
+                    "description": "Default response for CORS method",
+                    "headers": {
+                      "Access-Control-Allow-Headers": {
+                        "schema": {
+                          "schema": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "Access-Control-Allow-Methods": {
+                        "schema": {
+                          "schema": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "Access-Control-Allow-Origin": {
+                        "schema": {
+                          "schema": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "Access-Control-Max-Age": {
+                        "schema": {
+                          "schema": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "summary": "CORS support",
+                "x-amazon-apigateway-integration": {
+                  "requestTemplates": {
+                    "application/json": "{\n  \"statusCode\" : 200\n}\n"
+                  },
+                  "responses": {
+                    "default": {
+                      "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Headers": "'headers'",
+                        "method.response.header.Access-Control-Allow-Methods": "'methods'",
+                        "method.response.header.Access-Control-Allow-Origin": "'origins'",
+                        "method.response.header.Access-Control-Max-Age": "'600'"
+                      },
+                      "responseTemplates": {
+                        "application/json": "{}\n"
+                      },
+                      "statusCode": "200"
+                    }
+                  },
+                  "type": "mock"
+                }
+              }
+            }
+          }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiDeployment996e54a322": {
+      "Properties": {
+        "Description": "RestApi deployment id: 996e54a3224f4396bddbafc7ca104cb3685eccdd",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApidevStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment996e54a322"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "dev"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async function (event) {\n  return {\n    statusCode: 200,\n    body: JSON.stringify({ message: \"Hello, SAM!\" }),\n  }\n}\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

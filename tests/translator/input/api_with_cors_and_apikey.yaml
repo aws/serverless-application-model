@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Globals:
+  Api:
+    Auth:
+      ApiKeyRequired: true
+      AddApiKeyRequiredToCorsPreflight: false
+
+Resources:
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = async function (event) {
+          return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Hello, SAM!" }),
+          }
+        }
+      Runtime: nodejs16.x
+
+  ApiGatewayLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal: {Service: apigateway.amazonaws.com}
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: AllowInvokeLambdaFunctions
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: lambda:InvokeFunction
+            Resource: '*'
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Cors:
+        AllowMethods: "'methods'"
+        AllowHeaders: "'headers'"
+        AllowOrigin: "'origins'"
+        MaxAge: "'600'"
+      Auth:
+        ApiKeyRequired: true
+      StageName: dev
+      DefinitionBody:
+        openapi: 3.0.1
+        paths:
+          /apione:
+            get:
+              x-amazon-apigateway-integration:
+                credentials:
+                  Fn::Sub: ${ApiGatewayLambdaRole.Arn}
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+          /apitwo:
+            get:
+              x-amazon-apigateway-integration:
+                credentials:
+                  Fn::Sub: ${ApiGatewayLambdaRole.Arn}
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+
+
+
+Outputs:
+  ApiUrl:
+    Description: URL of your API endpoint
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+Metadata:
+  SamTransformTest: true

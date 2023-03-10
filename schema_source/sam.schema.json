@@ -3015,6 +3015,10 @@
     "samtranslator__internal__schema_source__aws_serverless_api__Auth": {
       "additionalProperties": false,
       "properties": {
+        "AddApiKeyRequiredToCorsPreflight": {
+          "title": "Addapikeyrequiredtocorspreflight",
+          "type": "boolean"
+        },
         "AddDefaultAuthorizerToCorsPreflight": {
           "description": "If the `DefaultAuthorizer` and `Cors` properties are set, then setting `AddDefaultAuthorizerToCorsPreflight` will cause the default authorizer to be added to the `Options` property in the OpenAPI section\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: True  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "markdownDescription": "If the `DefaultAuthorizer` and `Cors` properties are set, then setting `AddDefaultAuthorizerToCorsPreflight` will cause the default authorizer to be added to the `Options` property in the OpenAPI section\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: True  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",

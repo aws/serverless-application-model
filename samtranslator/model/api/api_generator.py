@@ -52,12 +52,13 @@ AuthProperties = namedtuple(
         "DefaultAuthorizer",
         "InvokeRole",
         "AddDefaultAuthorizerToCorsPreflight",
+        "AddApiKeyRequiredToCorsPreflight",
         "ApiKeyRequired",
         "ResourcePolicy",
         "UsagePlan",
     ],
 )
-AuthProperties.__new__.__defaults__ = (None, None, None, True, None, None, None)
+AuthProperties.__new__.__defaults__ = (None, None, None, True, True, None, None, None)
 UsagePlanProperties = namedtuple(
     "UsagePlanProperties", ["CreateUsagePlan", "Description", "Quota", "Tags", "Throttle", "UsagePlanName"]
 )
@@ -752,7 +753,7 @@ class ApiGenerator:
 
         if auth_properties.ApiKeyRequired:
             swagger_editor.add_apikey_security_definition()
-            self._set_default_apikey_required(swagger_editor)
+            self._set_default_apikey_required(swagger_editor, auth_properties.AddApiKeyRequiredToCorsPreflight)
 
         if auth_properties.ResourcePolicy:
             SwaggerEditor.validate_is_dict(
@@ -1224,9 +1225,9 @@ class ApiGenerator:
                 add_default_auth_to_preflight=add_default_auth_to_preflight,
             )
 
-    def _set_default_apikey_required(self, swagger_editor: SwaggerEditor) -> None:
+    def _set_default_apikey_required(self, swagger_editor: SwaggerEditor, required_options_api_key: bool) -> None:
         for path in swagger_editor.iter_on_path():
-            swagger_editor.set_path_default_apikey_required(path)
+            swagger_editor.set_path_default_apikey_required(path, required_options_api_key)
 
     def _set_endpoint_configuration(self, rest_api: ApiGatewayRestApi, value: Union[str, Dict[str, Any]]) -> None:
         """
