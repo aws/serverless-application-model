@@ -28,25 +28,25 @@ Resources:
         Tag2: value2
       Auth:
         Authorizers:
-          LambdaAuthWithDisablePropertyFalse:
+          LambdaAuthWithEnablePropertyTrue:
             # should create permissions resource for this auth
             FunctionArn: !GetAtt MyAuthFn.Arn
-            DisableFunctionDefaultPermissions: false
+            EnableFunctionDefaultPermissions: true
             AuthorizerPayloadFormatVersion: 1.0
-          LambdaAuthNoDisableProperty:
+          LambdaAuthNoEnableProperty:
             # should not create permissions resource for this auth as http api doesn't create the resource by default
             FunctionArn: !GetAtt MyAuthFn.Arn
             AuthorizerPayloadFormatVersion: 1.0
-          LambdaAuthWithDisablePropertySetTrue:
+          LambdaAuthWithEnablePropertySetFalse:
             # should not create permissions resource for this auth
             FunctionArn: !GetAtt MyAuthFn.Arn
             AuthorizerPayloadFormatVersion: 1.0
-            DisableFunctionDefaultPermissions: true
+            EnableFunctionDefaultPermissions: false
           LambdaAuthFull:
             # should create permissions resource for this auth
             FunctionArn: !GetAtt MyAuthFn.Arn
             FunctionInvokeRole: !GetAtt MyAuthFnRole.Arn
-            DisableFunctionDefaultPermissions: false
+            EnableFunctionDefaultPermissions: true
             Identity:
               Context:
               - contextVar
@@ -59,4 +59,4 @@ Resources:
               ReauthorizeEvery: 60
             AuthorizerPayloadFormatVersion: 2.0
             EnableSimpleResponses: true
-        DefaultAuthorizer: LambdaAuthWithDisablePropertyFalse
+        DefaultAuthorizer: LambdaAuthWithEnablePropertyTrue

@@ -555,8 +555,8 @@ class HttpApiGenerator:
             # Http Api shouldn't create the permissions by default (when its none)
             if (
                 not authorizer.function_arn
-                or authorizer.disable_function_default_permissions is None
-                or authorizer.disable_function_default_permissions
+                or authorizer.enable_function_default_permissions is None
+                or not authorizer.enable_function_default_permissions
             ):
                 continue
 
@@ -638,7 +638,7 @@ class HttpApiGenerator:
                 identity=authorizer.get("Identity"),
                 authorizer_payload_format_version=authorizer.get("AuthorizerPayloadFormatVersion"),
                 enable_simple_responses=authorizer.get("EnableSimpleResponses"),
-                disable_function_default_permissions=authorizer.get("DisableFunctionDefaultPermissions"),
+                enable_function_default_permissions=authorizer.get("EnableFunctionDefaultPermissions"),
             )
         return authorizers
 

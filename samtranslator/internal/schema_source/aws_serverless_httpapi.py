@@ -47,7 +47,7 @@ class LambdaAuthorizer(BaseModel):
     EnableSimpleResponses: Optional[bool] = lambdaauthorizer("EnableSimpleResponses")
     FunctionArn: SamIntrinsicable[str] = lambdaauthorizer("FunctionArn")
     FunctionInvokeRole: Optional[SamIntrinsicable[str]] = lambdaauthorizer("FunctionInvokeRole")
-    DisableFunctionDefaultPermissions: Optional[bool]  # TODO: add docs
+    EnableFunctionDefaultPermissions: Optional[bool]  # TODO: add docs
     Identity: Optional[LambdaAuthorizerIdentity] = lambdaauthorizer("Identity")
 
 

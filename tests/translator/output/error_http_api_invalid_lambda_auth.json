@@ -7,7 +7,7 @@
     "Resource with id [MyApi2] is invalid. ",
     "LambdaAuth Lambda Authorizer must define 'FunctionArn'. ",
     "Resource with id [MyApi3] is invalid. ",
-    "Property 'Authorizers.LambdaAuth.DisableFunctionDefaultPermissions' should be a boolean."
+    "Property 'Authorizers.LambdaAuth.EnableFunctionDefaultPermissions' should be a boolean."
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 3. Resource with id [MyApi1] is invalid. LambdaAuth Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'. Resource with id [MyApi2] is invalid. LambdaAuth Lambda Authorizer must define 'FunctionArn'. Resource with id [MyApi3] is invalid. Property 'Authorizers.LambdaAuth.DisableFunctionDefaultPermissions' should be a boolean."
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 3. Resource with id [MyApi1] is invalid. LambdaAuth Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'. Resource with id [MyApi2] is invalid. LambdaAuth Lambda Authorizer must define 'FunctionArn'. Resource with id [MyApi3] is invalid. Property 'Authorizers.LambdaAuth.EnableFunctionDefaultPermissions' should be a boolean."
 }

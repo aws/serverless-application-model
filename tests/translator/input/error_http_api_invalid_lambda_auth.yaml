@@ -85,6 +85,6 @@ Resources:
         Authorizers:
           LambdaAuth:
             FunctionArn: !GetAtt MyAuthFn.Arn
-            DisableFunctionDefaultPermissions: foo
+            EnableFunctionDefaultPermissions: foo
             AuthorizerPayloadFormatVersion: 2.0
         DefaultAuthorizer: LambdaAuth
