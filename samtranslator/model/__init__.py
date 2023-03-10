@@ -3,12 +3,11 @@ import inspect
 import re
 from abc import ABC, ABCMeta, abstractmethod
 from contextlib import suppress
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidResourceException,
@@ -543,23 +542,6 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
                 "Please change the tag key in the "
                 "input.",
             )
-
-    def _resolve_string_parameter(
-        self,
-        intrinsics_resolver: IntrinsicsResolver,
-        parameter_value: Optional[Union[str, Dict[str, Any]]],
-        parameter_name: str,
-    ) -> Optional[Union[str, Dict[str, Any]]]:
-        if not parameter_value:
-            return parameter_value
-        value = intrinsics_resolver.resolve_parameter_refs(parameter_value)
-
-        if not isinstance(value, str) and not isinstance(value, dict):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Could not resolve parameter for '{}' or parameter is not a String.".format(parameter_name),
-            )
-        return value
 
 
 class ResourceTypeResolver:
