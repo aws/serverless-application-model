@@ -12,7 +12,7 @@ class SamParameterValues:
     Class representing SAM parameter values.
     """
 
-    def __init__(self, parameter_values: Dict[Any, Any]):
+    def __init__(self, parameter_values: Dict[Any, Any]) -> None:
         """
         Initialize the object given the parameter values as a dictionary
 

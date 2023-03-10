@@ -848,8 +848,8 @@
               "type": "array"
             }
           ],
-          "description": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "description": "The destination resource\\.  \n*Type*: [ ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html) \\| List of [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The destination resource\\.  \n*Type*: [ ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html) \\| List of [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "Destination"
         },
         "Permissions": {
@@ -1960,6 +1960,10 @@
           "markdownDescription": "The Amazon Resource Name \\(ARN\\) of the Amazon MQ broker\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventSourceArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-eventsourcearn) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "Broker"
         },
+        "DynamicPolicyName": {
+          "title": "Dynamicpolicyname",
+          "type": "boolean"
+        },
         "Enabled": {
           "allOf": [
             {
@@ -2465,6 +2469,9 @@
           "description": "The filter policy JSON assigned to the subscription\\. For more information, see [GetSubscriptionAttributes](https://docs.aws.amazon.com/sns/latest/api/API_GetSubscriptionAttributes.html) in the Amazon Simple Notification Service API Reference\\.  \n*Type*: [SnsFilterPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-subscription.html#cfn-sns-subscription-filterpolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FilterPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-subscription.html#cfn-sns-subscription-filterpolicy) property of an `AWS::SNS::Subscription` resource\\.",
           "markdownDescription": "The filter policy JSON assigned to the subscription\\. For more information, see [GetSubscriptionAttributes](https://docs.aws.amazon.com/sns/latest/api/API_GetSubscriptionAttributes.html) in the Amazon Simple Notification Service API Reference\\.  \n*Type*: [SnsFilterPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-subscription.html#cfn-sns-subscription-filterpolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FilterPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-subscription.html#cfn-sns-subscription-filterpolicy) property of an `AWS::SNS::Subscription` resource\\.",
           "title": "FilterPolicy"
+        },
+        "FilterPolicyScope": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Region": {
           "allOf": [
@@ -3233,6 +3240,10 @@
           "markdownDescription": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "AccessLogSetting"
         },
+        "AlwaysDeploy": {
+          "title": "Alwaysdeploy",
+          "type": "boolean"
+        },
         "Auth": {
           "allOf": [
             {
@@ -3418,6 +3429,10 @@
           "description": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
           "markdownDescription": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "AccessLogSetting"
+        },
+        "AlwaysDeploy": {
+          "title": "Alwaysdeploy",
+          "type": "boolean"
         },
         "ApiKeySourceType": {
           "allOf": [
@@ -4071,8 +4086,8 @@
               "type": "array"
             }
           ],
-          "description": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "The destination resource\\.  \n*Type*: [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "description": "The destination resource\\.  \n*Type*: [ ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html) \\| List of [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The destination resource\\.  \n*Type*: [ ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html) \\| List of [ResourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-resourcereference.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "Destination"
         },
         "Permissions": {

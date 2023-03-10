@@ -138,6 +138,7 @@ class SqsSubscription(BaseModel):
 
 class SNSEventProperties(BaseModel):
     FilterPolicy: Optional[PassThroughProp] = snseventproperties("FilterPolicy")
+    FilterPolicyScope: Optional[PassThroughProp]  # TODO: add documentation
     Region: Optional[PassThroughProp] = snseventproperties("Region")
     SqsSubscription: Optional[Union[bool, SqsSubscription]] = snseventproperties("SqsSubscription")
     Topic: PassThroughProp = snseventproperties("Topic")
@@ -405,6 +406,7 @@ class MSKEvent(BaseModel):
 class MQEventProperties(BaseModel):
     BatchSize: Optional[PassThroughProp] = mqeventproperties("BatchSize")
     Broker: PassThroughProp = mqeventproperties("Broker")
+    DynamicPolicyName: Optional[bool]  # TODO: add docs
     Enabled: Optional[PassThroughProp] = mqeventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = mqeventproperties("FilterCriteria")
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mqeventproperties("MaximumBatchingWindowInSeconds")
