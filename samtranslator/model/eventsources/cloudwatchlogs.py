@@ -45,7 +45,7 @@ class CloudWatchLogs(PushEventSource):
         partition = ArnGenerator.get_partition_name()
 
         return fnSub(
-            ArnGenerator.generate_arn(partition=partition, service="logs", resource=resource),  # type: ignore[no-untyped-call]
+            ArnGenerator.generate_arn(partition=partition, service="logs", resource=resource),
             {"__LogGroupName__": self.LogGroupName},
         )
 

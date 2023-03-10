@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, Type, Union
 
 import pydantic
 
-from schema_source import (
+from samtranslator.internal.schema_source import (
     any_cfn_resource,
     aws_serverless_api,
     aws_serverless_application,
@@ -18,7 +18,7 @@ from schema_source import (
     aws_serverless_simpletable,
     aws_serverless_statemachine,
 )
-from schema_source.common import BaseModel, LenientBaseModel
+from samtranslator.internal.schema_source.common import BaseModel, LenientBaseModel
 
 
 class Globals(BaseModel):
@@ -79,6 +79,23 @@ def json_dumps(obj: Any) -> str:
     return json.dumps(obj, indent=2, sort_keys=True) + "\n"
 
 
+def _add_embedded_connectors(schema: Dict[str, Any]) -> None:
+    """
+    Add embedded Connectors resource attribute to supported CloudFormation resources.
+    """
+    # We get the definition from an existing SAM resource
+    embedded_connector = schema["definitions"][
+        "samtranslator__internal__schema_source__aws_serverless_function__Resource"
+    ]["properties"]["Connectors"]
+
+    profiles = json.loads(Path("samtranslator/model/connector_profiles/profiles.json").read_text())
+
+    # Only add the resource attributes to resources that support it
+    source_resources = profiles["Permissions"].keys()
+    for resource in source_resources:
+        schema["definitions"][resource]["properties"]["Connectors"] = embedded_connector
+
+
 def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any]) -> None:
     """
     Add CloudFormation resources and template syntax to SAM schema.
@@ -104,6 +121,8 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
         if k in sam_defs:
             raise Exception(f"Key {k} already in SAM schema definitions")
         sam_defs[k] = cfn_defs[k]
+
+    _add_embedded_connectors(sam_schema)
 
     # The unified schema should include all supported properties
     sam_schema["additionalProperties"] = False

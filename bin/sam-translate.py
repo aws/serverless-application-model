@@ -106,7 +106,7 @@ def transform_template(input_file_path, output_file_path):  # type: ignore[no-un
         sam_template = yaml_parse(f)  # type: ignore[no-untyped-call]
 
     try:
-        cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))  # type: ignore[no-untyped-call]
+        cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))
         cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=1)
 
         with open(output_file_path, "w") as f:

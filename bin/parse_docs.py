@@ -89,10 +89,10 @@ def main() -> None:
         if args.cfn and not re.match(r"^\w+::\w+::\w+( \w+)?$", title):
             continue
         page = title if args.cfn else path.stem
-        for name, description in parse(text):
+        for name, raw_description in parse(text):
             if page not in props:
                 props[page] = {}
-            description = remove_first_line(description)  # Remove property name; already in the schema title
+            description = remove_first_line(raw_description)  # Remove property name; already in the schema title
             description = fix_markdown_code_link(description)
             prefix = (
                 "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/"

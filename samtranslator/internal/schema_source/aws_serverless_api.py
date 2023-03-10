@@ -4,8 +4,8 @@ from typing import Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
-from schema_source.aws_serverless_connector import EmbeddedConnector
-from schema_source.common import (
+from samtranslator.internal.schema_source.aws_serverless_connector import EmbeddedConnector
+from samtranslator.internal.schema_source.common import (
     BaseModel,
     DictStrAny,
     PassThroughProp,
@@ -77,6 +77,7 @@ class LambdaTokenAuthorizer(BaseModel):
     FunctionInvokeRole: Optional[str] = lambdatokenauthorizer("FunctionInvokeRole")
     FunctionPayloadType: Optional[Literal["TOKEN"]] = lambdatokenauthorizer("FunctionPayloadType")
     Identity: Optional[LambdaTokenAuthorizerIdentity] = lambdatokenauthorizer("Identity")
+    DisableFunctionDefaultPermissions: Optional[bool]  # TODO Add docs
 
 
 class LambdaRequestAuthorizer(BaseModel):
@@ -85,6 +86,7 @@ class LambdaRequestAuthorizer(BaseModel):
     FunctionInvokeRole: Optional[str] = lambdarequestauthorizer("FunctionInvokeRole")
     FunctionPayloadType: Optional[Literal["REQUEST"]] = lambdarequestauthorizer("FunctionPayloadType")
     Identity: Optional[LambdaRequestAuthorizerIdentity] = lambdarequestauthorizer("Identity")
+    DisableFunctionDefaultPermissions: Optional[bool]  # TODO Add docs
 
 
 class UsagePlan(BaseModel):
@@ -156,6 +158,7 @@ class EndpointConfiguration(BaseModel):
 
 Name = Optional[PassThroughProp]
 DefinitionUriType = Optional[Union[str, DefinitionUri]]
+MergeDefinitions = Optional[bool]
 CacheClusterEnabled = Optional[PassThroughProp]
 CacheClusterSize = Optional[PassThroughProp]
 Variables = Optional[PassThroughProp]
@@ -182,6 +185,7 @@ class Properties(BaseModel):
     Cors: Optional[CorsType] = properties("Cors")
     DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
     DefinitionUri: Optional[DefinitionUriType] = properties("DefinitionUri")
+    MergeDefinitions: Optional[MergeDefinitions]  # TODO: update docs when live
     Description: Optional[PassThroughProp] = properties("Description")
     DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
     Domain: Optional[Domain] = properties("Domain")
@@ -206,6 +210,7 @@ class Globals(BaseModel):
     DefinitionUri: Optional[PassThroughProp] = properties("DefinitionUri")
     CacheClusterEnabled: Optional[CacheClusterEnabled] = properties("CacheClusterEnabled")
     CacheClusterSize: Optional[CacheClusterSize] = properties("CacheClusterSize")
+    MergeDefinitions: Optional[MergeDefinitions]  # TODO: update docs when live
     Variables: Optional[Variables] = properties("Variables")
     EndpointConfiguration: Optional[PassThroughProp] = properties("EndpointConfiguration")
     MethodSettings: Optional[MethodSettings] = properties("MethodSettings")

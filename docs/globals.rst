@@ -81,6 +81,7 @@ Currently, the following resources and properties are being supported:
       Auth:
       Name:
       DefinitionUri:
+      MergeDefinitions:
       CacheClusterEnabled:
       CacheClusterSize:
       Variables:

@@ -1,6 +1,6 @@
 import pydantic
 
-from schema_source.common import LenientBaseModel
+from samtranslator.internal.schema_source.common import LenientBaseModel
 
 constr = pydantic.constr
 

@@ -32,8 +32,8 @@ DictStrAny = Dict[str, Any]
 
 LenientBaseModel = pydantic.BaseModel
 
-_thisdir = os.path.dirname(os.path.abspath(__file__))
-_DOCS = json.loads(Path(_thisdir, "docs.json").read_bytes())
+_docdir = os.path.dirname(os.path.abspath(__file__))
+_DOCS = json.loads(Path(_docdir, "sam-docs.json").read_bytes())
 
 
 def get_prop(stem: str) -> Any:
@@ -54,6 +54,14 @@ def _get_prop(stem: str, name: str) -> Any:
 class BaseModel(LenientBaseModel):
     class Config:
         extra = Extra.forbid
+
+    def __getattribute__(self, __name: str) -> Any:
+        """Overloading get attribute operation to allow access PassThroughProp without using __root__"""
+        attr_value = super().__getattribute__(__name)
+        if isinstance(attr_value, PassThroughProp):
+            # See docstring of PassThroughProp
+            return attr_value.__root__
+        return attr_value
 
 
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html

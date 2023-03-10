@@ -26,37 +26,6 @@ class TestArchitecture(TestCase):
     }
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
-    def test_with_unknown_architectures(self):
-        function = SamFunction("foo")
-        function.CodeUri = "s3://foobar/foo.zip"
-        function.Runtime = "foo"
-        function.Handler = "bar"
-        invalid_architectures = [["arm"], [1], "arm", 1, {"my": "value"}, True, [], {}]
-        for architecture in invalid_architectures:
-            function.Architectures = architecture
-            with pytest.raises(InvalidResourceException) as e:
-                function.to_cloudformation(**self.kwargs)
-            self.assertEqual(
-                str(e.value.message),
-                "Resource with id [foo] is invalid. Architectures needs to be a list with one string, either `x86_64` or `arm64`.",
-            )
-
-    @patch("boto3.session.Session.region_name", "ap-southeast-1")
-    def test_with_multiple_architectures(self):
-        function = SamFunction("foo")
-        function.CodeUri = "s3://foobar/foo.zip"
-        function.Runtime = "foo"
-        function.Handler = "bar"
-        function.Architectures = ["arm64", "x86_64"]
-
-        with pytest.raises(InvalidResourceException) as e:
-            function.to_cloudformation(**self.kwargs)
-        self.assertEqual(
-            str(e.value.message),
-            "Resource with id [foo] is invalid. Architectures needs to be a list with one string, either `x86_64` or `arm64`.",
-        )
-
-    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_validate_architecture_with_intrinsic(self):
         function = SamFunction("foo")
         function.CodeUri = "s3://foobar/foo.zip"

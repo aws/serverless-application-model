@@ -23,7 +23,7 @@ class MetricsMethodWrapperSingleton:
     This singleton will be alive until lambda receives shutdown event
     """
 
-    _DUMMY_INSTANCE = Metrics("ServerlessTransform", DummyMetricsPublisher())  # type: ignore[no-untyped-call, no-untyped-call]
+    _DUMMY_INSTANCE = Metrics("ServerlessTransform", DummyMetricsPublisher())
     _METRICS_INSTANCE = _DUMMY_INSTANCE
 
     @staticmethod

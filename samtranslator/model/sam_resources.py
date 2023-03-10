@@ -10,6 +10,7 @@ import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
+from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
@@ -96,17 +97,17 @@ class SamFunction(SamResourceMacro):
     resource_type = "AWS::Serverless::Function"
     property_types = {
         "FunctionName": PropertyType(False, one_of(IS_STR, IS_DICT)),
-        "Handler": PropertyType(False, IS_STR),
-        "Runtime": PropertyType(False, IS_STR),
-        "CodeUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
-        "ImageUri": PropertyType(False, IS_STR),
-        "PackageType": PropertyType(False, IS_STR),
-        "InlineCode": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "Handler": PassThroughProperty(False),
+        "Runtime": PassThroughProperty(False),
+        "CodeUri": PassThroughProperty(False),
+        "ImageUri": PassThroughProperty(False),
+        "PackageType": PassThroughProperty(False),
+        "InlineCode": PassThroughProperty(False),
         "DeadLetterQueue": PropertyType(False, IS_DICT),
-        "Description": PropertyType(False, IS_STR),
-        "MemorySize": PropertyType(False, is_type(int)),
-        "Timeout": PropertyType(False, is_type(int)),
-        "VpcConfig": PropertyType(False, IS_DICT),
+        "Description": PassThroughProperty(False),
+        "MemorySize": PassThroughProperty(False),
+        "Timeout": PassThroughProperty(False),
+        "VpcConfig": PassThroughProperty(False),
         "Role": PropertyType(False, IS_STR),
         "AssumeRolePolicyDocument": PropertyType(False, IS_DICT),
         "Policies": PropertyType(False, one_of(IS_STR, IS_DICT, list_of(one_of(IS_STR, IS_DICT)))),
@@ -116,25 +117,25 @@ class SamFunction(SamResourceMacro):
         "Events": PropertyType(False, dict_of(IS_STR, IS_DICT)),
         "Tags": PropertyType(False, IS_DICT),
         "Tracing": PropertyType(False, one_of(IS_DICT, IS_STR)),
-        "KmsKeyArn": PropertyType(False, one_of(IS_DICT, IS_STR)),
+        "KmsKeyArn": PassThroughProperty(False),
         "DeploymentPreference": PropertyType(False, IS_DICT),
-        "ReservedConcurrentExecutions": PropertyType(False, any_type()),
+        "ReservedConcurrentExecutions": PassThroughProperty(False),
         "Layers": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
         "EventInvokeConfig": PropertyType(False, IS_DICT),
-        "EphemeralStorage": PropertyType(False, IS_DICT),
+        "EphemeralStorage": PassThroughProperty(False),
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(IS_STR)),
         "AutoPublishCodeSha256": PropertyType(False, one_of(IS_STR)),
         "AutoPublishAliasAllProperties": Property(False, is_type(bool)),
-        "VersionDescription": PropertyType(False, IS_STR),
-        "ProvisionedConcurrencyConfig": PropertyType(False, IS_DICT),
-        "FileSystemConfigs": PropertyType(False, list_of(IS_DICT)),
-        "ImageConfig": PropertyType(False, IS_DICT),
-        "CodeSigningConfigArn": PropertyType(False, IS_STR),
-        "Architectures": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
+        "VersionDescription": PassThroughProperty(False),
+        "ProvisionedConcurrencyConfig": PassThroughProperty(False),
+        "FileSystemConfigs": PassThroughProperty(False),
+        "ImageConfig": PassThroughProperty(False),
+        "CodeSigningConfigArn": PassThroughProperty(False),
+        "Architectures": PassThroughProperty(False),
         "SnapStart": PropertyType(False, IS_DICT),
         "FunctionUrlConfig": PropertyType(False, IS_DICT),
-        "RuntimeManagementConfig": PropertyType(False, IS_DICT),
+        "RuntimeManagementConfig": PassThroughProperty(False),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -277,12 +278,15 @@ class SamFunction(SamResourceMacro):
             resources.extend(event_invoke_resources)
 
         managed_policy_map = kwargs.get("managed_policy_map", {})
-        if not managed_policy_map:
-            raise Exception("Managed policy map is empty, but should not be.")
+        get_managed_policy_map = kwargs.get("get_managed_policy_map")
 
         execution_role = None
         if lambda_function.Role is None:
-            execution_role = self._construct_role(managed_policy_map, event_invoke_policies)
+            execution_role = self._construct_role(
+                managed_policy_map,
+                event_invoke_policies,
+                get_managed_policy_map,
+            )
             lambda_function.Role = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
 
@@ -540,7 +544,6 @@ class SamFunction(SamResourceMacro):
 
         lambda_function.RuntimeManagementConfig = self.RuntimeManagementConfig  # type: ignore[attr-defined]
         self._validate_package_type(lambda_function)
-        self._validate_architectures(lambda_function)
         return lambda_function
 
     def _add_event_invoke_managed_policy(
@@ -560,7 +563,10 @@ class SamFunction(SamResourceMacro):
         return {}
 
     def _construct_role(
-        self, managed_policy_map: Dict[str, Any], event_invoke_policies: List[Dict[str, Any]]
+        self,
+        managed_policy_map: Dict[str, Any],
+        event_invoke_policies: List[Dict[str, Any]],
+        get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
     ) -> IAMRole:
         """Constructs a Lambda execution role based on this SAM function's Policies property.
 
@@ -613,6 +619,7 @@ class SamFunction(SamResourceMacro):
             role_path=self.RolePath,
             permissions_boundary=self.PermissionsBoundary,
             tags=self._construct_tag_list(self.Tags),
+            get_managed_policy_map=get_managed_policy_map,
         )
 
     def _validate_package_type(self, lambda_function: LambdaFunction) -> None:
@@ -658,36 +665,6 @@ class SamFunction(SamResourceMacro):
 
         # Call appropriate validation function based on the package type.
         return _validate_per_package_type[packagetype]()
-
-    def _validate_architectures(self, lambda_function: LambdaFunction) -> None:
-        """
-        Validates Function based on the existence of architecture type
-
-        parameters
-        ----------
-        lambda_function: LambdaFunction
-            Object of function properties supported on AWS Lambda
-
-        Raises
-        ------
-        InvalidResourceException
-            Raised when the Architectures property is invalid
-        """
-
-        architectures = [X86_64] if lambda_function.Architectures is None else lambda_function.Architectures
-
-        if is_intrinsic(architectures):
-            return
-
-        if (
-            not isinstance(architectures, list)
-            or len(architectures) != 1
-            or (not is_intrinsic(architectures[0]) and (architectures[0] not in [X86_64, ARM64]))
-        ):
-            raise InvalidResourceException(
-                lambda_function.logical_id,
-                "Architectures needs to be a list with one string, either `{}` or `{}`.".format(X86_64, ARM64),
-            )
 
     def _validate_dlq(self, dead_letter_queue: Dict[str, Any]) -> None:
         """Validates whether the DeadLetterQueue LogicalId is validation
@@ -1170,6 +1147,7 @@ class SamApi(SamResourceMacro):
         "Tags": PropertyType(False, IS_DICT),
         "DefinitionBody": PropertyType(False, IS_DICT),
         "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "MergeDefinitions": Property(False, is_type(bool)),
         "CacheClusterEnabled": PropertyType(False, is_type(bool)),
         "CacheClusterSize": PropertyType(False, IS_STR),
         "Variables": PropertyType(False, IS_DICT),
@@ -1198,6 +1176,7 @@ class SamApi(SamResourceMacro):
     Tags: Optional[Dict[str, Any]]
     DefinitionBody: Optional[Dict[str, Any]]
     DefinitionUri: Optional[Intrinsicable[str]]
+    MergeDefinitions: Optional[bool]
     CacheClusterEnabled: Optional[Intrinsicable[bool]]
     CacheClusterSize: Optional[Intrinsicable[str]]
     Variables: Optional[Dict[str, Any]]
@@ -1263,6 +1242,7 @@ class SamApi(SamResourceMacro):
             template_conditions,
             tags=self.Tags,
             endpoint_configuration=self.EndpointConfiguration,
+            merge_definitions=self.MergeDefinitions,
             method_settings=self.MethodSettings,
             binary_media=self.BinaryMediaTypes,
             minimum_compression_size=self.MinimumCompressionSize,
@@ -1755,6 +1735,7 @@ class SamStateMachine(SamResourceMacro):
     @cw_timer
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
         managed_policy_map = kwargs.get("managed_policy_map", {})
+        get_managed_policy_map = kwargs.get("get_managed_policy_map")
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         event_resources = kwargs["event_resources"]
 
@@ -1780,6 +1761,7 @@ class SamStateMachine(SamResourceMacro):
             tags=self.Tags,
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+            get_managed_policy_map=get_managed_policy_map,
         )
 
         return state_machine_generator.to_cloudformation()
