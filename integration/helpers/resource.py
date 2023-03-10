@@ -2,7 +2,7 @@ import json
 import random
 import re
 import string  # pylint: disable=deprecated-module
-from typing import Any, Callable, Dict, Iterator, List, Set
+from typing import Any, Callable, Dict, Iterator, Set
 
 from integration.config.service_names import (
     APP_SYNC,
