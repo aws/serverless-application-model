@@ -2,7 +2,7 @@ import json
 import random
 import re
 import string  # pylint: disable=deprecated-module
-from typing import Any, Callable, Dict, Set
+from typing import Any, Callable, Dict, Iterator, Set
 
 from integration.config.service_names import (
     APP_SYNC,
@@ -12,6 +12,7 @@ from integration.config.service_names import (
     REST_API,
     S3_EVENTS,
     SCHEDULE_EVENT,
+    SNS_FILTER_POLICY_SCOPE,
     SQS,
     STATE_MACHINE_INLINE_DEFINITION,
 )
@@ -210,6 +211,17 @@ def _resource_using_s3_events(resource: Dict[str, Any]) -> bool:
     return resource_type == "AWS::S3::Bucket" and properties.get("NotificationConfiguration")
 
 
+def _get_all_event_sources(template_dict: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
+    resources = template_dict.get("Resources", {}).values()
+    for resource in resources:
+        for event in resource.get("Properties", {}).get("Events", {}).values():
+            yield event
+
+
+def _event_using_sns_filter_policy_scope(event: Dict[str, Any]) -> bool:
+    return event["Type"] == "SNS" and "FilterPolicyScope" in event.get("Properties", {})
+
+
 SERVICE_DETECTORS: Dict[str, Callable[[Dict[str, Any], Set[str]], bool]] = {
     HTTP_API: lambda template_dict, cfn_resource_types: "AWS::ApiGatewayV2::Api" in cfn_resource_types,
     REST_API: lambda template_dict, cfn_resource_types: "AWS::ApiGateway::RestApi" in cfn_resource_types,
@@ -225,6 +237,9 @@ SERVICE_DETECTORS: Dict[str, Callable[[Dict[str, Any], Set[str]], bool]] = {
     ),
     LOCATION: lambda template_dict, cfn_resource_types: "AWS::Location::PlaceIndex" in cfn_resource_types,
     APP_SYNC: lambda template_dict, cfn_resource_types: "AWS::AppSync::GraphQLApi" in cfn_resource_types,
+    SNS_FILTER_POLICY_SCOPE: lambda template_dict, cfn_resource_types: any(
+        _event_using_sns_filter_policy_scope(event) for event in _get_all_event_sources(template_dict)
+    ),
 }
 
 
