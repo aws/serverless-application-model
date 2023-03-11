@@ -85,7 +85,7 @@ class TestApiWithAuthorizerApiKey(BaseTest):
         status = response.status_code
         if status != expected_status_code:
             raise StatusCodeError(
-                "Request to {} failed with status: {}, expected status: {}".format(url, status, expected_status_code)
+                f"Request to {url} failed with status: {status}, expected status: {expected_status_code}"
             )
 
         if not header_key or not header_value:

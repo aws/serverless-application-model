@@ -296,7 +296,7 @@ class TestDeploymentPreferenceCollection(TestCase):
             deployment_preference_collection.deployment_group(self.function_logical_id)
         self.assertEqual(
             e.exception.message,
-            "Resource with id [{}] is invalid. Alarms must be a list".format(self.function_logical_id),
+            f"Resource with id [{self.function_logical_id}] is invalid. Alarms must be a list",
         )
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -311,7 +311,7 @@ class TestDeploymentPreferenceCollection(TestCase):
             deployment_preference_collection.deployment_group(self.function_logical_id)
         self.assertEqual(
             e.exception.message,
-            "Resource with id [{}] is invalid. Fn::If requires 3 arguments".format(self.function_logical_id),
+            f"Resource with id [{self.function_logical_id}] is invalid. Fn::If requires 3 arguments",
         )
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -326,7 +326,7 @@ class TestDeploymentPreferenceCollection(TestCase):
             deployment_preference_collection.deployment_group(self.function_logical_id)
         self.assertEqual(
             e.exception.message,
-            "Resource with id [{}] is invalid. Fn::If requires 3 arguments".format(self.function_logical_id),
+            f"Resource with id [{self.function_logical_id}] is invalid. Fn::If requires 3 arguments",
         )
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")

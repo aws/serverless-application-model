@@ -360,9 +360,7 @@ class Resource(ABC):
             # If the property value has not been set, verify that the property is not required.
             if value is None:
                 if property_type.required:
-                    raise InvalidResourceException(
-                        self.logical_id, "Missing required property '{property_name}'.".format(property_name=name)
-                    )
+                    raise InvalidResourceException(self.logical_id, f"Missing required property '{name}'.")
             # Otherwise, validate the value of the property.
             elif not property_type.validate(value, should_raise=False):
                 raise InvalidResourcePropertyTypeException(self.logical_id, name, property_type.expected_type)
@@ -614,7 +612,7 @@ class ResourceResolver:
         :param resources: Dictionary of the resource from the SAM template
         """
         if not isinstance(_input, str):
-            raise TypeError("Invalid logical ID '{}'. Expected a string.".format(_input))
+            raise TypeError(f"Invalid logical ID '{_input}'. Expected a string.")
 
         return self.resources.get(_input, None)
 

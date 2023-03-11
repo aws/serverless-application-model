@@ -130,11 +130,7 @@ class SwaggerEditor(BaseEditor):
         method = self._normalize_method_name(method)
         if self.has_integration(path, method):
             raise InvalidDocumentException(
-                [
-                    InvalidTemplateException(
-                        "Lambda integration already exists on Path={}, Method={}".format(path, method)
-                    )
-                ]
+                [InvalidTemplateException(f"Lambda integration already exists on Path={path}, Method={method}")]
             )
 
         self.add_path(path, method)
@@ -198,7 +194,7 @@ class SwaggerEditor(BaseEditor):
         method = self._normalize_method_name(method)
         if self.has_integration(path, method):
             raise InvalidDocumentException(
-                [InvalidTemplateException("Integration already exists on Path={}, Method={}".format(path, method))]
+                [InvalidTemplateException(f"Integration already exists on Path={path}, Method={method}")]
             )
 
         self.add_path(path, method)
@@ -313,7 +309,7 @@ class SwaggerEditor(BaseEditor):
                 allowed_methods = self._make_cors_allowed_methods_for_path_item(path_item)
 
                 # APIGW expects the value to be a "string expression". Hence wrap in another quote. Ex: "'GET,POST,DELETE'"
-                allowed_methods = "'{}'".format(allowed_methods)
+                allowed_methods = f"'{allowed_methods}'"
 
             if allow_credentials is not True:
                 allow_credentials = False
@@ -837,7 +833,7 @@ class SwaggerEditor(BaseEditor):
                 parameter = Py27Dict()
                 parameter["in"] = "body"
                 parameter["name"] = model_name
-                parameter["schema"] = {"$ref": "#/definitions/{}".format(model_name)}
+                parameter["schema"] = {"$ref": f"#/definitions/{model_name}"}
 
                 if model_required is not None:
                     parameter["required"] = model_required
@@ -850,7 +846,7 @@ class SwaggerEditor(BaseEditor):
                 SwaggerEditor._OPENAPI_VERSION_3_REGEX, self._doc["openapi"]
             ):
                 method_definition["requestBody"] = {
-                    "content": {"application/json": {"schema": {"$ref": "#/components/schemas/{}".format(model_name)}}}
+                    "content": {"application/json": {"schema": {"$ref": f"#/components/schemas/{model_name}"}}}
                 }
 
                 if model_required is not None:
@@ -981,7 +977,7 @@ class SwaggerEditor(BaseEditor):
 
         if not isinstance(policy_list, (dict, list)):
             raise InvalidDocumentException(
-                [InvalidTemplateException("Type of '{}' must be a list or dictionary".format(policy_list))]
+                [InvalidTemplateException(f"Type of '{policy_list}' must be a list or dictionary")]
             )
 
         if not isinstance(policy_list, list):

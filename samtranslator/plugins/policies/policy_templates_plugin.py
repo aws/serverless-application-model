@@ -100,7 +100,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
             raise InvalidResourceException(logical_id, str(ex)) from ex
         except InvalidParameterValues as ex:
             raise InvalidResourceException(
-                logical_id, "Must specify valid parameter values for policy template '{}'".format(template_name)
+                logical_id, f"Must specify valid parameter values for policy template '{template_name}'"
             ) from ex
 
     def _is_supported(self, resource_type):  # type: ignore[no-untyped-def]

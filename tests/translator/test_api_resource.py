@@ -122,7 +122,7 @@ class TestApiGatewayDeploymentResource(TestCase):
         deployment.make_auto_deployable(stage, swagger=swagger)
 
         self.assertEqual(deployment.logical_id, id_val)
-        self.assertEqual(deployment.Description, "RestApi deployment id: {}".format(full_hash))
+        self.assertEqual(deployment.Description, f"RestApi deployment id: {full_hash}")
 
         LogicalIdGeneratorMock.assert_called_once_with(prefix, str(swagger))
         generator_mock.gen.assert_called_once_with()

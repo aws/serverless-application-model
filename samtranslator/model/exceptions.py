@@ -94,7 +94,7 @@ class InvalidTemplateException(ExceptionWithMessage):
 
     @property
     def message(self) -> str:
-        return "Structure of the SAM template is invalid. {}".format(self._message)
+        return f"Structure of the SAM template is invalid. {self._message}"
 
 
 class InvalidResourceException(ExceptionWithMessage):
@@ -116,7 +116,7 @@ class InvalidResourceException(ExceptionWithMessage):
 
     @property
     def message(self) -> str:
-        return "Resource with id [{}] is invalid. {}".format(self._logical_id, self._message)
+        return f"Resource with id [{self._logical_id}] is invalid. {self._message}"
 
     @property
     def metadata(self) -> Optional[Dict[str, Any]]:
@@ -179,7 +179,7 @@ class InvalidEventException(ExceptionWithMessage):
 
     @property
     def message(self) -> str:
-        return "Event with id [{}] is invalid. {}".format(self._event_id, self._message)
+        return f"Event with id [{self._event_id}] is invalid. {self._message}"
 
 
 def prepend(exception, message, end=": "):  # type: ignore[no-untyped-def]
