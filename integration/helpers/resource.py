@@ -1,8 +1,13 @@
 import json
 import random
 import re
-import string  # pylint: disable=deprecated-module
+import string
+from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Set
+
+import boto3
+from botocore.exceptions import NoRegionError
+from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 
 from integration.config.service_names import (
     APP_SYNC,
@@ -17,15 +22,6 @@ from integration.config.service_names import (
     STATE_MACHINE_INLINE_DEFINITION,
 )
 from integration.helpers.yaml_utils import load_yaml
-
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
-
-import boto3
-from botocore.exceptions import NoRegionError
-from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 
 # Length of the random suffix added at the end of the resources we create
 # to avoid collisions between tests

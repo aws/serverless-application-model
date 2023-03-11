@@ -2,7 +2,10 @@ import json
 import logging
 import os
 import shutil
+from pathlib import Path
+from unittest.case import TestCase
 
+import boto3
 import botocore
 import pytest
 import requests
@@ -20,6 +23,7 @@ from tenacity import (
 
 from integration.config.logger_configurations import LoggingConfiguration
 from integration.helpers.client_provider import ClientProvider
+from integration.helpers.deployer.deployer import Deployer
 from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.exception import StatusCodeError
@@ -32,18 +36,8 @@ from integration.helpers.resource import (
     verify_stack_resources,
 )
 from integration.helpers.s3_uploader import S3Uploader
-from integration.helpers.yaml_utils import dump_yaml, load_yaml
-
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
-from unittest.case import TestCase
-
-import boto3
-
-from integration.helpers.deployer.deployer import Deployer
 from integration.helpers.template import transform_template
+from integration.helpers.yaml_utils import dump_yaml, load_yaml
 
 LOG = logging.getLogger(__name__)
 
