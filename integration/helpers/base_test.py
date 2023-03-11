@@ -416,7 +416,7 @@ class BaseTest(TestCase):
             data = f.read()
         for key, _ in self.code_key_to_file.items():
             # We must double the {} to escape them so they will survive a round of unescape
-            data = data.replace("${{{}}}".format(key), self.get_code_key_s3_uri(key))
+            data = data.replace(f"${{{key}}}", self.get_code_key_s3_uri(key))
         yaml_doc = yaml_parse(data)
 
         dump_yaml(updated_template_path, yaml_doc)

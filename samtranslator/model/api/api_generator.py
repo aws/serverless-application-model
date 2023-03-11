@@ -797,7 +797,7 @@ class ApiGenerator:
             raise InvalidResourceException(self.logical_id, "'CreateUsagePlan' is a required field for UsagePlan.")
         if create_usage_plan not in create_usage_plans_accepted_values:
             raise InvalidResourceException(
-                self.logical_id, "'CreateUsagePlan' accepts one of {}.".format(create_usage_plans_accepted_values)
+                self.logical_id, f"'CreateUsagePlan' accepts one of {create_usage_plans_accepted_values}."
             )
 
         if create_usage_plan == "NONE":

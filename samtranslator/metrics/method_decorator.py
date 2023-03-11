@@ -63,7 +63,7 @@ def _get_metric_name(prefix, name, func, args):  # type: ignore[no-untyped-def]
         metric_name = func.__name__
 
     if prefix:
-        return "{}-{}".format(prefix, metric_name)
+        return f"{prefix}-{metric_name}"
 
     return metric_name
 
