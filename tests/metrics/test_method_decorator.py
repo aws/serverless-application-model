@@ -37,7 +37,7 @@ class TestMetricsMethodDecoratorMetricName(TestCase):
         given_metric_name = "MetricName"
         given_prefix = "Prefix"
         metric_name = _get_metric_name(given_prefix, given_metric_name, None, [])
-        self.assertEqual(metric_name, "{}-{}".format(given_prefix, given_metric_name))
+        self.assertEqual(metric_name, f"{given_prefix}-{given_metric_name}")
 
     def test_get_metric_name_with_function(self):
         def my_function():

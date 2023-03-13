@@ -53,13 +53,13 @@ def pprint_column_names(format_string, format_kwargs, margin=None, table_header=
 
         total_args = len(format_kwargs)
         if not total_args:
-            raise ValueError("Number of arguments supplied should be > 0 , format_kwargs: {}".format(format_kwargs))
+            raise ValueError(f"Number of arguments supplied should be > 0 , format_kwargs: {format_kwargs}")
 
         # Get width to be a usable number so that we can equally divide the space for all the columns.
         # Can be refactored, to allow for modularity in the shaping of the columns.
         width = width - (width % total_args)
         usable_width_no_margin = int(width) - 1
-        usable_width = int((usable_width_no_margin - (margin if margin else min_margin)))
+        usable_width = int(usable_width_no_margin - (margin if margin else min_margin))
         if total_args > int(usable_width / 2):
             raise ValueError("Total number of columns exceed available width")
         width_per_column = int(usable_width / total_args)

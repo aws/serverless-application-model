@@ -1225,7 +1225,7 @@ class Cognito(PushEventSource):
                 lambda_config[event_trigger] = function.get_runtime_attr("arn")
             else:
                 raise InvalidEventException(
-                    self.relative_id, 'Cognito trigger "{trigger}" defined multiple times.'.format(trigger=self.Trigger)
+                    self.relative_id, f'Cognito trigger "{self.Trigger}" defined multiple times.'
                 )
         return userpool
 

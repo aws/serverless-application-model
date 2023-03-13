@@ -42,5 +42,5 @@ class S3Uploader:
         http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingBucket.html#access-bucket-intro
         """
         base = self.s3_client.meta.endpoint_url
-        result = "{0}/{1}/{2}".format(base, self.bucket_name, file_name)
+        result = f"{base}/{self.bucket_name}/{file_name}"
         return result

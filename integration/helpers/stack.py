@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import botocore
 
 from integration.helpers.deployer.deployer import Deployer
@@ -5,11 +7,6 @@ from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.resource import generate_suffix
 from integration.helpers.template import transform_template
-
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
 
 
 class Stack:

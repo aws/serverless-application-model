@@ -75,7 +75,7 @@ def replace_aws_partition(partition: str, file_path: str) -> None:
 def generate_transform_test_output_files(input_file_path: str, file_basename: str) -> None:
     output_file_option = file_basename + ".json"
 
-    with open(os.path.join(input_file_path), "r") as f:
+    with open(os.path.join(input_file_path)) as f:
         manifest = yaml_parse(f)  # type: ignore[no-untyped-call]
 
     transform_test_output_paths = {

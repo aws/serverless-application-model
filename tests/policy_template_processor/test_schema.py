@@ -4,7 +4,7 @@ from parameterized import parameterized
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 
 
-class TestTemplates(object):
+class TestTemplates:
     """
     Write your test cases here as different variables that store the entire template file. Start the variable with
     "succeed" if you want to test success case, "fail" if you want to test failure cases. The test runner will know
