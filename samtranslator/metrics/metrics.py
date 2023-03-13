@@ -59,7 +59,7 @@ class CWMetricsPublisher(MetricsPublisher):
             if metric_data:
                 self.cloudwatch_client.put_metric_data(Namespace=namespace, MetricData=metric_data)
         except Exception as e:
-            LOG.exception("Failed to report {} metrics".format(len(metric_data)), exc_info=e)
+            LOG.exception(f"Failed to report {len(metric_data)} metrics", exc_info=e)
 
 
 class DummyMetricsPublisher(MetricsPublisher):
@@ -68,7 +68,7 @@ class DummyMetricsPublisher(MetricsPublisher):
 
     def publish(self, namespace, metrics):  # type: ignore[no-untyped-def]
         """Do not publish any metric, this is a dummy publisher used for offline use."""
-        LOG.debug("Dummy publisher ignoring {} metrices".format(len(metrics)))
+        LOG.debug(f"Dummy publisher ignoring {len(metrics)} metrices")
 
 
 class Unit:

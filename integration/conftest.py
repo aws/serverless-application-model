@@ -1,5 +1,6 @@
 import logging
 import time
+from pathlib import Path
 
 import boto3
 import botocore
@@ -17,11 +18,6 @@ from integration.helpers.resource import (
 )
 from integration.helpers.stack import Stack
 from integration.helpers.yaml_utils import load_yaml
-
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
 
 LOG = logging.getLogger(__name__)
 
@@ -175,16 +171,16 @@ def upload_resources(get_s3):
 
 def get_s3_uri(file_name, uri_type, bucket, region):
     if uri_type == "s3":
-        return "s3://{}/{}".format(bucket, file_name)
+        return f"s3://{bucket}/{file_name}"
 
     if region == "us-east-1":
-        return "https://s3.amazonaws.com/{}/{}".format(bucket, file_name)
+        return f"https://s3.amazonaws.com/{bucket}/{file_name}"
     if region == "us-iso-east-1":
-        return "https://s3.us-iso-east-1.c2s.ic.gov/{}/{}".format(bucket, file_name)
+        return f"https://s3.us-iso-east-1.c2s.ic.gov/{bucket}/{file_name}"
     if region == "us-isob-east-1":
-        return "https://s3.us-isob-east-1.sc2s.sgov.gov/{}/{}".format(bucket, file_name)
+        return f"https://s3.us-isob-east-1.sc2s.sgov.gov/{bucket}/{file_name}"
 
-    return "https://s3-{}.amazonaws.com/{}/{}".format(region, bucket, file_name)
+    return f"https://s3-{region}.amazonaws.com/{bucket}/{file_name}"
 
 
 @pytest.fixture()

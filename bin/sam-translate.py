@@ -40,7 +40,7 @@ parser.add_argument(
     "--output-template",
     help="Location to store resulting CloudFormation template [default: transformed-template.json].",
     type=Path,
-    default=Path("transformed-template.yaml"),
+    default=Path("transformed-template.json"),
 )
 parser.add_argument(
     "--s3-bucket",
@@ -102,7 +102,7 @@ def package(input_file_path, output_file_path):  # type: ignore[no-untyped-def]
 
 
 def transform_template(input_file_path, output_file_path):  # type: ignore[no-untyped-def]
-    with open(input_file_path, "r") as f:
+    with open(input_file_path) as f:
         sam_template = yaml_parse(f)  # type: ignore[no-untyped-call]
 
     try:

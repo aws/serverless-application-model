@@ -332,7 +332,7 @@ class SamFunction(SamResourceMacro):
         # Try to resolve.
         resolved_event_invoke_config = intrinsics_resolver.resolve_parameter_refs(self.EventInvokeConfig)
 
-        logical_id = "{id}EventInvokeConfig".format(id=function_name)
+        logical_id = f"{function_name}EventInvokeConfig"
         lambda_event_invoke_config = (
             LambdaEventInvokeConfig(
                 logical_id=logical_id, depends_on=[lambda_alias.logical_id], attributes=self.resource_attributes
@@ -424,7 +424,7 @@ class SamFunction(SamResourceMacro):
                 policy = self._add_event_invoke_managed_policy(dest_config, resource_logical_id, destination)
             else:
                 raise InvalidResourceException(
-                    self.logical_id, "Destination is required if Type is not {}".format(auto_inject_list)
+                    self.logical_id, f"Destination is required if Type is not {auto_inject_list}"
                 )
         if dest_config.get("Destination") is not None and property_condition is None:
             policy = self._add_event_invoke_managed_policy(
@@ -507,7 +507,7 @@ class SamFunction(SamResourceMacro):
         if not isinstance(resolved_alias_name, str):
             # This is still a dictionary which means we are not able to completely resolve intrinsics
             raise InvalidResourceException(
-                self.logical_id, "'{}' must be a string or a Ref to a template parameter".format(property_name)
+                self.logical_id, f"'{property_name}' must be a string or a Ref to a template parameter"
             )
 
         return resolved_alias_name
@@ -642,20 +642,20 @@ class SamFunction(SamResourceMacro):
         if packagetype not in [ZIP, IMAGE]:
             raise InvalidResourceException(
                 lambda_function.logical_id,
-                "PackageType needs to be `{zip}` or `{image}`".format(zip=ZIP, image=IMAGE),
+                f"PackageType needs to be `{ZIP}` or `{IMAGE}`",
             )
 
         def _validate_package_type_zip() -> None:
             if not all([lambda_function.Runtime, lambda_function.Handler]):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
-                    "Runtime and Handler needs to be present when PackageType is of type `{zip}`".format(zip=ZIP),
+                    f"Runtime and Handler needs to be present when PackageType is of type `{ZIP}`",
                 )
 
             if any([lambda_function.Code.get("ImageUri", False), lambda_function.ImageConfig]):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
-                    "ImageUri or ImageConfig cannot be present when PackageType is of type `{zip}`".format(zip=ZIP),
+                    f"ImageUri or ImageConfig cannot be present when PackageType is of type `{ZIP}`",
                 )
 
         def _validate_package_type_image() -> None:
@@ -669,7 +669,7 @@ class SamFunction(SamResourceMacro):
             if not lambda_function.Code.get("ImageUri"):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
-                    "ImageUri needs to be present when PackageType is of type `{image}`".format(image=IMAGE),
+                    f"ImageUri needs to be present when PackageType is of type `{IMAGE}`",
                 )
 
         _validate_per_package_type = {ZIP: _validate_package_type_zip, IMAGE: _validate_package_type_image}
@@ -694,9 +694,7 @@ class SamFunction(SamResourceMacro):
 
         # Validate required Types
         if dlq_type not in self.dead_letter_queue_policy_actions:
-            raise InvalidResourceException(
-                self.logical_id, "'DeadLetterQueue' requires Type of {}".format(valid_dlq_types)
-            )
+            raise InvalidResourceException(self.logical_id, f"'DeadLetterQueue' requires Type of {valid_dlq_types}")
 
     def _event_resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         event_resources = {}
@@ -707,7 +705,7 @@ class SamFunction(SamResourceMacro):
                         self.logical_id + logical_id, event_dict, logical_id
                     )
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, "{}".format(e)) from e
+                    raise InvalidEventException(logical_id, f"{e}") from e
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
 
@@ -755,7 +753,7 @@ class SamFunction(SamResourceMacro):
                         lambda_function.logical_id + logical_id, event_dict, logical_id
                     )
                 except TypeError as e:
-                    raise InvalidEventException(logical_id, "{}".format(e)) from e
+                    raise InvalidEventException(logical_id, f"{e}") from e
 
                 kwargs = {
                     # When Alias is provided, connect all event sources to the alias and *not* the function
@@ -787,7 +785,7 @@ class SamFunction(SamResourceMacro):
             artifacts = {"ImageUri": self.ImageUri}
 
         if packagetype not in [ZIP, IMAGE]:
-            raise InvalidResourceException(self.logical_id, "invalid 'PackageType' : {}".format(packagetype))
+            raise InvalidResourceException(self.logical_id, f"invalid 'PackageType' : {packagetype}")
 
         # Inline function for transformation of inline code.
         # It accepts arbitrary argumemnts, because the arguments do not matter for the result.
@@ -866,7 +864,7 @@ class SamFunction(SamResourceMacro):
         #
         # SHA Collisions: For purposes of triggering a new update, we are concerned about just the difference previous
         #                 and next hashes. The chances that two subsequent hashes collide is fairly low.
-        prefix = "{id}Version".format(id=self.logical_id)
+        prefix = f"{self.logical_id}Version"
         logical_dict = {}
         # We can't directly change AutoPublishAlias as that would be a breaking change, so we have to add this opt-in
         # property that when set to true would change the lambda version whenever a property in the lambda function changes
@@ -910,7 +908,7 @@ class SamFunction(SamResourceMacro):
         if not name:
             raise InvalidResourceException(self.logical_id, "Alias name is required to create an alias")
 
-        logical_id = "{id}Alias{suffix}".format(id=function.logical_id, suffix=name)
+        logical_id = f"{function.logical_id}Alias{name}"
         alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())
         alias.Name = name
         alias.FunctionName = function.get_runtime_attr("name")
@@ -1096,7 +1094,7 @@ class SamFunction(SamResourceMacro):
             if prop_name not in cors_property_data_type:
                 raise InvalidResourceException(
                     lambda_function.logical_id,
-                    "{} is not a valid property for configuring Cors.".format(prop_name),
+                    f"{prop_name} is not a valid property for configuring Cors.",
                 )
             prop_type = cors_property_data_type.get(prop_name, list)
             if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):
@@ -1477,7 +1475,7 @@ class SamSimpleTable(SamResourceMacro):
     def _convert_attribute_type(self, attribute_type: str) -> str:
         if attribute_type in self.attribute_type_conversions:
             return self.attribute_type_conversions[attribute_type]
-        raise InvalidResourceException(self.logical_id, "Invalid 'Type' \"{actual}\".".format(actual=attribute_type))
+        raise InvalidResourceException(self.logical_id, f"Invalid 'Type' \"{attribute_type}\".")
 
 
 class SamApplication(SamResourceMacro):
@@ -1678,7 +1676,7 @@ class SamLayerVersion(SamResourceMacro):
                 return option
         raise InvalidResourceException(
             self.logical_id,
-            "'RetentionPolicy' must be one of the following options: {}.".format([self.RETAIN, self.DELETE]),
+            f"'RetentionPolicy' must be one of the following options: {[self.RETAIN, self.DELETE]}.",
         )
 
     def _validate_architectures(self, lambda_layer: LambdaLayerVersion) -> None:
@@ -1703,7 +1701,7 @@ class SamLayerVersion(SamResourceMacro):
             if not is_intrinsic(arq) and arq not in [ARM64, X86_64]:
                 raise InvalidResourceException(
                     lambda_layer.logical_id,
-                    "CompatibleArchitectures needs to be a list of '{}' or '{}'".format(X86_64, ARM64),
+                    f"CompatibleArchitectures needs to be a list of '{X86_64}' or '{ARM64}'",
                 )
 
 
@@ -1795,7 +1793,7 @@ class SamStateMachine(SamResourceMacro):
                         self.logical_id + logical_id, event_dict, logical_id
                     )
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, "{}".format(e)) from e
+                    raise InvalidEventException(logical_id, f"{e}") from e
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
 

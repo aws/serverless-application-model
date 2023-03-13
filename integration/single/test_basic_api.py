@@ -109,7 +109,7 @@ class TestBasicApi(BaseTest):
         stages = self.get_api_stack_stages()
         self.assertEqual(len(stages), 2)
 
-        stage = next((s for s in stages if s["stageName"] == "my-new-stage-name"))
+        stage = next(s for s in stages if s["stageName"] == "my-new-stage-name")
         self.assertIsNotNone(stage)
         self.assertEqual(stage["tags"]["TagKey1"], "TagValue1")
         self.assertEqual(stage["tags"]["TagKey2"], "")

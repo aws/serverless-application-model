@@ -100,6 +100,7 @@ class UsagePlan(BaseModel):
 
 class Auth(BaseModel):
     AddDefaultAuthorizerToCorsPreflight: Optional[bool] = auth("AddDefaultAuthorizerToCorsPreflight")
+    AddApiKeyRequiredToCorsPreflight: Optional[bool]  # TODO Add Docs
     ApiKeyRequired: Optional[bool] = auth("ApiKeyRequired")
     Authorizers: Optional[
         Dict[

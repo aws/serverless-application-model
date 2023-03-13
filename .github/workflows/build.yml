@@ -7,6 +7,8 @@ on:
       - "feat-*"
   pull_request:
   workflow_dispatch:
+  merge_group:
+    types: [checks_requested]
 
 jobs:
   build:
@@ -22,6 +24,7 @@ jobs:
           - "3.8"
           - "3.9"
           - "3.10"
+          - "3.11"
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4

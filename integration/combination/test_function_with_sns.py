@@ -8,7 +8,9 @@ from integration.helpers.resource import current_region_does_not_support
 @skipIf(current_region_does_not_support([SNS]), "SNS is not supported in this testing region")
 class TestFunctionWithSns(BaseTest):
     def test_function_with_sns_bucket_trigger(self):
-        self.create_and_verify_stack("combination/function_with_sns")
+        template_file_path = "combination/function_with_sns"
+        self.skip_using_service_detector(template_file_path)
+        self.create_and_verify_stack(template_file_path)
 
         sns_client = self.client_provider.sns_client
 
@@ -33,7 +35,9 @@ class TestFunctionWithSns(BaseTest):
         self.assertEqual(sqs_subscription["TopicArn"], sns_topic_arn)
 
     def test_function_with_sns_intrinsics(self):
-        self.create_and_verify_stack("combination/function_with_sns_intrinsics")
+        template_file_path = "combination/function_with_sns_intrinsics"
+        self.skip_using_service_detector(template_file_path)
+        self.create_and_verify_stack(template_file_path)
 
         sns_client = self.client_provider.sns_client
 
@@ -51,3 +55,4 @@ class TestFunctionWithSns(BaseTest):
         subscription_arn = subscription["SubscriptionArn"]
         subscription_attributes = sns_client.get_subscription_attributes(SubscriptionArn=subscription_arn)
         self.assertEqual(subscription_attributes["Attributes"]["FilterPolicy"], '{"price_usd":[{"numeric":["<",100]}]}')
+        self.assertEqual(subscription_attributes["Attributes"]["FilterPolicyScope"], "MessageAttributes")

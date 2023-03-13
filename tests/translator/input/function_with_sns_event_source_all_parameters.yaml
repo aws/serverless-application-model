@@ -25,3 +25,4 @@ Resources:
               - numeric:
                 - '>='
                 - 100
+            FilterPolicyScope: MessageAttributes
