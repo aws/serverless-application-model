@@ -1561,6 +1561,10 @@
           "markdownDescription": "Specifies the format of the payload sent to an HTTP API Lambda authorizer\\. Required for HTTP API Lambda authorizers\\.  \nThis is passed through to the `authorizerPayloadFormatVersion` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Valid values*: `1.0` or `2.0`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "AuthorizerPayloadFormatVersion"
         },
+        "EnableFunctionDefaultPermissions": {
+          "title": "Enablefunctiondefaultpermissions",
+          "type": "boolean"
+        },
         "EnableSimpleResponses": {
           "description": "Specifies whether a Lambda authorizer returns a response in a simple format\\. By default, a Lambda authorizer must return an AWS Identity and Access Management \\(IAM\\) policy\\. If enabled, the Lambda authorizer can return a boolean value instead of an IAM policy\\.  \nThis is passed through to the `enableSimpleResponses` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "markdownDescription": "Specifies whether a Lambda authorizer returns a response in a simple format\\. By default, a Lambda authorizer must return an AWS Identity and Access Management \\(IAM\\) policy\\. If enabled, the Lambda authorizer can return a boolean value instead of an IAM policy\\.  \nThis is passed through to the `enableSimpleResponses` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",

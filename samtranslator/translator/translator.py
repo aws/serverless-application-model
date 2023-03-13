@@ -326,31 +326,31 @@ class Translator:
                 ).to_be_a_map()
             except InvalidResourceException as e:
                 self.document_errors.append(e)
+            else:
+                for connector_logical_id, connector_dict in resource["Connectors"].items():
+                    try:
+                        full_connector_logical_id = source_logical_id + connector_logical_id
+                        # can't use sam_expect since this is neither a property nor a resource attribute
+                        if not isinstance(connector_dict, dict):
+                            raise InvalidResourceException(
+                                full_connector_logical_id,
+                                f"{source_logical_id}.{full_connector_logical_id} should be a map.",
+                            )
 
-            for connector_logical_id, connector_dict in resource["Connectors"].items():
-                try:
-                    full_connector_logical_id = source_logical_id + connector_logical_id
-                    # can't use sam_expect since this is neither a property nor a resource attribute
-                    if not isinstance(connector_dict, dict):
-                        raise InvalidResourceException(
+                        generated_connector = self._get_generated_connector(
+                            source_logical_id,
                             full_connector_logical_id,
-                            f"{source_logical_id}.{full_connector_logical_id} should be a map.",
+                            connector_logical_id,
+                            connector_dict,
                         )
 
-                    generated_connector = self._get_generated_connector(
-                        source_logical_id,
-                        full_connector_logical_id,
-                        connector_logical_id,
-                        connector_dict,
-                    )
-
-                    if not verify_unique_logical_id(generated_connector, resources):
-                        raise DuplicateLogicalIdException(
-                            source_logical_id, full_connector_logical_id, generated_connector.resource_type
-                        )
-                    connectors.append(generated_connector)
-                except (InvalidResourceException, DuplicateLogicalIdException) as e:
-                    self.document_errors.append(e)
+                        if not verify_unique_logical_id(generated_connector, resources):
+                            raise DuplicateLogicalIdException(
+                                source_logical_id, full_connector_logical_id, generated_connector.resource_type
+                            )
+                        connectors.append(generated_connector)
+                    except (InvalidResourceException, DuplicateLogicalIdException) as e:
+                        self.document_errors.append(e)
 
         return connectors
 
