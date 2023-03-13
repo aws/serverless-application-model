@@ -88,3 +88,15 @@ Resources:
             EnableFunctionDefaultPermissions: foo
             AuthorizerPayloadFormatVersion: 2.0
         DefaultAuthorizer: LambdaAuth
+
+  MyApi4:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          NonLambdaAuth:
+            JwtConfiguration:
+              audience: https://test-sam.com
+              issuer: https://test-sam.com
+            EnableFunctionDefaultPermissions: foo
+        DefaultAuthorizer: LambdaAuth
