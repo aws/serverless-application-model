@@ -77,3 +77,26 @@ Resources:
             AuthorizerPayloadFormatVersion: 2.0
             EnableSimpleResponses: true
         DefaultAuthorizer: LambdaAuth
+
+  MyApi3:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          LambdaAuth:
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            EnableFunctionDefaultPermissions: foo
+            AuthorizerPayloadFormatVersion: 2.0
+        DefaultAuthorizer: LambdaAuth
+
+  MyApi4:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          NonLambdaAuth:
+            JwtConfiguration:
+              audience: https://test-sam.com
+              issuer: https://test-sam.com
+            EnableFunctionDefaultPermissions: foo
+        DefaultAuthorizer: LambdaAuth

@@ -11,10 +11,12 @@ from samtranslator.model.apigatewayv2 import (
     ApiGatewayV2Stage,
 )
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.intrinsics import fnGetAtt, is_intrinsic, is_intrinsic_no_value, ref
+from samtranslator.model.intrinsics import fnGetAtt, fnSub, is_intrinsic, is_intrinsic_no_value, ref
+from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.utils.utils import InvalidValueType, dict_deep_get
@@ -511,6 +513,60 @@ class HttpApiGenerator:
         open_api_editor.add_tags(self.tags)
         self.definition_body = open_api_editor.openapi
 
+    def _get_permission(
+        self, authorizer_name: str, authorizer_lambda_function_arn: str, api_arn: str
+    ) -> LambdaPermission:
+        """Constructs and returns the Lambda Permission resource allowing the Authorizer to invoke the function.
+
+        :returns: the permission resource
+        :rtype: model.lambda_.LambdaPermission
+        """
+
+        resource = "${__ApiId__}/authorizers/*"
+        source_arn = fnSub(
+            ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),
+            {"__ApiId__": api_arn},
+        )
+
+        lambda_permission = LambdaPermission(
+            self.logical_id + authorizer_name + "AuthorizerPermission", attributes=self.passthrough_resource_attributes
+        )
+        lambda_permission.Action = "lambda:InvokeFunction"
+        lambda_permission.FunctionName = authorizer_lambda_function_arn
+        lambda_permission.Principal = "apigateway.amazonaws.com"
+        lambda_permission.SourceArn = source_arn
+
+        return lambda_permission
+
+    def _construct_authorizer_lambda_permission(self, http_api: ApiGatewayV2HttpApi) -> List[LambdaPermission]:
+        if not self.auth:
+            return []
+
+        auth_properties = AuthProperties(**self.auth)
+        authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.EnableIamAuthorizer)
+
+        if not authorizers:
+            return []
+
+        permissions: List[LambdaPermission] = []
+
+        for authorizer_name, authorizer in authorizers.items():
+            # Construct permissions for Lambda Authorizers only
+            # Http Api shouldn't create the permissions by default (when its none)
+            if (
+                not authorizer.function_arn
+                or authorizer.enable_function_default_permissions is None
+                or not authorizer.enable_function_default_permissions
+            ):
+                continue
+
+            permission = self._get_permission(
+                authorizer_name, authorizer.function_arn, http_api.get_runtime_attr("http_api_id")
+            )
+            permissions.append(permission)
+
+        return permissions
+
     def _set_default_authorizer(
         self,
         open_api_editor: OpenApiEditor,
@@ -582,6 +638,7 @@ class HttpApiGenerator:
                 identity=authorizer.get("Identity"),
                 authorizer_payload_format_version=authorizer.get("AuthorizerPayloadFormatVersion"),
                 enable_simple_responses=authorizer.get("EnableSimpleResponses"),
+                enable_function_default_permissions=authorizer.get("EnableFunctionDefaultPermissions"),
             )
         return authorizers
 
@@ -719,6 +776,7 @@ class HttpApiGenerator:
         Optional[ApiGatewayV2DomainName],
         Optional[List[ApiGatewayV2ApiMapping]],
         Optional[Route53RecordSetGroup],
+        Optional[List[LambdaPermission]],
     ]:
         """Generates CloudFormation resources from a SAM HTTP API resource
 
@@ -727,6 +785,7 @@ class HttpApiGenerator:
         """
         http_api = self._construct_http_api()
         domain, basepath_mapping, route53 = self._construct_api_domain(http_api, route53_record_set_groups)
+        permissions = self._construct_authorizer_lambda_permission(http_api)
         stage = self._construct_stage()
 
-        return http_api, stage, domain, basepath_mapping, route53
+        return http_api, stage, domain, basepath_mapping, route53, permissions
