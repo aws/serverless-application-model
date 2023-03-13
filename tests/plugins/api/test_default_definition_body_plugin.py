@@ -44,6 +44,6 @@ class TestDefaultDefinitionBodyPlugin_on_before_transform_template(TestCase):
         sam_template.iterate.assert_any_call({"AWS::Serverless::HttpApi"})
 
 
-class ApiResource(object):
+class ApiResource:
     def __init__(self):
         self.properties = {}

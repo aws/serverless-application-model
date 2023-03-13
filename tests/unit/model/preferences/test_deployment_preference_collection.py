@@ -21,7 +21,7 @@ class TestDeploymentPreferenceCollection(TestCase):
             iam_role = DeploymentPreferenceCollection().get_codedeploy_iam_role()
 
             self.assertIn(
-                "arn:{}:iam::aws:policy/service-role/AWSCodeDeployRoleForLambdaLimited".format(partition),
+                f"arn:{partition}:iam::aws:policy/service-role/AWSCodeDeployRoleForLambdaLimited",
                 iam_role.ManagedPolicyArns,
             )
 
@@ -41,6 +41,6 @@ class TestDeploymentPreferenceCollection(TestCase):
             iam_role = DeploymentPreferenceCollection().get_codedeploy_iam_role()
 
             self.assertIn(
-                "arn:{}:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda".format(partition),
+                f"arn:{partition}:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda",
                 iam_role.ManagedPolicyArns,
             )

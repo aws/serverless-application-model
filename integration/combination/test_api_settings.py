@@ -1,17 +1,12 @@
 import hashlib
+from pathlib import Path
 from unittest.case import skipIf
-
-from integration.config.service_names import REST_API
-from integration.helpers.resource import current_region_does_not_support
-
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
 
 from parameterized import parameterized
 
+from integration.config.service_names import REST_API
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
 
 
 @skipIf(current_region_does_not_support([REST_API]), "Rest API is not supported in this testing region")

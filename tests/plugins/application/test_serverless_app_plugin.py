@@ -319,7 +319,7 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
         self.assertEqual(self.plugin._get_sleep_time_sec.call_count, 1)  # make sure we slept once
 
 
-class ApplicationResource(object):
+class ApplicationResource:
     def __init__(self, app_id="app_id", semver="1.3.5", location=None):
         self.properties = (
             {"ApplicationId": app_id, "SemanticVersion": semver}

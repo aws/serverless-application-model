@@ -36,7 +36,7 @@ class TestLogicalIdGenerator(TestCase):
 
         generator = LogicalIdGenerator(self.prefix, data_obj=data)
 
-        expected = "{}{}".format(self.prefix, hash_value)
+        expected = f"{self.prefix}{hash_value}"
         self.assertEqual(expected, generator.gen())
         get_hash_mock.assert_called_once_with()
         stringify_mock.assert_called_once_with(data)
@@ -52,7 +52,7 @@ class TestLogicalIdGenerator(TestCase):
 
         generator = LogicalIdGenerator(self.prefix, data_obj=data, data_hash=hash_value)
 
-        expected = "{}{}".format(self.prefix, hash_value)
+        expected = f"{self.prefix}{hash_value}"
         self.assertEqual(expected, generator.gen())
         stringify_mock.assert_called_once_with(data)
 

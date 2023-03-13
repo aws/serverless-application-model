@@ -18,6 +18,6 @@ def resolve_string_parameter_in_resource(
     if not isinstance(value, str) and not isinstance(value, dict):
         raise InvalidResourceException(
             logical_id,
-            "Could not resolve parameter for '{}' or parameter is not a String.".format(parameter_name),
+            f"Could not resolve parameter for '{parameter_name}' or parameter is not a String.",
         )
     return value

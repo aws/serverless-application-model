@@ -422,7 +422,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         # slashes and curly braces for templated params, e.g., /foo/{customerId}. So we'll replace
         # non-alphanumeric characters.
         path_logical_id = path.replace("/", "SLASH").replace("{", "OB").replace("}", "CB")
-        return "{}{}PathCondition".format(api_id, path_logical_id)
+        return f"{api_id}{path_logical_id}PathCondition"
 
     def _maybe_remove_implicit_api(self, template):  # type: ignore[no-untyped-def]
         """
