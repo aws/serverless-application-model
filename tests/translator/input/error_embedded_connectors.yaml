@@ -181,3 +181,11 @@ Resources:
       Runtime: python3.9
       InlineCode: foo
       Handler: foo
+
+  NoneTypeConnector:
+    Connectors:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      InlineCode: foo
+      Handler: foo

@@ -326,7 +326,7 @@ class Translator:
                 ).to_be_a_map()
             except InvalidResourceException as e:
                 self.document_errors.append(e)
-
+                continue
             for connector_logical_id, connector_dict in resource["Connectors"].items():
                 try:
                     full_connector_logical_id = source_logical_id + connector_logical_id
