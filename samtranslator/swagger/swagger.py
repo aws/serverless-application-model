@@ -41,6 +41,7 @@ class SwaggerEditor(BaseEditor):
     _X_APIGW_REQUEST_VALIDATOR = "x-amazon-apigateway-request-validator"
     _X_ENDPOINT_CONFIG = "x-amazon-apigateway-endpoint-configuration"
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
+    _SECURITY_DEFINITIONS = "securityDefinitions"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _EXCLUDED_PATHS_FIELDS = ["summary", "description", "parameters"]
     _POLICY_TYPE_IAM = "Iam"
@@ -65,9 +66,9 @@ class SwaggerEditor(BaseEditor):
 
         self._doc = _deepcopy(doc)
         self.paths = self._doc["paths"]
-        self.security_definitions = self._doc.get("securityDefinitions", Py27Dict())
-        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())
-        self.resource_policy = self._doc.get(self._X_APIGW_POLICY, Py27Dict())
+        self.security_definitions = self._doc.get(self._SECURITY_DEFINITIONS) or Py27Dict()
+        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES) or Py27Dict()
+        self.resource_policy = self._doc.get(self._X_APIGW_POLICY) or Py27Dict()
         self.definitions = self._doc.get("definitions", Py27Dict())
 
         # https://swagger.io/specification/#path-item-object
@@ -1208,7 +1209,7 @@ class SwaggerEditor(BaseEditor):
                 self._doc[key] = self.paths
 
         if self.security_definitions:
-            self._doc["securityDefinitions"] = self.security_definitions
+            self._doc[self._SECURITY_DEFINITIONS] = self.security_definitions
         if self.gateway_responses:
             self._doc[self._X_APIGW_GATEWAY_RESPONSES] = self.gateway_responses
         if self.definitions:
