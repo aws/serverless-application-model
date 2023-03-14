@@ -88,6 +88,7 @@ class ApiGatewayV2Authorizer:
         authorizer_payload_format_version=None,
         enable_simple_responses=None,
         is_aws_iam_authorizer=False,
+        enable_function_default_permissions=None,
     ):
         """
         Creates an authorizer for use in V2 Http Apis
@@ -103,6 +104,7 @@ class ApiGatewayV2Authorizer:
         self.authorizer_payload_format_version = authorizer_payload_format_version
         self.enable_simple_responses = enable_simple_responses
         self.is_aws_iam_authorizer = is_aws_iam_authorizer
+        self.enable_function_default_permissions = enable_function_default_permissions
 
         self._validate_input_parameters()
 
@@ -114,6 +116,13 @@ class ApiGatewayV2Authorizer:
 
         if authorizer_type == "REQUEST":
             self._validate_lambda_authorizer()
+
+        if enable_function_default_permissions is not None:
+            sam_expect(
+                enable_function_default_permissions,
+                api_logical_id,
+                f"Authorizers.{name}.EnableFunctionDefaultPermissions",
+            ).to_be_a_bool()
 
     def _get_auth_type(self) -> str:
         if self.is_aws_iam_authorizer:
@@ -164,6 +173,11 @@ class ApiGatewayV2Authorizer:
         if self.enable_simple_responses is not None and not authorizer_type == "REQUEST":
             raise InvalidResourceException(
                 self.api_logical_id, "EnableSimpleResponses must be defined only for Lambda Authorizer."
+            )
+
+        if self.enable_function_default_permissions is not None and authorizer_type != "REQUEST":
+            raise InvalidResourceException(
+                self.api_logical_id, "EnableFunctionDefaultPermissions must be defined only for Lambda Authorizer."
             )
 
     def _validate_jwt_authorizer(self) -> None:

@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union, cast
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import PropertyType, ResourceMacro
+from samtranslator.model import PassThroughProperty, PropertyType, ResourceMacro
 from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.model.events import EventsRule, generate_valid_target_id
@@ -19,7 +19,7 @@ from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
 from samtranslator.model.sqs import SQSQueue, SQSQueuePolicies, SQSQueuePolicy
 from samtranslator.model.tags.resource_tagging import get_tag_list
-from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, dict_of, is_type, list_of, one_of
+from samtranslator.model.types import IS_BOOL, IS_DICT, IS_INT, IS_LIST, IS_STR, PassThrough, dict_of, list_of, one_of
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
@@ -105,7 +105,7 @@ class Schedule(PushEventSource):
         "Schedule": PropertyType(True, IS_STR),
         "RuleName": PropertyType(False, IS_STR),
         "Input": PropertyType(False, IS_STR),
-        "Enabled": PropertyType(False, is_type(bool)),
+        "Enabled": PropertyType(False, IS_BOOL),
         "State": PropertyType(False, IS_STR),
         "Name": PropertyType(False, IS_STR),
         "Description": PropertyType(False, IS_STR),
@@ -205,7 +205,7 @@ class CloudWatchEvent(PushEventSource):
         "Input": PropertyType(False, IS_STR),
         "InputPath": PropertyType(False, IS_STR),
         "Target": PropertyType(False, IS_DICT),
-        "Enabled": PropertyType(False, is_type(bool)),
+        "Enabled": PropertyType(False, IS_BOOL),
         "State": PropertyType(False, IS_STR),
     }
 
@@ -486,13 +486,15 @@ class SNS(PushEventSource):
         "Topic": PropertyType(True, IS_STR),
         "Region": PropertyType(False, IS_STR),
         "FilterPolicy": PropertyType(False, dict_of(IS_STR, list_of(one_of(IS_STR, IS_DICT)))),
-        "SqsSubscription": PropertyType(False, one_of(is_type(bool), IS_DICT)),
+        "FilterPolicyScope": PassThroughProperty(False),
+        "SqsSubscription": PropertyType(False, one_of(IS_BOOL, IS_DICT)),
         "RedrivePolicy": PropertyType(False, IS_DICT),
     }
 
     Topic: str
     Region: Optional[str]
     FilterPolicy: Optional[Dict[str, Any]]
+    FilterPolicyScope: Optional[str]
     SqsSubscription: Optional[Any]
     RedrivePolicy: Optional[Dict[str, Any]]
 
@@ -518,6 +520,7 @@ class SNS(PushEventSource):
                 self.Topic,
                 self.Region,
                 self.FilterPolicy,
+                self.FilterPolicyScope,
                 self.RedrivePolicy,
                 function,
             )
@@ -532,7 +535,14 @@ class SNS(PushEventSource):
 
             queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function)  # type: ignore[no-untyped-call]
             subscription = self._inject_subscription(
-                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function
+                "sqs",
+                queue_arn,
+                self.Topic,
+                self.Region,
+                self.FilterPolicy,
+                self.FilterPolicyScope,
+                self.RedrivePolicy,
+                function,
             )
             event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)  # type: ignore[no-untyped-call]
 
@@ -560,7 +570,14 @@ class SNS(PushEventSource):
             self.Topic, queue_arn, queue_url, function, queue_policy_logical_id
         )
         subscription = self._inject_subscription(
-            "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, self.RedrivePolicy, function
+            "sqs",
+            queue_arn,
+            self.Topic,
+            self.Region,
+            self.FilterPolicy,
+            self.FilterPolicyScope,
+            self.RedrivePolicy,
+            function,
         )
         event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)  # type: ignore[no-untyped-call]
 
@@ -576,6 +593,7 @@ class SNS(PushEventSource):
         topic: str,
         region: Optional[str],
         filterPolicy: Optional[Dict[str, Any]],
+        filterPolicyScope: Optional[str],
         redrivePolicy: Optional[Dict[str, Any]],
         function: Any,
     ) -> SNSSubscription:
@@ -589,6 +607,9 @@ class SNS(PushEventSource):
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
+
+        if filterPolicyScope is not None:
+            subscription.FilterPolicyScope = filterPolicyScope
 
         if redrivePolicy is not None:
             subscription.RedrivePolicy = redrivePolicy
@@ -630,7 +651,7 @@ class Api(PushEventSource):
         "Stage": PropertyType(False, IS_STR),
         "Auth": PropertyType(False, IS_DICT),
         "RequestModel": PropertyType(False, IS_DICT),
-        "RequestParameters": PropertyType(False, is_type(list)),
+        "RequestParameters": PropertyType(False, IS_LIST),
     }
 
     Path: str
@@ -1178,35 +1199,35 @@ class Cognito(PushEventSource):
             lambda_permission.set_resource_attribute(attribute, value)
         resources.append(lambda_permission)
 
-        self._inject_lambda_config(function, userpool)  # type: ignore[no-untyped-call]
-        resources.append(CognitoUserPool.from_dict(userpool_id, userpool))
+        self._inject_lambda_config(function, userpool, userpool_id)
+        resources.append(CognitoUserPool.from_dict(userpool_id, userpool, userpool_id))
         return resources
 
-    def _inject_lambda_config(self, function, userpool):  # type: ignore[no-untyped-def]
+    def _inject_lambda_config(self, function: Any, userpool: Dict[str, Any], userpool_id: str) -> None:
         event_triggers = self.Trigger
         if isinstance(self.Trigger, str):
             event_triggers = [self.Trigger]
 
         # TODO can these be conditional?
 
-        properties = userpool.get("Properties", None)
+        properties = userpool.get("Properties")
         if properties is None:
             properties = {}
             userpool["Properties"] = properties
 
-        lambda_config = properties.get("LambdaConfig", None)
+        lambda_config = properties.get("LambdaConfig")
         if lambda_config is None:
             lambda_config = {}
             properties["LambdaConfig"] = lambda_config
+        sam_expect(lambda_config, userpool_id, "LambdaConfig").to_be_a_map()
 
         for event_trigger in event_triggers:
             if event_trigger not in lambda_config:
                 lambda_config[event_trigger] = function.get_runtime_attr("arn")
             else:
                 raise InvalidEventException(
-                    self.relative_id, 'Cognito trigger "{trigger}" defined multiple times.'.format(trigger=self.Trigger)
+                    self.relative_id, f'Cognito trigger "{self.Trigger}" defined multiple times.'
                 )
-        return userpool
 
 
 class HttpApi(PushEventSource):
@@ -1220,7 +1241,7 @@ class HttpApi(PushEventSource):
         "ApiId": PropertyType(False, IS_STR),
         "Stage": PropertyType(False, IS_STR),
         "Auth": PropertyType(False, IS_DICT),
-        "TimeoutInMillis": PropertyType(False, is_type(int)),
+        "TimeoutInMillis": PropertyType(False, IS_INT),
         "RouteSettings": PropertyType(False, IS_DICT),
         "PayloadFormatVersion": PropertyType(False, IS_STR),
     }

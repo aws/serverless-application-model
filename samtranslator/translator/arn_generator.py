@@ -57,7 +57,7 @@ class ArnGenerator:
         :param policy_name: Name of the policy
         :return: ARN Of the managed policy
         """
-        return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)
+        return f"arn:{ArnGenerator.get_partition_name()}:iam::aws:policy/{policy_name}"
 
     @classmethod
     def get_partition_name(cls, region: Optional[str] = None) -> str:

@@ -180,3 +180,7 @@ Resources:
 
       - StepFunctionsExecutionPolicy_v2:
           StateMachineName: name
+
+      - SESBulkTemplatedCrudPolicy_v2:
+          IdentityName: name
+          TemplateName: template_name

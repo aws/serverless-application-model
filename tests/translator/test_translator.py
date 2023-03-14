@@ -105,11 +105,11 @@ def mock_sar_service_call(self, service_call_function, logical_id, *args):
     application_id = args[0]
     status = "ACTIVE"
     if application_id == "no-access":
-        raise InvalidResourceException(logical_id, "Cannot access application: {}.".format(application_id))
+        raise InvalidResourceException(logical_id, f"Cannot access application: {application_id}.")
     elif application_id == "non-existent":
-        raise InvalidResourceException(logical_id, "Cannot access application: {}.".format(application_id))
+        raise InvalidResourceException(logical_id, f"Cannot access application: {application_id}.")
     elif application_id == "invalid-semver":
-        raise InvalidResourceException(logical_id, "Cannot access application: {}.".format(application_id))
+        raise InvalidResourceException(logical_id, f"Cannot access application: {application_id}.")
     elif application_id == 1:
         raise InvalidResourceException(logical_id, "Type of property 'ApplicationId' is invalid.")
     elif application_id == "preparing" and self._wait_for_template_active_status < 2:
@@ -145,14 +145,14 @@ class AbstractTestTranslator(TestCase):
     maxDiff = None
 
     def _read_input(self, testcase):
-        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml")))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         return json.loads(json.dumps(manifest))
 
     def _read_expected_output(self, testcase, partition):
         partition_folder = partition if partition != "aws" else ""
         expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
-        return json.load(open(expected_filepath, "r"))
+        return json.load(open(expected_filepath))
 
     def _compare_transform(self, manifest, expected, partition, region):
         with patch("boto3.session.Session.region_name", region):
@@ -162,9 +162,9 @@ class AbstractTestTranslator(TestCase):
                 "AWSLambdaBasicExecutionRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole".format(
                     partition
                 ),
-                "AmazonDynamoDBFullAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess".format(partition),
-                "AmazonDynamoDBReadOnlyAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess".format(partition),
-                "AWSLambdaRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaRole".format(partition),
+                "AmazonDynamoDBFullAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBFullAccess",
+                "AmazonDynamoDBReadOnlyAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess",
+                "AWSLambdaRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaRole",
             }
             if partition == "aws":
                 mock_policy_loader.load.return_value[
@@ -173,7 +173,7 @@ class AbstractTestTranslator(TestCase):
             else:
                 mock_policy_loader.load.return_value[
                     "AWSXRayDaemonWriteAccess"
-                ] = "arn:{}:iam::aws:policy/AWSXRayDaemonWriteAccess".format(partition)
+                ] = f"arn:{partition}:iam::aws:policy/AWSXRayDaemonWriteAccess"
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
@@ -345,12 +345,12 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         region = partition_with_region[1]
         mock_get_region_from_session.return_value = region
 
-        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml")))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
         partition_folder = partition if partition != "aws" else ""
         expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
-        expected = json.load(open(expected_filepath, "r"))
+        expected = json.load(open(expected_filepath))
 
         with patch("boto3.session.Session.region_name", region):
             parameter_values = get_template_parameter_values()
@@ -359,9 +359,9 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "AWSLambdaBasicExecutionRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole".format(
                     partition
                 ),
-                "AmazonDynamoDBFullAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess".format(partition),
-                "AmazonDynamoDBReadOnlyAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess".format(partition),
-                "AWSLambdaRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaRole".format(partition),
+                "AmazonDynamoDBFullAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBFullAccess",
+                "AmazonDynamoDBReadOnlyAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess",
+                "AWSLambdaRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaRole",
             }
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
@@ -401,12 +401,12 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         region = partition_with_region[1]
         mock_get_region_from_session.return_value = region
 
-        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml")))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
         partition_folder = partition if partition != "aws" else ""
         expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
-        expected = json.load(open(expected_filepath, "r"))
+        expected = json.load(open(expected_filepath))
 
         with patch("boto3.session.Session.region_name", region):
             parameter_values = get_template_parameter_values()
@@ -415,9 +415,9 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "AWSLambdaBasicExecutionRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole".format(
                     partition
                 ),
-                "AmazonDynamoDBFullAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess".format(partition),
-                "AmazonDynamoDBReadOnlyAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess".format(partition),
-                "AWSLambdaRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaRole".format(partition),
+                "AmazonDynamoDBFullAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBFullAccess",
+                "AmazonDynamoDBReadOnlyAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess",
+                "AWSLambdaRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaRole",
             }
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
@@ -481,8 +481,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
 )
 @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
 def test_transform_invalid_document(testcase):
-    manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
-    expected = json.load(open(os.path.join(OUTPUT_FOLDER, testcase + ".json"), "r"))
+    manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml")))
+    expected = json.load(open(os.path.join(OUTPUT_FOLDER, testcase + ".json")))
 
     mock_policy_loader = MagicMock()
     parameter_values = get_template_parameter_values()
@@ -1017,9 +1017,9 @@ class TestTemplateValidation(TestCase):
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_validate_translated_no_metadata(self):
-        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml"), "r") as f:
+        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml")) as f:
             template = yaml_parse(f.read())
-        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_no_metadata.json"), "r") as f:
+        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_no_metadata.json")) as f:
             expected = json.loads(f.read())
 
         sam_parser = Parser()
@@ -1031,9 +1031,9 @@ class TestTemplateValidation(TestCase):
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_validate_translated_metadata(self):
         self.maxDiff = None
-        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml"), "r") as f:
+        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml")) as f:
             template = yaml_parse(f.read())
-        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_metadata.json"), "r") as f:
+        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_metadata.json")) as f:
             expected = json.loads(f.read())
 
         sam_parser = Parser()

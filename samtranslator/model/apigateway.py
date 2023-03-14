@@ -136,7 +136,7 @@ class ApiGatewayDeployment(Resource):
         generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)
         self.logical_id = generator.gen()
         digest = generator.get_hash(length=40)
-        self.Description = "RestApi deployment id: {}".format(digest)
+        self.Description = f"RestApi deployment id: {digest}"
         stage.update_deployment_ref(self.logical_id)
 
 
@@ -155,7 +155,7 @@ class ApiGatewayResponse:
             for response_parameter_key in response_parameters:
                 if response_parameter_key not in ApiGatewayResponse.ResponseParameterProperties:
                     raise InvalidResourceException(
-                        api_logical_id, "Invalid gateway response parameter '{}'".format(response_parameter_key)
+                        api_logical_id, f"Invalid gateway response parameter '{response_parameter_key}'"
                     )
 
         status_code_str = self._status_code_string(status_code)  # type: ignore[no-untyped-call]

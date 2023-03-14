@@ -1,0 +1,42 @@
+[
+  {
+    "LogicalResourceId": "MyFunctionImplicitGetPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyFunctionImplicitPostPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApipostApiMapping",
+    "ResourceType": "AWS::ApiGatewayV2::ApiMapping"
+  },
+  {
+    "LogicalResourceId": "MyApigetApiMapping",
+    "ResourceType": "AWS::ApiGatewayV2::ApiMapping"
+  },
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "RecordSetGroupddfc299be2",
+    "ResourceType": "AWS::Route53::RecordSetGroup"
+  },
+  {
+    "LogicalResourceId": "MyApiProdStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  },
+  {
+    "LogicalResourceId": "ApiGatewayDomainNameV2e7a0af471b",
+    "ResourceType": "AWS::ApiGatewayV2::DomainName"
+  },
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
+]

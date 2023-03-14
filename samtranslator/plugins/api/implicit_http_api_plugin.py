@@ -116,7 +116,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin[Type[OpenApiEditor]]):
         method = event_properties["Method"]
 
         # Route should be in format "METHOD /path" or just "/path" if the ANY method is used
-        route = "{} {}".format(method.upper(), path)
+        route = f"{method.upper()} {path}"
         if method == OpenApiEditor._X_ANY_METHOD:
             route = path
 

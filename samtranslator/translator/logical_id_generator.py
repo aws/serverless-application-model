@@ -44,7 +44,7 @@ class LogicalIdGenerator:
         """
 
         data_hash = self.get_hash()
-        return "{prefix}{hash}".format(prefix=self._prefix, hash=data_hash)
+        return f"{self._prefix}{data_hash}"
 
     def get_hash(self, length: int = HASH_LENGTH) -> str:
         """

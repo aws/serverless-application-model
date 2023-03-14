@@ -47,6 +47,7 @@ class LambdaAuthorizer(BaseModel):
     EnableSimpleResponses: Optional[bool] = lambdaauthorizer("EnableSimpleResponses")
     FunctionArn: SamIntrinsicable[str] = lambdaauthorizer("FunctionArn")
     FunctionInvokeRole: Optional[SamIntrinsicable[str]] = lambdaauthorizer("FunctionInvokeRole")
+    EnableFunctionDefaultPermissions: Optional[bool]  # TODO: add docs
     Identity: Optional[LambdaAuthorizerIdentity] = lambdaauthorizer("Identity")
 
 
@@ -86,6 +87,8 @@ class Route53(BaseModel):
     HostedZoneId: Optional[PassThroughProp] = route53("HostedZoneId")
     HostedZoneName: Optional[PassThroughProp] = route53("HostedZoneName")
     IpV6: Optional[bool] = route53("IpV6")
+    SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
+    Region: Optional[PassThroughProp]  # TODO: add docs
 
 
 class Domain(BaseModel):

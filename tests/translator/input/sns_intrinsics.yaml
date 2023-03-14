@@ -31,6 +31,7 @@ Resources:
                 - numeric:
                   - <
                   - 100
+            FilterPolicyScope: MessageAttributes
             Region:
               Ref: SnsRegion
             SqsSubscription: true

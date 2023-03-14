@@ -9,7 +9,7 @@ from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRolePolicies
 from samtranslator.model.intrinsics import is_intrinsic
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
-from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, is_type
+from samtranslator.model.types import IS_BOOL, IS_DICT, IS_INT, IS_LIST, IS_STR, PassThrough
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.validator.value_validator import sam_expect
@@ -34,23 +34,23 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     resource_type: str = None  # type: ignore
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
     property_types: Dict[str, PropertyType] = {
-        "BatchSize": PropertyType(False, is_type(int)),
+        "BatchSize": PropertyType(False, IS_INT),
         "StartingPosition": PassThroughProperty(False),
         "StartingPositionTimestamp": PassThroughProperty(False),
-        "Enabled": PropertyType(False, is_type(bool)),
-        "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
-        "MaximumRetryAttempts": PropertyType(False, is_type(int)),
-        "BisectBatchOnFunctionError": PropertyType(False, is_type(bool)),
-        "MaximumRecordAgeInSeconds": PropertyType(False, is_type(int)),
+        "Enabled": PropertyType(False, IS_BOOL),
+        "MaximumBatchingWindowInSeconds": PropertyType(False, IS_INT),
+        "MaximumRetryAttempts": PropertyType(False, IS_INT),
+        "BisectBatchOnFunctionError": PropertyType(False, IS_BOOL),
+        "MaximumRecordAgeInSeconds": PropertyType(False, IS_INT),
         "DestinationConfig": PropertyType(False, IS_DICT),
-        "ParallelizationFactor": PropertyType(False, is_type(int)),
-        "Topics": PropertyType(False, is_type(list)),
-        "Queues": PropertyType(False, is_type(list)),
-        "SourceAccessConfigurations": PropertyType(False, is_type(list)),
+        "ParallelizationFactor": PropertyType(False, IS_INT),
+        "Topics": PropertyType(False, IS_LIST),
+        "Queues": PropertyType(False, IS_LIST),
+        "SourceAccessConfigurations": PropertyType(False, IS_LIST),
         "SecretsManagerKmsKeyId": PropertyType(False, IS_STR),
-        "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
-        "FunctionResponseTypes": PropertyType(False, is_type(list)),
-        "KafkaBootstrapServers": PropertyType(False, is_type(list)),
+        "TumblingWindowInSeconds": PropertyType(False, IS_INT),
+        "FunctionResponseTypes": PropertyType(False, IS_LIST),
+        "KafkaBootstrapServers": PropertyType(False, IS_LIST),
         "FilterCriteria": PropertyType(False, IS_DICT),
         "ConsumerGroupId": PropertyType(False, IS_STR),
         "ScalingConfig": PropertyType(False, IS_DICT),
@@ -157,7 +157,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
             else:
                 raise InvalidEventException(
                     self.logical_id,
-                    "Property ConsumerGroupId not defined for resource of type {}.".format(self.resource_type),
+                    f"Property ConsumerGroupId not defined for resource of type {self.resource_type}.",
                 )
 
         destination_config_policy: Optional[Dict[str, Any]] = None
@@ -424,7 +424,7 @@ class MQ(PullEventSource):
     property_types: Dict[str, PropertyType] = {
         **PullEventSource.property_types,
         "Broker": PassThroughProperty(True),
-        "DynamicPolicyName": Property(False, is_type(bool)),
+        "DynamicPolicyName": Property(False, IS_BOOL),
     }
 
     Broker: PassThrough
@@ -626,7 +626,7 @@ class SelfManagedKafka(PullEventSource):
         if not uri:
             raise InvalidEventException(
                 self.relative_id,
-                "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
+                f"No {msg} URI property specified in SourceAccessConfigurations for self managed kafka event.",
             )
 
         if not isinstance(uri, str) and not is_intrinsic(uri):
@@ -659,7 +659,7 @@ class SelfManagedKafka(PullEventSource):
         }
 
     @staticmethod
-    @deprecated(None)
+    @deprecated()
     def get_kms_policy(secrets_manager_kms_key_id: str) -> Dict[str, Any]:
         return {
             "Action": ["kms:Decrypt"],
