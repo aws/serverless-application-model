@@ -82,6 +82,6 @@ Resources:
 Outputs:
   ApiUrl:
     Description: URL of your API endpoint
-    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/"
 Metadata:
   SamTransformTest: true
