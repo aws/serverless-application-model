@@ -1,6 +1,7 @@
 import logging
 from collections import namedtuple
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Set, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigateway import (
@@ -65,6 +66,14 @@ UsagePlanProperties = namedtuple(
 UsagePlanProperties.__new__.__defaults__ = (None, None, None, None, None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
+
+
+@dataclass
+class ApiDomainResponse:
+    Domain: Optional[ApiGatewayDomainName]
+    ApiGWBasePathMappingList: Optional[List[ApiGatewayBasePathMapping]]
+    RecordSetsGroup: Any
+    RecordSet: Optional[List[Route53RecordSet]]
 
 
 class SharedApiUsagePlan:
@@ -196,7 +205,6 @@ class ApiGenerator:
         mode: Optional[Intrinsicable[str]] = None,
         api_key_source_type: Optional[Intrinsicable[str]] = None,
         always_deploy: Optional[bool] = False,
-        individual_recordset: Optional[bool] = False,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -253,7 +261,6 @@ class ApiGenerator:
         self.mode = mode
         self.api_key_source_type = api_key_source_type
         self.always_deploy = always_deploy
-        self.individual_recordset = individual_recordset
 
     def _construct_rest_api(self) -> ApiGatewayRestApi:
         """Constructs and returns the ApiGateway RestApi.
@@ -445,12 +452,12 @@ class ApiGenerator:
 
     def _construct_api_domain(  # noqa: too-many-branches
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
-    ) -> Tuple[Optional[ApiGatewayDomainName], Optional[List[ApiGatewayBasePathMapping]], Any, Any]:
+    ) -> ApiDomainResponse:
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
         if self.domain is None:
-            return None, None, None, None
+            return ApiDomainResponse(None, None, None, None)
 
         sam_expect(self.domain, self.logical_id, "Domain").to_be_a_map()
         domain_name: PassThrough = sam_expect(
@@ -568,8 +575,8 @@ class ApiGenerator:
 
             record_set_group = route53_record_set_groups.get(logical_id)
 
-            if self.individual_recordset:
-                return (
+            if route53.get("SeparateRecordSets"):
+                return ApiDomainResponse(
                     domain,
                     basepath_resource_list,
                     None,
@@ -587,7 +594,7 @@ class ApiGenerator:
 
             record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, api_domain_name, route53)
 
-        return domain, basepath_resource_list, record_set_group, None
+        return ApiDomainResponse(domain, basepath_resource_list, record_set_group, None)
 
     def _construct_individual_record_set(
         self, domain: Dict[str, Any], api_domain_name: str, route53: Any
@@ -676,9 +683,12 @@ class ApiGenerator:
         :rtype: tuple
         """
         rest_api = self._construct_rest_api()
-        domain, basepath_mapping, route53, individual_route53 = self._construct_api_domain(
-            rest_api, route53_record_set_groups
-        )
+        apiDomainResponse = self._construct_api_domain(rest_api, route53_record_set_groups)
+        domain = apiDomainResponse.Domain
+        basepath_mapping = apiDomainResponse.ApiGWBasePathMappingList
+        route53 = apiDomainResponse.RecordSetsGroup
+        individual_route53 = apiDomainResponse.RecordSet
+
         deployment = self._construct_deployment(rest_api)
 
         swagger = None

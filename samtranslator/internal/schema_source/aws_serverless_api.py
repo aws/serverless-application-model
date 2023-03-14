@@ -134,6 +134,7 @@ class Route53(BaseModel):
     IpV6: Optional[bool] = route53("IpV6")
     SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
     Region: Optional[PassThroughProp]  # TODO: add docs
+    SeparateRecordSets: Optional[bool] # TODO: add docs
 
 
 class Domain(BaseModel):
@@ -176,7 +177,6 @@ CanarySetting = Optional[PassThroughProp]
 TracingEnabled = Optional[PassThroughProp]
 OpenApiVersion = Optional[Union[float, str]]  # TODO: float doesn't exist in documentation
 AlwaysDeploy = Optional[bool]
-IndividualRecordSet = Optional[bool]
 
 
 class Properties(BaseModel):
@@ -208,7 +208,6 @@ class Properties(BaseModel):
     TracingEnabled: Optional[TracingEnabled] = properties("TracingEnabled")
     Variables: Optional[Variables] = properties("Variables")
     AlwaysDeploy: Optional[AlwaysDeploy]  # TODO: Add docs
-    IndividualRecordSet: Optional[IndividualRecordSet]  # TODO: Add docs
 
 
 class Globals(BaseModel):

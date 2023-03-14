@@ -3596,10 +3596,6 @@
           "title": "GatewayResponses",
           "type": "object"
         },
-        "IndividualRecordSet": {
-          "title": "Individualrecordset",
-          "type": "boolean"
-        },
         "MergeDefinitions": {
           "title": "Mergedefinitions",
           "type": "boolean"
@@ -3986,6 +3982,10 @@
         },
         "Region": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "SeparateRecordSets": {
+          "title": "Separaterecordsets",
+          "type": "boolean"
         },
         "SetIdentifier": {
           "$ref": "#/definitions/PassThroughProp"

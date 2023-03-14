@@ -56,9 +56,9 @@ Resources:
         EndpointConfiguration: REGIONAL
         Route53:
           HostedZoneId: abc123456
+          SeparateRecordSets: true
       EndpointConfiguration:
         Type: REGIONAL
-      IndividualRecordSet: true
 
 
   ApiGatewayAdminThree:
@@ -77,6 +77,6 @@ Resources:
         EndpointConfiguration: REGIONAL
         Route53:
           HostedZoneId: abc123456
+          SeparateRecordSets: true
       EndpointConfiguration:
         Type: REGIONAL
-      IndividualRecordSet: true
