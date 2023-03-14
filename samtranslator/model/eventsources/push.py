@@ -1199,26 +1199,27 @@ class Cognito(PushEventSource):
             lambda_permission.set_resource_attribute(attribute, value)
         resources.append(lambda_permission)
 
-        self._inject_lambda_config(function, userpool)  # type: ignore[no-untyped-call]
-        resources.append(CognitoUserPool.from_dict(userpool_id, userpool))
+        self._inject_lambda_config(function, userpool, userpool_id)
+        resources.append(CognitoUserPool.from_dict(userpool_id, userpool, userpool_id))
         return resources
 
-    def _inject_lambda_config(self, function, userpool):  # type: ignore[no-untyped-def]
+    def _inject_lambda_config(self, function: Any, userpool: Dict[str, Any], userpool_id: str) -> None:
         event_triggers = self.Trigger
         if isinstance(self.Trigger, str):
             event_triggers = [self.Trigger]
 
         # TODO can these be conditional?
 
-        properties = userpool.get("Properties", None)
+        properties = userpool.get("Properties")
         if properties is None:
             properties = {}
             userpool["Properties"] = properties
 
-        lambda_config = properties.get("LambdaConfig", None)
+        lambda_config = properties.get("LambdaConfig")
         if lambda_config is None:
             lambda_config = {}
             properties["LambdaConfig"] = lambda_config
+        sam_expect(lambda_config, userpool_id, "LambdaConfig").to_be_a_map()
 
         for event_trigger in event_triggers:
             if event_trigger not in lambda_config:
@@ -1227,7 +1228,6 @@ class Cognito(PushEventSource):
                 raise InvalidEventException(
                     self.relative_id, f'Cognito trigger "{self.Trigger}" defined multiple times.'
                 )
-        return userpool
 
 
 class HttpApi(PushEventSource):
