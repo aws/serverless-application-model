@@ -659,7 +659,7 @@ class SelfManagedKafka(PullEventSource):
         }
 
     @staticmethod
-    @deprecated(None)
+    @deprecated()
     def get_kms_policy(secrets_manager_kms_key_id: str) -> Dict[str, Any]:
         return {
             "Action": ["kms:Decrypt"],
