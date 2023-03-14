@@ -24,7 +24,7 @@ class InterfaceScanner:
     def __init__(self, skipped_modules: Optional[List[str]] = None) -> None:
         self.signatures: Dict[str, Union[inspect.Signature]] = {}
         self.variables: Set[str] = set()
-        self.skipped_modules: Set[str] = set(skipped_modules) or set()
+        self.skipped_modules: Set[str] = set(skipped_modules or [])
 
     def scan_interfaces_recursively(self, module_name: str) -> None:
         if module_name in self.skipped_modules:
