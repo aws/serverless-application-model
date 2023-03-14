@@ -87,6 +87,8 @@ class Route53(BaseModel):
     HostedZoneId: Optional[PassThroughProp] = route53("HostedZoneId")
     HostedZoneName: Optional[PassThroughProp] = route53("HostedZoneName")
     IpV6: Optional[bool] = route53("IpV6")
+    SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
+    Region: Optional[PassThroughProp]  # TODO: add docs
 
 
 class Domain(BaseModel):

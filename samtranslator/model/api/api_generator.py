@@ -579,24 +579,35 @@ class ApiGenerator:
         return domain, basepath_resource_list, record_set_group
 
     def _construct_record_sets_for_domain(
-        self, domain: Dict[str, Any], api_domain_name: str, route53: Any
+        self, custom_domain_config: Dict[str, Any], api_domain_name: str, route53_config: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         recordset_list = []
+
         recordset = {}
-
-        recordset["Name"] = domain.get("DomainName")
+        recordset["Name"] = custom_domain_config.get("DomainName")
         recordset["Type"] = "A"
-        recordset["AliasTarget"] = self._construct_alias_target(domain, api_domain_name, route53)
-        recordset_list.extend([recordset])
+        recordset["AliasTarget"] = self._construct_alias_target(custom_domain_config, api_domain_name, route53_config)
+        self._update_route53_routing_policy_properties(route53_config, recordset)
+        recordset_list.append(recordset)
 
-        recordset_ipv6 = {}
-        if route53.get("IpV6") is not None and route53.get("IpV6") is True:
-            recordset_ipv6["Name"] = domain.get("DomainName")
+        if route53_config.get("IpV6") is not None and route53_config.get("IpV6") is True:
+            recordset_ipv6 = {}
+            recordset_ipv6["Name"] = custom_domain_config.get("DomainName")
             recordset_ipv6["Type"] = "AAAA"
-            recordset_ipv6["AliasTarget"] = self._construct_alias_target(domain, api_domain_name, route53)
-            recordset_list.extend([recordset_ipv6])
+            recordset_ipv6["AliasTarget"] = self._construct_alias_target(
+                custom_domain_config, api_domain_name, route53_config
+            )
+            self._update_route53_routing_policy_properties(route53_config, recordset_ipv6)
+            recordset_list.append(recordset_ipv6)
 
         return recordset_list
+
+    @staticmethod
+    def _update_route53_routing_policy_properties(route53_config: Dict[str, Any], recordset: Dict[str, Any]) -> None:
+        if route53_config.get("Region") is not None:
+            recordset["Region"] = route53_config.get("Region")
+        if route53_config.get("SetIdentifier") is not None:
+            recordset["SetIdentifier"] = route53_config.get("SetIdentifier")
 
     def _construct_alias_target(self, domain: Dict[str, Any], api_domain_name: str, route53: Any) -> Dict[str, Any]:
         alias_target = {}
