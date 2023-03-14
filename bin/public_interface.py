@@ -15,17 +15,20 @@ import os.path
 import pkgutil
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Set, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Set, Union
 
 _ARGUMENT_SELF = {"kind": "POSITIONAL_OR_KEYWORD", "name": "self"}
 
 
 class InterfaceScanner:
-    def __init__(self) -> None:
+    def __init__(self, skipped_modules: Optional[List[str]] = None) -> None:
         self.signatures: Dict[str, Union[inspect.Signature]] = {}
         self.variables: Set[str] = set()
+        self.skipped_modules: Set[str] = set(skipped_modules) or set()
 
     def scan_interfaces_recursively(self, module_name: str) -> None:
+        if module_name in self.skipped_modules:
+            return
         self._scan_interfaces_in_module(module_name)
         for submodule in pkgutil.iter_modules([module_name.replace(".", os.path.sep)]):
             submodule_name = module_name + "." + submodule.name
@@ -218,7 +221,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "extract":
-        scanner = InterfaceScanner()
+        scanner = InterfaceScanner(skipped_modules=["samtranslator.internal"])
         scanner.scan_interfaces_recursively(args.module)
         _print(scanner.signatures, scanner.variables)
     elif args.command == "check":
