@@ -216,10 +216,11 @@ def main() -> None:
     extract = subparsers.add_parser("extract", help="Extract public interfaces")
     extract.add_argument("--module", help="The module to extract public interfaces", type=str, default="samtranslator")
     extract.add_argument(
-        "--skipped-modules",
-        help="The modules separated by ',' that should be skipped",
+        "--skipped-module",
+        help="The modules that should be skipped",
         type=str,
-        default="samtranslator.internal",
+        nargs="*",
+        default=["samtranslator.internal"],
     )
     check = subparsers.add_parser("check", help="Check public interface changes")
     check.add_argument("original_json", help="The original public interface JSON file", type=Path)
@@ -227,7 +228,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "extract":
-        scanner = InterfaceScanner(skipped_modules=args.skipped_modules.split(","))
+        scanner = InterfaceScanner(skipped_modules=args.skipped_module)
         scanner.scan_interfaces_recursively(args.module)
         _print(scanner.signatures, scanner.variables)
     elif args.command == "check":
