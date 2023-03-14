@@ -1,7 +1,7 @@
 import logging
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set, Union, cast
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigateway import (
@@ -676,7 +676,19 @@ class ApiGenerator:
         return alias_target
 
     @cw_timer(prefix="Generator", name="Api")
-    def to_cloudformation(self, redeploy_restapi_parameters, route53_record_set_groups):  # type: ignore[no-untyped-def]
+    def to_cloudformation(
+        self, redeploy_restapi_parameters: Optional[Any], route53_record_set_groups: Dict[str, Route53RecordSetGroup]
+    ) -> Tuple[
+        ApiGatewayRestApi,
+        ApiGatewayDeployment,
+        ApiGatewayStage,
+        List[LambdaPermission],
+        Optional[ApiGatewayDomainName],
+        Optional[List[ApiGatewayBasePathMapping]],
+        Optional[Route53RecordSetGroup],
+        Optional[Any],
+        Optional[List[Route53RecordSet]],
+    ]:
         """Generates CloudFormation resources from a SAM API resource
 
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
@@ -686,8 +698,8 @@ class ApiGenerator:
         apiDomainResponse = self._construct_api_domain(rest_api, route53_record_set_groups)
         domain = apiDomainResponse.Domain
         basepath_mapping = apiDomainResponse.ApiGWBasePathMappingList
-        route53 = apiDomainResponse.RecordSetsGroup
-        individual_route53 = apiDomainResponse.RecordSet
+        route53_recordsetGroup = apiDomainResponse.RecordSetsGroup
+        route53_recordsets = apiDomainResponse.RecordSet
 
         deployment = self._construct_deployment(rest_api)
 
@@ -708,9 +720,9 @@ class ApiGenerator:
             permissions,
             domain,
             basepath_mapping,
-            route53,
+            route53_recordsetGroup,
             usage_plan,
-            individual_route53,
+            route53_recordsets,
         )
 
     def _add_cors(self) -> None:
