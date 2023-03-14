@@ -1169,6 +1169,7 @@ class SamApi(SamResourceMacro):
         "Mode": PropertyType(False, IS_STR),
         "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
         "ApiKeySourceType": PropertyType(False, IS_STR),
+        "AlwaysDeploy": Property(False, is_type(bool)),
     }
 
     Name: Optional[Intrinsicable[str]]
@@ -1198,6 +1199,7 @@ class SamApi(SamResourceMacro):
     Mode: Optional[Intrinsicable[str]]
     DisableExecuteApiEndpoint: Optional[Intrinsicable[bool]]
     ApiKeySourceType: Optional[Intrinsicable[str]]
+    AlwaysDeploy: Optional[bool]
 
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
@@ -1262,6 +1264,7 @@ class SamApi(SamResourceMacro):
             description=self.Description,
             mode=self.Mode,
             api_key_source_type=self.ApiKeySourceType,
+            always_deploy=self.AlwaysDeploy,
         )
 
         (

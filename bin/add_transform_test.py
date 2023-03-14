@@ -6,12 +6,20 @@ import os
 import shutil
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
+import boto3
+
+from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
+from samtranslator.translator.transform import transform
+from samtranslator.yaml_helper import yaml_parse
+
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 TRANSFORM_TEST_DIR = os.path.join(SCRIPT_DIR, "..", "tests", "translator")
+
+iam_client = boto3.client("iam")
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument(
@@ -40,7 +48,7 @@ def read_json_file(file_path: str) -> Dict[str, Any]:
 
 def write_json_file(obj: Dict[str, Any], file_path: str) -> None:
     with open(file_path, "w", encoding="utf-8") as f:
-        json.dump(obj, f, indent=2)
+        json.dump(obj, f, indent=2, sort_keys=True)
 
 
 def add_regional_endpoint_configuration_if_needed(template: Dict[str, Any]) -> Dict[str, Any]:
@@ -66,38 +74,28 @@ def replace_aws_partition(partition: str, file_path: str) -> None:
 def generate_transform_test_output_files(input_file_path: str, file_basename: str) -> None:
     output_file_option = file_basename + ".json"
 
-    # run sam-translate.py and get the temporary output file
-    with tempfile.NamedTemporaryFile() as temp_output_file:
-        subprocess.run(
-            [
-                sys.executable,
-                os.path.join(SCRIPT_DIR, "sam-translate.py"),
-                "--template-file",
-                input_file_path,
-                "--output-template",
-                temp_output_file.name,
-            ],
-            check=True,
-        )
+    with open(os.path.join(input_file_path), "r") as f:
+        manifest = yaml_parse(f)  # type: ignore[no-untyped-call]
 
-        # copy the output files into correct directories
-        transform_test_output_path = os.path.join(TRANSFORM_TEST_DIR, "output", output_file_option)
-        shutil.copyfile(temp_output_file.name, transform_test_output_path)
+    transform_test_output_paths = {
+        "aws": ("us-west-2", os.path.join(TRANSFORM_TEST_DIR, "output", output_file_option)),
+        "aws-cn": ("cn-north-1 ", os.path.join(TRANSFORM_TEST_DIR, "output/aws-cn/", output_file_option)),
+        "aws-us-gov": ("us-gov-west-1", os.path.join(TRANSFORM_TEST_DIR, "output/aws-us-gov/", output_file_option)),
+    }
 
-        regional_transform_test_output_paths = {
-            "aws-cn": os.path.join(TRANSFORM_TEST_DIR, "output/aws-cn/", output_file_option),
-            "aws-us-gov": os.path.join(TRANSFORM_TEST_DIR, "output/aws-us-gov/", output_file_option),
-        }
+    for partition, (region, output_path) in transform_test_output_paths.items():
+        # Set Boto Session Region to guarantee the same hash input as transform tests for API deployment id
+        ArnGenerator.BOTO_SESSION_REGION_NAME = region
+        output_fragment = transform(manifest, {}, ManagedPolicyLoader(iam_client))
 
-        if not CLI_OPTIONS.disable_api_configuration:
-            template = read_json_file(temp_output_file.name)
-            template = add_regional_endpoint_configuration_if_needed(template)
-            write_json_file(template, temp_output_file.name)
+        if not CLI_OPTIONS.disable_api_configuration and partition != "aws":
+            output_fragment = add_regional_endpoint_configuration_if_needed(output_fragment)
 
-        for partition, output_path in regional_transform_test_output_paths.items():
-            shutil.copyfile(temp_output_file.name, output_path)
-            if not CLI_OPTIONS.disable_update_partition:
-                replace_aws_partition(partition, output_path)
+        write_json_file(output_fragment, output_path)
+
+        # Update arn partition if necessary
+        if not CLI_OPTIONS.disable_update_partition:
+            replace_aws_partition(partition, output_path)
 
 
 def get_input_file_path() -> str:
@@ -118,6 +116,18 @@ def verify_input_template(input_file_path: str):  # type: ignore[no-untyped-def]
         )
 
 
+def format_test_files() -> None:
+    subprocess.run(
+        [sys.executable, os.path.join(SCRIPT_DIR, "json-format.py"), "--write", "tests"],
+        check=True,
+    )
+
+    subprocess.run(
+        [sys.executable, os.path.join(SCRIPT_DIR, "yaml-format.py"), "--write", "tests"],
+        check=True,
+    )
+
+
 def main() -> None:
     input_file_path = get_input_file_path()
     file_basename = Path(input_file_path).stem
@@ -132,6 +142,8 @@ def main() -> None:
     print(
         "Generating transform test input and output files complete. \n\nPlease check the generated output is as expected. This tool does not guarantee correct output."
     )
+
+    format_test_files()
 
 
 if __name__ == "__main__":

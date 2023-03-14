@@ -1,0 +1,44 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: Test
+      CodeUri: s3://sam-demo-bucket/queues.zip
+      Handler: app.handler
+      Runtime: nodejs18.x
+      MemorySize: 256
+      Architectures:
+      - x86_64
+      Events:
+        BrokerOne:
+          Type: MQ
+          Properties:
+            Broker: !Sub 'arn:${AWS::Partition}:mq:us-east-2:123456789012:broker:MyBroker:b-1234a5b6-78cd-901e-2fgh-3i45j6k17801'
+            BatchSize: 1
+            Queues:
+            - MyQueue
+            SourceAccessConfigurations:
+            - Type: BASIC_AUTH
+              URI: !Sub 'arn:${AWS::Partition}:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b01'
+        BrokerTwo:
+          Type: MQ
+          Properties:
+            Broker: !Sub 'arn:${AWS::Partition}:mq:us-east-2:123456789012:broker:MyBroker:b-1234a5b6-78cd-901e-2fgh-3i45j6k17802'
+            BatchSize: 1
+            DynamicPolicyName: true
+            Queues:
+            - MyQueue
+            SourceAccessConfigurations:
+            - Type: BASIC_AUTH
+              URI: !Sub 'arn:${AWS::Partition}:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b02'
+        BrokerThree:
+          Type: MQ
+          Properties:
+            Broker: !Sub 'arn:${AWS::Partition}:mq:us-east-2:123456789012:broker:MyBroker:b-1234a5b6-78cd-901e-2fgh-3i45j6k17803'
+            BatchSize: 1
+            DynamicPolicyName: true
+            Queues:
+            - MyQueue
+            SourceAccessConfigurations:
+            - Type: BASIC_AUTH
+              URI: !Sub 'arn:${AWS::Partition}:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b03'

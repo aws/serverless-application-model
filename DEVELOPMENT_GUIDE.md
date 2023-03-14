@@ -59,7 +59,7 @@ eval "$(pyenv virtualenv-init -)"
 We format our code using [Black](https://github.com/python/black) and verify the source code is black compliant
 during PR checks. Black will be installed automatically with `make init`.
 
-After installing, you can run our formatting through our Makefile by `make black` or integrating Black directly in your favorite IDE (instructions
+After installing, you can run our formatting through our Makefile by `make format` or integrating Black directly in your favorite IDE (instructions
 can be found [here](https://black.readthedocs.io/en/stable/editor_integration.html))
  
 ##### (Workaround) Integrating Black directly in your favorite IDE
