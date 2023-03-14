@@ -580,41 +580,120 @@
       "additionalProperties": false,
       "properties": {
         "BatchSize": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The maximum number of items to retrieve in a single batch\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ BatchSize](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-batchsize)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "The maximum number of items to retrieve in a single batch\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ BatchSize](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-batchsize)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "BatchSize"
         },
         "Cluster": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The Amazon Resource Name \\(ARN\\) of the Amazon DocumentDB cluster\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ EventSourceArn](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-eventsourcearn)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "The Amazon Resource Name \\(ARN\\) of the Amazon DocumentDB cluster\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ EventSourceArn](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-eventsourcearn)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "Cluster"
         },
         "CollectionName": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The name of the collection to consume within the database\\. If you do not specify a collection, Lambda consumes all collections\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ CollectionName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-documentdbeventsourceconfig.html#cfn-lambda-eventsourcemapping-documentdbeventsourceconfig-collectionname)` property of an `AWS::Lambda::EventSourceMapping` `DocumentDBEventSourceConfig` data type\\.",
+          "markdownDescription": "The name of the collection to consume within the database\\. If you do not specify a collection, Lambda consumes all collections\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ CollectionName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-documentdbeventsourceconfig.html#cfn-lambda-eventsourcemapping-documentdbeventsourceconfig-collectionname)` property of an `AWS::Lambda::EventSourceMapping` `DocumentDBEventSourceConfig` data type\\.",
+          "title": "CollectionName"
         },
         "DatabaseName": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The name of the database to consume within the Amazon DocumentDB cluster\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ DatabaseName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-documentdbeventsourceconfig.html#cfn-lambda-eventsourcemapping-documentdbeventsourceconfig-databasename)` property of an `AWS::Lambda::EventSourceMapping` `DocumentDBEventSourceConfig`data type\\.",
+          "markdownDescription": "The name of the database to consume within the Amazon DocumentDB cluster\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ DatabaseName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-documentdbeventsourceconfig.html#cfn-lambda-eventsourcemapping-documentdbeventsourceconfig-databasename)` property of an `AWS::Lambda::EventSourceMapping` `DocumentDBEventSourceConfig`data type\\.",
+          "title": "DatabaseName"
         },
         "Enabled": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "If `true`, the event source mapping is active\\. To pause polling and invocation, set to `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ Enabled](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-enabled)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "If `true`, the event source mapping is active\\. To pause polling and invocation, set to `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ Enabled](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-enabled)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "Enabled"
         },
         "FilterCriteria": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "An object that defines the criteria that determines whether Lambda should process an event\\. For more information, see [ Lambda event filtering](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [FilterCriteria](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ FilterCriteria](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "An object that defines the criteria that determines whether Lambda should process an event\\. For more information, see [ Lambda event filtering](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [FilterCriteria](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ FilterCriteria](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "FilterCriteria"
         },
         "FullDocument": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "Determines what Amazon DocumentDB sends to your event stream during document update operations\\. If set to `UpdateLookup`, Amazon DocumentDB sends a delta describing the changes, along with a copy of the entire document\\. Otherwise, Amazon DocumentDB sends only a partial document that contains the changes\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ FullDocument](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-documentdbeventsourceconfig.html#cfn-lambda-eventsourcemapping-documentdbeventsourceconfig-fulldocument)` property of an `AWS::Lambda::EventSourceMapping` `DocumentDBEventSourceConfig` data type\\.",
+          "markdownDescription": "Determines what Amazon DocumentDB sends to your event stream during document update operations\\. If set to `UpdateLookup`, Amazon DocumentDB sends a delta describing the changes, along with a copy of the entire document\\. Otherwise, Amazon DocumentDB sends only a partial document that contains the changes\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ FullDocument](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-documentdbeventsourceconfig.html#cfn-lambda-eventsourcemapping-documentdbeventsourceconfig-fulldocument)` property of an `AWS::Lambda::EventSourceMapping` `DocumentDBEventSourceConfig` data type\\.",
+          "title": "FullDocument"
         },
         "MaximumBatchingWindowInSeconds": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The maximum amount of time to gather records before invoking the function, in seconds\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ MaximumBatchingWindowInSeconds](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumbatchingwindowinseconds)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "The maximum amount of time to gather records before invoking the function, in seconds\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ MaximumBatchingWindowInSeconds](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumbatchingwindowinseconds)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "MaximumBatchingWindowInSeconds"
         },
         "SecretsManagerKmsKeyId": {
-          "title": "Secretsmanagerkmskeyid",
+          "description": "The AWS Key Management Service \\(AWS KMS\\) key ID of a customer managed key from AWS Secrets Manager\\. Required when you use a customer managed key from Secrets Manager with a Lambda execution role that doesn\u2019t include the `kms:Decrypt` permission\\.  \nThe value of this property is a UUID\\. For example: `1abc23d4-567f-8ab9-cde0-1fab234c5d67`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn\u2019t have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The AWS Key Management Service \\(AWS KMS\\) key ID of a customer managed key from AWS Secrets Manager\\. Required when you use a customer managed key from Secrets Manager with a Lambda execution role that doesn\u2019t include the `kms:Decrypt` permission\\.  \nThe value of this property is a UUID\\. For example: `1abc23d4-567f-8ab9-cde0-1fab234c5d67`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn\u2019t have an AWS CloudFormation equivalent\\.",
+          "title": "SecretsManagerKmsKeyId",
           "type": "string"
         },
         "SourceAccessConfigurations": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "An array of the authentication protocol or virtual host\\. Specify this using the [ SourceAccessConfigurations](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-sourceaccessconfiguration.html) data type\\.  \nFor the `DocumentDB` event source type, the only valid configuration type is `BASIC_AUTH`\\.  \n+ `BASIC_AUTH` \u2013 The Secrets Manager secret that stores your broker credentials\\. For this type, the credential must be in the following format: `{\"username\": \"your-username\", \"password\": \"your-password\"}`\\. Only one object of type `BASIC_AUTH` is allowed\\.\n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ SourceAccessConfigurations](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "An array of the authentication protocol or virtual host\\. Specify this using the [ SourceAccessConfigurations](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-sourceaccessconfiguration.html) data type\\.  \nFor the `DocumentDB` event source type, the only valid configuration type is `BASIC_AUTH`\\.  \n+ `BASIC_AUTH` \u2013 The Secrets Manager secret that stores your broker credentials\\. For this type, the credential must be in the following format: `{\"username\": \"your-username\", \"password\": \"your-password\"}`\\. Only one object of type `BASIC_AUTH` is allowed\\.\n*Type*: List  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ SourceAccessConfigurations](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "SourceAccessConfigurations"
         },
         "StartingPosition": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The position in a stream from which to start reading\\.  \n+ `AT_TIMESTAMP` \u2013 Specify a time from which to start reading records\\.\n+ `LATEST` \u2013 Read only new records\\.\n+ `TRIM_HORIZON` \u2013 Process all available records\\.\n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ StartingPosition](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "The position in a stream from which to start reading\\.  \n+ `AT_TIMESTAMP` \u2013 Specify a time from which to start reading records\\.\n+ `LATEST` \u2013 Read only new records\\.\n+ `TRIM_HORIZON` \u2013 Process all available records\\.\n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ StartingPosition](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "StartingPosition"
         },
         "StartingPositionTimestamp": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The time from which to start reading, in Unix time seconds\\. Define `StartingPositionTimestamp` when `StartingPosition` is specified as `AT_TIMESTAMP`\\.  \n*Type*: Double  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ StartingPositionTimestamp](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingpositiontimestamp)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "The time from which to start reading, in Unix time seconds\\. Define `StartingPositionTimestamp` when `StartingPosition` is specified as `AT_TIMESTAMP`\\.  \n*Type*: Double  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ StartingPositionTimestamp](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingpositiontimestamp)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "StartingPositionTimestamp"
         }
       },
       "required": [
@@ -866,7 +945,14 @@
           "type": "array"
         },
         "SourceReference": {
-          "$ref": "#/definitions/SourceReference"
+          "allOf": [
+            {
+              "$ref": "#/definitions/SourceReferenceProperties"
+            }
+          ],
+          "description": "The source resource\\.  \nUse with the embedded connectors syntax when defining additional properties for the source resource\\.\n*Type*: [SourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-sourcereference.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The source resource\\.  \nUse with the embedded connectors syntax when defining additional properties for the source resource\\.\n*Type*: [SourceReference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-connector-sourcereference.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "SourceReference"
         }
       },
       "required": [
@@ -1677,7 +1763,9 @@
           "type": "array"
         },
         "DisableFunctionDefaultPermissions": {
-          "title": "Disablefunctiondefaultpermissions",
+          "description": "Specify `true` to prevent AWS SAM from automatically creating an `AWS::Lambda::Permissions` resource to provision permissions between your `AWS::Serverless::Api` resource and authorizer Lambda function\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specify `true` to prevent AWS SAM from automatically creating an `AWS::Lambda::Permissions` resource to provision permissions between your `AWS::Serverless::Api` resource and authorizer Lambda function\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "DisableFunctionDefaultPermissions",
           "type": "boolean"
         },
         "FunctionArn": {
@@ -1689,8 +1777,8 @@
               "type": "string"
             }
           ],
-          "description": "Specify the function arn of the Lambda function which provides authorization for the API\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "Specify the function arn of the Lambda function which provides authorization for the API\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "description": "Specify the function ARN of the Lambda function which provides authorization for the API\\.  \nAWS SAM will automatically create an `AWS::Lambda::Permissions` resource when `FunctionArn` is specified for `AWS::Serverless::Api`\\. The `AWS::Lambda::Permissions` resource provisions permissions between your API and authorizer Lambda function\\.\n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specify the function ARN of the Lambda function which provides authorization for the API\\.  \nAWS SAM will automatically create an `AWS::Lambda::Permissions` resource when `FunctionArn` is specified for `AWS::Serverless::Api`\\. The `AWS::Lambda::Permissions` resource provisions permissions between your API and authorizer Lambda function\\.\n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "FunctionArn"
         },
         "FunctionInvokeRole": {
@@ -1794,7 +1882,9 @@
           "type": "array"
         },
         "DisableFunctionDefaultPermissions": {
-          "title": "Disablefunctiondefaultpermissions",
+          "description": "Specify `true` to prevent AWS SAM from automatically creating an `AWS::Lambda::Permissions` resource to provision permissions between your `AWS::Serverless::Api` resource and authorizer Lambda function\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specify `true` to prevent AWS SAM from automatically creating an `AWS::Lambda::Permissions` resource to provision permissions between your `AWS::Serverless::Api` resource and authorizer Lambda function\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "DisableFunctionDefaultPermissions",
           "type": "boolean"
         },
         "FunctionArn": {
@@ -1806,8 +1896,8 @@
               "type": "string"
             }
           ],
-          "description": "Specify the function arn of the Lambda function which provides authorization for the API\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "Specify the function arn of the Lambda function which provides authorization for the API\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "description": "Specify the function ARN of the Lambda function which provides authorization for the API\\.  \nAWS SAM will automatically create an `AWS::Lambda::Permissions` resource when `FunctionArn` is specified for `AWS::Serverless::Api`\\. The `AWS::Lambda::Permissions` resource provisions permissions between your API and authorizer Lambda function\\.\n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specify the function ARN of the Lambda function which provides authorization for the API\\.  \nAWS SAM will automatically create an `AWS::Lambda::Permissions` resource when `FunctionArn` is specified for `AWS::Serverless::Api`\\. The `AWS::Lambda::Permissions` resource provisions permissions between your API and authorizer Lambda function\\.\n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "FunctionArn"
         },
         "FunctionInvokeRole": {
@@ -2097,7 +2187,14 @@
           "title": "MaximumBatchingWindowInSeconds"
         },
         "SourceAccessConfigurations": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "An array of the authentication protocol, VPC components, or virtual host to secure and define your event source\\.  \n*Valid values*: `CLIENT_CERTIFICATE_TLS_AUTH`  \n*Type*: List of [SourceAccessConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-sourceaccessconfiguration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SourceAccessConfigurations`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "An array of the authentication protocol, VPC components, or virtual host to secure and define your event source\\.  \n*Valid values*: `CLIENT_CERTIFICATE_TLS_AUTH`  \n*Type*: List of [SourceAccessConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-sourceaccessconfiguration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SourceAccessConfigurations`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "SourceAccessConfigurations"
         },
         "StartingPosition": {
           "allOf": [
@@ -2690,7 +2787,14 @@
           "title": "State"
         },
         "Target": {
-          "$ref": "#/definitions/ScheduleTarget"
+          "allOf": [
+            {
+              "$ref": "#/definitions/ScheduleTarget"
+            }
+          ],
+          "description": "The AWS resource that EventBridge invokes when a rule is triggered\\. You can use this property to specify the logical ID of the target\\. If this property is not specified, then AWS SAM generates the logical ID of the target\\.  \n*Type*: [Target](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinetarget.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Targets`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-targets) property of an `AWS::Events::Rule` resource\\. The AWS SAM version of this property only allows you to specify the logical ID of a single target\\.",
+          "markdownDescription": "The AWS resource that EventBridge invokes when a rule is triggered\\. You can use this property to specify the logical ID of the target\\. If this property is not specified, then AWS SAM generates the logical ID of the target\\.  \n*Type*: [Target](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinetarget.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Targets`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-targets) property of an `AWS::Events::Rule` resource\\. The AWS SAM version of this property only allows you to specify the logical ID of a single target\\.",
+          "title": "Target"
         }
       },
       "title": "ScheduleEventProperties",
@@ -2700,7 +2804,14 @@
       "additionalProperties": false,
       "properties": {
         "Id": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The logical ID of the target\\.  \nThe value of `Id` can include alphanumeric characters, periods \\(`.`\\), hyphens \\(`-`\\), and underscores \\(`_`\\)\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Id`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-id) property of the `AWS::Events::Rule` `Target` data type\\.",
+          "markdownDescription": "The logical ID of the target\\.  \nThe value of `Id` can include alphanumeric characters, periods \\(`.`\\), hyphens \\(`-`\\), and underscores \\(`_`\\)\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Id`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-id) property of the `AWS::Events::Rule` `Target` data type\\.",
+          "title": "Id"
         }
       },
       "required": [
@@ -2826,7 +2937,7 @@
       "title": "SelfManagedKafkaEventProperties",
       "type": "object"
     },
-    "SourceReference": {
+    "SourceReferenceProperties": {
       "additionalProperties": false,
       "properties": {
         "Qualifier": {
@@ -2835,12 +2946,12 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "markdownDescription": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\. For an example, see [API Gateway invoking a Lambda function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function.html#sam-property-connector-resourcereference--examples--api-gateway-invoking-a-lambda-function)\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "description": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "A qualifier for a resource that narrows its scope\\. `Qualifier` replaces the `*` value at the end of a resource constraint ARN\\.  \nQualifier definition varies per resource type\\. For a list of supported source and destination resource types, see [AWS SAM connector reference](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/reference-sam-connector.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "Qualifier"
         }
       },
-      "title": "SourceReference",
+      "title": "SourceReferenceProperties",
       "type": "object"
     },
     "SqsSubscription": {
@@ -4731,7 +4842,14 @@
           "title": "Runtime"
         },
         "RuntimeManagementConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "Configure runtime management options for your Lambda functions such as runtime environment updates, rollback behavior, and selecting a specific runtime version\\. To learn more, see [Lambda runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html) in the *AWS Lambda Developer Guide*\\.  \nIf `AutoPublishAlias` is configured, `RuntimeManagementConfig` will apply to both `$LATEST` and to the newly created version of the function\\.\n*Type*: [RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)` property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "Configure runtime management options for your Lambda functions such as runtime environment updates, rollback behavior, and selecting a specific runtime version\\. To learn more, see [Lambda runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html) in the *AWS Lambda Developer Guide*\\.  \nIf `AutoPublishAlias` is configured, `RuntimeManagementConfig` will apply to both `$LATEST` and to the newly created version of the function\\.\n*Type*: [RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)` property of an `AWS::Lambda::Function` resource\\.",
+          "title": "RuntimeManagementConfig"
         },
         "SnapStart": {
           "allOf": [
@@ -4823,7 +4941,9 @@
           "title": "AutoPublishAlias"
         },
         "AutoPublishAliasAllProperties": {
-          "title": "Autopublishaliasallproperties",
+          "description": "Specifies when a new [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html) is created\\. When `true`, a new Lambda version is created when any property in the Lambda function is modified\\. When `false`, a new Lambda version is created only when any of the following properties are modified:  \n+ `Environment`, `MemorySize`, or `SnapStart`\\.\n+ Any change that results in an update to the `Code` property, such as `CodeDict`, `ImageUri`, or `InlineCode`\\.\nThis property requires `AutoPublishAlias` to be defined\\.  \nIf `AutoPublishSha256` is also specified, its behavior takes precedence over `AutoPublishAliasAllProperties: true`\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default value*: `false`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Specifies when a new [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html) is created\\. When `true`, a new Lambda version is created when any property in the Lambda function is modified\\. When `false`, a new Lambda version is created only when any of the following properties are modified:  \n+ `Environment`, `MemorySize`, or `SnapStart`\\.\n+ Any change that results in an update to the `Code` property, such as `CodeDict`, `ImageUri`, or `InlineCode`\\.\nThis property requires `AutoPublishAlias` to be defined\\.  \nIf `AutoPublishSha256` is also specified, its behavior takes precedence over `AutoPublishAliasAllProperties: true`\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default value*: `false`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "AutoPublishAliasAllProperties",
           "type": "boolean"
         },
         "AutoPublishCodeSha256": {
@@ -5195,7 +5315,14 @@
           "title": "Runtime"
         },
         "RuntimeManagementConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "Configure runtime management options for your Lambda functions such as runtime environment updates, rollback behavior, and selecting a specific runtime version\\. To learn more, see [Lambda runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html) in the *AWS Lambda Developer Guide*\\.  \nIf `AutoPublishAlias` is configured, `RuntimeManagementConfig` will apply to both `$LATEST` and to the newly created version of the function\\.\n*Type*: [RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)` property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "Configure runtime management options for your Lambda functions such as runtime environment updates, rollback behavior, and selecting a specific runtime version\\. To learn more, see [Lambda runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html) in the *AWS Lambda Developer Guide*\\.  \nIf `AutoPublishAlias` is configured, `RuntimeManagementConfig` will apply to both `$LATEST` and to the newly created version of the function\\.\n*Type*: [RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)` property of an `AWS::Lambda::Function` resource\\.",
+          "title": "RuntimeManagementConfig"
         },
         "SnapStart": {
           "allOf": [
@@ -6058,7 +6185,14 @@
           "title": "FailOnWarnings"
         },
         "Name": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The name of the HTTP API resource\\.  \nWhen you specify `Name`, AWS SAM will modify the HTTP API resource's OpenAPI definition by setting the `title` field\\. The following scenarios will result in an error:  \n+ The `DefinitionBody` property is specified with the `title` field set in the Open API definition \u2013 This results in a conflict of the `title` field that AWS SAM won't resolve\\.\n+ The `DefinitionUri` property is specified \u2013 AWS SAM won't modify an Open API definition that is retrieved from Amazon S3\\.\n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "The name of the HTTP API resource\\.  \nWhen you specify `Name`, AWS SAM will modify the HTTP API resource's OpenAPI definition by setting the `title` field\\. The following scenarios will result in an error:  \n+ The `DefinitionBody` property is specified with the `title` field set in the Open API definition \u2013 This results in a conflict of the `title` field that AWS SAM won't resolve\\.\n+ The `DefinitionUri` property is specified \u2013 AWS SAM won't modify an Open API definition that is retrieved from Amazon S3\\.\n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Name"
         },
         "RouteSettings": {
           "allOf": [
@@ -6504,7 +6638,9 @@
           "title": "RestApiId"
         },
         "UnescapeMappingTemplate": {
-          "title": "Unescapemappingtemplate",
+          "description": "Unescapes single quotes, by replacing `\\'` with `'`, on the input that is passed to the state machine\\. Use when your input contains single quotes\\.  \nIf set to `False` and your input contains single quotes, an error will occur\\.\n*Type*: Boolean  \n*Required*: No  \n*Default*: False  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Unescapes single quotes, by replacing `\\'` with `'`, on the input that is passed to the state machine\\. Use when your input contains single quotes\\.  \nIf set to `False` and your input contains single quotes, an error will occur\\.\n*Type*: Boolean  \n*Required*: No  \n*Default*: False  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "UnescapeMappingTemplate",
           "type": "boolean"
         }
       },
@@ -6756,7 +6892,14 @@
           "title": "RetryPolicy"
         },
         "Target": {
-          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__EventBridgeRuleTarget"
+          "allOf": [
+            {
+              "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_statemachine__EventBridgeRuleTarget"
+            }
+          ],
+          "description": "The AWS resource that EventBridge invokes when a rule is triggered\\. You can use this property to specify the logical ID of the target\\. If this property is not specified, then AWS SAM generates the logical ID of the target\\.  \n*Type*: [Target](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinetarget.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Targets`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-targets) property of an `AWS::Events::Rule` resource\\. The AWS SAM version of this property only allows you to specify the logical ID of a single target\\.",
+          "markdownDescription": "The AWS resource that EventBridge invokes when a rule is triggered\\. You can use this property to specify the logical ID of the target\\. If this property is not specified, then AWS SAM generates the logical ID of the target\\.  \n*Type*: [Target](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-statemachine-statemachinetarget.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Targets`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-targets) property of an `AWS::Events::Rule` resource\\. The AWS SAM version of this property only allows you to specify the logical ID of a single target\\.",
+          "title": "Target"
         }
       },
       "title": "EventBridgeRuleEventProperties",
@@ -6766,7 +6909,14 @@
       "additionalProperties": false,
       "properties": {
         "Id": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The logical ID of the target\\.  \nThe value of `Id` can include alphanumeric characters, periods \\(`.`\\), hyphens \\(`-`\\), and underscores \\(`_`\\)\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Id`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-id) property of the `AWS::Events::Rule` `Target` data type\\.",
+          "markdownDescription": "The logical ID of the target\\.  \nThe value of `Id` can include alphanumeric characters, periods \\(`.`\\), hyphens \\(`-`\\), and underscores \\(`_`\\)\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Id`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-id) property of the `AWS::Events::Rule` `Target` data type\\.",
+          "title": "Id"
         }
       },
       "required": [
@@ -6895,7 +7045,14 @@
           "title": "Role"
         },
         "RolePath": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The path to the state machine's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
+          "markdownDescription": "The path to the state machine's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
+          "title": "RolePath"
         },
         "Tags": {
           "description": "A string\\-to\\-string map that specifies the tags added to the state machine and the corresponding execution role\\. For information about valid keys and values for tags, see the [Tags](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-tags) property of an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html) resource\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-tags) property of an `AWS::StepFunctions::StateMachine` resource\\. AWS SAM automatically adds a `stateMachine:createdBy:SAM` tag to this resource, and to the default role that is generated for it\\.",
