@@ -1,0 +1,286 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Parameters": {
+    "HostedZoneId": {
+      "Type": "String"
+    },
+    "MyRestRegionalDomainCert": {
+      "Type": "String"
+    },
+    "MyRestRegionalDomainName": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "ApiGatewayDomainName1a01391c0c": {
+      "Properties": {
+        "DomainName": {
+          "Ref": "MyRestRegionalDomainName"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "MutualTlsAuthentication": {
+          "TruststoreUri": "${mtlsuri}"
+        },
+        "RegionalCertificateArn": {
+          "Ref": "MyRestRegionalDomainCert"
+        },
+        "SecurityPolicy": "TLS_1_2"
+      },
+      "Type": "AWS::ApiGateway::DomainName"
+    },
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionImplicitGetPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/get",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyFunctionImplicitPostPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/post",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "RecordSetGroup1194dea82a": {
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "HostedZoneId"
+        },
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName1a01391c0c",
+                  "RegionalDomainName"
+                ]
+              },
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName1a01391c0c",
+                  "RegionalHostedZoneId"
+                ]
+              }
+            },
+            "Name": {
+              "Ref": "MyRestRegionalDomainName"
+            },
+            "Region": "eu-west-2",
+            "SetIdentifier": "eu-west-2",
+            "Type": "A"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName1a01391c0c",
+                  "RegionalDomainName"
+                ]
+              },
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName1a01391c0c",
+                  "RegionalHostedZoneId"
+                ]
+              }
+            },
+            "Name": {
+              "Ref": "MyRestRegionalDomainName"
+            },
+            "Region": "eu-west-2",
+            "SetIdentifier": "eu-west-2",
+            "Type": "AAAA"
+          }
+        ]
+      },
+      "Type": "AWS::Route53::RecordSetGroup"
+    },
+    "ServerlessRestApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/get": {
+              "get": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }
+              }
+            },
+            "/post": {
+              "post": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ServerlessRestApiDeployment0173db1f08": {
+      "Properties": {
+        "Description": "RestApi deployment id: 0173db1f08a21b6fa9477b90933b400190264d0b",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ServerlessRestApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment0173db1f08"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "ServerlessRestApigetBasePathMapping": {
+      "Properties": {
+        "BasePath": "get",
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName1a01391c0c"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Stage": {
+          "Ref": "ServerlessRestApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "ServerlessRestApipostBasePathMapping": {
+      "Properties": {
+        "BasePath": "post",
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName1a01391c0c"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Stage": {
+          "Ref": "ServerlessRestApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    }
+  }
+}

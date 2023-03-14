@@ -3979,6 +3979,12 @@
           "markdownDescription": "When this property is set, AWS SAM creates a `AWS::Route53::RecordSet` resource and sets [Type](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset.html#cfn-route53-recordset-type) to `AAAA` for the provided HostedZone\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "IpV6",
           "type": "boolean"
+        },
+        "Region": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "SetIdentifier": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "title": "Route53",
@@ -6184,6 +6190,12 @@
           "markdownDescription": "When this property is set, AWS SAM creates a `AWS::Route53::RecordSet` resource and sets [Type](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset.html#cfn-route53-recordset-type) to `AAAA` for the provided HostedZone\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "IpV6",
           "type": "boolean"
+        },
+        "Region": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "SetIdentifier": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "title": "Route53",
