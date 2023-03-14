@@ -33,12 +33,12 @@ class Resource(ResourceAttributes):
     Properties: Properties
 
 
-class SourceReferenceProperties(BaseModel):
+class SourceReference(BaseModel):
     Qualifier: Optional[PassThroughProp] = sourcereference("Qualifier")
 
 
 class EmbeddedConnectorProperties(BaseModel):
-    SourceReference: Optional[SourceReferenceProperties] = properties("SourceReference")
+    SourceReference: Optional[SourceReference] = properties("SourceReference")
     Destination: Union[ResourceReference, List[ResourceReference]] = properties("Destination")
     Permissions: PermissionsType = properties("Permissions")
 
