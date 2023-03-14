@@ -15,17 +15,20 @@ import os.path
 import pkgutil
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Set, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Set, Union
 
 _ARGUMENT_SELF = {"kind": "POSITIONAL_OR_KEYWORD", "name": "self"}
 
 
 class InterfaceScanner:
-    def __init__(self) -> None:
+    def __init__(self, skipped_modules: Optional[List[str]] = None) -> None:
         self.signatures: Dict[str, Union[inspect.Signature]] = {}
         self.variables: Set[str] = set()
+        self.skipped_modules: Set[str] = set(skipped_modules or [])
 
     def scan_interfaces_recursively(self, module_name: str) -> None:
+        if module_name in self.skipped_modules:
+            return
         self._scan_interfaces_in_module(module_name)
         for submodule in pkgutil.iter_modules([module_name.replace(".", os.path.sep)]):
             submodule_name = module_name + "." + submodule.name
@@ -212,13 +215,20 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command")
     extract = subparsers.add_parser("extract", help="Extract public interfaces")
     extract.add_argument("--module", help="The module to extract public interfaces", type=str, default="samtranslator")
+    extract.add_argument(
+        "--skipped-module",
+        help="The modules that should be skipped",
+        type=str,
+        nargs="*",
+        default=["samtranslator.internal"],
+    )
     check = subparsers.add_parser("check", help="Check public interface changes")
     check.add_argument("original_json", help="The original public interface JSON file", type=Path)
     check.add_argument("new_json", help="The new public interface JSON file", type=Path)
     args = parser.parse_args()
 
     if args.command == "extract":
-        scanner = InterfaceScanner()
+        scanner = InterfaceScanner(skipped_modules=args.skipped_module)
         scanner.scan_interfaces_recursively(args.module)
         _print(scanner.signatures, scanner.variables)
     elif args.command == "check":
