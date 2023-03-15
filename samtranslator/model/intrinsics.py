@@ -106,7 +106,7 @@ def make_combined_condition(
         new_condition_name = condition_name
         # If more than 1 new condition is needed, add a number to the end of the name
         if zero_based_num_conditions > 0:
-            new_condition_name = "{}{}".format(condition_name, zero_based_num_conditions)
+            new_condition_name = f"{condition_name}{zero_based_num_conditions}"
             zero_based_num_conditions -= 1
         new_condition_content = make_or_condition(conditions_list[:max_conditions])
         conditions_list = conditions_list[max_conditions:]

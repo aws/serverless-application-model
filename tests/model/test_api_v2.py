@@ -168,6 +168,21 @@ class TestApiGatewayV2Authorizer(TestCase):
             + "EnableSimpleResponses must be defined only for Lambda Authorizer.",
         )
 
+    def test_create_authorizer_fails_with_enable_function_default_permissions_non_lambda(self):
+        with pytest.raises(InvalidResourceException) as e:
+            ApiGatewayV2Authorizer(
+                api_logical_id="logicalId",
+                name="authName",
+                jwt_configuration={"config": "value"},
+                authorization_scopes=["scope1", "scope2"],
+                enable_function_default_permissions=True,
+            )
+        self.assertEqual(
+            e.value.message,
+            "Resource with id [logicalId] is invalid. "
+            + "EnableFunctionDefaultPermissions must be defined only for Lambda Authorizer.",
+        )
+
     @mock.patch(
         "samtranslator.model.apigatewayv2.ApiGatewayV2Authorizer._get_auth_type", mock.MagicMock(return_value="JWT")
     )

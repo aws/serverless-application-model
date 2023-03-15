@@ -52,12 +52,13 @@ AuthProperties = namedtuple(
         "DefaultAuthorizer",
         "InvokeRole",
         "AddDefaultAuthorizerToCorsPreflight",
+        "AddApiKeyRequiredToCorsPreflight",
         "ApiKeyRequired",
         "ResourcePolicy",
         "UsagePlan",
     ],
 )
-AuthProperties.__new__.__defaults__ = (None, None, None, True, None, None, None)
+AuthProperties.__new__.__defaults__ = (None, None, None, True, True, None, None, None)
 UsagePlanProperties = namedtuple(
     "UsagePlanProperties", ["CreateUsagePlan", "Description", "Quota", "Tags", "Throttle", "UsagePlanName"]
 )
@@ -578,24 +579,35 @@ class ApiGenerator:
         return domain, basepath_resource_list, record_set_group
 
     def _construct_record_sets_for_domain(
-        self, domain: Dict[str, Any], api_domain_name: str, route53: Any
+        self, custom_domain_config: Dict[str, Any], api_domain_name: str, route53_config: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         recordset_list = []
+
         recordset = {}
-
-        recordset["Name"] = domain.get("DomainName")
+        recordset["Name"] = custom_domain_config.get("DomainName")
         recordset["Type"] = "A"
-        recordset["AliasTarget"] = self._construct_alias_target(domain, api_domain_name, route53)
-        recordset_list.extend([recordset])
+        recordset["AliasTarget"] = self._construct_alias_target(custom_domain_config, api_domain_name, route53_config)
+        self._update_route53_routing_policy_properties(route53_config, recordset)
+        recordset_list.append(recordset)
 
-        recordset_ipv6 = {}
-        if route53.get("IpV6") is not None and route53.get("IpV6") is True:
-            recordset_ipv6["Name"] = domain.get("DomainName")
+        if route53_config.get("IpV6") is not None and route53_config.get("IpV6") is True:
+            recordset_ipv6 = {}
+            recordset_ipv6["Name"] = custom_domain_config.get("DomainName")
             recordset_ipv6["Type"] = "AAAA"
-            recordset_ipv6["AliasTarget"] = self._construct_alias_target(domain, api_domain_name, route53)
-            recordset_list.extend([recordset_ipv6])
+            recordset_ipv6["AliasTarget"] = self._construct_alias_target(
+                custom_domain_config, api_domain_name, route53_config
+            )
+            self._update_route53_routing_policy_properties(route53_config, recordset_ipv6)
+            recordset_list.append(recordset_ipv6)
 
         return recordset_list
+
+    @staticmethod
+    def _update_route53_routing_policy_properties(route53_config: Dict[str, Any], recordset: Dict[str, Any]) -> None:
+        if route53_config.get("Region") is not None:
+            recordset["Region"] = route53_config.get("Region")
+        if route53_config.get("SetIdentifier") is not None:
+            recordset["SetIdentifier"] = route53_config.get("SetIdentifier")
 
     def _construct_alias_target(self, domain: Dict[str, Any], api_domain_name: str, route53: Any) -> Dict[str, Any]:
         alias_target = {}
@@ -752,7 +764,7 @@ class ApiGenerator:
 
         if auth_properties.ApiKeyRequired:
             swagger_editor.add_apikey_security_definition()
-            self._set_default_apikey_required(swagger_editor)
+            self._set_default_apikey_required(swagger_editor, auth_properties.AddApiKeyRequiredToCorsPreflight)
 
         if auth_properties.ResourcePolicy:
             SwaggerEditor.validate_is_dict(
@@ -796,7 +808,7 @@ class ApiGenerator:
             raise InvalidResourceException(self.logical_id, "'CreateUsagePlan' is a required field for UsagePlan.")
         if create_usage_plan not in create_usage_plans_accepted_values:
             raise InvalidResourceException(
-                self.logical_id, "'CreateUsagePlan' accepts one of {}.".format(create_usage_plans_accepted_values)
+                self.logical_id, f"'CreateUsagePlan' accepts one of {create_usage_plans_accepted_values}."
             )
 
         if create_usage_plan == "NONE":
@@ -1224,9 +1236,9 @@ class ApiGenerator:
                 add_default_auth_to_preflight=add_default_auth_to_preflight,
             )
 
-    def _set_default_apikey_required(self, swagger_editor: SwaggerEditor) -> None:
+    def _set_default_apikey_required(self, swagger_editor: SwaggerEditor, required_options_api_key: bool) -> None:
         for path in swagger_editor.iter_on_path():
-            swagger_editor.set_path_default_apikey_required(path)
+            swagger_editor.set_path_default_apikey_required(path, required_options_api_key)
 
     def _set_endpoint_configuration(self, rest_api: ApiGatewayRestApi, value: Union[str, Dict[str, Any]]) -> None:
         """

@@ -12,7 +12,15 @@ select = [
     "Q", # flake8-quotes
     "TID", # flake8-tidy-imports
     "RUF", # Ruff-specific rules
+    "UP", # pyupgrade
 ]
+
+# Mininal python version we support is 3.7
+target-version = "py37"
+
+# https://github.com/charliermarsh/ruff/issues/2382
+[pyupgrade]
+keep-runtime-typing = true
 
 [per-file-ignores]
 

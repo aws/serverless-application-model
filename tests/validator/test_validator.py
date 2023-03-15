@@ -164,7 +164,7 @@ class TestValidatorTranslatorTemplates(TestValidatorBase):
         validation_errors = TestValidatorProvider.get().get_errors(manifest)
         has_errors = len(validation_errors)
         if has_errors:
-            print("\nFailing template: {0}\n".format(testcase))
+            print(f"\nFailing template: {testcase}\n")
             print(validation_errors)
         assert len(validation_errors) == 0
 

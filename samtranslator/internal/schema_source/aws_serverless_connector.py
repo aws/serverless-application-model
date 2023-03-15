@@ -12,6 +12,7 @@ from samtranslator.internal.schema_source.common import (
 
 resourcereference = get_prop("sam-property-connector-resourcereference")
 properties = get_prop("sam-resource-connector")
+sourcereference = get_prop("sam-property-connector-sourcereference")
 
 
 class ResourceReference(BaseModel):
@@ -36,12 +37,12 @@ class Resource(ResourceAttributes):
     Properties: Properties
 
 
-class SourceReference(BaseModel):
-    Qualifier: Optional[PassThroughProp] = resourcereference("Qualifier")
+class SourceReferenceProperties(BaseModel):
+    Qualifier: Optional[PassThroughProp] = sourcereference("Qualifier")
 
 
 class EmbeddedConnectorProperties(BaseModel):
-    SourceReference: Optional[SourceReference]  # TODO: add docs for SourceReference
+    SourceReference: Optional[SourceReferenceProperties] = properties("SourceReference")
     Destination: Union[ResourceReference, List[ResourceReference]] = properties("Destination")
     Permissions: PermissionsType = properties("Permissions")
 

@@ -15,6 +15,7 @@ class TestApiWithCors(BaseTest):
         [
             "combination/api_with_cors",
             "combination/api_with_cors_openapi",
+            "combination/api_with_cors_and_apikey",
         ]
     )
     def test_cors(self, file_name):

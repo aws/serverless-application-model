@@ -233,7 +233,7 @@ class BaseEditor:
         """
 
         BaseEditor.validate_is_dict(
-            path_item, "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
+            path_item, f"Value of '{path}' path must be a dictionary according to Swagger spec."
         )
 
     @staticmethod

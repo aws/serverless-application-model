@@ -1,0 +1,58 @@
+Parameters:
+  MyRestRegionalDomainName:
+    Type: String
+  MyRestRegionalDomainCert:
+    Type: String
+  HostedZoneId:
+    Type: String
+
+Globals:
+  Api:
+    Domain:
+      DomainName:
+        Ref: MyRestRegionalDomainName
+      CertificateArn:
+        Ref: MyRestRegionalDomainCert
+      EndpointConfiguration: REGIONAL
+      MutualTlsAuthentication:
+        TruststoreUri: ${mtlsuri}
+        TruststoreVersion: 0
+      SecurityPolicy: TLS_1_2
+      BasePath:
+      - /get
+      - /post
+      Route53:
+        HostedZoneId:
+          Ref: HostedZoneId
+        Region: eu-west-2
+        SetIdentifier: eu-west-2
+        DistributionDomainName: test.domain.com
+        IpV6: true
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs14.x
+      Events:
+        ImplicitGet:
+          Type: Api
+          Properties:
+            Method: Get
+            Path: /get
+        ImplicitPost:
+          Type: Api
+          Properties:
+            Method: Post
+            Path: /post
+Metadata:
+  SamTransformTest: true
