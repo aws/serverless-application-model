@@ -2302,8 +2302,8 @@ class SamGraphQLApi(SamResourceMacro):
                 logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
 
-            # Name must be unique, so we use the datasource logical ID instead of the relative ID from the customer.
-            cfn_datasource.Name = ddb_datasource.Name or datasource_logical_id
+            # Datasource "Name" property must be unique from all other datasources.
+            cfn_datasource.Name = ddb_datasource.Name or relative_id
             cfn_datasource.Type = "AMAZON_DYNAMODB"
             cfn_datasource.ApiId = api_id
 

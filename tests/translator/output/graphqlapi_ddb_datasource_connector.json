@@ -41,7 +41,7 @@
           },
           "TableName": "cool-table"
         },
-        "Name": "SuperCoolAPIAnotherDataSource",
+        "Name": "AnotherDataSource",
         "ServiceRoleArn": {
           "Fn::GetAtt": [
             "SuperCoolAPIAnotherDataSourceRole",
@@ -185,7 +185,7 @@
           },
           "TableName": "some-table"
         },
-        "Name": "SuperCoolAPIMyDataSource",
+        "Name": "MyDataSource",
         "ServiceRoleArn": {
           "Fn::GetAtt": [
             "SuperCoolAPIMyDataSourceRole",
