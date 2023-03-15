@@ -2,7 +2,6 @@
 Logic for uploading to S3 per Cloudformation Specific Resource
 This was ported over from the sam-cli repo
 """
-# pylint: disable=no-member
 
 # Copyright 2012-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #

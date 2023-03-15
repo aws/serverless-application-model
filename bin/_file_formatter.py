@@ -45,7 +45,7 @@ class FileFormatter(ABC):
         """Optionally configure additional args to arg parser."""
 
     def process_file(self, file_path: str) -> None:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             file_str = f.read()
             try:
                 formatted_file_str = self.format_str(file_str)

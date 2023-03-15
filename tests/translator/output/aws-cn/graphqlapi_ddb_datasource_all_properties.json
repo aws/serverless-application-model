@@ -1,31 +1,5 @@
 {
   "Resources": {
-    "MyDataSource": {
-      "Properties": {
-        "ApiId": {
-          "Fn::GetAtt": [
-            "SuperCoolAPI",
-            "ApiId"
-          ]
-        },
-        "Description": "This data source is special to me",
-        "DynamoDBConfig": {
-          "AwsRegion": "na-west-2",
-          "DeltaSyncConfig": {
-            "BaseTableTTL": "60",
-            "DeltaSyncTableName": "60",
-            "DeltaSyncTableTTL": "60"
-          },
-          "TableName": "some-table",
-          "UseCallerCredentials": true,
-          "Versioned": true
-        },
-        "Name": "AwesomeDataSourceName",
-        "ServiceRoleArn": "some-arn",
-        "Type": "AMAZON_DYNAMODB"
-      },
-      "Type": "AWS::AppSync::DataSource"
-    },
     "SuperCoolAPI": {
       "Properties": {
         "AuthenticationType": "AWS_IAM",
@@ -78,6 +52,32 @@
         ]
       },
       "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIMyDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Description": "This data source is special to me",
+        "DynamoDBConfig": {
+          "AwsRegion": "na-west-2",
+          "DeltaSyncConfig": {
+            "BaseTableTTL": "60",
+            "DeltaSyncTableName": "60",
+            "DeltaSyncTableTTL": "60"
+          },
+          "TableName": "some-table",
+          "UseCallerCredentials": true,
+          "Versioned": true
+        },
+        "Name": "AwesomeDataSourceName",
+        "ServiceRoleArn": "some-arn",
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "Type": "AWS::AppSync::DataSource"
     },
     "SuperCoolAPISchema": {
       "Properties": {

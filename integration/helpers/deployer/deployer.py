@@ -140,7 +140,7 @@ class Deployer:
             "ChangeSetType": changeset_type,
             "Parameters": parameter_values,
             "Capabilities": capabilities,
-            "Description": "Created by SAM CLI at {0} UTC".format(datetime.utcnow().isoformat()),
+            "Description": f"Created by SAM CLI at {datetime.utcnow().isoformat()} UTC",
             "Tags": tags,
         }
 
@@ -172,7 +172,7 @@ class Deployer:
         except botocore.exceptions.ClientError as ex:
             if "The bucket you are attempting to access must be addressed using the specified endpoint" in str(ex):
                 raise deploy_exceptions.DeployBucketInDifferentRegionError(
-                    "Failed to create/update stack {}".format(stack_name)
+                    f"Failed to create/update stack {stack_name}"
                 )
             raise deploy_exceptions.ChangeSetError(stack_name=stack_name, msg=str(ex))
 
@@ -278,7 +278,7 @@ class Deployer:
                 raise deploy_exceptions.ChangeEmptyError(stack_name=stack_name)
 
             raise deploy_exceptions.ChangeSetError(
-                stack_name=stack_name, msg="ex: {0} Status: {1}. Reason: {2}".format(ex, status, reason)
+                stack_name=stack_name, msg=f"ex: {ex} Status: {status}. Reason: {reason}"
             )
 
     def execute_changeset(self, changeset_id, stack_name):
@@ -323,7 +323,7 @@ class Deployer:
         elif changeset_type == "UPDATE":
             waiter = self._client.get_waiter("stack_update_complete")
         else:
-            raise RuntimeError("Invalid changeset type {0}".format(changeset_type))
+            raise RuntimeError(f"Invalid changeset type {changeset_type}")
 
         # Poll every 30 seconds. Polling too frequently risks hitting rate limits
         # on CloudFormation's DescribeStacks API
@@ -408,7 +408,7 @@ class Deployer:
             try:
                 outputs = stacks_description["Stacks"][0]["Outputs"]
                 if echo:
-                    sys.stdout.write("\nStack {stack_name} outputs:\n".format(stack_name=stack_name))
+                    sys.stdout.write(f"\nStack {stack_name} outputs:\n")
                     sys.stdout.flush()
                     self._display_stack_outputs(stack_outputs=outputs)
                 return outputs

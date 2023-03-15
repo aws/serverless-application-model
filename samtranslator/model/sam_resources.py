@@ -345,7 +345,7 @@ class SamFunction(SamResourceMacro):
         # Try to resolve.
         resolved_event_invoke_config = intrinsics_resolver.resolve_parameter_refs(self.EventInvokeConfig)
 
-        logical_id = "{id}EventInvokeConfig".format(id=function_name)
+        logical_id = f"{function_name}EventInvokeConfig"
         lambda_event_invoke_config = (
             LambdaEventInvokeConfig(
                 logical_id=logical_id, depends_on=[lambda_alias.logical_id], attributes=self.resource_attributes
@@ -437,7 +437,7 @@ class SamFunction(SamResourceMacro):
                 policy = self._add_event_invoke_managed_policy(dest_config, resource_logical_id, destination)
             else:
                 raise InvalidResourceException(
-                    self.logical_id, "Destination is required if Type is not {}".format(auto_inject_list)
+                    self.logical_id, f"Destination is required if Type is not {auto_inject_list}"
                 )
         if dest_config.get("Destination") is not None and property_condition is None:
             policy = self._add_event_invoke_managed_policy(
@@ -520,7 +520,7 @@ class SamFunction(SamResourceMacro):
         if not isinstance(resolved_alias_name, str):
             # This is still a dictionary which means we are not able to completely resolve intrinsics
             raise InvalidResourceException(
-                self.logical_id, "'{}' must be a string or a Ref to a template parameter".format(property_name)
+                self.logical_id, f"'{property_name}' must be a string or a Ref to a template parameter"
             )
 
         return resolved_alias_name
@@ -655,20 +655,20 @@ class SamFunction(SamResourceMacro):
         if packagetype not in [ZIP, IMAGE]:
             raise InvalidResourceException(
                 lambda_function.logical_id,
-                "PackageType needs to be `{zip}` or `{image}`".format(zip=ZIP, image=IMAGE),
+                f"PackageType needs to be `{ZIP}` or `{IMAGE}`",
             )
 
         def _validate_package_type_zip() -> None:
             if not all([lambda_function.Runtime, lambda_function.Handler]):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
-                    "Runtime and Handler needs to be present when PackageType is of type `{zip}`".format(zip=ZIP),
+                    f"Runtime and Handler needs to be present when PackageType is of type `{ZIP}`",
                 )
 
             if any([lambda_function.Code.get("ImageUri", False), lambda_function.ImageConfig]):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
-                    "ImageUri or ImageConfig cannot be present when PackageType is of type `{zip}`".format(zip=ZIP),
+                    f"ImageUri or ImageConfig cannot be present when PackageType is of type `{ZIP}`",
                 )
 
         def _validate_package_type_image() -> None:
@@ -682,7 +682,7 @@ class SamFunction(SamResourceMacro):
             if not lambda_function.Code.get("ImageUri"):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
-                    "ImageUri needs to be present when PackageType is of type `{image}`".format(image=IMAGE),
+                    f"ImageUri needs to be present when PackageType is of type `{IMAGE}`",
                 )
 
         _validate_per_package_type = {ZIP: _validate_package_type_zip, IMAGE: _validate_package_type_image}
@@ -707,9 +707,7 @@ class SamFunction(SamResourceMacro):
 
         # Validate required Types
         if dlq_type not in self.dead_letter_queue_policy_actions:
-            raise InvalidResourceException(
-                self.logical_id, "'DeadLetterQueue' requires Type of {}".format(valid_dlq_types)
-            )
+            raise InvalidResourceException(self.logical_id, f"'DeadLetterQueue' requires Type of {valid_dlq_types}")
 
     def _event_resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         event_resources = {}
@@ -720,7 +718,7 @@ class SamFunction(SamResourceMacro):
                         self.logical_id + logical_id, event_dict, logical_id
                     )
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, "{}".format(e)) from e
+                    raise InvalidEventException(logical_id, f"{e}") from e
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
 
@@ -768,7 +766,7 @@ class SamFunction(SamResourceMacro):
                         lambda_function.logical_id + logical_id, event_dict, logical_id
                     )
                 except TypeError as e:
-                    raise InvalidEventException(logical_id, "{}".format(e)) from e
+                    raise InvalidEventException(logical_id, f"{e}") from e
 
                 kwargs = {
                     # When Alias is provided, connect all event sources to the alias and *not* the function
@@ -800,7 +798,7 @@ class SamFunction(SamResourceMacro):
             artifacts = {"ImageUri": self.ImageUri}
 
         if packagetype not in [ZIP, IMAGE]:
-            raise InvalidResourceException(self.logical_id, "invalid 'PackageType' : {}".format(packagetype))
+            raise InvalidResourceException(self.logical_id, f"invalid 'PackageType' : {packagetype}")
 
         # Inline function for transformation of inline code.
         # It accepts arbitrary argumemnts, because the arguments do not matter for the result.
@@ -879,7 +877,7 @@ class SamFunction(SamResourceMacro):
         #
         # SHA Collisions: For purposes of triggering a new update, we are concerned about just the difference previous
         #                 and next hashes. The chances that two subsequent hashes collide is fairly low.
-        prefix = "{id}Version".format(id=self.logical_id)
+        prefix = f"{self.logical_id}Version"
         logical_dict = {}
         # We can't directly change AutoPublishAlias as that would be a breaking change, so we have to add this opt-in
         # property that when set to true would change the lambda version whenever a property in the lambda function changes
@@ -923,7 +921,7 @@ class SamFunction(SamResourceMacro):
         if not name:
             raise InvalidResourceException(self.logical_id, "Alias name is required to create an alias")
 
-        logical_id = "{id}Alias{suffix}".format(id=function.logical_id, suffix=name)
+        logical_id = f"{function.logical_id}Alias{name}"
         alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())
         alias.Name = name
         alias.FunctionName = function.get_runtime_attr("name")
@@ -1109,7 +1107,7 @@ class SamFunction(SamResourceMacro):
             if prop_name not in cors_property_data_type:
                 raise InvalidResourceException(
                     lambda_function.logical_id,
-                    "{} is not a valid property for configuring Cors.".format(prop_name),
+                    f"{prop_name} is not a valid property for configuring Cors.",
                 )
             prop_type = cors_property_data_type.get(prop_name, list)
             if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):
@@ -1407,9 +1405,12 @@ class SamHttpApi(SamResourceMacro):
             domain,
             basepath_mapping,
             route53,
+            permissions,
         ) = api_generator.to_cloudformation(kwargs.get("route53_record_set_groups", {}))
 
         resources.append(http_api)
+        if permissions:
+            resources.extend(permissions)
         if domain:
             resources.append(domain)
         if basepath_mapping:
@@ -1490,7 +1491,7 @@ class SamSimpleTable(SamResourceMacro):
     def _convert_attribute_type(self, attribute_type: str) -> str:
         if attribute_type in self.attribute_type_conversions:
             return self.attribute_type_conversions[attribute_type]
-        raise InvalidResourceException(self.logical_id, "Invalid 'Type' \"{actual}\".".format(actual=attribute_type))
+        raise InvalidResourceException(self.logical_id, f"Invalid 'Type' \"{attribute_type}\".")
 
 
 class SamApplication(SamResourceMacro):
@@ -1691,7 +1692,7 @@ class SamLayerVersion(SamResourceMacro):
                 return option
         raise InvalidResourceException(
             self.logical_id,
-            "'RetentionPolicy' must be one of the following options: {}.".format([self.RETAIN, self.DELETE]),
+            f"'RetentionPolicy' must be one of the following options: {[self.RETAIN, self.DELETE]}.",
         )
 
     def _validate_architectures(self, lambda_layer: LambdaLayerVersion) -> None:
@@ -1716,7 +1717,7 @@ class SamLayerVersion(SamResourceMacro):
             if not is_intrinsic(arq) and arq not in [ARM64, X86_64]:
                 raise InvalidResourceException(
                     lambda_layer.logical_id,
-                    "CompatibleArchitectures needs to be a list of '{}' or '{}'".format(X86_64, ARM64),
+                    f"CompatibleArchitectures needs to be a list of '{X86_64}' or '{ARM64}'",
                 )
 
 
@@ -1808,7 +1809,7 @@ class SamStateMachine(SamResourceMacro):
                         self.logical_id + logical_id, event_dict, logical_id
                     )
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, "{}".format(e)) from e
+                    raise InvalidEventException(logical_id, f"{e}") from e
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
 
@@ -2306,10 +2307,12 @@ class SamGraphQLApi(SamResourceMacro):
         resources: List[Resource] = []
 
         for relative_id, ddb_datasource in ddb_datasources.items():
+            datasource_logical_id = self.logical_id + relative_id
             cfn_datasource = DataSource(
-                logical_id=relative_id, depends_on=self.depends_on, attributes=self.resource_attributes
+                logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
 
+            # Datasource "Name" property must be unique from all other datasources.
             cfn_datasource.Name = ddb_datasource.Name or relative_id
             cfn_datasource.Type = "AMAZON_DYNAMODB"
             cfn_datasource.ApiId = api_id
@@ -2320,7 +2323,7 @@ class SamGraphQLApi(SamResourceMacro):
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
 
             cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_datasource_role(
-                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, kwargs
+                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, datasource_logical_id, kwargs
             )
 
             resources.extend([cfn_datasource, *permissions_resources])
@@ -2332,6 +2335,7 @@ class SamGraphQLApi(SamResourceMacro):
         ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource,
         datasource_arn: Intrinsicable[str],
         relative_id: str,
+        datasource_logical_id: str,
         kwargs: Dict[str, Any],
     ) -> Tuple[str, List[Resource]]:
         # If the user defined a role, then there's no need to generate role/policy for them, so we return fast.
@@ -2344,7 +2348,7 @@ class SamGraphQLApi(SamResourceMacro):
         ).to_not_be_none("'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined.")
         permissions = ddb_datasource.Permissions or ["Read", "Write"]
 
-        role_id = f"{relative_id}Role"
+        role_id = f"{datasource_logical_id}Role"
         role = IAMRole(
             logical_id=role_id,
             depends_on=self.depends_on,
@@ -2356,7 +2360,7 @@ class SamGraphQLApi(SamResourceMacro):
         role_arn = role.get_runtime_attr("arn")
 
         connector_resources = self._construct_ddb_datasource_connector_resources(
-            relative_id, datasource_arn, table_arn, permissions, role.get_runtime_attr("name"), kwargs
+            datasource_logical_id, datasource_arn, table_arn, permissions, role.get_runtime_attr("name"), kwargs
         )
 
         return role_arn, [role, *connector_resources]

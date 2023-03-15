@@ -1,0 +1,26 @@
+[
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "MyApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "MyApidevStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "ApiGatewayLambdaRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
+]

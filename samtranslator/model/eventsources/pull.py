@@ -157,7 +157,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
             else:
                 raise InvalidEventException(
                     self.logical_id,
-                    "Property ConsumerGroupId not defined for resource of type {}.".format(self.resource_type),
+                    f"Property ConsumerGroupId not defined for resource of type {self.resource_type}.",
                 )
 
         destination_config_policy: Optional[Dict[str, Any]] = None
@@ -626,7 +626,7 @@ class SelfManagedKafka(PullEventSource):
         if not uri:
             raise InvalidEventException(
                 self.relative_id,
-                "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
+                f"No {msg} URI property specified in SourceAccessConfigurations for self managed kafka event.",
             )
 
         if not isinstance(uri, str) and not is_intrinsic(uri):
@@ -659,7 +659,7 @@ class SelfManagedKafka(PullEventSource):
         }
 
     @staticmethod
-    @deprecated(None)
+    @deprecated()
     def get_kms_policy(secrets_manager_kms_key_id: str) -> Dict[str, Any]:
         return {
             "Action": ["kms:Decrypt"],

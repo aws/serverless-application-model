@@ -136,7 +136,7 @@ class SamTemplateValidator:
             # [Path.To.Element] Error message
             error_path = ".".join([str(p) for p in error.absolute_path]) if error.absolute_path else "."
 
-            error_content = "[{}] {}".format(error_path, self._cleanup_error_message(error))  # type: ignore[no-untyped-call]
+            error_content = f"[{error_path}] {self._cleanup_error_message(error)}"  # type: ignore[no-untyped-call]
 
             if error_content not in errors_set:
                 # We set the value to None as we don't use it

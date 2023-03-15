@@ -156,7 +156,7 @@ class ServerlessAppPlugin(BasePlugin):
             except ClientError as e:
                 error_code = e.response["Error"]["Code"]
                 if error_code == "TooManyRequestsException":
-                    LOG.debug("SAR call timed out for application id {}".format(app_id))
+                    LOG.debug(f"SAR call timed out for application id {app_id}")
                     sleep_time = self._get_sleep_time_sec()
                     sleep(sleep_time)
                     self._total_wait_time += sleep_time
@@ -211,14 +211,14 @@ class ServerlessAppPlugin(BasePlugin):
         :param string key: The dictionary key consisting of (ApplicationId, SemanticVersion)
         :param string logical_id: the logical_id of this application resource
         """
-        LOG.info("Getting application {}/{} from serverless application repo...".format(app_id, semver))
+        LOG.info(f"Getting application {app_id}/{semver} from serverless application repo...")
         try:
             self._sar_service_call(self._get_application, logical_id, app_id, semver)
             self._applications[key] = {"Available"}
-            LOG.info("Finished getting application {}/{}.".format(app_id, semver))
+            LOG.info(f"Finished getting application {app_id}/{semver}.")
         except EndpointConnectionError as e:
             # No internet connection. Don't break verification, but do show a warning.
-            warning_message = "{}. Unable to verify access to {}/{}.".format(e, app_id, semver)
+            warning_message = f"{e}. Unable to verify access to {app_id}/{semver}."
             LOG.warning(warning_message)
             self._applications[key] = {"Unable to verify"}
 
@@ -231,10 +231,10 @@ class ServerlessAppPlugin(BasePlugin):
         :param string key: The dictionary key consisting of (ApplicationId, SemanticVersion)
         :param string logical_id: the logical_id of this application resource
         """
-        LOG.info("Requesting to create CFN template {}/{} in serverless application repo...".format(app_id, semver))
+        LOG.info(f"Requesting to create CFN template {app_id}/{semver} in serverless application repo...")
         response = self._sar_service_call(self._create_cfn_template, logical_id, app_id, semver)
 
-        LOG.info("Requested to create CFN template {}/{} in serverless application repo.".format(app_id, semver))
+        LOG.info(f"Requested to create CFN template {app_id}/{semver} in serverless application repo.")
         self._applications[key] = response[self.TEMPLATE_URL_KEY]
         if response["Status"] != "ACTIVE":
             self._in_progress_templates.append((response[self.APPLICATION_ID_KEY], response["TemplateId"]))
@@ -353,7 +353,7 @@ class ServerlessAppPlugin(BasePlugin):
                 except ClientError as e:
                     error_code = e.response["Error"]["Code"]
                     if error_code == "TooManyRequestsException":
-                        LOG.debug("SAR call timed out for application id {}".format(application_id))
+                        LOG.debug(f"SAR call timed out for application id {application_id}")
                         break  # We were throttled by SAR, break out to a sleep
                     raise e
 
