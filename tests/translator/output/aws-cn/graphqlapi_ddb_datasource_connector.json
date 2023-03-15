@@ -1,241 +1,5 @@
 {
   "Resources": {
-    "AnotherDataSource": {
-      "Properties": {
-        "ApiId": {
-          "Fn::GetAtt": [
-            "SuperCoolAPI",
-            "ApiId"
-          ]
-        },
-        "DynamoDBConfig": {
-          "AwsRegion": {
-            "Ref": "AWS::Region"
-          },
-          "TableName": "cool-table"
-        },
-        "Name": "AnotherDataSource",
-        "ServiceRoleArn": {
-          "Fn::GetAtt": [
-            "AnotherDataSourceRole",
-            "Arn"
-          ]
-        },
-        "Type": "AMAZON_DYNAMODB"
-      },
-      "Type": "AWS::AppSync::DataSource"
-    },
-    "AnotherDataSourceRole": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "appsync.amazonaws.com"
-                ]
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        }
-      },
-      "Type": "AWS::IAM::Role"
-    },
-    "AnotherDataSourceToTableConnectorPolicy": {
-      "Metadata": {
-        "aws:sam:connectors": {
-          "AnotherDataSourceToTableConnector": {
-            "Destination": {
-              "Type": "AWS::DynamoDB::Table"
-            },
-            "Source": {
-              "Type": "AWS::AppSync::DataSource"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "dynamodb:GetItem",
-                "dynamodb:Query",
-                "dynamodb:Scan",
-                "dynamodb:BatchGetItem",
-                "dynamodb:ConditionCheckItem",
-                "dynamodb:PartiQLSelect"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                "table-arn",
-                {
-                  "Fn::Sub": [
-                    "${DestinationArn}/index/*",
-                    {
-                      "DestinationArn": "table-arn"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "Action": [
-                "dynamodb:PutItem",
-                "dynamodb:UpdateItem",
-                "dynamodb:DeleteItem",
-                "dynamodb:BatchWriteItem",
-                "dynamodb:PartiQLDelete",
-                "dynamodb:PartiQLInsert",
-                "dynamodb:PartiQLUpdate"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                "table-arn",
-                {
-                  "Fn::Sub": [
-                    "${DestinationArn}/index/*",
-                    {
-                      "DestinationArn": "table-arn"
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "Roles": [
-          {
-            "Ref": "AnotherDataSourceRole"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::ManagedPolicy"
-    },
-    "MyDataSource": {
-      "Properties": {
-        "ApiId": {
-          "Fn::GetAtt": [
-            "SuperCoolAPI",
-            "ApiId"
-          ]
-        },
-        "DynamoDBConfig": {
-          "AwsRegion": {
-            "Ref": "AWS::Region"
-          },
-          "TableName": "some-table"
-        },
-        "Name": "MyDataSource",
-        "ServiceRoleArn": {
-          "Fn::GetAtt": [
-            "MyDataSourceRole",
-            "Arn"
-          ]
-        },
-        "Type": "AMAZON_DYNAMODB"
-      },
-      "Type": "AWS::AppSync::DataSource"
-    },
-    "MyDataSourceRole": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "appsync.amazonaws.com"
-                ]
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        }
-      },
-      "Type": "AWS::IAM::Role"
-    },
-    "MyDataSourceToTableConnectorPolicy": {
-      "Metadata": {
-        "aws:sam:connectors": {
-          "MyDataSourceToTableConnector": {
-            "Destination": {
-              "Type": "AWS::DynamoDB::Table"
-            },
-            "Source": {
-              "Type": "AWS::AppSync::DataSource"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "dynamodb:GetItem",
-                "dynamodb:Query",
-                "dynamodb:Scan",
-                "dynamodb:BatchGetItem",
-                "dynamodb:ConditionCheckItem",
-                "dynamodb:PartiQLSelect"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                "big-arn",
-                {
-                  "Fn::Sub": [
-                    "${DestinationArn}/index/*",
-                    {
-                      "DestinationArn": "big-arn"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "Action": [
-                "dynamodb:PutItem",
-                "dynamodb:UpdateItem",
-                "dynamodb:DeleteItem",
-                "dynamodb:BatchWriteItem",
-                "dynamodb:PartiQLDelete",
-                "dynamodb:PartiQLInsert",
-                "dynamodb:PartiQLUpdate"
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                "big-arn",
-                {
-                  "Fn::Sub": [
-                    "${DestinationArn}/index/*",
-                    {
-                      "DestinationArn": "big-arn"
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "Roles": [
-          {
-            "Ref": "MyDataSourceRole"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::ManagedPolicy"
-    },
     "SuperCoolAPI": {
       "Properties": {
         "AuthenticationType": "AWS_IAM",
@@ -263,6 +27,124 @@
       },
       "Type": "AWS::AppSync::GraphQLApi"
     },
+    "SuperCoolAPIAnotherDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "DynamoDBConfig": {
+          "AwsRegion": {
+            "Ref": "AWS::Region"
+          },
+          "TableName": "cool-table"
+        },
+        "Name": "SuperCoolAPIAnotherDataSource",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "SuperCoolAPIAnotherDataSourceRole",
+            "Arn"
+          ]
+        },
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPIAnotherDataSourceRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIAnotherDataSourceToTableConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SuperCoolAPIAnotherDataSourceToTableConnector": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::DataSource"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "table-arn",
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": "table-arn"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "table-arn",
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": "table-arn"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SuperCoolAPIAnotherDataSourceRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
     "SuperCoolAPICloudWatchRole": {
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -288,6 +170,124 @@
         ]
       },
       "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIMyDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "DynamoDBConfig": {
+          "AwsRegion": {
+            "Ref": "AWS::Region"
+          },
+          "TableName": "some-table"
+        },
+        "Name": "SuperCoolAPIMyDataSource",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "SuperCoolAPIMyDataSourceRole",
+            "Arn"
+          ]
+        },
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPIMyDataSourceRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIMyDataSourceToTableConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SuperCoolAPIMyDataSourceToTableConnector": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::DataSource"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "big-arn",
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": "big-arn"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "big-arn",
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": "big-arn"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SuperCoolAPIMyDataSourceRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
     },
     "SuperCoolAPISchema": {
       "Properties": {

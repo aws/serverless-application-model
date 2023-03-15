@@ -2297,11 +2297,12 @@ class SamGraphQLApi(SamResourceMacro):
         resources: List[Resource] = []
 
         for relative_id, ddb_datasource in ddb_datasources.items():
+            datasource_logical_id = self.logical_id + relative_id
             cfn_datasource = DataSource(
-                logical_id=relative_id, depends_on=self.depends_on, attributes=self.resource_attributes
+                logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
 
-            cfn_datasource.Name = ddb_datasource.Name or relative_id
+            cfn_datasource.Name = ddb_datasource.Name or datasource_logical_id
             cfn_datasource.Type = "AMAZON_DYNAMODB"
             cfn_datasource.ApiId = api_id
 
@@ -2311,7 +2312,7 @@ class SamGraphQLApi(SamResourceMacro):
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
 
             cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_datasource_role(
-                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, kwargs
+                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), datasource_logical_id, kwargs
             )
 
             resources.extend([cfn_datasource, *permissions_resources])
@@ -2322,7 +2323,7 @@ class SamGraphQLApi(SamResourceMacro):
         self,
         ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource,
         datasource_arn: Intrinsicable[str],
-        relative_id: str,
+        datasource_logical_id: str,
         kwargs: Dict[str, Any],
     ) -> Tuple[str, List[Resource]]:
         # If the user defined a role, then there's no need to generate role/policy for them, so we return fast.
@@ -2331,11 +2332,11 @@ class SamGraphQLApi(SamResourceMacro):
 
         # If the user doesn't have their own role, then we will create for them if TableArn is defined.
         table_arn = sam_expect(
-            ddb_datasource.TableArn, relative_id, f"DynamoDBDataSources.{relative_id}.TableArn"
+            ddb_datasource.TableArn, datasource_logical_id, f"DynamoDBDataSources.{datasource_logical_id}.TableArn"
         ).to_not_be_none("'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined.")
         permissions = ddb_datasource.Permissions or ["Read", "Write"]
 
-        role_id = f"{relative_id}Role"
+        role_id = f"{datasource_logical_id}Role"
         role = IAMRole(
             logical_id=role_id,
             depends_on=self.depends_on,
@@ -2347,7 +2348,7 @@ class SamGraphQLApi(SamResourceMacro):
         role_arn = role.get_runtime_attr("arn")
 
         connector_resources = self._construct_ddb_datasource_connector_resources(
-            relative_id, datasource_arn, table_arn, permissions, role.get_runtime_attr("name"), kwargs
+            datasource_logical_id, datasource_arn, table_arn, permissions, role.get_runtime_attr("name"), kwargs
         )
 
         return role_arn, [role, *connector_resources]
