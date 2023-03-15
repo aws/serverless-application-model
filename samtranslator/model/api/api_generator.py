@@ -576,6 +576,9 @@ class ApiGenerator:
             record_set_group = route53_record_set_groups.get(logical_id)
 
             if route53.get("SeparateRecordSets") and not is_intrinsic(route53.get("SeparateRecordSets")):
+                sam_expect(
+                    route53.get("SeparateRecordSets"), self.logical_id, "Domain.Route53.SeparateRecordSets"
+                ).to_be_a_string
                 return ApiDomainResponse(
                     domain,
                     basepath_resource_list,
