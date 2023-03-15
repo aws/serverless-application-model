@@ -2313,7 +2313,7 @@ class SamGraphQLApi(SamResourceMacro):
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
 
             cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_datasource_role(
-                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), datasource_logical_id, kwargs
+                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, datasource_logical_id, kwargs
             )
 
             resources.extend([cfn_datasource, *permissions_resources])
@@ -2324,6 +2324,7 @@ class SamGraphQLApi(SamResourceMacro):
         self,
         ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource,
         datasource_arn: Intrinsicable[str],
+        relative_id: str,
         datasource_logical_id: str,
         kwargs: Dict[str, Any],
     ) -> Tuple[str, List[Resource]]:
@@ -2333,7 +2334,7 @@ class SamGraphQLApi(SamResourceMacro):
 
         # If the user doesn't have their own role, then we will create for them if TableArn is defined.
         table_arn = sam_expect(
-            ddb_datasource.TableArn, datasource_logical_id, f"DynamoDBDataSources.{datasource_logical_id}.TableArn"
+            ddb_datasource.TableArn, relative_id, f"DynamoDBDataSources.{relative_id}.TableArn"
         ).to_not_be_none("'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined.")
         permissions = ddb_datasource.Permissions or ["Read", "Write"]
 
