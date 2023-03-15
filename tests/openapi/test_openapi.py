@@ -360,7 +360,7 @@ class TestOpenApiEditor_is_valid(TestCase):
         ]
     )
     def test_must_fail_for_invalid_values(self, data, case):
-        self.assertFalse(OpenApiEditor.is_valid(data), "openapi dictionary with {} must not be valid".format(case))
+        self.assertFalse(OpenApiEditor.is_valid(data), f"openapi dictionary with {case} must not be valid")
 
 
 class TestOpenApiEditor_add_auth(TestCase):

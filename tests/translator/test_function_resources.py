@@ -577,7 +577,7 @@ class TestVersionsAndAliases(TestCase):
         generator_mock = LogicalIdGeneratorMock.return_value
         prefix = "SomeLogicalId"
         hash_code = "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
-        id_val = "{}{}".format(prefix, hash_code[:10])
+        id_val = f"{prefix}{hash_code[:10]}"
         generator_mock.gen.return_value = id_val
 
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
@@ -738,7 +738,7 @@ class TestVersionsAndAliases(TestCase):
 
         alias = self.sam_func._construct_alias(name, self.lambda_func, self.lambda_version)
 
-        expected_logical_id = "%sAlias%s" % (self.lambda_func.logical_id, name)
+        expected_logical_id = f"{self.lambda_func.logical_id}Alias{name}"
         self.assertEqual(alias.logical_id, expected_logical_id)
         self.assertEqual(alias.Name, name)
         self.assertEqual(alias.FunctionName, {"Ref": self.lambda_func.logical_id})

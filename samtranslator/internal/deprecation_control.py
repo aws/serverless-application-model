@@ -23,7 +23,10 @@ def _make_message(message: str, replacement: Optional[str]) -> str:
     return f"{message}, please use {replacement}" if replacement else message
 
 
-def deprecated(replacement: Optional[str]) -> Callable[[Callable[PT, RT]], Callable[PT, RT]]:
+# TODO: make @deprecated able to decorate a class
+
+
+def deprecated(replacement: Optional[str] = None) -> Callable[[Callable[PT, RT]], Callable[PT, RT]]:
     """
     Mark a function/method as deprecated.
 

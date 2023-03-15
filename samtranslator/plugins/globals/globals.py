@@ -386,7 +386,7 @@ class GlobalProperties:
         if self.TOKEN.LIST == token_global == token_local:
             return self._merge_lists(global_value, local_value)  # type: ignore[no-untyped-call]
 
-        raise TypeError("Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local))
+        raise TypeError(f"Unsupported type of objects. GlobalType={token_global}, LocalType={token_local}")
 
     def _merge_lists(self, global_list, local_list):  # type: ignore[no-untyped-def]
         """
@@ -477,4 +477,4 @@ class InvalidGlobalsSectionException(ExceptionWithMessage):
 
     @property
     def message(self) -> str:
-        return "'{}' section is invalid. {}".format(self._logical_id, self._message)
+        return f"'{self._logical_id}' section is invalid. {self._message}"

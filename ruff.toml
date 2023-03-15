@@ -19,10 +19,15 @@ select = [
     "TID", # flake8-tidy-imports
     "RUF", # Ruff-specific rules
     "YTT", # flake8-2020
+    "UP", # pyupgrade
 ]
 
 # Mininal python version we support is 3.7
 target-version = "py37"
+
+# https://github.com/charliermarsh/ruff/issues/2382
+[pyupgrade]
+keep-runtime-typing = true
 
 [per-file-ignores]
 # python scripts in bin/ needs some python path configurations before import
