@@ -1,7 +1,7 @@
 import logging
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Set, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigateway import (
@@ -575,7 +575,7 @@ class ApiGenerator:
 
             record_set_group = route53_record_set_groups.get(logical_id)
 
-            if route53.get("SeparateRecordSets"):
+            if route53.get("SeparateRecordSets") and not is_intrinsic(route53.get("SeparateRecordSets")):
                 return ApiDomainResponse(
                     domain,
                     basepath_resource_list,
@@ -678,17 +678,7 @@ class ApiGenerator:
     @cw_timer(prefix="Generator", name="Api")
     def to_cloudformation(
         self, redeploy_restapi_parameters: Optional[Any], route53_record_set_groups: Dict[str, Route53RecordSetGroup]
-    ) -> Tuple[
-        ApiGatewayRestApi,
-        ApiGatewayDeployment,
-        ApiGatewayStage,
-        List[LambdaPermission],
-        Optional[ApiGatewayDomainName],
-        Optional[List[ApiGatewayBasePathMapping]],
-        Optional[Route53RecordSetGroup],
-        Optional[Any],
-        Optional[List[Route53RecordSet]],
-    ]:
+    ) -> List[Any]:
         """Generates CloudFormation resources from a SAM API resource
 
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
@@ -713,17 +703,21 @@ class ApiGenerator:
         permissions = self._construct_authorizer_lambda_permission()
         usage_plan = self._construct_usage_plan(rest_api_stage=stage)
 
-        return (
-            rest_api,
-            deployment,
-            stage,
-            permissions,
-            domain,
-            basepath_mapping,
-            route53_recordsetGroup,
-            usage_plan,
-            route53_recordsets,
+        generated_resources: List[Any] = []
+        generated_resources.extend(
+            [
+                rest_api,
+                deployment,
+                stage,
+                permissions,
+                domain,
+                basepath_mapping,
+                route53_recordsetGroup,
+                usage_plan,
+                route53_recordsets,
+            ]
         )
+        return generated_resources
 
     def _add_cors(self) -> None:
         """

@@ -1228,7 +1228,6 @@ class SamApi(SamResourceMacro):
         :returns: a list of vanilla CloudFormation Resources, to which this Function expands
         :rtype: list
         """
-        resources = []
 
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
@@ -1276,31 +1275,18 @@ class SamApi(SamResourceMacro):
             always_deploy=self.AlwaysDeploy,
         )
 
-        (
-            rest_api,
-            deployment,
-            stage,
-            permissions,
-            domain,
-            basepath_mapping,
-            route53,
-            usage_plan_resources,
-            individual_route53,
-        ) = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
+        generated_api_resources = api_generator.to_cloudformation(
+            redeploy_restapi_parameters, route53_record_set_groups
+        )
 
-        resources.extend([rest_api, deployment, stage])
-        resources.extend(permissions)
-        if domain:
-            resources.extend([domain])
-        if basepath_mapping:
-            resources.extend(basepath_mapping)
-        if route53:
-            resources.extend([route53])
-        if individual_route53:
-            resources.extend(individual_route53)
-        # contains usage plan, api key and usageplan key resources
-        if usage_plan_resources:
-            resources.extend(usage_plan_resources)
+        resources: List[Any] = []
+
+        for resource in generated_api_resources:
+            if resource:
+                if isinstance(resource, (list, tuple)):
+                    resources.extend(resource)
+                else:
+                    resources.extend([resource])
         return resources
 
 
