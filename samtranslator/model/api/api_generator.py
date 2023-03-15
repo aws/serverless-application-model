@@ -1,9 +1,10 @@
 import logging
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set, Union, cast
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
+from samtranslator.model import Resource
 from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
     ApiGatewayAuthorizer,
@@ -706,7 +707,18 @@ class ApiGenerator:
         permissions = self._construct_authorizer_lambda_permission()
         usage_plan = self._construct_usage_plan(rest_api_stage=stage)
 
-        generated_resources: List[Any] = []
+        # mypy complains if the type in List doesn't match exactly
+        # TODO: refactor to have a list of single resource
+        generated_resources: List[
+            Union[
+                Optional[Resource],
+                List[Resource],
+                Tuple[Resource],
+                List[Route53RecordSet],
+                List[LambdaPermission],
+                List[ApiGatewayBasePathMapping],
+            ],
+        ] = []
         generated_resources.extend(
             [
                 rest_api,
