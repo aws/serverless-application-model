@@ -1,0 +1,22 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: SuperDuperCoolAPI
+      AuthenticationType: AWS_IAM
+  
+  MyDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      Type: NONE
+      Name: SameName
+      ApiId: !GetAtt SuperCoolAPI.ApiId
+  
+  AnotherDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      Type: NONE
+      Name: SameName
+      ApiId: !GetAtt SuperCoolAPI.ApiId
+

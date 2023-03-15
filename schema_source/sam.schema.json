@@ -1181,6 +1181,51 @@
       "title": "EventsScheduleProperties",
       "type": "object"
     },
+    "Function": {
+      "additionalProperties": false,
+      "properties": {
+        "CodeInline": {
+          "title": "Codeinline",
+          "type": "string"
+        },
+        "CodeUri": {
+          "title": "Codeuri",
+          "type": "string"
+        },
+        "DataSource": {
+          "enum": [
+            "NONE"
+          ],
+          "title": "Datasource",
+          "type": "string"
+        },
+        "DataSourceType": {
+          "title": "Datasourcetype",
+          "type": "string"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Id": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "MaxBatchSize": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        },
+        "Sync": {
+          "$ref": "#/definitions/Sync"
+        }
+      },
+      "title": "Function",
+      "type": "object"
+    },
     "FunctionUrlConfig": {
       "additionalProperties": false,
       "properties": {
@@ -1733,6 +1778,16 @@
         }
       },
       "title": "LambdaAuthorizerIdentity",
+      "type": "object"
+    },
+    "LambdaConflictHandlerConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "LambdaConflictHandlerArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "title": "LambdaConflictHandlerConfig",
       "type": "object"
     },
     "LambdaRequestAuthorizer": {
@@ -2475,12 +2530,10 @@
       "additionalProperties": false,
       "properties": {
         "Name": {
-          "title": "Name",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Version": {
-          "title": "Version",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
@@ -3036,6 +3089,25 @@
         "QueueUrl"
       ],
       "title": "SqsSubscription",
+      "type": "object"
+    },
+    "Sync": {
+      "additionalProperties": false,
+      "properties": {
+        "ConflictDetection": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ConflictHandler": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "LambdaConflictHandlerConfig": {
+          "$ref": "#/definitions/LambdaConflictHandlerConfig"
+        }
+      },
+      "required": [
+        "ConflictDetection"
+      ],
+      "title": "Sync",
       "type": "object"
     },
     "UsagePlan": {
@@ -5854,6 +5926,13 @@
             "$ref": "#/definitions/DynamoDBDataSource"
           },
           "title": "Dynamodbdatasources",
+          "type": "object"
+        },
+        "Functions": {
+          "additionalProperties": {
+            "$ref": "#/definitions/Function"
+          },
+          "title": "Functions",
           "type": "object"
         },
         "Logging": {

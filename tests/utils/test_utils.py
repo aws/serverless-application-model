@@ -1,6 +1,13 @@
 from unittest import TestCase
 
-from samtranslator.utils.utils import InvalidValueType, as_array, dict_deep_get, dict_deep_set, insert_unique
+from samtranslator.utils.utils import (
+    InvalidValueType,
+    as_array,
+    dict_deep_get,
+    dict_deep_set,
+    insert_unique,
+    remove_none_keys,
+)
 
 
 class TestUtils(TestCase):
@@ -62,3 +69,10 @@ class TestUtils(TestCase):
         d = {"a": {"b": {"c": "hi"}}}
         with self.assertRaisesRegex(ValueError, r"path cannot be empty"):
             dict_deep_set(d, "", "world")
+
+    def test_remove_none_keys(self):
+        d = {"a": "hello", "b": None}
+        self.assertEqual(remove_none_keys(d), {"a": "hello"})
+
+        d = {"a": None, "b": None, "c": None}
+        self.assertEqual(remove_none_keys(d), {})

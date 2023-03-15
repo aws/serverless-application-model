@@ -11,11 +11,14 @@ import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
+    AppSyncRuntimeType,
     DataSource,
     DynamoDBConfigType,
+    FunctionConfiguration,
     GraphQLApi,
     GraphQLSchema,
     LogConfigType,
+    SyncConfigType,
 )
 from samtranslator.internal.schema_source import aws_serverless_graphqlapi
 from samtranslator.internal.schema_source.common import PermissionsType
@@ -100,6 +103,7 @@ from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.utils.types import Intrinsicable
+from samtranslator.utils.utils import remove_none_keys
 from samtranslator.validator.value_validator import sam_expect
 
 from .api.api_generator import ApiGenerator
@@ -2161,6 +2165,7 @@ class SamGraphQLApi(SamResourceMacro):
         "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
         "DynamoDBDataSources": Property(False, IS_DICT),
         "ResolverCodeSettings": Property(False, IS_DICT),
+        "Functions": Property(False, IS_DICT),
     }
 
     Auth: Dict[str, Any]
@@ -2172,6 +2177,7 @@ class SamGraphQLApi(SamResourceMacro):
     Logging: Optional[Union[Dict[str, Any], bool]]
     DynamoDBDataSources: Optional[Dict[str, Dict[str, Any]]]
     ResolverCodeSettings: Optional[Dict[str, Any]]
+    Functions: Optional[Dict[str, Dict[str, Any]]]
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
@@ -2191,6 +2197,10 @@ class SamGraphQLApi(SamResourceMacro):
 
         if model.ResolverCodeSettings:
             self._set_resolver_code_settings(model.ResolverCodeSettings)
+
+        if model.Functions:
+            function_configurations = self._construct_appsync_function_configurations(model, api_id)
+            resources.extend(function_configurations)
 
         return resources
 
@@ -2403,3 +2413,80 @@ class SamGraphQLApi(SamResourceMacro):
         # TODO: Add FileNamePatterns defaults once implemented
         resolver_code_settings.FunctionsFolder = resolver_code_settings.FunctionsFolder or "functions"
         resolver_code_settings.ResolversFolder = resolver_code_settings.ResolversFolder or "resolvers"
+
+    def _construct_appsync_function_configurations(
+        self,
+        model: aws_serverless_graphqlapi.Properties,
+        api_id: Intrinsicable[str],
+    ) -> List[Resource]:
+        Dict[str, aws_serverless_graphqlapi.Function]
+        functions = model.Functions
+        resources: List[Resource] = []
+        create_none_datasource = False
+
+        for relative_id, function in functions.items():
+            func_config = FunctionConfiguration(
+                logical_id=relative_id, depends_on=self.depends_on, attributes=self.resource_attributes
+            )
+
+            if function.Id:
+                keys = remove_none_keys(function.dict()).keys()  # remove undefined properties from dict
+                if len(keys) != 1:
+                    raise InvalidResourceException(
+                        relative_id, "'Id' cannot be defined with other properties in Function."
+                    )
+                continue
+
+            if not function.CodeInline and not function.CodeUri:
+                raise InvalidResourceException(relative_id, "One of 'CodeInline' or 'CodeUri' must be set.")
+
+            if function.CodeInline and function.CodeUri:
+                raise InvalidResourceException(
+                    relative_id, "Both 'CodeInline' and 'CodeUri' cannot be defined at the same time."
+                )
+
+            if (function.CodeInline and not function.Runtime) or (function.Runtime and not function.CodeInline):
+                raise InvalidResourceException(
+                    relative_id,
+                    "'CodeInline' and 'Runtime' must be defined together if you are using these properties.",
+                )
+
+            if not function.DataSource and not function.DataSourceName:
+                raise InvalidResourceException(relative_id, "One of 'DataSourceType' or 'DataSourceName' must be set.")
+
+            if function.DataSource and function.DataSourceName:
+                raise InvalidResourceException(relative_id, "Both 'DataSourceType' and 'DataSourceName' cannot be defined at the same time.")
+
+            func_config.Code = function.CodeInline
+            func_config.CodeS3Location = function.CodeUri
+            func_config.ApiId = api_id
+            func_config.Name = function.Name if function.Name else relative_id
+            func_config.MaxBatchSize = cast(PassThrough, function.MaxBatchSize)
+            func_config.Description = cast(PassThrough, function.Description)
+            func_config.DataSourceName = function.DataSourceName
+
+            if function.Runtime:
+                func_config.Runtime = cast(AppSyncRuntimeType, function.Runtime.dict())
+
+            if function.Sync:
+                func_config.SyncConfig = cast(SyncConfigType, remove_none_keys(function.Sync.dict()))
+
+            resources.append(func_config)
+
+        if create_none_datasource:
+            resources.append(self._construct_none_datasource(api_id))
+
+        return resources
+
+    def _construct_none_datasource(self, api_id: Intrinsicable[str]) -> DataSource:
+        relative_id = f"{self.logical_id}NoneDataSource"
+
+        none_datasource = DataSource(
+            logical_id=relative_id, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
+        none_datasource.ApiId = api_id
+        none_datasource.Name = relative_id
+        none_datasource.Type = "NONE"
+
+        return none_datasource
