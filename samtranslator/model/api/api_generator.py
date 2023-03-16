@@ -576,7 +576,7 @@ class ApiGenerator:
 
             record_set_group = route53_record_set_groups.get(logical_id)
 
-            if route53.get("SeparateRecordSets") and not is_intrinsic(route53.get("SeparateRecordSets")):
+            if route53.get("SeparateRecordSets"):
                 sam_expect(
                     route53.get("SeparateRecordSets"), self.logical_id, "Domain.Route53.SeparateRecordSets"
                 ).to_be_a_bool()
@@ -603,9 +603,10 @@ class ApiGenerator:
     def _construct_individual_record_set(
         self, domain: Dict[str, Any], api_domain_name: str, route53: Any
     ) -> List[Route53RecordSet]:
-        logical_id_suffix = LogicalIdGenerator(
-            "", [route53.get("HostedZoneId") or route53.get("HostedZoneName"), domain.get("DomainName")]
-        ).gen()
+        hostedZoneId = route53.get("HostedZoneId")
+        hostedZoneName = route53.get("HostedZoneName")
+        domainName = domain.get("DomainName")
+        logical_id_suffix = LogicalIdGenerator("", [hostedZoneId or hostedZoneName, domainName]).gen()
         logical_id = "RecordSet" + logical_id_suffix
         logical_id_ipv6 = "RecordSetIpv6" + logical_id_suffix
 
@@ -616,16 +617,16 @@ class ApiGenerator:
         recordset.Type = "A"
         recordset.AliasTarget = self._construct_alias_target(domain, api_domain_name, route53)
 
-        if route53.get("HostedZoneId"):
-            recordset.HostedZoneId = route53.get("HostedZoneId")
+        if hostedZoneId:
+            recordset.HostedZoneId = hostedZoneId
         else:
-            recordset.HostedZoneName = route53.get("HostedZoneName")
+            recordset.HostedZoneName = hostedZoneName
 
         recordset_list.extend([recordset])
 
         if route53.get("IpV6"):
             recordset_ipv6 = Route53RecordSet(logical_id_ipv6, attributes=self.passthrough_resource_attributes)
-            recordset_ipv6.Name = domain.get("DomainName")
+            recordset_ipv6.Name = domainName
             recordset_ipv6.Type = "AAAA"
             recordset_ipv6.AliasTarget = self._construct_alias_target(domain, api_domain_name, route53)
             recordset_list.extend([recordset_ipv6])
