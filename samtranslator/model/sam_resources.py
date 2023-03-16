@@ -1220,7 +1220,7 @@ class SamApi(SamResourceMacro):
     }
 
     @cw_timer
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
+    def to_cloudformation(self, **kwargs) -> List[Resource]:  # type: ignore[no-untyped-def]
         """Returns the API Gateway RestApi, Deployment, and Stage to which this SAM Api corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
@@ -1275,19 +1275,7 @@ class SamApi(SamResourceMacro):
             always_deploy=self.AlwaysDeploy,
         )
 
-        generated_api_resources = api_generator.to_cloudformation(
-            redeploy_restapi_parameters, route53_record_set_groups
-        )
-
-        resources: List[Resource] = []
-
-        for resource in generated_api_resources:
-            if resource:
-                if isinstance(resource, (list, tuple)):
-                    resources.extend(resource)
-                else:
-                    resources.extend([resource])
-        return resources
+        return api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
 
 
 class SamHttpApi(SamResourceMacro):

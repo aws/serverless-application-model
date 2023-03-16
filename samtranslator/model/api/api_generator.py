@@ -667,7 +667,7 @@ class ApiGenerator:
     @cw_timer(prefix="Generator", name="Api")
     def to_cloudformation(
         self, redeploy_restapi_parameters: Optional[Any], route53_record_set_groups: Dict[str, Route53RecordSetGroup]
-    ) -> List[Any]:
+    ) -> List[Resource]:
         """Generates CloudFormation resources from a SAM API resource
 
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
@@ -702,6 +702,7 @@ class ApiGenerator:
                 List[ApiGatewayBasePathMapping],
             ],
         ] = []
+
         generated_resources.extend(
             [
                 rest_api,
@@ -714,7 +715,17 @@ class ApiGenerator:
                 usage_plan,
             ]
         )
-        return generated_resources
+
+        # Make a list of single resources
+        generated_resources_list: List[Resource] = []
+        for resource in generated_resources:
+            if resource:
+                if isinstance(resource, (list, tuple)):
+                    generated_resources_list.extend(resource)
+                else:
+                    generated_resources_list.extend([resource])
+
+        return generated_resources_list
 
     def _add_cors(self) -> None:
         """
