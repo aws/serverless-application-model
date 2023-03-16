@@ -55,9 +55,6 @@ class ResolverCodeSettings(BaseModel):
     FunctionsFolder: Optional[str]
 
 
-# TODO: MARK PASSTHROUGH VARIABLES PLS!!
-
-
 class Sync(BaseModel):
     ConflictDetection: PassThroughProp
     ConflictHandler: Optional[PassThroughProp]
