@@ -1867,16 +1867,6 @@
       "title": "LambdaAuthorizerIdentity",
       "type": "object"
     },
-    "LambdaConflictHandlerConfig": {
-      "additionalProperties": false,
-      "properties": {
-        "LambdaConflictHandlerArn": {
-          "$ref": "#/definitions/PassThroughProp"
-        }
-      },
-      "title": "LambdaConflictHandlerConfig",
-      "type": "object"
-    },
     "LambdaRequestAuthorizer": {
       "additionalProperties": false,
       "properties": {
@@ -3212,8 +3202,8 @@
         "ConflictHandler": {
           "$ref": "#/definitions/PassThroughProp"
         },
-        "LambdaConflictHandlerConfig": {
-          "$ref": "#/definitions/LambdaConflictHandlerConfig"
+        "LambdaConflictHandlerArn": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [

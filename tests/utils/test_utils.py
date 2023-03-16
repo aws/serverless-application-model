@@ -6,7 +6,7 @@ from samtranslator.utils.utils import (
     dict_deep_get,
     dict_deep_set,
     insert_unique,
-    remove_none_keys,
+    remove_none_items,
 )
 
 
@@ -70,9 +70,9 @@ class TestUtils(TestCase):
         with self.assertRaisesRegex(ValueError, r"path cannot be empty"):
             dict_deep_set(d, "", "world")
 
-    def test_remove_none_keys(self):
+    def test_remove_none_items(self):
         d = {"a": "hello", "b": None}
-        self.assertEqual(remove_none_keys(d), {"a": "hello"})
+        self.assertEqual(remove_none_items(d), {"a": "hello"})
 
         d = {"a": None, "b": None, "c": None}
-        self.assertEqual(remove_none_keys(d), {})
+        self.assertEqual(remove_none_items(d), {})

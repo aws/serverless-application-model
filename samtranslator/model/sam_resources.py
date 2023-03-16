@@ -2553,13 +2553,13 @@ class SamGraphQLApi(SamResourceMacro):
 
     def _parse_function_sync(self, sync: aws_serverless_graphqlapi.Sync) -> SyncConfigType:
         sync_config: SyncConfigType = {
-            "ConflictDetection": cast(PassThrough, function.Sync.ConflictDetection),
-            "ConflictHandler": cast(PassThrough, function.Sync.ConflictHandler),
+            "ConflictDetection": cast(PassThrough, sync.ConflictDetection),
+            "ConflictHandler": cast(PassThrough, sync.ConflictHandler),
         }
 
-        if function.Sync.LambdaConflictHandlerArn:
+        if sync.LambdaConflictHandlerArn:
             sync_config["LambdaConflictHandlerConfig"] = {
-                "LambdaConflictHandlerArn": function.Sync.LambdaConflictHandlerArn
+                "LambdaConflictHandlerArn": cast(PassThrough, sync.LambdaConflictHandlerArn)
             }
 
         return sync_config
