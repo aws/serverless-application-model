@@ -134,7 +134,7 @@ class Route53(BaseModel):
     IpV6: Optional[bool] = route53("IpV6")
     SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
     Region: Optional[PassThroughProp]  # TODO: add docs
-    SeparateRecordSets: Optional[bool]  # TODO: add docs
+    SeparateRecordSetGroup: Optional[bool]  # TODO: add docs
 
 
 class Domain(BaseModel):

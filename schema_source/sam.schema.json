@@ -4094,8 +4094,8 @@
         "Region": {
           "$ref": "#/definitions/PassThroughProp"
         },
-        "SeparateRecordSets": {
-          "title": "Separaterecordsets",
+        "SeparateRecordSetGroup": {
+          "title": "Separaterecordsetgroup",
           "type": "boolean"
         },
         "SetIdentifier": {
