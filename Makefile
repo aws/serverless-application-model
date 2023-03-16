@@ -13,7 +13,7 @@ test-fast:
 
 test-cov-report:
 	pytest --cov samtranslator --cov-report term-missing --cov-report html --cov-fail-under 95 -n auto tests/
-	open htmlcov/index.html
+	open htmlcov/index.html &> /dev/null || true
 
 integ-test:
 	pytest --no-cov integration/
