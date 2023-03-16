@@ -56,21 +56,19 @@ class ResolverCodeSettings(BaseModel):
 
 
 # TODO: MARK PASSTHROUGH VARIABLES PLS!!
-class LambdaConflictHandlerConfig(BaseModel):
-    LambdaConflictHandlerArn: Optional[PassThroughProp]
 
 
 class Sync(BaseModel):
     ConflictDetection: PassThroughProp
     ConflictHandler: Optional[PassThroughProp]
-    LambdaConflictHandlerConfig: Optional[LambdaConflictHandlerConfig]
+    LambdaConflictHandlerArn: Optional[PassThroughProp]
 
 
 class Function(BaseModel):
     DataSource: Optional[str]
     DataSourceName: Optional[str]
     Runtime: Optional[Runtime]
-    CodeInline: Optional[str]
+    InlineCode: Optional[str]
     CodeUri: Optional[str]
     Description: Optional[PassThroughProp]
     MaxBatchSize: Optional[PassThroughProp]

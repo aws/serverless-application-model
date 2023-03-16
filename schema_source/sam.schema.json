@@ -1270,23 +1270,16 @@
     "Function": {
       "additionalProperties": false,
       "properties": {
-        "CodeInline": {
-          "title": "Codeinline",
-          "type": "string"
-        },
         "CodeUri": {
           "title": "Codeuri",
           "type": "string"
         },
         "DataSource": {
-          "enum": [
-            "NONE"
-          ],
           "title": "Datasource",
           "type": "string"
         },
-        "DataSourceType": {
-          "title": "Datasourcetype",
+        "DataSourceName": {
+          "title": "Datasourcename",
           "type": "string"
         },
         "Description": {
@@ -1294,6 +1287,10 @@
         },
         "Id": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "InlineCode": {
+          "title": "Inlinecode",
+          "type": "string"
         },
         "MaxBatchSize": {
           "$ref": "#/definitions/PassThroughProp"

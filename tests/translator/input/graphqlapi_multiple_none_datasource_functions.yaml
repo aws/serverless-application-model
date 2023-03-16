@@ -1,0 +1,19 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      Functions:
+        MyFunction:
+          CodeUri: my-code-uri
+          DataSource: NONE
+        MyOtherFunction:
+          CodeUri: my-code-uri
+          DataSource: NONE
