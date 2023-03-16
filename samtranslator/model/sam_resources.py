@@ -1279,7 +1279,7 @@ class SamApi(SamResourceMacro):
             redeploy_restapi_parameters, route53_record_set_groups
         )
 
-        resources: List[Any] = []
+        resources: List[Resource] = []
 
         for resource in generated_api_resources:
             if resource:

@@ -604,8 +604,9 @@ class ApiGenerator:
         hostedZoneId = route53.get("HostedZoneId")
         hostedZoneName = route53.get("HostedZoneName")
         domainName = domain.get("DomainName")
-        logical_id_suffix = LogicalIdGenerator("", [hostedZoneId or hostedZoneName, domainName]).gen()
-        logical_id = "RecordSetGroup" + logical_id_suffix
+        logical_id = logical_id = LogicalIdGenerator(
+            "RecordSetGroup", [hostedZoneId or hostedZoneName, domainName]
+        ).gen()
 
         record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
         if hostedZoneId:
