@@ -2600,7 +2600,15 @@ class SamGraphQLApi(SamResourceMacro):
         code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         relative_id: str,
     ) -> AppSyncRuntimeType:
-        """Parse Runtime property of Function (AND RESOLVER WHEN IMPLEMENTED)."""
+        """
+        Parse Runtime property of Function (AND RESOLVER WHEN IMPLEMENTED).
+
+        Runtime must be defined by the customer, either within the resource or in the
+        ResolverCodeSettings property. This function parses Runtime and returns it in the
+        correct form for the respective CFN resource. We throw an error if Runtime is not
+        defined anywhere.
+        """
+
         # Runtime can exist in either the resource or in ResolverCodeSettings as a default.
         def make_runtime_dict(r: aws_serverless_graphqlapi.Runtime) -> AppSyncRuntimeType:
             return {"Name": passthrough_value(r.Name), "RuntimeVersion": passthrough_value(r.Version)}
