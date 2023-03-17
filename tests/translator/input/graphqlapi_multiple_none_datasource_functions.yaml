@@ -14,9 +14,15 @@ Resources:
         MyFunction:
           CodeUri: my-code-uri
           DataSource: NONE
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
         MyOtherFunction:
           CodeUri: my-code-uri
           DataSource: NONE
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
   AnotherCoolAPI:
     Type: AWS::Serverless::GraphQLApi
     Properties:
@@ -31,9 +37,15 @@ Resources:
         MyFunction:
           CodeUri: my-code-uri
           DataSource: None
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
         MyOtherFunction:
           CodeUri: my-code-uri
           DataSource: None
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
   ReallyCoolAPI:
     Type: AWS::Serverless::GraphQLApi
     Properties:
@@ -48,6 +60,12 @@ Resources:
         MyFunction:
           CodeUri: my-code-uri
           DataSource: none
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
         MyOtherFunction:
           CodeUri: my-code-uri
           DataSource: none
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3

@@ -52,7 +52,11 @@
         },
         "CodeS3Location": "my-code-uri",
         "DataSourceName": "SomeDataSourceName",
-        "Name": "MyFunction"
+        "Name": "MyFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
       },
       "Type": "AWS::AppSync::FunctionConfiguration"
     },

@@ -52,7 +52,11 @@
         },
         "CodeS3Location": "my-code-uri",
         "DataSourceName": "AnotherCoolAPINoneDataSource",
-        "Name": "MyFunction"
+        "Name": "MyFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
       },
       "Type": "AWS::AppSync::FunctionConfiguration"
     },
@@ -66,7 +70,11 @@
         },
         "CodeS3Location": "my-code-uri",
         "DataSourceName": "AnotherCoolAPINoneDataSource",
-        "Name": "MyOtherFunction"
+        "Name": "MyOtherFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
       },
       "Type": "AWS::AppSync::FunctionConfiguration"
     },
@@ -147,7 +155,11 @@
         },
         "CodeS3Location": "my-code-uri",
         "DataSourceName": "ReallyCoolAPINoneDataSource",
-        "Name": "MyFunction"
+        "Name": "MyFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
       },
       "Type": "AWS::AppSync::FunctionConfiguration"
     },
@@ -161,7 +173,11 @@
         },
         "CodeS3Location": "my-code-uri",
         "DataSourceName": "ReallyCoolAPINoneDataSource",
-        "Name": "MyOtherFunction"
+        "Name": "MyOtherFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
       },
       "Type": "AWS::AppSync::FunctionConfiguration"
     },
@@ -242,7 +258,11 @@
         },
         "CodeS3Location": "my-code-uri",
         "DataSourceName": "SuperCoolAPINoneDataSource",
-        "Name": "MyFunction"
+        "Name": "MyFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
       },
       "Type": "AWS::AppSync::FunctionConfiguration"
     },
@@ -256,7 +276,11 @@
         },
         "CodeS3Location": "my-code-uri",
         "DataSourceName": "SuperCoolAPINoneDataSource",
-        "Name": "MyOtherFunction"
+        "Name": "MyOtherFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
       },
       "Type": "AWS::AppSync::FunctionConfiguration"
     },

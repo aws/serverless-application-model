@@ -14,3 +14,6 @@ Resources:
         MyFunction:
           CodeUri: my-code-uri
           DataSourceName: SomeDataSourceName
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3

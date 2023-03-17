@@ -164,7 +164,7 @@ Resources:
         BothCodeProperties:
           DataSource: MyDataSource
 
-  InlineCodeWithoutRuntimeAndResolverCodeSettings:
+  RuntimeNotDefined:
     Type: AWS::Serverless::GraphQLApi
     Properties:
       Name: SomeApi
@@ -179,6 +179,6 @@ Resources:
           TableName: some-table
           TableArn: big-arn
       Functions:
-        BothCodeProperties:
+        NoRuntime:
           DataSource: MyDataSource
           InlineCode: blahblahblah

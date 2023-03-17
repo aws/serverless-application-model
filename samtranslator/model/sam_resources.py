@@ -2473,10 +2473,7 @@ class SamGraphQLApi(SamResourceMacro):
             )
             func_config.MaxBatchSize = passthrough_value(function.MaxBatchSize)
             func_config.Description = passthrough_value(function.Description)
-            func_config.Runtime = self._parse_runtime(function, resolver_code_settings)
-
-            if func_config.Code and not func_config.Runtime:
-                raise InvalidResourceException(relative_id, "'Runtime' must be defined when 'InlineCode' is defined.")
+            func_config.Runtime = self._parse_runtime(function, resolver_code_settings, relative_id)
 
             if function.Sync:
                 func_config.SyncConfig = self._parse_function_sync(function.Sync)
@@ -2601,7 +2598,8 @@ class SamGraphQLApi(SamResourceMacro):
     def _parse_runtime(
         resource: aws_serverless_graphqlapi.Function,
         code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
-    ) -> Optional[AppSyncRuntimeType]:
+        relative_id: str,
+    ) -> AppSyncRuntimeType:
         # Runtime can exist in either the resource or in ResolverCodeSettings as a default.
         def make_runtime_dict(r: aws_serverless_graphqlapi.Runtime) -> AppSyncRuntimeType:
             return {"Name": passthrough_value(r.Name), "RuntimeVersion": passthrough_value(r.Version)}
@@ -2612,4 +2610,7 @@ class SamGraphQLApi(SamResourceMacro):
         if code_settings:
             return make_runtime_dict(code_settings.Runtime)
 
-        return None
+        # Runtime is not defined, raise error.
+        raise InvalidResourceException(
+            relative_id, "'Runtime' must be defined as a property here or in 'ResolverCodeSettings.'"
+        )
