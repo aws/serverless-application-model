@@ -36,3 +36,5 @@ class CognitoUserPool(Resource):
         "provider_name": lambda self: fnGetAtt(self.logical_id, "ProviderName"),
         "provider_url": lambda self: fnGetAtt(self.logical_id, "ProviderURL"),
     }
+
+    skip_validate_setattr = True
