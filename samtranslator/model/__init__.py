@@ -125,7 +125,7 @@ class Resource(ABC):
     # Validation isn't always desired, e.g. when creating from a customer-provided template resource,
     # which could contain new properties not in the model
     # See https://github.com/aws/serverless-application-model/issues/2581#issuecomment-1474422567
-    skip_validate_setattr: bool = False
+    validate_setattr: bool = True
 
     def __init__(
         self,
@@ -321,8 +321,8 @@ class Resource(ABC):
         if name in self._keywords or name in self.property_types:
             return super().__setattr__(name, value)
 
-        if self.skip_validate_setattr:
-            return
+        if not self.validate_setattr:
+            return None
 
         raise InvalidResourceException(
             self.logical_id,
