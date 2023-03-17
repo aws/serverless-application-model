@@ -9,6 +9,7 @@ class CognitoUserPool(Resource):
         "AdminCreateUserConfig": GeneratedProperty(),
         "AliasAttributes": GeneratedProperty(),
         "AutoVerifiedAttributes": GeneratedProperty(),
+        "DeletionProtection": GeneratedProperty(),
         "DeviceConfiguration": GeneratedProperty(),
         "EmailConfiguration": GeneratedProperty(),
         "EmailVerificationMessage": GeneratedProperty(),
