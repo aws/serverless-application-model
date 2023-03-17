@@ -1,5 +1,195 @@
 {
   "Resources": {
+    "AnotherCoolAPI": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "LogConfig": {
+          "CloudWatchLogsRoleArn": {
+            "Fn::GetAtt": [
+              "AnotherCoolAPICloudWatchRole",
+              "Arn"
+            ]
+          },
+          "FieldLogLevel": "ALL"
+        },
+        "Name": "SomeApi"
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "AnotherCoolAPICloudWatchRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "AnotherCoolAPIMyFunction": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "AnotherCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CodeS3Location": "my-code-uri",
+        "DataSourceName": "AnotherCoolAPINoneDataSource",
+        "Name": "MyFunction"
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "AnotherCoolAPIMyOtherFunction": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "AnotherCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CodeS3Location": "my-code-uri",
+        "DataSourceName": "AnotherCoolAPINoneDataSource",
+        "Name": "MyOtherFunction"
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "AnotherCoolAPINoneDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "AnotherCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Name": "AnotherCoolAPINoneDataSource",
+        "Type": "NONE"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "AnotherCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "AnotherCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    },
+    "ReallyCoolAPI": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "LogConfig": {
+          "CloudWatchLogsRoleArn": {
+            "Fn::GetAtt": [
+              "ReallyCoolAPICloudWatchRole",
+              "Arn"
+            ]
+          },
+          "FieldLogLevel": "ALL"
+        },
+        "Name": "SomeApi"
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "ReallyCoolAPICloudWatchRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ReallyCoolAPIMyFunction": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "ReallyCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CodeS3Location": "my-code-uri",
+        "DataSourceName": "ReallyCoolAPINoneDataSource",
+        "Name": "MyFunction"
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "ReallyCoolAPIMyOtherFunction": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "ReallyCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CodeS3Location": "my-code-uri",
+        "DataSourceName": "ReallyCoolAPINoneDataSource",
+        "Name": "MyOtherFunction"
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "ReallyCoolAPINoneDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "ReallyCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Name": "ReallyCoolAPINoneDataSource",
+        "Type": "NONE"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "ReallyCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "ReallyCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    },
     "SuperCoolAPI": {
       "Properties": {
         "AuthenticationType": "AWS_IAM",
@@ -69,6 +259,19 @@
         "Name": "MyOtherFunction"
       },
       "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "SuperCoolAPINoneDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Name": "SuperCoolAPINoneDataSource",
+        "Type": "NONE"
+      },
+      "Type": "AWS::AppSync::DataSource"
     },
     "SuperCoolAPISchema": {
       "Properties": {

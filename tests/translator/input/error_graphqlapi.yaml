@@ -80,24 +80,14 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
+      DynamoDBDataSources:
+        MyDataSource:
+          TableName: some-table
+          TableArn: big-arn
       Functions:
         IdNotMutuallyExclusive:
           Id: some-id
-          DataSource: some-datasource
-
-  NoInlineCodeOrCodeUriDefined:
-    Type: AWS::Serverless::GraphQLApi
-    Properties:
-      Name: SomeApi
-      SchemaInline: |
-        type Mutation {
-          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
-        }
-      Auth:
-        Type: AWS_IAM
-      Functions:
-        NoCodeProperties:
-          DataSource: some-datasource
+          DataSource: MyDataSource
 
   BothInlineCodeAndCodeUriDefined:
     Type: AWS::Serverless::GraphQLApi
@@ -109,29 +99,18 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
+      DynamoDBDataSources:
+        MyDataSource:
+          TableName: some-table
+          TableArn: big-arn
       Functions:
         BothCodeProperties:
-          DataSource: some-datasource
+          DataSource: MyDataSource
           InlineCode: blahblahblah
           CodeUri: MyCodeUri
           Runtime:
             Name: some-name
             Version: 1.2.3
-
-  InlineCodeWithoutRuntime:
-    Type: AWS::Serverless::GraphQLApi
-    Properties:
-      Name: SomeApi
-      SchemaInline: |
-        type Mutation {
-          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
-        }
-      Auth:
-        Type: AWS_IAM
-      Functions:
-        NoRuntime:
-          DataSource: some-datasource
-          InlineCode: blahblahblah
 
   DataSourceAndDataSourceName:
     Type: AWS::Serverless::GraphQLApi
@@ -143,9 +122,13 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
+      DynamoDBDataSources:
+        MyDataSource:
+          TableName: some-table
+          TableArn: big-arn
       Functions:
-        BothDataSourceProperties:
-          DataSource: some-datasource
+        BothCodeProperties:
+          DataSource: MyDataSource
           DataSourceName: some-datasource-name
           CodeUri: my-code
 
@@ -162,3 +145,40 @@ Resources:
       Functions:
         NoDataSourceProperties:
           CodeUri: my-code
+
+  NoInlineCodeOrCodeUriDefinedWithoutResolverCodeSettings:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      DynamoDBDataSources:
+        MyDataSource:
+          TableName: some-table
+          TableArn: big-arn
+      Functions:
+        BothCodeProperties:
+          DataSource: MyDataSource
+
+  InlineCodeWithoutRuntimeAndResolverCodeSettings:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      DynamoDBDataSources:
+        MyDataSource:
+          TableName: some-table
+          TableArn: big-arn
+      Functions:
+        BothCodeProperties:
+          DataSource: MyDataSource
+          InlineCode: blahblahblah

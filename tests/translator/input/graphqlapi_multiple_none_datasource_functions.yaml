@@ -17,3 +17,37 @@ Resources:
         MyOtherFunction:
           CodeUri: my-code-uri
           DataSource: NONE
+  AnotherCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      Functions:
+        MyFunction:
+          CodeUri: my-code-uri
+          DataSource: None
+        MyOtherFunction:
+          CodeUri: my-code-uri
+          DataSource: None
+  ReallyCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      Functions:
+        MyFunction:
+          CodeUri: my-code-uri
+          DataSource: none
+        MyOtherFunction:
+          CodeUri: my-code-uri
+          DataSource: none

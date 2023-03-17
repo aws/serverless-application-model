@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, List, Optional, Union, cast
 
 
 def as_array(x: Any) -> List[Any]:
@@ -71,8 +71,3 @@ def dict_deep_set(d: Any, path: str, value: Any) -> None:
     if not isinstance(d, dict):
         raise InvalidValueType(relative_path)
     d[_path_nodes[0]] = value
-
-
-def remove_none_items(d: Dict[Any, Any]) -> Dict[Any, Any]:
-    """Returns a copy of the dictionary with no items that have the value None."""
-    return {k: v for k, v in d.items() if v is not None}
