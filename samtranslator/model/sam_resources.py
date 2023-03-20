@@ -2474,7 +2474,7 @@ class SamGraphQLApi(SamResourceMacro):
 
     @staticmethod
     def _is_none_datasource_input(datasource: Optional[str]) -> bool:
-        return bool(datasource and datasource.lower() == "none")
+        return datasource is not None and datasource.lower() == "none"
 
     def _check_and_construct_none_datasource(
         self,
