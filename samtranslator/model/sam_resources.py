@@ -2472,6 +2472,10 @@ class SamGraphQLApi(SamResourceMacro):
 
         return resources
 
+    @staticmethod
+    def _is_none_datasource_input(datasource: Optional[str]) -> bool:
+        return bool(datasource and datasource.lower() == "none")
+
     def _check_and_construct_none_datasource(
         self,
         functions: Dict[str, aws_serverless_graphqlapi.Function],
@@ -2488,7 +2492,7 @@ class SamGraphQLApi(SamResourceMacro):
         with this none input will reference it.
         """
         for function in functions.values():
-            if not function.DataSource or function.DataSource.lower() != "none":
+            if not self._is_none_datasource_input(function.DataSource):
                 continue
 
             none_datasource = DataSource(
@@ -2502,8 +2506,8 @@ class SamGraphQLApi(SamResourceMacro):
 
         return None
 
-    @staticmethod
     def _parse_datasource_name(
+        self,
         relative_id: str,
         function: aws_serverless_graphqlapi.Function,
         datasources: Optional[Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource]],
@@ -2538,7 +2542,7 @@ class SamGraphQLApi(SamResourceMacro):
         if function.DataSourceName:
             return function.DataSourceName
 
-        if function.DataSource and function.DataSource.lower() == "none":
+        if self._is_none_datasource_input(function.DataSource):
             return none_datasource_logical_id
 
         if not datasources or function.DataSource not in datasources:
