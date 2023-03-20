@@ -70,6 +70,8 @@ class Resolver(BaseModel):
     Functions: PassThroughProp  # TODO: EDIT THIS TO FUNCTIONS WHEN I MERGE
     Runtime: Optional[Runtime]
     GenerateCode: Optional[bool]
+
+
 class LambdaConflictHandlerConfig(BaseModel):
     LambdaConflictHandlerArn: PassThroughProp
 
