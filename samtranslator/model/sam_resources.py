@@ -17,7 +17,6 @@ from samtranslator.internal.model.appsync import (
     FunctionConfiguration,
     GraphQLApi,
     GraphQLSchema,
-    LambdaConflictHandlerConfigType,
     LogConfigType,
     SyncConfigType,
 )
@@ -2467,7 +2466,7 @@ class SamGraphQLApi(SamResourceMacro):
             func_config.Runtime = self._parse_runtime(function, resolver_code_settings, relative_id)
 
             if function.Sync:
-                func_config.SyncConfig = self._parse_function_sync(function.Sync)
+                func_config.SyncConfig = cast(SyncConfigType, function.Sync.dict())
 
             resources.append(func_config)
 
@@ -2548,20 +2547,6 @@ class SamGraphQLApi(SamResourceMacro):
             )
 
         return datasources[function.DataSource].Name or function.DataSource
-
-    @staticmethod
-    def _parse_function_sync(sync: aws_serverless_graphqlapi.Sync) -> SyncConfigType:
-        sync_config: SyncConfigType = {"ConflictDetection": passthrough_value(sync.ConflictDetection)}
-
-        if sync.ConflictHandler:
-            sync_config["ConflictHandler"] = passthrough_value(sync.ConflictHandler)
-
-        if sync.LambdaConflictHandlerConfig:
-            sync_config["LambdaConflictHandlerConfig"] = cast(
-                LambdaConflictHandlerConfigType, sync.LambdaConflictHandlerConfig.dict()
-            )
-
-        return sync_config
 
     @staticmethod
     def _parse_code_properties(
