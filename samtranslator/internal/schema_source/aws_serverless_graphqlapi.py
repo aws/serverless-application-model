@@ -67,7 +67,9 @@ class Resolver(BaseModel):
     DataSource: Optional[str]
     DataSourceName: Optional[str]
     MaxBatchSize: Optional[PassThroughProp]
-
+    Functions: PassThroughProp  # TODO: EDIT THIS TO FUNCTIONS WHEN I MERGE
+    Runtime: Optional[Runtime]
+    GenerateCode: Optional[bool]
 
 class Properties(BaseModel):
     Auth: Auth
