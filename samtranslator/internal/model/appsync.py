@@ -27,6 +27,21 @@ class LogConfigType(TypedDict, total=False):
     FieldLogLevel: str
 
 
+class AppSyncRuntimeType(TypedDict):
+    Name: str
+    RuntimeVersion: str
+
+
+class LambdaConflictHandlerConfigType(TypedDict):
+    LambdaConflictHandlerArn: str
+
+
+class SyncConfigType(TypedDict, total=False):
+    ConflictDetection: str
+    ConflictHandler: str
+    LambdaConflictHandlerConfig: LambdaConflictHandlerConfigType
+
+
 class GraphQLApi(Resource):
     resource_type = "AWS::AppSync::GraphQLApi"
     property_types = {
@@ -78,3 +93,28 @@ class DataSource(Resource):
     DynamoDBConfig: DynamoDBConfigType
 
     runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "DataSourceArn")}
+
+
+class FunctionConfiguration(Resource):
+    resource_type = "AWS::AppSync::FunctionConfiguration"
+    property_types = {
+        "ApiId": GeneratedProperty(),
+        "Code": GeneratedProperty(),
+        "CodeS3Location": GeneratedProperty(),
+        "DataSourceName": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "MaxBatchSize": GeneratedProperty(),
+        "Name": GeneratedProperty(),
+        "Runtime": GeneratedProperty(),
+        "SyncConfig": GeneratedProperty(),
+    }
+
+    ApiId: Intrinsicable[str]
+    DataSourceName: str
+    Name: str
+    Code: Optional[str]
+    CodeS3Location: Optional[str]
+    Description: Optional[str]
+    MaxBatchSize: Optional[int]
+    Runtime: Optional[AppSyncRuntimeType]
+    SyncConfig: Optional[SyncConfigType]

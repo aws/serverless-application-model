@@ -44,8 +44,8 @@ class DynamoDBDataSource(BaseModel):
 
 
 class Runtime(BaseModel):
-    Name: str
-    Version: str
+    Name: PassThroughProp
+    Version: PassThroughProp
 
 
 class ResolverCodeSettings(BaseModel):
@@ -70,6 +70,28 @@ class Resolver(BaseModel):
     Functions: PassThroughProp  # TODO: EDIT THIS TO FUNCTIONS WHEN I MERGE
     Runtime: Optional[Runtime]
     GenerateCode: Optional[bool]
+class LambdaConflictHandlerConfig(BaseModel):
+    LambdaConflictHandlerArn: PassThroughProp
+
+
+class Sync(BaseModel):
+    ConflictDetection: PassThroughProp
+    ConflictHandler: Optional[PassThroughProp]
+    LambdaConflictHandlerConfig: LambdaConflictHandlerConfig
+
+
+class Function(BaseModel):
+    DataSource: Optional[str]
+    DataSourceName: Optional[str]
+    Runtime: Optional[Runtime]
+    InlineCode: Optional[str]
+    CodeUri: Optional[str]
+    Description: Optional[PassThroughProp]
+    MaxBatchSize: Optional[PassThroughProp]
+    Name: Optional[str]
+    Id: Optional[PassThroughProp]
+    Sync: Optional[Sync]
+
 
 class Properties(BaseModel):
     Auth: Auth
@@ -81,6 +103,7 @@ class Properties(BaseModel):
     Logging: Optional[Union[Logging, bool]]
     DynamoDBDataSources: Optional[Dict[str, DynamoDBDataSource]]
     ResolverCodeSettings: Optional[ResolverCodeSettings]
+    Functions: Optional[Dict[str, Function]]
 
 
 class Resource(BaseModel):
