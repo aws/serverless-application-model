@@ -6,8 +6,6 @@ from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt
 from samtranslator.utils.types import Intrinsicable
 
-NONE_DATASOURCE_LITERALS = {"NONE", "None", "none"}
-
 
 class DeltaSyncConfigType(TypedDict):
     BaseTableTTL: str

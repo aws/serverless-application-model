@@ -11,7 +11,6 @@ import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
-    NONE_DATASOURCE_LITERALS,
     AppSyncRuntimeType,
     DataSource,
     DynamoDBConfigType,
@@ -2454,15 +2453,6 @@ class SamGraphQLApi(SamResourceMacro):
                     )
                 continue
 
-            # TODO: Make utility function that handles these mutual exclusive errors for us
-            if not function.DataSource and not function.DataSourceName:
-                raise InvalidResourceException(relative_id, "One of 'DataSource' or 'DataSourceName' must be set.")
-
-            if function.DataSource and function.DataSourceName:
-                raise InvalidResourceException(
-                    relative_id, "Both 'DataSourceType' and 'DataSourceName' cannot be defined at the same time."
-                )
-
             func_config.ApiId = api_id
             func_config.Name = function.Name or relative_id
             func_config.Code, func_config.CodeS3Location = self._parse_code_properties(
@@ -2493,12 +2483,12 @@ class SamGraphQLApi(SamResourceMacro):
 
         Within a Serverless::GraphQLApi Function resource, customers can create a
         DataSource of Type "NONE" for quick use in Functions. To do so, a customer
-        can input "NONE", "None", or "none" in the "DataSource" property. Only one
+        can input "none" case insensitive in the "DataSource" property. Only one
         DataSource will be created for each GraphQLApi, and all GraphQLApi functions
         with this none input will reference it.
         """
         for function in functions.values():
-            if not function.DataSource or function.DataSource not in NONE_DATASOURCE_LITERALS:
+            if not function.DataSource or function.DataSource.lower() != "none":
                 continue
 
             none_datasource = DataSource(
@@ -2532,11 +2522,23 @@ class SamGraphQLApi(SamResourceMacro):
         3. Customer defines "DataSource" property with a logical id of a datasource defined in
            Serverless::GraphQLApi. We can then search if this DataSource exists, and return the name.
            If it does not exist, throw an InvalidResourceException.
+
+        The DataSource and DataSourceName property are mutually exclusive, but one must be defined. We
+        raise an error if either of these is not true.
         """
+        # TODO: Make utility function that handles these mutual exclusive errors for us
+        if not function.DataSource and not function.DataSourceName:
+            raise InvalidResourceException(relative_id, "One of 'DataSource' or 'DataSourceName' must be set.")
+
+        if function.DataSource and function.DataSourceName:
+            raise InvalidResourceException(
+                relative_id, "Both 'DataSourceType' and 'DataSourceName' cannot be defined at the same time."
+            )
+
         if function.DataSourceName:
             return function.DataSourceName
 
-        if function.DataSource in NONE_DATASOURCE_LITERALS:
+        if function.DataSource and function.DataSource.lower() == "none":
             return none_datasource_logical_id
 
         if not datasources or function.DataSource not in datasources:
