@@ -55,6 +55,20 @@ class ResolverCodeSettings(BaseModel):
     FunctionsFolder: Optional[str]
 
 
+class CachingConfig(BaseModel):
+    pass
+
+
+class Resolver(BaseModel):
+    FieldName: Optional[str]
+    CachingConfig: Optional[CachingConfig]
+    InlineCode: Optional[str]
+    CodeUri: Optional[str]
+    DataSource: Optional[str]
+    DataSourceName: Optional[str]
+    MaxBatchSize: Optional[PassThroughProp]
+
+
 class Properties(BaseModel):
     Auth: Auth
     Tags: Optional[DictStrAny]
