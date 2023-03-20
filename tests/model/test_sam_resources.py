@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 import pytest
+from samtranslator.internal.schema_source import aws_serverless_graphqlapi
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model import InvalidResourceException, ResourceResolver
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestApi, ApiGatewayStage
@@ -13,6 +14,7 @@ from samtranslator.model.sam_resources import (
     SamApi,
     SamConnector,
     SamFunction,
+    SamGraphQLApi,
     SamHttpApi,
     SamLayerVersion,
 )
@@ -691,3 +693,46 @@ class TestInvalidSamConnectors(TestCase):
             "Unsupported 'Permissions' provided for connector from AWS::SQS::Queue to AWS::Lambda::Function; valid combinations are: Read \\+ Write.",
         ):
             connector.to_cloudformation(**self.kwargs)[0]
+
+
+class TestGraphQLApiNoneDataSource(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    def test_function_datasource_name_set(self):
+        api = SamGraphQLApi("MyApi")
+
+        functions = {
+            "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSourceName="my-name"),
+            "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSourceName="my-name"),
+        }
+        res = api._check_and_construct_none_datasource(functions, "foo", "bar")
+
+        self.assertIsNone(res)
+
+    def test_function_datasource_set_with_logical_id(self):
+        api = SamGraphQLApi("MyApi")
+
+        functions = {
+            "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource="SomeId"),
+            "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource="SomeOtherId"),
+        }
+        res = api._check_and_construct_none_datasource(functions, "foo", "bar")
+
+        self.assertIsNone(res)
+
+
+@pytest.mark.parametrize("data", ["NONE", "None", "none"])
+def test_function_datasource_set_with_none(data):
+    api = SamGraphQLApi("MyApi")
+
+    functions = {
+        "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource=data),
+        "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource="SomeOtherId"),
+    }
+    res = api._check_and_construct_none_datasource(functions, "foo", "bar")
+
+    assert res
