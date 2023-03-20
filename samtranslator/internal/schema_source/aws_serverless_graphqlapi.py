@@ -55,10 +55,14 @@ class ResolverCodeSettings(BaseModel):
     FunctionsFolder: Optional[str]
 
 
+class LambdaConflictHandlerConfig(BaseModel):
+    LambdaConflictHandlerArn: PassThroughProp
+
+
 class Sync(BaseModel):
     ConflictDetection: PassThroughProp
     ConflictHandler: Optional[PassThroughProp]
-    LambdaConflictHandlerArn: Optional[PassThroughProp]
+    LambdaConflictHandlerConfig: LambdaConflictHandlerConfig
 
 
 class Function(BaseModel):

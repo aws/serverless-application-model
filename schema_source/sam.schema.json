@@ -1867,6 +1867,19 @@
       "title": "LambdaAuthorizerIdentity",
       "type": "object"
     },
+    "LambdaConflictHandlerConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "LambdaConflictHandlerArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "LambdaConflictHandlerArn"
+      ],
+      "title": "LambdaConflictHandlerConfig",
+      "type": "object"
+    },
     "LambdaRequestAuthorizer": {
       "additionalProperties": false,
       "properties": {
@@ -3202,12 +3215,13 @@
         "ConflictHandler": {
           "$ref": "#/definitions/PassThroughProp"
         },
-        "LambdaConflictHandlerArn": {
-          "$ref": "#/definitions/PassThroughProp"
+        "LambdaConflictHandlerConfig": {
+          "$ref": "#/definitions/LambdaConflictHandlerConfig"
         }
       },
       "required": [
-        "ConflictDetection"
+        "ConflictDetection",
+        "LambdaConflictHandlerConfig"
       ],
       "title": "Sync",
       "type": "object"

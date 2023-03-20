@@ -26,4 +26,5 @@ Resources:
           Sync:
             ConflictDetection: VERSION
             ConflictHandler: LAMBDA
-            LambdaConflictHandlerArn: my-lambda-arn
+            LambdaConflictHandlerConfig:
+              LambdaConflictHandlerArn: my-lambda-arn

@@ -17,6 +17,7 @@ from samtranslator.internal.model.appsync import (
     FunctionConfiguration,
     GraphQLApi,
     GraphQLSchema,
+    LambdaConflictHandlerConfigType,
     LogConfigType,
     SyncConfigType,
 )
@@ -2555,10 +2556,10 @@ class SamGraphQLApi(SamResourceMacro):
         if sync.ConflictHandler:
             sync_config["ConflictHandler"] = passthrough_value(sync.ConflictHandler)
 
-        if sync.LambdaConflictHandlerArn:
-            sync_config["LambdaConflictHandlerConfig"] = {
-                "LambdaConflictHandlerArn": passthrough_value(sync.LambdaConflictHandlerArn)
-            }
+        if sync.LambdaConflictHandlerConfig:
+            sync_config["LambdaConflictHandlerConfig"] = cast(
+                LambdaConflictHandlerConfigType, sync.LambdaConflictHandlerConfig.dict()
+            )
 
         return sync_config
 
