@@ -1,0 +1,278 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Parameters": {
+    "MQBrokerName": {
+      "Default": "TestMQBroker",
+      "Description": "The name of MQ Broker",
+      "Type": "String"
+    },
+    "MQBrokerPassword": {
+      "ConstraintDescription": "The Amazon MQ broker password is required !",
+      "Default": "testBrokerPassword",
+      "Description": "The password to access the Amazon MQ broker. Min 12 characters",
+      "MinLength": 12,
+      "NoEcho": true,
+      "Type": "String"
+    },
+    "MQBrokerUser": {
+      "ConstraintDescription": "The Amazon MQ broker user is required !",
+      "Default": "testBrokerUser",
+      "Description": "The user to access the Amazon MQ broker.",
+      "MinLength": 2,
+      "Type": "String"
+    },
+    "MQBrokerUserSecretName": {
+      "Type": "String"
+    },
+    "PreCreatedInternetGateway": {
+      "Type": "String"
+    },
+    "PreCreatedSubnetOne": {
+      "Type": "String"
+    },
+    "PreCreatedVpc": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "MQBrokerUserSecret": {
+      "Properties": {
+        "Description": "SecretsManager Secret for broker user and password",
+        "Name": {
+          "Ref": "MQBrokerUserSecretName"
+        },
+        "SecretString": {
+          "Fn::Sub": "{\"username\":\"${MQBrokerUser}\",\"password\":\"${MQBrokerPassword}\"}"
+        }
+      },
+      "Type": "AWS::SecretsManager::Secret"
+    },
+    "MQSecurityGroup": {
+      "Properties": {
+        "GroupDescription": "Limits security group ingress and egress traffic for the Amazon MQ instance",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": 8162,
+            "IpProtocol": "tcp",
+            "ToPort": 8162
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": 61617,
+            "IpProtocol": "tcp",
+            "ToPort": 61617
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": 5671,
+            "IpProtocol": "tcp",
+            "ToPort": 5671
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": 61614,
+            "IpProtocol": "tcp",
+            "ToPort": 61614
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": 8883,
+            "IpProtocol": "tcp",
+            "ToPort": 8883
+          }
+        ],
+        "VpcId": {
+          "Ref": "PreCreatedVpc"
+        }
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    },
+    "MyLambdaExecutionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          }
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ec2:CreateNetworkInterface",
+                    "ec2:CreateNetworkInterfacePermission",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DeleteNetworkInterfacePermission",
+                    "ec2:DetachNetworkInterface",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DescribeVpcs",
+                    "ec2:DescribeInternetGateways",
+                    "ec2:DescribeNetworkInterfacePermissions",
+                    "ec2:DescribeSecurityGroups",
+                    "ec2:DescribeRouteTables",
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                    "kms:Decrypt",
+                    "mq:DescribeBroker",
+                    "secretsmanager:GetSecretValue"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": "IntegrationTestExecution"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyLambdaFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyLambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyLambdaFunctionMyMqEvent": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": "MyMqBroker.Arn"
+        },
+        "FunctionName": {
+          "Ref": "MyLambdaFunction"
+        },
+        "Queues": [
+          "TestQueue"
+        ],
+        "SourceAccessConfigurations": [
+          {
+            "Type": "BASIC_AUTH",
+            "URI": {
+              "Ref": "MQBrokerUserSecret"
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyMqBroker": {
+      "DependsOn": "MyLambdaExecutionRole",
+      "Properties": {
+        "AutoMinorVersionUpgrade": false,
+        "BrokerName": {
+          "Ref": "MQBrokerName"
+        },
+        "DeploymentMode": "SINGLE_INSTANCE",
+        "EngineType": "ACTIVEMQ",
+        "EngineVersion": "5.15.12",
+        "HostInstanceType": "mq.t3.micro",
+        "Logs": {
+          "Audit": true,
+          "General": true
+        },
+        "PubliclyAccessible": true,
+        "SecurityGroups": [
+          {
+            "Ref": "MQSecurityGroup"
+          }
+        ],
+        "SubnetIds": [
+          {
+            "Ref": "PreCreatedSubnetOne"
+          }
+        ],
+        "Users": [
+          {
+            "ConsoleAccess": true,
+            "Groups": [
+              "admin"
+            ],
+            "Password": {
+              "Ref": "MQBrokerPassword"
+            },
+            "Username": {
+              "Ref": "MQBrokerUser"
+            }
+          }
+        ]
+      },
+      "Type": "AWS::AmazonMQ::Broker"
+    },
+    "PublicSubnetRouteTableAssociation": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "RouteTable"
+        },
+        "SubnetId": {
+          "Ref": "PreCreatedSubnetOne"
+        }
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation"
+    },
+    "Route": {
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "PreCreatedInternetGateway"
+        },
+        "RouteTableId": {
+          "Ref": "RouteTable"
+        }
+      },
+      "Type": "AWS::EC2::Route"
+    },
+    "RouteTable": {
+      "Properties": {
+        "VpcId": {
+          "Ref": "PreCreatedVpc"
+        }
+      },
+      "Type": "AWS::EC2::RouteTable"
+    }
+  }
+}
