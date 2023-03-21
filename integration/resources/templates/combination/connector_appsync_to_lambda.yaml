@@ -1,0 +1,188 @@
+Resources:
+  AppSyncApiLambdaInvocationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action:
+              - sts:AssumeRole
+
+  HelloLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (_) => {
+          return "Hello World"
+        }
+      Handler: index.handler
+      Runtime: nodejs14.x
+
+  AppSyncApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      AuthenticationType: API_KEY
+      Name: AppSyncApi
+
+  ApiSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Definition: |
+        type Query {
+          sayHello: String!
+        }
+        schema {
+          query: Query
+        }
+
+  AppSyncLambdaDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: "AppSyncLambdaDataSource"
+      Type: "AWS_LAMBDA"
+      ServiceRoleArn: !GetAtt AppSyncApiLambdaInvocationRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !GetAtt HelloLambda.Arn
+
+  AppSyncSayHelloResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: "Query"
+      FieldName: "sayHello"
+      DataSourceName: !GetAtt AppSyncLambdaDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation": "Invoke",
+          "payload": $util.toJson($context.args)
+        }
+      ResponseMappingTemplate: |
+        $util.toJson($context.result)
+
+  DataSourceToLambdaConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: AppSyncLambdaDataSource
+      Destination:
+        Id: HelloLambda
+      Permissions:
+      - Write
+
+  ApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          API_KEY: !GetAtt ApiKey.ApiKey
+          GRAPHQL_URL: !GetAtt AppSyncApi.GraphQLUrl
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const https = require("https");
+
+        exports.handler = async (_) => {
+          const queries = {
+            sayHello: /* GraphQL */ `
+              query {
+                sayHello
+              }
+            `,
+          };
+
+          const fetch = async (url, options) =>
+            new Promise((resolve, reject) => {
+              const req = https.request(url, options, (res) => {
+                const body = [];
+                res.on("data", (chunk) => body.push(chunk));
+                res.on("end", () => {
+                  const resString = Buffer.concat(body).toString();
+                  resolve(resString);
+                });
+              });
+
+              req.on("error", (err) => {
+                reject(err);
+              });
+
+              req.on("timeout", () => {
+                req.destroy();
+                reject(new Error("Request time out"));
+              });
+
+              req.write(options.body);
+              req.end();
+            });
+
+          const makeRequest = async (queryName) => {
+            const options = {
+              method: "POST",
+              headers: {
+                "x-api-key": process.env.API_KEY,
+              },
+              body: JSON.stringify({ query: queries[queryName] }),
+              timeout: 10000, // ms
+            };
+
+            let statusCode;
+            let body;
+            let response;
+
+            try {
+              response = await fetch(process.env.GRAPHQL_URL, options);
+              body = JSON.parse(response);
+              const data = body.data?.[queryName];
+              const hasNoErrors = body.errors === undefined;
+              const allFieldsAreSet =
+                data?.Status === 200 && data?.Body === "Hello World";
+              statusCode = hasNoErrors && allFieldsAreSet ? 200 : 400;
+              if (hasNoErrors) {
+                body = body.data;
+              } else {
+                body = {
+                  [queryName]: {
+                    errors: body.errors,
+                  },
+                };
+              }
+            } catch (error) {
+              statusCode = 400;
+              body = {
+                [queryName]: {
+                  errors: [
+                    {
+                      status: response.status,
+                      message: error.message,
+                      stack: error.stack,
+                    },
+                  ],
+                },
+              };
+            }
+            return {
+              statusCode,
+              body,
+            };
+          };
+
+          let response = await makeRequest("sayHello");
+          return {
+            StatusCode: response.statusCode,
+            Body: response.body,
+          };
+        };
+
+
+Metadata:
+  SamTransformTest: true

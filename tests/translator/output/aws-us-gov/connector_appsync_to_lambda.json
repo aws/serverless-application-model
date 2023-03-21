@@ -1,0 +1,176 @@
+{
+  "Resources": {
+    "ApiSchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "AppSyncApi",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Query {\n  sayHello: String!\n}\nschema {\n  query: Query\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    },
+    "AppSyncApi": {
+      "Properties": {
+        "AuthenticationType": "API_KEY",
+        "Name": "AppSyncApi"
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "AppSyncApiLambdaInvocationRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "appsync.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "AppSyncLambdaDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "AppSyncApi",
+            "ApiId"
+          ]
+        },
+        "LambdaConfig": {
+          "LambdaFunctionArn": {
+            "Fn::GetAtt": [
+              "HelloLambda",
+              "Arn"
+            ]
+          }
+        },
+        "Name": "AppSyncLambdaDataSource",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "AppSyncApiLambdaInvocationRole",
+            "Arn"
+          ]
+        },
+        "Type": "AWS_LAMBDA"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "DataSourceToLambdaConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "DataSourceToLambdaConnector": {
+            "Destination": {
+              "Type": "AWS::Serverless::Function"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::DataSource"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "lambda:InvokeAsync",
+                "lambda:InvokeFunction"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "HelloLambda",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}:*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "HelloLambda",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "AppSyncApiLambdaInvocationRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "HelloLambda": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (_) => {\n  return \"Hello World\"\n}\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "HelloLambdaRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "HelloLambdaRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
