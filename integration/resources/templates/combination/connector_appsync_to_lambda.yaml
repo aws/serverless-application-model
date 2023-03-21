@@ -50,6 +50,7 @@ Resources:
         LambdaFunctionArn: !GetAtt HelloLambda.Arn
 
   AppSyncSayHelloResolver:
+    DependsOn: AppSyncSchema
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
