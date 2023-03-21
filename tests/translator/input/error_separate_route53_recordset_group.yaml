@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  apigateway-2402
+
+  Sample SAM Template for apigateway-2402
+
+Parameters:
+  EnvType:
+    Description: Environment type.
+    Default: test
+    Type: String
+    AllowedValues:
+    - prod
+    - test
+    ConstraintDescription: must specify prod or test.
+Conditions:
+  CreateProdResources: !Equals
+  - !Ref EnvType
+  - prod
+Resources:
+  ApiGatewayAdminOne:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: App-Prod-Web
+      StageName: Prod
+      TracingEnabled: true
+      MethodSettings:
+      - LoggingLevel: Info
+        ResourcePath: /*
+        HttpMethod: '*'
+      Domain:
+        DomainName: admin.one.amazon.com
+        CertificateArn: arn::cert::abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: abc123456
+      EndpointConfiguration:
+        Type: REGIONAL
+
+
+  ApiGatewayAdminTwo:
+    Type: AWS::Serverless::Api
+    Condition: CreateProdResources
+    Properties:
+      Name: App-Prod-Web
+      StageName: Prod
+      TracingEnabled: true
+      MethodSettings:
+      - LoggingLevel: Info
+        ResourcePath: /*
+        HttpMethod: '*'
+      Domain:
+        DomainName: admin.two.amazon.com
+        CertificateArn: arn::cert::abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: abc123456
+          SeparateRecordSetGroup: [true]
+      EndpointConfiguration:
+        Type: REGIONAL
+
+
+  ApiGatewayAdminThree:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: App-Prod-Web
+      StageName: Prod
+      TracingEnabled: true
+      MethodSettings:
+      - LoggingLevel: Info
+        ResourcePath: /*
+        HttpMethod: '*'
+      Domain:
+        DomainName: admin.three.amazon.com
+        CertificateArn: arn::cert::abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: abc123456
+          SeparateRecordSetGroup: true
+      EndpointConfiguration:
+        Type: REGIONAL

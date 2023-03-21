@@ -1,0 +1,167 @@
+Parameters:
+  MQBrokerUser:
+    Description: The user to access the Amazon MQ broker.
+    Type: String
+    Default: testBrokerUser
+    MinLength: 2
+    ConstraintDescription: The Amazon MQ broker user is required !
+  MQBrokerPassword:
+    Description: The password to access the Amazon MQ broker. Min 12 characters
+    Type: String
+    Default: testBrokerPassword
+    MinLength: 12
+    ConstraintDescription: The Amazon MQ broker password is required !
+    NoEcho: true
+  PreCreatedVpc:
+    Type: String
+  PreCreatedSubnetOne:
+    Type: String
+  MQBrokerUserSecretName:
+    Type: String
+  PreCreatedInternetGateway:
+    Type: String
+  MQBrokerName:
+    Description: The name of MQ Broker
+    Type: String
+    Default: TestMQBroker
+
+Resources:
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: PreCreatedVpc
+
+  Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: PreCreatedInternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PreCreatedSubnetOne
+      RouteTableId:
+        Ref: RouteTable
+
+  MQSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Limits security group ingress and egress traffic for the Amazon
+        MQ instance
+      VpcId:
+        Ref: PreCreatedVpc
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8162
+        ToPort: 8162
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 61617
+        ToPort: 61617
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 5671
+        ToPort: 5671
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 61614
+        ToPort: 61614
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 8883
+        ToPort: 8883
+        CidrIp: 0.0.0.0/0
+
+  MyLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: [sts:AssumeRole]
+          Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+      Policies:
+      - PolicyName: IntegrationTestExecution
+        PolicyDocument:
+          Statement:
+          - Action: [ec2:CreateNetworkInterface, ec2:CreateNetworkInterfacePermission,
+              ec2:DeleteNetworkInterface, ec2:DeleteNetworkInterfacePermission, ec2:DetachNetworkInterface,
+              ec2:DescribeSubnets, ec2:DescribeNetworkInterfaces, ec2:DescribeVpcs,
+              ec2:DescribeInternetGateways, ec2:DescribeNetworkInterfacePermissions,
+              ec2:DescribeSecurityGroups, ec2:DescribeRouteTables, logs:CreateLogGroup,
+              logs:CreateLogStream, logs:PutLogEvents, kms:Decrypt, mq:DescribeBroker,
+              secretsmanager:GetSecretValue]
+            Effect: Allow
+            Resource: '*'
+      ManagedPolicyArns:
+      - !Sub 'arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Tags:
+      - {Value: SAM, Key: lambda:createdBy}
+
+  MyMqBroker:
+    Properties:
+      BrokerName:
+        Ref: MQBrokerName
+      DeploymentMode: SINGLE_INSTANCE
+      EngineType: ACTIVEMQ
+      EngineVersion: 5.15.12
+      HostInstanceType: mq.t3.micro
+      Logs:
+        Audit: true
+        General: true
+      PubliclyAccessible: true
+      AutoMinorVersionUpgrade: false
+      SecurityGroups:
+      - Ref: MQSecurityGroup
+      SubnetIds:
+      - Ref: PreCreatedSubnetOne
+      Users:
+      - ConsoleAccess: true
+        Groups:
+        - admin
+        Username:
+          Ref: MQBrokerUser
+        Password:
+          Ref: MQBrokerPassword
+    Type: AWS::AmazonMQ::Broker
+    DependsOn: MyLambdaExecutionRole
+
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+      Role:
+        Fn::GetAtt: [MyLambdaExecutionRole, Arn]
+      Events:
+        MyMqEvent:
+          Type: MQ
+          Properties:
+            Broker:
+              Fn::GetAtt: MyMqBroker.Arn
+            Queues:
+            - TestQueue
+            SourceAccessConfigurations:
+            - Type: BASIC_AUTH
+              URI:
+                Ref: MQBrokerUserSecret
+
+  MQBrokerUserSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name:
+        Ref: MQBrokerUserSecretName
+      SecretString:
+        Fn::Sub: '{"username":"${MQBrokerUser}","password":"${MQBrokerPassword}"}'
+      Description: SecretsManager Secret for broker user and password
+Metadata:
+  SamTransformTest: true
