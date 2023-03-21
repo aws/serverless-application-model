@@ -5,11 +5,11 @@ Resources:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Effect: Allow
-            Principal:
-              Service: appsync.amazonaws.com
-            Action:
-              - sts:AssumeRole
+        - Effect: Allow
+          Principal:
+            Service: appsync.amazonaws.com
+          Action:
+          - sts:AssumeRole
 
   HelloLambda:
     Type: AWS::Serverless::Function
@@ -40,22 +40,22 @@ Resources:
         }
 
   AppSyncLambdaDataSource:
-    Type: "AWS::AppSync::DataSource"
+    Type: AWS::AppSync::DataSource
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
-      Name: "AppSyncLambdaDataSource"
-      Type: "AWS_LAMBDA"
+      Name: AppSyncLambdaDataSource
+      Type: AWS_LAMBDA
       ServiceRoleArn: !GetAtt AppSyncApiLambdaInvocationRole.Arn
       LambdaConfig:
         LambdaFunctionArn: !GetAtt HelloLambda.Arn
 
   AppSyncSayHelloResolver:
     DependsOn: ApiSchema
-    Type: "AWS::AppSync::Resolver"
+    Type: AWS::AppSync::Resolver
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
-      TypeName: "Query"
-      FieldName: "sayHello"
+      TypeName: Query
+      FieldName: sayHello
       DataSourceName: !GetAtt AppSyncLambdaDataSource.Name
       RequestMappingTemplate: |
         {
