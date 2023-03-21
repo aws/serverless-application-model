@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
@@ -9,6 +9,8 @@ from samtranslator.internal.schema_source.common import (
     PermissionsType,
     get_prop,
 )
+
+FieldTypes = Literal["Query", "Mutation", "Subscription"]
 
 properties = get_prop("sam-resource-graphqlapi")
 
@@ -55,23 +57,6 @@ class ResolverCodeSettings(BaseModel):
     FunctionsFolder: Optional[str]
 
 
-class CachingConfig(BaseModel):
-    pass
-
-
-class Resolver(BaseModel):
-    FieldName: Optional[str]
-    CachingConfig: Optional[CachingConfig]
-    InlineCode: Optional[str]
-    CodeUri: Optional[str]
-    DataSource: Optional[str]
-    DataSourceName: Optional[str]
-    MaxBatchSize: Optional[PassThroughProp]
-    Functions: PassThroughProp  # TODO: EDIT THIS TO FUNCTIONS WHEN I MERGE
-    Runtime: Optional[Runtime]
-    GenerateCode: Optional[bool]
-
-
 class LambdaConflictHandlerConfig(BaseModel):
     LambdaConflictHandlerArn: PassThroughProp
 
@@ -95,6 +80,24 @@ class Function(BaseModel):
     Sync: Optional[Sync]
 
 
+class Caching(BaseModel):
+    Ttl: PassThroughProp
+    CachingKeys: Optional[List[str]]
+
+
+class AppSyncResolver(BaseModel):
+    FieldName: Optional[str]
+    Caching: Optional[Caching]
+    InlineCode: Optional[str]
+    CodeUri: Optional[str]
+    DataSource: Optional[str]
+    DataSourceName: Optional[str]
+    MaxBatchSize: Optional[PassThroughProp]
+    Functions: Optional[Dict[str, Function]]
+    Runtime: Optional[Runtime]
+    GenerateCode: Optional[bool]
+
+
 class Properties(BaseModel):
     Auth: Auth
     Tags: Optional[DictStrAny]
@@ -106,6 +109,7 @@ class Properties(BaseModel):
     DynamoDBDataSources: Optional[Dict[str, DynamoDBDataSource]]
     ResolverCodeSettings: Optional[ResolverCodeSettings]
     Functions: Optional[Dict[str, Function]]
+    AppSyncResolvers: Optional[Dict[FieldTypes, Dict[str, AppSyncResolver]]]
 
 
 class Resource(BaseModel):

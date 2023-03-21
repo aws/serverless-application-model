@@ -2167,6 +2167,7 @@ class SamGraphQLApi(SamResourceMacro):
         "DynamoDBDataSources": Property(False, IS_DICT),
         "ResolverCodeSettings": Property(False, IS_DICT),
         "Functions": Property(False, IS_DICT),
+        "AppSyncResolvers": Property(False, IS_DICT)
     }
 
     Auth: Dict[str, Any]
@@ -2179,6 +2180,7 @@ class SamGraphQLApi(SamResourceMacro):
     DynamoDBDataSources: Optional[Dict[str, Dict[str, Any]]]
     ResolverCodeSettings: Optional[Dict[str, Any]]
     Functions: Optional[Dict[str, Dict[str, Any]]]
+    AppSyncResolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
@@ -2204,6 +2206,9 @@ class SamGraphQLApi(SamResourceMacro):
                 model.Functions, model.DynamoDBDataSources, model.ResolverCodeSettings, api_id
             )
             resources.extend(function_configurations)
+
+        if model.AppSyncResolvers:
+            appsync_resolver_resources = self._construct_appsync_resolver_resources()
 
         return resources
 
@@ -2615,3 +2620,27 @@ class SamGraphQLApi(SamResourceMacro):
         raise InvalidResourceException(
             relative_id, "'Runtime' must be defined as a property here or in 'ResolverCodeSettings.'"
         )
+
+    def _construct_appsync_resolver_resources(
+        appsync_resolvers: Dict[aws_serverless_graphqlapi.FieldTypes, Dict[str, aws_serverless_graphqlapi.AppSyncResolver]]
+    ):
+        # class Caching(BaseModel):
+        #     Ttl: PassThroughProp
+        #     CachingKeys: Optional[List[str]]
+
+
+        # class AppSyncResolver(BaseModel):
+        #     FieldName: Optional[str]
+        #     Caching: Optional[Caching]
+        #     InlineCode: Optional[str]
+        #     CodeUri: Optional[str]
+        #     DataSource: Optional[str]
+        #     DataSourceName: Optional[str]
+        #     MaxBatchSize: Optional[PassThroughProp]
+        #     Functions: Optional[Dict[str, Function]]
+        #     Runtime: Optional[Runtime]
+        #     GenerateCode: Optional[bool]
+
+        for field_type, relative_id_to_resolver in appsync_resolvers.items():
+            for relative_id, appsync_resolver in relative_id_to_resolver.items():
+                pass                

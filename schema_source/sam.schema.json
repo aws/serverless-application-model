@@ -94,6 +94,73 @@
       "title": "ApiAuth",
       "type": "object"
     },
+    "AppSyncResolver": {
+      "additionalProperties": false,
+      "properties": {
+        "Caching": {
+          "$ref": "#/definitions/Caching"
+        },
+        "CodeUri": {
+          "title": "Codeuri",
+          "type": "string"
+        },
+        "DataSource": {
+          "title": "Datasource",
+          "type": "string"
+        },
+        "DataSourceName": {
+          "title": "Datasourcename",
+          "type": "string"
+        },
+        "FieldName": {
+          "title": "Fieldname",
+          "type": "string"
+        },
+        "Functions": {
+          "additionalProperties": {
+            "$ref": "#/definitions/Function"
+          },
+          "title": "Functions",
+          "type": "object"
+        },
+        "GenerateCode": {
+          "title": "Generatecode",
+          "type": "boolean"
+        },
+        "InlineCode": {
+          "title": "Inlinecode",
+          "type": "string"
+        },
+        "MaxBatchSize": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        }
+      },
+      "title": "AppSyncResolver",
+      "type": "object"
+    },
+    "Caching": {
+      "additionalProperties": false,
+      "properties": {
+        "CachingKeys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Cachingkeys",
+          "type": "array"
+        },
+        "Ttl": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Ttl"
+      ],
+      "title": "Caching",
+      "type": "object"
+    },
     "CloudWatchLogsEvent": {
       "additionalProperties": false,
       "properties": {
@@ -6060,6 +6127,16 @@
     "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties": {
       "additionalProperties": false,
       "properties": {
+        "AppSyncResolvers": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "$ref": "#/definitions/AppSyncResolver"
+            },
+            "type": "object"
+          },
+          "title": "Appsyncresolvers",
+          "type": "object"
+        },
         "Auth": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
         },

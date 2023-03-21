@@ -1,0 +1,130 @@
+{
+ "Resources": {
+  "SuperCoolAPI": {
+   "Type": "AWS::AppSync::GraphQLApi",
+   "Properties": {
+    "Name": "SomeApi",
+    "AuthenticationType": "AWS_IAM",
+    "LogConfig": {
+     "FieldLogLevel": "ALL",
+     "CloudWatchLogsRoleArn": {
+      "Fn::GetAtt": [
+       "SuperCoolAPICloudWatchRole",
+       "Arn"
+      ]
+     }
+    }
+   }
+  },
+  "SuperCoolAPISchema": {
+   "Type": "AWS::AppSync::GraphQLSchema",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "SuperCoolAPI",
+      "ApiId"
+     ]
+    },
+    "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
+   }
+  },
+  "SuperCoolAPICloudWatchRole": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": [
+        "sts:AssumeRole"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "Service": [
+         "appsync.amazonaws.com"
+        ]
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+     }
+    ]
+   }
+  },
+  "SuperCoolAPIMyFunction": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "SuperCoolAPI",
+      "ApiId"
+     ]
+    },
+    "CodeS3Location": "my-code-uri",
+    "DataSourceName": "SuperCoolAPINoneDataSource",
+    "Name": "MyFunction",
+    "Runtime": {
+     "Name": "some-runtime",
+     "RuntimeVersion": "1.2.3"
+    }
+   }
+  },
+  "SuperCoolAPIAnotherFunction": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "SuperCoolAPI",
+      "ApiId"
+     ]
+    },
+    "CodeS3Location": "my-code-uri",
+    "DataSourceName": "SuperCoolAPINoneDataSource",
+    "Name": "AnotherFunction",
+    "Runtime": {
+     "Name": "some-runtime",
+     "RuntimeVersion": "1.2.3"
+    }
+   }
+  },
+  "SuperCoolAPISimilarFunction": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "SuperCoolAPI",
+      "ApiId"
+     ]
+    },
+    "CodeS3Location": "my-code-uri",
+    "DataSourceName": "SuperCoolAPINoneDataSource",
+    "Name": "SimilarFunction",
+    "Runtime": {
+     "Name": "some-runtime",
+     "RuntimeVersion": "1.2.3"
+    }
+   }
+  },
+  "SuperCoolAPIGoodFunction": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "SuperCoolAPI",
+      "ApiId"
+     ]
+    },
+    "CodeS3Location": "my-code-uri",
+    "DataSourceName": "SuperCoolAPINoneDataSource",
+    "Name": "GoodFunction",
+    "Runtime": {
+     "Name": "some-runtime",
+     "RuntimeVersion": "1.2.3"
+    }
+   }
+  }
+ }
+}
