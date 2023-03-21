@@ -26,6 +26,10 @@ class TestFunctionWithMq(BaseTest):
         ]
     )
     def test_function_with_mq(self, file_name, mq_broker, mq_secret, subnet_key):
+        # Temporarily skip this test and we should either re-enable this once the AZ issue is fixed
+        # or once we figure out a way to trigger integ test only when transform output changes.
+        if subnet_key == "PreCreatedSubnetOne":
+            pytest.skip("Skipping this test to temporarily bypass AvailabilityZone issue.")
         companion_stack_outputs = self.companion_stack_outputs
         parameters = self.get_parameters(companion_stack_outputs, subnet_key)
         secret_name = mq_secret + "-" + generate_suffix()

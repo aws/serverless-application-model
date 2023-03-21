@@ -4304,6 +4304,10 @@
         "Region": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "SeparateRecordSetGroup": {
+          "title": "Separaterecordsetgroup",
+          "type": "boolean"
+        },
         "SetIdentifier": {
           "$ref": "#/definitions/PassThroughProp"
         }
