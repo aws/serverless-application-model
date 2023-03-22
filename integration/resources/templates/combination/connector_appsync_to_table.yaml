@@ -63,7 +63,7 @@ Resources:
         AwsRegion: !Sub ${AWS::Region}
 
   GetNoteResolver:
-    Type: "AWS::AppSync::Resolver"
+    Type: AWS::AppSync::Resolver
     DependsOn: ApiSchema
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
@@ -78,10 +78,10 @@ Resources:
             "NoteId": $util.dynamodb.toDynamoDBJson($context.arguments.NoteId)
           }
         }
-      ResponseMappingTemplate: "$util.toJson($context.result)"
+      ResponseMappingTemplate: $util.toJson($context.result)
 
   SaveNoteResolver:
-    Type: "AWS::AppSync::Resolver"
+    Type: AWS::AppSync::Resolver
     DependsOn: ApiSchema
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
@@ -100,7 +100,7 @@ Resources:
             "content": $util.dynamodb.toDynamoDBJson($context.arguments.content)
           }
         }
-      ResponseMappingTemplate: "$util.toJson($context.result)"
+      ResponseMappingTemplate: $util.toJson($context.result)
 
   DataSourceToTableConnector:
     Type: AWS::Serverless::Connector
