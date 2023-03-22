@@ -3360,7 +3360,9 @@
           "title": "AccessLogSetting"
         },
         "AlwaysDeploy": {
-          "title": "Alwaysdeploy",
+          "description": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "AlwaysDeploy",
           "type": "boolean"
         },
         "Auth": {
@@ -3466,7 +3468,9 @@
           "type": "object"
         },
         "MergeDefinitions": {
-          "title": "Mergedefinitions",
+          "description": "AWS SAM generates an OpenAPI specification from your API event source\\. Specify `true` to have AWS SAM merge this into the inline OpenAPI specification defined in your `AWS::Serverless::Api` resource\\. Specify `false` to not merge\\.  \n`MergeDefinitions` requires the `DefinitionBody` property for `AWS::Serverless::Api` to be defined\\. `MergeDefinitions` is not compatible with the `DefinitionUri` property for `AWS::Serverless::Api`\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "AWS SAM generates an OpenAPI specification from your API event source\\. Specify `true` to have AWS SAM merge this into the inline OpenAPI specification defined in your `AWS::Serverless::Api` resource\\. Specify `false` to not merge\\.  \n`MergeDefinitions` requires the `DefinitionBody` property for `AWS::Serverless::Api` to be defined\\. `MergeDefinitions` is not compatible with the `DefinitionUri` property for `AWS::Serverless::Api`\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "MergeDefinitions",
           "type": "boolean"
         },
         "MethodSettings": {
@@ -3550,7 +3554,9 @@
           "title": "AccessLogSetting"
         },
         "AlwaysDeploy": {
-          "title": "Alwaysdeploy",
+          "description": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "AlwaysDeploy",
           "type": "boolean"
         },
         "ApiKeySourceType": {
@@ -3708,7 +3714,9 @@
           "type": "object"
         },
         "MergeDefinitions": {
-          "title": "Mergedefinitions",
+          "description": "AWS SAM generates an OpenAPI specification from your API event source\\. Specify `true` to have AWS SAM merge this into the inline OpenAPI specification defined in your `AWS::Serverless::Api` resource\\. Specify `false` to not merge\\.  \n`MergeDefinitions` requires the `DefinitionBody` property for `AWS::Serverless::Api` to be defined\\. `MergeDefinitions` is not compatible with the `DefinitionUri` property for `AWS::Serverless::Api`\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "AWS SAM generates an OpenAPI specification from your API event source\\. Specify `true` to have AWS SAM merge this into the inline OpenAPI specification defined in your `AWS::Serverless::Api` resource\\. Specify `false` to not merge\\.  \n`MergeDefinitions` requires the `DefinitionBody` property for `AWS::Serverless::Api` to be defined\\. `MergeDefinitions` is not compatible with the `DefinitionUri` property for `AWS::Serverless::Api`\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "MergeDefinitions",
           "type": "boolean"
         },
         "MethodSettings": {
