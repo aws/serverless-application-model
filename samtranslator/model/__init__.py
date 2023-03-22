@@ -291,6 +291,7 @@ class Resource(ABC):
 
         resource_dict = self._generate_resource_dict()
         if self.input_dict:
+            # TODO: Fail if conflict (would mean overwrite of either)
             resource_dict.update(self.input_dict)
 
         return {self.logical_id: resource_dict}
