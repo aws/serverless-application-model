@@ -1,0 +1,46 @@
+[
+  {
+    "LogicalResourceId": "HelloLambda",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "HelloLambdaRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "AppSyncApi",
+    "ResourceType": "AWS::AppSync::GraphQLApi"
+  },
+  {
+    "LogicalResourceId": "ApiKey",
+    "ResourceType": "AWS::AppSync::ApiKey"
+  },
+  {
+    "LogicalResourceId": "ApiSchema",
+    "ResourceType": "AWS::AppSync::GraphQLSchema"
+  },
+  {
+    "LogicalResourceId": "AppSyncLambdaDataSource",
+    "ResourceType": "AWS::AppSync::DataSource"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "TriggerFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "AppSyncApiLambdaInvocationRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "DataSourceToLambdaConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  },
+  {
+    "LogicalResourceId": "AppSyncSayHelloResolver",
+    "ResourceType": "AWS::AppSync::Resolver"
+  }
+]
