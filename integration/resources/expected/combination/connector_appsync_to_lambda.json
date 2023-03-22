@@ -1,10 +1,10 @@
 [
   {
-    "LogicalResourceId": "NotesTable",
-    "ResourceType": "AWS::DynamoDB::Table"
+    "LogicalResourceId": "HelloLambda",
+    "ResourceType": "AWS::Lambda::Function"
   },
   {
-    "LogicalResourceId": "DynamoDBRole",
+    "LogicalResourceId": "HelloLambdaRole",
     "ResourceType": "AWS::IAM::Role"
   },
   {
@@ -20,7 +20,7 @@
     "ResourceType": "AWS::AppSync::GraphQLSchema"
   },
   {
-    "LogicalResourceId": "NotesTableDataSource",
+    "LogicalResourceId": "AppSyncLambdaDataSource",
     "ResourceType": "AWS::AppSync::DataSource"
   },
   {
@@ -32,15 +32,15 @@
     "ResourceType": "AWS::IAM::Role"
   },
   {
-    "LogicalResourceId": "DataSourceToTableConnectorPolicy",
+    "LogicalResourceId": "AppSyncApiLambdaInvocationRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "DataSourceToLambdaConnectorPolicy",
     "ResourceType": "AWS::IAM::ManagedPolicy"
   },
   {
-    "LogicalResourceId": "SaveNoteResolver",
-    "ResourceType": "AWS::AppSync::Resolver"
-  },
-  {
-    "LogicalResourceId": "GetNoteResolver",
+    "LogicalResourceId": "AppSyncSayHelloResolver",
     "ResourceType": "AWS::AppSync::Resolver"
   }
 ]

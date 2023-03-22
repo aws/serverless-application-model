@@ -46,7 +46,7 @@ Resources:
         type Mutation {
           saveNote(NoteId: ID!, title: String!, content: String!): Note!
         }
-        type Schema {
+        schema {
           query: Query
           mutation: Mutation
         }
@@ -61,6 +61,46 @@ Resources:
       DynamoDBConfig:
         TableName: !Ref NotesTable
         AwsRegion: !Sub ${AWS::Region}
+
+  GetNoteResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: ApiSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      DataSourceName: !GetAtt NotesTableDataSource.Name
+      TypeName: Query
+      FieldName: getNote
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "operation": "GetItem",
+          "key": {
+            "NoteId": $util.dynamodb.toDynamoDBJson($context.arguments.NoteId)
+          }
+        }
+      ResponseMappingTemplate: $util.toJson($context.result)
+
+  SaveNoteResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: ApiSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Mutation
+      FieldName: saveNote
+      DataSourceName: !GetAtt NotesTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "operation": "PutItem",
+          "key": {
+            "NoteId": $util.dynamodb.toDynamoDBJson($context.arguments.NoteId)
+          },
+          "attributeValues": {
+            "title": $util.dynamodb.toDynamoDBJson($context.arguments.title),
+            "content": $util.dynamodb.toDynamoDBJson($context.arguments.content)
+          }
+        }
+      ResponseMappingTemplate: $util.toJson($context.result)
 
   DataSourceToTableConnector:
     Type: AWS::Serverless::Connector
@@ -129,6 +169,7 @@ Resources:
               req.end();
             });
 
+
           const makeRequest = async (queryName) => {
             const options = {
               method: "POST",
@@ -139,65 +180,27 @@ Resources:
               timeout: 10000, // ms
             };
 
-            let statusCode;
-            let body;
-            let response;
-
-            try {
-              response = await fetch(process.env.GRAPHQL_URL, options);
-              body = JSON.parse(response);
-              const data = body.data?.[queryName];
-              const hasNoErrors = body.errors === undefined;
-              const allFieldsAreSet =
-                data?.title === "1st note" && data?.content === "some note";
-              statusCode = hasNoErrors && allFieldsAreSet ? 200 : 400;
-              if (hasNoErrors) {
-                body = body.data;
-              } else {
-                body = {
-                  [queryName]: {
-                    errors: body.errors,
-                  },
-                };
-              }
-            } catch (error) {
-              statusCode = 400;
-              body = {
-                [queryName]: {
-                  errors: [
-                    {
-                      status: response.status,
-                      message: error.message,
-                      stack: error.stack,
-                    },
-                  ],
-                },
-              };
+            const response = await fetch(process.env.GRAPHQL_URL, options);
+            let body = JSON.parse(response);
+            const data = body.data?.[queryName];
+            
+            if (body.errors !== undefined) {
+              throw JSON.stringify(body.errors);
             }
-            return {
-              statusCode,
-              body,
-            };
+            
+            if (data?.title !== "1st note" || data?.content !== "some note") {
+              throw new Error(
+                `${queryName} error: '${data?.title}' must be '1st note', '${data?.content}' must be 'some note'`);
+            }
+            
+            return body.data;
           };
 
-          let response = await makeRequest("saveNote");
-          if (response.statusCode !== 200) {
-            return {
-              StatusCode: response.statusCode,
-              Body: response.body,
-            };
-          }
-          let body = response.body;
 
-          response = await makeRequest("getNote");
-          body = { ...body, ...response.body };
-
-          return {
-            StatusCode: response.statusCode,
-            Body: body,
-          };
+          const saveResponse = await makeRequest("saveNote");
+          const getResponse = await makeRequest("getNote");
+          return { ...saveResponse, ...getResponse };
         };
-
 
 Metadata:
   SamTransformTest: true
