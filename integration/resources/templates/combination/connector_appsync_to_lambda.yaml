@@ -102,6 +102,7 @@ Resources:
             `,
           };
 
+
           const fetch = async (url, options) =>
             new Promise((resolve, reject) => {
               const req = https.request(url, options, (res) => {
@@ -126,6 +127,7 @@ Resources:
               req.end();
             });
 
+
           const makeRequest = async (queryName) => {
             const options = {
               method: "POST",
@@ -136,52 +138,23 @@ Resources:
               timeout: 10000, // ms
             };
 
-            let statusCode;
-            let body;
-            let response;
+            const response = await fetch(process.env.GRAPHQL_URL, options);
+            const body = JSON.parse(response);
+            const data = body.data?.[queryName];
 
-            try {
-              response = await fetch(process.env.GRAPHQL_URL, options);
-              body = JSON.parse(response);
-              const data = body.data?.[queryName];
-              const hasNoErrors = body.errors === undefined;
-              const allFieldsAreSet =
-                data?.Status === 200 && data?.Body === "Hello World";
-              statusCode = hasNoErrors && allFieldsAreSet ? 200 : 400;
-              if (hasNoErrors) {
-                body = body.data;
-              } else {
-                body = {
-                  [queryName]: {
-                    errors: body.errors,
-                  },
-                };
-              }
-            } catch (error) {
-              statusCode = 400;
-              body = {
-                [queryName]: {
-                  errors: [
-                    {
-                      status: response.status,
-                      message: error.message,
-                      stack: error.stack,
-                    },
-                  ],
-                },
-              };
+            if (body.errors !== undefined) {
+              throw JSON.stringify(body.errors);
             }
-            return {
-              statusCode,
-              body,
-            };
+            
+            if (data !== "Hello World") {
+              throw new Error(`${queryName} error: '${data}' must be 'Hello World'`);
+            }
+
+            return body.data;
           };
 
-          let response = await makeRequest("sayHello");
-          return {
-            StatusCode: response.statusCode,
-            Body: response.body,
-          };
+
+          return await makeRequest("sayHello");
         };
 
 
