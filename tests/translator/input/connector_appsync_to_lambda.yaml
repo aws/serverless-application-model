@@ -1,0 +1,60 @@
+Resources:
+  AppSyncApiLambdaInvocationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: appsync.amazonaws.com
+          Action:
+          - sts:AssumeRole
+
+  HelloLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (_) => {
+          return "Hello World"
+        }
+      Handler: index.handler
+      Runtime: nodejs14.x
+
+  AppSyncApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      AuthenticationType: API_KEY
+      Name: AppSyncApi
+
+  ApiSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Definition: |
+        type Query {
+          sayHello: String!
+        }
+        schema {
+          query: Query
+        }
+
+  AppSyncLambdaDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: AppSyncLambdaDataSource
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt AppSyncApiLambdaInvocationRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !GetAtt HelloLambda.Arn
+
+  DataSourceToLambdaConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: AppSyncLambdaDataSource
+      Destination:
+        Id: HelloLambda
+      Permissions:
+      - Write
