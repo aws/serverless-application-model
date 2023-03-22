@@ -1,9 +1,9 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
 import inspect
 import re
-from copy import deepcopy
 from abc import ABC, ABCMeta, abstractmethod
 from contextlib import suppress
+from copy import deepcopy
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
 from pydantic import BaseModel
