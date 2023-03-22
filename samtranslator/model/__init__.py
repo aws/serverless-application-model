@@ -1,6 +1,7 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
 import inspect
 import re
+from copy import deepcopy
 from abc import ABC, ABCMeta, abstractmethod
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
@@ -105,7 +106,7 @@ class Resource(ABC):
     # TODO: Make `Resource` an abstract class and not giving `resource_type`/`property_types` initial value.
     resource_type: str = None  # type: ignore
     property_types: Dict[str, PropertyType] = None  # type: ignore
-    _keywords = ["logical_id", "relative_id", "depends_on", "resource_attributes"]
+    _keywords = ["logical_id", "relative_id", "depends_on", "resource_attributes", "input_dict"]
 
     # For attributes in this list, they will be passed into the translated template for the same resource itself.
     _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy", "Condition", "UpdateReplacePolicy", "Metadata"]
@@ -121,6 +122,9 @@ class Resource(ABC):
     #   "arn": fnGetAtt(self.logical_id, "Arn")
     # }
     runtime_attrs: Dict[str, Callable[["Resource"], Any]] = {}  # TODO: replace Any with something more explicit
+
+    merge_input = False
+    input_dict = None
 
     def __init__(
         self,
@@ -213,6 +217,9 @@ class Resource(ABC):
             if attr in resource_dict:
                 resource.set_resource_attribute(attr, resource_dict[attr])
 
+        if resource.merge_input:
+            resource.input_dict = deepcopy(resource_dict)
+
         resource.validate_properties()
         return resource
 
@@ -278,6 +285,8 @@ class Resource(ABC):
         self.validate_properties()
 
         resource_dict = self._generate_resource_dict()
+        if self.input_dict:
+            resource_dict.update(self.input_dict)
 
         return {self.logical_id: resource_dict}
 
@@ -315,6 +324,9 @@ class Resource(ABC):
         """
         if name in self._keywords or name in self.property_types:
             return super().__setattr__(name, value)
+
+        if self.merge_input:
+            return None
 
         raise InvalidResourceException(
             self.logical_id,

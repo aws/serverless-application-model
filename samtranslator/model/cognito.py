@@ -4,6 +4,7 @@ from samtranslator.model.intrinsics import fnGetAtt, ref
 
 class CognitoUserPool(Resource):
     resource_type = "AWS::Cognito::UserPool"
+    merge_input = True
     property_types = {
         "AccountRecoverySetting": GeneratedProperty(),
         "AdminCreateUserConfig": GeneratedProperty(),
