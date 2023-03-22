@@ -46,7 +46,7 @@ Resources:
         type Mutation {
           saveNote(NoteId: ID!, title: String!, content: String!): Note!
         }
-        type Schema {
+        schema {
           query: Query
           mutation: Mutation
         }
@@ -61,6 +61,46 @@ Resources:
       DynamoDBConfig:
         TableName: !Ref NotesTable
         AwsRegion: !Sub ${AWS::Region}
+
+  GetNoteResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: ApiSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      DataSourceName: !GetAtt NotesTableDataSource.Name
+      TypeName: Query
+      FieldName: getNote
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "operation": "GetItem",
+          "key": {
+            "NoteId": $util.dynamodb.toDynamoDBJson($context.arguments.NoteId)
+          }
+        }
+      ResponseMappingTemplate: "$util.toJson($context.result)"
+
+  SaveNoteResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: ApiSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Mutation
+      FieldName: saveNote
+      DataSourceName: !GetAtt NotesTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "operation": "PutItem",
+          "key": {
+            "NoteId": $util.dynamodb.toDynamoDBJson($context.arguments.NoteId)
+          },
+          "attributeValues": {
+            "title": $util.dynamodb.toDynamoDBJson($context.arguments.title),
+            "content": $util.dynamodb.toDynamoDBJson($context.arguments.content)
+          }
+        }
+      ResponseMappingTemplate: "$util.toJson($context.result)"
 
   DataSourceToTableConnector:
     Type: AWS::Serverless::Connector
@@ -197,7 +237,6 @@ Resources:
             Body: body,
           };
         };
-
 
 Metadata:
   SamTransformTest: true

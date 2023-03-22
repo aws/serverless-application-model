@@ -34,5 +34,13 @@
   {
     "LogicalResourceId": "DataSourceToTableConnectorPolicy",
     "ResourceType": "AWS::IAM::ManagedPolicy"
+  },
+  {
+    "LogicalResourceId": "SaveNoteResolver",
+    "ResourceType": "AWS::AppSync::Resolver"
+  },
+  {
+    "LogicalResourceId": "GetNoteResolver",
+    "ResourceType": "AWS::AppSync::Resolver"
   }
 ]
