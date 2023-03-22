@@ -128,6 +128,7 @@ class Resource(ABC):
     # update other class variables as well after instantiation.
     validate_setattr: bool = True
 
+    # TODO: set in constructor? so enabled on case-by-case basis
     merge_input = False
     input_dict = None
 
