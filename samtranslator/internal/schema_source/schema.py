@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+from copy import deepcopy
 from typing import Any, Callable, Dict, Optional, Type, Union
 
 import pydantic
@@ -151,7 +152,7 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
     # Inject CloudFormation documentation to SAM pass-through properties
     def replace_passthrough(d: Dict[str, Any]) -> Dict[str, Any]:
         passthrough = d["__samPassThrough"]
-        schema = _deep_get(cfn_schema, passthrough["schemaPath"])
+        schema = deepcopy(_deep_get(cfn_schema, passthrough["schemaPath"]))
         schema["markdownDescription"] = passthrough["markdownDescriptionOverride"]
         return schema
 
