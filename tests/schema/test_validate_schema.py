@@ -1,9 +1,8 @@
-import copy
 import itertools
 import json
 from pathlib import Path
+from typing import Any, Dict
 from unittest import TestCase
-from typing import Dict, Any
 
 import pytest
 from jsonschema import validate
