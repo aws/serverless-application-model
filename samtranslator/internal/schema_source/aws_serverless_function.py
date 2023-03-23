@@ -539,7 +539,7 @@ class Properties(BaseModel):
     FileSystemConfigs: Optional[PassThroughProp] = lambda_passthrough("FileSystemConfigs")
     FunctionName: Optional[PassThroughProp] = lambda_passthrough("FunctionName")
     FunctionUrlConfig: Optional[FunctionUrlConfig] = prop("FunctionUrlConfig")
-    Handler: Optional[Handler] = lambda_passthrough("Handler")
+    Handler: Optional[Handler] = prop("Handler")
     ImageConfig: Optional[PassThroughProp] = prop("ImageConfig")
     ImageUri: Optional[PassThroughProp] = prop("ImageUri")
     InlineCode: Optional[PassThroughProp] = prop("InlineCode")
@@ -555,7 +555,7 @@ class Properties(BaseModel):
         "ReservedConcurrentExecutions"
     )
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
-    Runtime: Optional[Runtime] = lambda_passthrough("Runtime")
+    Runtime: Optional[Runtime] = prop("Runtime")
     SnapStart: Optional[SnapStart] = lambda_passthrough("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     Tags: Optional[Tags] = prop("Tags")
@@ -566,8 +566,8 @@ class Properties(BaseModel):
 
 
 class Globals(BaseModel):
-    Handler: Optional[Handler] = lambda_passthrough("Handler")
-    Runtime: Optional[Runtime] = lambda_passthrough("Runtime")
+    Handler: Optional[Handler] = prop("Handler")
+    Runtime: Optional[Runtime] = prop("Runtime")
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
     Description: Optional[Description] = lambda_passthrough("Description")
