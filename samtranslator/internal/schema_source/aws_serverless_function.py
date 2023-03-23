@@ -564,7 +564,12 @@ class Properties(BaseModel):
     RolePath: Optional[RolePath] = prop("RolePath")
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = prop("Policies")
-    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
+    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = passthrough_prop(
+        PROPERTIES_STEM,
+        "ProvisionedConcurrencyConfig",
+        "AWS::Lambda::Alias",
+        "ProvisionedConcurrencyConfig",
+    )
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
     Runtime: Optional[Runtime] = prop("Runtime")
