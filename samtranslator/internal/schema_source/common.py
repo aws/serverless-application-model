@@ -40,6 +40,25 @@ def get_prop(stem: str) -> Any:
     return partial(_get_prop, stem)
 
 
+def prop_path(resource_type: str, path: str) -> str:
+    """
+    Convenience function to get the path to a property in the CloudFormation schema.
+    """
+    return f"definitions.{resource_type}.properties.Properties.properties.{path}"
+
+
+def passthrough(path: str) -> Any:
+    """
+    Specifies a pass-through field, where path is the path to the property in the
+    in the CloudFormation schema. Use `.` to delimitate keys in the path.
+    """
+    # We add a custom value to the schema containing the path to the pass-through
+    # documentation; the dict containing the value is replaced in the final schema
+    return Field(
+        __samPassThroughPath=path,
+    )
+
+
 def _get_prop(stem: str, name: str) -> Any:
     docs = _DOCS["properties"][stem][name]
     return Field(
