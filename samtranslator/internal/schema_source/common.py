@@ -40,10 +40,6 @@ def get_prop(stem: str) -> Any:
     return partial(_get_prop, stem)
 
 
-# TODO: Support getting schema from CloudFormation, but documentation from SAM
-# Sometimes the SAM docs add valuable context, e.g. how properties behave with
-# some other SAM-specific properties
-# So we should't use this to replace every pass-through
 def passthrough_prop(sam_docs_stem: str, sam_docs_name: str, resource_type: str, prop_path: str) -> Any:
     """
     Specifies a pass-through field, where resource_type is the CloudFormation
@@ -55,7 +51,9 @@ def passthrough_prop(sam_docs_stem: str, sam_docs_name: str, resource_type: str,
         # We add a custom value to the schema containing the path to the pass-through
         # documentation; the dict containing the value is replaced in the final schema
         __samPassThrough={
+            # To know at schema build-time where to find the property schema
             "schemaPath": prop_path,
+            # Use SAM docs at the top-level pass-through; it can include useful SAM-specific information
             "markdownDescriptionOverride": docs,
         },
     )

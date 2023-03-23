@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
@@ -15,7 +15,6 @@ from samtranslator.internal.schema_source.common import (
     get_prop,
     passthrough_prop,
 )
-
 
 PROPERTIES_STEM = "sam-resource-function"
 
