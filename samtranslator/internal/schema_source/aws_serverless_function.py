@@ -16,6 +16,11 @@ from samtranslator.internal.schema_source.common import (
     passthrough_prop,
 )
 
+
+def lambda_passthrough(path: str) -> Any:
+    return passthrough_prop("AWS::Lambda::Function", path)
+
+
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
 apiauth = get_prop("sam-property-function-apifunctionauth")
 apieventproperties = get_prop("sam-property-function-api")
@@ -502,8 +507,8 @@ class Properties(BaseModel):
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
     Description: Optional[Description] = prop("Description")
-    Environment: Optional[Environment] = passthrough_prop("AWS::Lambda::Function", "Environment")
-    EphemeralStorage: Optional[EphemeralStorage] = passthrough_prop("AWS::Lambda::Function", "EphemeralStorage")
+    Environment: Optional[Environment] = lambda_passthrough("Environment")
+    EphemeralStorage: Optional[EphemeralStorage] = lambda_passthrough("EphemeralStorage")
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Events: Optional[
         Dict[
@@ -532,9 +537,9 @@ class Properties(BaseModel):
         ]
     ] = prop("Events")
     FileSystemConfigs: Optional[PassThroughProp] = prop("FileSystemConfigs")
-    FunctionName: Optional[PassThroughProp] = passthrough_prop("AWS::Lambda::Function", "FunctionName")
+    FunctionName: Optional[PassThroughProp] = lambda_passthrough("FunctionName")
     FunctionUrlConfig: Optional[FunctionUrlConfig] = prop("FunctionUrlConfig")
-    Handler: Optional[Handler] = prop("Handler")
+    Handler: Optional[Handler] = lambda_passthrough("Handler")
     ImageConfig: Optional[PassThroughProp] = prop("ImageConfig")
     ImageUri: Optional[PassThroughProp] = prop("ImageUri")
     InlineCode: Optional[PassThroughProp] = prop("InlineCode")
@@ -548,7 +553,7 @@ class Properties(BaseModel):
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
-    Runtime: Optional[Runtime] = prop("Runtime")
+    Runtime: Optional[Runtime] = lambda_passthrough("Runtime")
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     Tags: Optional[Tags] = prop("Tags")
@@ -559,15 +564,15 @@ class Properties(BaseModel):
 
 
 class Globals(BaseModel):
-    Handler: Optional[Handler] = prop("Handler")
-    Runtime: Optional[Runtime] = prop("Runtime")
+    Handler: Optional[Handler] = lambda_passthrough("Handler")
+    Runtime: Optional[Runtime] = lambda_passthrough("Runtime")
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
     Description: Optional[Description] = prop("Description")
     MemorySize: Optional[MemorySize] = prop("MemorySize")
     Timeout: Optional[Timeout] = prop("Timeout")
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
-    Environment: Optional[Environment] = passthrough_prop("AWS::Lambda::Function", "Environment")
+    Environment: Optional[Environment] = lambda_passthrough("Environment")
     Tags: Optional[Tags] = prop("Tags")
     Tracing: Optional[Tracing] = prop("Tracing")
     KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
@@ -581,7 +586,7 @@ class Globals(BaseModel):
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Architectures: Optional[Architectures] = prop("Architectures")
-    EphemeralStorage: Optional[EphemeralStorage] = passthrough_prop("AWS::Lambda::Function", "EphemeralStorage")
+    EphemeralStorage: Optional[EphemeralStorage] = lambda_passthrough("EphemeralStorage")
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
 
