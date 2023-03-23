@@ -4659,13 +4659,12 @@
       "additionalProperties": false,
       "properties": {
         "Architectures": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Architectures",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Architectures"
         },
         "AssumeRolePolicyDocument": {
@@ -4724,13 +4723,12 @@
           "title": "DeploymentPreference"
         },
         "Description": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Description",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Description"
         },
         "Environment": {
@@ -4781,24 +4779,22 @@
           "title": "KmsKeyArn"
         },
         "Layers": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Layers",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The list of `LayerVersion` ARNs that this function should use\\. The order specified here is the order in which they will be imported when running the Lambda function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Layers`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The list of `LayerVersion` ARNs that this function should use\\. The order specified here is the order in which they will be imported when running the Lambda function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Layers`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Layers"
         },
         "MemorySize": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.MemorySize",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The size of the memory in MB allocated per invocation of the function\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MemorySize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-memorysize) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The size of the memory in MB allocated per invocation of the function\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MemorySize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-memorysize) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "MemorySize"
+          "title": "Memorysize"
         },
         "PermissionsBoundary": {
           "allOf": [
@@ -4821,14 +4817,13 @@
           "title": "ProvisionedConcurrencyConfig"
         },
         "ReservedConcurrentExecutions": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.ReservedConcurrentExecutions",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The maximum number of concurrent executions that you want to reserve for the function\\.  \nFor more information about this property, see [Lambda Function Scaling](https://docs.aws.amazon.com/lambda/latest/dg/scaling.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ReservedConcurrentExecutions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-reservedconcurrentexecutions) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The maximum number of concurrent executions that you want to reserve for the function\\.  \nFor more information about this property, see [Lambda Function Scaling](https://docs.aws.amazon.com/lambda/latest/dg/scaling.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ReservedConcurrentExecutions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-reservedconcurrentexecutions) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "ReservedConcurrentExecutions"
+          "title": "Reservedconcurrentexecutions"
         },
         "RolePath": {
           "allOf": [
@@ -4860,14 +4855,13 @@
           "title": "RuntimeManagementConfig"
         },
         "SnapStart": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.SnapStart",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Create a snapshot of any new Lambda function version\\. A snapshot is a cached state of your initialized function, including all of its dependencies\\. The function is initialized just once and the cached state is reused for all future invocations, improving application performance by reducing the number of times your function must be initialized\\. To learn more, see [Improving startup performance with Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [SnapStart](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SnapStart`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "Create a snapshot of any new Lambda function version\\. A snapshot is a cached state of your initialized function, including all of its dependencies\\. The function is initialized just once and the cached state is reused for all future invocations, improving application performance by reducing the number of times your function must be initialized\\. To learn more, see [Improving startup performance with Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [SnapStart](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SnapStart`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "SnapStart"
+          "title": "Snapstart"
         },
         "Tags": {
           "description": "A map \\(string to string\\) that specifies the tags added to this function\\. For details about valid keys and values for tags, see [Tag Key and Value Requirements](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html#configuration-tags-restrictions) in the *AWS Lambda Developer Guide*\\.  \nWhen the stack is created, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tags) property of an `AWS::Lambda::Function` resource\\. The `Tags` property in AWS SAM consists of key\\-value pairs \\(whereas in AWS CloudFormation this property consists of a list of `Tag` objects\\)\\. Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.",
@@ -4876,13 +4870,12 @@
           "type": "object"
         },
         "Timeout": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Timeout",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The maximum time in seconds that the function can run before it is stopped\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 3  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Timeout`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-timeout) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The maximum time in seconds that the function can run before it is stopped\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 3  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Timeout`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-timeout) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Timeout"
         },
         "Tracing": {
@@ -4903,14 +4896,13 @@
           "title": "Tracing"
         },
         "VpcConfig": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.VpcConfig",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The configuration that enables this function to access private resources within your virtual private cloud \\(VPC\\)\\.  \n*Type*: [VpcConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The configuration that enables this function to access private resources within your virtual private cloud \\(VPC\\)\\.  \n*Type*: [VpcConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "VpcConfig"
+          "title": "Vpcconfig"
         }
       },
       "title": "Globals",
@@ -5119,14 +5111,13 @@
           "type": "object"
         },
         "FileSystemConfigs": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.FileSystemConfigs",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "List of [FileSystemConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html) objects that specify the connection settings for an Amazon Elastic File System \\(Amazon EFS\\) file system\\.  \nIf your template contains an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a `DependsOn` resource attribute to ensure that the mount target is created or updated before the function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FileSystemConfigs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "List of [FileSystemConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html) objects that specify the connection settings for an Amazon Elastic File System \\(Amazon EFS\\) file system\\.  \nIf your template contains an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a `DependsOn` resource attribute to ensure that the mount target is created or updated before the function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FileSystemConfigs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "FileSystemConfigs"
+          "title": "Filesystemconfigs"
         },
         "FunctionName": {
           "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.FunctionName",
@@ -5197,34 +5188,31 @@
           "title": "KmsKeyArn"
         },
         "Layers": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Layers",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The list of `LayerVersion` ARNs that this function should use\\. The order specified here is the order in which they will be imported when running the Lambda function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Layers`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The list of `LayerVersion` ARNs that this function should use\\. The order specified here is the order in which they will be imported when running the Lambda function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Layers`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Layers"
         },
         "MemorySize": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.MemorySize",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The size of the memory in MB allocated per invocation of the function\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MemorySize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-memorysize) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The size of the memory in MB allocated per invocation of the function\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MemorySize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-memorysize) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "MemorySize"
+          "title": "Memorysize"
         },
         "PackageType": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.PackageType",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The deployment package type of the Lambda function\\. For more information, see [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) in the *AWS Lambda Developer Guide*\\.  \n**Notes**:  \n1\\. If this property is set to `Zip` \\(default\\), then either `CodeUri` or `InlineCode` applies, and `ImageUri` is ignored\\.  \n2\\. If this property is set to `Image`, then only `ImageUri` applies, and both `CodeUri` and `InlineCode` are ignored\\. The Amazon ECR repository required to store the functionsl container image can be auto created by the AWS SAM CLI\\. For more information, see [sam deploy](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html)\\.  \n*Valid values*: `Zip` or `Image`  \n*Type*: String  \n*Required*: No  \n*Default*: `Zip`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PackageType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-packagetype) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The deployment package type of the Lambda function\\. For more information, see [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) in the *AWS Lambda Developer Guide*\\.  \n**Notes**:  \n1\\. If this property is set to `Zip` \\(default\\), then either `CodeUri` or `InlineCode` applies, and `ImageUri` is ignored\\.  \n2\\. If this property is set to `Image`, then only `ImageUri` applies, and both `CodeUri` and `InlineCode` are ignored\\. The Amazon ECR repository required to store the functionsl container image can be auto created by the AWS SAM CLI\\. For more information, see [sam deploy](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html)\\.  \n*Valid values*: `Zip` or `Image`  \n*Type*: String  \n*Required*: No  \n*Default*: `Zip`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PackageType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-packagetype) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "PackageType"
+          "title": "Packagetype"
         },
         "PermissionsBoundary": {
           "allOf": [
@@ -5273,14 +5261,13 @@
           "title": "ProvisionedConcurrencyConfig"
         },
         "ReservedConcurrentExecutions": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.ReservedConcurrentExecutions",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The maximum number of concurrent executions that you want to reserve for the function\\.  \nFor more information about this property, see [Lambda Function Scaling](https://docs.aws.amazon.com/lambda/latest/dg/scaling.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ReservedConcurrentExecutions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-reservedconcurrentexecutions) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The maximum number of concurrent executions that you want to reserve for the function\\.  \nFor more information about this property, see [Lambda Function Scaling](https://docs.aws.amazon.com/lambda/latest/dg/scaling.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ReservedConcurrentExecutions`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-reservedconcurrentexecutions) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "ReservedConcurrentExecutions"
+          "title": "Reservedconcurrentexecutions"
         },
         "Role": {
           "anyOf": [
@@ -5325,14 +5312,13 @@
           "title": "RuntimeManagementConfig"
         },
         "SnapStart": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.SnapStart",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Create a snapshot of any new Lambda function version\\. A snapshot is a cached state of your initialized function, including all of its dependencies\\. The function is initialized just once and the cached state is reused for all future invocations, improving application performance by reducing the number of times your function must be initialized\\. To learn more, see [Improving startup performance with Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [SnapStart](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SnapStart`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "Create a snapshot of any new Lambda function version\\. A snapshot is a cached state of your initialized function, including all of its dependencies\\. The function is initialized just once and the cached state is reused for all future invocations, improving application performance by reducing the number of times your function must be initialized\\. To learn more, see [Improving startup performance with Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [SnapStart](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SnapStart`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "SnapStart"
+          "title": "Snapstart"
         },
         "Tags": {
           "description": "A map \\(string to string\\) that specifies the tags added to this function\\. For details about valid keys and values for tags, see [Tag Key and Value Requirements](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html#configuration-tags-restrictions) in the *AWS Lambda Developer Guide*\\.  \nWhen the stack is created, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tags) property of an `AWS::Lambda::Function` resource\\. The `Tags` property in AWS SAM consists of key\\-value pairs \\(whereas in AWS CloudFormation this property consists of a list of `Tag` objects\\)\\. Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.",
@@ -5341,13 +5327,12 @@
           "type": "object"
         },
         "Timeout": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Timeout",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The maximum time in seconds that the function can run before it is stopped\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 3  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Timeout`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-timeout) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The maximum time in seconds that the function can run before it is stopped\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 3  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Timeout`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-timeout) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Timeout"
         },
         "Tracing": {
@@ -5378,14 +5363,13 @@
           "title": "VersionDescription"
         },
         "VpcConfig": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.VpcConfig",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The configuration that enables this function to access private resources within your virtual private cloud \\(VPC\\)\\.  \n*Type*: [VpcConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The configuration that enables this function to access private resources within your virtual private cloud \\(VPC\\)\\.  \n*Type*: [VpcConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "VpcConfig"
+          "title": "Vpcconfig"
         }
       },
       "title": "Properties",
