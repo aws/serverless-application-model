@@ -3,6 +3,7 @@ import itertools
 import json
 from pathlib import Path
 from unittest import TestCase
+from typing import Dict, Any
 
 import pytest
 from jsonschema import validate
@@ -74,6 +75,15 @@ def get_all_test_templates():
         + list(Path(PROJECT_ROOT, "integration/resources/templates").glob("**/*.yaml"))
         + list(Path(PROJECT_ROOT, "integration/resources/templates").glob("**/*.yml"))
     )
+
+
+def _dict_remove_keys(d: Dict[str, Any], keyword: str) -> Dict[str, Any]:
+    r = {}
+    for k, v in d.items():
+        if k == keyword:
+            continue
+        r[k] = _dict_remove_keys(v, keyword) if isinstance(v, dict) else v
+    return r
 
 
 SCHEMA_VALIDATION_TESTS = [str(f) for f in get_all_test_templates() if not should_skip_test(str(f))]
@@ -148,9 +158,14 @@ class TestValidateUnifiedSchema(TestCase):
         )
 
         # Contains all definitions from SAM-only schema (except rule that ignores non-SAM)
-        sam_defs = copy.deepcopy(SCHEMA["definitions"])
-        del sam_defs["samtranslator__internal__schema_source__any_cfn_resource__Resource"]
-        assert sam_defs.items() <= UNIFIED_SCHEMA["definitions"].items()
+        # Pass-through properties are replaced in the SAM schema, so can't do a deep check
+        sam_defs = {
+            k
+            for k in SCHEMA["definitions"]
+            if k != "samtranslator__internal__schema_source__any_cfn_resource__Resource"
+        }
+        unified_defs = set(UNIFIED_SCHEMA["definitions"])
+        assert sam_defs < unified_defs
 
         # Contains all resources from SAM-only schema (except rule that ignores non-SAM)
         unified_resources = UNIFIED_SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]
