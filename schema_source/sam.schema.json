@@ -4734,7 +4734,10 @@
           "title": "Description"
         },
         "Environment": {
-          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Environment",
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Environment"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
@@ -4743,7 +4746,10 @@
           "title": "Environment"
         },
         "EphemeralStorage": {
-          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.EphemeralStorage",
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.EphemeralStorage"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
@@ -5029,7 +5035,10 @@
           "title": "Description"
         },
         "Environment": {
-          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Environment",
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Environment"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
@@ -5038,7 +5047,10 @@
           "title": "Environment"
         },
         "EphemeralStorage": {
-          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.EphemeralStorage",
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.EphemeralStorage"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
@@ -5134,7 +5146,10 @@
           "title": "FileSystemConfigs"
         },
         "FunctionName": {
-          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.FunctionName",
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A name for the function\\. If you don't specify a name, a unique name is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-functionname) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.FunctionName"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
@@ -5269,14 +5284,16 @@
           "title": "Policies"
         },
         "ProvisionedConcurrencyConfig": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The provisioned concurrency configuration of a function's alias\\.  \n`ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.\n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedConcurrencyConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig) property of an `AWS::Lambda::Alias` resource\\.",
+            "schemaPath": "definitions.AWS::Lambda::Alias.properties.Properties.properties.ProvisionedConcurrencyConfig"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The provisioned concurrency configuration of a function's alias\\.  \n`ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.\n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedConcurrencyConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig) property of an `AWS::Lambda::Alias` resource\\.",
-          "markdownDescription": "The provisioned concurrency configuration of a function's alias\\.  \n`ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.\n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedConcurrencyConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig) property of an `AWS::Lambda::Alias` resource\\.",
-          "title": "ProvisionedConcurrencyConfig"
+          "title": "Provisionedconcurrencyconfig"
         },
         "ReservedConcurrentExecutions": {
           "allOf": [
