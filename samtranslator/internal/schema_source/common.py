@@ -40,6 +40,10 @@ def get_prop(stem: str) -> Any:
     return partial(_get_prop, stem)
 
 
+# TODO: Support getting schema from CloudFormation, but documentation from SAM
+# Sometimes the SAM docs add valuable context, e.g. how properties behave with
+# some other SAM-specific properties
+# So we should't use this to replace every pass-through
 def passthrough_prop(resource_type: str, path: str) -> Any:
     """
     Specifies a pass-through field, where resource_type is the CloudFormation
