@@ -4961,7 +4961,6 @@
           "title": "AutoPublishCodeSha256"
         },
         "CodeSigningConfigArn": {
-          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.CodeSigningConfigArn",
           "anyOf": [
             {
               "type": "object"
@@ -4970,7 +4969,9 @@
               "type": "string"
             }
           ],
-          "title": "Codesigningconfigarn"
+          "description": "The ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/authoring-codesigning.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CodeSigningConfigArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn) property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "The ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/authoring-codesigning.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CodeSigningConfigArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn) property of an `AWS::Lambda::Function` resource\\.",
+          "title": "CodeSigningConfigArn"
         },
         "CodeUri": {
           "anyOf": [

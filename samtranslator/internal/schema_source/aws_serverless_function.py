@@ -502,7 +502,7 @@ class Properties(BaseModel):
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
     AutoPublishAliasAllProperties: Optional[AutoPublishAliasAllProperties] = prop("AutoPublishAliasAllProperties")
     AutoPublishCodeSha256: Optional[SamIntrinsicable[str]] = prop("AutoPublishCodeSha256")
-    CodeSigningConfigArn: Optional[SamIntrinsicable[str]] = lambda_passthrough("CodeSigningConfigArn")
+    CodeSigningConfigArn: Optional[SamIntrinsicable[str]] = prop("CodeSigningConfigArn")
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
