@@ -149,10 +149,16 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
     _add_embedded_connectors(sam_schema)
 
     # Inject CloudFormation documentation to SAM pass-through properties
+    def replace_passthrough(d: Dict[str, Any]) -> Dict[str, Any]:
+        passthrough = d["__samPassThrough"]
+        schema = _deep_get(cfn_schema, passthrough["schemaPath"])
+        schema["markdownDescription"] = passthrough["markdownDescriptionOverride"]
+        return schema
+
     _replace_in_dict(
         sam_schema,
-        "__samPassThroughPath",
-        lambda d: _deep_get(cfn_schema, d["__samPassThroughPath"]),
+        "__samPassThrough",
+        replace_passthrough,
     )
 
     # The unified schema should include all supported properties

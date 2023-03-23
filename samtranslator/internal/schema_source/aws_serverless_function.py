@@ -17,9 +17,7 @@ from samtranslator.internal.schema_source.common import (
 )
 
 
-def lambda_passthrough(path: str) -> Any:
-    return passthrough_prop("AWS::Lambda::Function", path)
-
+PROPERTIES_STEM = "sam-resource-function"
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
 apiauth = get_prop("sam-property-function-apifunctionauth")
@@ -497,7 +495,7 @@ RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
 
 
 class Properties(BaseModel):
-    Architectures: Optional[Architectures] = lambda_passthrough("Architectures")
+    Architectures: Optional[Architectures] = prop("Architectures")
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
     AutoPublishAliasAllProperties: Optional[AutoPublishAliasAllProperties] = prop("AutoPublishAliasAllProperties")
@@ -506,9 +504,14 @@ class Properties(BaseModel):
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
-    Description: Optional[Description] = lambda_passthrough("Description")
-    Environment: Optional[Environment] = lambda_passthrough("Environment")
-    EphemeralStorage: Optional[EphemeralStorage] = lambda_passthrough("EphemeralStorage")
+    Description: Optional[Description] = prop("Description")
+    Environment: Optional[Environment] = passthrough_prop(
+        "AWS::Lambda::Function",
+        "Environment",
+        PROPERTIES_STEM,
+        "Environment",
+    )
+    EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Events: Optional[
         Dict[
@@ -536,33 +539,31 @@ class Properties(BaseModel):
             ],
         ]
     ] = prop("Events")
-    FileSystemConfigs: Optional[PassThroughProp] = lambda_passthrough("FileSystemConfigs")
-    FunctionName: Optional[PassThroughProp] = lambda_passthrough("FunctionName")
+    FileSystemConfigs: Optional[PassThroughProp] = prop("FileSystemConfigs")
+    FunctionName: Optional[PassThroughProp] = prop("FunctionName")
     FunctionUrlConfig: Optional[FunctionUrlConfig] = prop("FunctionUrlConfig")
     Handler: Optional[Handler] = prop("Handler")
     ImageConfig: Optional[PassThroughProp] = prop("ImageConfig")
     ImageUri: Optional[PassThroughProp] = prop("ImageUri")
     InlineCode: Optional[PassThroughProp] = prop("InlineCode")
     KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
-    Layers: Optional[Layers] = lambda_passthrough("Layers")
-    MemorySize: Optional[MemorySize] = lambda_passthrough("MemorySize")
+    Layers: Optional[Layers] = prop("Layers")
+    MemorySize: Optional[MemorySize] = prop("MemorySize")
     PackageType: Optional[PassThroughProp] = prop("PackageType")
     RolePath: Optional[RolePath] = prop("RolePath")
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = prop("Policies")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
-    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = lambda_passthrough(
-        "ReservedConcurrentExecutions"
-    )
+    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
     Runtime: Optional[Runtime] = prop("Runtime")
-    SnapStart: Optional[SnapStart] = lambda_passthrough("SnapStart")
+    SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     Tags: Optional[Tags] = prop("Tags")
-    Timeout: Optional[Timeout] = lambda_passthrough("Timeout")
+    Timeout: Optional[Timeout] = prop("Timeout")
     Tracing: Optional[Tracing] = prop("Tracing")
     VersionDescription: Optional[PassThroughProp] = prop("VersionDescription")
-    VpcConfig: Optional[VpcConfig] = lambda_passthrough("VpcConfig")
+    VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
 
 
 class Globals(BaseModel):
@@ -570,28 +571,26 @@ class Globals(BaseModel):
     Runtime: Optional[Runtime] = prop("Runtime")
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
-    Description: Optional[Description] = lambda_passthrough("Description")
-    MemorySize: Optional[MemorySize] = lambda_passthrough("MemorySize")
-    Timeout: Optional[Timeout] = lambda_passthrough("Timeout")
-    VpcConfig: Optional[VpcConfig] = lambda_passthrough("VpcConfig")
-    Environment: Optional[Environment] = lambda_passthrough("Environment")
+    Description: Optional[Description] = prop("Description")
+    MemorySize: Optional[MemorySize] = prop("MemorySize")
+    Timeout: Optional[Timeout] = prop("Timeout")
+    VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
+    Environment: Optional[Environment] = prop("Environment")
     Tags: Optional[Tags] = prop("Tags")
     Tracing: Optional[Tracing] = prop("Tracing")
     KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
-    Layers: Optional[Layers] = lambda_passthrough("Layers")
+    Layers: Optional[Layers] = prop("Layers")
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
     RolePath: Optional[RolePath] = prop("RolePath")
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
-    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = lambda_passthrough(
-        "ReservedConcurrentExecutions"
-    )
+    ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
-    Architectures: Optional[Architectures] = lambda_passthrough("Architectures")
-    EphemeralStorage: Optional[EphemeralStorage] = lambda_passthrough("EphemeralStorage")
-    SnapStart: Optional[SnapStart] = lambda_passthrough("SnapStart")
+    Architectures: Optional[Architectures] = prop("Architectures")
+    EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
+    SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
 
 
