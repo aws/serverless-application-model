@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
@@ -497,16 +497,16 @@ RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
 
 
 class Properties(BaseModel):
-    Architectures: Optional[Architectures] = prop("Architectures")
+    Architectures: Optional[Architectures] = lambda_passthrough("Architectures")
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
     AutoPublishAliasAllProperties: Optional[AutoPublishAliasAllProperties] = prop("AutoPublishAliasAllProperties")
     AutoPublishCodeSha256: Optional[SamIntrinsicable[str]] = prop("AutoPublishCodeSha256")
-    CodeSigningConfigArn: Optional[SamIntrinsicable[str]] = prop("CodeSigningConfigArn")
+    CodeSigningConfigArn: Optional[SamIntrinsicable[str]] = lambda_passthrough("CodeSigningConfigArn")
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
-    Description: Optional[Description] = prop("Description")
+    Description: Optional[Description] = lambda_passthrough("Description")
     Environment: Optional[Environment] = lambda_passthrough("Environment")
     EphemeralStorage: Optional[EphemeralStorage] = lambda_passthrough("EphemeralStorage")
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")

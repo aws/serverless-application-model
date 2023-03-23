@@ -4920,13 +4920,12 @@
       "additionalProperties": false,
       "properties": {
         "Architectures": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Architectures",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Architectures"
         },
         "AssumeRolePolicyDocument": {
@@ -4968,6 +4967,7 @@
           "title": "AutoPublishCodeSha256"
         },
         "CodeSigningConfigArn": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.CodeSigningConfigArn",
           "anyOf": [
             {
               "type": "object"
@@ -4976,9 +4976,7 @@
               "type": "string"
             }
           ],
-          "description": "The ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/authoring-codesigning.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CodeSigningConfigArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/authoring-codesigning.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CodeSigningConfigArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "CodeSigningConfigArn"
+          "title": "Codesigningconfigarn"
         },
         "CodeUri": {
           "anyOf": [
@@ -5017,13 +5015,12 @@
           "title": "DeploymentPreference"
         },
         "Description": {
+          "__samPassThroughPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Description",
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Description"
         },
         "Environment": {
