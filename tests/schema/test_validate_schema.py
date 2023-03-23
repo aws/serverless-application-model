@@ -1,7 +1,6 @@
 import itertools
 import json
 from pathlib import Path
-from typing import Any, Dict
 from unittest import TestCase
 
 import pytest
@@ -74,15 +73,6 @@ def get_all_test_templates():
         + list(Path(PROJECT_ROOT, "integration/resources/templates").glob("**/*.yaml"))
         + list(Path(PROJECT_ROOT, "integration/resources/templates").glob("**/*.yml"))
     )
-
-
-def _dict_remove_keys(d: Dict[str, Any], keyword: str) -> Dict[str, Any]:
-    r = {}
-    for k, v in d.items():
-        if k == keyword:
-            continue
-        r[k] = _dict_remove_keys(v, keyword) if isinstance(v, dict) else v
-    return r
 
 
 SCHEMA_VALIDATION_TESTS = [str(f) for f in get_all_test_templates() if not should_skip_test(str(f))]
