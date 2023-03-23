@@ -546,7 +546,7 @@ class Properties(BaseModel):
     KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
     Layers: Optional[Layers] = lambda_passthrough("Layers")
     MemorySize: Optional[MemorySize] = lambda_passthrough("MemorySize")
-    PackageType: Optional[PassThroughProp] = lambda_passthrough("PackageType")
+    PackageType: Optional[PassThroughProp] = prop("PackageType")
     RolePath: Optional[RolePath] = prop("RolePath")
     PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = prop("Policies")
