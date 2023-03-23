@@ -44,13 +44,13 @@ def get_prop(stem: str) -> Any:
 # Sometimes the SAM docs add valuable context, e.g. how properties behave with
 # some other SAM-specific properties
 # So we should't use this to replace every pass-through
-def passthrough_prop(resource_type: str, path: str, stem: str, name: str) -> Any:
+def passthrough_prop(sam_docs_stem: str, sam_docs_name: str, resource_type: str, prop_path: str) -> Any:
     """
     Specifies a pass-through field, where resource_type is the CloudFormation
     resource type, and path is a `.`-delimitated path to the property.
     """
-    prop_path = f"definitions.{resource_type}.properties.Properties.properties.{path}"
-    docs = _DOCS["properties"][stem][name]
+    prop_path = f"definitions.{resource_type}.properties.Properties.properties.{prop_path}"
+    docs = _DOCS["properties"][sam_docs_stem][sam_docs_name]
     return Field(
         # We add a custom value to the schema containing the path to the pass-through
         # documentation; the dict containing the value is replaced in the final schema
