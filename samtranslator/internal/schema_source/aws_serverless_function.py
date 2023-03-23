@@ -13,6 +13,7 @@ from samtranslator.internal.schema_source.common import (
     ResourceAttributes,
     SamIntrinsicable,
     get_prop,
+    passthrough_prop,
 )
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
@@ -501,8 +502,8 @@ class Properties(BaseModel):
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
     Description: Optional[Description] = prop("Description")
-    Environment: Optional[Environment] = prop("Environment")
-    EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
+    Environment: Optional[Environment] = passthrough_prop("AWS::Lambda::Function", "Environment")
+    EphemeralStorage: Optional[EphemeralStorage] = passthrough_prop("AWS::Lambda::Function", "EphemeralStorage")
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Events: Optional[
         Dict[
@@ -531,7 +532,7 @@ class Properties(BaseModel):
         ]
     ] = prop("Events")
     FileSystemConfigs: Optional[PassThroughProp] = prop("FileSystemConfigs")
-    FunctionName: Optional[PassThroughProp] = prop("FunctionName")
+    FunctionName: Optional[PassThroughProp] = passthrough_prop("AWS::Lambda::Function", "FunctionName")
     FunctionUrlConfig: Optional[FunctionUrlConfig] = prop("FunctionUrlConfig")
     Handler: Optional[Handler] = prop("Handler")
     ImageConfig: Optional[PassThroughProp] = prop("ImageConfig")
@@ -566,7 +567,7 @@ class Globals(BaseModel):
     MemorySize: Optional[MemorySize] = prop("MemorySize")
     Timeout: Optional[Timeout] = prop("Timeout")
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
-    Environment: Optional[Environment] = prop("Environment")
+    Environment: Optional[Environment] = passthrough_prop("AWS::Lambda::Function", "Environment")
     Tags: Optional[Tags] = prop("Tags")
     Tracing: Optional[Tracing] = prop("Tracing")
     KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
@@ -580,7 +581,7 @@ class Globals(BaseModel):
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Architectures: Optional[Architectures] = prop("Architectures")
-    EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
+    EphemeralStorage: Optional[EphemeralStorage] = passthrough_prop("AWS::Lambda::Function", "EphemeralStorage")
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
 
