@@ -552,7 +552,12 @@ class Properties(BaseModel):
         "FunctionName",
     )
     FunctionUrlConfig: Optional[FunctionUrlConfig] = prop("FunctionUrlConfig")
-    Handler: Optional[Handler] = prop("Handler")
+    Handler: Optional[Handler] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Handler",
+        "AWS::Lambda::Function",
+        "Handler",
+    )
     ImageConfig: Optional[PassThroughProp] = prop("ImageConfig")
     ImageUri: Optional[PassThroughProp] = prop("ImageUri")
     InlineCode: Optional[PassThroughProp] = prop("InlineCode")
@@ -560,8 +565,18 @@ class Properties(BaseModel):
     Layers: Optional[Layers] = prop("Layers")
     MemorySize: Optional[MemorySize] = prop("MemorySize")
     PackageType: Optional[PassThroughProp] = prop("PackageType")
-    RolePath: Optional[RolePath] = prop("RolePath")
-    PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
+    RolePath: Optional[RolePath] = passthrough_prop(
+        PROPERTIES_STEM,
+        "RolePath",
+        "AWS::IAM::Role",
+        "Path",
+    )
+    PermissionsBoundary: Optional[PermissionsBoundary] = passthrough_prop(
+        PROPERTIES_STEM,
+        "PermissionsBoundary",
+        "AWS::IAM::Role",
+        "PermissionsBoundary",
+    )
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = prop("Policies")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = passthrough_prop(
         PROPERTIES_STEM,
@@ -571,7 +586,12 @@ class Properties(BaseModel):
     )
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
-    Runtime: Optional[Runtime] = prop("Runtime")
+    Runtime: Optional[Runtime] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Runtime",
+        "AWS::Lambda::Function",
+        "Runtime",
+    )
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     Tags: Optional[Tags] = prop("Tags")
@@ -582,8 +602,18 @@ class Properties(BaseModel):
 
 
 class Globals(BaseModel):
-    Handler: Optional[Handler] = prop("Handler")
-    Runtime: Optional[Runtime] = prop("Runtime")
+    Handler: Optional[Handler] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Handler",
+        "AWS::Lambda::Function",
+        "Handler",
+    )
+    Runtime: Optional[Runtime] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Runtime",
+        "AWS::Lambda::Function",
+        "Runtime",
+    )
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
     Description: Optional[Description] = prop("Description")
@@ -602,8 +632,18 @@ class Globals(BaseModel):
     Layers: Optional[Layers] = prop("Layers")
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
-    RolePath: Optional[RolePath] = prop("RolePath")
-    PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
+    RolePath: Optional[RolePath] = passthrough_prop(
+        PROPERTIES_STEM,
+        "RolePath",
+        "AWS::IAM::Role",
+        "Path",
+    )
+    PermissionsBoundary: Optional[PermissionsBoundary] = passthrough_prop(
+        PROPERTIES_STEM,
+        "PermissionsBoundary",
+        "AWS::IAM::Role",
+        "PermissionsBoundary",
+    )
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
