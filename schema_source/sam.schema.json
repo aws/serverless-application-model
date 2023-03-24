@@ -4768,13 +4768,15 @@
           "title": "EventInvokeConfig"
         },
         "Handler": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Handler"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Handler"
         },
         "KmsKeyArn": {
@@ -4808,14 +4810,16 @@
           "title": "MemorySize"
         },
         "PermissionsBoundary": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
+            "schemaPath": "definitions.AWS::IAM::Role.properties.Properties.properties.PermissionsBoundary"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
-          "markdownDescription": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
-          "title": "PermissionsBoundary"
+          "title": "Permissionsboundary"
         },
         "ProvisionedConcurrencyConfig": {
           "allOf": [
@@ -4838,23 +4842,27 @@
           "title": "ReservedConcurrentExecutions"
         },
         "RolePath": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
+            "schemaPath": "definitions.AWS::IAM::Role.properties.Properties.properties.Path"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
-          "markdownDescription": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
-          "title": "RolePath"
+          "title": "Rolepath"
         },
         "Runtime": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Runtime"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Runtime"
         },
         "RuntimeManagementConfig": {
@@ -5168,13 +5176,15 @@
           "title": "FunctionUrlConfig"
         },
         "Handler": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Handler"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Handler"
         },
         "ImageConfig": {
@@ -5248,14 +5258,16 @@
           "title": "PackageType"
         },
         "PermissionsBoundary": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
+            "schemaPath": "definitions.AWS::IAM::Role.properties.Properties.properties.PermissionsBoundary"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
-          "markdownDescription": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
-          "title": "PermissionsBoundary"
+          "title": "Permissionsboundary"
         },
         "Policies": {
           "anyOf": [
@@ -5319,23 +5331,27 @@
           "title": "Role"
         },
         "RolePath": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
+            "schemaPath": "definitions.AWS::IAM::Role.properties.Properties.properties.Path"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
-          "markdownDescription": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
-          "title": "RolePath"
+          "title": "Rolepath"
         },
         "Runtime": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Runtime"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Runtime"
         },
         "RuntimeManagementConfig": {
