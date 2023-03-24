@@ -17,6 +17,7 @@ from samtranslator.internal.schema_source.common import (
 )
 
 PROPERTIES_STEM = "sam-resource-function"
+DEPLOYMENT_PREFERENCE_STEM = "sam-property-function-deploymentpreference"
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
 apiauth = get_prop("sam-property-function-apifunctionauth")
@@ -26,7 +27,7 @@ cloudwatchlogseventproperties = get_prop("sam-property-function-cloudwatchlogs")
 codeuri = get_prop("sam-property-function-functioncode")
 cognitoeventproperties = get_prop("sam-property-function-cognito")
 deadletterconfig = get_prop("sam-property-function-deadletterconfig")
-deploymentpreference = get_prop("sam-property-function-deploymentpreference")
+deploymentpreference = get_prop(DEPLOYMENT_PREFERENCE_STEM)
 dlq = get_prop("sam-property-function-deadletterqueue")
 documentdbeventproperties = get_prop("sam-property-function-documentdb")
 dynamodbeventproperties = get_prop("sam-property-function-dynamodb")
@@ -46,7 +47,7 @@ iotruleeventproperties = get_prop("sam-property-function-iotrule")
 kinesiseventproperties = get_prop("sam-property-function-kinesis")
 mqeventproperties = get_prop("sam-property-function-mq")
 mskeventproperties = get_prop("sam-property-function-msk")
-prop = get_prop("sam-resource-function")
+prop = get_prop(PROPERTIES_STEM)
 requestmodel = get_prop("sam-property-function-requestmodel")
 requestparameters = get_prop("sam-property-function-requestparameter")
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
@@ -89,7 +90,11 @@ class DeploymentPreference(BaseModel):
     Hooks: Optional[Hooks] = deploymentpreference("Hooks")
     PassthroughCondition: Optional[SamIntrinsicable[bool]] = deploymentpreference("PassthroughCondition")
     Role: Optional[SamIntrinsicable[str]] = deploymentpreference("Role")
-    TriggerConfigurations: Optional[PassThroughProp] = deploymentpreference("TriggerConfigurations")
+    TriggerConfigurations: Optional[PassThroughProp] = passthrough_prop(
+        DEPLOYMENT_PREFERENCE_STEM,
+        "TriggerConfigurations",
+        ["AWS::CodeDeploy::DeploymentGroup", "Properties", "TriggerConfigurations"],
+    )
     Type: Optional[SamIntrinsicable[str]] = deploymentpreference(
         "Type"
     )  # TODO: Should investigate whether this is a required field. This is a required field on documentation. However, we don't seem to use this field.

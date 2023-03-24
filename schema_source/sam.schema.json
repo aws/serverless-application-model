@@ -520,14 +520,16 @@
           "title": "Role"
         },
         "TriggerConfigurations": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A list of trigger configurations you want to associate with the deployment group\\. Used to notify an SNS topic on lifecycle events\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TriggerConfigurations`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html#cfn-codedeploy-deploymentgroup-triggerconfigurations) property of an `AWS::CodeDeploy::DeploymentGroup` resource\\.",
+            "schemaPath": "definitions#AWS::CodeDeploy::DeploymentGroup#properties#Properties#properties#TriggerConfigurations"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A list of trigger configurations you want to associate with the deployment group\\. Used to notify an SNS topic on lifecycle events\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TriggerConfigurations`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html#cfn-codedeploy-deploymentgroup-triggerconfigurations) property of an `AWS::CodeDeploy::DeploymentGroup` resource\\.",
-          "markdownDescription": "A list of trigger configurations you want to associate with the deployment group\\. Used to notify an SNS topic on lifecycle events\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TriggerConfigurations`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html#cfn-codedeploy-deploymentgroup-triggerconfigurations) property of an `AWS::CodeDeploy::DeploymentGroup` resource\\.",
-          "title": "TriggerConfigurations"
+          "title": "Triggerconfigurations"
         },
         "Type": {
           "anyOf": [
