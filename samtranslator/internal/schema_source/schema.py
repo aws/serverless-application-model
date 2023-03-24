@@ -96,9 +96,9 @@ def _replace_in_dict(d: Dict[str, Any], keyword: str, replace: Callable[[Dict[st
 
 def _deep_get(d: Dict[str, Any], path: str) -> Dict[str, Any]:
     """
-    Returns value at path, where `.` in path delimitates the keys.
+    Returns value at path, where `#` in path delimitates the keys.
     """
-    keys = path.split(".")
+    keys = path.split("#")
     for k in keys:
         d = d[k]
     return d

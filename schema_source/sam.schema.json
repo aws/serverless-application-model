@@ -4659,13 +4659,15 @@
       "additionalProperties": false,
       "properties": {
         "Architectures": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#Architectures"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Architectures"
         },
         "AssumeRolePolicyDocument": {
@@ -4736,7 +4738,7 @@
         "Environment": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
-            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Environment"
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#Environment"
           },
           "allOf": [
             {
@@ -4748,7 +4750,7 @@
         "EphemeralStorage": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
-            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.EphemeralStorage"
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#EphemeralStorage"
           },
           "allOf": [
             {
@@ -4770,7 +4772,7 @@
         "Handler": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
-            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Handler"
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#Handler"
           },
           "allOf": [
             {
@@ -4812,7 +4814,7 @@
         "PermissionsBoundary": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
-            "schemaPath": "definitions.AWS::IAM::Role.properties.Properties.properties.PermissionsBoundary"
+            "schemaPath": "definitions#AWS::IAM::Role#properties#Properties#properties#PermissionsBoundary"
           },
           "allOf": [
             {
@@ -4844,7 +4846,7 @@
         "RolePath": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
-            "schemaPath": "definitions.AWS::IAM::Role.properties.Properties.properties.Path"
+            "schemaPath": "definitions#AWS::IAM::Role#properties#Properties#properties#Path"
           },
           "allOf": [
             {
@@ -4856,7 +4858,7 @@
         "Runtime": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
-            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Runtime"
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#Runtime"
           },
           "allOf": [
             {
@@ -4936,13 +4938,15 @@
       "additionalProperties": false,
       "properties": {
         "Architectures": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#Architectures"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Architectures"
         },
         "AssumeRolePolicyDocument": {
@@ -4984,6 +4988,10 @@
           "title": "AutoPublishCodeSha256"
         },
         "CodeSigningConfigArn": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/authoring-codesigning.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CodeSigningConfigArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#CodeSigningConfigArn"
+          },
           "anyOf": [
             {
               "type": "object"
@@ -4992,9 +5000,7 @@
               "type": "string"
             }
           ],
-          "description": "The ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/authoring-codesigning.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CodeSigningConfigArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/authoring-codesigning.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CodeSigningConfigArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "CodeSigningConfigArn"
+          "title": "Codesigningconfigarn"
         },
         "CodeUri": {
           "anyOf": [
@@ -5033,19 +5039,21 @@
           "title": "DeploymentPreference"
         },
         "Description": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#Description"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Description"
         },
         "Environment": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
-            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Environment"
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#Environment"
           },
           "allOf": [
             {
@@ -5057,7 +5065,7 @@
         "EphemeralStorage": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
-            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.EphemeralStorage"
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#EphemeralStorage"
           },
           "allOf": [
             {
@@ -5144,19 +5152,21 @@
           "type": "object"
         },
         "FileSystemConfigs": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "List of [FileSystemConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html) objects that specify the connection settings for an Amazon Elastic File System \\(Amazon EFS\\) file system\\.  \nIf your template contains an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a `DependsOn` resource attribute to ensure that the mount target is created or updated before the function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FileSystemConfigs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#FileSystemConfigs"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "List of [FileSystemConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html) objects that specify the connection settings for an Amazon Elastic File System \\(Amazon EFS\\) file system\\.  \nIf your template contains an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a `DependsOn` resource attribute to ensure that the mount target is created or updated before the function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FileSystemConfigs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "List of [FileSystemConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html) objects that specify the connection settings for an Amazon Elastic File System \\(Amazon EFS\\) file system\\.  \nIf your template contains an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a `DependsOn` resource attribute to ensure that the mount target is created or updated before the function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FileSystemConfigs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "FileSystemConfigs"
+          "title": "Filesystemconfigs"
         },
         "FunctionName": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "A name for the function\\. If you don't specify a name, a unique name is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-functionname) property of an `AWS::Lambda::Function` resource\\.",
-            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.FunctionName"
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#FunctionName"
           },
           "allOf": [
             {
@@ -5178,7 +5188,7 @@
         "Handler": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
-            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Handler"
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#Handler"
           },
           "allOf": [
             {
@@ -5188,24 +5198,28 @@
           "title": "Handler"
         },
         "ImageConfig": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The object used to configure Lambda container image settings\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [ImageConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#ImageConfig"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The object used to configure Lambda container image settings\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [ImageConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The object used to configure Lambda container image settings\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [ImageConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig) property of an `AWS::Lambda::Function` resource\\.",
-          "title": "ImageConfig"
+          "title": "Imageconfig"
         },
         "ImageUri": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The URI of the Amazon Elastic Container Registry \\(Amazon ECR\\) repository for the Lambda function's container image\\. This property only applies if the `PackageType` property is set to `Image`, otherwise it is ignored\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \nIf the `PackageType` property is set to `Image`, then either `ImageUri` is required, or you must build your application with necessary `Metadata` entries in the AWS SAM template file\\. For more information, see [Building applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-using-build.html)\\.\nBuilding your application with necessary `Metadata` entries takes precedence over `ImageUri`, so if you specify both then `ImageUri` is ignored\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageUri`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-imageuri) property of the `AWS::Lambda::Function` `Code` data type\\.",
+            "schemaPath": "definitions#AWS::Lambda::Function.Code#properties#ImageUri"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The URI of the Amazon Elastic Container Registry \\(Amazon ECR\\) repository for the Lambda function's container image\\. This property only applies if the `PackageType` property is set to `Image`, otherwise it is ignored\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \nIf the `PackageType` property is set to `Image`, then either `ImageUri` is required, or you must build your application with necessary `Metadata` entries in the AWS SAM template file\\. For more information, see [Building applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-using-build.html)\\.\nBuilding your application with necessary `Metadata` entries takes precedence over `ImageUri`, so if you specify both then `ImageUri` is ignored\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageUri`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-imageuri) property of the `AWS::Lambda::Function` `Code` data type\\.",
-          "markdownDescription": "The URI of the Amazon Elastic Container Registry \\(Amazon ECR\\) repository for the Lambda function's container image\\. This property only applies if the `PackageType` property is set to `Image`, otherwise it is ignored\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \nIf the `PackageType` property is set to `Image`, then either `ImageUri` is required, or you must build your application with necessary `Metadata` entries in the AWS SAM template file\\. For more information, see [Building applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-using-build.html)\\.\nBuilding your application with necessary `Metadata` entries takes precedence over `ImageUri`, so if you specify both then `ImageUri` is ignored\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageUri`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-imageuri) property of the `AWS::Lambda::Function` `Code` data type\\.",
-          "title": "ImageUri"
+          "title": "Imageuri"
         },
         "InlineCode": {
           "allOf": [
@@ -5260,7 +5274,7 @@
         "PermissionsBoundary": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
-            "schemaPath": "definitions.AWS::IAM::Role.properties.Properties.properties.PermissionsBoundary"
+            "schemaPath": "definitions#AWS::IAM::Role#properties#Properties#properties#PermissionsBoundary"
           },
           "allOf": [
             {
@@ -5298,7 +5312,7 @@
         "ProvisionedConcurrencyConfig": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The provisioned concurrency configuration of a function's alias\\.  \n`ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.\n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedConcurrencyConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig) property of an `AWS::Lambda::Alias` resource\\.",
-            "schemaPath": "definitions.AWS::Lambda::Alias.properties.Properties.properties.ProvisionedConcurrencyConfig"
+            "schemaPath": "definitions#AWS::Lambda::Alias#properties#Properties#properties#ProvisionedConcurrencyConfig"
           },
           "allOf": [
             {
@@ -5333,7 +5347,7 @@
         "RolePath": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
-            "schemaPath": "definitions.AWS::IAM::Role.properties.Properties.properties.Path"
+            "schemaPath": "definitions#AWS::IAM::Role#properties#Properties#properties#Path"
           },
           "allOf": [
             {
@@ -5345,7 +5359,7 @@
         "Runtime": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
-            "schemaPath": "definitions.AWS::Lambda::Function.properties.Properties.properties.Runtime"
+            "schemaPath": "definitions#AWS::Lambda::Function#properties#Properties#properties#Runtime"
           },
           "allOf": [
             {

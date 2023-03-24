@@ -2,7 +2,7 @@ import json
 import os
 from functools import partial
 from pathlib import Path
-from typing import Any, Dict, Optional, TypeVar, Union
+from typing import Any, Dict, List, Optional, TypeVar, Union
 
 import pydantic
 from pydantic import Extra, Field
@@ -40,12 +40,13 @@ def get_prop(stem: str) -> Any:
     return partial(_get_prop, stem)
 
 
-def passthrough_prop(sam_docs_stem: str, sam_docs_name: str, resource_type: str, prop_path: str) -> Any:
+def passthrough_prop(sam_docs_stem: str, sam_docs_name: str, prop_path: List[str]) -> Any:
     """
     Specifies a pass-through field, where resource_type is the CloudFormation
-    resource type, and path is a `.`-delimitated path to the property.
+    resource type, and path is a `#`-delimitated path to the property.
     """
-    prop_path = f"definitions.{resource_type}.properties.Properties.properties.{prop_path}"
+    # need to change separator... sometimes contains dot
+    prop_path = f"definitions#" + f"#properties#".join(prop_path)
     docs = _DOCS["properties"][sam_docs_stem][sam_docs_name]
     return Field(
         # We add a custom value to the schema containing the path to the pass-through
