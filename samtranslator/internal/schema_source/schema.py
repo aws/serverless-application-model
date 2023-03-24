@@ -154,6 +154,7 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
         passthrough = d["__samPassThrough"]
         schema = deepcopy(_deep_get(cfn_schema, passthrough["schemaPath"]))
         schema["markdownDescription"] = passthrough["markdownDescriptionOverride"]
+        schema["title"] = d["title"]  # Still want the original title, CFN property name could be different
         return schema
 
     _replace_in_dict(
