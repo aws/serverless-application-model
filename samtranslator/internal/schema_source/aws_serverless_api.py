@@ -134,6 +134,7 @@ class Route53(BaseModel):
     IpV6: Optional[bool] = route53("IpV6")
     SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
     Region: Optional[PassThroughProp]  # TODO: add docs
+    SeparateRecordSetGroup: Optional[bool]  # TODO: add docs
 
 
 class Domain(BaseModel):
@@ -189,7 +190,7 @@ class Properties(BaseModel):
     Cors: Optional[CorsType] = properties("Cors")
     DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
     DefinitionUri: Optional[DefinitionUriType] = properties("DefinitionUri")
-    MergeDefinitions: Optional[MergeDefinitions]  # TODO: update docs when live
+    MergeDefinitions: Optional[MergeDefinitions] = properties("MergeDefinitions")
     Description: Optional[PassThroughProp] = properties("Description")
     DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
     Domain: Optional[Domain] = properties("Domain")
@@ -206,7 +207,7 @@ class Properties(BaseModel):
     Tags: Optional[DictStrAny] = properties("Tags")
     TracingEnabled: Optional[TracingEnabled] = properties("TracingEnabled")
     Variables: Optional[Variables] = properties("Variables")
-    AlwaysDeploy: Optional[AlwaysDeploy]  # TODO: Add docs
+    AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
 
 
 class Globals(BaseModel):
@@ -215,7 +216,7 @@ class Globals(BaseModel):
     DefinitionUri: Optional[PassThroughProp] = properties("DefinitionUri")
     CacheClusterEnabled: Optional[CacheClusterEnabled] = properties("CacheClusterEnabled")
     CacheClusterSize: Optional[CacheClusterSize] = properties("CacheClusterSize")
-    MergeDefinitions: Optional[MergeDefinitions]  # TODO: update docs when live
+    MergeDefinitions: Optional[MergeDefinitions] = properties("MergeDefinitions")
     Variables: Optional[Variables] = properties("Variables")
     EndpointConfiguration: Optional[PassThroughProp] = properties("EndpointConfiguration")
     MethodSettings: Optional[MethodSettings] = properties("MethodSettings")
@@ -228,7 +229,7 @@ class Globals(BaseModel):
     TracingEnabled: Optional[TracingEnabled] = properties("TracingEnabled")
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
     Domain: Optional[Domain] = properties("Domain")
-    AlwaysDeploy: Optional[AlwaysDeploy]  # TODO: Add docs
+    AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
 
 
 class Resource(ResourceAttributes):

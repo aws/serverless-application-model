@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../../../samtranslator/schema/schema.json
 Transform: AWS::Serverless-2016-10-31
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Some description
@@ -54,6 +55,16 @@ Resources:
         SubnetIds:
         - subnet-071f712345678e7c8
         - subnet-07fd123456788a036
+
+  OtherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.8
+      Handler: foo
+      InlineCode: bar
+      Environment:
+        Variables:
+          Some: variable
 
 Outputs:
   BackupLoadBalancerDNSName:
