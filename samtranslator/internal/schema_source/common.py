@@ -66,7 +66,6 @@ def _get_prop(stem: str, name: str) -> Any:
     docs = _DOCS["properties"][stem][name]
     return Field(
         title=name,
-        description=docs,
         # https://code.visualstudio.com/docs/languages/json#_use-rich-formatting-in-hovers
         markdownDescription=docs,
     )
