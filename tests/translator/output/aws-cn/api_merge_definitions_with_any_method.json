@@ -1,0 +1,119 @@
+{
+  "Resources": {
+    "WebhooksApi": {
+      "Properties": {
+        "Body": {
+          "swagger": 2,
+          "x-amazon-apigateway-policy": {
+            "Version": "2012-10-17"
+          }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "WebhooksApiDeployment472b94a845": {
+      "Properties": {
+        "Description": "RestApi deployment id: 472b94a845dac11081ca2890e848230a4e30a2aa",
+        "RestApiId": {
+          "Ref": "WebhooksApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "WebhooksApiliveStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "WebhooksApiDeployment472b94a845"
+        },
+        "RestApiId": {
+          "Ref": "WebhooksApi"
+        },
+        "StageName": "live"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "WebhooksReceiver": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Handler": "code/handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "WebhooksReceiverRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "WebhooksReceiverAllEventPermissionlive": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "WebhooksReceiver"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/proxy",
+            {
+              "__ApiId__": {
+                "Ref": "WebhooksApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "WebhooksReceiverRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
