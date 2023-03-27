@@ -955,7 +955,7 @@ class Api(PushEventSource):
             )
 
         if merge_definitions:
-            api["DefinitionBody"] = self._get_merged_definitions(api_id, api["DefinitionBody"], editor, editor.swagger)
+            api["DefinitionBody"] = self._get_merged_definitions(api_id, api["DefinitionBody"], editor)
         else:
             api["DefinitionBody"] = editor.swagger
 
@@ -964,7 +964,6 @@ class Api(PushEventSource):
         api_id: str,
         source_definition_body: Dict[str, Any],
         editor: SwaggerEditor,
-        dest_definition_body: Dict[str, Any],
     ) -> Dict[str, Any]:
         """
         Merge SAM generated swagger definition(dest_definition_body) into inline DefinitionBody(source_definition_body):
@@ -983,6 +982,7 @@ class Api(PushEventSource):
 
         # Normalized version of HTTP Method. It also handle API Gateway specific methods like "ANY"
         method = editor._normalize_method_name(self.Method)
+        dest_definition_body = editor.swagger
         generated_path_method_body = dest_definition_body["paths"][self.Path][method]
         # this guarantees that the merged definition use SAM generated value for a conflicting key
         merged_path_method_body = {**path_method_body, **generated_path_method_body}
