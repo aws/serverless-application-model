@@ -322,30 +322,54 @@
       "additionalProperties": false,
       "properties": {
         "Bucket": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The Amazon S3 bucket of the layer archive\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3Bucket`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3bucket) property of the `AWS::Lambda::LayerVersion` `Content` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::LayerVersion.Content",
+              "properties",
+              "S3Bucket"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The Amazon S3 bucket of the layer archive\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3Bucket`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3bucket) property of the `AWS::Lambda::LayerVersion` `Content` data type\\.",
           "title": "Bucket"
         },
         "Key": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The Amazon S3 key of the layer archive\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3key) property of the `AWS::Lambda::LayerVersion` `Content` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::LayerVersion.Content",
+              "properties",
+              "S3Key"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The Amazon S3 key of the layer archive\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3key) property of the `AWS::Lambda::LayerVersion` `Content` data type\\.",
           "title": "Key"
         },
         "Version": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "For versioned objects, the version of the layer archive object to use\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3ObjectVersion`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3objectversion) property of the `AWS::Lambda::LayerVersion` `Content` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::LayerVersion.Content",
+              "properties",
+              "S3ObjectVersion"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "For versioned objects, the version of the layer archive object to use\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`S3ObjectVersion`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-layerversion-content.html#cfn-lambda-layerversion-content-s3objectversion) property of the `AWS::Lambda::LayerVersion` `Content` data type\\.",
           "title": "Version"
         }
       },
@@ -2107,21 +2131,37 @@
       "additionalProperties": false,
       "properties": {
         "Name": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Attribute name of the primary key\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AttributeName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-attributedef.html#cfn-dynamodb-attributedef-attributename) property of the `AWS::DynamoDB::Table` `AttributeDefinition` data type\\.  \n*Additional notes*: This property is also passed to the [AttributeName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-keyschema.html#aws-properties-dynamodb-keyschema-attributename) property of an `AWS::DynamoDB::Table KeySchema` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::DynamoDB::Table.AttributeDefinition",
+              "properties",
+              "AttributeName"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Attribute name of the primary key\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AttributeName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-attributedef.html#cfn-dynamodb-attributedef-attributename) property of the `AWS::DynamoDB::Table` `AttributeDefinition` data type\\.  \n*Additional notes*: This property is also passed to the [AttributeName](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-keyschema.html#aws-properties-dynamodb-keyschema-attributename) property of an `AWS::DynamoDB::Table KeySchema` data type\\.",
           "title": "Name"
         },
         "Type": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The data type for the primary key\\.  \n*Valid values*: `String`, `Number`, `Binary`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AttributeType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-attributedef.html#cfn-dynamodb-attributedef-attributename-attributetype) property of the `AWS::DynamoDB::Table` `AttributeDefinition` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::DynamoDB::Table.AttributeDefinition",
+              "properties",
+              "AttributeType"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The data type for the primary key\\.  \n*Valid values*: `String`, `Number`, `Binary`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AttributeType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-attributedef.html#cfn-dynamodb-attributedef-attributename-attributetype) property of the `AWS::DynamoDB::Table` `AttributeDefinition` data type\\.",
           "title": "Type"
         }
       },
@@ -4018,21 +4058,41 @@
           "title": "Location"
         },
         "NotificationARNs": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A list of existing Amazon SNS topics where notifications about stack events are sent\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`NotificationARNs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-notificationarns) property of an `AWS::CloudFormation::Stack` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::CloudFormation::Stack",
+              "properties",
+              "Properties",
+              "properties",
+              "NotificationARNs"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "A list of existing Amazon SNS topics where notifications about stack events are sent\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`NotificationARNs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-notificationarns) property of an `AWS::CloudFormation::Stack` resource\\.",
           "title": "NotificationARNs"
         },
         "Parameters": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Application parameter values\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Parameters`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-parameters) property of an `AWS::CloudFormation::Stack` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::CloudFormation::Stack",
+              "properties",
+              "Properties",
+              "properties",
+              "Parameters"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Application parameter values\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Parameters`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-parameters) property of an `AWS::CloudFormation::Stack` resource\\.",
           "title": "Parameters"
         },
         "Tags": {
@@ -4041,12 +4101,22 @@
           "type": "object"
         },
         "TimeoutInMinutes": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The length of time, in minutes, that AWS CloudFormation waits for the nested stack to reach the `CREATE_COMPLETE` state\\. The default is no timeout\\. When AWS CloudFormation detects that the nested stack has reached the `CREATE_COMPLETE` state, it marks the nested stack resource as `CREATE_COMPLETE` in the parent stack and resumes creating the parent stack\\. If the timeout period expires before the nested stack reaches `CREATE_COMPLETE`, AWS CloudFormation marks the nested stack as failed and rolls back both the nested stack and parent stack\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TimeoutInMinutes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-timeoutinminutes) property of an `AWS::CloudFormation::Stack` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::CloudFormation::Stack",
+              "properties",
+              "Properties",
+              "properties",
+              "TimeoutInMinutes"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The length of time, in minutes, that AWS CloudFormation waits for the nested stack to reach the `CREATE_COMPLETE` state\\. The default is no timeout\\. When AWS CloudFormation detects that the nested stack has reached the `CREATE_COMPLETE` state, it marks the nested stack resource as `CREATE_COMPLETE` in the parent stack and resumes creating the parent stack\\. If the timeout period expires before the nested stack reaches `CREATE_COMPLETE`, AWS CloudFormation marks the nested stack as failed and rolls back both the nested stack and parent stack\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TimeoutInMinutes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-stack.html#cfn-cloudformation-stack-timeoutinminutes) property of an `AWS::CloudFormation::Stack` resource\\.",
           "title": "TimeoutInMinutes"
         }
       },
@@ -6274,21 +6344,41 @@
       "additionalProperties": false,
       "properties": {
         "CompatibleArchitectures": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Specifies the supported instruction set architectures for the layer version\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `x86_64`, `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CompatibleArchitectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-compatiblearchitectures) property of an `AWS::Lambda::LayerVersion` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::LayerVersion",
+              "properties",
+              "Properties",
+              "properties",
+              "CompatibleArchitectures"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Specifies the supported instruction set architectures for the layer version\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `x86_64`, `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CompatibleArchitectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-compatiblearchitectures) property of an `AWS::Lambda::LayerVersion` resource\\.",
           "title": "CompatibleArchitectures"
         },
         "CompatibleRuntimes": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "List of runtimes compatible with this LayerVersion\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CompatibleRuntimes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-compatibleruntimes) property of an `AWS::Lambda::LayerVersion` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::LayerVersion",
+              "properties",
+              "Properties",
+              "properties",
+              "CompatibleRuntimes"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "List of runtimes compatible with this LayerVersion\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CompatibleRuntimes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-compatibleruntimes) property of an `AWS::Lambda::LayerVersion` resource\\.",
           "title": "CompatibleRuntimes"
         },
         "ContentUri": {
@@ -6304,12 +6394,22 @@
           "title": "ContentUri"
         },
         "Description": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Description of this layer\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-description) property of an `AWS::Lambda::LayerVersion` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::LayerVersion",
+              "properties",
+              "Properties",
+              "properties",
+              "Description"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Description of this layer\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-description) property of an `AWS::Lambda::LayerVersion` resource\\.",
           "title": "Description"
         },
         "LayerName": {
@@ -6322,12 +6422,22 @@
           "title": "LayerName"
         },
         "LicenseInfo": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Information about the license for this LayerVersion\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`LicenseInfo`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-licenseinfo) property of an `AWS::Lambda::LayerVersion` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::LayerVersion",
+              "properties",
+              "Properties",
+              "properties",
+              "LicenseInfo"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Information about the license for this LayerVersion\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`LicenseInfo`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-layerversion.html#cfn-lambda-layerversion-licenseinfo) property of an `AWS::Lambda::LayerVersion` resource\\.",
           "title": "LicenseInfo"
         },
         "RetentionPolicy": {
@@ -6389,12 +6499,22 @@
       "additionalProperties": false,
       "properties": {
         "SSESpecification": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Specifies the settings to enable server\\-side encryption\\.  \n*Type*: [SSESpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SSESpecification`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html) property of an `AWS::DynamoDB::Table` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::DynamoDB::Table",
+              "properties",
+              "Properties",
+              "properties",
+              "SSESpecification"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Specifies the settings to enable server\\-side encryption\\.  \n*Type*: [SSESpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SSESpecification`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html) property of an `AWS::DynamoDB::Table` resource\\.",
           "title": "SSESpecification"
         }
       },
@@ -6414,30 +6534,60 @@
           "title": "PrimaryKey"
         },
         "ProvisionedThroughput": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Read and write throughput provisioning information\\.  \nIf `ProvisionedThroughput` is not specified `BillingMode` will be specified as `PAY_PER_REQUEST`\\.  \n*Type*: [ProvisionedThroughput](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-provisionedthroughput.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedThroughput`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-provisionedthroughput.html) property of an `AWS::DynamoDB::Table` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::DynamoDB::Table",
+              "properties",
+              "Properties",
+              "properties",
+              "ProvisionedThroughput"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Read and write throughput provisioning information\\.  \nIf `ProvisionedThroughput` is not specified `BillingMode` will be specified as `PAY_PER_REQUEST`\\.  \n*Type*: [ProvisionedThroughput](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-provisionedthroughput.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedThroughput`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-provisionedthroughput.html) property of an `AWS::DynamoDB::Table` resource\\.",
           "title": "ProvisionedThroughput"
         },
         "SSESpecification": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Specifies the settings to enable server\\-side encryption\\.  \n*Type*: [SSESpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SSESpecification`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html) property of an `AWS::DynamoDB::Table` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::DynamoDB::Table",
+              "properties",
+              "Properties",
+              "properties",
+              "SSESpecification"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Specifies the settings to enable server\\-side encryption\\.  \n*Type*: [SSESpecification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SSESpecification`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-table-ssespecification.html) property of an `AWS::DynamoDB::Table` resource\\.",
           "title": "SSESpecification"
         },
         "TableName": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Name for the DynamoDB Table\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TableName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html#cfn-dynamodb-table-tablename) property of an `AWS::DynamoDB::Table` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::DynamoDB::Table",
+              "properties",
+              "Properties",
+              "properties",
+              "TableName"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Name for the DynamoDB Table\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TableName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html#cfn-dynamodb-table-tablename) property of an `AWS::DynamoDB::Table` resource\\.",
           "title": "TableName"
         },
         "Tags": {
