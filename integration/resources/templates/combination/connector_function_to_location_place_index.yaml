@@ -1,7 +1,7 @@
 Transform: AWS::Serverless-2016-10-31-test
 
 Parameters:
-  IndexName: 
+  IndexName:
     Type: String
     Default: PlaceIndex
 
