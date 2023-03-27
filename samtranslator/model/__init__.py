@@ -105,7 +105,7 @@ class Resource(ABC):
     # TODO: Make `Resource` an abstract class and not giving `resource_type`/`property_types` initial value.
     resource_type: str = None  # type: ignore
     property_types: Dict[str, PropertyType] = None  # type: ignore
-    _keywords = ["logical_id", "relative_id", "depends_on", "resource_attributes"]
+    _keywords = {"logical_id", "relative_id", "depends_on", "resource_attributes"}
 
     # For attributes in this list, they will be passed into the translated template for the same resource itself.
     _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy", "Condition", "UpdateReplacePolicy", "Metadata"]
@@ -121,6 +121,11 @@ class Resource(ABC):
     #   "arn": fnGetAtt(self.logical_id, "Arn")
     # }
     runtime_attrs: Dict[str, Callable[["Resource"], Any]] = {}  # TODO: replace Any with something more explicit
+
+    # When "validate_setattr" is True, we cannot change the value of any class variables after instantiation unless they
+    # are in "property_types" or "_keywords". We can set this to False in the inheriting class definition so we can
+    # update other class variables as well after instantiation.
+    validate_setattr: bool = True
 
     def __init__(
         self,
@@ -313,7 +318,7 @@ class Resource(ABC):
         :param value: the value of the attribute to be set
         :raises InvalidResourceException: if an invalid property is provided
         """
-        if name in self._keywords or name in self.property_types:
+        if (name in self._keywords or name in self.property_types) or not self.validate_setattr:
             return super().__setattr__(name, value)
 
         raise InvalidResourceException(

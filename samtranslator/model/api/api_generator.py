@@ -1,8 +1,10 @@
 import logging
 from collections import namedtuple
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
+from samtranslator.model import Resource
 from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
     ApiGatewayAuthorizer,
@@ -65,6 +67,13 @@ UsagePlanProperties = namedtuple(
 UsagePlanProperties.__new__.__defaults__ = (None, None, None, None, None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
+
+
+@dataclass
+class ApiDomainResponse:
+    domain: Optional[ApiGatewayDomainName]
+    apigw_basepath_mapping_list: Optional[List[ApiGatewayBasePathMapping]]
+    recordset_group: Any
 
 
 class SharedApiUsagePlan:
@@ -443,12 +452,12 @@ class ApiGenerator:
 
     def _construct_api_domain(  # noqa: too-many-branches
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
-    ) -> Tuple[Optional[ApiGatewayDomainName], Optional[List[ApiGatewayBasePathMapping]], Any]:
+    ) -> ApiDomainResponse:
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
         if self.domain is None:
-            return None, None, None
+            return ApiDomainResponse(None, None, None)
 
         sam_expect(self.domain, self.logical_id, "Domain").to_be_a_map()
         domain_name: PassThrough = sam_expect(
@@ -565,6 +574,17 @@ class ApiGenerator:
             logical_id = "RecordSetGroup" + logical_id_suffix
 
             record_set_group = route53_record_set_groups.get(logical_id)
+
+            if route53.get("SeparateRecordSetGroup"):
+                sam_expect(
+                    route53.get("SeparateRecordSetGroup"), self.logical_id, "Domain.Route53.SeparateRecordSetGroup"
+                ).to_be_a_bool()
+                return ApiDomainResponse(
+                    domain,
+                    basepath_resource_list,
+                    self._construct_single_record_set_group(self.domain, api_domain_name, route53),
+                )
+
             if not record_set_group:
                 record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
                 if "HostedZoneId" in route53:
@@ -576,17 +596,38 @@ class ApiGenerator:
 
             record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, api_domain_name, route53)
 
-        return domain, basepath_resource_list, record_set_group
+        return ApiDomainResponse(domain, basepath_resource_list, record_set_group)
+
+    def _construct_single_record_set_group(
+        self, domain: Dict[str, Any], api_domain_name: str, route53: Any
+    ) -> Route53RecordSetGroup:
+        hostedZoneId = route53.get("HostedZoneId")
+        hostedZoneName = route53.get("HostedZoneName")
+        domainName = domain.get("DomainName")
+        logical_id = logical_id = LogicalIdGenerator(
+            "RecordSetGroup", [hostedZoneId or hostedZoneName, domainName]
+        ).gen()
+
+        record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
+        if hostedZoneId:
+            record_set_group.HostedZoneId = hostedZoneId
+        if hostedZoneName:
+            record_set_group.HostedZoneName = hostedZoneName
+
+        record_set_group.RecordSets = []
+        record_set_group.RecordSets += self._construct_record_sets_for_domain(domain, api_domain_name, route53)
+
+        return record_set_group
 
     def _construct_record_sets_for_domain(
         self, custom_domain_config: Dict[str, Any], api_domain_name: str, route53_config: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         recordset_list = []
-
+        alias_target = self._construct_alias_target(custom_domain_config, api_domain_name, route53_config)
         recordset = {}
         recordset["Name"] = custom_domain_config.get("DomainName")
         recordset["Type"] = "A"
-        recordset["AliasTarget"] = self._construct_alias_target(custom_domain_config, api_domain_name, route53_config)
+        recordset["AliasTarget"] = alias_target
         self._update_route53_routing_policy_properties(route53_config, recordset)
         recordset_list.append(recordset)
 
@@ -594,9 +635,7 @@ class ApiGenerator:
             recordset_ipv6 = {}
             recordset_ipv6["Name"] = custom_domain_config.get("DomainName")
             recordset_ipv6["Type"] = "AAAA"
-            recordset_ipv6["AliasTarget"] = self._construct_alias_target(
-                custom_domain_config, api_domain_name, route53_config
-            )
+            recordset_ipv6["AliasTarget"] = alias_target
             self._update_route53_routing_policy_properties(route53_config, recordset_ipv6)
             recordset_list.append(recordset_ipv6)
 
@@ -626,14 +665,20 @@ class ApiGenerator:
         return alias_target
 
     @cw_timer(prefix="Generator", name="Api")
-    def to_cloudformation(self, redeploy_restapi_parameters, route53_record_set_groups):  # type: ignore[no-untyped-def]
+    def to_cloudformation(
+        self, redeploy_restapi_parameters: Optional[Any], route53_record_set_groups: Dict[str, Route53RecordSetGroup]
+    ) -> List[Resource]:
         """Generates CloudFormation resources from a SAM API resource
 
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
         :rtype: tuple
         """
         rest_api = self._construct_rest_api()
-        domain, basepath_mapping, route53 = self._construct_api_domain(rest_api, route53_record_set_groups)
+        api_domain_response = self._construct_api_domain(rest_api, route53_record_set_groups)
+        domain = api_domain_response.domain
+        basepath_mapping = api_domain_response.apigw_basepath_mapping_list
+        route53_recordsetGroup = api_domain_response.recordset_group
+
         deployment = self._construct_deployment(rest_api)
 
         swagger = None
@@ -646,7 +691,41 @@ class ApiGenerator:
         permissions = self._construct_authorizer_lambda_permission()
         usage_plan = self._construct_usage_plan(rest_api_stage=stage)
 
-        return rest_api, deployment, stage, permissions, domain, basepath_mapping, route53, usage_plan
+        # mypy complains if the type in List doesn't match exactly
+        # TODO: refactor to have a list of single resource
+        generated_resources: List[
+            Union[
+                Optional[Resource],
+                List[Resource],
+                Tuple[Resource],
+                List[LambdaPermission],
+                List[ApiGatewayBasePathMapping],
+            ],
+        ] = []
+
+        generated_resources.extend(
+            [
+                rest_api,
+                deployment,
+                stage,
+                permissions,
+                domain,
+                basepath_mapping,
+                route53_recordsetGroup,
+                usage_plan,
+            ]
+        )
+
+        # Make a list of single resources
+        generated_resources_list: List[Resource] = []
+        for resource in generated_resources:
+            if resource:
+                if isinstance(resource, (list, tuple)):
+                    generated_resources_list.extend(resource)
+                else:
+                    generated_resources_list.extend([resource])
+
+        return generated_resources_list
 
     def _add_cors(self) -> None:
         """
