@@ -50,6 +50,7 @@ def passthrough_prop(sam_docs_stem: str, sam_docs_name: str, prop_path: List[str
         path.extend(["properties", s])
     docs = _DOCS["properties"][sam_docs_stem][sam_docs_name]
     return Field(
+        title=sam_docs_name,
         # We add a custom value to the schema containing the path to the pass-through
         # documentation; the dict containing the value is replaced in the final schema
         __samPassThrough={

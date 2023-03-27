@@ -536,7 +536,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Triggerconfigurations"
+          "title": "TriggerConfigurations"
         },
         "Type": {
           "anyOf": [
@@ -3375,7 +3375,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Accesslogsetting"
+          "title": "AccessLogSetting"
         },
         "AlwaysDeploy": {
           "description": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3420,7 +3420,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Cacheclusterenabled"
+          "title": "CacheClusterEnabled"
         },
         "CacheClusterSize": {
           "__samPassThrough": {
@@ -3439,7 +3439,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Cacheclustersize"
+          "title": "CacheClusterSize"
         },
         "CanarySetting": {
           "__samPassThrough": {
@@ -3458,7 +3458,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Canarysetting"
+          "title": "CanarySetting"
         },
         "Cors": {
           "anyOf": [
@@ -3545,7 +3545,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Minimumcompressionsize"
+          "title": "MinimumCompressionSize"
         },
         "Name": {
           "__samPassThrough": {
@@ -3596,7 +3596,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Tracingenabled"
+          "title": "TracingEnabled"
         },
         "Variables": {
           "__samPassThrough": {
@@ -3641,7 +3641,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Accesslogsetting"
+          "title": "AccessLogSetting"
         },
         "AlwaysDeploy": {
           "description": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3666,7 +3666,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Apikeysourcetype"
+          "title": "ApiKeySourceType"
         },
         "Auth": {
           "allOf": [
@@ -3705,7 +3705,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Cacheclusterenabled"
+          "title": "CacheClusterEnabled"
         },
         "CacheClusterSize": {
           "__samPassThrough": {
@@ -3724,7 +3724,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Cacheclustersize"
+          "title": "CacheClusterSize"
         },
         "CanarySetting": {
           "__samPassThrough": {
@@ -3743,7 +3743,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Canarysetting"
+          "title": "CanarySetting"
         },
         "Cors": {
           "anyOf": [
@@ -3849,7 +3849,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Failonwarnings"
+          "title": "FailOnWarnings"
         },
         "GatewayResponses": {
           "description": "Configures Gateway Responses for an API\\. Gateway Responses are responses returned by API Gateway, either directly or through the use of Lambda Authorizers\\. For more information, see the documentation for the [Api Gateway OpenApi extension for Gateway Responses](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-gateway-responses.html)\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3880,7 +3880,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Methodsettings"
+          "title": "MethodSettings"
         },
         "MinimumCompressionSize": {
           "__samPassThrough": {
@@ -3899,7 +3899,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Minimumcompressionsize"
+          "title": "MinimumCompressionSize"
         },
         "Mode": {
           "__samPassThrough": {
@@ -3994,7 +3994,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Tracingenabled"
+          "title": "TracingEnabled"
         },
         "Variables": {
           "__samPassThrough": {
@@ -4976,7 +4976,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Ephemeralstorage"
+          "title": "EphemeralStorage"
         },
         "EventInvokeConfig": {
           "allOf": [
@@ -5054,7 +5054,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Permissionsboundary"
+          "title": "PermissionsBoundary"
         },
         "ProvisionedConcurrencyConfig": {
           "allOf": [
@@ -5093,7 +5093,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Rolepath"
+          "title": "RolePath"
         },
         "Runtime": {
           "__samPassThrough": {
@@ -5261,7 +5261,7 @@
               "type": "string"
             }
           ],
-          "title": "Codesigningconfigarn"
+          "title": "CodeSigningConfigArn"
         },
         "CodeUri": {
           "anyOf": [
@@ -5354,7 +5354,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Ephemeralstorage"
+          "title": "EphemeralStorage"
         },
         "EventInvokeConfig": {
           "allOf": [
@@ -5450,7 +5450,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Filesystemconfigs"
+          "title": "FileSystemConfigs"
         },
         "FunctionName": {
           "__samPassThrough": {
@@ -5469,7 +5469,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Functionname"
+          "title": "FunctionName"
         },
         "FunctionUrlConfig": {
           "allOf": [
@@ -5517,7 +5517,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Imageconfig"
+          "title": "ImageConfig"
         },
         "ImageUri": {
           "__samPassThrough": {
@@ -5534,7 +5534,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Imageuri"
+          "title": "ImageUri"
         },
         "InlineCode": {
           "allOf": [
@@ -5603,7 +5603,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Permissionsboundary"
+          "title": "PermissionsBoundary"
         },
         "Policies": {
           "anyOf": [
@@ -5648,7 +5648,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Provisionedconcurrencyconfig"
+          "title": "ProvisionedConcurrencyConfig"
         },
         "ReservedConcurrentExecutions": {
           "allOf": [
@@ -5690,7 +5690,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "title": "Rolepath"
+          "title": "RolePath"
         },
         "Runtime": {
           "__samPassThrough": {
