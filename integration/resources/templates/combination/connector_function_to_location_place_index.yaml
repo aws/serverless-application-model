@@ -1,5 +1,10 @@
 Transform: AWS::Serverless-2016-10-31-test
 
+Parameters:
+  IndexName:
+    Type: String
+    Default: PlaceIndex
+
 Resources:
   TriggerFunction:
     Type: AWS::Serverless::Function
@@ -35,14 +40,14 @@ Resources:
           )
       Environment:
         Variables:
-          LOCATION_INDEX: !Sub ${AWS::StackName}-PI
+          LOCATION_INDEX: !Ref IndexName
 
 
   MyPlace:
     Type: AWS::Location::PlaceIndex
     Properties:
       DataSource: Here
-      IndexName: !Sub ${AWS::StackName}-PI
+      IndexName: !Ref IndexName
 
   MyConnector:
     Type: AWS::Serverless::Connector
