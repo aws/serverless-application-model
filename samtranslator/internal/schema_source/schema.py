@@ -4,7 +4,7 @@ import argparse
 import json
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 import pydantic
 
