@@ -622,7 +622,7 @@ class SwaggerEditor(BaseEditor):
         """
 
         for method_name, method_definition in self.iter_on_all_methods_for_path(path):  # type: ignore[no-untyped-call]
-            apikey_security_names = set(["api_key", "api_key_false"])
+            apikey_security_names = {"api_key", "api_key_false"}
             existing_non_apikey_security = []
             existing_apikey_security = []
             apikey_security = []
