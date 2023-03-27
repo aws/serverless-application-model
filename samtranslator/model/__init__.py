@@ -8,6 +8,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 
+from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidResourceException,
@@ -489,7 +490,9 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
     # Aggregate list of all reserved tags
     _RESERVED_TAGS = [_SAM_KEY, _SAR_APP_KEY, _SAR_SEMVER_KEY]
 
-    def get_resource_references(self, generated_cfn_resources, supported_resource_refs):  # type: ignore[no-untyped-def]
+    def get_resource_references(
+        self, generated_cfn_resources: List[Resource], supported_resource_refs: SupportedResourceReferences
+    ) -> SupportedResourceReferences:
         """
         Constructs the list of supported resource references by going through the list of CFN resources generated
         by to_cloudformation() on this SAM resource. Each SAM resource must provide a map of properties that it

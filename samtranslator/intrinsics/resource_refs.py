@@ -13,7 +13,7 @@ class SupportedResourceReferences:
         # { "LogicalId": {"Property": "Value"} }
         self._refs: Dict[str, Dict[str, Any]] = {}
 
-    def add(self, logical_id, property_name, value):  # type: ignore[no-untyped-def]
+    def add(self, logical_id: str, property_name: str, value: str) -> None:
         """
         Add the information that resource with given `logical_id` supports the given `property`, and that a reference
         to `logical_id.property` resolves to given `value.
@@ -21,6 +21,7 @@ class SupportedResourceReferences:
         Example:
 
             "MyApi.Deployment" -> "MyApiDeployment1234567890"
+            "SuperCoolAPI.DataSources:MyDataSource" -> "SuperCoolAPIMyDataSource"
 
         :param logical_id: Logical ID of the resource  (Ex: MyLambdaFunction)
         :param property_name: Property on the resource that can be referenced (Ex: Alias)

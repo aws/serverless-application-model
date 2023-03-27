@@ -1,0 +1,54 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Todo {
+          id: ID!
+          name: String
+          description: String
+          priority: Int
+        }
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+        type Query {
+          getNote(id: ID!): Todo
+        }
+        schema {
+          query: Query
+          mutation: Mutation
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      DynamoDBDataSources:
+        MyDataSource:
+          TableName: some-table
+          TableArn: big-arn
+        AnotherDataSource:
+          TableName: cool-table
+          TableArn: table-arn
+
+  GetTodoResolver:
+    Description: Don't do anything, just reference
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !GetAtt SuperCoolAPI.ApiId
+      DataSourceName: !GetAtt SuperCoolAPI.DataSources:AnotherDataSource.Name
+      TypeName: Query
+      FieldName: getNote
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "operation": "GetItem",
+          "key": {
+            "NoteId": $util.dynamodb.toDynamoDBJson($context.arguments.id)
+          }
+        }
+      ResponseMappingTemplate: $util.toJson($context.result)
