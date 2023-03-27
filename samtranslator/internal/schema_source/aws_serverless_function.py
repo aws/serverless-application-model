@@ -25,6 +25,7 @@ cognitoeventproperties = get_prop("sam-property-function-cognito")
 deadletterconfig = get_prop("sam-property-function-deadletterconfig")
 deploymentpreference = get_prop("sam-property-function-deploymentpreference")
 dlq = get_prop("sam-property-function-deadletterqueue")
+documentdbeventproperties = get_prop("sam-property-function-documentdb")
 dynamodbeventproperties = get_prop("sam-property-function-dynamodb")
 event = get_prop("sam-property-function-eventsource")
 eventbridgeruleeventproperties = get_prop("sam-property-function-eventbridgerule")
@@ -138,6 +139,7 @@ class SqsSubscription(BaseModel):
 
 class SNSEventProperties(BaseModel):
     FilterPolicy: Optional[PassThroughProp] = snseventproperties("FilterPolicy")
+    FilterPolicyScope: Optional[PassThroughProp]  # TODO: add documentation
     Region: Optional[PassThroughProp] = snseventproperties("Region")
     SqsSubscription: Optional[Union[bool, SqsSubscription]] = snseventproperties("SqsSubscription")
     Topic: PassThroughProp = snseventproperties("Topic")
@@ -200,18 +202,20 @@ class DynamoDBEvent(BaseModel):
 
 
 class DocumentDBEventProperties(BaseModel):
-    BatchSize: Optional[PassThroughProp]  # TODO: add documentation
-    Cluster: PassThroughProp  # TODO: add documentation
-    CollectionName: Optional[PassThroughProp]  # TODO: add documentation
-    DatabaseName: PassThroughProp  # TODO: add documentation
-    Enabled: Optional[PassThroughProp]  # TODO: add documentation
-    FilterCriteria: Optional[PassThroughProp]  # TODO: add documentation
-    FullDocument: Optional[PassThroughProp]  # TODO: add documentation
-    MaximumBatchingWindowInSeconds: Optional[PassThroughProp]  # TODO: add documentation
-    SecretsManagerKmsKeyId: Optional[str]  # TODO: add documentation
-    SourceAccessConfigurations: PassThroughProp  # TODO: add documentation
-    StartingPosition: Optional[PassThroughProp]  # TODO: add documentation
-    StartingPositionTimestamp: Optional[PassThroughProp]  # TODO: add documentation
+    BatchSize: Optional[PassThroughProp] = documentdbeventproperties("BatchSize")
+    Cluster: PassThroughProp = documentdbeventproperties("Cluster")
+    CollectionName: Optional[PassThroughProp] = documentdbeventproperties("CollectionName")
+    DatabaseName: PassThroughProp = documentdbeventproperties("DatabaseName")
+    Enabled: Optional[PassThroughProp] = documentdbeventproperties("Enabled")
+    FilterCriteria: Optional[PassThroughProp] = documentdbeventproperties("FilterCriteria")
+    FullDocument: Optional[PassThroughProp] = documentdbeventproperties("FullDocument")
+    MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = documentdbeventproperties(
+        "MaximumBatchingWindowInSeconds"
+    )
+    SecretsManagerKmsKeyId: Optional[str] = documentdbeventproperties("SecretsManagerKmsKeyId")
+    SourceAccessConfigurations: PassThroughProp = documentdbeventproperties("SourceAccessConfigurations")
+    StartingPosition: Optional[PassThroughProp] = documentdbeventproperties("StartingPosition")
+    StartingPositionTimestamp: Optional[PassThroughProp] = documentdbeventproperties("StartingPositionTimestamp")
 
 
 class DocumentDBEvent(BaseModel):
@@ -394,7 +398,7 @@ class MSKEventProperties(BaseModel):
     StartingPositionTimestamp: Optional[PassThroughProp] = mskeventproperties("StartingPositionTimestamp")
     Stream: PassThroughProp = mskeventproperties("Stream")
     Topics: PassThroughProp = mskeventproperties("Topics")
-    SourceAccessConfigurations: Optional[PassThroughProp]  # TODO: update docs when live
+    SourceAccessConfigurations: Optional[PassThroughProp] = mskeventproperties("SourceAccessConfigurations")
 
 
 class MSKEvent(BaseModel):
@@ -490,7 +494,7 @@ class Properties(BaseModel):
     Architectures: Optional[Architectures] = prop("Architectures")
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
-    AutoPublishAliasAllProperties: Optional[AutoPublishAliasAllProperties]  # TODO: add docs
+    AutoPublishAliasAllProperties: Optional[AutoPublishAliasAllProperties] = prop("AutoPublishAliasAllProperties")
     AutoPublishCodeSha256: Optional[SamIntrinsicable[str]] = prop("AutoPublishCodeSha256")
     CodeSigningConfigArn: Optional[SamIntrinsicable[str]] = prop("CodeSigningConfigArn")
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
@@ -545,7 +549,7 @@ class Properties(BaseModel):
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
     Runtime: Optional[Runtime] = prop("Runtime")
     SnapStart: Optional[SnapStart] = prop("SnapStart")
-    RuntimeManagementConfig: Optional[RuntimeManagementConfig]  # TODO: add prop and types
+    RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     Tags: Optional[Tags] = prop("Tags")
     Timeout: Optional[Timeout] = prop("Timeout")
     Tracing: Optional[Tracing] = prop("Tracing")
@@ -578,7 +582,7 @@ class Globals(BaseModel):
     Architectures: Optional[Architectures] = prop("Architectures")
     EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
     SnapStart: Optional[SnapStart] = prop("SnapStart")
-    RuntimeManagementConfig: Optional[RuntimeManagementConfig]  # TODO: add prop
+    RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
 
 
 class Resource(ResourceAttributes):

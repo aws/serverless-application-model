@@ -46,6 +46,9 @@ def is_type(valid_type: Type[Any]) -> Validator:
 
 IS_DICT = is_type(dict)
 IS_STR = is_type(str)
+IS_BOOL = is_type(bool)
+IS_LIST = is_type(list)
+IS_INT = is_type(int)
 
 
 def list_of(validate_item: Union[Type[Any], Validator]) -> Validator:

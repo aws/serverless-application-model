@@ -10,6 +10,7 @@ class SNSSubscription(Resource):
         "TopicArn": GeneratedProperty(),
         "Region": GeneratedProperty(),
         "FilterPolicy": GeneratedProperty(),
+        "FilterPolicyScope": GeneratedProperty(),
         "RedrivePolicy": GeneratedProperty(),
     }
 

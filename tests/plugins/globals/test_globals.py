@@ -5,7 +5,7 @@ from parameterized import parameterized
 from samtranslator.plugins.globals.globals import GlobalProperties, Globals, InvalidGlobalsSectionException
 
 
-class GlobalPropertiesTestCases(object):
+class GlobalPropertiesTestCases:
     dict_with_single_level_should_be_merged = {
         "global": {"a": 1, "b": 2},
         "local": {"a": "foo", "c": 3, "d": 4},

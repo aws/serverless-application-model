@@ -30,6 +30,7 @@ Resources:
                 - numeric:
                   - <
                   - 100
+            FilterPolicyScope: MessageAttributes
             Region:
               Ref: AWS::Region
             SqsSubscription: true

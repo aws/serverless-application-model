@@ -41,6 +41,7 @@ class SwaggerEditor(BaseEditor):
     _X_APIGW_REQUEST_VALIDATOR = "x-amazon-apigateway-request-validator"
     _X_ENDPOINT_CONFIG = "x-amazon-apigateway-endpoint-configuration"
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
+    _SECURITY_DEFINITIONS = "securityDefinitions"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _EXCLUDED_PATHS_FIELDS = ["summary", "description", "parameters"]
     _POLICY_TYPE_IAM = "Iam"
@@ -65,9 +66,9 @@ class SwaggerEditor(BaseEditor):
 
         self._doc = _deepcopy(doc)
         self.paths = self._doc["paths"]
-        self.security_definitions = self._doc.get("securityDefinitions", Py27Dict())
-        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())
-        self.resource_policy = self._doc.get(self._X_APIGW_POLICY, Py27Dict())
+        self.security_definitions = self._doc.get(self._SECURITY_DEFINITIONS) or Py27Dict()
+        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES) or Py27Dict()
+        self.resource_policy = self._doc.get(self._X_APIGW_POLICY) or Py27Dict()
         self.definitions = self._doc.get("definitions", Py27Dict())
 
         # https://swagger.io/specification/#path-item-object
@@ -130,11 +131,7 @@ class SwaggerEditor(BaseEditor):
         method = self._normalize_method_name(method)
         if self.has_integration(path, method):
             raise InvalidDocumentException(
-                [
-                    InvalidTemplateException(
-                        "Lambda integration already exists on Path={}, Method={}".format(path, method)
-                    )
-                ]
+                [InvalidTemplateException(f"Lambda integration already exists on Path={path}, Method={method}")]
             )
 
         self.add_path(path, method)
@@ -198,7 +195,7 @@ class SwaggerEditor(BaseEditor):
         method = self._normalize_method_name(method)
         if self.has_integration(path, method):
             raise InvalidDocumentException(
-                [InvalidTemplateException("Integration already exists on Path={}, Method={}".format(path, method))]
+                [InvalidTemplateException(f"Integration already exists on Path={path}, Method={method}")]
             )
 
         self.add_path(path, method)
@@ -313,7 +310,7 @@ class SwaggerEditor(BaseEditor):
                 allowed_methods = self._make_cors_allowed_methods_for_path_item(path_item)
 
                 # APIGW expects the value to be a "string expression". Hence wrap in another quote. Ex: "'GET,POST,DELETE'"
-                allowed_methods = "'{}'".format(allowed_methods)
+                allowed_methods = f"'{allowed_methods}'"
 
             if allow_credentials is not True:
                 allow_credentials = False
@@ -612,7 +609,7 @@ class SwaggerEditor(BaseEditor):
                 if "AWS_IAM" in method_definition["security"][0]:
                     self.add_awsiam_security_definition()
 
-    def set_path_default_apikey_required(self, path: str) -> None:
+    def set_path_default_apikey_required(self, path: str, required_options_api_key: bool = True) -> None:
         """
         Add the ApiKey security as required for each method on this path unless ApiKeyRequired
         was defined at the Function/Path/Method level. This is intended to be used to set the
@@ -620,6 +617,8 @@ class SwaggerEditor(BaseEditor):
         Serverless API.
 
         :param string path: Path name
+        :param bool required_options_api_key: Bool of whether to add the ApiKeyRequired
+         to OPTIONS preflight requests.
         """
 
         for method_name, method_definition in self.iter_on_all_methods_for_path(path):  # type: ignore[no-untyped-call]
@@ -673,6 +672,9 @@ class SwaggerEditor(BaseEditor):
 
             security = existing_non_apikey_security + apikey_security
 
+            if method_name == "options" and not required_options_api_key:
+                security = existing_non_apikey_security
+
             if security != existing_security:
                 method_definition["security"] = security
 
@@ -691,10 +693,12 @@ class SwaggerEditor(BaseEditor):
         method_scopes = auth and auth.get("AuthorizationScopes")
         api_auth = api and api.get("Auth")
         authorizers = api_auth and api_auth.get("Authorizers")
+
         if method_authorizer:
             self._set_method_authorizer(path, method_name, method_authorizer, authorizers, method_scopes)  # type: ignore[no-untyped-call]
 
         method_apikey_required = auth and auth.get("ApiKeyRequired")
+
         if method_apikey_required is not None:
             self._set_method_apikey_handling(path, method_name, method_apikey_required)  # type: ignore[no-untyped-call]
 
@@ -830,7 +834,7 @@ class SwaggerEditor(BaseEditor):
                 parameter = Py27Dict()
                 parameter["in"] = "body"
                 parameter["name"] = model_name
-                parameter["schema"] = {"$ref": "#/definitions/{}".format(model_name)}
+                parameter["schema"] = {"$ref": f"#/definitions/{model_name}"}
 
                 if model_required is not None:
                     parameter["required"] = model_required
@@ -843,7 +847,7 @@ class SwaggerEditor(BaseEditor):
                 SwaggerEditor._OPENAPI_VERSION_3_REGEX, self._doc["openapi"]
             ):
                 method_definition["requestBody"] = {
-                    "content": {"application/json": {"schema": {"$ref": "#/components/schemas/{}".format(model_name)}}}
+                    "content": {"application/json": {"schema": {"$ref": f"#/components/schemas/{model_name}"}}}
                 }
 
                 if model_required is not None:
@@ -974,7 +978,7 @@ class SwaggerEditor(BaseEditor):
 
         if not isinstance(policy_list, (dict, list)):
             raise InvalidDocumentException(
-                [InvalidTemplateException("Type of '{}' must be a list or dictionary".format(policy_list))]
+                [InvalidTemplateException(f"Type of '{policy_list}' must be a list or dictionary")]
             )
 
         if not isinstance(policy_list, list):
@@ -1205,7 +1209,7 @@ class SwaggerEditor(BaseEditor):
                 self._doc[key] = self.paths
 
         if self.security_definitions:
-            self._doc["securityDefinitions"] = self.security_definitions
+            self._doc[self._SECURITY_DEFINITIONS] = self.security_definitions
         if self.gateway_responses:
             self._doc[self._X_APIGW_GATEWAY_RESPONSES] = self.gateway_responses
         if self.definitions:

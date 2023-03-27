@@ -57,7 +57,7 @@ def construct_image_code_object(image_uri, logical_id, property_name):  # type: 
     """
     if not image_uri:
         raise InvalidResourceException(
-            logical_id, "'{}' requires that a image hosted at a registry be specified.".format(property_name)
+            logical_id, f"'{property_name}' requires that a image hosted at a registry be specified."
         )
 
     return {"ImageUri": image_uri}
@@ -79,7 +79,7 @@ def construct_s3_location_object(
         if not location_uri.get("Bucket") or not location_uri.get("Key"):
             # location_uri is a dictionary but does not contain Bucket or Key property
             raise InvalidResourceException(
-                logical_id, "'{}' requires Bucket and Key properties to be specified.".format(property_name)
+                logical_id, f"'{property_name}' requires Bucket and Key properties to be specified."
             )
 
         s3_pointer = location_uri

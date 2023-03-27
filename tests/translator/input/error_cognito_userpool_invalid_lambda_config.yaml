@@ -1,0 +1,20 @@
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      LambdaConfig:
+      - this: should not be a list
+
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        OneTrigger:
+          Type: Cognito
+          Properties:
+            UserPool:
+              Ref: UserPool
+            Trigger: PreSignUp

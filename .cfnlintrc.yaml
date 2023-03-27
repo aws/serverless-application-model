@@ -125,3 +125,4 @@ ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
   - W2531 # EOL runtime; not relevant for transform tests
   - E3001 # Invalid or unsupported Type; common in transform tests since they focus on SAM resources
+  - W2001 # Parameter not used

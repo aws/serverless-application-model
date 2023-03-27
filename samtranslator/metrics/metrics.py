@@ -4,7 +4,11 @@ Helper classes to publish metrics
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
+
+from typing_extensions import TypedDict
+
+from samtranslator.internal.deprecation_control import deprecated
 
 LOG = logging.getLogger(__name__)
 
@@ -25,6 +29,7 @@ class MetricsPublisher(ABC):
 class CWMetricsPublisher(MetricsPublisher):
     BATCH_SIZE = 20
 
+    @deprecated()
     def __init__(self, cloudwatch_client) -> None:  # type: ignore[no-untyped-def]
         """
         Constructor
@@ -59,16 +64,16 @@ class CWMetricsPublisher(MetricsPublisher):
             if metric_data:
                 self.cloudwatch_client.put_metric_data(Namespace=namespace, MetricData=metric_data)
         except Exception as e:
-            LOG.exception("Failed to report {} metrics".format(len(metric_data)), exc_info=e)
+            LOG.exception(f"Failed to report {len(metric_data)} metrics", exc_info=e)
 
 
 class DummyMetricsPublisher(MetricsPublisher):
     def __init__(self) -> None:
         MetricsPublisher.__init__(self)
 
-    def publish(self, namespace, metrics):  # type: ignore[no-untyped-def]
+    def publish(self, namespace: str, metrics: List["MetricDatum"]) -> None:
         """Do not publish any metric, this is a dummy publisher used for offline use."""
-        LOG.debug("Dummy publisher ignoring {} metrices".format(len(metrics)))
+        LOG.debug(f"Dummy publisher ignoring {len(metrics)} metrices")
 
 
 class Unit:
@@ -90,7 +95,14 @@ class MetricDatum:
     Class to hold Metric data.
     """
 
-    def __init__(self, name, value, unit, dimensions=None, timestamp=None) -> None:  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        name: str,
+        value: Union[int, float],
+        unit: str,
+        dimensions: Optional[List["MetricDimension"]] = None,
+        timestamp: Optional[datetime] = None,
+    ) -> None:
         """
         Constructor
 
@@ -116,6 +128,11 @@ class MetricDatum:
         }
 
 
+class MetricDimension(TypedDict):
+    Name: str
+    Value: Any
+
+
 class Metrics:
     def __init__(
         self, namespace: str = "ServerlessTransform", metrics_publisher: Optional[MetricsPublisher] = None
@@ -138,7 +155,14 @@ class Metrics:
             )
             self.publish()
 
-    def _record_metric(self, name, value, unit, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
+    def _record_metric(
+        self,
+        name: str,
+        value: Union[int, float],
+        unit: str,
+        dimensions: Optional[List["MetricDimension"]] = None,
+        timestamp: Optional[datetime] = None,
+    ) -> None:
         """
         Create and save metric object in internal cache.
 
@@ -150,7 +174,13 @@ class Metrics:
         """
         self.metrics_cache.setdefault(name, []).append(MetricDatum(name, value, unit, dimensions, timestamp))
 
-    def record_count(self, name, value, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
+    def record_count(
+        self,
+        name: str,
+        value: int,
+        dimensions: Optional[List["MetricDimension"]] = None,
+        timestamp: Optional[datetime] = None,
+    ) -> None:
         """
         Create metric with unit Count.
 
@@ -160,9 +190,15 @@ class Metrics:
         :param dimensions: array of dimensions applied to the metric
         :param timestamp: timestamp of metric (datetime.datetime object)
         """
-        self._record_metric(name, value, Unit.Count, dimensions, timestamp)  # type: ignore[no-untyped-call]
+        self._record_metric(name, value, Unit.Count, dimensions, timestamp)
 
-    def record_latency(self, name, value, dimensions=None, timestamp=None):  # type: ignore[no-untyped-def]
+    def record_latency(
+        self,
+        name: str,
+        value: Union[int, float],
+        dimensions: Optional[List["MetricDimension"]] = None,
+        timestamp: Optional[datetime] = None,
+    ) -> None:
         """
         Create metric with unit Milliseconds.
 
@@ -172,7 +208,7 @@ class Metrics:
         :param dimensions: array of dimensions applied to the metric
         :param timestamp: timestamp of metric (datetime.datetime object)
         """
-        self._record_metric(name, value, Unit.Milliseconds, dimensions, timestamp)  # type: ignore[no-untyped-call]
+        self._record_metric(name, value, Unit.Milliseconds, dimensions, timestamp)
 
     def publish(self) -> None:
         """Calls publish method from the configured metrics publisher to publish metrics"""
@@ -184,7 +220,7 @@ class Metrics:
         self.metrics_publisher.publish(self.namespace, all_metrics)
         self.metrics_cache = {}
 
-    def get_metric(self, name):  # type: ignore[no-untyped-def]
+    def get_metric(self, name: str) -> List[MetricDatum]:
         """
         Returns a list of metrics from the internal cache for a metric name
 

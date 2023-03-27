@@ -63,7 +63,7 @@ def _get_metric_name(prefix, name, func, args):  # type: ignore[no-untyped-def]
         metric_name = func.__name__
 
     if prefix:
-        return "{}-{}".format(prefix, metric_name)
+        return f"{prefix}-{metric_name}"
 
     return metric_name
 
@@ -76,7 +76,7 @@ def _send_cw_metric(prefix, name, execution_time_ms, func, args):  # type: ignor
     try:
         metric_name = _get_metric_name(prefix, name, func, args)  # type: ignore[no-untyped-call]
         LOG.debug("Execution took %sms for %s", execution_time_ms, metric_name)
-        MetricsMethodWrapperSingleton.get_instance().record_latency(metric_name, execution_time_ms)  # type: ignore[no-untyped-call]
+        MetricsMethodWrapperSingleton.get_instance().record_latency(metric_name, execution_time_ms)
     except Exception as e:
         LOG.warning("Failed to add metrics", exc_info=e)
 

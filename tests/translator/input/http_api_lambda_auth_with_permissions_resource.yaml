@@ -1,0 +1,62 @@
+Resources:
+  HttpApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        Basic:
+          Type: HttpApi
+          Properties:
+            Path: /basic
+            Method: GET
+            ApiId: !Ref MyApi
+
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Tags:
+        Tag1: value1
+        Tag2: value2
+      Auth:
+        Authorizers:
+          LambdaAuthWithEnablePropertyTrue:
+            # should create permissions resource for this auth
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            EnableFunctionDefaultPermissions: true
+            AuthorizerPayloadFormatVersion: 1.0
+          LambdaAuthNoEnableProperty:
+            # should not create permissions resource for this auth as http api doesn't create the resource by default
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            AuthorizerPayloadFormatVersion: 1.0
+          LambdaAuthWithEnablePropertySetFalse:
+            # should not create permissions resource for this auth
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            AuthorizerPayloadFormatVersion: 1.0
+            EnableFunctionDefaultPermissions: false
+          LambdaAuthFull:
+            # should create permissions resource for this auth
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            FunctionInvokeRole: !GetAtt MyAuthFnRole.Arn
+            EnableFunctionDefaultPermissions: true
+            Identity:
+              Context:
+              - contextVar
+              Headers:
+              - Authorization
+              QueryStrings:
+              - petId
+              StageVariables:
+              - stageVar
+              ReauthorizeEvery: 60
+            AuthorizerPayloadFormatVersion: 2.0
+            EnableSimpleResponses: true
+        DefaultAuthorizer: LambdaAuthWithEnablePropertyTrue

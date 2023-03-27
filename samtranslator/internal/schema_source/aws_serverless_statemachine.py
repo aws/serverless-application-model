@@ -25,6 +25,8 @@ eventbridgeruleeventproperties = get_prop("sam-property-statemachine-statemachin
 apieventproperties = get_prop("sam-property-statemachine-statemachineapi")
 apiauth = get_prop("sam-property-statemachine-apistatemachineauth")
 event = get_prop("sam-property-statemachine-statemachineeventsource")
+scheduletarget = get_prop("sam-property-statemachine-statemachinescheduletarget")
+eventtarget = get_prop("sam-property-statemachine-statemachinetarget")
 
 
 class DeadLetterConfig(BaseModel):
@@ -34,7 +36,7 @@ class DeadLetterConfig(BaseModel):
 
 
 class ScheduleTarget(BaseModel):
-    Id: PassThroughProp  # TODO: Add docs
+    Id: PassThroughProp = scheduletarget("Id")
 
 
 class ScheduleEventProperties(BaseModel):
@@ -46,7 +48,7 @@ class ScheduleEventProperties(BaseModel):
     RetryPolicy: Optional[PassThroughProp] = scheduleeventproperties("RetryPolicy")
     Schedule: Optional[PassThroughProp] = scheduleeventproperties("Schedule")
     State: Optional[PassThroughProp] = scheduleeventproperties("State")
-    Target: Optional[ScheduleTarget]  # TODO: Add docs
+    Target: Optional[ScheduleTarget] = scheduleeventproperties("Target")
 
 
 class ScheduleEvent(BaseModel):
@@ -104,7 +106,7 @@ class CloudWatchEvent(BaseModel):
 
 
 class EventBridgeRuleTarget(BaseModel):
-    Id: PassThroughProp  # TODO: Add docs
+    Id: PassThroughProp = eventtarget("Id")
 
 
 class EventBridgeRuleEventProperties(BaseModel):
@@ -114,7 +116,7 @@ class EventBridgeRuleEventProperties(BaseModel):
     InputPath: Optional[PassThroughProp] = eventbridgeruleeventproperties("InputPath")
     Pattern: Optional[PassThroughProp] = eventbridgeruleeventproperties("Pattern")
     RetryPolicy: Optional[PassThroughProp] = eventbridgeruleeventproperties("RetryPolicy")
-    Target: Optional[EventBridgeRuleTarget]  # TODO: Add docs
+    Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
 
 
 class EventBridgeRuleEvent(BaseModel):
@@ -134,7 +136,7 @@ class ApiEventProperties(BaseModel):
     Method: str = apieventproperties("Method")
     Path: str = apieventproperties("Path")
     RestApiId: Optional[SamIntrinsicable[str]] = apieventproperties("RestApiId")
-    UnescapeMappingTemplate: Optional[bool]  # TODO: Add to docs
+    UnescapeMappingTemplate: Optional[bool] = apieventproperties("UnescapeMappingTemplate")
 
 
 class ApiEvent(BaseModel):
@@ -163,7 +165,7 @@ class Properties(BaseModel):
     PermissionsBoundary: Optional[PassThroughProp] = properties("PermissionsBoundary")
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = properties("Policies")
     Role: Optional[PassThroughProp] = properties("Role")
-    RolePath: Optional[PassThroughProp]  # TODO: Add docs
+    RolePath: Optional[PassThroughProp] = properties("RolePath")
     Tags: Optional[DictStrAny] = properties("Tags")
     Tracing: Optional[PassThroughProp] = properties("Tracing")
     Type: Optional[PassThroughProp] = properties("Type")

@@ -1,8 +1,8 @@
 import pytest
-from samtranslator.model.types import dict_of, is_type, list_of, one_of
+from samtranslator.model.types import IS_INT, dict_of, is_type, list_of, one_of
 
 
-class DummyType(object):
+class DummyType:
     pass
 
 
@@ -12,7 +12,7 @@ def test_is_type_validator():
     for value, value_type in example_properties:
         # Check that is_type(value_type) passes for value
         validate = is_type(value_type)
-        assert validate(value), "is_type validator failed for type {}, value {}".format(value_type, value)
+        assert validate(value), f"is_type validator failed for type {value_type}, value {value}"
 
         # For every non-matching type, check that is_type(other_type) raises TypeError
         for _, other_type in example_properties:
@@ -20,7 +20,7 @@ def test_is_type_validator():
                 validate = is_type(other_type)
                 assert not validate(
                     value, should_raise=False
-                ), "is_type validator unexpectedly succeeded for type {}, value {}".format(value_type, value)
+                ), f"is_type validator unexpectedly succeeded for type {value_type}, value {value}"
                 with pytest.raises(TypeError):
                     validate(value)
 
@@ -39,11 +39,11 @@ def test_is_type_validator():
 def test_list_of_validator(value, item_type, should_pass):
     validate = list_of(is_type(item_type))
     if should_pass:
-        assert validate(value), "list_of validator failed for item type {}, value {}".format(item_type, value)
+        assert validate(value), f"list_of validator failed for item type {item_type}, value {value}"
     else:
         assert not validate(
             value, should_raise=False
-        ), "list_of validator unexpectedly succeeded for item type {}, value {}".format(item_type, value)
+        ), f"list_of validator unexpectedly succeeded for item type {item_type}, value {value}"
         with pytest.raises(TypeError):
             validate(value)
 
@@ -83,20 +83,20 @@ def test_dict_of_validator(value, key_type, value_type, should_pass):
     "value,validators,should_pass",
     [
         # Value of first expected type
-        (1, [is_type(int), list_of(is_type(int))], True),
+        (1, [IS_INT, list_of(IS_INT)], True),
         # Value of second expected type
-        ([1, 2, 3], [is_type(int), list_of(is_type(int))], True),
+        ([1, 2, 3], [IS_INT, list_of(IS_INT)], True),
         # Value of neither expected type
-        ("Hello, World!", [is_type(int), list_of(is_type(int))], False),
+        ("Hello, World!", [IS_INT, list_of(IS_INT)], False),
     ],
 )
 def test_one_of_validator(value, validators, should_pass):
     validate = one_of(*validators)
     if should_pass:
-        assert validate(value), "one_of validator failed for validators {}, value {}".format(validators, value)
+        assert validate(value), f"one_of validator failed for validators {validators}, value {value}"
     else:
         assert not validate(
             value, should_raise=False
-        ), "one_of validator unexpectedly succeeded for validators {}, value {}".format(validators, value)
+        ), f"one_of validator unexpectedly succeeded for validators {validators}, value {value}"
         with pytest.raises(TypeError):
             validate(value)

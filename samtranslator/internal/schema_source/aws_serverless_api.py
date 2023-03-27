@@ -77,7 +77,7 @@ class LambdaTokenAuthorizer(BaseModel):
     FunctionInvokeRole: Optional[str] = lambdatokenauthorizer("FunctionInvokeRole")
     FunctionPayloadType: Optional[Literal["TOKEN"]] = lambdatokenauthorizer("FunctionPayloadType")
     Identity: Optional[LambdaTokenAuthorizerIdentity] = lambdatokenauthorizer("Identity")
-    DisableFunctionDefaultPermissions: Optional[bool]  # TODO Add docs
+    DisableFunctionDefaultPermissions: Optional[bool] = lambdatokenauthorizer("DisableFunctionDefaultPermissions")
 
 
 class LambdaRequestAuthorizer(BaseModel):
@@ -86,7 +86,7 @@ class LambdaRequestAuthorizer(BaseModel):
     FunctionInvokeRole: Optional[str] = lambdarequestauthorizer("FunctionInvokeRole")
     FunctionPayloadType: Optional[Literal["REQUEST"]] = lambdarequestauthorizer("FunctionPayloadType")
     Identity: Optional[LambdaRequestAuthorizerIdentity] = lambdarequestauthorizer("Identity")
-    DisableFunctionDefaultPermissions: Optional[bool]  # TODO Add docs
+    DisableFunctionDefaultPermissions: Optional[bool] = lambdarequestauthorizer("DisableFunctionDefaultPermissions")
 
 
 class UsagePlan(BaseModel):
@@ -100,6 +100,7 @@ class UsagePlan(BaseModel):
 
 class Auth(BaseModel):
     AddDefaultAuthorizerToCorsPreflight: Optional[bool] = auth("AddDefaultAuthorizerToCorsPreflight")
+    AddApiKeyRequiredToCorsPreflight: Optional[bool]  # TODO Add Docs
     ApiKeyRequired: Optional[bool] = auth("ApiKeyRequired")
     Authorizers: Optional[
         Dict[
@@ -131,6 +132,8 @@ class Route53(BaseModel):
     HostedZoneId: Optional[PassThroughProp] = route53("HostedZoneId")
     HostedZoneName: Optional[PassThroughProp] = route53("HostedZoneName")
     IpV6: Optional[bool] = route53("IpV6")
+    SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
+    Region: Optional[PassThroughProp]  # TODO: add docs
 
 
 class Domain(BaseModel):
