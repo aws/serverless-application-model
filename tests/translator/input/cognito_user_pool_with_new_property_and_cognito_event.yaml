@@ -1,0 +1,19 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      DeletionProtection: ACTIVE
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.8
+      InlineCode: foo
+      Handler: bar
+      Events:
+        CognitoEvent:
+          Type: Cognito
+          Properties:
+            Trigger: CustomMessage
+            UserPool: !Ref MyUserPool

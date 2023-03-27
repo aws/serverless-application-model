@@ -26,6 +26,7 @@ class TestConnectors(BaseTest):
 
     @parameterized.expand(
         [
+            ("combination/connector_appsync_to_lambda",),
             ("combination/connector_appsync_to_table",),
             ("combination/connector_function_to_function",),
             ("combination/connector_restapi_to_function",),
@@ -49,7 +50,6 @@ class TestConnectors(BaseTest):
             ("combination/connector_event_rule_to_eb_custom_write",),
             ("combination/connector_event_rule_to_lambda_write",),
             ("combination/connector_event_rule_to_lambda_write_multiple",),
-            ("combination/connector_function_to_location_place_index",),
             ("combination/connector_mix_destination",),
             ("combination/connector_sqs_to_function",),
             ("combination/connector_sns_to_function_write",),
@@ -61,6 +61,30 @@ class TestConnectors(BaseTest):
     def test_connector_by_invoking_a_function(self, template_file_path):
         self.skip_using_service_detector(template_file_path)
         self.create_and_verify_stack(template_file_path)
+
+        lambda_function_name = self.get_physical_id_by_logical_id("TriggerFunction")
+        lambda_client = self.client_provider.lambda_client
+
+        request_params = {
+            "FunctionName": lambda_function_name,
+            "InvocationType": "RequestResponse",
+            "Payload": "{}",
+        }
+        response = lambda_client.invoke(**request_params)
+        self.assertEqual(response.get("StatusCode"), 200)
+        self.assertEqual(response.get("FunctionError"), None)
+
+    @parameterized.expand(
+        [
+            ("combination/connector_function_to_location_place_index",),
+        ]
+    )
+    @retry_once
+    def test_connector_by_invoking_a_function_with_parameters(self, template_file_path):
+        parameters = []
+        parameters.append(self.generate_parameter("IndexName", f"PlaceIndex-{generate_suffix()}"))
+        self.skip_using_service_detector(template_file_path)
+        self.create_and_verify_stack(template_file_path, parameters)
 
         lambda_function_name = self.get_physical_id_by_logical_id("TriggerFunction")
         lambda_client = self.client_provider.lambda_client

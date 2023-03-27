@@ -1,4 +1,3 @@
-import copy
 import itertools
 import json
 from pathlib import Path
@@ -148,9 +147,14 @@ class TestValidateUnifiedSchema(TestCase):
         )
 
         # Contains all definitions from SAM-only schema (except rule that ignores non-SAM)
-        sam_defs = copy.deepcopy(SCHEMA["definitions"])
-        del sam_defs["samtranslator__internal__schema_source__any_cfn_resource__Resource"]
-        assert sam_defs.items() <= UNIFIED_SCHEMA["definitions"].items()
+        # Pass-through properties are replaced in the SAM schema, so can't do a deep check
+        sam_defs = {
+            k
+            for k in SCHEMA["definitions"]
+            if k != "samtranslator__internal__schema_source__any_cfn_resource__Resource"
+        }
+        unified_defs = set(UNIFIED_SCHEMA["definitions"])
+        assert sam_defs < unified_defs
 
         # Contains all resources from SAM-only schema (except rule that ignores non-SAM)
         unified_resources = UNIFIED_SCHEMA["properties"]["Resources"]["additionalProperties"]["anyOf"]

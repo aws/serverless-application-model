@@ -520,13 +520,22 @@
           "title": "Role"
         },
         "TriggerConfigurations": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A list of trigger configurations you want to associate with the deployment group\\. Used to notify an SNS topic on lifecycle events\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TriggerConfigurations`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html#cfn-codedeploy-deploymentgroup-triggerconfigurations) property of an `AWS::CodeDeploy::DeploymentGroup` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::CodeDeploy::DeploymentGroup",
+              "properties",
+              "Properties",
+              "properties",
+              "TriggerConfigurations"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A list of trigger configurations you want to associate with the deployment group\\. Used to notify an SNS topic on lifecycle events\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TriggerConfigurations`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html#cfn-codedeploy-deploymentgroup-triggerconfigurations) property of an `AWS::CodeDeploy::DeploymentGroup` resource\\.",
-          "markdownDescription": "A list of trigger configurations you want to associate with the deployment group\\. Used to notify an SNS topic on lifecycle events\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TriggerConfigurations`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html#cfn-codedeploy-deploymentgroup-triggerconfigurations) property of an `AWS::CodeDeploy::DeploymentGroup` resource\\.",
           "title": "TriggerConfigurations"
         },
         "Type": {
@@ -3350,17 +3359,28 @@
       "additionalProperties": false,
       "properties": {
         "AccessLogSetting": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "AccessLogSetting"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "AccessLogSetting"
         },
         "AlwaysDeploy": {
-          "title": "Alwaysdeploy",
+          "description": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "AlwaysDeploy",
           "type": "boolean"
         },
         "Auth": {
@@ -3384,33 +3404,60 @@
           "title": "BinaryMediaTypes"
         },
         "CacheClusterEnabled": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "CacheClusterEnabled"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "CacheClusterEnabled"
         },
         "CacheClusterSize": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "CacheClusterSize"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "CacheClusterSize"
         },
         "CanarySetting": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "CanarySetting"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "CanarySetting"
         },
         "Cors": {
@@ -3466,7 +3513,9 @@
           "type": "object"
         },
         "MergeDefinitions": {
-          "title": "Mergedefinitions",
+          "description": "AWS SAM generates an OpenAPI specification from your API event source\\. Specify `true` to have AWS SAM merge this into the inline OpenAPI specification defined in your `AWS::Serverless::Api` resource\\. Specify `false` to not merge\\.  \n`MergeDefinitions` requires the `DefinitionBody` property for `AWS::Serverless::Api` to be defined\\. `MergeDefinitions` is not compatible with the `DefinitionUri` property for `AWS::Serverless::Api`\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "AWS SAM generates an OpenAPI specification from your API event source\\. Specify `true` to have AWS SAM merge this into the inline OpenAPI specification defined in your `AWS::Serverless::Api` resource\\. Specify `false` to not merge\\.  \n`MergeDefinitions` requires the `DefinitionBody` property for `AWS::Serverless::Api` to be defined\\. `MergeDefinitions` is not compatible with the `DefinitionUri` property for `AWS::Serverless::Api`\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "MergeDefinitions",
           "type": "boolean"
         },
         "MethodSettings": {
@@ -3480,23 +3529,41 @@
           "title": "MethodSettings"
         },
         "MinimumCompressionSize": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "MinimumCompressionSize"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "MinimumCompressionSize"
         },
         "Name": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "Name"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "Name"
         },
         "OpenApiVersion": {
@@ -3513,23 +3580,41 @@
           "title": "OpenApiVersion"
         },
         "TracingEnabled": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "TracingEnabled"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "TracingEnabled"
         },
         "Variables": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "Variables"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "Variables"
         }
       },
@@ -3540,27 +3625,47 @@
       "additionalProperties": false,
       "properties": {
         "AccessLogSetting": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "AccessLogSetting"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "AccessLogSetting"
         },
         "AlwaysDeploy": {
-          "title": "Alwaysdeploy",
+          "description": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "AlwaysDeploy",
           "type": "boolean"
         },
         "ApiKeySourceType": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The source of the API key for metering requests according to a usage plan\\. Valid values are `HEADER` and `AUTHORIZER`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ApiKeySourceType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-apikeysourcetype) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "ApiKeySourceType"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The source of the API key for metering requests according to a usage plan\\. Valid values are `HEADER` and `AUTHORIZER`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ApiKeySourceType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-apikeysourcetype) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "The source of the API key for metering requests according to a usage plan\\. Valid values are `HEADER` and `AUTHORIZER`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ApiKeySourceType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-apikeysourcetype) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "ApiKeySourceType"
         },
         "Auth": {
@@ -3584,33 +3689,60 @@
           "title": "BinaryMediaTypes"
         },
         "CacheClusterEnabled": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "CacheClusterEnabled"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "CacheClusterEnabled"
         },
         "CacheClusterSize": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "CacheClusterSize"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "CacheClusterSize"
         },
         "CanarySetting": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "CanarySetting"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "CanarySetting"
         },
         "Cors": {
@@ -3649,13 +3781,22 @@
           "title": "DefinitionUri"
         },
         "Description": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A description of the Api resource\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-description) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "Description"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A description of the Api resource\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-description) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "A description of the Api resource\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-description) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "Description"
         },
         "DisableExecuteApiEndpoint": {
@@ -3692,13 +3833,22 @@
           "title": "EndpointConfiguration"
         },
         "FailOnWarnings": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Specifies whether to roll back the API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-failonwarnings) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "FailOnWarnings"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Specifies whether to roll back the API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-failonwarnings) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "Specifies whether to roll back the API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-failonwarnings) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "FailOnWarnings"
         },
         "GatewayResponses": {
@@ -3708,37 +3858,66 @@
           "type": "object"
         },
         "MergeDefinitions": {
-          "title": "Mergedefinitions",
+          "description": "AWS SAM generates an OpenAPI specification from your API event source\\. Specify `true` to have AWS SAM merge this into the inline OpenAPI specification defined in your `AWS::Serverless::Api` resource\\. Specify `false` to not merge\\.  \n`MergeDefinitions` requires the `DefinitionBody` property for `AWS::Serverless::Api` to be defined\\. `MergeDefinitions` is not compatible with the `DefinitionUri` property for `AWS::Serverless::Api`\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "AWS SAM generates an OpenAPI specification from your API event source\\. Specify `true` to have AWS SAM merge this into the inline OpenAPI specification defined in your `AWS::Serverless::Api` resource\\. Specify `false` to not merge\\.  \n`MergeDefinitions` requires the `DefinitionBody` property for `AWS::Serverless::Api` to be defined\\. `MergeDefinitions` is not compatible with the `DefinitionUri` property for `AWS::Serverless::Api`\\.  \n*Default value*: `false`  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "MergeDefinitions",
           "type": "boolean"
         },
         "MethodSettings": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configures all settings for API stage including Logging, Metrics, CacheTTL, Throttling\\.  \n*Type*: List of [ MethodSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-stage-methodsetting.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MethodSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-methodsettings) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "MethodSettings"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Configures all settings for API stage including Logging, Metrics, CacheTTL, Throttling\\.  \n*Type*: List of [ MethodSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-stage-methodsetting.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MethodSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-methodsettings) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Configures all settings for API stage including Logging, Metrics, CacheTTL, Throttling\\.  \n*Type*: List of [ MethodSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-stage-methodsetting.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MethodSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-methodsettings) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "MethodSettings"
         },
         "MinimumCompressionSize": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "MinimumCompressionSize"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "MinimumCompressionSize"
         },
         "Mode": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "This property applies only when you use OpenAPI to define your REST API\\. The `Mode` determines how API Gateway handles resource updates\\. For more information, see [Mode](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html) resource type\\.  \n*Valid values*: `overwrite` or `merge`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Mode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "Mode"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "This property applies only when you use OpenAPI to define your REST API\\. The `Mode` determines how API Gateway handles resource updates\\. For more information, see [Mode](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html) resource type\\.  \n*Valid values*: `overwrite` or `merge`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Mode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "This property applies only when you use OpenAPI to define your REST API\\. The `Mode` determines how API Gateway handles resource updates\\. For more information, see [Mode](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html) resource type\\.  \n*Valid values*: `overwrite` or `merge`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Mode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "Mode"
         },
         "Models": {
@@ -3748,13 +3927,22 @@
           "type": "object"
         },
         "Name": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "Name"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "Name"
         },
         "OpenApiVersion": {
@@ -3790,23 +3978,41 @@
           "type": "object"
         },
         "TracingEnabled": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "TracingEnabled"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "TracingEnabled"
         },
         "Variables": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::Stage",
+              "properties",
+              "Properties",
+              "properties",
+              "Variables"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "Variables"
         }
       },
@@ -4093,6 +4299,10 @@
         },
         "Region": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "SeparateRecordSetGroup": {
+          "title": "Separaterecordsetgroup",
+          "type": "boolean"
         },
         "SetIdentifier": {
           "$ref": "#/definitions/PassThroughProp"
@@ -4647,13 +4857,22 @@
       "additionalProperties": false,
       "properties": {
         "Architectures": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "Architectures"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Architectures"
         },
         "AssumeRolePolicyDocument": {
@@ -4722,23 +4941,41 @@
           "title": "Description"
         },
         "Environment": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "Environment"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Environment"
         },
         "EphemeralStorage": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "EphemeralStorage"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
           "title": "EphemeralStorage"
         },
         "EventInvokeConfig": {
@@ -4752,13 +4989,22 @@
           "title": "EventInvokeConfig"
         },
         "Handler": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "Handler"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Handler"
         },
         "KmsKeyArn": {
@@ -4792,13 +5038,22 @@
           "title": "MemorySize"
         },
         "PermissionsBoundary": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::IAM::Role",
+              "properties",
+              "Properties",
+              "properties",
+              "PermissionsBoundary"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
-          "markdownDescription": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
           "title": "PermissionsBoundary"
         },
         "ProvisionedConcurrencyConfig": {
@@ -4822,23 +5077,41 @@
           "title": "ReservedConcurrentExecutions"
         },
         "RolePath": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::IAM::Role",
+              "properties",
+              "Properties",
+              "properties",
+              "Path"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
-          "markdownDescription": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
           "title": "RolePath"
         },
         "Runtime": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "Runtime"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Runtime"
         },
         "RuntimeManagementConfig": {
@@ -4912,13 +5185,22 @@
       "additionalProperties": false,
       "properties": {
         "Architectures": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "Architectures"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The instruction set architecture for the function\\.  \nFor more information about this property, see [Lambda instruction set architectures](https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: One of `x86_64` or `arm64`  \n*Type*: List  \n*Required*: No  \n*Default*: `x86_64`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architectures`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Architectures"
         },
         "AssumeRolePolicyDocument": {
@@ -4960,6 +5242,17 @@
           "title": "AutoPublishCodeSha256"
         },
         "CodeSigningConfigArn": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/authoring-codesigning.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CodeSigningConfigArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "CodeSigningConfigArn"
+            ]
+          },
           "anyOf": [
             {
               "type": "object"
@@ -4968,8 +5261,6 @@
               "type": "string"
             }
           ],
-          "description": "The ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/authoring-codesigning.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CodeSigningConfigArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The ARN of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-codesigningconfig.html) resource, used to enable code signing for this function\\. For more information about code signing, see [Configuring code signing for AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/authoring-codesigning.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CodeSigningConfigArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn) property of an `AWS::Lambda::Function` resource\\.",
           "title": "CodeSigningConfigArn"
         },
         "CodeUri": {
@@ -5009,33 +5300,60 @@
           "title": "DeploymentPreference"
         },
         "Description": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "Description"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Description"
         },
         "Environment": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "Environment"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Environment"
         },
         "EphemeralStorage": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "EphemeralStorage"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "An object that specifies the disk space, in MB, available to your Lambda function in `/tmp`\\.  \nFor more information about this property, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [EphemeralStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EphemeralStorage`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage) property of an `AWS::Lambda::Function` resource\\.",
           "title": "EphemeralStorage"
         },
         "EventInvokeConfig": {
@@ -5116,23 +5434,41 @@
           "type": "object"
         },
         "FileSystemConfigs": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "List of [FileSystemConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html) objects that specify the connection settings for an Amazon Elastic File System \\(Amazon EFS\\) file system\\.  \nIf your template contains an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a `DependsOn` resource attribute to ensure that the mount target is created or updated before the function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FileSystemConfigs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "FileSystemConfigs"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "List of [FileSystemConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html) objects that specify the connection settings for an Amazon Elastic File System \\(Amazon EFS\\) file system\\.  \nIf your template contains an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a `DependsOn` resource attribute to ensure that the mount target is created or updated before the function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FileSystemConfigs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "List of [FileSystemConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html) objects that specify the connection settings for an Amazon Elastic File System \\(Amazon EFS\\) file system\\.  \nIf your template contains an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a `DependsOn` resource attribute to ensure that the mount target is created or updated before the function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FileSystemConfigs`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs) property of an `AWS::Lambda::Function` resource\\.",
           "title": "FileSystemConfigs"
         },
         "FunctionName": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A name for the function\\. If you don't specify a name, a unique name is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-functionname) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "FunctionName"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A name for the function\\. If you don't specify a name, a unique name is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-functionname) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "A name for the function\\. If you don't specify a name, a unique name is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-functionname) property of an `AWS::Lambda::Function` resource\\.",
           "title": "FunctionName"
         },
         "FunctionUrlConfig": {
@@ -5146,33 +5482,58 @@
           "title": "FunctionUrlConfig"
         },
         "Handler": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "Handler"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Handler"
         },
         "ImageConfig": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The object used to configure Lambda container image settings\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [ImageConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "ImageConfig"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The object used to configure Lambda container image settings\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [ImageConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The object used to configure Lambda container image settings\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [ImageConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig) property of an `AWS::Lambda::Function` resource\\.",
           "title": "ImageConfig"
         },
         "ImageUri": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The URI of the Amazon Elastic Container Registry \\(Amazon ECR\\) repository for the Lambda function's container image\\. This property only applies if the `PackageType` property is set to `Image`, otherwise it is ignored\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \nIf the `PackageType` property is set to `Image`, then either `ImageUri` is required, or you must build your application with necessary `Metadata` entries in the AWS SAM template file\\. For more information, see [Building applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-using-build.html)\\.\nBuilding your application with necessary `Metadata` entries takes precedence over `ImageUri`, so if you specify both then `ImageUri` is ignored\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageUri`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-imageuri) property of the `AWS::Lambda::Function` `Code` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function.Code",
+              "properties",
+              "ImageUri"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The URI of the Amazon Elastic Container Registry \\(Amazon ECR\\) repository for the Lambda function's container image\\. This property only applies if the `PackageType` property is set to `Image`, otherwise it is ignored\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \nIf the `PackageType` property is set to `Image`, then either `ImageUri` is required, or you must build your application with necessary `Metadata` entries in the AWS SAM template file\\. For more information, see [Building applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-using-build.html)\\.\nBuilding your application with necessary `Metadata` entries takes precedence over `ImageUri`, so if you specify both then `ImageUri` is ignored\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageUri`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-imageuri) property of the `AWS::Lambda::Function` `Code` data type\\.",
-          "markdownDescription": "The URI of the Amazon Elastic Container Registry \\(Amazon ECR\\) repository for the Lambda function's container image\\. This property only applies if the `PackageType` property is set to `Image`, otherwise it is ignored\\. For more information, see [Using container images with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the *AWS Lambda Developer Guide*\\.  \nIf the `PackageType` property is set to `Image`, then either `ImageUri` is required, or you must build your application with necessary `Metadata` entries in the AWS SAM template file\\. For more information, see [Building applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-using-build.html)\\.\nBuilding your application with necessary `Metadata` entries takes precedence over `ImageUri`, so if you specify both then `ImageUri` is ignored\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ImageUri`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-imageuri) property of the `AWS::Lambda::Function` `Code` data type\\.",
           "title": "ImageUri"
         },
         "InlineCode": {
@@ -5226,13 +5587,22 @@
           "title": "PackageType"
         },
         "PermissionsBoundary": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::IAM::Role",
+              "properties",
+              "Properties",
+              "properties",
+              "PermissionsBoundary"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
-          "markdownDescription": "The ARN of a permissions boundary to use for this function's execution role\\. This property works only if the role is generated for you\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PermissionsBoundary`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary) property of an `AWS::IAM::Role` resource\\.",
           "title": "PermissionsBoundary"
         },
         "Policies": {
@@ -5262,13 +5632,22 @@
           "title": "Policies"
         },
         "ProvisionedConcurrencyConfig": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The provisioned concurrency configuration of a function's alias\\.  \n`ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.\n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedConcurrencyConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig) property of an `AWS::Lambda::Alias` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Alias",
+              "properties",
+              "Properties",
+              "properties",
+              "ProvisionedConcurrencyConfig"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The provisioned concurrency configuration of a function's alias\\.  \n`ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.\n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedConcurrencyConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig) property of an `AWS::Lambda::Alias` resource\\.",
-          "markdownDescription": "The provisioned concurrency configuration of a function's alias\\.  \n`ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.\n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedConcurrencyConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig) property of an `AWS::Lambda::Alias` resource\\.",
           "title": "ProvisionedConcurrencyConfig"
         },
         "ReservedConcurrentExecutions": {
@@ -5295,23 +5674,41 @@
           "title": "Role"
         },
         "RolePath": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::IAM::Role",
+              "properties",
+              "Properties",
+              "properties",
+              "Path"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
-          "markdownDescription": "The path to the function's IAM execution role\\.  \nUse this property when the role is generated for you\\. Do not use when the role is specified with the `Role` property\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Path`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path) property of an `AWS::IAM::Role` resource\\.",
           "title": "RolePath"
         },
         "Runtime": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::Function",
+              "properties",
+              "Properties",
+              "properties",
+              "Runtime"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
-          "markdownDescription": "The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \nIf you specify the `provided` identifier for this property, you can use the `Metadata` resource attribute to instruct AWS SAM to build the custom runtime that this function requires\\. For more information about building custom runtimes, see [Building custom runtimes](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html)\\.\n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Runtime`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Runtime"
         },
         "RuntimeManagementConfig": {

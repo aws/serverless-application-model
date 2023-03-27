@@ -1220,7 +1220,7 @@ class SamApi(SamResourceMacro):
     }
 
     @cw_timer
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
+    def to_cloudformation(self, **kwargs) -> List[Resource]:  # type: ignore[no-untyped-def]
         """Returns the API Gateway RestApi, Deployment, and Stage to which this SAM Api corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
@@ -1228,7 +1228,6 @@ class SamApi(SamResourceMacro):
         :returns: a list of vanilla CloudFormation Resources, to which this Function expands
         :rtype: list
         """
-        resources = []
 
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
@@ -1276,29 +1275,7 @@ class SamApi(SamResourceMacro):
             always_deploy=self.AlwaysDeploy,
         )
 
-        (
-            rest_api,
-            deployment,
-            stage,
-            permissions,
-            domain,
-            basepath_mapping,
-            route53,
-            usage_plan_resources,
-        ) = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
-
-        resources.extend([rest_api, deployment, stage])
-        resources.extend(permissions)
-        if domain:
-            resources.extend([domain])
-        if basepath_mapping:
-            resources.extend(basepath_mapping)
-        if route53:
-            resources.extend([route53])
-        # contains usage plan, api key and usageplan key resources
-        if usage_plan_resources:
-            resources.extend(usage_plan_resources)
-        return resources
+        return api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
 
 
 class SamHttpApi(SamResourceMacro):

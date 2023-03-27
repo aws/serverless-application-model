@@ -23,7 +23,7 @@ black==23.1.0
 ruamel.yaml==0.17.21  # It can parse yaml while perserving comments
 
 # type check
-mypy~=1.0.0
+mypy~=1.1.0
 
 # types
 boto3-stubs[appconfig,serverlessrepo]>=1.19.5,==1.*
