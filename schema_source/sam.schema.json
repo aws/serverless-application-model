@@ -3352,14 +3352,16 @@
       "additionalProperties": false,
       "properties": {
         "AccessLogSetting": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#AccessLogSetting"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "AccessLogSetting"
+          "title": "Accesslogsetting"
         },
         "AlwaysDeploy": {
           "description": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3388,34 +3390,40 @@
           "title": "BinaryMediaTypes"
         },
         "CacheClusterEnabled": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#CacheClusterEnabled"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "CacheClusterEnabled"
+          "title": "Cacheclusterenabled"
         },
         "CacheClusterSize": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#CacheClusterSize"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "CacheClusterSize"
+          "title": "Cacheclustersize"
         },
         "CanarySetting": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#CanarySetting"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "CanarySetting"
+          "title": "Canarysetting"
         },
         "Cors": {
           "anyOf": [
@@ -3486,23 +3494,27 @@
           "title": "MethodSettings"
         },
         "MinimumCompressionSize": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::RestApi#properties#Properties#properties#MinimumCompressionSize"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "title": "MinimumCompressionSize"
+          "title": "Minimumcompressionsize"
         },
         "Name": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::RestApi#properties#Properties#properties#Name"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "Name"
         },
         "OpenApiVersion": {
@@ -3519,23 +3531,27 @@
           "title": "OpenApiVersion"
         },
         "TracingEnabled": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#TracingEnabled"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "TracingEnabled"
+          "title": "Tracingenabled"
         },
         "Variables": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#Variables"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "Variables"
         }
       },
@@ -3546,14 +3562,16 @@
       "additionalProperties": false,
       "properties": {
         "AccessLogSetting": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#AccessLogSetting"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Configures Access Log Setting for a stage\\.  \n*Type*: [AccessLogSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AccessLogSetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-accesslogsetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "AccessLogSetting"
+          "title": "Accesslogsetting"
         },
         "AlwaysDeploy": {
           "description": "Always deploys the API, even when no changes to the API have been detected\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3562,14 +3580,16 @@
           "type": "boolean"
         },
         "ApiKeySourceType": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The source of the API key for metering requests according to a usage plan\\. Valid values are `HEADER` and `AUTHORIZER`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ApiKeySourceType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-apikeysourcetype) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::RestApi#properties#Properties#properties#ApiKeySourceType"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The source of the API key for metering requests according to a usage plan\\. Valid values are `HEADER` and `AUTHORIZER`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ApiKeySourceType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-apikeysourcetype) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "The source of the API key for metering requests according to a usage plan\\. Valid values are `HEADER` and `AUTHORIZER`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ApiKeySourceType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-apikeysourcetype) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "title": "ApiKeySourceType"
+          "title": "Apikeysourcetype"
         },
         "Auth": {
           "allOf": [
@@ -3592,34 +3612,40 @@
           "title": "BinaryMediaTypes"
         },
         "CacheClusterEnabled": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#CacheClusterEnabled"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Indicates whether caching is enabled for the stage\\. To cache responses, you must also set `CachingEnabled` to `true` under `MethodSettings`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclusterenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "CacheClusterEnabled"
+          "title": "Cacheclusterenabled"
         },
         "CacheClusterSize": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#CacheClusterSize"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "The stage's cache cluster size\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CacheClusterSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-cacheclustersize) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "CacheClusterSize"
+          "title": "Cacheclustersize"
         },
         "CanarySetting": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#CanarySetting"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Configure a canary setting to a stage of a regular deployment\\.  \n*Type*: [CanarySetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`CanarySetting`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-canarysetting) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "CanarySetting"
+          "title": "Canarysetting"
         },
         "Cors": {
           "anyOf": [
@@ -3657,13 +3683,15 @@
           "title": "DefinitionUri"
         },
         "Description": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A description of the Api resource\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-description) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#Description"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A description of the Api resource\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-description) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "A description of the Api resource\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-description) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "Description"
         },
         "DisableExecuteApiEndpoint": {
@@ -3700,14 +3728,16 @@
           "title": "EndpointConfiguration"
         },
         "FailOnWarnings": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Specifies whether to roll back the API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-failonwarnings) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::RestApi#properties#Properties#properties#FailOnWarnings"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Specifies whether to roll back the API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-failonwarnings) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "Specifies whether to roll back the API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-failonwarnings) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "title": "FailOnWarnings"
+          "title": "Failonwarnings"
         },
         "GatewayResponses": {
           "description": "Configures Gateway Responses for an API\\. Gateway Responses are responses returned by API Gateway, either directly or through the use of Lambda Authorizers\\. For more information, see the documentation for the [Api Gateway OpenApi extension for Gateway Responses](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-gateway-responses.html)\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -3722,33 +3752,39 @@
           "type": "boolean"
         },
         "MethodSettings": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configures all settings for API stage including Logging, Metrics, CacheTTL, Throttling\\.  \n*Type*: List of [ MethodSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-stage-methodsetting.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MethodSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-methodsettings) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#MethodSettings"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Configures all settings for API stage including Logging, Metrics, CacheTTL, Throttling\\.  \n*Type*: List of [ MethodSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-stage-methodsetting.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MethodSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-methodsettings) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Configures all settings for API stage including Logging, Metrics, CacheTTL, Throttling\\.  \n*Type*: List of [ MethodSetting](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-stage-methodsetting.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MethodSettings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-methodsettings) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "MethodSettings"
+          "title": "Methodsettings"
         },
         "MinimumCompressionSize": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::RestApi#properties#Properties#properties#MinimumCompressionSize"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "Allow compression of response bodies based on client's Accept\\-Encoding header\\. Compression is triggered when response body size is greater than or equal to your configured threshold\\. The maximum body size threshold is 10 MB \\(10,485,760 Bytes\\)\\. \\- The following compression types are supported: gzip, deflate, and identity\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MinimumCompressionSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "title": "MinimumCompressionSize"
+          "title": "Minimumcompressionsize"
         },
         "Mode": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "This property applies only when you use OpenAPI to define your REST API\\. The `Mode` determines how API Gateway handles resource updates\\. For more information, see [Mode](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html) resource type\\.  \n*Valid values*: `overwrite` or `merge`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Mode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::RestApi#properties#Properties#properties#Mode"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "This property applies only when you use OpenAPI to define your REST API\\. The `Mode` determines how API Gateway handles resource updates\\. For more information, see [Mode](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html) resource type\\.  \n*Valid values*: `overwrite` or `merge`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Mode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "This property applies only when you use OpenAPI to define your REST API\\. The `Mode` determines how API Gateway handles resource updates\\. For more information, see [Mode](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of the [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html) resource type\\.  \n*Valid values*: `overwrite` or `merge`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Mode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "Mode"
         },
         "Models": {
@@ -3758,13 +3794,15 @@
           "type": "object"
         },
         "Name": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::RestApi#properties#Properties#properties#Name"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
-          "markdownDescription": "A name for the API Gateway RestApi resource  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name) property of an `AWS::ApiGateway::RestApi` resource\\.",
           "title": "Name"
         },
         "OpenApiVersion": {
@@ -3800,23 +3838,27 @@
           "type": "object"
         },
         "TracingEnabled": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#TracingEnabled"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "title": "TracingEnabled"
+          "title": "Tracingenabled"
         },
         "Variables": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
+            "schemaPath": "definitions#AWS::ApiGateway::Stage#properties#Properties#properties#Variables"
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "description": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
-          "markdownDescription": "A map \\(string to string\\) that defines the stage variables, where the variable name is the key and the variable value is the value\\. Variable names are limited to alphanumeric characters\\. Values must match the following regular expression: `[A-Za-z0-9._~:/?#&=,-]+`\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Variables`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-variables) property of an `AWS::ApiGateway::Stage` resource\\.",
           "title": "Variables"
         }
       },
