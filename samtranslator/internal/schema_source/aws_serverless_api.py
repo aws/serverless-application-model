@@ -12,7 +12,10 @@ from samtranslator.internal.schema_source.common import (
     ResourceAttributes,
     SamIntrinsicable,
     get_prop,
+    passthrough_prop,
 )
+
+PROPERTIES_STEM = "sam-resource-api"
 
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 cognitoauthorizeridentity = get_prop("sam-property-api-cognitoauthorizationidentity")
@@ -28,7 +31,7 @@ route53 = get_prop("sam-property-api-route53configuration")
 domain = get_prop("sam-property-api-domainconfiguration")
 definitionuri = get_prop("sam-property-api-apidefinition")
 endpointconfiguration = get_prop("sam-property-api-endpointconfiguration")
-properties = get_prop("sam-resource-api")
+properties = get_prop(PROPERTIES_STEM)
 
 
 class ResourcePolicy(BaseModel):
@@ -180,53 +183,137 @@ AlwaysDeploy = Optional[bool]
 
 
 class Properties(BaseModel):
-    AccessLogSetting: Optional[AccessLogSetting] = properties("AccessLogSetting")
-    ApiKeySourceType: Optional[PassThroughProp] = properties("ApiKeySourceType")
+    AccessLogSetting: Optional[AccessLogSetting] = passthrough_prop(
+        PROPERTIES_STEM,
+        "AccessLogSetting",
+        ["AWS::ApiGateway::Stage", "Properties", "AccessLogSetting"],
+    )
+    ApiKeySourceType: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "ApiKeySourceType",
+        ["AWS::ApiGateway::RestApi", "Properties", "ApiKeySourceType"],
+    )
     Auth: Optional[Auth] = properties("Auth")
     BinaryMediaTypes: Optional[BinaryMediaTypes] = properties("BinaryMediaTypes")
-    CacheClusterEnabled: Optional[CacheClusterEnabled] = properties("CacheClusterEnabled")
-    CacheClusterSize: Optional[CacheClusterSize] = properties("CacheClusterSize")
-    CanarySetting: Optional[CanarySetting] = properties("CanarySetting")
+    CacheClusterEnabled: Optional[CacheClusterEnabled] = passthrough_prop(
+        PROPERTIES_STEM,
+        "CacheClusterEnabled",
+        ["AWS::ApiGateway::Stage", "Properties", "CacheClusterEnabled"],
+    )
+    CacheClusterSize: Optional[CacheClusterSize] = passthrough_prop(
+        PROPERTIES_STEM,
+        "CacheClusterSize",
+        ["AWS::ApiGateway::Stage", "Properties", "CacheClusterSize"],
+    )
+    CanarySetting: Optional[CanarySetting] = passthrough_prop(
+        PROPERTIES_STEM,
+        "CanarySetting",
+        ["AWS::ApiGateway::Stage", "Properties", "CanarySetting"],
+    )
     Cors: Optional[CorsType] = properties("Cors")
     DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
     DefinitionUri: Optional[DefinitionUriType] = properties("DefinitionUri")
     MergeDefinitions: Optional[MergeDefinitions] = properties("MergeDefinitions")
-    Description: Optional[PassThroughProp] = properties("Description")
+    Description: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Description",
+        ["AWS::ApiGateway::Stage", "Properties", "Description"],
+    )
     DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
     Domain: Optional[Domain] = properties("Domain")
     EndpointConfiguration: Optional[EndpointConfigurationType] = properties("EndpointConfiguration")
-    FailOnWarnings: Optional[PassThroughProp] = properties("FailOnWarnings")
+    FailOnWarnings: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "FailOnWarnings",
+        ["AWS::ApiGateway::RestApi", "Properties", "FailOnWarnings"],
+    )
     GatewayResponses: Optional[GatewayResponses] = properties("GatewayResponses")
-    MethodSettings: Optional[MethodSettings] = properties("MethodSettings")
-    MinimumCompressionSize: Optional[MinimumCompressionSize] = properties("MinimumCompressionSize")
-    Mode: Optional[PassThroughProp] = properties("Mode")
+    MethodSettings: Optional[MethodSettings] = passthrough_prop(
+        PROPERTIES_STEM,
+        "MethodSettings",
+        ["AWS::ApiGateway::Stage", "Properties", "MethodSettings"],
+    )
+    MinimumCompressionSize: Optional[MinimumCompressionSize] = passthrough_prop(
+        PROPERTIES_STEM,
+        "MinimumCompressionSize",
+        ["AWS::ApiGateway::RestApi", "Properties", "MinimumCompressionSize"],
+    )
+    Mode: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Mode",
+        ["AWS::ApiGateway::RestApi", "Properties", "Mode"],
+    )
     Models: Optional[DictStrAny] = properties("Models")
-    Name: Optional[Name] = properties("Name")
+    Name: Optional[Name] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Name",
+        ["AWS::ApiGateway::RestApi", "Properties", "Name"],
+    )
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
     StageName: SamIntrinsicable[str] = properties("StageName")
     Tags: Optional[DictStrAny] = properties("Tags")
-    TracingEnabled: Optional[TracingEnabled] = properties("TracingEnabled")
-    Variables: Optional[Variables] = properties("Variables")
+    TracingEnabled: Optional[TracingEnabled] = passthrough_prop(
+        PROPERTIES_STEM,
+        "TracingEnabled",
+        ["AWS::ApiGateway::Stage", "Properties", "TracingEnabled"],
+    )
+    Variables: Optional[Variables] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Variables",
+        ["AWS::ApiGateway::Stage", "Properties", "Variables"],
+    )
     AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
 
 
 class Globals(BaseModel):
     Auth: Optional[Auth] = properties("Auth")
-    Name: Optional[Name] = properties("Name")
+    Name: Optional[Name] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Name",
+        ["AWS::ApiGateway::RestApi", "Properties", "Name"],
+    )
     DefinitionUri: Optional[PassThroughProp] = properties("DefinitionUri")
-    CacheClusterEnabled: Optional[CacheClusterEnabled] = properties("CacheClusterEnabled")
-    CacheClusterSize: Optional[CacheClusterSize] = properties("CacheClusterSize")
+    CacheClusterEnabled: Optional[CacheClusterEnabled] = passthrough_prop(
+        PROPERTIES_STEM,
+        "CacheClusterEnabled",
+        ["AWS::ApiGateway::Stage", "Properties", "CacheClusterEnabled"],
+    )
+    CacheClusterSize: Optional[CacheClusterSize] = passthrough_prop(
+        PROPERTIES_STEM,
+        "CacheClusterSize",
+        ["AWS::ApiGateway::Stage", "Properties", "CacheClusterSize"],
+    )
     MergeDefinitions: Optional[MergeDefinitions] = properties("MergeDefinitions")
-    Variables: Optional[Variables] = properties("Variables")
+    Variables: Optional[Variables] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Variables",
+        ["AWS::ApiGateway::Stage", "Properties", "Variables"],
+    )
     EndpointConfiguration: Optional[PassThroughProp] = properties("EndpointConfiguration")
     MethodSettings: Optional[MethodSettings] = properties("MethodSettings")
     BinaryMediaTypes: Optional[BinaryMediaTypes] = properties("BinaryMediaTypes")
-    MinimumCompressionSize: Optional[MinimumCompressionSize] = properties("MinimumCompressionSize")
+    MinimumCompressionSize: Optional[MinimumCompressionSize] = passthrough_prop(
+        PROPERTIES_STEM,
+        "MinimumCompressionSize",
+        ["AWS::ApiGateway::RestApi", "Properties", "MinimumCompressionSize"],
+    )
     Cors: Optional[CorsType] = properties("Cors")
     GatewayResponses: Optional[GatewayResponses] = properties("GatewayResponses")
-    AccessLogSetting: Optional[AccessLogSetting] = properties("AccessLogSetting")
-    CanarySetting: Optional[CanarySetting] = properties("CanarySetting")
-    TracingEnabled: Optional[TracingEnabled] = properties("TracingEnabled")
+    AccessLogSetting: Optional[AccessLogSetting] = passthrough_prop(
+        PROPERTIES_STEM,
+        "AccessLogSetting",
+        ["AWS::ApiGateway::Stage", "Properties", "AccessLogSetting"],
+    )
+    CanarySetting: Optional[CanarySetting] = passthrough_prop(
+        PROPERTIES_STEM,
+        "CanarySetting",
+        ["AWS::ApiGateway::Stage", "Properties", "CanarySetting"],
+    )
+    TracingEnabled: Optional[TracingEnabled] = passthrough_prop(
+        PROPERTIES_STEM,
+        "TracingEnabled",
+        ["AWS::ApiGateway::Stage", "Properties", "TracingEnabled"],
+    )
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
     Domain: Optional[Domain] = properties("Domain")
     AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")

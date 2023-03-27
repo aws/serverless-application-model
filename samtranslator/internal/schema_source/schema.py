@@ -4,7 +4,7 @@ import argparse
 import json
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 import pydantic
 
@@ -94,12 +94,11 @@ def _replace_in_dict(d: Dict[str, Any], keyword: str, replace: Callable[[Dict[st
     return d
 
 
-def _deep_get(d: Dict[str, Any], path: str) -> Dict[str, Any]:
+def _deep_get(d: Dict[str, Any], path: List[str]) -> Dict[str, Any]:
     """
-    Returns value at path, where `.` in path delimitates the keys.
+    Returns value at path defined by the keys in `path`.
     """
-    keys = path.split(".")
-    for k in keys:
+    for k in path:
         d = d[k]
     return d
 
