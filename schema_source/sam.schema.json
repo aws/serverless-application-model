@@ -3344,12 +3344,9 @@
           "title": "Domain"
         },
         "EndpointConfiguration": {
-          "anyOf": [
+          "allOf": [
             {
-              "type": "object"
-            },
-            {
-              "$ref": "#/definitions/EndpointConfiguration"
+              "$ref": "#/definitions/PassThroughProp"
             }
           ],
           "markdownDescription": "The endpoint type of a REST API\\.  \n*Type*: [EndpointConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-endpointconfiguration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`EndpointConfiguration`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-endpointconfiguration) property of an `AWS::ApiGateway::RestApi` resource\\. The nested configuration properties are named differently\\.",
