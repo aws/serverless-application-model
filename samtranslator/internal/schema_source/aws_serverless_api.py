@@ -345,7 +345,7 @@ class Globals(BaseModel):
         "Variables",
         ["AWS::ApiGateway::Stage", "Properties", "Variables"],
     )
-    EndpointConfiguration: Optional[EndpointConfigurationType] = properties("EndpointConfiguration")
+    EndpointConfiguration: Optional[PassThroughProp] = properties("EndpointConfiguration")
     MethodSettings: Optional[MethodSettings] = properties("MethodSettings")
     BinaryMediaTypes: Optional[BinaryMediaTypes] = properties("BinaryMediaTypes")
     MinimumCompressionSize: Optional[MinimumCompressionSize] = passthrough_prop(
