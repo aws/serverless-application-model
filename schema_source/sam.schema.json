@@ -3015,30 +3015,54 @@
       "additionalProperties": false,
       "properties": {
         "Bucket": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The name of the Amazon S3 bucket where the OpenAPI file is stored\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Bucket`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-bucket) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi.S3Location",
+              "properties",
+              "Bucket"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The name of the Amazon S3 bucket where the OpenAPI file is stored\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Bucket`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-bucket) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
           "title": "Bucket"
         },
         "Key": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The Amazon S3 key of the OpenAPI file\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-key) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi.S3Location",
+              "properties",
+              "Key"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The Amazon S3 key of the OpenAPI file\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-key) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
           "title": "Key"
         },
         "Version": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "For versioned objects, the version of the OpenAPI file\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Version`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-version) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi.S3Location",
+              "properties",
+              "Version"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "For versioned objects, the version of the OpenAPI file\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Version`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-version) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
           "title": "Version"
         }
       },

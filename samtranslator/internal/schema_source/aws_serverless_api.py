@@ -19,6 +19,7 @@ PROPERTIES_STEM = "sam-resource-api"
 DOMAIN_STEM = "sam-property-api-domainconfiguration"
 ROUTE53_STEM = "sam-property-api-route53configuration"
 ENDPOINT_CONFIGURATION_STEM = "sam-property-api-endpointconfiguration"
+DEFINITION_URI_STEM = "sam-property-api-apidefinition"
 
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 cognitoauthorizeridentity = get_prop("sam-property-api-cognitoauthorizationidentity")
@@ -32,7 +33,7 @@ auth = get_prop("sam-property-api-apiauth")
 cors = get_prop("sam-property-api-corsconfiguration")
 route53 = get_prop(ROUTE53_STEM)
 domain = get_prop(DOMAIN_STEM)
-definitionuri = get_prop("sam-property-api-apidefinition")
+definitionuri = get_prop(DEFINITION_URI_STEM)
 endpointconfiguration = get_prop(ENDPOINT_CONFIGURATION_STEM)
 properties = get_prop(PROPERTIES_STEM)
 
@@ -188,9 +189,21 @@ class Domain(BaseModel):
 
 
 class DefinitionUri(BaseModel):
-    Bucket: PassThroughProp = definitionuri("Bucket")
-    Key: PassThroughProp = definitionuri("Key")
-    Version: Optional[PassThroughProp] = definitionuri("Version")
+    Bucket: PassThroughProp = passthrough_prop(
+        DEFINITION_URI_STEM,
+        "Bucket",
+        ["AWS::ApiGateway::RestApi.S3Location", "Bucket"],
+    )
+    Key: PassThroughProp = passthrough_prop(
+        DEFINITION_URI_STEM,
+        "Key",
+        ["AWS::ApiGateway::RestApi.S3Location", "Key"],
+    )
+    Version: Optional[PassThroughProp] = passthrough_prop(
+        DEFINITION_URI_STEM,
+        "Version",
+        ["AWS::ApiGateway::RestApi.S3Location", "Version"],
+    )
 
 
 class EndpointConfiguration(BaseModel):
