@@ -2286,7 +2286,7 @@ class SamGraphQLApi(SamResourceMacro):
         resources: List[Resource] = []
 
         for relative_id, ddb_datasource in ddb_datasources.items():
-            datasource_logical_id = self.logical_id + relative_id
+            datasource_logical_id = f"{self.logical_id}DynamoDBDataSource{relative_id}"
             cfn_datasource = DataSource(
                 logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
