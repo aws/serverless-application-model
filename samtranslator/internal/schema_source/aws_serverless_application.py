@@ -10,10 +10,13 @@ from samtranslator.internal.schema_source.common import (
     ResourceAttributes,
     SamIntrinsicable,
     get_prop,
+    passthrough_prop,
 )
 
+PROPERTIES_STEM = "sam-resource-application"
+
 location = get_prop("sam-property-application-applicationlocationobject")
-properties = get_prop("sam-resource-application")
+properties = get_prop(PROPERTIES_STEM)
 
 
 class Location(BaseModel):
@@ -23,10 +26,22 @@ class Location(BaseModel):
 
 class Properties(BaseModel):
     Location: Union[str, Location] = properties("Location")
-    NotificationARNs: Optional[PassThroughProp] = properties("NotificationARNs")
-    Parameters: Optional[PassThroughProp] = properties("Parameters")
+    NotificationARNs: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "NotificationARNs",
+        ["AWS::CloudFormation::Stack", "Properties", "NotificationARNs"],
+    )
+    Parameters: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Parameters",
+        ["AWS::CloudFormation::Stack", "Properties", "Parameters"],
+    )
     Tags: Optional[Dict[str, Any]] = properties("Tags")
-    TimeoutInMinutes: Optional[PassThroughProp] = properties("TimeoutInMinutes")
+    TimeoutInMinutes: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "TimeoutInMinutes",
+        ["AWS::CloudFormation::Stack", "Properties", "TimeoutInMinutes"],
+    )
 
 
 class Resource(ResourceAttributes):
