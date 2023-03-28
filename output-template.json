@@ -4,6 +4,17 @@
    "Type": "AWS::AppSync::GraphQLApi",
    "Properties": {
     "Name": "SomeApi",
+    "Tags": [
+     {
+      "Key": "key1",
+      "Value": "value1"
+     },
+     {
+      "Key": "key2",
+      "Value": "value2"
+     }
+    ],
+    "XrayEnabled": true,
     "AuthenticationType": "AWS_IAM",
     "LogConfig": {
      "FieldLogLevel": "ALL",
@@ -54,8 +65,8 @@
     ]
    }
   },
-  "SuperCoolAPIMyFunction": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
+  "SuperCoolAPIMyDataSource": {
+   "Type": "AWS::AppSync::DataSource",
    "Properties": {
     "ApiId": {
      "Fn::GetAtt": [
@@ -63,17 +74,19 @@
       "ApiId"
      ]
     },
-    "CodeS3Location": "my-code-uri",
-    "DataSourceName": "SuperCoolAPINoneDataSource",
-    "Name": "MyFunction",
-    "Runtime": {
-     "Name": "some-runtime",
-     "RuntimeVersion": "1.2.3"
+    "Name": "MyDataSource",
+    "Type": "AMAZON_DYNAMODB",
+    "ServiceRoleArn": "SomeRoleArn",
+    "DynamoDBConfig": {
+     "AwsRegion": {
+      "Ref": "AWS::Region"
+     },
+     "TableName": "SomeTable"
     }
    }
   },
-  "SuperCoolAPIAnotherFunction": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
+  "SuperCoolAPIsaveNote": {
+   "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Fn::GetAtt": [
@@ -81,49 +94,32 @@
       "ApiId"
      ]
     },
-    "CodeS3Location": "my-code-uri",
-    "DataSourceName": "SuperCoolAPINoneDataSource",
-    "Name": "AnotherFunction",
-    "Runtime": {
-     "Name": "some-runtime",
-     "RuntimeVersion": "1.2.3"
-    }
-   }
-  },
-  "SuperCoolAPISimilarFunction": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Fn::GetAtt": [
-      "SuperCoolAPI",
-      "ApiId"
+    "CachingConfig": {
+     "Ttl": 20,
+     "CachingKeys": [
+      "key1",
+      "key2"
      ]
     },
-    "CodeS3Location": "my-code-uri",
-    "DataSourceName": "SuperCoolAPINoneDataSource",
-    "Name": "SimilarFunction",
-    "Runtime": {
-     "Name": "some-runtime",
-     "RuntimeVersion": "1.2.3"
-    }
-   }
-  },
-  "SuperCoolAPIGoodFunction": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Fn::GetAtt": [
-      "SuperCoolAPI",
-      "ApiId"
+    "Code": "\nexport function request(ctx) {\n    ctx.stash.input = ctx.args.input\n    return {};\n}\n\nexport function response(ctx) {\n    return ctx.prev.result;\n}\n",
+    "FieldName": "blah",
+    "Kind": "PIPELINE",
+    "MaxBatchSize": 10,
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "SuperCoolAPIMyFunction",
+        "FunctionId"
+       ]
+      }
      ]
     },
-    "CodeS3Location": "my-code-uri",
-    "DataSourceName": "SuperCoolAPINoneDataSource",
-    "Name": "GoodFunction",
     "Runtime": {
      "Name": "some-runtime",
      "RuntimeVersion": "1.2.3"
-    }
+    },
+    "TypeName": "Mutation"
    }
   }
  }

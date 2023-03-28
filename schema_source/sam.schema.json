@@ -117,15 +117,21 @@
           "type": "string"
         },
         "Functions": {
-          "additionalProperties": {
-            "$ref": "#/definitions/Function"
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/definitions/Function"
+                },
+                "type": "object"
+              }
+            ]
           },
           "title": "Functions",
-          "type": "object"
-        },
-        "GenerateCode": {
-          "title": "Generatecode",
-          "type": "boolean"
+          "type": "array"
         },
         "InlineCode": {
           "title": "Inlinecode",
@@ -136,6 +142,9 @@
         },
         "Runtime": {
           "$ref": "#/definitions/Runtime"
+        },
+        "Sync": {
+          "$ref": "#/definitions/Sync"
         }
       },
       "title": "AppSyncResolver",

@@ -709,9 +709,9 @@ class TestGraphQLApiNoneDataSource(TestCase):
             "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSourceName="my-name"),
             "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSourceName="my-name"),
         }
-        res = api._check_and_construct_none_datasource(functions, "foo", "bar")
+        api._check_and_construct_none_datasource(functions, "foo", "bar")
 
-        self.assertIsNone(res)
+        self.assertIsNone(api.none_datasource)
 
     def test_function_datasource_set_with_logical_id(self):
         api = SamGraphQLApi("MyApi")
@@ -733,6 +733,6 @@ def test_function_datasource_set_with_none(data):
         "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource=data),
         "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource="SomeOtherId"),
     }
-    res = api._check_and_construct_none_datasource(functions, "foo", "bar")
+    api._check_and_construct_none_datasource(functions, "foo", "bar")
 
-    assert res
+    assert api.none_datasource

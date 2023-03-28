@@ -10,8 +10,6 @@ from samtranslator.internal.schema_source.common import (
     get_prop,
 )
 
-FieldTypes = Literal["Query", "Mutation", "Subscription"]
-
 properties = get_prop("sam-resource-graphqlapi")
 
 
@@ -93,11 +91,12 @@ class AppSyncResolver(BaseModel):
     DataSource: Optional[str]
     DataSourceName: Optional[str]
     MaxBatchSize: Optional[PassThroughProp]
-    Functions: Optional[Dict[str, Function]]
+    Functions: List[Union[str, Dict[str, Function]]] # TODO: should functions be optional? ask
     Runtime: Optional[Runtime]
-    GenerateCode: Optional[bool]
+    Sync: Optional[Sync]
 
 
+# TODO: CHANGE PASSTHROUGHS TO NEW SCHEMA SETTINGS
 class Properties(BaseModel):
     Auth: Auth
     Tags: Optional[DictStrAny]
@@ -109,7 +108,7 @@ class Properties(BaseModel):
     DynamoDBDataSources: Optional[Dict[str, DynamoDBDataSource]]
     ResolverCodeSettings: Optional[ResolverCodeSettings]
     Functions: Optional[Dict[str, Function]]
-    AppSyncResolvers: Optional[Dict[FieldTypes, Dict[str, AppSyncResolver]]]
+    AppSyncResolvers: Optional[Dict[str, Dict[str, AppSyncResolver]]]
 
 
 class Resource(BaseModel):

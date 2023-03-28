@@ -17,6 +17,7 @@ export function response(ctx) {
 }
 """
 
+
 class DeltaSyncConfigType(TypedDict):
     BaseTableTTL: str
     DeltaSyncTableName: str
@@ -50,6 +51,15 @@ class SyncConfigType(TypedDict, total=False):
     ConflictDetection: str
     ConflictHandler: str
     LambdaConflictHandlerConfig: LambdaConflictHandlerConfigType
+
+
+class CachingConfigType(TypedDict, total=False):
+    CachingKeys: List[str]
+    Ttl: float
+
+
+class PipelineConfigType(TypedDict, total=False):
+    Functions: List[str]
 
 
 class GraphQLApi(Resource):
@@ -129,6 +139,9 @@ class FunctionConfiguration(Resource):
     Runtime: Optional[AppSyncRuntimeType]
     SyncConfig: Optional[SyncConfigType]
 
+    runtime_attrs = {"function_id": lambda self: fnGetAtt(self.logical_id, "FunctionId")}
+
+
 class Resolver(Resource):
     resource_type = "AWS::AppSync::Resolver"
     property_types = {
@@ -145,3 +158,16 @@ class Resolver(Resource):
         "SyncConfig": GeneratedProperty(),
         "TypeName": GeneratedProperty(),
     }
+
+    ApiId: Intrinsicable[str]
+    CachingConfig: Optional[CachingConfigType]
+    Code: Optional[str]
+    CodeS3Location: Optional[str]
+    DataSourceName: Optional[str]
+    FieldName: str
+    Kind: Optional[str]
+    MaxBatchSize: Optional[int]
+    PipelineConfig: Optional[PipelineConfigType]
+    Runtime: Optional[AppSyncRuntimeType]
+    SyncConfig: Optional[SyncConfigType]
+    TypeName: str
