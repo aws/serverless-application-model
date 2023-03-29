@@ -767,6 +767,29 @@
             }
           }
         }
+      },
+      "AWS::Lambda::Function": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeAsync",
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": [
+                    "%{Destination.Arn}",
+                    "%{Destination.Arn}:*"
+                  ]
+                }
+              ]
+            }
+          }
+        }
       }
     }
   }

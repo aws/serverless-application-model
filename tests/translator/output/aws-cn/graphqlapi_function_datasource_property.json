@@ -42,7 +42,7 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "SuperCoolAPIMyDataSource": {
+    "SuperCoolAPIDynamoDBDataSourceMyDataSource": {
       "Properties": {
         "ApiId": {
           "Fn::GetAtt": [

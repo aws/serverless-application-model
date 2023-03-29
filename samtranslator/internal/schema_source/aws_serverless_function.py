@@ -13,7 +13,10 @@ from samtranslator.internal.schema_source.common import (
     ResourceAttributes,
     SamIntrinsicable,
     get_prop,
+    passthrough_prop,
 )
+
+PROPERTIES_STEM = "sam-resource-function"
 
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
 apiauth = get_prop("sam-property-function-apifunctionauth")
@@ -501,8 +504,19 @@ class Properties(BaseModel):
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
     Description: Optional[Description] = prop("Description")
-    Environment: Optional[Environment] = prop("Environment")
-    EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
+    # TODO: Make the notation shorter; resource type and SAM/CFN property names usually same
+    Environment: Optional[Environment] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Environment",
+        "AWS::Lambda::Function",
+        "Environment",
+    )
+    EphemeralStorage: Optional[EphemeralStorage] = passthrough_prop(
+        PROPERTIES_STEM,
+        "EphemeralStorage",
+        "AWS::Lambda::Function",
+        "EphemeralStorage",
+    )
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Events: Optional[
         Dict[
@@ -531,9 +545,19 @@ class Properties(BaseModel):
         ]
     ] = prop("Events")
     FileSystemConfigs: Optional[PassThroughProp] = prop("FileSystemConfigs")
-    FunctionName: Optional[PassThroughProp] = prop("FunctionName")
+    FunctionName: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "FunctionName",
+        "AWS::Lambda::Function",
+        "FunctionName",
+    )
     FunctionUrlConfig: Optional[FunctionUrlConfig] = prop("FunctionUrlConfig")
-    Handler: Optional[Handler] = prop("Handler")
+    Handler: Optional[Handler] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Handler",
+        "AWS::Lambda::Function",
+        "Handler",
+    )
     ImageConfig: Optional[PassThroughProp] = prop("ImageConfig")
     ImageUri: Optional[PassThroughProp] = prop("ImageUri")
     InlineCode: Optional[PassThroughProp] = prop("InlineCode")
@@ -541,13 +565,33 @@ class Properties(BaseModel):
     Layers: Optional[Layers] = prop("Layers")
     MemorySize: Optional[MemorySize] = prop("MemorySize")
     PackageType: Optional[PassThroughProp] = prop("PackageType")
-    RolePath: Optional[RolePath] = prop("RolePath")
-    PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
+    RolePath: Optional[RolePath] = passthrough_prop(
+        PROPERTIES_STEM,
+        "RolePath",
+        "AWS::IAM::Role",
+        "Path",
+    )
+    PermissionsBoundary: Optional[PermissionsBoundary] = passthrough_prop(
+        PROPERTIES_STEM,
+        "PermissionsBoundary",
+        "AWS::IAM::Role",
+        "PermissionsBoundary",
+    )
     Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = prop("Policies")
-    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
+    ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = passthrough_prop(
+        PROPERTIES_STEM,
+        "ProvisionedConcurrencyConfig",
+        "AWS::Lambda::Alias",
+        "ProvisionedConcurrencyConfig",
+    )
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     Role: Optional[SamIntrinsicable[str]] = prop("Role")
-    Runtime: Optional[Runtime] = prop("Runtime")
+    Runtime: Optional[Runtime] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Runtime",
+        "AWS::Lambda::Function",
+        "Runtime",
+    )
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     Tags: Optional[Tags] = prop("Tags")
@@ -558,29 +602,59 @@ class Properties(BaseModel):
 
 
 class Globals(BaseModel):
-    Handler: Optional[Handler] = prop("Handler")
-    Runtime: Optional[Runtime] = prop("Runtime")
+    Handler: Optional[Handler] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Handler",
+        "AWS::Lambda::Function",
+        "Handler",
+    )
+    Runtime: Optional[Runtime] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Runtime",
+        "AWS::Lambda::Function",
+        "Runtime",
+    )
     CodeUri: Optional[CodeUriType] = prop("CodeUri")
     DeadLetterQueue: Optional[DeadLetterQueueType] = prop("DeadLetterQueue")
     Description: Optional[Description] = prop("Description")
     MemorySize: Optional[MemorySize] = prop("MemorySize")
     Timeout: Optional[Timeout] = prop("Timeout")
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
-    Environment: Optional[Environment] = prop("Environment")
+    Environment: Optional[Environment] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Environment",
+        "AWS::Lambda::Function",
+        "Environment",
+    )
     Tags: Optional[Tags] = prop("Tags")
     Tracing: Optional[Tracing] = prop("Tracing")
     KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
     Layers: Optional[Layers] = prop("Layers")
     AutoPublishAlias: Optional[AutoPublishAlias] = prop("AutoPublishAlias")
     DeploymentPreference: Optional[DeploymentPreference] = prop("DeploymentPreference")
-    RolePath: Optional[RolePath] = prop("RolePath")
-    PermissionsBoundary: Optional[PermissionsBoundary] = prop("PermissionsBoundary")
+    RolePath: Optional[RolePath] = passthrough_prop(
+        PROPERTIES_STEM,
+        "RolePath",
+        "AWS::IAM::Role",
+        "Path",
+    )
+    PermissionsBoundary: Optional[PermissionsBoundary] = passthrough_prop(
+        PROPERTIES_STEM,
+        "PermissionsBoundary",
+        "AWS::IAM::Role",
+        "PermissionsBoundary",
+    )
     ReservedConcurrentExecutions: Optional[ReservedConcurrentExecutions] = prop("ReservedConcurrentExecutions")
     ProvisionedConcurrencyConfig: Optional[ProvisionedConcurrencyConfig] = prop("ProvisionedConcurrencyConfig")
     AssumeRolePolicyDocument: Optional[AssumeRolePolicyDocument] = prop("AssumeRolePolicyDocument")
     EventInvokeConfig: Optional[EventInvokeConfig] = prop("EventInvokeConfig")
     Architectures: Optional[Architectures] = prop("Architectures")
-    EphemeralStorage: Optional[EphemeralStorage] = prop("EphemeralStorage")
+    EphemeralStorage: Optional[EphemeralStorage] = passthrough_prop(
+        PROPERTIES_STEM,
+        "EphemeralStorage",
+        "AWS::Lambda::Function",
+        "EphemeralStorage",
+    )
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
 
