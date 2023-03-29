@@ -116,7 +116,7 @@ def transform_template(input_file_path, output_file_path):  # type: ignore[no-un
     except InvalidDocumentException as e:
         error_message = reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
         LOG.error(error_message)
-        errors = map(lambda cause: cause.message, e.causes)
+        errors = (cause.message for cause in e.causes)
         LOG.error(errors)
 
 

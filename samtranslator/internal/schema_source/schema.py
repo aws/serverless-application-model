@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import argparse
 import json
+from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 import pydantic
 
@@ -79,6 +80,29 @@ def json_dumps(obj: Any) -> str:
     return json.dumps(obj, indent=2, sort_keys=True) + "\n"
 
 
+def _replace_in_dict(d: Dict[str, Any], keyword: str, replace: Callable[[Dict[str, Any]], Any]) -> Dict[str, Any]:
+    """
+    Replace any dict containing keyword.
+
+    replace() takes the containing dict as input, and returns its replacement.
+    """
+    if keyword in d:
+        d = replace(d)
+    for k, v in d.items():
+        if isinstance(v, dict):
+            d[k] = _replace_in_dict(v, keyword, replace)
+    return d
+
+
+def _deep_get(d: Dict[str, Any], path: List[str]) -> Dict[str, Any]:
+    """
+    Returns value at path defined by the keys in `path`.
+    """
+    for k in path:
+        d = d[k]
+    return d
+
+
 def _add_embedded_connectors(schema: Dict[str, Any]) -> None:
     """
     Add embedded Connectors resource attribute to supported CloudFormation resources.
@@ -123,6 +147,20 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
         sam_defs[k] = cfn_defs[k]
 
     _add_embedded_connectors(sam_schema)
+
+    # Inject CloudFormation documentation to SAM pass-through properties
+    def replace_passthrough(d: Dict[str, Any]) -> Dict[str, Any]:
+        passthrough = d["__samPassThrough"]
+        schema = deepcopy(_deep_get(cfn_schema, passthrough["schemaPath"]))
+        schema["markdownDescription"] = passthrough["markdownDescriptionOverride"]
+        schema["title"] = d["title"]  # Still want the original title, CFN property name could be different
+        return schema
+
+    _replace_in_dict(
+        sam_schema,
+        "__samPassThrough",
+        replace_passthrough,
+    )
 
     # The unified schema should include all supported properties
     sam_schema["additionalProperties"] = False
