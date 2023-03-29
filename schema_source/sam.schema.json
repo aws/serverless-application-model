@@ -2609,10 +2609,6 @@
           "title": "Functionsfolder",
           "type": "string"
         },
-        "ResolversFolder": {
-          "title": "Resolversfolder",
-          "type": "string"
-        },
         "Runtime": {
           "$ref": "#/definitions/Runtime"
         }

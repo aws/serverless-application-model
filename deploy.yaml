@@ -1,0 +1,74 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: PradsApi
+      SchemaInline: |
+        type Mutation {
+          signUp(input: Signup): User
+        }
+
+        type Query {
+          getUser(id: ID!): User
+        }
+
+        input Signup {
+          username: String!
+          email: String!
+        }
+
+        type User {
+          id: ID!
+          username: String
+          email: AWSEmail
+        }
+
+        schema {
+          query: Query
+          mutation: Mutation
+        }
+      Auth:
+        Type: AWS_IAM
+      AppSyncResolvers:
+        Mutation:
+          signUp:
+            DataSource: NONE
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Functions:
+            - validateEmail:
+                DataSource: NONE
+                InlineCode: |
+                  import { util } from '@aws-appsync/utils';
+
+                  export function request(ctx) {
+                    const { email, username } = ctx.stash.input;
+                    const valid = util.matches(
+                      '^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+.)?[a-zA-Z]+.)?(xmyvaliddomain).com',
+                      email
+                    );
+                    if (!valid) {
+                      util.error(`"${email}" is not a valid email.`);
+                    }
+
+                    return { payload: { email, username } };
+                  }
+
+                  export function response(ctx) {
+                    return ctx.result;
+                  }
+            - saveUser:
+                DataSource: NONE
+                InlineCode: |
+                  import { util } from '@aws-appsync/utils';
+
+                  export function request(ctx) {
+                    return { payload: ctx.prev.result }
+                  }
+
+                  export function response(ctx) {
+                    ctx.result.id = util.autoId();
+                    return ctx.result;
+                  }

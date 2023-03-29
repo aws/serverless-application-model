@@ -6,6 +6,9 @@ from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt
 from samtranslator.utils.types import Intrinsicable
 
+# This JavaScript default resolver code stashes all input arguments for customers to use in their functions.
+# They can deconstruct them with the notation `{ var1, var2 } = ctx.stash.input`.
+# The response function simply returns the last executed functions result.
 APPSYNC_PIPELINE_RESOLVER_JS_CODE = """
 export function request(ctx) {
     ctx.stash.input = ctx.args.input
@@ -59,7 +62,7 @@ class CachingConfigType(TypedDict, total=False):
 
 
 class PipelineConfigType(TypedDict, total=False):
-    Functions: List[str]
+    Functions: List[Intrinsicable[str]]
 
 
 class GraphQLApi(Resource):
@@ -112,7 +115,10 @@ class DataSource(Resource):
     ServiceRoleArn: str
     DynamoDBConfig: DynamoDBConfigType
 
-    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "DataSourceArn")}
+    runtime_attrs = {
+        "arn": lambda self: fnGetAtt(self.logical_id, "DataSourceArn"),
+        "name": lambda self: fnGetAtt(self.logical_id, "Name"),
+    }
 
 
 class FunctionConfiguration(Resource):

@@ -709,7 +709,7 @@ class TestGraphQLApiNoneDataSource(TestCase):
             "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSourceName="my-name"),
             "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSourceName="my-name"),
         }
-        api._check_and_construct_none_datasource(functions, "foo", "bar")
+        api._check_and_construct_none_datasource(functions, "foo")
 
         self.assertIsNone(api.none_datasource)
 
@@ -720,7 +720,7 @@ class TestGraphQLApiNoneDataSource(TestCase):
             "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource="SomeId"),
             "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource="SomeOtherId"),
         }
-        res = api._check_and_construct_none_datasource(functions, "foo", "bar")
+        res = api._check_and_construct_none_datasource(functions, "foo")
 
         self.assertIsNone(res)
 
@@ -733,6 +733,6 @@ def test_function_datasource_set_with_none(data):
         "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource=data),
         "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource="SomeOtherId"),
     }
-    api._check_and_construct_none_datasource(functions, "foo", "bar")
+    api._check_and_construct_none_datasource(functions, "foo")
 
     assert api.none_datasource

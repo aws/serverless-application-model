@@ -51,7 +51,6 @@ class Runtime(BaseModel):
 class ResolverCodeSettings(BaseModel):
     CodeRootPath: str
     Runtime: Runtime
-    ResolversFolder: Optional[str]
     FunctionsFolder: Optional[str]
 
 
@@ -91,7 +90,7 @@ class AppSyncResolver(BaseModel):
     DataSource: Optional[str]
     DataSourceName: Optional[str]
     MaxBatchSize: Optional[PassThroughProp]
-    Functions: List[Union[str, Dict[str, Function]]] # TODO: should functions be optional? ask
+    Functions: Optional[List[Union[str, Dict[str, Function]]]]
     Runtime: Optional[Runtime]
     Sync: Optional[Sync]
 
