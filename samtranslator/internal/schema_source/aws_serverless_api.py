@@ -16,6 +16,10 @@ from samtranslator.internal.schema_source.common import (
 )
 
 PROPERTIES_STEM = "sam-resource-api"
+DOMAIN_STEM = "sam-property-api-domainconfiguration"
+ROUTE53_STEM = "sam-property-api-route53configuration"
+ENDPOINT_CONFIGURATION_STEM = "sam-property-api-endpointconfiguration"
+DEFINITION_URI_STEM = "sam-property-api-apidefinition"
 
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 cognitoauthorizeridentity = get_prop("sam-property-api-cognitoauthorizationidentity")
@@ -27,10 +31,10 @@ lambdarequestauthorizer = get_prop("sam-property-api-lambdarequestauthorizer")
 usageplan = get_prop("sam-property-api-apiusageplan")
 auth = get_prop("sam-property-api-apiauth")
 cors = get_prop("sam-property-api-corsconfiguration")
-route53 = get_prop("sam-property-api-route53configuration")
-domain = get_prop("sam-property-api-domainconfiguration")
-definitionuri = get_prop("sam-property-api-apidefinition")
-endpointconfiguration = get_prop("sam-property-api-endpointconfiguration")
+route53 = get_prop(ROUTE53_STEM)
+domain = get_prop(DOMAIN_STEM)
+definitionuri = get_prop(DEFINITION_URI_STEM)
+endpointconfiguration = get_prop(ENDPOINT_CONFIGURATION_STEM)
 properties = get_prop(PROPERTIES_STEM)
 
 
@@ -130,10 +134,26 @@ class Cors(BaseModel):
 
 
 class Route53(BaseModel):
-    DistributionDomainName: Optional[PassThroughProp] = route53("DistributionDomainName")
-    EvaluateTargetHealth: Optional[PassThroughProp] = route53("EvaluateTargetHealth")
-    HostedZoneId: Optional[PassThroughProp] = route53("HostedZoneId")
-    HostedZoneName: Optional[PassThroughProp] = route53("HostedZoneName")
+    DistributionDomainName: Optional[PassThroughProp] = passthrough_prop(
+        ROUTE53_STEM,
+        "DistributionDomainName",
+        ["AWS::Route53::RecordSetGroup.AliasTarget", "DNSName"],
+    )
+    EvaluateTargetHealth: Optional[PassThroughProp] = passthrough_prop(
+        ROUTE53_STEM,
+        "EvaluateTargetHealth",
+        ["AWS::Route53::RecordSetGroup.AliasTarget", "EvaluateTargetHealth"],
+    )
+    HostedZoneId: Optional[PassThroughProp] = passthrough_prop(
+        ROUTE53_STEM,
+        "HostedZoneId",
+        ["AWS::Route53::RecordSetGroup.RecordSet", "HostedZoneId"],
+    )
+    HostedZoneName: Optional[PassThroughProp] = passthrough_prop(
+        ROUTE53_STEM,
+        "HostedZoneName",
+        ["AWS::Route53::RecordSetGroup.RecordSet", "HostedZoneName"],
+    )
     IpV6: Optional[bool] = route53("IpV6")
     SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
     Region: Optional[PassThroughProp]  # TODO: add docs
@@ -144,23 +164,59 @@ class Domain(BaseModel):
     BasePath: Optional[PassThroughProp] = domain("BasePath")
     NormalizeBasePath: Optional[bool] = domain("NormalizeBasePath")
     CertificateArn: PassThroughProp = domain("CertificateArn")
-    DomainName: PassThroughProp = domain("DomainName")
+    DomainName: PassThroughProp = passthrough_prop(
+        DOMAIN_STEM,
+        "DomainName",
+        ["AWS::ApiGateway::DomainName", "Properties", "DomainName"],
+    )
     EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE"]]] = domain("EndpointConfiguration")
-    MutualTlsAuthentication: Optional[PassThroughProp] = domain("MutualTlsAuthentication")
-    OwnershipVerificationCertificateArn: Optional[PassThroughProp] = domain("OwnershipVerificationCertificateArn")
+    MutualTlsAuthentication: Optional[PassThroughProp] = passthrough_prop(
+        DOMAIN_STEM,
+        "MutualTlsAuthentication",
+        ["AWS::ApiGateway::DomainName", "Properties", "MutualTlsAuthentication"],
+    )
+    OwnershipVerificationCertificateArn: Optional[PassThroughProp] = passthrough_prop(
+        DOMAIN_STEM,
+        "OwnershipVerificationCertificateArn",
+        ["AWS::ApiGateway::DomainName", "Properties", "OwnershipVerificationCertificateArn"],
+    )
     Route53: Optional[Route53] = domain("Route53")
-    SecurityPolicy: Optional[PassThroughProp] = domain("SecurityPolicy")
+    SecurityPolicy: Optional[PassThroughProp] = passthrough_prop(
+        DOMAIN_STEM,
+        "SecurityPolicy",
+        ["AWS::ApiGateway::DomainName", "Properties", "SecurityPolicy"],
+    )
 
 
 class DefinitionUri(BaseModel):
-    Bucket: PassThroughProp = definitionuri("Bucket")
-    Key: PassThroughProp = definitionuri("Key")
-    Version: Optional[PassThroughProp] = definitionuri("Version")
+    Bucket: PassThroughProp = passthrough_prop(
+        DEFINITION_URI_STEM,
+        "Bucket",
+        ["AWS::ApiGateway::RestApi.S3Location", "Bucket"],
+    )
+    Key: PassThroughProp = passthrough_prop(
+        DEFINITION_URI_STEM,
+        "Key",
+        ["AWS::ApiGateway::RestApi.S3Location", "Key"],
+    )
+    Version: Optional[PassThroughProp] = passthrough_prop(
+        DEFINITION_URI_STEM,
+        "Version",
+        ["AWS::ApiGateway::RestApi.S3Location", "Version"],
+    )
 
 
 class EndpointConfiguration(BaseModel):
-    Type: Optional[PassThroughProp] = endpointconfiguration("Type")
-    VPCEndpointIds: Optional[PassThroughProp] = endpointconfiguration("VPCEndpointIds")
+    Type: Optional[PassThroughProp] = passthrough_prop(
+        ENDPOINT_CONFIGURATION_STEM,
+        "Type",
+        ["AWS::ApiGateway::RestApi.EndpointConfiguration", "Types"],
+    )
+    VPCEndpointIds: Optional[PassThroughProp] = passthrough_prop(
+        ENDPOINT_CONFIGURATION_STEM,
+        "VPCEndpointIds",
+        ["AWS::ApiGateway::RestApi.EndpointConfiguration", "VpcEndpointIds"],
+    )
 
 
 Name = Optional[PassThroughProp]

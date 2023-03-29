@@ -925,21 +925,37 @@
       "additionalProperties": false,
       "properties": {
         "Type": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The endpoint type of a REST API\\.  \n*Valid values*: `EDGE` or `REGIONAL` or `PRIVATE`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Types`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-endpointconfiguration.html#cfn-apigateway-restapi-endpointconfiguration-types) property of the `AWS::ApiGateway::RestApi` `EndpointConfiguration` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi.EndpointConfiguration",
+              "properties",
+              "Types"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The endpoint type of a REST API\\.  \n*Valid values*: `EDGE` or `REGIONAL` or `PRIVATE`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Types`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-endpointconfiguration.html#cfn-apigateway-restapi-endpointconfiguration-types) property of the `AWS::ApiGateway::RestApi` `EndpointConfiguration` data type\\.",
           "title": "Type"
         },
         "VPCEndpointIds": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "A list of VPC endpoint IDs of a REST API against which to create Route53 aliases\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`VpcEndpointIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-endpointconfiguration.html#cfn-apigateway-restapi-endpointconfiguration-vpcendpointids) property of the `AWS::ApiGateway::RestApi` `EndpointConfiguration` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi.EndpointConfiguration",
+              "properties",
+              "VpcEndpointIds"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "A list of VPC endpoint IDs of a REST API against which to create Route53 aliases\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`VpcEndpointIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-endpointconfiguration.html#cfn-apigateway-restapi-endpointconfiguration-vpcendpointids) property of the `AWS::ApiGateway::RestApi` `EndpointConfiguration` data type\\.",
           "title": "VPCEndpointIds"
         }
       },
@@ -2999,30 +3015,54 @@
       "additionalProperties": false,
       "properties": {
         "Bucket": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The name of the Amazon S3 bucket where the OpenAPI file is stored\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Bucket`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-bucket) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi.S3Location",
+              "properties",
+              "Bucket"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The name of the Amazon S3 bucket where the OpenAPI file is stored\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Bucket`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-bucket) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
           "title": "Bucket"
         },
         "Key": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The Amazon S3 key of the OpenAPI file\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-key) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi.S3Location",
+              "properties",
+              "Key"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The Amazon S3 key of the OpenAPI file\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Key`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-key) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
           "title": "Key"
         },
         "Version": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "For versioned objects, the version of the OpenAPI file\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Version`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-version) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi.S3Location",
+              "properties",
+              "Version"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "For versioned objects, the version of the OpenAPI file\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Version`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-version) property of the `AWS::ApiGateway::RestApi` `S3Location` data type\\.",
           "title": "Version"
         }
       },
@@ -3055,12 +3095,22 @@
           "title": "CertificateArn"
         },
         "DomainName": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The custom domain name for your API Gateway API\\. Uppercase letters are not supported\\.  \nAWS SAM generates an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html) resource when this property is set\\. For information about this scenario, see [DomainName property is specified](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources-api.html#sam-specification-generated-resources-api-domain-name)\\. For information about generated AWS CloudFormation resources, see [Generated AWS CloudFormation resources](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources.html)\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DomainName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-domainname) property of an `AWS::ApiGateway::DomainName` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::DomainName",
+              "properties",
+              "Properties",
+              "properties",
+              "DomainName"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The custom domain name for your API Gateway API\\. Uppercase letters are not supported\\.  \nAWS SAM generates an [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html) resource when this property is set\\. For information about this scenario, see [DomainName property is specified](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources-api.html#sam-specification-generated-resources-api-domain-name)\\. For information about generated AWS CloudFormation resources, see [Generated AWS CloudFormation resources](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources.html)\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DomainName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-domainname) property of an `AWS::ApiGateway::DomainName` resource\\.",
           "title": "DomainName"
         },
         "EndpointConfiguration": {
@@ -3080,12 +3130,22 @@
           "title": "EndpointConfiguration"
         },
         "MutualTlsAuthentication": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The mutual Transport Layer Security \\(TLS\\) authentication configuration for a custom domain name\\.  \n*Type*: [MutualTlsAuthentication](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-mutualtlsauthentication)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MutualTlsAuthentication`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-mutualtlsauthentication) property of an `AWS::ApiGateway::DomainName` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::DomainName",
+              "properties",
+              "Properties",
+              "properties",
+              "MutualTlsAuthentication"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The mutual Transport Layer Security \\(TLS\\) authentication configuration for a custom domain name\\.  \n*Type*: [MutualTlsAuthentication](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-mutualtlsauthentication)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MutualTlsAuthentication`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-mutualtlsauthentication) property of an `AWS::ApiGateway::DomainName` resource\\.",
           "title": "MutualTlsAuthentication"
         },
         "NormalizeBasePath": {
@@ -3094,12 +3154,22 @@
           "type": "boolean"
         },
         "OwnershipVerificationCertificateArn": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The ARN of the public certificate issued by ACM to validate ownership of your custom domain\\. Required only when you configure mutual TLS and you specify an ACM imported or private CA certificate ARN for the `CertificateArn`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`OwnershipVerificationCertificateArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-ownershipverificationcertificatearn) property of an `AWS::ApiGateway::DomainName` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::DomainName",
+              "properties",
+              "Properties",
+              "properties",
+              "OwnershipVerificationCertificateArn"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The ARN of the public certificate issued by ACM to validate ownership of your custom domain\\. Required only when you configure mutual TLS and you specify an ACM imported or private CA certificate ARN for the `CertificateArn`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`OwnershipVerificationCertificateArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-ownershipverificationcertificatearn) property of an `AWS::ApiGateway::DomainName` resource\\.",
           "title": "OwnershipVerificationCertificateArn"
         },
         "Route53": {
@@ -3112,12 +3182,22 @@
           "title": "Route53"
         },
         "SecurityPolicy": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The TLS version plus cipher suite for this domain name\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SecurityPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-securitypolicy) property of an `AWS::ApiGateway::DomainName` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::DomainName",
+              "properties",
+              "Properties",
+              "properties",
+              "SecurityPolicy"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The TLS version plus cipher suite for this domain name\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SecurityPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-securitypolicy) property of an `AWS::ApiGateway::DomainName` resource\\.",
           "title": "SecurityPolicy"
         }
       },
@@ -3988,39 +4068,71 @@
       "additionalProperties": false,
       "properties": {
         "DistributionDomainName": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "Configures a custom distribution of the API custom domain name\\.  \n*Type*: String  \n*Required*: No  \n*Default*: Use the API Gateway distribution\\.  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DNSName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget-1.html#cfn-route53-aliastarget-dnshostname) property of an `AWS::Route53::RecordSetGroup AliasTarget` resource\\.  \n*Additional notes*: The domain name of a [CloudFront distribution](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html)\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Route53::RecordSetGroup.AliasTarget",
+              "properties",
+              "DNSName"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Configures a custom distribution of the API custom domain name\\.  \n*Type*: String  \n*Required*: No  \n*Default*: Use the API Gateway distribution\\.  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DNSName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget-1.html#cfn-route53-aliastarget-dnshostname) property of an `AWS::Route53::RecordSetGroup AliasTarget` resource\\.  \n*Additional notes*: The domain name of a [CloudFront distribution](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html)\\.",
           "title": "DistributionDomainName"
         },
         "EvaluateTargetHealth": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "When EvaluateTargetHealth is true, an alias record inherits the health of the referenced AWS resource, such as an Elastic Load Balancing load balancer or another record in the hosted zone\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EvaluateTargetHealth`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html#cfn-route53-aliastarget-evaluatetargethealth) property of an `AWS::Route53::RecordSetGroup AliasTarget` resource\\.  \n*Additional notes*: You can't set EvaluateTargetHealth to true when the alias target is a CloudFront distribution\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Route53::RecordSetGroup.AliasTarget",
+              "properties",
+              "EvaluateTargetHealth"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "When EvaluateTargetHealth is true, an alias record inherits the health of the referenced AWS resource, such as an Elastic Load Balancing load balancer or another record in the hosted zone\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EvaluateTargetHealth`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html#cfn-route53-aliastarget-evaluatetargethealth) property of an `AWS::Route53::RecordSetGroup AliasTarget` resource\\.  \n*Additional notes*: You can't set EvaluateTargetHealth to true when the alias target is a CloudFront distribution\\.",
           "title": "EvaluateTargetHealth"
         },
         "HostedZoneId": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The ID of the hosted zone that you want to create records in\\.  \nSpecify either `HostedZoneName` or `HostedZoneId`, but not both\\. If you have multiple hosted zones with the same domain name, you must specify the hosted zone using `HostedZoneId`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`HostedZoneId`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset-1.html#cfn-route53-recordset-hostedzoneid) property of an `AWS::Route53::RecordSetGroup RecordSet` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Route53::RecordSetGroup.RecordSet",
+              "properties",
+              "HostedZoneId"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The ID of the hosted zone that you want to create records in\\.  \nSpecify either `HostedZoneName` or `HostedZoneId`, but not both\\. If you have multiple hosted zones with the same domain name, you must specify the hosted zone using `HostedZoneId`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`HostedZoneId`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset-1.html#cfn-route53-recordset-hostedzoneid) property of an `AWS::Route53::RecordSetGroup RecordSet` resource\\.",
           "title": "HostedZoneId"
         },
         "HostedZoneName": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The name of the hosted zone that you want to create records in\\.  \nSpecify either `HostedZoneName` or `HostedZoneId`, but not both\\. If you have multiple hosted zones with the same domain name, you must specify the hosted zone using `HostedZoneId`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`HostedZoneName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset-1.html#cfn-route53-recordset-hostedzonename) property of an `AWS::Route53::RecordSetGroup RecordSet` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Route53::RecordSetGroup.RecordSet",
+              "properties",
+              "HostedZoneName"
+            ]
+          },
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The name of the hosted zone that you want to create records in\\.  \nSpecify either `HostedZoneName` or `HostedZoneId`, but not both\\. If you have multiple hosted zones with the same domain name, you must specify the hosted zone using `HostedZoneId`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`HostedZoneName`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset-1.html#cfn-route53-recordset-hostedzonename) property of an `AWS::Route53::RecordSetGroup RecordSet` resource\\.",
           "title": "HostedZoneName"
         },
         "IpV6": {
