@@ -30,6 +30,23 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
+      Functions:
+        saveUser:
+          DataSource: NONE
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          InlineCode: |
+            import { util } from '@aws-appsync/utils';
+
+            export function request(ctx) {
+              return { payload: ctx.prev.result }
+            }
+
+            export function response(ctx) {
+              ctx.result.id = util.autoId();
+              return ctx.result;
+            }
       AppSyncResolvers:
         Mutation:
           signUp:
@@ -59,16 +76,4 @@ Resources:
                   export function response(ctx) {
                     return ctx.result;
                   }
-            - saveUser:
-                DataSource: NONE
-                InlineCode: |
-                  import { util } from '@aws-appsync/utils';
-
-                  export function request(ctx) {
-                    return { payload: ctx.prev.result }
-                  }
-
-                  export function response(ctx) {
-                    ctx.result.id = util.autoId();
-                    return ctx.result;
-                  }
+            - saveUser

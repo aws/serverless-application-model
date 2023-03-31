@@ -9,9 +9,10 @@ from samtranslator.utils.types import Intrinsicable
 # This JavaScript default resolver code stashes all input arguments for customers to use in their functions.
 # They can deconstruct them with the notation `{ var1, var2 } = ctx.stash.input`.
 # The response function simply returns the last executed functions result.
+# TODO: check if we can remove this new line
 APPSYNC_PIPELINE_RESOLVER_JS_CODE = """
 export function request(ctx) {
-    ctx.stash.input = ctx.args.input
+    ctx.stash.args = ctx.args
     return {};
 }
 
@@ -136,7 +137,7 @@ class FunctionConfiguration(Resource):
     }
 
     ApiId: Intrinsicable[str]
-    DataSourceName: str
+    DataSourceName: Intrinsicable[str]
     Name: str
     Code: Optional[str]
     CodeS3Location: Optional[str]

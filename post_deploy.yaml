@@ -1,0 +1,66 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  DynamoDBPostsTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: posts-table
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  
+  DynamoDBPostsLogTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: posts-log-table
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: PradsApi
+      SchemaUri: s3://prad-graph-ql-demo/schema.graphql
+      Auth:
+        Type: AWS_IAM
+      DynamoDBDataSources:
+        PostsDataSource:
+          TableName: !Ref DynamoDBPostsTable
+          TableArn: !GetAtt DynamoDBPostsTable.Arn
+        PostsLogDataSource:
+          TableName: !Ref DynamoDBPostsLogTable
+          TableArn: !GetAtt DynamoDBPostsLogTable.Arn
+      AppSyncResolvers:
+        Mutation:
+          addPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Functions:
+            - createPostLogInTable:
+                DataSource: PostsLogDataSource
+                CodeUri: s3://prad-graph-ql-demo/functions/createPostLogInTable.js
+            - createPostInTable:
+                DataSource: PostsDataSource
+                CodeUri: s3://prad-graph-ql-demo/functions/createPostInTable.js
+        Query:
+          getPost:
+            DataSource: PostsDataSource
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Functions:
+            - getPostFromTable:
+                CodeUri: s3://prad-graph-ql-demo/functions/getPostFromTable.js

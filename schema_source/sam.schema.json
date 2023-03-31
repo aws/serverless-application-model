@@ -839,8 +839,7 @@
           "type": "string"
         },
         "TableName": {
-          "title": "Tablename",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "UseCallerCredentials": {
           "$ref": "#/definitions/PassThroughProp"

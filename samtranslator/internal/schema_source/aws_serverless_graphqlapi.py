@@ -31,9 +31,9 @@ class DeltaSync(BaseModel):
 
 
 class DynamoDBDataSource(BaseModel):
-    TableName: str
+    TableName: PassThroughProp  # TODO: change to passthrough
     ServiceRoleArn: Optional[PassThroughProp]
-    TableArn: Optional[str]
+    TableArn: Optional[PassThroughProp]
     Permissions: Optional[PermissionsType]
     Name: Optional[str]
     Description: Optional[PassThroughProp]
@@ -48,7 +48,7 @@ class Runtime(BaseModel):
     Version: PassThroughProp
 
 
-class ResolverCodeSettings(BaseModel):
+class ResolverCodeSettings(BaseModel):  # TODO: change to CodeSettings
     CodeRootPath: str
     Runtime: Runtime
     FunctionsFolder: Optional[str]

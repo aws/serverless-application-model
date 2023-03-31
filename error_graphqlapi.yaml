@@ -1,0 +1,112 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # ===== AppSync Function =====
+  MyFunction:
+    Type: AWS::AppSync::FunctionConfiguration
+    Properties:
+      ApiId: some-api-id
+      Code: this is my epic code
+      DataSourceName: some-cool-datasource
+      Name: MyFunction
+      Runtime:
+        Name: some-runtime
+        RuntimeVersion: 1.2.3
+
+  # ===== SAM Error Resources =====
+  MultipleInlineFunctionsWithSameName:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      AppSyncResolvers:
+        Mutation:
+          saveNote:
+            InlineCode: blahblahblah
+            DataSource: NONE
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Functions:
+            - MyFunction:
+                InlineCode: this is my epic code
+            - MyFunction:
+                InlineCode: this is my epic code
+
+  InlineAndStandaloneFunctionWithSameName:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      Functions:
+        MyFunction:
+          CodeUri: my-code-uri
+          DataSourceName: SomeDataSourceName
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+      AppSyncResolvers:
+        Mutation:
+          saveNote:
+            InlineCode: blahblahblah
+            DataSource: NONE
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Functions:
+            - MyFunction:
+                InlineCode: this is my epic code
+
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      Functions:
+        MyFunction:
+          CodeUri: my-code-uri
+          DataSourceName: SomeDataSourceName
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+      AppSyncResolvers:
+        Mutation:
+          saveNote:
+            InlineCode: blahblahblah
+            FieldName: my_field
+            DataSource: NONE
+            MaxBatchSize: 10
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Caching:
+              Ttl: 20
+              CachingKeys:
+              - key1
+              - key2
+            Functions:
+            - MyFunction:
+                Id: !GetAtt MyFunction.FunctionId
+            - MyFunction

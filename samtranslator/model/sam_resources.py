@@ -2165,7 +2165,10 @@ class SamGraphQLApi(SamResourceMacro):
     # stop validation so we can use class variables for tracking state
     validate_setattr = False
 
-    none_datasource = None
+    none_datasource: Optional[DataSource] = None
+    # TODO: ask about typing. technically Id is not an intrinsicable str, its passthrough.
+    function_id_map: Dict[str, Intrinsicable[str]] = {}
+    datasource_name_map: Dict[str, Intrinsicable[str]] = {}
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
@@ -2186,23 +2189,20 @@ class SamGraphQLApi(SamResourceMacro):
         if model.ResolverCodeSettings:
             self._set_resolver_code_settings(model.ResolverCodeSettings)
 
-        function_map = self._construct_appsync_function_configurations(
-            model.Functions, model.DynamoDBDataSources, model.ResolverCodeSettings, api_id
-        )
-
-        if function_map:
-            resources.extend(list(function_map.values()))
+        if model.Functions:
+            function_configurations = self._construct_appsync_function_configurations(
+                model.Functions, model.DynamoDBDataSources, model.ResolverCodeSettings, api_id
+            )
+            resources.extend(function_configurations)
 
         if model.AppSyncResolvers:
             appsync_resolver_resources = self._construct_appsync_resolver_resources(
-                model.AppSyncResolvers, function_map, model.ResolverCodeSettings, model.DynamoDBDataSources, api_id
+                model.AppSyncResolvers, model.ResolverCodeSettings, model.DynamoDBDataSources, api_id
             )
             resources.extend(appsync_resolver_resources)
 
         if self.none_datasource:
-            # TODO: Check if we can get rid of this type: ignore
-            # relevant link: https://github.com/python/mypy/issues/9457
-            resources.append(self.none_datasource)  # type: ignore
+            resources.append(self.none_datasource)
 
         return resources
 
@@ -2327,6 +2327,8 @@ class SamGraphQLApi(SamResourceMacro):
                 ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, datasource_logical_id, kwargs
             )
 
+            self.datasource_name_map[relative_id] = cfn_datasource.get_runtime_attr("name")
+
             resources.extend([cfn_datasource, *permissions_resources])
 
         return resources
@@ -2420,25 +2422,17 @@ class SamGraphQLApi(SamResourceMacro):
 
     def _construct_appsync_function_configurations(
         self,
-        functions: Optional[Dict[str, aws_serverless_graphqlapi.Function]],
+        functions: Dict[str, aws_serverless_graphqlapi.Function],
         datasources: Optional[Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource]],
         resolver_code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         api_id: Intrinsicable[str],
-    ) -> Dict[str, FunctionConfiguration]:
-        if not functions:
-            return {}
+    ) -> List[FunctionConfiguration]:
+        func_configs: List[FunctionConfiguration] = []
 
-        function_map: Dict[str, FunctionConfiguration] = {}
         self._check_and_construct_none_datasource(functions, api_id)
 
         for relative_id, function in functions.items():
-            func_config = FunctionConfiguration(
-                logical_id=self.logical_id + relative_id,
-                depends_on=self.depends_on,
-                attributes=self.resource_attributes,
-            )
-
-            # "Id" refers to the "LogicalId" attribute for a "AppSync::FunctionConfiguration" resource.
+            # "Id" refers to the "FunctionId" attribute for a "AppSync::FunctionConfiguration" resource.
             # "Id" is a mutually exclusive property to every other property. If this function has it
             # defined, then we make sure it's the only property, and continue to next function.
             if function.Id:
@@ -2447,7 +2441,14 @@ class SamGraphQLApi(SamResourceMacro):
                     raise InvalidResourceException(
                         relative_id, "'Id' cannot be defined with other properties in Function."
                     )
+                self.function_id_map[relative_id] = passthrough_value(function.Id)
                 continue
+
+            func_config = FunctionConfiguration(
+                logical_id=self.logical_id + relative_id,
+                depends_on=self.depends_on,
+                attributes=self.resource_attributes,
+            )
 
             func_config.ApiId = api_id
             func_config.Name = function.Name or relative_id
@@ -2462,9 +2463,10 @@ class SamGraphQLApi(SamResourceMacro):
             if function.Sync:
                 func_config.SyncConfig = cast(SyncConfigType, function.Sync.dict())
 
-            function_map[relative_id] = func_config
+            self.function_id_map[relative_id] = func_config.get_runtime_attr("function_id")
+            func_configs.append(func_config)
 
-        return function_map
+        return func_configs
 
     @staticmethod
     def _is_none_datasource_input(datasource: Optional[str]) -> bool:
@@ -2514,7 +2516,7 @@ class SamGraphQLApi(SamResourceMacro):
         relative_id: str,
         resource: Union[aws_serverless_graphqlapi.Function, aws_serverless_graphqlapi.AppSyncResolver],
         datasources: Optional[Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource]],
-    ) -> str:
+    ) -> Intrinsicable[str]:
         """
         Parse DataSource name from a Serverless::GraphQLApi function or resolver.
 
@@ -2544,15 +2546,18 @@ class SamGraphQLApi(SamResourceMacro):
         if resource.DataSourceName:
             return resource.DataSourceName
 
-        if self._is_none_datasource_input(resource.DataSource):
-            return self.none_datasource.get_runtime_attr("name")
+        if self._is_none_datasource_input(resource.DataSource) and self.none_datasource:
+            # TODO: check if return type should just be intrinsicable str
+            # TODO: check if that additional self.none_datasource condition is necessary. maybe rewrite?
+            return cast(Intrinsicable[str], self.none_datasource.get_runtime_attr("name"))
 
         if not datasources or resource.DataSource not in datasources:
             raise InvalidResourceException(
                 relative_id, f"No DynamoDB DataSource exists with logical id '{resource.DataSource}'."
             )
 
-        return datasources[resource.DataSource].Name
+        #TODO: why do we have an or condition here???
+        return self.datasource_name_map[resource.DataSource]  # or resource.DataSource
 
     @staticmethod
     def _parse_function_code_properties(
@@ -2621,13 +2626,18 @@ class SamGraphQLApi(SamResourceMacro):
     def _construct_appsync_resolver_resources(
         self,
         appsync_resolvers: Dict[str, Dict[str, aws_serverless_graphqlapi.AppSyncResolver]],
-        function_map: Dict[str, FunctionConfiguration],
         resolver_code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         datasources: Optional[Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource]],
         api_id: Intrinsicable[str],
-    ) -> List[Resolver]:
-        resources: List[Resolver] = []
+    ) -> List[Resource]:
+        """
+        add comment
+        """
+        resources: List[Resource] = []
 
+        # Because resolvers are stored in a unique manner with the parent TypeName dictionary,
+        # we must first gather all relative id to AppSyncResolver pairs and put them into one dictionary
+        # before passing it to _check_and_construct_none_datasource().
         resolvers = {}
 
         for resolver in appsync_resolvers.values():
@@ -2648,6 +2658,7 @@ class SamGraphQLApi(SamResourceMacro):
                         relative_id, "Both 'InlineCode' and 'CodeUri' cannot be defined at the same time."
                     )
 
+                # maybe move this to code properties function
                 if appsync_resolver.DataSource and appsync_resolver.DataSourceName:
                     raise InvalidResourceException(
                         relative_id, "Both 'DataSource' and 'DataSourceName' cannot be defined at the same time."
@@ -2662,33 +2673,40 @@ class SamGraphQLApi(SamResourceMacro):
                 cfn_resolver.ApiId = api_id
                 cfn_resolver.FieldName = appsync_resolver.FieldName or relative_id
                 cfn_resolver.TypeName = type_name
-                cfn_resolver.Kind = "PIPELINE"
-                # TODO: pipeline resolvers CANNOT have datasource defined in the resolver. address this.
-
+                # TODO: test if maxbatchsize works for pipeline resolver
                 cfn_resolver.MaxBatchSize = passthrough_value(appsync_resolver.MaxBatchSize)
                 cfn_resolver.Runtime = self._parse_runtime(appsync_resolver, resolver_code_settings, relative_id)
 
-                functions, function_ids = self._parse_functions_from_resolver(
-                    appsync_resolver, function_map, resolver_code_settings, datasources, relative_id, api_id
-                )
+                if appsync_resolver.Functions:
+                    cfn_resolver.Kind = "PIPELINE"  # TODO: make it so it does this if functionsi s defined instead.
+                    functions, function_ids = self._parse_appsync_resolver_functions(
+                        appsync_resolver, resolver_code_settings, datasources, relative_id, api_id
+                    )
+                    cfn_resolver.PipelineConfig = {"Functions": function_ids}
+                    resources.extend(functions)
+                else:
+                    # Add unit resolver code once AppSync has support for them in CFN.
+                    # For now, we just raise an error.
+                    raise InvalidResourceException(
+                        relative_id,
+                        f"Resolver '{relative_id}' must have Functions defined. JavaScript Unit resolvers are not supported in CloudFormation currently.",
+                    )
 
-                cfn_resolver.PipelineConfig = {"Functions": function_ids}
-
+                # TODO: test if sync config works in pipeline resolver
                 if appsync_resolver.Sync:
                     cfn_resolver.SyncConfig = cast(SyncConfigType, appsync_resolver.Sync.dict())
 
                 if appsync_resolver.Caching:
                     cfn_resolver.CachingConfig = cast(CachingConfigType, appsync_resolver.Caching.dict())
 
-                resources.extend(functions)
                 resources.append(cfn_resolver)
 
         return resources
 
-    def _parse_functions_from_resolver(  # noqa: PLR0913
+    # TODO: lets consistently name stuff with appsync_resolver.
+    def _parse_appsync_resolver_functions(
         self,
-        resolver: aws_serverless_graphqlapi.AppSyncResolver,
-        function_map: Dict[str, FunctionConfiguration],
+        appsync_resolver: aws_serverless_graphqlapi.AppSyncResolver,
         resolver_code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         datasources: Optional[Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource]],
         relative_id: str,
@@ -2697,62 +2715,39 @@ class SamGraphQLApi(SamResourceMacro):
         """
         Parse functions property in GraphQLApi Resolver.
 
-        Functions are used in pipeline resolvers.
+        When a resolver has the functions property defined, it is a pipeline resolver. These functions are
+        executed in the order they are listed in the template. Because functions can be created inline in the
+        functions property, we return not only a list of function IDs for the PipelineConfig, but a list of
+        FunctionConfiguration resources to build as well if new functions were created.
         """
-        # TODO: MAKE DOCSTRING COMMENT
-        # TODO: check this case with an empty list if our type system catches that. if it doesnt we should throw err
-        if not resolver.Functions:
-            raise InvalidResourceException(
-                relative_id,
-                f"Resolver '{relative_id}' must have Functions defined. JavaScript Unit resolvers are not supported in CloudFormation currently.",
-            )
-
-        function_ids: List[Intrinsicable[str]] = []
-
-        # TODO: we cant do this :( we need to return a list so that we can maintain order
-        # since it matters with pipeline resolvers. this means we need to parse
-        # both at once, but we can create separate functions to handle str vs dict case.
-
-        function_strs, function_objs = self._split_inline_functions(resolver.Functions)
-
-        functions = {}
-
-        # create a combined function map
-        # then go through
-
-        for function_str in function_strs:
-            if function_str not in function_map:
-                raise InvalidResourceException(
-                    relative_id,
-                    f"Function '{function_str}' could not be found in the 'Functions' property under {self.logical_id}.",
-                )
-
-            function_ids.append(function_map[function_str].get_runtime_attr("function_id"))
-
-        for relative_id in function_objs:
-            # we can also inherit sync config and maxbatchsize, question is should we?
-            function_obj = function_objs[relative_id]
-            function_obj.Runtime = function_obj.Runtime or resolver.Runtime
-            function_obj.DataSource, function_obj.DataSourceName = self._parse_inline_function_code_properties(
-                function_obj, resolver
-            )
-
-        cfn_functions = self._construct_appsync_function_configurations(
+        function_objs = self._make_function_dict_from_resolver(appsync_resolver)
+        func_configs = self._construct_appsync_function_configurations(
             function_objs, datasources, resolver_code_settings, api_id
         )
 
-        for cfn_function in cfn_functions.values():
-            function_id = cfn_function.get_runtime_attr("function_id")
-            function_ids.append(function_id)
+        function_ids = []
+        
+        # TODO: this is dumb lol
+        appsync_resolver.Functions = cast(List[Union[str, Dict[str, aws_serverless_graphqlapi.Function]]], appsync_resolver.Functions)
+        for resolver_function in appsync_resolver.Functions:
+            if isinstance(resolver_function, str):
+                if resolver_function not in self.function_id_map:
+                    raise InvalidResourceException(relative_id, f"Function '{resolver_function}'")
 
-        return cfn_functions.values(), function_ids
+                function_ids.append(self.function_id_map[resolver_function])
+                continue
+
+            for function_relative_id in resolver_function:
+                function_ids.append(self.function_id_map[function_relative_id])
+
+        return func_configs, function_ids
 
     @staticmethod
-    def _parse_inline_function_code_properties(
-        function: aws_serverless_graphqlapi.Function, resolver: aws_serverless_graphqlapi.AppSyncResolver
+    def _parse_inline_function_datasource_properties(
+        function: aws_serverless_graphqlapi.Function, appsync_resolver: aws_serverless_graphqlapi.AppSyncResolver
     ) -> Tuple[Optional[str], Optional[str]]:
         """
-        Parses the code properties for an inline function defined in a resolver in Serverless::GraphQLApi.
+        Parses the code properties for an inline function defined in an AppSync resolver in Serverless::GraphQLApi.
 
         When a function is defined inline within a resolver, it can inherit these code properties from the resolver.
         This function ensures that only one code property is defined at a time, so we don't inherit if it is already
@@ -2760,37 +2755,48 @@ class SamGraphQLApi(SamResourceMacro):
 
         Inline functions will not use ResolverCodeSettings to generate their CodeUri if not defined.
         """
-        # TODO: docstring about how inline functions inherit from resolver, DFIFERENT from real resolvers
-        # also we dont use resolvercodesettings as previously discussed.
         if function.DataSource:
             return function.DataSource, None
 
         if function.DataSourceName:
             return None, function.DataSourceName
 
-        return resolver.DataSource, resolver.DataSourceName
+        # While a pipeline resolver itself does not use these DataSource properties, they can still be defined.
+        # This is so they can be used in inline functions for when they do not have defined DataSource properties.
+        return appsync_resolver.DataSource, appsync_resolver.DataSourceName
 
-    @staticmethod
-    def _split_inline_functions(  # TODO: review this name. something isnt right
-        functions: List[Union[str, Dict[str, aws_serverless_graphqlapi.Function]]]
-    ) -> Tuple[List[str], Dict[str, aws_serverless_graphqlapi.Function]]:
+    def _make_function_dict_from_resolver(  # TODO: review this name. something isnt right
+        self,
+        appsync_resolver: aws_serverless_graphqlapi.AppSyncResolver,
+    ) -> Dict[str, aws_serverless_graphqlapi.Function]:
         """
-        Create a list of function relative ID strings and a dictionary of function objects from Functions input.
+        Return a dictionary with relative ID to Function objects from an AppSyncResolver.
 
-        Functions in resolver are either strings (logical ID of a function declared in GraphQLApi.Functions)
-        or dictionaries that represent functions (defined in GraphQLApi.<Resolver>.Functions). In this function,
-        we break the combined list into a list of strings and a dictionary of functions for easier handling.
+        Functions in resolvers are either strings (logical ID of a function declared in GraphQLApi.Functions) or
+        dictionaries that represent functions (inline function). This method makes a dictionary with relative IDs
+        as keys and values as their respective Function object. This dictionary can then be converted into CFN
+        FunctionConfiguration resources.
         """
-        function_strs = []
-        function_objs = {}
-
-        for i in range(len(functions)):
-            function = functions[i]
-
-            if isinstance(function, str):
-                function_strs.append(function)
+        function_objs: Dict[str, aws_serverless_graphqlapi.Function] = {}
+        
+        # TODO: this is dumb lol
+        appsync_resolver.Functions = cast(List[Union[str, Dict[str, aws_serverless_graphqlapi.Function]]], appsync_resolver.Functions)
+        for resolver_function in appsync_resolver.Functions:
+            if isinstance(resolver_function, str):
                 continue
+            # TODO: we can also inherit sync config and maxbatchsize, question is should we?
+            for relative_id, function in resolver_function.items():
+                # Check if function with same logical ID has already been defined. Throw an error if so.
+                if relative_id in self.function_id_map or relative_id in function_objs:
+                    raise InvalidResourceException(
+                        self.logical_id, f"There are multiple instances of function '{relative_id}'."
+                    )
 
-            function_objs.update(function)
+                if not function.Id:
+                    function.Runtime = function.Runtime or appsync_resolver.Runtime
+                    function.DataSource, function.DataSourceName = self._parse_inline_function_datasource_properties(
+                        function, appsync_resolver
+                    )
+                function_objs.update({relative_id: function})
 
-        return function_strs, function_objs
+        return function_objs

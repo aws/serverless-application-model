@@ -1,0 +1,329 @@
+Resources:
+  DynamoDBPostsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: posts-table
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  DynamoDBPostsLogTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: posts-log-table
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  SuperCoolAPI:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: PradsApi
+      AuthenticationType: AWS_IAM
+      LogConfig:
+        FieldLogLevel: ALL
+        CloudWatchLogsRoleArn:
+          Fn::GetAtt:
+          - SuperCoolAPICloudWatchRole
+          - Arn
+  SuperCoolAPISchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId:
+        Fn::GetAtt:
+        - SuperCoolAPI
+        - ApiId
+      DefinitionS3Location: s3://prad-graph-ql-demo/schema.js
+  SuperCoolAPICloudWatchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - appsync.amazonaws.com
+      ManagedPolicyArns:
+      - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs
+  SuperCoolAPIDynamoDBDataSourcePostsDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId:
+        Fn::GetAtt:
+        - SuperCoolAPI
+        - ApiId
+      Name: PostsDataSource
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn:
+        Fn::GetAtt:
+        - SuperCoolAPIDynamoDBDataSourcePostsDataSourceRole
+        - Arn
+      DynamoDBConfig:
+        AwsRegion:
+          Ref: AWS::Region
+        TableName:
+          Ref: DynamoDBPostsTable
+  SuperCoolAPIDynamoDBDataSourcePostsDataSourceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - appsync.amazonaws.com
+  SuperCoolAPIDynamoDBDataSourcePostsDataSourceToTableConnectorPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Metadata:
+      aws:sam:connectors:
+        SuperCoolAPIDynamoDBDataSourcePostsDataSourceToTableConnector:
+          Source:
+            Type: AWS::AppSync::DataSource
+          Destination:
+            Type: AWS::DynamoDB::Table
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:GetItem
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:BatchGetItem
+          - dynamodb:ConditionCheckItem
+          - dynamodb:PartiQLSelect
+          Resource:
+          - Fn::GetAtt:
+            - DynamoDBPostsTable
+            - Arn
+          - Fn::Sub:
+            - "${DestinationArn}/index/*"
+            - DestinationArn:
+                Fn::GetAtt:
+                - DynamoDBPostsTable
+                - Arn
+        - Effect: Allow
+          Action:
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          - dynamodb:BatchWriteItem
+          - dynamodb:PartiQLDelete
+          - dynamodb:PartiQLInsert
+          - dynamodb:PartiQLUpdate
+          Resource:
+          - Fn::GetAtt:
+            - DynamoDBPostsTable
+            - Arn
+          - Fn::Sub:
+            - "${DestinationArn}/index/*"
+            - DestinationArn:
+                Fn::GetAtt:
+                - DynamoDBPostsTable
+                - Arn
+      Roles:
+      - Ref: SuperCoolAPIDynamoDBDataSourcePostsDataSourceRole
+  SuperCoolAPIDynamoDBDataSourcePostsLogDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId:
+        Fn::GetAtt:
+        - SuperCoolAPI
+        - ApiId
+      Name: PostsLogDataSource
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn:
+        Fn::GetAtt:
+        - SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceRole
+        - Arn
+      DynamoDBConfig:
+        AwsRegion:
+          Ref: AWS::Region
+        TableName:
+          Ref: DynamoDBPostsLogTable
+  SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - appsync.amazonaws.com
+  SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceToTableConnectorPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Metadata:
+      aws:sam:connectors:
+        SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceToTableConnector:
+          Source:
+            Type: AWS::AppSync::DataSource
+          Destination:
+            Type: AWS::DynamoDB::Table
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:GetItem
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:BatchGetItem
+          - dynamodb:ConditionCheckItem
+          - dynamodb:PartiQLSelect
+          Resource:
+          - Fn::GetAtt:
+            - DynamoDBPostsLogTable
+            - Arn
+          - Fn::Sub:
+            - "${DestinationArn}/index/*"
+            - DestinationArn:
+                Fn::GetAtt:
+                - DynamoDBPostsLogTable
+                - Arn
+        - Effect: Allow
+          Action:
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          - dynamodb:BatchWriteItem
+          - dynamodb:PartiQLDelete
+          - dynamodb:PartiQLInsert
+          - dynamodb:PartiQLUpdate
+          Resource:
+          - Fn::GetAtt:
+            - DynamoDBPostsLogTable
+            - Arn
+          - Fn::Sub:
+            - "${DestinationArn}/index/*"
+            - DestinationArn:
+                Fn::GetAtt:
+                - DynamoDBPostsLogTable
+                - Arn
+      Roles:
+      - Ref: SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceRole
+  SuperCoolAPIcreatePostLogInTable:
+    Type: AWS::AppSync::FunctionConfiguration
+    Properties:
+      ApiId:
+        Fn::GetAtt:
+        - SuperCoolAPI
+        - ApiId
+      CodeS3Location: s3://prad-graph-ql-demo/functions/createPostLogInTable.js
+      DataSourceName:
+        Fn::GetAtt:
+        - SuperCoolAPIDynamoDBDataSourcePostsLogDataSource
+        - Name
+      Name: createPostLogInTable
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: 1.0.0
+  SuperCoolAPIcreatePostInTable:
+    Type: AWS::AppSync::FunctionConfiguration
+    Properties:
+      ApiId:
+        Fn::GetAtt:
+        - SuperCoolAPI
+        - ApiId
+      CodeS3Location: s3://prad-graph-ql-demo/functions/createPostInTable.js
+      DataSourceName:
+        Fn::GetAtt:
+        - SuperCoolAPIDynamoDBDataSourcePostsDataSource
+        - Name
+      Name: createPostInTable
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: 1.0.0
+  SuperCoolAPIaddPost:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId:
+        Fn::GetAtt:
+        - SuperCoolAPI
+        - ApiId
+      Code: |
+        export function request(ctx) {
+            ctx.stash.args = ctx.args
+            return {};
+        }
+
+        export function response(ctx) {
+            return ctx.prev.result;
+        }
+      FieldName: addPost
+      Kind: PIPELINE
+      PipelineConfig:
+        Functions:
+        - Fn::GetAtt:
+          - SuperCoolAPIcreatePostLogInTable
+          - FunctionId
+        - Fn::GetAtt:
+          - SuperCoolAPIcreatePostInTable
+          - FunctionId
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: 1.0.0
+      TypeName: Mutation
+  SuperCoolAPIgetPostFromTable:
+    Type: AWS::AppSync::FunctionConfiguration
+    Properties:
+      ApiId:
+        Fn::GetAtt:
+        - SuperCoolAPI
+        - ApiId
+      CodeS3Location: s3://prad-graph-ql-demo/functions/getPostFromTable.js
+      DataSourceName:
+        Fn::GetAtt:
+        - SuperCoolAPIDynamoDBDataSourcePostsDataSource
+        - Name
+      Name: getPostFromTable
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: 1.0.0
+  SuperCoolAPIgetPost:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId:
+        Fn::GetAtt:
+        - SuperCoolAPI
+        - ApiId
+      Code: |
+        export function request(ctx) {
+            ctx.stash.args = ctx.args
+            return {};
+        }
+
+        export function response(ctx) {
+            return ctx.prev.result;
+        }
+      FieldName: getPost
+      Kind: PIPELINE
+      PipelineConfig:
+        Functions:
+        - Fn::GetAtt:
+          - SuperCoolAPIgetPostFromTable
+          - FunctionId
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: 1.0.0
+      TypeName: Query
