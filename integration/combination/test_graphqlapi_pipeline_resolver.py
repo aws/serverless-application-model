@@ -55,7 +55,7 @@ class TestGraphQLApiPipelineResolver(BaseTest):
               ) {{
                 id
                 author
-                titlesds
+                title
                 content
                 url
                 ups
