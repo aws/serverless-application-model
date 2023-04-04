@@ -48,7 +48,7 @@ class Runtime(BaseModel):
     Version: PassThroughProp
 
 
-class ResolverCodeSettings(BaseModel):  # TODO: change to CodeSettings
+class ResolverCodeSettings(BaseModel):
     CodeRootPath: str
     Runtime: Runtime
     FunctionsFolder: Optional[str]
@@ -95,7 +95,6 @@ class AppSyncResolver(BaseModel):
     Sync: Optional[Sync]
 
 
-# TODO: maybe change passthroughs to the new changes
 class Properties(BaseModel):
     Auth: Auth
     Tags: Optional[DictStrAny]
