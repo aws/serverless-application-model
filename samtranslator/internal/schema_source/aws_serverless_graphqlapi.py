@@ -31,7 +31,7 @@ class DeltaSync(BaseModel):
 
 
 class DynamoDBDataSource(BaseModel):
-    TableName: PassThroughProp  # TODO: change to passthrough
+    TableName: PassThroughProp
     ServiceRoleArn: Optional[PassThroughProp]
     TableArn: Optional[PassThroughProp]
     Permissions: Optional[PermissionsType]
@@ -61,7 +61,7 @@ class LambdaConflictHandlerConfig(BaseModel):
 class Sync(BaseModel):
     ConflictDetection: PassThroughProp
     ConflictHandler: Optional[PassThroughProp]
-    LambdaConflictHandlerConfig: LambdaConflictHandlerConfig
+    LambdaConflictHandlerConfig: Optional[LambdaConflictHandlerConfig]
 
 
 class Function(BaseModel):
@@ -95,7 +95,7 @@ class AppSyncResolver(BaseModel):
     Sync: Optional[Sync]
 
 
-# TODO: CHANGE PASSTHROUGHS TO NEW SCHEMA SETTINGS
+# TODO: maybe change passthroughs to the new changes
 class Properties(BaseModel):
     Auth: Auth
     Tags: Optional[DictStrAny]

@@ -1,0 +1,70 @@
+[
+  {
+    "LogicalResourceId": "DynamoDBPostsTable",
+    "ResourceType": "AWS::DynamoDB::Table"
+  },
+  {
+    "LogicalResourceId": "DynamoDBPostsLogTable",
+    "ResourceType": "AWS::DynamoDB::Table"
+  },
+  {
+    "LogicalResourceId": "MyApiKey",
+    "ResourceType": "AWS::AppSync::ApiKey"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPI",
+    "ResourceType": "AWS::AppSync::GraphQLApi"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPISchema",
+    "ResourceType": "AWS::AppSync::GraphQLSchema"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPICloudWatchRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsDataSource",
+    "ResourceType": "AWS::AppSync::DataSource"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsDataSourceRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsDataSourceToTableConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsLogDataSource",
+    "ResourceType": "AWS::AppSync::DataSource"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceToTableConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIcreatePostLogInTable",
+    "ResourceType": "AWS::AppSync::FunctionConfiguration"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIcreatePostInTable",
+    "ResourceType": "AWS::AppSync::FunctionConfiguration"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIaddPost",
+    "ResourceType": "AWS::AppSync::Resolver"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIgetPostFromTable",
+    "ResourceType": "AWS::AppSync::FunctionConfiguration"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIgetPost",
+    "ResourceType": "AWS::AppSync::Resolver"
+  }
+]

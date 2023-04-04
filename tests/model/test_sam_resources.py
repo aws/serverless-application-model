@@ -711,7 +711,7 @@ class TestGraphQLApiNoneDataSource(TestCase):
         }
         api._check_and_construct_none_datasource(functions, "foo")
 
-        self.assertIsNone(api.none_datasource)
+        self.assertIsNone(api._none_datasource)
 
     def test_function_datasource_set_with_logical_id(self):
         api = SamGraphQLApi("MyApi")
@@ -735,4 +735,4 @@ def test_function_datasource_set_with_none(data):
     }
     api._check_and_construct_none_datasource(functions, "foo")
 
-    assert api.none_datasource
+    assert api._none_datasource

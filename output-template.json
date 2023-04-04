@@ -1,53 +1,20 @@
 {
  "Resources": {
-  "DynamoDBPostsTable": {
-   "Type": "AWS::DynamoDB::Table",
-   "Properties": {
-    "TableName": "posts-table",
-    "AttributeDefinitions": [
-     {
-      "AttributeName": "id",
-      "AttributeType": "S"
-     }
-    ],
-    "KeySchema": [
-     {
-      "AttributeName": "id",
-      "KeyType": "HASH"
-     }
-    ],
-    "ProvisionedThroughput": {
-     "ReadCapacityUnits": 5,
-     "WriteCapacityUnits": 5
-    }
-   }
-  },
-  "DynamoDBPostsLogTable": {
-   "Type": "AWS::DynamoDB::Table",
-   "Properties": {
-    "TableName": "posts-log-table",
-    "AttributeDefinitions": [
-     {
-      "AttributeName": "id",
-      "AttributeType": "S"
-     }
-    ],
-    "KeySchema": [
-     {
-      "AttributeName": "id",
-      "KeyType": "HASH"
-     }
-    ],
-    "ProvisionedThroughput": {
-     "ReadCapacityUnits": 5,
-     "WriteCapacityUnits": 5
-    }
-   }
-  },
   "SuperCoolAPI": {
    "Type": "AWS::AppSync::GraphQLApi",
    "Properties": {
-    "Name": "PradsApi",
+    "Name": "SomeApi",
+    "Tags": [
+     {
+      "Key": "key1",
+      "Value": "value1"
+     },
+     {
+      "Key": "key2",
+      "Value": "value2"
+     }
+    ],
+    "XrayEnabled": true,
     "AuthenticationType": "AWS_IAM",
     "LogConfig": {
      "FieldLogLevel": "ALL",
@@ -69,7 +36,7 @@
       "ApiId"
      ]
     },
-    "DefinitionS3Location": "s3://prad-graph-ql-demo/schema.graphql"
+    "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
    }
   },
   "SuperCoolAPICloudWatchRole": {
@@ -98,287 +65,7 @@
     ]
    }
   },
-  "SuperCoolAPIDynamoDBDataSourcePostsDataSource": {
-   "Type": "AWS::AppSync::DataSource",
-   "Properties": {
-    "ApiId": {
-     "Fn::GetAtt": [
-      "SuperCoolAPI",
-      "ApiId"
-     ]
-    },
-    "Name": "PostsDataSource",
-    "Type": "AMAZON_DYNAMODB",
-    "ServiceRoleArn": {
-     "Fn::GetAtt": [
-      "SuperCoolAPIDynamoDBDataSourcePostsDataSourceRole",
-      "Arn"
-     ]
-    },
-    "DynamoDBConfig": {
-     "AwsRegion": {
-      "Ref": "AWS::Region"
-     },
-     "TableName": {
-      "Ref": "DynamoDBPostsTable"
-     }
-    }
-   }
-  },
-  "SuperCoolAPIDynamoDBDataSourcePostsDataSourceRole": {
-   "Type": "AWS::IAM::Role",
-   "Properties": {
-    "AssumeRolePolicyDocument": {
-     "Version": "2012-10-17",
-     "Statement": [
-      {
-       "Action": [
-        "sts:AssumeRole"
-       ],
-       "Effect": "Allow",
-       "Principal": {
-        "Service": [
-         "appsync.amazonaws.com"
-        ]
-       }
-      }
-     ]
-    }
-   }
-  },
-  "SuperCoolAPIDynamoDBDataSourcePostsDataSourceToTableConnectorPolicy": {
-   "Type": "AWS::IAM::ManagedPolicy",
-   "Metadata": {
-    "aws:sam:connectors": {
-     "SuperCoolAPIDynamoDBDataSourcePostsDataSourceToTableConnector": {
-      "Source": {
-       "Type": "AWS::AppSync::DataSource"
-      },
-      "Destination": {
-       "Type": "AWS::DynamoDB::Table"
-      }
-     }
-    }
-   },
-   "Properties": {
-    "PolicyDocument": {
-     "Version": "2012-10-17",
-     "Statement": [
-      {
-       "Effect": "Allow",
-       "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:Query",
-        "dynamodb:Scan",
-        "dynamodb:BatchGetItem",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:PartiQLSelect"
-       ],
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "DynamoDBPostsTable",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::Sub": [
-          "${DestinationArn}/index/*",
-          {
-           "DestinationArn": {
-            "Fn::GetAtt": [
-             "DynamoDBPostsTable",
-             "Arn"
-            ]
-           }
-          }
-         ]
-        }
-       ]
-      },
-      {
-       "Effect": "Allow",
-       "Action": [
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:BatchWriteItem",
-        "dynamodb:PartiQLDelete",
-        "dynamodb:PartiQLInsert",
-        "dynamodb:PartiQLUpdate"
-       ],
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "DynamoDBPostsTable",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::Sub": [
-          "${DestinationArn}/index/*",
-          {
-           "DestinationArn": {
-            "Fn::GetAtt": [
-             "DynamoDBPostsTable",
-             "Arn"
-            ]
-           }
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    "Roles": [
-     {
-      "Ref": "SuperCoolAPIDynamoDBDataSourcePostsDataSourceRole"
-     }
-    ]
-   }
-  },
-  "SuperCoolAPIDynamoDBDataSourcePostsLogDataSource": {
-   "Type": "AWS::AppSync::DataSource",
-   "Properties": {
-    "ApiId": {
-     "Fn::GetAtt": [
-      "SuperCoolAPI",
-      "ApiId"
-     ]
-    },
-    "Name": "PostsLogDataSource",
-    "Type": "AMAZON_DYNAMODB",
-    "ServiceRoleArn": {
-     "Fn::GetAtt": [
-      "SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceRole",
-      "Arn"
-     ]
-    },
-    "DynamoDBConfig": {
-     "AwsRegion": {
-      "Ref": "AWS::Region"
-     },
-     "TableName": {
-      "Ref": "DynamoDBPostsLogTable"
-     }
-    }
-   }
-  },
-  "SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceRole": {
-   "Type": "AWS::IAM::Role",
-   "Properties": {
-    "AssumeRolePolicyDocument": {
-     "Version": "2012-10-17",
-     "Statement": [
-      {
-       "Action": [
-        "sts:AssumeRole"
-       ],
-       "Effect": "Allow",
-       "Principal": {
-        "Service": [
-         "appsync.amazonaws.com"
-        ]
-       }
-      }
-     ]
-    }
-   }
-  },
-  "SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceToTableConnectorPolicy": {
-   "Type": "AWS::IAM::ManagedPolicy",
-   "Metadata": {
-    "aws:sam:connectors": {
-     "SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceToTableConnector": {
-      "Source": {
-       "Type": "AWS::AppSync::DataSource"
-      },
-      "Destination": {
-       "Type": "AWS::DynamoDB::Table"
-      }
-     }
-    }
-   },
-   "Properties": {
-    "PolicyDocument": {
-     "Version": "2012-10-17",
-     "Statement": [
-      {
-       "Effect": "Allow",
-       "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:Query",
-        "dynamodb:Scan",
-        "dynamodb:BatchGetItem",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:PartiQLSelect"
-       ],
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "DynamoDBPostsLogTable",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::Sub": [
-          "${DestinationArn}/index/*",
-          {
-           "DestinationArn": {
-            "Fn::GetAtt": [
-             "DynamoDBPostsLogTable",
-             "Arn"
-            ]
-           }
-          }
-         ]
-        }
-       ]
-      },
-      {
-       "Effect": "Allow",
-       "Action": [
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:BatchWriteItem",
-        "dynamodb:PartiQLDelete",
-        "dynamodb:PartiQLInsert",
-        "dynamodb:PartiQLUpdate"
-       ],
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "DynamoDBPostsLogTable",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::Sub": [
-          "${DestinationArn}/index/*",
-          {
-           "DestinationArn": {
-            "Fn::GetAtt": [
-             "DynamoDBPostsLogTable",
-             "Arn"
-            ]
-           }
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    "Roles": [
-     {
-      "Ref": "SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceRole"
-     }
-    ]
-   }
-  },
-  "SuperCoolAPIcreatePostLogInTable": {
+  "SuperCoolAPIMyFunction": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -387,44 +74,24 @@
       "ApiId"
      ]
     },
-    "CodeS3Location": "s3://prad-graph-ql-demo/functions/createPostLogInTable.js",
-    "DataSourceName": {
-     "Fn::GetAtt": [
-      "SuperCoolAPIDynamoDBDataSourcePostsLogDataSource",
-      "Name"
-     ]
-    },
-    "Name": "createPostLogInTable",
+    "Code": "this is my epic code",
+    "DataSourceName": "some other datasource",
+    "MaxBatchSize": 20,
+    "Name": "MyFunction",
     "Runtime": {
-     "Name": "APPSYNC_JS",
-     "RuntimeVersion": "1.0.0"
+     "Name": "different-runtime",
+     "RuntimeVersion": "6.2.1"
+    },
+    "SyncConfig": {
+     "ConflictDetection": "VERSION",
+     "ConflictHandler": "LAMBDA",
+     "LambdaConflictHandlerConfig": {
+      "LambdaConflictHandlerArn": "override-lambda-arn"
+     }
     }
    }
   },
-  "SuperCoolAPIcreatePostInTable": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Fn::GetAtt": [
-      "SuperCoolAPI",
-      "ApiId"
-     ]
-    },
-    "CodeS3Location": "s3://prad-graph-ql-demo/functions/createPostInTable.js",
-    "DataSourceName": {
-     "Fn::GetAtt": [
-      "SuperCoolAPIDynamoDBDataSourcePostsDataSource",
-      "Name"
-     ]
-    },
-    "Name": "createPostInTable",
-    "Runtime": {
-     "Name": "APPSYNC_JS",
-     "RuntimeVersion": "1.0.0"
-    }
-   }
-  },
-  "SuperCoolAPIaddPost": {
+  "SuperCoolAPIsaveNote": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
@@ -433,34 +100,35 @@
       "ApiId"
      ]
     },
-    "Code": "\nexport function request(ctx) {\n    ctx.stash.args = ctx.args\n    return {};\n}\n\nexport function response(ctx) {\n    return ctx.prev.result;\n}\n",
-    "FieldName": "addPost",
+    "CachingConfig": {
+     "Ttl": 20,
+     "CachingKeys": [
+      "key1",
+      "key2"
+     ]
+    },
+    "Code": "blahblahblah",
+    "FieldName": "my_field",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "SuperCoolAPIcreatePostLogInTable",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "SuperCoolAPIcreatePostInTable",
+        "SuperCoolAPIMyFunction",
         "FunctionId"
        ]
       }
      ]
     },
     "Runtime": {
-     "Name": "APPSYNC_JS",
-     "RuntimeVersion": "1.0.0"
+     "Name": "some-runtime",
+     "RuntimeVersion": "1.2.3"
     },
     "TypeName": "Mutation"
    }
   },
-  "SuperCoolAPIgetPostFromTable": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
+  "SuperCoolAPINoneDataSource": {
+   "Type": "AWS::AppSync::DataSource",
    "Properties": {
     "ApiId": {
      "Fn::GetAtt": [
@@ -468,47 +136,8 @@
       "ApiId"
      ]
     },
-    "CodeS3Location": "s3://prad-graph-ql-demo/functions/getPostFromTable.js",
-    "DataSourceName": {
-     "Fn::GetAtt": [
-      "SuperCoolAPIDynamoDBDataSourcePostsDataSource",
-      "Name"
-     ]
-    },
-    "Name": "getPostFromTable",
-    "Runtime": {
-     "Name": "APPSYNC_JS",
-     "RuntimeVersion": "1.0.0"
-    }
-   }
-  },
-  "SuperCoolAPIgetPost": {
-   "Type": "AWS::AppSync::Resolver",
-   "Properties": {
-    "ApiId": {
-     "Fn::GetAtt": [
-      "SuperCoolAPI",
-      "ApiId"
-     ]
-    },
-    "Code": "\nexport function request(ctx) {\n    ctx.stash.args = ctx.args\n    return {};\n}\n\nexport function response(ctx) {\n    return ctx.prev.result;\n}\n",
-    "FieldName": "getPost",
-    "Kind": "PIPELINE",
-    "PipelineConfig": {
-     "Functions": [
-      {
-       "Fn::GetAtt": [
-        "SuperCoolAPIgetPostFromTable",
-        "FunctionId"
-       ]
-      }
-     ]
-    },
-    "Runtime": {
-     "Name": "APPSYNC_JS",
-     "RuntimeVersion": "1.0.0"
-    },
-    "TypeName": "Query"
+    "Name": "SuperCoolAPINoneDataSource",
+    "Type": "NONE"
    }
   }
  }

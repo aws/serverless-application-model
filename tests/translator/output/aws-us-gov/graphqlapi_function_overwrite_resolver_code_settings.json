@@ -71,7 +71,12 @@
           ]
         },
         "CodeS3Location": "not-code-settings-uri",
-        "DataSourceName": "MyDataSource",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPIDynamoDBDataSourceMyDataSource",
+            "Name"
+          ]
+        },
         "Name": "MyFunction",
         "Runtime": {
           "Name": "not-code-settings-runtime",

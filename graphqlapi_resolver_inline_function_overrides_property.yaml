@@ -21,6 +21,11 @@ Resources:
             FieldName: my_field
             DataSource: NONE
             MaxBatchSize: 10
+            Sync:
+              ConflictDetection: VERSION
+              ConflictHandler: LAMBDA
+              LambdaConflictHandlerConfig:
+                LambdaConflictHandlerArn: my-lambda-arn
             Runtime:
               Name: some-runtime
               Version: 1.2.3
@@ -36,3 +41,9 @@ Resources:
                 Runtime:
                   Name: different-runtime
                   Version: 6.2.1
+                MaxBatchSize: 20
+                Sync:
+                  ConflictDetection: VERSION
+                  ConflictHandler: LAMBDA
+                  LambdaConflictHandlerConfig:
+                    LambdaConflictHandlerArn: override-lambda-arn

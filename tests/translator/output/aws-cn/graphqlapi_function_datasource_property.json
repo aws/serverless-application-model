@@ -71,7 +71,12 @@
           ]
         },
         "Code": "this is my epic code",
-        "DataSourceName": "MyDataSource",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPIDynamoDBDataSourceMyDataSource",
+            "Name"
+          ]
+        },
         "Name": "MyFunction",
         "Runtime": {
           "Name": "some-runtime",

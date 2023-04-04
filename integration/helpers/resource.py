@@ -108,7 +108,6 @@ def _sort_resources(resources):
     filtered_resources = map(
         lambda x: {"LogicalResourceId": x["LogicalResourceId"], "ResourceType": x["ResourceType"]}, resources
     )
-
     return sorted(filtered_resources, key=lambda d: d["LogicalResourceId"])
 
 

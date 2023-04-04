@@ -1,5 +1,18 @@
 Transform: AWS::Serverless-2016-10-31
 Resources:
+  # ===== AppSync Function =====
+  MyFunction:
+    Type: AWS::AppSync::FunctionConfiguration
+    Properties:
+      ApiId: some-api-id
+      Code: this is my epic code
+      DataSourceName: some-cool-datasource
+      Name: MyFunction
+      Runtime:
+        Name: some-runtime
+        RuntimeVersion: 1.2.3
+
+  # ===== SAM Error Resources =====
   NoAuthAPI:
     Type: AWS::Serverless::GraphQLApi
     Properties:
@@ -182,3 +195,193 @@ Resources:
         NoRuntime:
           DataSource: MyDataSource
           InlineCode: blahblahblah
+
+  MultipleInlineFunctionsWithSameName:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      AppSyncResolvers:
+        Mutation:
+          FunctionsHaveSameName:
+            InlineCode: blahblahblah
+            DataSource: NONE
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Functions:
+            - MyFunction:
+                InlineCode: this is my epic code
+            - MyFunction:
+                InlineCode: this is my epic code
+
+  InlineAndStandaloneFunctionWithSameName:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      Functions:
+        MyFunction:
+          CodeUri: my-code-uri
+          DataSourceName: SomeDataSourceName
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+      AppSyncResolvers:
+        Mutation:
+          InlineFunctionHasSameName:
+            InlineCode: blahblahblah
+            DataSource: NONE
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Functions:
+            - MyFunction:
+                InlineCode: this is my epic code
+
+  ResolverFunctionDoesNotExist:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      Functions:
+        MyFunction:
+          CodeUri: my-code-uri
+          DataSourceName: SomeDataSourceName
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+      AppSyncResolvers:
+        Mutation:
+          ReferenceFunctionThatDoesNotExist:
+            InlineCode: blahblahblah
+            DataSource: NONE
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Functions:
+            - ThisFunctionDoesntExist
+
+  ResolverWithNoFunctions:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      AppSyncResolvers:
+        Mutation:
+          HasNoFunctions:
+            InlineCode: blahblahblah
+            FieldName: my_field
+            DataSource: NONE
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+
+  ResolverBothCodePropertiesDefined:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      AppSyncResolvers:
+        Mutation:
+          BothCodePropertiesDefined:
+            InlineCode: blahblahblah
+            CodeUri: somecodeuri
+            FieldName: my_field
+            DataSource: NONE
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Functions:
+            - MyFunction:
+                InlineCode: this is my epic code
+
+  ResolverBothDatasourcePropertiesDefined:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      AppSyncResolvers:
+        Mutation:
+          BothDatasourcePropertiesDefined:
+            FieldName: my_field
+            DataSource: NONE
+            DataSourceName: somenames
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Functions:
+            - MyFunction:
+                InlineCode: this is my epic code
+
+  ResolverWithNoRuntime:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      AppSyncResolvers:
+        Mutation:
+          NoRuntimeForResolver:
+            FieldName: my_field
+            DataSource: NONE
+            Functions:
+            - MyFunction:
+                InlineCode: this is my epic code
+                Runtime:
+                  Name: some-runtime
+                  Version: 1.2.3

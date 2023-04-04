@@ -835,8 +835,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "TableArn": {
-          "title": "Tablearn",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "TableName": {
           "$ref": "#/definitions/PassThroughProp"
@@ -3291,8 +3290,7 @@
         }
       },
       "required": [
-        "ConflictDetection",
-        "LambdaConflictHandlerConfig"
+        "ConflictDetection"
       ],
       "title": "Sync",
       "type": "object"
