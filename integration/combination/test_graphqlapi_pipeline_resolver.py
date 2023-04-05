@@ -3,11 +3,9 @@ from unittest.case import skipIf
 
 import requests
 
-from integration.config.service_names import REST_API
+from integration.config.service_names import APP_SYNC
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
-
-ALL_METHODS = "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT"
 
 
 def execute_and_verify_appsync_query(url, api_key, query):
@@ -28,11 +26,10 @@ def execute_and_verify_appsync_query(url, api_key, query):
     if "errors" in data:
         raise Exception(json.dumps(data["errors"]))
 
-    return response
+    return data
 
 
-# TODO: find out how to do the skipif for graphql apis
-@skipIf(current_region_does_not_support([REST_API]), "Rest API is not supported in this testing region")
+@skipIf(current_region_does_not_support([APP_SYNC]), "AppSync is not supported in this testing region")
 class TestGraphQLApiPipelineResolver(BaseTest):
     def test_api(self):
         file_name = "combination/graphqlapi_pipeline_resolver"
@@ -69,9 +66,8 @@ class TestGraphQLApiPipelineResolver(BaseTest):
         api_key = outputs["MyApiKey"]
 
         response = execute_and_verify_appsync_query(url, api_key, query)
-        data = response.json()
 
-        add_post = data["data"]["addPost"]
+        add_post = response["data"]["addPost"]
 
         self.assertEqual(add_post["author"], author)
         self.assertEqual(add_post["title"], title)
@@ -98,9 +94,8 @@ class TestGraphQLApiPipelineResolver(BaseTest):
         """
 
         response = execute_and_verify_appsync_query(url, api_key, query)
-        data = response.json()
 
-        get_post = data["data"]["getPost"]
+        get_post = response["data"]["getPost"]
 
         self.assertEqual(get_post["author"], author)
         self.assertEqual(get_post["title"], title)

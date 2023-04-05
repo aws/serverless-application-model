@@ -2556,7 +2556,7 @@ class SamGraphQLApi(SamResourceMacro):
         if resource.DataSourceName:
             return resource.DataSourceName
 
-        if self._is_none_datasource_input(resource.DataSource):
+        if self._is_none_datasource_input(resource.DataSource) and self._none_datasource:
             return cast(Intrinsicable[str], self._none_datasource.get_runtime_attr("name"))
 
         if resource.DataSource not in self._datasource_name_map:
@@ -2729,17 +2729,18 @@ class SamGraphQLApi(SamResourceMacro):
 
         for resolver_function in appsync_resolver.Functions:
             if isinstance(resolver_function, str):
-                # If the function is a string which references logical ID of a function, then we return the ID of the
-                # referenced function. If the function does not exist, throw an error.
+                # If the function is a string which references logical ID of a function, then we append the ID of the
+                # referenced function and continue. If the function does not exist, throw an error.
                 if resolver_function not in self._function_id_map:
                     raise InvalidResourceException(relative_id, f"Function '{resolver_function}' does not exist.")
                 function_ids.append(self._function_id_map[resolver_function])
                 continue
 
-            # Technically, users can define multiple resolver functions in the same dictionary (similar to how they are
-            # defined in GraphQLApi.Functions). This is not a recommended method of defining inline functions, but it works
-            # because dictionaries in Python are ordered. So we can still iterate over the dictionary and grab them in order.
-            # "graphqlapi_resolver_multiple_inline_functions_in_same_dict.yaml" contains an example of this.
+            # If the user defines resolvers inline, they are declared in the same way as GraphQLApi.Functions property,
+            # in a dictionary. This means that they can define multiple resolver functions in the same index. This is not a
+            # recommended approach, but it works because dictionaries in Python are ordered. So we can still iterate over the
+            # add the functions in the user defined order. "graphqlapi_resolver_multiple_inline_functions_in_same_dict.yaml"
+            # is a transform test with an example of this in action.
             for function_relative_id in resolver_function:
                 function_ids.append(self._function_id_map[function_relative_id])
 
@@ -2755,8 +2756,6 @@ class SamGraphQLApi(SamResourceMacro):
         When a function is defined inline within a resolver, it can inherit these code properties from the resolver.
         This function ensures that only one code property is defined at a time, so we don't inherit if it is already
         defined in the inline function.
-
-        Inline functions will not use ResolverCodeSettings to generate their CodeUri if not defined.
         """
         if function.DataSource:
             return function.DataSource, None
@@ -2788,6 +2787,7 @@ class SamGraphQLApi(SamResourceMacro):
         )
 
         for resolver_function in appsync_resolver.Functions:
+            # We only care about inline functions. Skip strings.
             if isinstance(resolver_function, str):
                 continue
 
