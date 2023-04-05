@@ -8,6 +8,7 @@ so we assume anything public by convention unless it is prefixed with "_".
 This CLI tool helps automate the detection of compatibility-breaking changes.
 """
 import argparse
+import ast
 import importlib
 import inspect
 import json
@@ -51,20 +52,25 @@ class InterfaceScanner:
 
     def _scan_variables_in_module(self, module_name: str) -> None:
         """
-        There is no method to verify if a module attribute is a constant,
-        After some experiment, here we assume if an attribute is a value
-        (without `__module__`) and not a module itself is a constant.
-
+        Use ast to find all assignments at the module level to find constants.
         Note: Class (and other types) should be treated as a variable too
         """
-        for constant_name, _ in inspect.getmembers(
-            importlib.import_module(module_name),
-            lambda obj: not hasattr(obj, "__module__") and not inspect.ismodule(obj),
-        ):
-            if constant_name.startswith("_"):
-                continue
-            full_path = f"{module_name}.{constant_name}"
-            self.variables.add(full_path)
+        module_path = Path(module_name.replace(".", os.path.sep))
+        if module_path.is_dir():
+            module_path /= "__init__.py"
+        else:
+            module_path = module_path.with_suffix(".py")
+        print(module_path)
+        tree = ast.parse(module_path.read_text())
+        assignments: List[ast.Assign] = [node for node in ast.iter_child_nodes(tree) if isinstance(node, ast.Assign)]
+        for assignment in assignments:
+            for target in assignment.targets:
+                if not isinstance(target, ast.Name):
+                    continue
+                if target.id.startswith("_"):
+                    continue
+                full_path = f"{module_name}.{target.id}"
+                self.variables.add(full_path)
 
         for class_name, _class in inspect.getmembers(importlib.import_module(module_name), inspect.isclass):
             # Skip imported and ones starting with "_"
