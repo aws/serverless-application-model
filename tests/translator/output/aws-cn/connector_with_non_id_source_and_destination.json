@@ -306,7 +306,7 @@
         "DefinitionSubstitutions": {
           "definition_substitution_1": {
             "Fn::GetAtt": [
-              "StateMachineFunction",
+              "SamFunction",
               "Arn"
             ]
           }

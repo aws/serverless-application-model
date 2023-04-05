@@ -44,7 +44,7 @@ Resources:
         States:
           MyLambdaState:
             Type: Task
-            Resource: !GetAtt StateMachineFunction.Arn
+            Resource: !GetAtt SamFunction.Arn
             End: true
 
   SamApi:
