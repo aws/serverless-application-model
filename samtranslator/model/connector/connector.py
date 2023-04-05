@@ -28,7 +28,7 @@ ConnectorResourceReference = namedtuple(
     ],
 )
 
-SAM_TO_CFN_RESOURCE_TYPE = {
+_SAM_TO_CFN_RESOURCE_TYPE = {
     SamResourceType.Function.value: LambdaFunction.resource_type,
     SamResourceType.StateMachine.value: StepFunctionsStateMachine.resource_type,
     SamResourceType.Api.value: ApiGatewayRestApi.resource_type,
@@ -105,11 +105,6 @@ def _is_valid_resource_reference(obj: Dict[str, Any]) -> bool:
     return id_provided != non_id_provided
 
 
-def get_underlying_cfn_resource_type(resource_type: str) -> str:
-    """profiles.json only support CFN resource type. We need to convert SAM resource types to corresponding CFN resource type"""
-    return SAM_TO_CFN_RESOURCE_TYPE.get(resource_type, resource_type)
-
-
 def get_resource_reference(
     obj: Dict[str, Any], resource_resolver: ResourceResolver, connecting_obj: Dict[str, Any]
 ) -> ConnectorResourceReference:
@@ -125,7 +120,10 @@ def get_resource_reference(
         resource_type = obj.get("Type")
         if not _is_nonblank_str(resource_type):
             raise ConnectorResourceError("'Type' is missing or not a string.")
-        resource_type = get_underlying_cfn_resource_type(str(resource_type))
+
+        # profiles.json only support CFN resource type.
+        # We need to convert SAM resource types to corresponding CFN resource type
+        resource_type = _SAM_TO_CFN_RESOURCE_TYPE.get(str(resource_type), str(resource_type))
 
         return ConnectorResourceReference(
             logical_id=None,
