@@ -1,0 +1,46 @@
+# NOTE: This is not an intended use case, but it's supported since functions must be defined as dictionaries, so
+# technically customers can define more than one function in said dictionary. It does not introduce any issues, but
+# this is not the recommended way of defining inline resolvers. Instead, make it one function per index in the list.
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      AppSyncResolvers:
+        Mutation:
+          saveNote:
+            FieldName: my_field
+            DataSource: NONE
+            MaxBatchSize: 10
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Caching:
+              Ttl: 20
+              CachingKeys:
+              - key1
+              - key2
+            Functions:
+            # Note how we have five functions declared in the same object in the same index, but Python dicts are ordered so its still
+            # ordered from top to bottom, and the PipelineConfig property in the output template will reflect this.
+            - Function1:
+                InlineCode: first code
+              Function2:
+                InlineCode: second code
+              Function3:
+                InlineCode: third code
+              Function4:
+                InlineCode: fourth code
+              Function5:
+                InlineCode: fifth code

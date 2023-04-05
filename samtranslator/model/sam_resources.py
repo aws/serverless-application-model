@@ -2744,10 +2744,9 @@ class SamGraphQLApi(SamResourceMacro):
                 continue
 
             # Technically, users can define multiple resolver functions in the same dictionary (similar to how they are
-            # defined in GraphQLApi.Functions). This is not the recommended behaviour since this is a list of functions
-            # and it is most readable to have 1 function (string function logical ID OR dictionary inline function) per
-            # index. However, because dictionaries are ordered in Python, we can still iterate over the functions in
-            # order, so we will allow this behaviour.
+            # defined in GraphQLApi.Functions). This is not a recommended method of defining inline functions, but it works
+            # because dictionaries in Python are ordered. So we can still iterate over the dictionary and grab them in order.
+            # "graphqlapi_resolver_multiple_inline_functions_in_same_dict.yaml" contains an example of this.
             for function_relative_id in resolver_function:
                 function_ids.append(self._function_id_map[function_relative_id])
 
