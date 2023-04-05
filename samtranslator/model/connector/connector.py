@@ -89,6 +89,17 @@ def _is_valid_resource_reference(obj: Dict[str, Any]) -> bool:
     return id_provided != non_id_provided
 
 
+def get_underlying_cfn_resource_type(resource_type: str) -> str:
+    sam_to_cfn_types = {
+        "AWS::Serverless::Function": "AWS::Lambda::Function",
+        "AWS::Serverless::StateMachine": "AWS::StepFunctions::StateMachine",
+        "AWS::Serverless::Api": "AWS::ApiGateway::RestApi",
+        "AWS::Serverless::SimpleTable": "AWS::DynamoDB::Table",
+        "AWS::Serverless::HttpApi": "AWS::ApiGatewayV2::Api",
+    }
+    return sam_to_cfn_types.get(resource_type, resource_type)
+
+
 def get_resource_reference(
     obj: Dict[str, Any], resource_resolver: ResourceResolver, connecting_obj: Dict[str, Any]
 ) -> ConnectorResourceReference:
@@ -98,14 +109,14 @@ def get_resource_reference(
         )
 
     logical_id = obj.get("Id")
-
     # Must provide Id (with optional Qualifier) or a supported combination of other properties
     # If Id is not provided, all values must come from overrides.
     if not logical_id:
         resource_type = obj.get("Type")
+
         if not _is_nonblank_str(resource_type):
             raise ConnectorResourceError("'Type' is missing or not a string.")
-        resource_type = str(resource_type)
+        resource_type = get_underlying_cfn_resource_type(str(resource_type))
 
         return ConnectorResourceReference(
             logical_id=None,
