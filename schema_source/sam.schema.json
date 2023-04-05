@@ -6920,6 +6920,16 @@
           "markdownDescription": "When you don't want to pass the entire matched event to the target, use the `InputPath` property to describe which part of the event to pass\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`InputPath`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-inputpath) property of an `AWS::Events::Rule Target` resource\\.",
           "title": "InputPath"
         },
+        "Name": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "description": "The name of the rule\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-name) property of an `AWS::Events::Rule` resource\\.",
+          "markdownDescription": "The name of the rule\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-name) property of an `AWS::Events::Rule` resource\\.",
+          "title": "Name"
+        },
         "Pattern": {
           "allOf": [
             {
