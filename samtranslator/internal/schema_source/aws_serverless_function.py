@@ -417,7 +417,7 @@ class MSKEvent(BaseModel):
 class MQEventProperties(BaseModel):
     BatchSize: Optional[PassThroughProp] = mqeventproperties("BatchSize")
     Broker: PassThroughProp = mqeventproperties("Broker")
-    DynamicPolicyName: Optional[bool]  # TODO: add docs
+    DynamicPolicyName: Optional[bool] = mqeventproperties("DynamicPolicyName")
     Enabled: Optional[PassThroughProp] = mqeventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = mqeventproperties("FilterCriteria")
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mqeventproperties("MaximumBatchingWindowInSeconds")
