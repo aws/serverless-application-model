@@ -6,9 +6,8 @@ from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt
 from samtranslator.utils.types import Intrinsicable
 
-# This JavaScript default resolver code stashes all input arguments for customers to use in their functions.
-# They can deconstruct them with the notation `{ var1, var2 } = ctx.stash.input`.
-# The response function simply returns the last executed functions result.
+# This JavaScript default resolver code is the template AppSync provides by default as well in the AWS Console.
+# Arguments are available in every function within that resolver by accessing `ctx.args`.
 APPSYNC_PIPELINE_RESOLVER_JS_CODE = """
 export function request(ctx) {
     return {};
