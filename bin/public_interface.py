@@ -62,7 +62,6 @@ class InterfaceScanner:
             module_path /= "__init__.py"
         else:
             module_path = module_path.with_suffix(".py")
-        print(module_path)
         tree = ast.parse("".join([char for char in module_path.read_text() if char in _PRINTABLE_CHARS]))
         assignments: List[ast.Assign] = [node for node in ast.iter_child_nodes(tree) if isinstance(node, ast.Assign)]
         for assignment in assignments:
