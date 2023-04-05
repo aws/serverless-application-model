@@ -2,7 +2,15 @@ from collections import namedtuple
 from typing import Any, Dict, Iterable, List, Optional
 
 from samtranslator.model import ResourceResolver
+from samtranslator.model.apigateway import ApiGatewayRestApi
+from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
+from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.intrinsics import fnGetAtt, get_logical_id_from_intrinsic, ref
+from samtranslator.model.lambda_ import (
+    LambdaFunction,
+)
+from samtranslator.model.stepfunctions import StepFunctionsStateMachine
+from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.utils.utils import as_array, insert_unique
 
 # TODO: Switch to dataclass
@@ -19,6 +27,14 @@ ConnectorResourceReference = namedtuple(
         "qualifier",
     ],
 )
+
+SAM_TO_CFN_RESOURCE_TYPE = {
+    SamResourceType.Function.value: LambdaFunction.resource_type,
+    SamResourceType.StateMachine.value: StepFunctionsStateMachine.resource_type,
+    SamResourceType.Api.value: ApiGatewayRestApi.resource_type,
+    SamResourceType.HttpApi.value: ApiGatewayV2HttpApi.resource_type,
+    SamResourceType.SimpleTable.value: DynamoDBTable.resource_type,
+}
 
 UNSUPPORTED_CONNECTOR_PROFILE_TYPE = "UNSUPPORTED_CONNECTOR_PROFILE_TYPE"
 
@@ -90,14 +106,8 @@ def _is_valid_resource_reference(obj: Dict[str, Any]) -> bool:
 
 
 def get_underlying_cfn_resource_type(resource_type: str) -> str:
-    sam_to_cfn_types = {
-        "AWS::Serverless::Function": "AWS::Lambda::Function",
-        "AWS::Serverless::StateMachine": "AWS::StepFunctions::StateMachine",
-        "AWS::Serverless::Api": "AWS::ApiGateway::RestApi",
-        "AWS::Serverless::SimpleTable": "AWS::DynamoDB::Table",
-        "AWS::Serverless::HttpApi": "AWS::ApiGatewayV2::Api",
-    }
-    return sam_to_cfn_types.get(resource_type, resource_type)
+    """profiles.json only support CFN resource type. We need to convert SAM resource types to corresponding CFN resource type"""
+    return SAM_TO_CFN_RESOURCE_TYPE.get(resource_type, resource_type)
 
 
 def get_resource_reference(
@@ -113,7 +123,6 @@ def get_resource_reference(
     # If Id is not provided, all values must come from overrides.
     if not logical_id:
         resource_type = obj.get("Type")
-
         if not _is_nonblank_str(resource_type):
             raise ConnectorResourceError("'Type' is missing or not a string.")
         resource_type = get_underlying_cfn_resource_type(str(resource_type))
