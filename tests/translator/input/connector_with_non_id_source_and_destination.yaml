@@ -1,0 +1,110 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  MyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+      - arn:{AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  SamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Role: !GetAtt MyRole.Arn
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+        };
+
+  SamTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: NoteId
+        Type: String
+
+  SamStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      # Express state machine support sync execution
+      # which allows us to get the error message quickly in trigger function.
+      Type: EXPRESS
+      Role: !GetAtt MyRole.Arn
+      Definition:
+        StartAt: MyLambdaState
+        States:
+          MyLambdaState:
+            Type: Task
+            Resource: !GetAtt SamFunction.Arn
+            End: true
+
+  SamApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
+      Description: my description
+
+  SamHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: Prod
+
+  Connector1:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::Serverless::Function
+        RoleName: MyRole
+      Destination:
+        Type: AWS::Serverless::SimpleTable
+        Arn: !GetAtt SamTable.Arn
+      Permissions:
+      - Read
+
+  Connector2:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::Serverless::Api
+        ResourceId: !Ref SamApi
+        Qualifier: Prod/GET/foobar
+      Destination:
+        Type: AWS::Serverless::Function
+        Arn: !GetAtt SamFunction.Arn
+      Permissions:
+      - Write
+
+  Connector3:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::Serverless::StateMachine
+        RoleName: MyRole
+      Destination:
+        Type: AWS::Serverless::Function
+        Arn: !GetAtt SamFunction.Arn
+      Permissions:
+      - Write
+
+  Connector4:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::Serverless::HttpApi
+        ResourceId: !Ref SamHttpApi
+        Qualifier: Prod/GET/foobar
+      Destination:
+        Type: AWS::Serverless::Function
+        Arn: !GetAtt SamFunction.Arn
+      Permissions:
+      - Write
