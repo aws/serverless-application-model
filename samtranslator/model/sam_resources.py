@@ -2165,9 +2165,6 @@ class SamGraphQLApi(SamResourceMacro):
     # stop validation so we can use class variables for tracking state
     validate_setattr = False
 
-    # TODO: technically Id is not an intrinsicable str, its passthrough.
-    # TODO: is it better to have this just be a map to the cfn resource instead of just an attr?
-
     def __init__(
         self,
         logical_id: Optional[Any],
@@ -2357,7 +2354,6 @@ class SamGraphQLApi(SamResourceMacro):
             return cast(PassThrough, ddb_datasource.ServiceRoleArn), []
 
         # If the user doesn't have their own role, then we will create for them if TableArn is defined.
-        # TODO: wow this is horrible
         table_arn = passthrough_value(
             sam_expect(
                 ddb_datasource.TableArn, relative_id, f"DynamoDBDataSources.{relative_id}.TableArn"
@@ -2434,7 +2430,6 @@ class SamGraphQLApi(SamResourceMacro):
 
     @staticmethod
     def _set_resolver_code_settings(resolver_code_settings: aws_serverless_graphqlapi.ResolverCodeSettings) -> None:
-        # TODO: Add FileNamePatterns defaults once implemented
         resolver_code_settings.FunctionsFolder = resolver_code_settings.FunctionsFolder or "functions"
 
     def _construct_appsync_function_configurations(
@@ -2561,9 +2556,7 @@ class SamGraphQLApi(SamResourceMacro):
         if resource.DataSourceName:
             return resource.DataSourceName
 
-        if self._is_none_datasource_input(resource.DataSource) and self._none_datasource:
-            # TODO: check if return type should just be intrinsicable str
-            # TODO: check if that additional self._nonme_datasource condition is necessary. maybe rewrite?
+        if self._is_none_datasource_input(resource.DataSource):
             return cast(Intrinsicable[str], self._none_datasource.get_runtime_attr("name"))
 
         if resource.DataSource not in self._datasource_name_map:
