@@ -27,3 +27,4 @@ Resources:
           ExposeHeaders:
           - x-amzn-header
           MaxAge: 10
+        InvokeMode: RESPONSE_STREAM

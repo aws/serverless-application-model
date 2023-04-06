@@ -12,6 +12,10 @@ Parameters:
     Type: CommaDelimitedList
     Default: GET
 
+  InvokeModeRef:
+    Type: String
+    Default: BUFFERED
+
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
@@ -27,3 +31,4 @@ Resources:
         Cors:
           AllowOrigins: !Ref AllowOriginsRef
           AllowMethods: !Ref AllowMethodsRef
+        InvokeMode: !Ref InvokeModeRef

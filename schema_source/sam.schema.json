@@ -1217,6 +1217,9 @@
           "description": "The Cross\\-Origin Resource Sharing \\(CORS\\) settings for your function URL\\.  \n*Type*: [Cors](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-url-cors.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Cors`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-url-cors.html) property of an `AWS::Lambda::Url` resource\\.",
           "markdownDescription": "The Cross\\-Origin Resource Sharing \\(CORS\\) settings for your function URL\\.  \n*Type*: [Cors](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-url-cors.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Cors`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-url-cors.html) property of an `AWS::Lambda::Url` resource\\.",
           "title": "Cors"
+        },
+        "InvokeMode": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [

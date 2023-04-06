@@ -475,7 +475,11 @@ class TestFunctionUrlConfig(TestCase):
         function.CodeUri = "s3://foobar/foo.zip"
         function.Runtime = "foo"
         function.Handler = "bar"
-        function.FunctionUrlConfig = {"AuthType": {"Ref": "AWS_IAM"}, "Cors": {"Ref": "MyCorConfigRef"}}
+        function.FunctionUrlConfig = {
+            "AuthType": {"Ref": "AWS_IAM"},
+            "Cors": {"Ref": "MyCorConfigRef"},
+            "InvokeMode": {"Ref": "MyInvokeMode"},
+        }
 
         cfnResources = function.to_cloudformation(**self.kwargs)
         generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
@@ -484,6 +488,7 @@ class TestFunctionUrlConfig(TestCase):
         self.assertEqual(generatedUrlList.__len__(), 1)
         self.assertEqual(generatedUrlList[0].AuthType, {"Ref": "AWS_IAM"})
         self.assertEqual(generatedUrlList[0].Cors, {"Ref": "MyCorConfigRef"})
+        self.assertEqual(generatedUrlList[0].InvokeMode, {"Ref": "MyInvokeMode"})
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_with_valid_function_url_config(self):
@@ -593,6 +598,18 @@ class TestFunctionUrlConfig(TestCase):
             "Resource with id [foo] is invalid. AuthType is required to configure function property "
             + "`FunctionUrlConfig`. Please provide either AWS_IAM or NONE.",
         )
+
+    def test_with_function_url_config_with_invoke_mode(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"AuthType": "AWS_IAM", "InvokeMode": "RESPONSE_STREAM"}
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
+        self.assertEqual(generatedUrlList.__len__(), 1)
+        self.assertEqual(generatedUrlList[0].AuthType, "AWS_IAM")
+        self.assertEqual(generatedUrlList[0].InvokeMode, "RESPONSE_STREAM")
 
 
 class TestInvalidSamConnectors(TestCase):

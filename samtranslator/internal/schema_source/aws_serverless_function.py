@@ -153,6 +153,7 @@ class SNSEvent(BaseModel):
 class FunctionUrlConfig(BaseModel):
     AuthType: SamIntrinsicable[str] = functionurlconfig("AuthType")
     Cors: Optional[PassThroughProp] = functionurlconfig("Cors")
+    InvokeMode: Optional[PassThroughProp]  # TODO: add to doc
 
 
 class KinesisEventProperties(BaseModel):
