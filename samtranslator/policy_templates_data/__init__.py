@@ -1,9 +1,9 @@
-import os
+from pathlib import Path
 
-_thisdir = os.path.dirname(os.path.abspath(__file__))
+_thisdir = Path(__file__).absolute().parent
 
 # ./schema.json
-SCHEMA_FILE = os.path.join(_thisdir, "schema.json")
+SCHEMA_FILE = _thisdir / "schema.json"
 
 # ./policy_templates.json
-POLICY_TEMPLATES_FILE = os.path.join(_thisdir, "policy_templates.json")
+POLICY_TEMPLATES_FILE = _thisdir / "policy_templates.json"

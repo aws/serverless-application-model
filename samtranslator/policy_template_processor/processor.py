@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 import jsonschema
@@ -148,11 +149,11 @@ class PolicyTemplatesProcessor:
         return PolicyTemplatesProcessor._read_json(PolicyTemplatesProcessor.SCHEMA_LOCATION)
 
     @staticmethod
-    def _read_json(filepath: str) -> Any:
+    def _read_json(filepath: Path) -> Any:
         """
         Helper method to read a JSON file
         :param filepath: Path to the file
         :return dict: Dictionary containing file data
         """
-        with open(filepath, encoding="utf-8") as fp:
+        with filepath.open(encoding="utf-8") as fp:
             return json.load(fp)
