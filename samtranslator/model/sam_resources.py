@@ -1043,6 +1043,7 @@ class SamFunction(SamResourceMacro):
         lambda_url.TargetFunctionArn = (
             lambda_alias.get_runtime_attr("arn") if lambda_alias else lambda_function.get_runtime_attr("name")
         )
+        lambda_url.InvokeMode = function_url_config.get("InvokeMode")
         return lambda_url
 
     def _validate_function_url_params(

@@ -174,4 +174,5 @@ class LambdaUrl(Resource):
         "TargetFunctionArn": GeneratedProperty(),
         "AuthType": GeneratedProperty(),
         "Cors": GeneratedProperty(),
+        "InvokeMode": GeneratedProperty(),
     }
