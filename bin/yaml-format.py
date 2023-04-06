@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """JSON file formatter (without prettier)."""
-import os
 import sys
+from pathlib import Path
 from textwrap import dedent
 
-my_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, my_path + "/..")
+# To allow this script to be executed from other directories
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 import re
 from io import StringIO

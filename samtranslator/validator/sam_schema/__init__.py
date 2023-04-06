@@ -1,8 +1,8 @@
-import os
+from pathlib import Path
 
-SCHEMA_DIR = os.path.dirname(os.path.abspath(__file__))
+SCHEMA_DIR = Path(__file__).absolute().parent
 
 # ./schema.json
-SCHEMA_FILE = os.path.join(SCHEMA_DIR, "schema.json")
+SCHEMA_FILE = SCHEMA_DIR / "schema.json"
 # ./schema_new.json
-SCHEMA_NEW_FILE = os.path.join(SCHEMA_DIR, "schema_new.json")
+SCHEMA_NEW_FILE = SCHEMA_DIR / "schema_new.json"

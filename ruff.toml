@@ -21,6 +21,7 @@ select = [
     "YTT", # flake8-2020
     "UP", # pyupgrade
     "C4", # flake8-comprehensions
+    "PTH", # flake8-use-pathlib
 ]
 
 # Mininal python version we support is 3.7
