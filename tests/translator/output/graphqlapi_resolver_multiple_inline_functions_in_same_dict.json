@@ -173,32 +173,7 @@
       },
       "Type": "AWS::AppSync::FunctionConfiguration"
     },
-    "SuperCoolAPINoneDataSource": {
-      "Properties": {
-        "ApiId": {
-          "Fn::GetAtt": [
-            "SuperCoolAPI",
-            "ApiId"
-          ]
-        },
-        "Name": "SuperCoolAPINoneDataSource",
-        "Type": "NONE"
-      },
-      "Type": "AWS::AppSync::DataSource"
-    },
-    "SuperCoolAPISchema": {
-      "Properties": {
-        "ApiId": {
-          "Fn::GetAtt": [
-            "SuperCoolAPI",
-            "ApiId"
-          ]
-        },
-        "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
-      },
-      "Type": "AWS::AppSync::GraphQLSchema"
-    },
-    "SuperCoolAPIsaveNote": {
+    "SuperCoolAPIMutationsaveNote": {
       "Properties": {
         "ApiId": {
           "Fn::GetAtt": [
@@ -257,6 +232,31 @@
         "TypeName": "Mutation"
       },
       "Type": "AWS::AppSync::Resolver"
+    },
+    "SuperCoolAPINoneDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Name": "SuperCoolAPINoneDataSource",
+        "Type": "NONE"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
     }
   }
 }

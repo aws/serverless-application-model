@@ -40,7 +40,6 @@ class TestGraphQLApiPipelineResolver(BaseTest):
         author = "AUTHORNAME"
         title = "Our first post!"
         content = "This is our first post."
-        post_url = "https://aws.amazon.com/appsync/"
 
         query = f"""
             mutation addPost {{
@@ -48,13 +47,11 @@ class TestGraphQLApiPipelineResolver(BaseTest):
                 author: "{author}"
                 title: "{title}"
                 content: "{content}"
-                url: "{post_url}"
               ) {{
                 id
                 author
                 title
                 content
-                url
                 ups
                 downs
                 version
@@ -72,7 +69,6 @@ class TestGraphQLApiPipelineResolver(BaseTest):
         self.assertEqual(add_post["author"], author)
         self.assertEqual(add_post["title"], title)
         self.assertEqual(add_post["content"], content)
-        self.assertEqual(add_post["url"], post_url)
         self.assertEqual(add_post["ups"], 1)
         self.assertEqual(add_post["downs"], 0)
         self.assertEqual(add_post["version"], 1)
@@ -85,7 +81,6 @@ class TestGraphQLApiPipelineResolver(BaseTest):
                 author
                 title
                 content
-                url
                 ups
                 downs
                 version
@@ -100,7 +95,6 @@ class TestGraphQLApiPipelineResolver(BaseTest):
         self.assertEqual(get_post["author"], author)
         self.assertEqual(get_post["title"], title)
         self.assertEqual(get_post["content"], content)
-        self.assertEqual(get_post["url"], post_url)
         self.assertEqual(get_post["ups"], 1)
         self.assertEqual(get_post["downs"], 0)
         self.assertEqual(get_post["version"], 1)

@@ -53,6 +53,42 @@
       },
       "Type": "AWS::IAM::Role"
     },
+    "SuperCoolAPIMutationsaveNote": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CachingConfig": {
+          "CachingKeys": [
+            "key1",
+            "key2"
+          ],
+          "Ttl": 20
+        },
+        "Code": "\nexport function request(ctx) {\n    return {};\n}\n\nexport function response(ctx) {\n    return ctx.prev.result;\n}\n",
+        "FieldName": "my_field",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Fn::GetAtt": [
+                "SuperCoolAPIMyFunction",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        },
+        "TypeName": "Mutation"
+      },
+      "Type": "AWS::AppSync::Resolver"
+    },
     "SuperCoolAPIMyFunction": {
       "Properties": {
         "ApiId": {
@@ -101,42 +137,6 @@
         "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
       },
       "Type": "AWS::AppSync::GraphQLSchema"
-    },
-    "SuperCoolAPIsaveNote": {
-      "Properties": {
-        "ApiId": {
-          "Fn::GetAtt": [
-            "SuperCoolAPI",
-            "ApiId"
-          ]
-        },
-        "CachingConfig": {
-          "CachingKeys": [
-            "key1",
-            "key2"
-          ],
-          "Ttl": 20
-        },
-        "Code": "\nexport function request(ctx) {\n    return {};\n}\n\nexport function response(ctx) {\n    return ctx.prev.result;\n}\n",
-        "FieldName": "my_field",
-        "Kind": "PIPELINE",
-        "PipelineConfig": {
-          "Functions": [
-            {
-              "Fn::GetAtt": [
-                "SuperCoolAPIMyFunction",
-                "FunctionId"
-              ]
-            }
-          ]
-        },
-        "Runtime": {
-          "Name": "some-runtime",
-          "RuntimeVersion": "1.2.3"
-        },
-        "TypeName": "Mutation"
-      },
-      "Type": "AWS::AppSync::Resolver"
     }
   }
 }

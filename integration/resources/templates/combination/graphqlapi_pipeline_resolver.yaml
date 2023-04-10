@@ -1,4 +1,24 @@
 Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  DDBPutItemCode:
+    Type: String
+    Default: |
+      import { util } from "@aws-appsync/utils";
+
+      export function request(ctx) {
+          const { key, values } = ctx.prev.result;
+          return {
+            operation: "PutItem",
+            key: util.dynamodb.toMapValues(key),
+            attributeValues: util.dynamodb.toMapValues(values),
+          };
+      }
+
+      export function response(ctx) {
+          return ctx.result;
+      }
+
 Resources:
   MyApiKey:
     Type: AWS::AppSync::ApiKey
@@ -52,7 +72,6 @@ Resources:
             author: String!,
             title: String!,
             content: String!,
-            url: String!
             ): Post!
         }
 
@@ -61,7 +80,6 @@ Resources:
             author: String
             title: String
             content: String
-            url: String
             ups: Int!
             downs: Int!
             version: Int!
@@ -75,6 +93,19 @@ Resources:
         PostsLogDataSource:
           TableName: !Ref DynamoDBPostsLogTable
           TableArn: !GetAtt DynamoDBPostsLogTable.Arn
+      Functions:
+        createPostItem:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: PostsDataSource
+          InlineCode: !Ref DDBPutItemCode
+        createPostLogItem:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: PostsLogDataSource
+          InlineCode: !Ref DDBPutItemCode
       AppSyncResolvers:
         Mutation:
           addPost:
@@ -82,8 +113,8 @@ Resources:
               Name: APPSYNC_JS
               Version: 1.0.0
             Functions:
-            - createPostLogInTable:
-                DataSource: PostsLogDataSource
+            - formatPostLogItem:
+                DataSource: NONE
                 InlineCode: |
                   import { util } from '@aws-appsync/utils';
 
@@ -91,26 +122,15 @@ Resources:
                     const id = util.autoId();
                     const author = ctx.args.author
                     const time = "1234567890"
-                    return dynamodbPutRequest({ key: {id}, values: {"author": author, "time": time}});
+                    return { payload: { key: {id}, values: {"author": author, "time": time} } };
                   }
 
                   export function response(ctx) {
                     return ctx.result;
                   }
-
-                  /**
-                  * Helper function to create a new item
-                  * @returns a PutItem request
-                  */
-                  function dynamodbPutRequest({key, values}) {
-                    return {
-                      operation: 'PutItem',
-                      key: util.dynamodb.toMapValues(key),
-                      attributeValues: util.dynamodb.toMapValues(values),
-                    };
-                  }
-            - createPostInTable:
-                DataSource: PostsDataSource
+            - createPostLogItem
+            - formatPostItem:
+                DataSource: NONE
                 InlineCode: |
                   import { util } from '@aws-appsync/utils';
 
@@ -120,24 +140,13 @@ Resources:
                     values.ups = 1;
                     values.downs = 0;
                     values.version = 1;
-                    return dynamodbPutRequest({ key: {id}, values });
+                    return { payload: { key: {id}, values: values } } 
                   }
 
                   export function response(ctx) {
                     return ctx.result;
                   }
-
-                  /**
-                  * Helper function to create a new item
-                  * @returns a PutItem request
-                  */
-                  function dynamodbPutRequest({key, values}) {
-                    return {
-                      operation: 'PutItem',
-                      key: util.dynamodb.toMapValues(key),
-                      attributeValues: util.dynamodb.toMapValues(values),
-                    };
-                  }                
+            - createPostItem
         Query:
           getPost:
             DataSource: PostsDataSource

@@ -2302,8 +2302,8 @@ class SamGraphQLApi(SamResourceMacro):
             )
 
         schema.ApiId = api_id
-        schema.Definition = model.SchemaInline
-        schema.DefinitionS3Location = model.SchemaUri
+        schema.Definition = passthrough_value(model.SchemaInline)
+        schema.DefinitionS3Location = passthrough_value(model.SchemaUri)
 
         return schema
 
@@ -2572,7 +2572,7 @@ class SamGraphQLApi(SamResourceMacro):
         code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         name: str,
         relative_id: str,
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[PassThrough], Optional[PassThrough]]:
         """
         Parses the code properties from Serverless::GraphQLApi function.
 
@@ -2586,10 +2586,10 @@ class SamGraphQLApi(SamResourceMacro):
             )
 
         if function.InlineCode:
-            return function.InlineCode, None
+            return passthrough_value(function.InlineCode), None
 
         if function.CodeUri:
-            return None, function.CodeUri
+            return None, passthrough_value(function.CodeUri)
 
         if not code_settings:
             raise InvalidResourceException(
@@ -2649,7 +2649,7 @@ class SamGraphQLApi(SamResourceMacro):
         for type_name, relative_id_to_resolver in appsync_resolvers.items():
             for relative_id, appsync_resolver in relative_id_to_resolver.items():
                 cfn_resolver = Resolver(
-                    logical_id=self.logical_id + relative_id,
+                    logical_id=self.logical_id + type_name + relative_id,
                     depends_on=self.depends_on,
                     attributes=self.resource_attributes,
                 )
@@ -2664,8 +2664,8 @@ class SamGraphQLApi(SamResourceMacro):
                         relative_id, "Both 'DataSource' and 'DataSourceName' cannot be defined at the same time."
                     )
 
-                cfn_resolver.Code = appsync_resolver.InlineCode
-                cfn_resolver.CodeS3Location = appsync_resolver.CodeUri
+                cfn_resolver.Code = passthrough_value(appsync_resolver.InlineCode)
+                cfn_resolver.CodeS3Location = passthrough_value(appsync_resolver.CodeUri)
 
                 # If InlineCode and CodeUri were not defined, then we will set the resolver code
                 # to a default snippet which has basic definition of request/response functions.

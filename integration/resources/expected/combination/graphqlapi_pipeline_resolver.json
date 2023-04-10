@@ -1,15 +1,15 @@
 [
   {
+    "LogicalResourceId": "MyApiKey",
+    "ResourceType": "AWS::AppSync::ApiKey"
+  },
+  {
     "LogicalResourceId": "DynamoDBPostsTable",
     "ResourceType": "AWS::DynamoDB::Table"
   },
   {
     "LogicalResourceId": "DynamoDBPostsLogTable",
     "ResourceType": "AWS::DynamoDB::Table"
-  },
-  {
-    "LogicalResourceId": "MyApiKey",
-    "ResourceType": "AWS::AppSync::ApiKey"
   },
   {
     "LogicalResourceId": "SuperCoolAPI",
@@ -48,15 +48,23 @@
     "ResourceType": "AWS::IAM::ManagedPolicy"
   },
   {
-    "LogicalResourceId": "SuperCoolAPIcreatePostLogInTable",
+    "LogicalResourceId": "SuperCoolAPIcreatePostItem",
     "ResourceType": "AWS::AppSync::FunctionConfiguration"
   },
   {
-    "LogicalResourceId": "SuperCoolAPIcreatePostInTable",
+    "LogicalResourceId": "SuperCoolAPIcreatePostLogItem",
     "ResourceType": "AWS::AppSync::FunctionConfiguration"
   },
   {
-    "LogicalResourceId": "SuperCoolAPIaddPost",
+    "LogicalResourceId": "SuperCoolAPIformatPostLogItem",
+    "ResourceType": "AWS::AppSync::FunctionConfiguration"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIformatPostItem",
+    "ResourceType": "AWS::AppSync::FunctionConfiguration"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIMutationaddPost",
     "ResourceType": "AWS::AppSync::Resolver"
   },
   {
@@ -64,7 +72,11 @@
     "ResourceType": "AWS::AppSync::FunctionConfiguration"
   },
   {
-    "LogicalResourceId": "SuperCoolAPIgetPost",
+    "LogicalResourceId": "SuperCoolAPIQuerygetPost",
     "ResourceType": "AWS::AppSync::Resolver"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPINoneDataSource",
+    "ResourceType": "AWS::AppSync::DataSource"
   }
 ]

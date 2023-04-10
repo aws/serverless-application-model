@@ -68,8 +68,8 @@ class Function(BaseModel):
     DataSource: Optional[str]
     DataSourceName: Optional[str]
     Runtime: Optional[Runtime]
-    InlineCode: Optional[str]
-    CodeUri: Optional[str]
+    InlineCode: Optional[PassThroughProp]
+    CodeUri: Optional[PassThroughProp]
     Description: Optional[PassThroughProp]
     MaxBatchSize: Optional[PassThroughProp]
     Name: Optional[str]
@@ -79,14 +79,14 @@ class Function(BaseModel):
 
 class Caching(BaseModel):
     Ttl: PassThroughProp
-    CachingKeys: Optional[List[str]]
+    CachingKeys: Optional[List[PassThroughProp]]
 
 
 class AppSyncResolver(BaseModel):
     FieldName: Optional[str]
     Caching: Optional[Caching]
-    InlineCode: Optional[str]
-    CodeUri: Optional[str]
+    InlineCode: Optional[PassThroughProp]
+    CodeUri: Optional[PassThroughProp]
     DataSource: Optional[str]
     DataSourceName: Optional[str]
     MaxBatchSize: Optional[PassThroughProp]
@@ -100,8 +100,8 @@ class Properties(BaseModel):
     Tags: Optional[DictStrAny]
     Name: Optional[str]
     XrayEnabled: Optional[bool]
-    SchemaInline: Optional[str]
-    SchemaUri: Optional[str]
+    SchemaInline: Optional[PassThroughProp]
+    SchemaUri: Optional[PassThroughProp]
     Logging: Optional[Union[Logging, bool]]
     DynamoDBDataSources: Optional[Dict[str, DynamoDBDataSource]]
     ResolverCodeSettings: Optional[ResolverCodeSettings]
