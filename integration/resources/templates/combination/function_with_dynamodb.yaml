@@ -24,17 +24,12 @@ Resources:
   MyTable:
     Type: AWS::DynamoDB::Table
     Properties:
-
       AttributeDefinitions:
       - {AttributeName: id, AttributeType: S}
-
       KeySchema:
       - {AttributeName: id, KeyType: HASH}
-
-      ProvisionedThroughput:
-        ReadCapacityUnits: '5'
-        WriteCapacityUnits: '5'
-
+      # Eanble on-demand capacity mode
+      BillingMode: PAY_PER_REQUEST
       StreamSpecification:
         StreamViewType: NEW_IMAGE
 
