@@ -54,6 +54,9 @@
       "Type": "AWS::IAM::Role"
     },
     "SuperCoolAPIMutationsaveNote": {
+      "DependsOn": [
+        "SuperCoolAPISchema"
+      ],
       "Properties": {
         "ApiId": {
           "Fn::GetAtt": [

@@ -2205,7 +2205,7 @@ class SamGraphQLApi(SamResourceMacro):
 
         if model.AppSyncResolvers:
             appsync_resolver_resources = self._construct_appsync_resolver_resources(
-                model.AppSyncResolvers, model.ResolverCodeSettings, api_id
+                model.AppSyncResolvers, model.ResolverCodeSettings, api_id, appsync_schema.logical_id
             )
             resources.extend(appsync_resolver_resources)
 
@@ -2633,6 +2633,7 @@ class SamGraphQLApi(SamResourceMacro):
         appsync_resolvers: Dict[str, Dict[str, aws_serverless_graphqlapi.AppSyncResolver]],
         resolver_code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         api_id: Intrinsicable[str],
+        schema_logical_id: str,
     ) -> List[Resource]:
         resources: List[Resource] = []
 
@@ -2650,7 +2651,7 @@ class SamGraphQLApi(SamResourceMacro):
             for relative_id, appsync_resolver in relative_id_to_resolver.items():
                 cfn_resolver = Resolver(
                     logical_id=self.logical_id + type_name + relative_id,
-                    depends_on=self.depends_on,
+                    depends_on=[schema_logical_id],
                     attributes=self.resource_attributes,
                 )
 
