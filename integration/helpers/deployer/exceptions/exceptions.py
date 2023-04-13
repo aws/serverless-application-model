@@ -38,6 +38,16 @@ class DeployFailedError(UserException):
         super().__init__(message=message_fmt.format(stack_name=self.stack_name, msg=msg))
 
 
+class TerminationProtectionUpdateFailedError(UserException):
+    def __init__(self, stack_name, msg):
+        self.stack_name = stack_name
+        self.msg = msg
+
+        message_fmt = "Failed to update termination protection of the stack: {stack_name}, {msg}"
+
+        super().__init__(message=message_fmt.format(stack_name=self.stack_name, msg=msg))
+
+
 class DeployStackOutPutFailedError(UserException):
     def __init__(self, stack_name, msg):
         self.stack_name = stack_name
