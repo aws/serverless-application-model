@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
@@ -31,9 +31,9 @@ class DeltaSync(BaseModel):
 
 
 class DynamoDBDataSource(BaseModel):
-    TableName: str
+    TableName: PassThroughProp
     ServiceRoleArn: Optional[PassThroughProp]
-    TableArn: Optional[str]
+    TableArn: Optional[PassThroughProp]
     Permissions: Optional[PermissionsType]
     Name: Optional[str]
     Description: Optional[PassThroughProp]
@@ -51,7 +51,6 @@ class Runtime(BaseModel):
 class ResolverCodeSettings(BaseModel):
     CodeRootPath: str
     Runtime: Runtime
-    ResolversFolder: Optional[str]
     FunctionsFolder: Optional[str]
 
 
@@ -62,19 +61,37 @@ class LambdaConflictHandlerConfig(BaseModel):
 class Sync(BaseModel):
     ConflictDetection: PassThroughProp
     ConflictHandler: Optional[PassThroughProp]
-    LambdaConflictHandlerConfig: LambdaConflictHandlerConfig
+    LambdaConflictHandlerConfig: Optional[LambdaConflictHandlerConfig]
 
 
 class Function(BaseModel):
     DataSource: Optional[str]
     DataSourceName: Optional[str]
     Runtime: Optional[Runtime]
-    InlineCode: Optional[str]
-    CodeUri: Optional[str]
+    InlineCode: Optional[PassThroughProp]
+    CodeUri: Optional[PassThroughProp]
     Description: Optional[PassThroughProp]
     MaxBatchSize: Optional[PassThroughProp]
     Name: Optional[str]
     Id: Optional[PassThroughProp]
+    Sync: Optional[Sync]
+
+
+class Caching(BaseModel):
+    Ttl: PassThroughProp
+    CachingKeys: Optional[List[PassThroughProp]]
+
+
+class AppSyncResolver(BaseModel):
+    FieldName: Optional[str]
+    Caching: Optional[Caching]
+    InlineCode: Optional[PassThroughProp]
+    CodeUri: Optional[PassThroughProp]
+    DataSource: Optional[str]
+    DataSourceName: Optional[str]
+    MaxBatchSize: Optional[PassThroughProp]
+    Functions: Optional[List[Union[str, Dict[str, Function]]]]
+    Runtime: Optional[Runtime]
     Sync: Optional[Sync]
 
 
@@ -83,12 +100,13 @@ class Properties(BaseModel):
     Tags: Optional[DictStrAny]
     Name: Optional[str]
     XrayEnabled: Optional[bool]
-    SchemaInline: Optional[str]
-    SchemaUri: Optional[str]
+    SchemaInline: Optional[PassThroughProp]
+    SchemaUri: Optional[PassThroughProp]
     Logging: Optional[Union[Logging, bool]]
     DynamoDBDataSources: Optional[Dict[str, DynamoDBDataSource]]
     ResolverCodeSettings: Optional[ResolverCodeSettings]
     Functions: Optional[Dict[str, Function]]
+    AppSyncResolvers: Optional[Dict[str, Dict[str, AppSyncResolver]]]
 
 
 class Resource(BaseModel):

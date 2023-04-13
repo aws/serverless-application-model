@@ -94,6 +94,80 @@
       "title": "ApiAuth",
       "type": "object"
     },
+    "AppSyncResolver": {
+      "additionalProperties": false,
+      "properties": {
+        "Caching": {
+          "$ref": "#/definitions/Caching"
+        },
+        "CodeUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DataSource": {
+          "title": "Datasource",
+          "type": "string"
+        },
+        "DataSourceName": {
+          "title": "Datasourcename",
+          "type": "string"
+        },
+        "FieldName": {
+          "title": "Fieldname",
+          "type": "string"
+        },
+        "Functions": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/definitions/Function"
+                },
+                "type": "object"
+              }
+            ]
+          },
+          "title": "Functions",
+          "type": "array"
+        },
+        "InlineCode": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "MaxBatchSize": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        },
+        "Sync": {
+          "$ref": "#/definitions/Sync"
+        }
+      },
+      "title": "AppSyncResolver",
+      "type": "object"
+    },
+    "Caching": {
+      "additionalProperties": false,
+      "properties": {
+        "CachingKeys": {
+          "items": {
+            "$ref": "#/definitions/PassThroughProp"
+          },
+          "title": "Cachingkeys",
+          "type": "array"
+        },
+        "Ttl": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Ttl"
+      ],
+      "title": "Caching",
+      "type": "object"
+    },
     "CloudWatchLogsEvent": {
       "additionalProperties": false,
       "properties": {
@@ -759,12 +833,10 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "TableArn": {
-          "title": "Tablearn",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "TableName": {
-          "title": "Tablename",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "UseCallerCredentials": {
           "$ref": "#/definitions/PassThroughProp"
@@ -1271,8 +1343,7 @@
       "additionalProperties": false,
       "properties": {
         "CodeUri": {
-          "title": "Codeuri",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "DataSource": {
           "title": "Datasource",
@@ -1289,8 +1360,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "InlineCode": {
-          "title": "Inlinecode",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "MaxBatchSize": {
           "$ref": "#/definitions/PassThroughProp"
@@ -2533,10 +2603,6 @@
           "title": "Functionsfolder",
           "type": "string"
         },
-        "ResolversFolder": {
-          "title": "Resolversfolder",
-          "type": "string"
-        },
         "Runtime": {
           "$ref": "#/definitions/Runtime"
         }
@@ -3220,8 +3286,7 @@
         }
       },
       "required": [
-        "ConflictDetection",
-        "LambdaConflictHandlerConfig"
+        "ConflictDetection"
       ],
       "title": "Sync",
       "type": "object"
@@ -6100,6 +6165,16 @@
     "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties": {
       "additionalProperties": false,
       "properties": {
+        "AppSyncResolvers": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "$ref": "#/definitions/AppSyncResolver"
+            },
+            "type": "object"
+          },
+          "title": "Appsyncresolvers",
+          "type": "object"
+        },
         "Auth": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
         },
@@ -6136,12 +6211,10 @@
           "$ref": "#/definitions/ResolverCodeSettings"
         },
         "SchemaInline": {
-          "title": "Schemainline",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "SchemaUri": {
-          "title": "Schemauri",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Tags": {
           "title": "Tags",

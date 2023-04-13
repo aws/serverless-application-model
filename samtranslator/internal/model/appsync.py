@@ -6,6 +6,18 @@ from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt
 from samtranslator.utils.types import Intrinsicable
 
+# This JavaScript default resolver code is the template AppSync provides by default as well in the AWS Console.
+# Arguments are available in every function within that resolver by accessing `ctx.args`.
+APPSYNC_PIPELINE_RESOLVER_JS_CODE = """
+export function request(ctx) {
+    return {};
+}
+
+export function response(ctx) {
+    return ctx.prev.result;
+}
+"""
+
 
 class DeltaSyncConfigType(TypedDict):
     BaseTableTTL: str
@@ -40,6 +52,15 @@ class SyncConfigType(TypedDict, total=False):
     ConflictDetection: str
     ConflictHandler: str
     LambdaConflictHandlerConfig: LambdaConflictHandlerConfigType
+
+
+class CachingConfigType(TypedDict, total=False):
+    CachingKeys: List[str]
+    Ttl: float
+
+
+class PipelineConfigType(TypedDict, total=False):
+    Functions: List[Intrinsicable[str]]
 
 
 class GraphQLApi(Resource):
@@ -92,7 +113,10 @@ class DataSource(Resource):
     ServiceRoleArn: str
     DynamoDBConfig: DynamoDBConfigType
 
-    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "DataSourceArn")}
+    runtime_attrs = {
+        "arn": lambda self: fnGetAtt(self.logical_id, "DataSourceArn"),
+        "name": lambda self: fnGetAtt(self.logical_id, "Name"),
+    }
 
 
 class FunctionConfiguration(Resource):
@@ -110,7 +134,7 @@ class FunctionConfiguration(Resource):
     }
 
     ApiId: Intrinsicable[str]
-    DataSourceName: str
+    DataSourceName: Intrinsicable[str]
     Name: str
     Code: Optional[str]
     CodeS3Location: Optional[str]
@@ -118,3 +142,36 @@ class FunctionConfiguration(Resource):
     MaxBatchSize: Optional[int]
     Runtime: Optional[AppSyncRuntimeType]
     SyncConfig: Optional[SyncConfigType]
+
+    runtime_attrs = {"function_id": lambda self: fnGetAtt(self.logical_id, "FunctionId")}
+
+
+class Resolver(Resource):
+    resource_type = "AWS::AppSync::Resolver"
+    property_types = {
+        "ApiId": GeneratedProperty(),
+        "CachingConfig": GeneratedProperty(),
+        "Code": GeneratedProperty(),
+        "CodeS3Location": GeneratedProperty(),
+        "DataSourceName": GeneratedProperty(),
+        "FieldName": GeneratedProperty(),
+        "Kind": GeneratedProperty(),
+        "MaxBatchSize": GeneratedProperty(),
+        "PipelineConfig": GeneratedProperty(),
+        "Runtime": GeneratedProperty(),
+        "SyncConfig": GeneratedProperty(),
+        "TypeName": GeneratedProperty(),
+    }
+
+    ApiId: Intrinsicable[str]
+    CachingConfig: Optional[CachingConfigType]
+    Code: Optional[str]
+    CodeS3Location: Optional[str]
+    DataSourceName: Optional[str]
+    FieldName: str
+    Kind: Optional[str]
+    MaxBatchSize: Optional[int]
+    PipelineConfig: Optional[PipelineConfigType]
+    Runtime: Optional[AppSyncRuntimeType]
+    SyncConfig: Optional[SyncConfigType]
+    TypeName: str

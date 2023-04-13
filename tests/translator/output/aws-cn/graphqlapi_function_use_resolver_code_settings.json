@@ -71,7 +71,12 @@
           ]
         },
         "CodeS3Location": "path/to/my/code/functions/MyFunction.js",
-        "DataSourceName": "MyDataSource",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPIDynamoDBDataSourceMyDataSource",
+            "Name"
+          ]
+        },
         "Name": "MyFunction",
         "Runtime": {
           "Name": "some-runtime",

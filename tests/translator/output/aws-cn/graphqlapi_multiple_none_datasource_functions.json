@@ -25,7 +25,12 @@
           ]
         },
         "CodeS3Location": "my-code-uri",
-        "DataSourceName": "SuperCoolAPINoneDataSource",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPINoneDataSource",
+            "Name"
+          ]
+        },
         "Name": "AnotherFunction",
         "Runtime": {
           "Name": "some-runtime",
@@ -69,7 +74,12 @@
           ]
         },
         "CodeS3Location": "my-code-uri",
-        "DataSourceName": "SuperCoolAPINoneDataSource",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPINoneDataSource",
+            "Name"
+          ]
+        },
         "Name": "GoodFunction",
         "Runtime": {
           "Name": "some-runtime",
@@ -87,7 +97,12 @@
           ]
         },
         "CodeS3Location": "my-code-uri",
-        "DataSourceName": "SuperCoolAPINoneDataSource",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPINoneDataSource",
+            "Name"
+          ]
+        },
         "Name": "MyFunction",
         "Runtime": {
           "Name": "some-runtime",
@@ -130,7 +145,12 @@
           ]
         },
         "CodeS3Location": "my-code-uri",
-        "DataSourceName": "SuperCoolAPINoneDataSource",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPINoneDataSource",
+            "Name"
+          ]
+        },
         "Name": "SimilarFunction",
         "Runtime": {
           "Name": "some-runtime",
