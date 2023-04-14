@@ -24,27 +24,27 @@
     "ResourceType": "AWS::IAM::Role"
   },
   {
-    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsDataSource",
+    "LogicalResourceId": "SuperCoolAPIDataSourceDynamoDbPostsDataSource",
     "ResourceType": "AWS::AppSync::DataSource"
   },
   {
-    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsDataSourceRole",
+    "LogicalResourceId": "SuperCoolAPIDataSourceDynamoDbPostsDataSourceRole",
     "ResourceType": "AWS::IAM::Role"
   },
   {
-    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsDataSourceToTableConnectorPolicy",
+    "LogicalResourceId": "SuperCoolAPIDataSourceDynamoDbPostsDataSourceToTableConnectorPolicy",
     "ResourceType": "AWS::IAM::ManagedPolicy"
   },
   {
-    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsLogDataSource",
+    "LogicalResourceId": "SuperCoolAPIDataSourceDynamoDbPostsLogDataSource",
     "ResourceType": "AWS::AppSync::DataSource"
   },
   {
-    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceRole",
+    "LogicalResourceId": "SuperCoolAPIDataSourceDynamoDbPostsLogDataSourceRole",
     "ResourceType": "AWS::IAM::Role"
   },
   {
-    "LogicalResourceId": "SuperCoolAPIDynamoDBDataSourcePostsLogDataSourceToTableConnectorPolicy",
+    "LogicalResourceId": "SuperCoolAPIDataSourceDynamoDbPostsLogDataSourceToTableConnectorPolicy",
     "ResourceType": "AWS::IAM::ManagedPolicy"
   },
   {

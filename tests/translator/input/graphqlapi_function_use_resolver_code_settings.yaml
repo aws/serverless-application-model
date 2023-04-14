@@ -10,11 +10,12 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
-      DynamoDBDataSources:
-        MyDataSource:
-          Name: MyDataSource
-          TableName: SomeTable
-          ServiceRoleArn: SomeRoleArn
+      DataSources:
+        DynamoDb:
+          MyDataSource:
+            Name: MyDataSource
+            TableName: SomeTable
+            ServiceRoleArn: SomeRoleArn
       ResolverCodeSettings:
         CodeRootPath: path/to/my/code
         Runtime:

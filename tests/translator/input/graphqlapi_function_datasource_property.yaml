@@ -10,11 +10,12 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
-      DynamoDBDataSources:
-        MyDataSource:
-          Name: MyDataSource
-          TableName: SomeTable
-          ServiceRoleArn: SomeRoleArn
+      DataSources:
+        DynamoDb:
+          MyDataSource:
+            Name: MyDataSource
+            TableName: SomeTable
+            ServiceRoleArn: SomeRoleArn
       Functions:
         MyFunction:
           InlineCode: this is my epic code

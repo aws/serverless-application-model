@@ -14,16 +14,17 @@ Resources:
       Tags:
         key1: value1
         key2: value2
-      DynamoDBDataSources:
-        MyDataSource:
-          TableName: some-table
-          ServiceRoleArn: some-arn
-          Name: AwesomeDataSourceName
-          Description: This data source is special to me
-          Region: na-west-2
-          UseCallerCredentials: true
-          Versioned: true
-          DeltaSync:
-            BaseTableTTL: '60'
-            DeltaSyncTableName: '60'
-            DeltaSyncTableTTL: '60'
+      DataSources:
+        DynamoDb:
+          MyDataSource:
+            TableName: some-table
+            ServiceRoleArn: some-arn
+            Name: AwesomeDataSourceName
+            Description: This data source is special to me
+            Region: na-west-2
+            UseCallerCredentials: true
+            Versioned: true
+            DeltaSync:
+              BaseTableTTL: '60'
+              DeltaSyncTableName: '60'
+              DeltaSyncTableTTL: '60'

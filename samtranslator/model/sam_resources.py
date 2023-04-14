@@ -2144,7 +2144,7 @@ class SamGraphQLApi(SamResourceMacro):
         "SchemaInline": Property(False, IS_STR),
         "SchemaUri": Property(False, IS_STR),
         "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
-        "DynamoDBDataSources": Property(False, IS_DICT),
+        "DataSources": Property(False, IS_DICT),
         "ResolverCodeSettings": Property(False, IS_DICT),
         "Functions": Property(False, IS_DICT),
         "AppSyncResolvers": Property(False, IS_DICT),
@@ -2157,7 +2157,7 @@ class SamGraphQLApi(SamResourceMacro):
     SchemaInline: Optional[str]
     SchemaUri: Optional[str]
     Logging: Optional[Union[Dict[str, Any], bool]]
-    DynamoDBDataSources: Optional[Dict[str, Dict[str, Any]]]
+    DataSources: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
     ResolverCodeSettings: Optional[Dict[str, Any]]
     Functions: Optional[Dict[str, Dict[str, Any]]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
@@ -2190,9 +2190,9 @@ class SamGraphQLApi(SamResourceMacro):
         if cloudwatch_role:
             resources.append(cloudwatch_role)
 
-        if model.DynamoDBDataSources:
-            ddb_datasource_resources = self._construct_ddb_datasources(model.DynamoDBDataSources, api_id, kwargs)
-            resources.extend(ddb_datasource_resources)
+        if model.DataSources:
+            datasource_resources = self._construct_datasource_resources(model.DataSources, api_id, kwargs)
+            resources.extend(datasource_resources)
 
         if model.ResolverCodeSettings:
             self._set_resolver_code_settings(model.ResolverCodeSettings)
@@ -2307,16 +2307,28 @@ class SamGraphQLApi(SamResourceMacro):
 
         return schema
 
-    def _construct_ddb_datasources(
+    def _construct_datasource_resources(
         self,
-        ddb_datasources: Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource],
+        datasources: aws_serverless_graphqlapi.DataSources,
         api_id: Intrinsicable[str],
         kwargs: Dict[str, Any],
     ) -> List[Resource]:
+        ddb_datasources = self._construct_ddb_datasources(datasources.DynamoDb, api_id, kwargs)
+        return [*ddb_datasources]
+
+    def _construct_ddb_datasources(
+        self,
+        ddb_datasources: Optional[Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource]],
+        api_id: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        if not ddb_datasources:
+            return []
+
         resources: List[Resource] = []
 
         for relative_id, ddb_datasource in ddb_datasources.items():
-            datasource_logical_id = f"{self.logical_id}DynamoDBDataSource{relative_id}"
+            datasource_logical_id = f"{self.logical_id}DataSourceDynamoDb{relative_id}"
             cfn_datasource = DataSource(
                 logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
@@ -2356,7 +2368,7 @@ class SamGraphQLApi(SamResourceMacro):
         # If the user doesn't have their own role, then we will create for them if TableArn is defined.
         table_arn = passthrough_value(
             sam_expect(
-                ddb_datasource.TableArn, relative_id, f"DynamoDBDataSources.{relative_id}.TableArn"
+                ddb_datasource.TableArn, relative_id, f"DataSources.DynamoDb.{relative_id}.TableArn"
             ).to_not_be_none(
                 "'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined."
             )

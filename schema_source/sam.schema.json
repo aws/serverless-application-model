@@ -498,6 +498,20 @@
       "title": "Cors",
       "type": "object"
     },
+    "DataSources": {
+      "additionalProperties": false,
+      "properties": {
+        "DynamoDb": {
+          "additionalProperties": {
+            "$ref": "#/definitions/DynamoDBDataSource"
+          },
+          "title": "Dynamodb",
+          "type": "object"
+        }
+      },
+      "title": "DataSources",
+      "type": "object"
+    },
     "DeadLetterQueue": {
       "additionalProperties": false,
       "properties": {
@@ -6178,12 +6192,8 @@
         "Auth": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
         },
-        "DynamoDBDataSources": {
-          "additionalProperties": {
-            "$ref": "#/definitions/DynamoDBDataSource"
-          },
-          "title": "Dynamodbdatasources",
-          "type": "object"
+        "DataSources": {
+          "$ref": "#/definitions/DataSources"
         },
         "Functions": {
           "additionalProperties": {

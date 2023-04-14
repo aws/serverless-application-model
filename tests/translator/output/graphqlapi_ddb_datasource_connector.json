@@ -53,7 +53,7 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "SuperCoolAPIDynamoDBDataSourceAnotherDataSource": {
+    "SuperCoolAPIDataSourceDynamoDbAnotherDataSource": {
       "Properties": {
         "ApiId": {
           "Fn::GetAtt": [
@@ -70,7 +70,7 @@
         "Name": "AnotherDataSource",
         "ServiceRoleArn": {
           "Fn::GetAtt": [
-            "SuperCoolAPIDynamoDBDataSourceAnotherDataSourceRole",
+            "SuperCoolAPIDataSourceDynamoDbAnotherDataSourceRole",
             "Arn"
           ]
         },
@@ -78,7 +78,7 @@
       },
       "Type": "AWS::AppSync::DataSource"
     },
-    "SuperCoolAPIDynamoDBDataSourceAnotherDataSourceRole": {
+    "SuperCoolAPIDataSourceDynamoDbAnotherDataSourceRole": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -99,10 +99,10 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "SuperCoolAPIDynamoDBDataSourceAnotherDataSourceToTableConnectorPolicy": {
+    "SuperCoolAPIDataSourceDynamoDbAnotherDataSourceToTableConnectorPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "SuperCoolAPIDynamoDBDataSourceAnotherDataSourceToTableConnector": {
+          "SuperCoolAPIDataSourceDynamoDbAnotherDataSourceToTableConnector": {
             "Destination": {
               "Type": "AWS::DynamoDB::Table"
             },
@@ -165,13 +165,13 @@
         },
         "Roles": [
           {
-            "Ref": "SuperCoolAPIDynamoDBDataSourceAnotherDataSourceRole"
+            "Ref": "SuperCoolAPIDataSourceDynamoDbAnotherDataSourceRole"
           }
         ]
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
-    "SuperCoolAPIDynamoDBDataSourceMyDataSource": {
+    "SuperCoolAPIDataSourceDynamoDbMyDataSource": {
       "Properties": {
         "ApiId": {
           "Fn::GetAtt": [
@@ -188,7 +188,7 @@
         "Name": "MyDataSource",
         "ServiceRoleArn": {
           "Fn::GetAtt": [
-            "SuperCoolAPIDynamoDBDataSourceMyDataSourceRole",
+            "SuperCoolAPIDataSourceDynamoDbMyDataSourceRole",
             "Arn"
           ]
         },
@@ -196,7 +196,7 @@
       },
       "Type": "AWS::AppSync::DataSource"
     },
-    "SuperCoolAPIDynamoDBDataSourceMyDataSourceRole": {
+    "SuperCoolAPIDataSourceDynamoDbMyDataSourceRole": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -217,10 +217,10 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "SuperCoolAPIDynamoDBDataSourceMyDataSourceToTableConnectorPolicy": {
+    "SuperCoolAPIDataSourceDynamoDbMyDataSourceToTableConnectorPolicy": {
       "Metadata": {
         "aws:sam:connectors": {
-          "SuperCoolAPIDynamoDBDataSourceMyDataSourceToTableConnector": {
+          "SuperCoolAPIDataSourceDynamoDbMyDataSourceToTableConnector": {
             "Destination": {
               "Type": "AWS::DynamoDB::Table"
             },
@@ -283,7 +283,7 @@
         },
         "Roles": [
           {
-            "Ref": "SuperCoolAPIDynamoDBDataSourceMyDataSourceRole"
+            "Ref": "SuperCoolAPIDataSourceDynamoDbMyDataSourceRole"
           }
         ]
       },

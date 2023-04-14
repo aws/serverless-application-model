@@ -42,7 +42,7 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "SuperCoolAPIDynamoDBDataSourceMyDataSource": {
+    "SuperCoolAPIDataSourceDynamoDbMyDataSource": {
       "Properties": {
         "ApiId": {
           "Fn::GetAtt": [
@@ -73,7 +73,7 @@
         "CodeS3Location": "path/to/my/code/functions/MyFunction.js",
         "DataSourceName": {
           "Fn::GetAtt": [
-            "SuperCoolAPIDynamoDBDataSourceMyDataSource",
+            "SuperCoolAPIDataSourceDynamoDbMyDataSource",
             "Name"
           ]
         },
