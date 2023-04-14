@@ -7,7 +7,7 @@ VENV=.venv_cfn_lint
 # See https://github.com/aws/serverless-application-model/issues/1042
 if [ ! -d "${VENV}" ]; then
     python3 -m venv "${VENV}"
-    "${VENV}/bin/python" -m pip install cfn-lint --quiet
 fi
 
+"${VENV}/bin/python" -m pip install cfn-lint==0.75.0 --upgrade --quiet
 "${VENV}/bin/cfn-lint" --format parseable

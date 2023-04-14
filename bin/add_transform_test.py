@@ -2,7 +2,6 @@
 """Automatically create transform tests input and output files given an input template."""
 import argparse
 import json
-import os
 import shutil
 import subprocess
 import sys
@@ -17,8 +16,8 @@ from samtranslator.translator.managed_policy_translator import ManagedPolicyLoad
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
 
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-TRANSFORM_TEST_DIR = os.path.join(SCRIPT_DIR, "..", "tests", "translator")
+SCRIPT_DIR = Path(__file__).parent
+TRANSFORM_TEST_DIR = SCRIPT_DIR.parent / "tests" / "translator"
 
 iam_client = boto3.client("iam")
 
@@ -42,13 +41,13 @@ parser.add_argument(
 CLI_OPTIONS = parser.parse_args()
 
 
-def read_json_file(file_path: str) -> Dict[str, Any]:
-    template: Dict[str, Any] = json.loads(Path(file_path).read_text(encoding="utf-8"))
+def read_json_file(file_path: Path) -> Dict[str, Any]:
+    template: Dict[str, Any] = json.loads(file_path.read_text(encoding="utf-8"))
     return template
 
 
-def write_json_file(obj: Dict[str, Any], file_path: str) -> None:
-    with open(file_path, "w", encoding="utf-8") as f:
+def write_json_file(obj: Dict[str, Any], file_path: Path) -> None:
+    with file_path.open("w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2, sort_keys=True)
 
 
@@ -64,24 +63,23 @@ def add_regional_endpoint_configuration_if_needed(template: Dict[str, Any]) -> D
     return template
 
 
-def replace_aws_partition(partition: str, file_path: str) -> None:
+def replace_aws_partition(partition: str, file_path: Path) -> None:
     template = read_json_file(file_path)
-    with open(file_path, "w") as file:
-        updated_template = json.loads(json.dumps(template).replace("arn:aws:", f"arn:{partition}:"))
-        file.write(json.dumps(updated_template, indent=2))
+    updated_template = json.loads(json.dumps(template).replace("arn:aws:", f"arn:{partition}:"))
+    file_path.write_text(json.dumps(updated_template, indent=2), encoding="utf-8")
     print(f"Transform Test output files generated {file_path}")
 
 
-def generate_transform_test_output_files(input_file_path: str, file_basename: str) -> None:
+def generate_transform_test_output_files(input_file_path: Path, file_basename: str) -> None:
     output_file_option = file_basename + ".json"
 
-    with open(os.path.join(input_file_path)) as f:
+    with input_file_path.open(encoding="utf-8") as f:
         manifest = yaml_parse(f)  # type: ignore[no-untyped-call]
 
     transform_test_output_paths = {
-        "aws": ("us-west-2", os.path.join(TRANSFORM_TEST_DIR, "output", output_file_option)),
-        "aws-cn": ("cn-north-1 ", os.path.join(TRANSFORM_TEST_DIR, "output/aws-cn/", output_file_option)),
-        "aws-us-gov": ("us-gov-west-1", os.path.join(TRANSFORM_TEST_DIR, "output/aws-us-gov/", output_file_option)),
+        "aws": ("us-west-2", TRANSFORM_TEST_DIR / "output" / output_file_option),
+        "aws-cn": ("cn-north-1 ", TRANSFORM_TEST_DIR / "output" / "aws-cn" / output_file_option),
+        "aws-us-gov": ("us-gov-west-1", TRANSFORM_TEST_DIR / "output" / "aws-us-gov" / output_file_option),
     }
 
     for partition, (region, output_path) in transform_test_output_paths.items():
@@ -100,18 +98,18 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
             replace_aws_partition(partition, output_path)
 
 
-def get_input_file_path() -> str:
+def get_input_file_path() -> Path:
     input_file_option = str(CLI_OPTIONS.template_file)
-    return os.path.join(os.getcwd(), input_file_option)
+    return Path.cwd() / input_file_option
 
 
-def copy_input_file_to_transform_test_dir(input_file_path: str, transform_test_input_path: str) -> None:
+def copy_input_file_to_transform_test_dir(input_file_path: Path, transform_test_input_path: Path) -> None:
     shutil.copyfile(input_file_path, transform_test_input_path)
     print(f"Transform Test input file generated {transform_test_input_path}")
 
 
-def verify_input_template(input_file_path: str):  # type: ignore[no-untyped-def]
-    if "arn:aws:" in Path(input_file_path).read_text(encoding="utf-8"):
+def verify_input_template(input_file_path: Path) -> None:
+    if "arn:aws:" in input_file_path.read_text(encoding="utf-8"):
         print(
             "WARNING: hardcoded partition name detected. Consider replace it with pseudo parameter {AWS::Partition}",
             file=sys.stderr,
@@ -120,23 +118,23 @@ def verify_input_template(input_file_path: str):  # type: ignore[no-untyped-def]
 
 def format_test_files() -> None:
     subprocess.run(
-        [sys.executable, os.path.join(SCRIPT_DIR, "json-format.py"), "--write", "tests"],
+        [sys.executable, SCRIPT_DIR / "json-format.py", "--write", "tests"],
         check=True,
     )
 
     subprocess.run(
-        [sys.executable, os.path.join(SCRIPT_DIR, "yaml-format.py"), "--write", "tests"],
+        [sys.executable, SCRIPT_DIR / "yaml-format.py", "--write", "tests"],
         check=True,
     )
 
 
 def main() -> None:
     input_file_path = get_input_file_path()
-    file_basename = Path(input_file_path).stem
+    file_basename = input_file_path.stem
 
     verify_input_template(input_file_path)
 
-    transform_test_input_path = os.path.join(TRANSFORM_TEST_DIR, "input", file_basename + ".yaml")
+    transform_test_input_path = TRANSFORM_TEST_DIR / "input" / (file_basename + ".yaml")
     copy_input_file_to_transform_test_dir(input_file_path, transform_test_input_path)
 
     generate_transform_test_output_files(transform_test_input_path, file_basename)
