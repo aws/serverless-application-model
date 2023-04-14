@@ -2328,7 +2328,7 @@ class SamGraphQLApi(SamResourceMacro):
         resources: List[Resource] = []
 
         for relative_id, ddb_datasource in ddb_datasources.items():
-            datasource_logical_id = f"{self.logical_id}DynamoDBDataSource{relative_id}"
+            datasource_logical_id = f"{self.logical_id}DataSourceDynamoDb{relative_id}"
             cfn_datasource = DataSource(
                 logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
@@ -2368,7 +2368,7 @@ class SamGraphQLApi(SamResourceMacro):
         # If the user doesn't have their own role, then we will create for them if TableArn is defined.
         table_arn = passthrough_value(
             sam_expect(
-                ddb_datasource.TableArn, relative_id, f"DynamoDBDataSources.{relative_id}.TableArn"
+                ddb_datasource.TableArn, relative_id, f"DataSources.DynamoDb.{relative_id}.TableArn"
             ).to_not_be_none(
                 "'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined."
             )

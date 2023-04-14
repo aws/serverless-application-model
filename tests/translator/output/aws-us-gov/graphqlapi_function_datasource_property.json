@@ -42,7 +42,7 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "SuperCoolAPIDynamoDBDataSourceMyDataSource": {
+    "SuperCoolAPIDataSourceDynamoDbMyDataSource": {
       "Properties": {
         "ApiId": {
           "Fn::GetAtt": [
@@ -73,7 +73,7 @@
         "Code": "this is my epic code",
         "DataSourceName": {
           "Fn::GetAtt": [
-            "SuperCoolAPIDynamoDBDataSourceMyDataSource",
+            "SuperCoolAPIDataSourceDynamoDbMyDataSource",
             "Name"
           ]
         },
