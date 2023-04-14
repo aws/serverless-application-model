@@ -1,8 +1,18 @@
 from collections import namedtuple
 from typing import Any, Dict, Iterable, List, Optional
 
+from typing_extensions import TypeGuard
+
 from samtranslator.model import ResourceResolver
+from samtranslator.model.apigateway import ApiGatewayRestApi
+from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
+from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.intrinsics import fnGetAtt, get_logical_id_from_intrinsic, ref
+from samtranslator.model.lambda_ import (
+    LambdaFunction,
+)
+from samtranslator.model.stepfunctions import StepFunctionsStateMachine
+from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.utils.utils import as_array, insert_unique
 
 # TODO: Switch to dataclass
@@ -20,6 +30,14 @@ ConnectorResourceReference = namedtuple(
     ],
 )
 
+_SAM_TO_CFN_RESOURCE_TYPE = {
+    SamResourceType.Function.value: LambdaFunction.resource_type,
+    SamResourceType.StateMachine.value: StepFunctionsStateMachine.resource_type,
+    SamResourceType.Api.value: ApiGatewayRestApi.resource_type,
+    SamResourceType.HttpApi.value: ApiGatewayV2HttpApi.resource_type,
+    SamResourceType.SimpleTable.value: DynamoDBTable.resource_type,
+}
+
 UNSUPPORTED_CONNECTOR_PROFILE_TYPE = "UNSUPPORTED_CONNECTOR_PROFILE_TYPE"
 
 
@@ -29,7 +47,7 @@ class ConnectorResourceError(Exception):
     """
 
 
-def _is_nonblank_str(s: Any) -> bool:
+def _is_nonblank_str(s: Any) -> TypeGuard[str]:
     return s and isinstance(s, str)
 
 
@@ -98,14 +116,16 @@ def get_resource_reference(
         )
 
     logical_id = obj.get("Id")
-
     # Must provide Id (with optional Qualifier) or a supported combination of other properties
     # If Id is not provided, all values must come from overrides.
     if not logical_id:
         resource_type = obj.get("Type")
         if not _is_nonblank_str(resource_type):
             raise ConnectorResourceError("'Type' is missing or not a string.")
-        resource_type = str(resource_type)
+
+        # profiles.json only support CFN resource type.
+        # We need to convert SAM resource types to corresponding CFN resource type
+        resource_type = _SAM_TO_CFN_RESOURCE_TYPE.get(resource_type, resource_type)
 
         return ConnectorResourceReference(
             logical_id=None,
@@ -128,8 +148,6 @@ def get_resource_reference(
     resource_type = resource.get("Type")
     if not _is_nonblank_str(resource_type):
         raise ConnectorResourceError("'Type' is missing or not a string.")
-    resource_type = str(resource_type)
-
     properties = resource.get("Properties", {})
 
     arn = _get_resource_arn(logical_id, resource_type)

@@ -1,12 +1,13 @@
 import copy
 import json
-import os
 import re
+from pathlib import Path
 from typing import Any, Dict
 
 ConnectorProfile = Dict[str, Any]
 
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "profiles.json"), encoding="utf-8") as f:
+_PROFILE_FILE = Path(__file__).absolute().parent / "profiles.json"
+with _PROFILE_FILE.open(encoding="utf-8") as f:
     PROFILE: ConnectorProfile = json.load(f)
 
 
