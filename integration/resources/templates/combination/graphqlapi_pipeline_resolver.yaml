@@ -86,13 +86,14 @@ Resources:
         }
       Auth:
         Type: API_KEY
-      DynamoDBDataSources:
-        PostsDataSource:
-          TableName: !Ref DynamoDBPostsTable
-          TableArn: !GetAtt DynamoDBPostsTable.Arn
-        PostsLogDataSource:
-          TableName: !Ref DynamoDBPostsLogTable
-          TableArn: !GetAtt DynamoDBPostsLogTable.Arn
+      DataSources:
+        DynamoDB:
+          PostsDataSource:
+            TableName: !Ref DynamoDBPostsTable
+            TableArn: !GetAtt DynamoDBPostsTable.Arn
+          PostsLogDataSource:
+            TableName: !Ref DynamoDBPostsLogTable
+            TableArn: !GetAtt DynamoDBPostsLogTable.Arn
       Functions:
         createPostItem:
           Runtime:

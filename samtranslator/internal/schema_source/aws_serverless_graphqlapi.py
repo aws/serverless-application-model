@@ -43,6 +43,10 @@ class DynamoDBDataSource(BaseModel):
     Versioned: Optional[PassThroughProp]
 
 
+class DataSources(BaseModel):
+    DynamoDB: Optional[Dict[str, DynamoDBDataSource]]
+
+
 class Runtime(BaseModel):
     Name: PassThroughProp
     Version: PassThroughProp
@@ -103,7 +107,7 @@ class Properties(BaseModel):
     SchemaInline: Optional[PassThroughProp]
     SchemaUri: Optional[PassThroughProp]
     Logging: Optional[Union[Logging, bool]]
-    DynamoDBDataSources: Optional[Dict[str, DynamoDBDataSource]]
+    DataSources: Optional[DataSources]
     ResolverCodeSettings: Optional[ResolverCodeSettings]
     Functions: Optional[Dict[str, Function]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, AppSyncResolver]]]

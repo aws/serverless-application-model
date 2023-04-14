@@ -79,9 +79,10 @@ Resources:
       Tags:
         key1: value1
         key2: value2
-      DynamoDBDataSources:
-        MyDataSource:
-          TableName: some-table
+      DataSources:
+        DynamoDB:
+          MyDataSource:
+            TableName: some-table
 
   IdDefinedWithOtherProperties:
     Type: AWS::Serverless::GraphQLApi
@@ -93,10 +94,11 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
-      DynamoDBDataSources:
-        MyDataSource:
-          TableName: some-table
-          TableArn: big-arn
+      DataSources:
+        DynamoDB:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
       Functions:
         IdNotMutuallyExclusive:
           Id: some-id
@@ -112,10 +114,11 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
-      DynamoDBDataSources:
-        MyDataSource:
-          TableName: some-table
-          TableArn: big-arn
+      DataSources:
+        DynamoDB:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
       Functions:
         BothCodeProperties:
           DataSource: MyDataSource
@@ -135,10 +138,11 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
-      DynamoDBDataSources:
-        MyDataSource:
-          TableName: some-table
-          TableArn: big-arn
+      DataSources:
+        DynamoDB:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
       Functions:
         BothCodeProperties:
           DataSource: MyDataSource
@@ -169,10 +173,11 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
-      DynamoDBDataSources:
-        MyDataSource:
-          TableName: some-table
-          TableArn: big-arn
+      DataSources:
+        DynamoDB:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
       Functions:
         BothCodeProperties:
           DataSource: MyDataSource
@@ -187,10 +192,11 @@ Resources:
         }
       Auth:
         Type: AWS_IAM
-      DynamoDBDataSources:
-        MyDataSource:
-          TableName: some-table
-          TableArn: big-arn
+      DataSources:
+        DynamoDB:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
       Functions:
         NoRuntime:
           DataSource: MyDataSource

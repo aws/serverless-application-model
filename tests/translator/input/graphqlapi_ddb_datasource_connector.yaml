@@ -14,10 +14,11 @@ Resources:
       Tags:
         key1: value1
         key2: value2
-      DynamoDBDataSources:
-        MyDataSource:
-          TableName: some-table
-          TableArn: big-arn
-        AnotherDataSource:
-          TableName: cool-table
-          TableArn: table-arn
+      DataSources:
+        DynamoDB:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
+          AnotherDataSource:
+            TableName: cool-table
+            TableArn: table-arn
