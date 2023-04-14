@@ -2313,7 +2313,7 @@ class SamGraphQLApi(SamResourceMacro):
         api_id: Intrinsicable[str],
         kwargs: Dict[str, Any],
     ) -> List[Resource]:
-        ddb_datasources = self._construct_ddb_datasources(datasources.DynamoDB, api_id, kwargs)
+        ddb_datasources = self._construct_ddb_datasources(datasources.DynamoDb, api_id, kwargs)
         return [*ddb_datasources]
 
     def _construct_ddb_datasources(

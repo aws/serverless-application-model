@@ -80,7 +80,7 @@ Resources:
         key1: value1
         key2: value2
       DataSources:
-        DynamoDB:
+        DynamoDb:
           MyDataSource:
             TableName: some-table
 
@@ -95,7 +95,7 @@ Resources:
       Auth:
         Type: AWS_IAM
       DataSources:
-        DynamoDB:
+        DynamoDb:
           MyDataSource:
             TableName: some-table
             TableArn: big-arn
@@ -115,7 +115,7 @@ Resources:
       Auth:
         Type: AWS_IAM
       DataSources:
-        DynamoDB:
+        DynamoDb:
           MyDataSource:
             TableName: some-table
             TableArn: big-arn
@@ -139,7 +139,7 @@ Resources:
       Auth:
         Type: AWS_IAM
       DataSources:
-        DynamoDB:
+        DynamoDb:
           MyDataSource:
             TableName: some-table
             TableArn: big-arn
@@ -174,7 +174,7 @@ Resources:
       Auth:
         Type: AWS_IAM
       DataSources:
-        DynamoDB:
+        DynamoDb:
           MyDataSource:
             TableName: some-table
             TableArn: big-arn
@@ -193,7 +193,7 @@ Resources:
       Auth:
         Type: AWS_IAM
       DataSources:
-        DynamoDB:
+        DynamoDb:
           MyDataSource:
             TableName: some-table
             TableArn: big-arn

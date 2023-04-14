@@ -44,7 +44,7 @@ class DynamoDBDataSource(BaseModel):
 
 
 class DataSources(BaseModel):
-    DynamoDB: Optional[Dict[str, DynamoDBDataSource]]
+    DynamoDb: Optional[Dict[str, DynamoDBDataSource]]
 
 
 class Runtime(BaseModel):

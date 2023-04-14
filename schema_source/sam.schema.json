@@ -501,7 +501,7 @@
     "DataSources": {
       "additionalProperties": false,
       "properties": {
-        "DynamoDB": {
+        "DynamoDb": {
           "additionalProperties": {
             "$ref": "#/definitions/DynamoDBDataSource"
           },

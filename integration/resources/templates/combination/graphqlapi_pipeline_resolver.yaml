@@ -87,7 +87,7 @@ Resources:
       Auth:
         Type: API_KEY
       DataSources:
-        DynamoDB:
+        DynamoDb:
           PostsDataSource:
             TableName: !Ref DynamoDBPostsTable
             TableArn: !GetAtt DynamoDBPostsTable.Arn
