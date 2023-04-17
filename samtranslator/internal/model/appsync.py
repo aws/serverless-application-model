@@ -175,3 +175,18 @@ class Resolver(Resource):
     Runtime: Optional[AppSyncRuntimeType]
     SyncConfig: Optional[SyncConfigType]
     TypeName: str
+
+
+class ApiKey(Resource):
+    resource_type = "AWS::AppSync::ApiKey"
+    property_types = {
+        "ApiId": GeneratedProperty(),
+        "ApiKeyId": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "Expires": GeneratedProperty(),
+    }
+
+    ApiId: Intrinsicable[str]
+    ApiKeyId: Optional[str]
+    Description: Optional[str]
+    Expires: Optional[float]

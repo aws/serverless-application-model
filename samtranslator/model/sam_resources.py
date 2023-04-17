@@ -12,6 +12,7 @@ from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
+    ApiKey,
     AppSyncRuntimeType,
     CachingConfigType,
     DataSource,
@@ -2149,6 +2150,7 @@ class SamGraphQLApi(SamResourceMacro):
         "ResolverCodeSettings": Property(False, IS_DICT),
         "Functions": Property(False, IS_DICT),
         "AppSyncResolvers": Property(False, IS_DICT),
+        "ApiKey": Property(False, IS_DICT),
     }
 
     Auth: Dict[str, Any]
@@ -2162,6 +2164,7 @@ class SamGraphQLApi(SamResourceMacro):
     ResolverCodeSettings: Optional[Dict[str, Any]]
     Functions: Optional[Dict[str, Dict[str, Any]]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
+    ApiKey: Optional[Dict[str, Dict[str, Any]]]
 
     # stop validation so we can use class variables for tracking state
     validate_setattr = False
@@ -2190,6 +2193,10 @@ class SamGraphQLApi(SamResourceMacro):
 
         if cloudwatch_role:
             resources.append(cloudwatch_role)
+
+        if model.ApiKey:
+            api_key = self._construct_appsync_api_key(model.ApiKey, api_id)
+            resources.append(api_key)
 
         if model.DataSources:
             datasource_resources = self._construct_datasource_resources(model.DataSources, api_id, kwargs)
@@ -2307,6 +2314,20 @@ class SamGraphQLApi(SamResourceMacro):
         schema.DefinitionS3Location = passthrough_value(model.SchemaUri)
 
         return schema
+
+    def _construct_appsync_api_key(self, api_keys: Dict[str, aws_serverless_graphqlapi.ApiKey], api_id: Intrinsicable[str]):
+        if len(api_keys) != 1:
+            raise InvalidResourceException(self.logical_id, "One and only one API Key can be defined at a time.")
+        
+        relative_id, api_key = list(api_keys.items())[0]
+
+        cfn_api_key = ApiKey(logical_id=f"{self.logical_id}{relative_id}", depends_on=self.depends_on, attributes=self.resource_attributes)
+        cfn_api_key.ApiId = api_id
+        cfn_api_key.ApiKeyId = passthrough_value(api_key.ApiKeyId)
+        cfn_api_key.Description = passthrough_value(api_key.Description)
+        cfn_api_key.Expires = passthrough_value(api_key.Expires)
+        
+        return cfn_api_key
 
     def _construct_datasource_resources(
         self,
