@@ -2239,53 +2239,64 @@ class SamGraphQLApi(SamResourceMacro):
 
         return api, cloudwatch_role
 
-    def _parse_auth_properties(self, api: GraphQLApi, auths: List[aws_serverless_graphqlapi.Auth]):
+    def _parse_auth_properties(self, api: GraphQLApi, auths: List[aws_serverless_graphqlapi.Auth]) -> None:
         if not auths:
             raise InvalidResourceException(self.logical_id, "'Auth' must contain at least one valid authorizer.")
 
-        additional_auths = []
+        additional_auths: List[AdditionalAuthenticationProviderType] = []
 
         for i, auth in enumerate(auths):
-            # check if more than one authentication property is defined, throw error if so
+            # Check if more than one authentication config is defined, throw error if so
             keys = remove_none_values(auth.dict()).keys()
-            if len(keys) > 2:
+            if len(keys) > 2:  # noqa: PLR2004
                 raise InvalidResourceException(
-                    self.logical_id, f"Index {i} in 'Auth' has more than one authentication property defined."
+                    self.logical_id, f"Index {i} in 'Auth' has more than one authentication configuration defined."
                 )
 
-            name, auth_dict = self._validate_auth_properties(api, auth)
+            name, auth_dict = self._validate_auth_type_and_config(api, auth)
 
+            # The first authentication type is the primary authentication
             if i == 0:
                 api.AuthenticationType = auth.Type
                 if name:
                     setattr(api, name, auth_dict)
-            else:
-                additional_auth = {"AuthenticationType": auth.Type}
-                if name:
-                    additional_auth[name] = auth_dict
-                additional_auths.append(additional_auth)
+                continue
+
+            # All auths after the first are put into AdditionalAuthenticationProviders
+            additional_auth: Dict[str, Any] = {"AuthenticationType": auth.Type}
+            if name and auth_dict:
+                additional_auth[name] = auth_dict
+
+            additional_auths.append(cast(AdditionalAuthenticationProviderType, additional_auth))
 
         if additional_auths:
             api.AdditionalAuthenticationProviders = additional_auths
 
-    def _validate_auth_properties(self, api: GraphQLApi, auth: aws_serverless_graphqlapi.Auth):  # TODO: name
+    def _validate_auth_type_and_config(
+        self, api: GraphQLApi, auth: aws_serverless_graphqlapi.Auth
+    ) -> Tuple[Optional[str], Optional[Dict[str, Any]]]:
+        """
+        Validates the authentication type and returns the name of the config property and the respective dictionary.
+
+        This function will throw an error if auth.Type is not a recognized value.
+        """
         if auth.Type == "API_KEY" or auth.Type == "AWS_IAM":
             return None, None
 
         if auth.Type == "AWS_LAMBDA":
             lambda_authorizer = sam_expect(
-                auth.LambdaAuthorizer, self.logical_id, f"Auth.LambdaAuthorizer"
+                auth.LambdaAuthorizer, self.logical_id, "Auth.LambdaAuthorizer"
             ).to_not_be_none("'LambdaAuthorizer' must be defined if type is 'AWS_LAMBDA'.")
             return "LambdaAuthorizerConfig", remove_none_values(lambda_authorizer.dict())
 
         if auth.Type == "OPENID_CONNECT":
-            openid_connect = sam_expect(auth.OpenIDConnect, self.logical_id, f"Auth.OpenIDConnect").to_not_be_none(
+            openid_connect = sam_expect(auth.OpenIDConnect, self.logical_id, "Auth.OpenIDConnect").to_not_be_none(
                 "'OpenIDConnect' must be defined if type is 'OPENID_CONNECT'."
             )
             return "OpenIDConnectConfig", remove_none_values(openid_connect.dict())
 
         if auth.Type == "AMAZON_COGNITO_USER_POOLS":
-            user_pool = sam_expect(auth.UserPool, self.logical_id, f"Auth.UserPool").to_not_be_none(
+            user_pool = sam_expect(auth.UserPool, self.logical_id, "Auth.UserPool").to_not_be_none(
                 "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
             )
             return "UserPoolConfig", remove_none_values(user_pool.dict())

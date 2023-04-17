@@ -13,7 +13,7 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-        Type: AWS_IAM
+      - Type: AWS_IAM
       Tags:
         key1: value1
         key2: value2

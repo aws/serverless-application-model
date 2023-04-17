@@ -5,5 +5,5 @@ Resources:
     Properties:
       Name: SuperDuperCoolAPI
       Auth:
-        Type: AWS_IAM
+      - Type: AWS_IAM
       SchemaUri: https://bucket-name.s3.region-code.amazonaws.com/key-name

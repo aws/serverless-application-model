@@ -32,7 +32,27 @@
      {
       "AuthenticationType": "AWS_LAMBDA",
       "LambdaAuthorizerConfig": {
-       "AuthorizerUri": "blah"
+       "AuthorizerResultTtlInSeconds": 10,
+       "AuthorizerUri": "blah",
+       "IdentityValidationExpression": "hello"
+      }
+     },
+     {
+      "AuthenticationType": "OPENID_CONNECT",
+      "OpenIDConnectConfig": {
+       "AuthTTL": 10,
+       "ClientId": "myid",
+       "IatTTL": 10,
+       "Issuer": "prad"
+      }
+     },
+     {
+      "AuthenticationType": "AMAZON_COGNITO_USER_POOLS",
+      "UserPoolConfig": {
+       "AppIdClientRegex": "myregex",
+       "AwsRegion": "na-east-1",
+       "DefaultAction": "something",
+       "UserPoolId": "myid"
       }
      }
     ]

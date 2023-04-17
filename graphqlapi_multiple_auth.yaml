@@ -1,0 +1,33 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+      - Type: AWS_IAM
+      - Type: API_KEY
+      - Type: AWS_LAMBDA
+        LambdaAuthorizer:
+          AuthorizerUri: blah
+          AuthorizerResultTtlInSeconds: 10
+          IdentityValidationExpression: hello
+      - Type: OPENID_CONNECT
+        OpenIDConnect:
+          AuthTTL: 10
+          ClientId: myid
+          IatTTL: 10
+          Issuer: prad
+      - Type: AMAZON_COGNITO_USER_POOLS
+        UserPool:
+          AppIdClientRegex: myregex
+          AwsRegion: na-east-1
+          DefaultAction: something
+          UserPoolId: myid
+      Tags:
+        key1: value1
+        key2: value2
