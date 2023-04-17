@@ -175,3 +175,27 @@ class Resolver(Resource):
     Runtime: Optional[AppSyncRuntimeType]
     SyncConfig: Optional[SyncConfigType]
     TypeName: str
+
+
+class DomainName(Resource):
+    resource_type = "AWS::AppSync::DomainName"
+    property_types = {
+        "CertificateArn": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "DomainName": GeneratedProperty(),
+    }
+
+    CertificateArn: str
+    DomainName: str
+    Description: Optional[str]
+
+
+class DomainNameApiAssociation(Resource):
+    resource_type = "AWS::AppSync::DomainNameApiAssociation"
+    property_types = {
+        "ApiId": GeneratedProperty(),
+        "DomainName": GeneratedProperty(),
+    }
+
+    ApiId: Intrinsicable[str]
+    DomainName: str

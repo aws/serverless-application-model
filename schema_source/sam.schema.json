@@ -794,6 +794,26 @@
       "title": "DocumentDBEventProperties",
       "type": "object"
     },
+    "DomainName": {
+      "additionalProperties": false,
+      "properties": {
+        "CertificateArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DomainName": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "CertificateArn",
+        "DomainName"
+      ],
+      "title": "DomainName",
+      "type": "object"
+    },
     "DynamoDBDataSource": {
       "additionalProperties": false,
       "properties": {
@@ -6318,6 +6338,9 @@
         },
         "DataSources": {
           "$ref": "#/definitions/DataSources"
+        },
+        "DomainName": {
+          "$ref": "#/definitions/DomainName"
         },
         "Functions": {
           "additionalProperties": {
