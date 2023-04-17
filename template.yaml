@@ -1,0 +1,21 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+      - Type: AWS_IAM
+      - Type: API_KEY
+      - Type: AWS_LAMBDA
+        LambdaAuthorizer:
+          AuthorizerUri: blah
+        OpenIDConnect:
+          AuthTTL: blah
+      Tags:
+        key1: value1
+        key2: value2

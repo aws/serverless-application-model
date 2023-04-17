@@ -12,6 +12,7 @@ from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
+    AdditionalAuthenticationProviderType,
     AppSyncRuntimeType,
     CachingConfigType,
     DataSource,
@@ -2141,7 +2142,7 @@ class SamGraphQLApi(SamResourceMacro):
         "Name": Property(False, IS_STR),
         "Tags": Property(False, IS_DICT),
         "XrayEnabled": PassThroughProperty(False),
-        "Auth": Property(True, IS_DICT),
+        "Auth": Property(True, list_of(IS_DICT)),
         "SchemaInline": Property(False, IS_STR),
         "SchemaUri": Property(False, IS_STR),
         "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
@@ -2151,7 +2152,7 @@ class SamGraphQLApi(SamResourceMacro):
         "AppSyncResolvers": Property(False, IS_DICT),
     }
 
-    Auth: Dict[str, Any]
+    Auth: List[Dict[str, Any]]
     Tags: Optional[Dict[str, Any]]
     XrayEnabled: Optional[PassThrough]
     Name: Optional[str]
@@ -2220,9 +2221,10 @@ class SamGraphQLApi(SamResourceMacro):
     ) -> Tuple[GraphQLApi, Optional[IAMRole]]:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
-        api.AuthenticationType = model.Auth.Type
         api.Name = model.Name or self.logical_id
         api.XrayEnabled = model.XrayEnabled
+
+        self._parse_auth_properties(api, model.Auth)
 
         if model.Tags:
             api.Tags = get_tag_list(model.Tags)
@@ -2236,6 +2238,60 @@ class SamGraphQLApi(SamResourceMacro):
         api.LogConfig, cloudwatch_role = self._parse_logging_properties(model)
 
         return api, cloudwatch_role
+
+    def _parse_auth_properties(self, api: GraphQLApi, auths: List[aws_serverless_graphqlapi.Auth]):
+        if not auths:
+            raise InvalidResourceException(self.logical_id, "'Auth' must contain at least one valid authorizer.")
+
+        additional_auths = []
+
+        for i, auth in enumerate(auths):
+            # check if more than one authentication property is defined, throw error if so
+            keys = remove_none_values(auth.dict()).keys()
+            if len(keys) > 2:
+                raise InvalidResourceException(
+                    self.logical_id, f"Index {i} in 'Auth' has more than one authentication property defined."
+                )
+
+            name, auth_dict = self._validate_auth_properties(api, auth)
+
+            if i == 0:
+                api.AuthenticationType = auth.Type
+                if name:
+                    setattr(api, name, auth_dict)
+            else:
+                additional_auth = {"AuthenticationType": auth.Type}
+                if name:
+                    additional_auth[name] = auth_dict
+                additional_auths.append(additional_auth)
+
+        if additional_auths:
+            api.AdditionalAuthenticationProviders = additional_auths
+
+    def _validate_auth_properties(self, api: GraphQLApi, auth: aws_serverless_graphqlapi.Auth):  # TODO: name
+        if auth.Type == "API_KEY" or auth.Type == "AWS_IAM":
+            return None, None
+
+        if auth.Type == "AWS_LAMBDA":
+            lambda_authorizer = sam_expect(
+                auth.LambdaAuthorizer, self.logical_id, f"Auth.LambdaAuthorizer"
+            ).to_not_be_none("'LambdaAuthorizer' must be defined if type is 'AWS_LAMBDA'.")
+            return "LambdaAuthorizerConfig", remove_none_values(lambda_authorizer.dict())
+
+        if auth.Type == "OPENID_CONNECT":
+            openid_connect = sam_expect(auth.OpenIDConnect, self.logical_id, f"Auth.OpenIDConnect").to_not_be_none(
+                "'OpenIDConnect' must be defined if type is 'OPENID_CONNECT'."
+            )
+            return "OpenIDConnectConfig", remove_none_values(openid_connect.dict())
+
+        if auth.Type == "AMAZON_COGNITO_USER_POOLS":
+            user_pool = sam_expect(auth.UserPool, self.logical_id, f"Auth.UserPool").to_not_be_none(
+                "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
+            )
+            return "UserPoolConfig", remove_none_values(user_pool.dict())
+
+        # auth.Type is not a recognized value
+        raise InvalidResourceException(self.logical_id, f"'{auth.Type}' is not a valid authentication type.")
 
     def _create_logging_default(self) -> Tuple[LogConfigType, IAMRole]:
         """

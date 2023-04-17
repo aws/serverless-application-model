@@ -19,6 +19,33 @@ export function response(ctx) {
 """
 
 
+class LambdaAuthorizerConfigType(TypedDict, total=False):
+    AuthorizerResultTtlInSeconds: float
+    AuthorizerUri: str
+    IdentityValidationExpression: str
+
+
+class OpenIDConnectConfigType(TypedDict, total=False):
+    AuthTTL: float
+    ClientId: str
+    IatTTL: float
+    Issuer: str
+
+
+class UserPoolConfigType(TypedDict, total=False):
+    AppIdClientRegex: str
+    AwsRegion: str
+    DefaultAction: str
+    UserPoolId: str
+
+
+class AdditionalAuthenticationProviderType(TypedDict, total=False):
+    AuthenticationType: str
+    LambdaAuthorizerConfig: LambdaAuthorizerConfigType
+    OpenIDConnectConfig: OpenIDConnectConfigType
+    UserPoolConfig: UserPoolConfigType
+
+
 class DeltaSyncConfigType(TypedDict):
     BaseTableTTL: str
     DeltaSyncTableName: str
@@ -71,10 +98,18 @@ class GraphQLApi(Resource):
         "XrayEnabled": GeneratedProperty(),
         "AuthenticationType": GeneratedProperty(),
         "LogConfig": GeneratedProperty(),
+        "LambdaAuthorizerConfig": GeneratedProperty(),
+        "OpenIDConnectConfig": GeneratedProperty(),
+        "UserPoolConfig": GeneratedProperty(),
+        "AdditionalAuthenticationProviders": GeneratedProperty(),
     }
 
     Name: str
     AuthenticationType: str
+    LambdaAuthorizerConfig: Optional[LambdaAuthorizerConfigType]
+    OpenIDConnectConfig: Optional[OpenIDConnectConfigType]
+    UserPoolConfig: Optional[UserPoolConfigType]
+    AdditionalAuthenticationProviders: Optional[List[AdditionalAuthenticationProviderType]]
     Tags: Optional[List[Dict[str, Any]]]
     XrayEnabled: Optional[bool]
     LogConfig: Optional[LogConfigType]

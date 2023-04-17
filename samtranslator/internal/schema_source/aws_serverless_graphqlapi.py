@@ -14,8 +14,31 @@ properties = get_prop("sam-resource-graphqlapi")
 
 
 # TODO: add docs
+class LambdaAuthorizer(BaseModel):
+    AuthorizerResultTtlInSeconds: Optional[PassThroughProp]
+    AuthorizerUri: Optional[PassThroughProp]
+    IdentityValidationExpression: Optional[PassThroughProp]
+
+
+class OpenIDConnect(BaseModel):
+    AuthTTL: Optional[PassThroughProp]
+    ClientId: Optional[PassThroughProp]
+    IatTTL: Optional[PassThroughProp]
+    Issuer: Optional[PassThroughProp]
+
+
+class UserPool(BaseModel):
+    AppIdClientRegex: Optional[PassThroughProp]
+    AwsRegion: Optional[PassThroughProp]
+    DefaultAction: Optional[PassThroughProp]
+    UserPoolId: Optional[PassThroughProp]
+
+
 class Auth(BaseModel):
     Type: str
+    LambdaAuthorizer: Optional[LambdaAuthorizer]
+    OpenIDConnect: Optional[OpenIDConnect]
+    UserPool: Optional[UserPool]
 
 
 class Logging(BaseModel):
@@ -100,7 +123,7 @@ class AppSyncResolver(BaseModel):
 
 
 class Properties(BaseModel):
-    Auth: Auth
+    Auth: List[Auth]
     Tags: Optional[DictStrAny]
     Name: Optional[str]
     XrayEnabled: Optional[bool]
