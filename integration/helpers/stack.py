@@ -3,7 +3,7 @@ from pathlib import Path
 import botocore
 
 from integration.helpers.deployer.deployer import Deployer
-from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
+from integration.helpers.deployer.exceptions.exceptions import TerminationProtectionUpdateFailedError, ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.resource import generate_suffix
 from integration.helpers.template import transform_template
@@ -54,6 +54,7 @@ class Stack:
                 self.deployer.wait_for_execute(self.stack_name, "UPDATE" if update else "CREATE")
 
         self._get_stack_description()
+        self._udpate_termination_protection()
         self.stack_resources = self.cfn_client.list_stack_resources(StackName=self.stack_name)
 
     @retry_with_exponential_backoff_and_jitter(ThrottlingError, 5, 360)
@@ -64,6 +65,12 @@ class Stack:
             if "Throttling" in str(ex):
                 raise ThrottlingError(stack_name=self.stack_name, msg=str(ex))
             raise
+
+    def _udpate_termination_protection(self, enable=True):
+        try:
+            self.cfn_client.update_termination_protection(EnableTerminationProtection=enable, StackName=self.stack_name)
+        except botocore.exceptions.ClientError as ex:
+            raise TerminationProtectionUpdateFailedError(stack_name=self.stack_name, msg=str(ex))
 
     @staticmethod
     def _generate_output_file_path(file_path, output_dir):
