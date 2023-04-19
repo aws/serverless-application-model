@@ -22,7 +22,7 @@ class SchedulerSchedule(Resource):
 
     ScheduleExpression: str
     FlexibleTimeWindow: Dict[str, Any]
-    Name: str
+    Name: Optional[str]
     State: Optional[str]
     Description: Optional[str]
     StartDate: Optional[str]
