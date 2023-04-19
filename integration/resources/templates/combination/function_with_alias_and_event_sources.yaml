@@ -93,10 +93,7 @@ Resources:
       # Enable DDB streams
       StreamSpecification:
         StreamViewType: KEYS_ONLY
-
-      ProvisionedThroughput:
-        WriteCapacityUnits: 5
-        ReadCapacityUnits: 5
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
       - AttributeName: id
         AttributeType: S

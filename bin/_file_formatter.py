@@ -3,6 +3,7 @@ import argparse
 import os
 import sys
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Type
 
 
@@ -44,31 +45,28 @@ class FileFormatter(ABC):
     def config_additional_args(cls) -> None:  # noqa: empty-method-without-abstract-decorator
         """Optionally configure additional args to arg parser."""
 
-    def process_file(self, file_path: str) -> None:
-        with open(file_path, encoding="utf-8") as f:
-            file_str = f.read()
-            try:
-                formatted_file_str = self.format_str(file_str)
-            except self.decode_exception() as error:
-                raise ValueError(f"{file_path}: Cannot decode the file content") from error
-            except Exception as error:
-                raise ValueError(f"{file_path}: Fail to process") from error
+    def process_file(self, file_path: Path) -> None:
+        file_str = file_path.read_text(encoding="utf-8")
+        try:
+            formatted_file_str = self.format_str(file_str)
+        except self.decode_exception() as error:
+            raise ValueError(f"{file_path}: Cannot decode the file content") from error
+        except Exception as error:
+            raise ValueError(f"{file_path}: Fail to process") from error
         if file_str != formatted_file_str:
             if self.args.write:
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.write(formatted_file_str)
+                Path(file_path).write_text(formatted_file_str, encoding="utf-8")
                 print(f"reformatted {file_path}")
             if self.args.check:
                 print(f"would reformat {file_path}")
             self.unformatted_file_count += 1
         self.scanned_file_found += 1
 
-    def process_directory(self, directory_path: str) -> None:
+    def process_directory(self, directory_path: Path) -> None:
         for root, _dirs, files in os.walk(directory_path):
             for file in files:
-                file_path = os.path.join(root, file)
-                _, extension = os.path.splitext(file_path)
-                if extension != self.file_extension():
+                file_path = Path(root) / file
+                if file_path.suffix != self.file_extension():
                     continue
                 self.process_file(file_path)
 
@@ -112,15 +110,15 @@ class FileFormatter(ABC):
         args = cls.arg_parser.parse_args()
         formatter = cls(args)
 
-        for path in args.paths:
-            if not os.path.exists(path):
+        for _path in args.paths:
+            path = Path(_path)
+            if not path.exists():
                 raise ValueError(f"{path}: No such file or directory")
-            if os.path.isfile(path):
-                _, extension = os.path.splitext(path)
-                if extension != cls.file_extension():
+            if path.is_file():
+                if path.suffix != cls.file_extension():
                     raise ValueError(f"{path}: Not a format-able file")
                 formatter.process_file(path)
-            elif os.path.isdir(path):
+            elif path.is_dir():
                 formatter.process_directory(path)
             else:
                 raise ValueError(f"{path}: Unsupported path")

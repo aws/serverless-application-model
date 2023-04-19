@@ -1,6 +1,8 @@
 from collections import namedtuple
 from typing import Any, Dict, Iterable, List, Optional
 
+from typing_extensions import TypeGuard
+
 from samtranslator.model import ResourceResolver
 from samtranslator.model.apigateway import ApiGatewayRestApi
 from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
@@ -45,7 +47,7 @@ class ConnectorResourceError(Exception):
     """
 
 
-def _is_nonblank_str(s: Any) -> bool:
+def _is_nonblank_str(s: Any) -> TypeGuard[str]:
     return s and isinstance(s, str)
 
 
@@ -123,7 +125,7 @@ def get_resource_reference(
 
         # profiles.json only support CFN resource type.
         # We need to convert SAM resource types to corresponding CFN resource type
-        resource_type = _SAM_TO_CFN_RESOURCE_TYPE.get(str(resource_type), str(resource_type))
+        resource_type = _SAM_TO_CFN_RESOURCE_TYPE.get(resource_type, resource_type)
 
         return ConnectorResourceReference(
             logical_id=None,
@@ -146,8 +148,6 @@ def get_resource_reference(
     resource_type = resource.get("Type")
     if not _is_nonblank_str(resource_type):
         raise ConnectorResourceError("'Type' is missing or not a string.")
-    resource_type = str(resource_type)
-
     properties = resource.get("Properties", {})
 
     arn = _get_resource_arn(logical_id, resource_type)

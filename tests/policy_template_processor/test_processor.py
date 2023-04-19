@@ -211,18 +211,17 @@ class TestPolicyTemplateProcessor(TestCase):
 
     @patch.object(json, "loads")
     def test_read_json_must_read_from_file(self, json_loads_mock):
-        filepath = "some file"
+        filepath = Mock()
 
         json_return = "something"
         json_loads_mock.return_value = json_return
 
-        open_mock = mock_open()
-        with patch("samtranslator.policy_template_processor.processor.open", open_mock):
-            result = PolicyTemplatesProcessor._read_json(filepath)
-            self.assertEqual(result, json_return)
+        open_mock = filepath.open = mock_open()
+        result = PolicyTemplatesProcessor._read_json(filepath)
+        self.assertEqual(result, json_return)
 
-            open_mock.assert_called_once_with(filepath, encoding="utf-8")
-            self.assertEqual(1, json_loads_mock.call_count)
+        open_mock.assert_called_once_with(encoding="utf-8")
+        self.assertEqual(1, json_loads_mock.call_count)
 
     @patch.object(PolicyTemplatesProcessor, "_read_json")
     def test_read_schema_must_use_default_schema_location(self, _read_file_mock):

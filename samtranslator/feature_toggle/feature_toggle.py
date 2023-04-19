@@ -1,6 +1,7 @@
 import json
 import logging
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any, Dict, Optional, cast
 
 import boto3
@@ -119,10 +120,9 @@ class FeatureToggleDefaultConfigProvider(FeatureToggleConfigProvider):
 class FeatureToggleLocalConfigProvider(FeatureToggleConfigProvider):
     """Feature toggle config provider which uses a local file. This is to facilitate local testing."""
 
-    def __init__(self, local_config_path) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, local_config_path: str) -> None:
         FeatureToggleConfigProvider.__init__(self)
-        with open(local_config_path, encoding="utf-8") as f:
-            config_json = f.read()
+        config_json = Path(local_config_path).read_text(encoding="utf-8")
         self.feature_toggle_config = cast(Dict[str, Any], json.loads(config_json))
 
     @property
