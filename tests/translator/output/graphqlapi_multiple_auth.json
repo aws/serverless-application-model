@@ -28,7 +28,6 @@
             "UserPoolConfig": {
               "AppIdClientRegex": "myregex",
               "AwsRegion": "na-east-1",
-              "DefaultAction": "ALLOW",
               "UserPoolId": "myid"
             }
           }

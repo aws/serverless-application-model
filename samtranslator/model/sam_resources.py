@@ -3,6 +3,8 @@ import copy
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
+from typing_extensions import Literal
+
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.cloudwatchlogs
 import samtranslator.model.eventsources.pull
@@ -15,14 +17,18 @@ from samtranslator.internal.model.appsync import (
     AdditionalAuthenticationProviderType,
     AppSyncRuntimeType,
     CachingConfigType,
+    CognitoUserPoolConfigType,
     DataSource,
     DynamoDBConfigType,
     FunctionConfiguration,
     GraphQLApi,
     GraphQLSchema,
+    LambdaAuthorizerConfigType,
     LogConfigType,
+    OpenIDConnectConfigType,
     Resolver,
     SyncConfigType,
+    UserPoolConfigType,
 )
 from samtranslator.internal.schema_source import aws_serverless_graphqlapi
 from samtranslator.internal.schema_source.common import PermissionsType
@@ -2240,41 +2246,55 @@ class SamGraphQLApi(SamResourceMacro):
         return api, cloudwatch_role
 
     def _parse_auth_properties(self, api: GraphQLApi, auths: List[aws_serverless_graphqlapi.Auth]) -> None:
+        """
+        Parse the Auth properties in a Serverless::GraphQLApi resource.
+
+        This function does not return a value. The GraphQLApi object is modified directly.
+        """
         if not auths:
             raise InvalidResourceException(self.logical_id, "'Auth' must contain at least one valid authorizer.")
 
         additional_auths: List[AdditionalAuthenticationProviderType] = []
 
-        for i, auth in enumerate(auths):
+        # In each Auth index, you should only define a max of two properties. The "Type" property, and if
+        # necessary the associated config as well.
+        MAX_AUTH_PROPERTIES = 2
+
+        for index, auth in enumerate(auths):
             # Check if more than one authentication config is defined, throw error if so
             keys = remove_none_values(auth.dict()).keys()
-            if len(keys) > 2:  # noqa: PLR2004
+            if len(keys) > MAX_AUTH_PROPERTIES:
                 raise InvalidResourceException(
-                    self.logical_id, f"Index {i} in 'Auth' has more than one authentication configuration defined."
+                    self.logical_id, f"Index {index} in 'Auth' has more than one authentication configuration defined."
                 )
 
-            name, auth_dict = self._validate_auth_type_and_config(api, auth)
+            name, auth_dict = self._validate_auth_type_and_config(auth, index)
 
-            # The first authentication type is the primary authentication
-            if i == 0:
+            # The first index in authentication is the primary authentication
+            if index == 0:
                 api.AuthenticationType = auth.Type
                 if name:
                     setattr(api, name, auth_dict)
                 continue
 
             # All auths after the first are put into AdditionalAuthenticationProviders
-            additional_auth: Dict[str, Any] = {"AuthenticationType": auth.Type}
+            additional_auth: AdditionalAuthenticationProviderType = {"AuthenticationType": auth.Type}
             if name and auth_dict:
                 additional_auth[name] = auth_dict
 
-            additional_auths.append(cast(AdditionalAuthenticationProviderType, additional_auth))
+            additional_auths.append(additional_auth)
 
         if additional_auths:
             api.AdditionalAuthenticationProviders = additional_auths
 
     def _validate_auth_type_and_config(
-        self, api: GraphQLApi, auth: aws_serverless_graphqlapi.Auth
-    ) -> Tuple[Optional[str], Optional[Dict[str, Any]]]:
+        self, auth: aws_serverless_graphqlapi.Auth, index: int
+    ) -> Tuple[
+        Optional[Literal["LambdaAuthorizerConfig", "OpenIDConnectConfig", "UserPoolConfig"]],
+        Optional[
+            Union[LambdaAuthorizerConfigType, OpenIDConnectConfigType, UserPoolConfigType, CognitoUserPoolConfigType]
+        ],
+    ]:
         """
         Validates the authentication type and returns the name of the config property and the respective dictionary.
 
@@ -2285,21 +2305,28 @@ class SamGraphQLApi(SamResourceMacro):
 
         if auth.Type == "AWS_LAMBDA":
             lambda_authorizer = sam_expect(
-                auth.LambdaAuthorizer, self.logical_id, "Auth.LambdaAuthorizer"
+                auth.LambdaAuthorizer, self.logical_id, f"Auth.{index}.LambdaAuthorizer"
             ).to_not_be_none("'LambdaAuthorizer' must be defined if type is 'AWS_LAMBDA'.")
-            return "LambdaAuthorizerConfig", remove_none_values(lambda_authorizer.dict())
+            return "LambdaAuthorizerConfig", cast(
+                LambdaAuthorizerConfigType, remove_none_values(lambda_authorizer.dict())
+            )
 
         if auth.Type == "OPENID_CONNECT":
-            openid_connect = sam_expect(auth.OpenIDConnect, self.logical_id, "Auth.OpenIDConnect").to_not_be_none(
-                "'OpenIDConnect' must be defined if type is 'OPENID_CONNECT'."
-            )
-            return "OpenIDConnectConfig", remove_none_values(openid_connect.dict())
+            openid_connect = sam_expect(
+                auth.OpenIDConnect, self.logical_id, f"Auth.{index}.OpenIDConnect"
+            ).to_not_be_none("'OpenIDConnect' must be defined if type is 'OPENID_CONNECT'.")
+            return "OpenIDConnectConfig", cast(OpenIDConnectConfigType, remove_none_values(openid_connect.dict()))
 
         if auth.Type == "AMAZON_COGNITO_USER_POOLS":
-            user_pool = sam_expect(auth.UserPool, self.logical_id, "Auth.UserPool").to_not_be_none(
+            user_pool = sam_expect(auth.UserPool, self.logical_id, f"Auth.{index}.UserPool").to_not_be_none(
                 "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
             )
-            return "UserPoolConfig", remove_none_values(user_pool.dict())
+            if index != 0:
+                # UserPoolConfig does not have the DefaultAction property UNLESS it is the primary authentication
+                # method (first index). If it is an additional authentication, we nullify this value.
+                user_pool.DefaultAction = None
+                return "UserPoolConfig", cast(CognitoUserPoolConfigType, remove_none_values(user_pool.dict()))
+            return "UserPoolConfig", cast(UserPoolConfigType, remove_none_values(user_pool.dict()))
 
         # auth.Type is not a recognized value
         raise InvalidResourceException(self.logical_id, f"'{auth.Type}' is not a valid authentication type.")

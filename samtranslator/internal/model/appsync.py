@@ -39,11 +39,17 @@ class UserPoolConfigType(TypedDict, total=False):
     UserPoolId: str
 
 
+class CognitoUserPoolConfigType(TypedDict, total=False):
+    AppIdClientRegex: str
+    AwsRegion: str
+    UserPoolId: str
+
+
 class AdditionalAuthenticationProviderType(TypedDict, total=False):
     AuthenticationType: str
     LambdaAuthorizerConfig: LambdaAuthorizerConfigType
     OpenIDConnectConfig: OpenIDConnectConfigType
-    UserPoolConfig: UserPoolConfigType
+    UserPoolConfig: CognitoUserPoolConfigType
 
 
 class DeltaSyncConfigType(TypedDict):
