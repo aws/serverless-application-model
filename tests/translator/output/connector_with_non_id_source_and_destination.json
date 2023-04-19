@@ -1,0 +1,341 @@
+{
+  "Resources": {
+    "Connector1Policy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "Connector1": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "SamTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::GetAtt": [
+                          "SamTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          "MyRole"
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "Connector2WriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "Connector2": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::ApiGateway::RestApi"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "SamFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceQualifier": "Prod/GET/foobar",
+              "SourceResourceId": {
+                "Ref": "SamApi"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "Connector3Policy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "Connector3": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::StepFunctions::StateMachine"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "lambda:InvokeAsync",
+                "lambda:InvokeFunction"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "SamFunction",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          "MyRole"
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "Connector4WriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "Connector4": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::ApiGatewayV2::Api"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "SamFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceQualifier": "Prod/GET/foobar",
+              "SourceResourceId": {
+                "Ref": "SamHttpApi"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:{AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SamApi": {
+      "Properties": {
+        "BodyS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "webpage_swagger.json"
+        },
+        "Description": "my description"
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "SamApiDeploymentf117c932f7": {
+      "Properties": {
+        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289",
+        "RestApiId": {
+          "Ref": "SamApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "SamApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "SamApiDeploymentf117c932f7"
+        },
+        "RestApiId": {
+          "Ref": "SamApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "SamFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "SamHttpApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {},
+          "tags": [
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "SamHttpApiProdStage": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "SamHttpApi"
+        },
+        "AutoDeploy": true,
+        "StageName": "Prod",
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    },
+    "SamStateMachine": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"MyLambdaState\",",
+              "    \"States\": {",
+              "        \"MyLambdaState\": {",
+              "            \"End\": true,",
+              "            \"Resource\": \"${definition_substitution_1}\",",
+              "            \"Type\": \"Task\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "DefinitionSubstitutions": {
+          "definition_substitution_1": {
+            "Fn::GetAtt": [
+              "SamFunction",
+              "Arn"
+            ]
+          }
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MyRole",
+            "Arn"
+          ]
+        },
+        "StateMachineType": "EXPRESS",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "SamTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "NoteId",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "NoteId",
+            "KeyType": "HASH"
+          }
+        ]
+      },
+      "Type": "AWS::DynamoDB::Table"
+    }
+  }
+}

@@ -59,7 +59,7 @@ class CWMetricsPublisher(MetricsPublisher):
         """
         Internal method to publish all provided metrics to cloudwatch, please make sure that array size of metrics is <= 20.
         """
-        metric_data = list(map(lambda m: m.get_metric_data(), metrics))  # type: ignore[no-any-return]
+        metric_data = [m.get_metric_data() for m in metrics]
         try:
             if metric_data:
                 self.cloudwatch_client.put_metric_data(Namespace=namespace, MetricData=metric_data)

@@ -20,6 +20,7 @@ select = [
     "RUF", # Ruff-specific rules
     "YTT", # flake8-2020
     "UP", # pyupgrade
+    "C4", # flake8-comprehensions
 ]
 
 # Mininal python version we support is 3.7

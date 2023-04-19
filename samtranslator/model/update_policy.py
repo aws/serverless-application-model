@@ -27,10 +27,10 @@ class UpdatePolicy(CodeDeployLambdaAliasUpdate):
         :return: a dict that can be used as part of a cloudformation template
         """
         dict_with_nones = self._asdict()
-        codedeploy_lambda_alias_update_dict = dict(
+        codedeploy_lambda_alias_update_dict = {
             # Type ignore next line. `ref(None)` is not a typical usage of `ref()`.
-            (k, v)
+            k: v
             for k, v in dict_with_nones.items()
             if v != ref(None) and v is not None  # type: ignore
-        )
+        }
         return {"CodeDeployLambdaAliasUpdate": codedeploy_lambda_alias_update_dict}

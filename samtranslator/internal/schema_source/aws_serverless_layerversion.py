@@ -10,25 +10,57 @@ from samtranslator.internal.schema_source.common import (
     ResourceAttributes,
     SamIntrinsicable,
     get_prop,
+    passthrough_prop,
 )
 
-contenturi = get_prop("sam-property-layerversion-layercontent")
-properties = get_prop("sam-resource-layerversion")
+PROPERTIES_STEM = "sam-resource-layerversion"
+CONTENT_URI_STEM = "sam-property-layerversion-layercontent"
+
+contenturi = get_prop(CONTENT_URI_STEM)
+properties = get_prop(PROPERTIES_STEM)
 
 
 class ContentUri(BaseModel):
-    Bucket: PassThroughProp = contenturi("Bucket")
-    Key: PassThroughProp = contenturi("Key")
-    Version: Optional[PassThroughProp] = contenturi("Version")
+    Bucket: PassThroughProp = passthrough_prop(
+        CONTENT_URI_STEM,
+        "Bucket",
+        ["AWS::Lambda::LayerVersion.Content", "S3Bucket"],
+    )
+    Key: PassThroughProp = passthrough_prop(
+        CONTENT_URI_STEM,
+        "Key",
+        ["AWS::Lambda::LayerVersion.Content", "S3Key"],
+    )
+    Version: Optional[PassThroughProp] = passthrough_prop(
+        CONTENT_URI_STEM,
+        "Version",
+        ["AWS::Lambda::LayerVersion.Content", "S3ObjectVersion"],
+    )
 
 
 class Properties(BaseModel):
-    CompatibleArchitectures: Optional[PassThroughProp] = properties("CompatibleArchitectures")
-    CompatibleRuntimes: Optional[PassThroughProp] = properties("CompatibleRuntimes")
+    CompatibleArchitectures: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "CompatibleArchitectures",
+        ["AWS::Lambda::LayerVersion", "Properties", "CompatibleArchitectures"],
+    )
+    CompatibleRuntimes: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "CompatibleRuntimes",
+        ["AWS::Lambda::LayerVersion", "Properties", "CompatibleRuntimes"],
+    )
     ContentUri: Union[str, ContentUri] = properties("ContentUri")
-    Description: Optional[PassThroughProp] = properties("Description")
+    Description: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Description",
+        ["AWS::Lambda::LayerVersion", "Properties", "Description"],
+    )
     LayerName: Optional[PassThroughProp] = properties("LayerName")
-    LicenseInfo: Optional[PassThroughProp] = properties("LicenseInfo")
+    LicenseInfo: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "LicenseInfo",
+        ["AWS::Lambda::LayerVersion", "Properties", "LicenseInfo"],
+    )
     RetentionPolicy: Optional[SamIntrinsicable[str]] = properties("RetentionPolicy")
 
 
