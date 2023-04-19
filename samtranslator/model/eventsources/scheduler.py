@@ -9,7 +9,7 @@ from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.scheduler import SchedulerSchedule
 from samtranslator.model.sqs import SQSQueue
-from samtranslator.model.types import IS_BOOL, IS_DICT, IS_STR, one_of
+from samtranslator.model.types import IS_BOOL, IS_DICT, IS_STR, PassThrough, one_of
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 
 
@@ -57,19 +57,19 @@ class SchedulerEventSource(ResourceMacro):
     # - pass-through to AWS::Scheduler::Schedule
     ScheduleExpression: str
     FlexibleTimeWindow: Optional[Dict[str, Any]]
-    Name: Optional[str]
-    State: Optional[str]
-    Description: Optional[str]
-    StartDate: Optional[str]
-    EndDate: Optional[str]
-    ScheduleExpressionTimezone: Optional[str]
-    GroupName: Optional[str]
-    KmsKeyArn: Optional[str]
+    Name: Optional[Union[PassThrough, bool]]
+    State: Optional[PassThrough]
+    Description: Optional[PassThrough]
+    StartDate: Optional[PassThrough]
+    EndDate: Optional[PassThrough]
+    ScheduleExpressionTimezone: Optional[PassThrough]
+    GroupName: Optional[PassThrough]
+    KmsKeyArn: Optional[PassThrough]
     # - pass-through to AWS::Scheduler::Schedule's Target
-    Input: Optional[str]
-    RoleArn: Optional[str]
+    Input: Optional[PassThrough]
+    RoleArn: Optional[PassThrough]
     DeadLetterConfig: Optional[Dict[str, Any]]
-    RetryPolicy: Optional[Dict[str, Any]]
+    RetryPolicy: Optional[PassThrough]
 
     DEFAULT_FLEXIBLE_TIME_WINDOW = {"Mode": "OFF"}
 
