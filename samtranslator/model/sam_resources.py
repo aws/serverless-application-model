@@ -2249,7 +2249,8 @@ class SamGraphQLApi(SamResourceMacro):
         """
         Parse the Auth properties in a Serverless::GraphQLApi resource.
 
-        This function does not return a value. The GraphQLApi object is modified directly.
+        This function does not return a value. The GraphQLApi object is modified directly so that we don't
+        return multiple config properties which are mostly None values.
         """
         if not auths:
             raise InvalidResourceException(self.logical_id, "'Auth' must contain at least one valid authorizer.")
