@@ -80,6 +80,7 @@
           ],
           "MaxAge": 10
         },
+        "InvokeMode": "RESPONSE_STREAM",
         "TargetFunctionArn": {
           "Ref": "MyFunction"
         }

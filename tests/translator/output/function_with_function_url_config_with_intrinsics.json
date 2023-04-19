@@ -12,6 +12,10 @@
     "AuthorizationTypeRef": {
       "Default": "NONE",
       "Type": "String"
+    },
+    "InvokeModeRef": {
+      "Default": "BUFFERED",
+      "Type": "String"
     }
   },
   "Resources": {
@@ -83,6 +87,9 @@
           "AllowOrigins": {
             "Ref": "AllowOriginsRef"
           }
+        },
+        "InvokeMode": {
+          "Ref": "InvokeModeRef"
         },
         "TargetFunctionArn": {
           "Ref": "MyFunction"
