@@ -9,7 +9,7 @@ from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.scheduler import SchedulerSchedule
 from samtranslator.model.sqs import SQSQueue
-from samtranslator.model.types import IS_BOOL, IS_DICT, IS_STR, PassThrough, one_of
+from samtranslator.model.types import IS_BOOL, IS_DICT, IS_STR, PassThrough
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 
 
