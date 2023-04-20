@@ -2,7 +2,7 @@ from enum import Enum, auto
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import PropertyType, Resource, ResourceMacro
+from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.exceptions import InvalidEventException
@@ -49,7 +49,7 @@ class SchedulerEventSource(ResourceMacro):
         "RoleArn": PropertyType(False, IS_STR),
         "DeadLetterConfig": PropertyType(False, IS_DICT),
         "RetryPolicy": PropertyType(False, IS_DICT),
-        "OmitName": PropertyType(False, IS_BOOL, supports_intrinsics=False),
+        "OmitName": Property(False, IS_BOOL),
     }
 
     # Below are type hints, must maintain consistent with properties_types
