@@ -66,6 +66,10 @@ class DynamoDBConfigType(TypedDict, total=False):
     DeltaSyncConfig: DeltaSyncConfigType
 
 
+class LambdaConfigType(TypedDict, total=False):
+    LambdaFunctionArn: str
+
+
 class LogConfigType(TypedDict, total=False):
     CloudWatchLogsRoleArn: Intrinsicable[str]
     ExcludeVerboseContent: bool
@@ -145,6 +149,7 @@ class DataSource(Resource):
         "Type": GeneratedProperty(),
         "ServiceRoleArn": GeneratedProperty(),
         "DynamoDBConfig": GeneratedProperty(),
+        "LambdaConfig": GeneratedProperty(),
     }
 
     ApiId: Intrinsicable[str]
@@ -152,7 +157,8 @@ class DataSource(Resource):
     Name: str
     Type: str
     ServiceRoleArn: str
-    DynamoDBConfig: DynamoDBConfigType
+    DynamoDBConfig: Optional[DynamoDBConfigType]
+    LambdaConfig: Optional[LambdaConfigType]
 
     runtime_attrs = {
         "arn": lambda self: fnGetAtt(self.logical_id, "DataSourceArn"),

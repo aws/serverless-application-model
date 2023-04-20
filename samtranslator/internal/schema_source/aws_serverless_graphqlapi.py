@@ -76,8 +76,16 @@ class DynamoDBDataSource(BaseModel):
     Versioned: Optional[PassThroughProp]
 
 
+class LambdaDataSource(BaseModel):
+    FunctionArn: PassThroughProp
+    ServiceRoleArn: Optional[PassThroughProp]
+    Name: Optional[str]
+    Description: Optional[PassThroughProp]
+
+
 class DataSources(BaseModel):
     DynamoDb: Optional[Dict[str, DynamoDBDataSource]]
+    Lambda: Optional[Dict[str, LambdaDataSource]]
 
 
 class Runtime(BaseModel):
