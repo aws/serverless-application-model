@@ -4,9 +4,11 @@
     "Number of errors found: 4. ",
     "Event with id [ScheduledStateMachine2ScheduleIntrinsics] is invalid. ",
     "QueueLogicalId must be a string Event with id [ScheduledStateMachine3ScheduleBothProvided] is invalid. ",
-    "You can either define 'Arn' or 'Type' property of DeadLetterConfig Event with id [ScheduledStateMachine4ScheduleInvalidType] is invalid. ",
-    "The only valid value for 'Type' property of DeadLetterConfig is 'SQS' Event with id [ScheduledStateMachineScheduleMissingDLQProperty] is invalid. ",
-    "No 'Arn' or 'Type' property provided for DeadLetterConfig"
+    "You can either define 'Arn' or 'Type' property of DeadLetterConfig. ",
+    "Event with id [ScheduledStateMachine4ScheduleInvalidType] is invalid. ",
+    "The only valid value for 'Type' property of DeadLetterConfig is 'SQS'. ",
+    "Event with id [ScheduledStateMachineScheduleMissingDLQProperty] is invalid. ",
+    "No 'Arn' or 'Type' property provided for DeadLetterConfig."
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 4. Event with id [ScheduledStateMachine2ScheduleIntrinsics] is invalid. QueueLogicalId must be a string Event with id [ScheduledStateMachine3ScheduleBothProvided] is invalid. You can either define 'Arn' or 'Type' property of DeadLetterConfig Event with id [ScheduledStateMachine4ScheduleInvalidType] is invalid. The only valid value for 'Type' property of DeadLetterConfig is 'SQS' Event with id [ScheduledStateMachineScheduleMissingDLQProperty] is invalid. No 'Arn' or 'Type' property provided for DeadLetterConfig"
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 4. Event with id [ScheduledStateMachine2ScheduleIntrinsics] is invalid. QueueLogicalId must be a string Event with id [ScheduledStateMachine3ScheduleBothProvided] is invalid. You can either define 'Arn' or 'Type' property of DeadLetterConfig. Event with id [ScheduledStateMachine4ScheduleInvalidType] is invalid. The only valid value for 'Type' property of DeadLetterConfig is 'SQS'. Event with id [ScheduledStateMachineScheduleMissingDLQProperty] is invalid. No 'Arn' or 'Type' property provided for DeadLetterConfig."
 }
