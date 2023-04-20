@@ -3,7 +3,7 @@
     "Invalid Serverless Application Specification document. ",
     "Number of errors found: 1. ",
     "Event with id [StateMachineCWEvent] is invalid. ",
-    "You can either define 'Arn' or 'Type' property of DeadLetterConfig"
+    "You can either define 'Arn' or 'Type' property of DeadLetterConfig."
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Event with id [StateMachineCWEvent] is invalid. You can either define 'Arn' or 'Type' property of DeadLetterConfig"
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Event with id [StateMachineCWEvent] is invalid. You can either define 'Arn' or 'Type' property of DeadLetterConfig."
 }

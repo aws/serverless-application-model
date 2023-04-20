@@ -5930,6 +5930,10 @@
           "markdownDescription": "The name of the schedule\\. If you don't specify a name, AWS SAM generates a name in the format `Function-Logical-IDEvent-Source-Name` and uses that ID for the schedule name\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedule.html#cfn-scheduler-schedule-name) property of an `AWS::Scheduler::Schedule` resource\\.",
           "title": "Name"
         },
+        "OmitName": {
+          "title": "Omitname",
+          "type": "boolean"
+        },
         "PermissionsBoundary": {
           "allOf": [
             {
@@ -7583,6 +7587,10 @@
           ],
           "markdownDescription": "The name of the schedule\\. If you don't specify a name, AWS SAM generates a name in the format `StateMachine-Logical-IDEvent-Source-Name` and uses that ID for the schedule name\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedule.html#cfn-scheduler-schedule-name) property of an `AWS::Scheduler::Schedule` resource\\.",
           "title": "Name"
+        },
+        "OmitName": {
+          "title": "Omitname",
+          "type": "boolean"
         },
         "PermissionsBoundary": {
           "allOf": [

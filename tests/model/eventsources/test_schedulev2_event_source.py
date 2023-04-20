@@ -69,8 +69,8 @@ class ScheduleV2EventSourceInSamFunction(TestCase):
         self.assertIsNone(schedule.State)
         self.assertEqual(schedule.Name, self.logical_id)
 
-    def test_to_cloudformation_when_name_is_false(self):
-        self.schedule_event_source.Name = False
+    def test_to_cloudformation_when_omit_name(self):
+        self.schedule_event_source.OmitName = True
         resources = self.schedule_event_source.to_cloudformation(function=self.func)
         self.assertEqual(resources[0].resource_type, "AWS::Scheduler::Schedule")
 

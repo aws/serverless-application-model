@@ -42,7 +42,7 @@ Resources:
         ScheduleV2FalseName:
           Type: ScheduleV2
           Properties:
-            Name: false
+            OmitName: true
             ScheduleExpression: rate(1 minute)
         ScheduleV2MoreProperties:
           Type: ScheduleV2
