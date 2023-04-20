@@ -85,7 +85,7 @@ Resources:
             version: Int!
         }
       Auth:
-      - Type: API_KEY
+        Type: API_KEY
       DataSources:
         DynamoDb:
           PostsDataSource:

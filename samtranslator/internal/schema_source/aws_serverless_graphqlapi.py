@@ -34,11 +34,19 @@ class UserPool(BaseModel):
     UserPoolId: Optional[PassThroughProp]
 
 
+class AdditionalAuth(BaseModel):
+    Type: str
+    LambdaAuthorizer: Optional[LambdaAuthorizer]
+    OpenIDConnect: Optional[OpenIDConnect]
+    UserPool: Optional[UserPool]
+
+
 class Auth(BaseModel):
     Type: str
     LambdaAuthorizer: Optional[LambdaAuthorizer]
     OpenIDConnect: Optional[OpenIDConnect]
     UserPool: Optional[UserPool]
+    Additional: Optional[List[AdditionalAuth]]
 
 
 class Logging(BaseModel):
@@ -123,7 +131,7 @@ class AppSyncResolver(BaseModel):
 
 
 class Properties(BaseModel):
-    Auth: List[Auth]
+    Auth: Auth
     Tags: Optional[DictStrAny]
     Name: Optional[str]
     XrayEnabled: Optional[bool]

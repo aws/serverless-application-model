@@ -26,7 +26,7 @@ Resources:
     Properties:
       XrayEnabled: true
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Tags:
         key1: value1
         key2: value2
@@ -41,7 +41,7 @@ Resources:
       SchemaUri: https://bucket-name.s3.region-code.amazonaws.com/key-name
       XrayEnabled: true
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Tags:
         key1: value1
         key2: value2
@@ -55,7 +55,7 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Tags:
         key1: value1
         key2: value2
@@ -75,7 +75,7 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Tags:
         key1: value1
         key2: value2
@@ -93,7 +93,7 @@ Resources:
           addTodo(id: ID!, name: String, description: String, priority: Int): Todo
         }
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       DataSources:
         DynamoDb:
           MyDataSource:
@@ -113,7 +113,7 @@ Resources:
           addTodo(id: ID!, name: String, description: String, priority: Int): Todo
         }
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       DataSources:
         DynamoDb:
           MyDataSource:
@@ -137,7 +137,7 @@ Resources:
           addTodo(id: ID!, name: String, description: String, priority: Int): Todo
         }
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       DataSources:
         DynamoDb:
           MyDataSource:
@@ -158,7 +158,7 @@ Resources:
           addTodo(id: ID!, name: String, description: String, priority: Int): Todo
         }
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Functions:
         NoDataSourceProperties:
           CodeUri: my-code
@@ -172,7 +172,7 @@ Resources:
           addTodo(id: ID!, name: String, description: String, priority: Int): Todo
         }
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       DataSources:
         DynamoDb:
           MyDataSource:
@@ -191,7 +191,7 @@ Resources:
           addTodo(id: ID!, name: String, description: String, priority: Int): Todo
         }
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       DataSources:
         DynamoDb:
           MyDataSource:
@@ -212,7 +212,7 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Tags:
         key1: value1
         key2: value2
@@ -239,7 +239,7 @@ Resources:
           addTodo(id: ID!, name: String, description: String, priority: Int): Todo
         }
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Functions:
         MyFunction:
           CodeUri: my-code-uri
@@ -268,7 +268,7 @@ Resources:
           addTodo(id: ID!, name: String, description: String, priority: Int): Todo
         }
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Functions:
         MyFunction:
           CodeUri: my-code-uri
@@ -297,7 +297,7 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Tags:
         key1: value1
         key2: value2
@@ -321,7 +321,7 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Tags:
         key1: value1
         key2: value2
@@ -349,7 +349,7 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Tags:
         key1: value1
         key2: value2
@@ -376,7 +376,7 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       Tags:
         key1: value1
         key2: value2
@@ -392,7 +392,7 @@ Resources:
                   Name: some-runtime
                   Version: 1.2.3
 
-  MultipleAuthConfigsInOneIndex:
+  MultipleAuthConfigs:
     Type: AWS::Serverless::GraphQLApi
     Properties:
       SchemaInline: |
@@ -401,7 +401,7 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: AWS_LAMBDA
+        Type: AWS_LAMBDA
         LambdaAuthorizer:
           AuthorizerUri: blah
           AuthorizerResultTtlInSeconds: 10
@@ -415,6 +415,31 @@ Resources:
         key1: value1
         key2: value2
 
+  MultipleAdditionalAuthConfigs:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: API_KEY
+        Additional:
+          Type: AWS_LAMBDA
+          LambdaAuthorizer:
+            AuthorizerUri: blah
+            AuthorizerResultTtlInSeconds: 10
+            IdentityValidationExpression: hello
+          OpenIDConnect:
+            AuthTTL: 10
+            ClientId: myid
+            IatTTL: 10
+            Issuer: prad
+      Tags:
+        key1: value1
+        key2: value2
+
   AuthTypeLambdaAuthorizerWithNoConfig:
     Type: AWS::Serverless::GraphQLApi
     Properties:
@@ -424,7 +449,23 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: AWS_LAMBDA
+        Type: AWS_LAMBDA
+      Tags:
+        key1: value1
+        key2: value2
+
+  AdditionalAuthTypeLambdaAuthorizerWithNoConfig:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: API_KEY
+        Additional:
+          Type: AWS_LAMBDA
       Tags:
         key1: value1
         key2: value2
@@ -438,7 +479,23 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: OPENID_CONNECT
+        Type: OPENID_CONNECT
+      Tags:
+        key1: value1
+        key2: value2
+
+  AdditionalAuthTypeOpenIDWithNoConfig:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: API_KEY
+        Additional:
+          Type: OPENID_CONNECT
       Tags:
         key1: value1
         key2: value2
@@ -452,7 +509,37 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-      - Type: AMAZON_COGNITO_USER_POOLS
+        Type: AMAZON_COGNITO_USER_POOLS
+      Tags:
+        key1: value1
+        key2: value2
+
+  AdditionalAuthUserPoolWithNoConfig:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: API_KEY
+        Additional:
+          Type: AMAZON_COGNITO_USER_POOLS
+      Tags:
+        key1: value1
+        key2: value2
+
+  NotAnAuthType:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: PRAD_AUTH
       Tags:
         key1: value1
         key2: value2

@@ -9,7 +9,7 @@ Resources:
           addTodo(id: ID!, name: String, description: String, priority: Int): Todo
         }
       Auth:
-      - Type: AWS_IAM
+        Type: AWS_IAM
       DataSources:
         DynamoDb:
           MyDataSource:

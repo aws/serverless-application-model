@@ -1,6 +1,29 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "definitions": {
+    "AdditionalAuth": {
+      "additionalProperties": false,
+      "properties": {
+        "LambdaAuthorizer": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__LambdaAuthorizer"
+        },
+        "OpenIDConnect": {
+          "$ref": "#/definitions/OpenIDConnect"
+        },
+        "Type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "UserPool": {
+          "$ref": "#/definitions/UserPool"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "title": "AdditionalAuth",
+      "type": "object"
+    },
     "AlexaSkillEvent": {
       "additionalProperties": false,
       "properties": {
@@ -6258,6 +6281,13 @@
     "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth": {
       "additionalProperties": false,
       "properties": {
+        "Additional": {
+          "items": {
+            "$ref": "#/definitions/AdditionalAuth"
+          },
+          "title": "Additional",
+          "type": "array"
+        },
         "LambdaAuthorizer": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__LambdaAuthorizer"
         },
@@ -6308,11 +6338,7 @@
           "type": "object"
         },
         "Auth": {
-          "items": {
-            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
-          },
-          "title": "Auth",
-          "type": "array"
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
         },
         "DataSources": {
           "$ref": "#/definitions/DataSources"

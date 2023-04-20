@@ -2148,7 +2148,7 @@ class SamGraphQLApi(SamResourceMacro):
         "Name": Property(False, IS_STR),
         "Tags": Property(False, IS_DICT),
         "XrayEnabled": PassThroughProperty(False),
-        "Auth": Property(True, list_of(IS_DICT)),
+        "Auth": Property(True, IS_DICT),
         "SchemaInline": Property(False, IS_STR),
         "SchemaUri": Property(False, IS_STR),
         "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
@@ -2245,51 +2245,37 @@ class SamGraphQLApi(SamResourceMacro):
 
         return api, cloudwatch_role
 
-    def _parse_auth_properties(self, api: GraphQLApi, auths: List[aws_serverless_graphqlapi.Auth]) -> None:
+    def _parse_auth_properties(self, api: GraphQLApi, auth: aws_serverless_graphqlapi.Auth) -> None:
         """
         Parse the Auth properties in a Serverless::GraphQLApi resource.
 
         This function does not return a value. The GraphQLApi object is modified directly so that we don't
         return multiple config properties which are mostly None values.
         """
-        if not auths:
-            raise InvalidResourceException(self.logical_id, "'Auth' must contain at least one valid authorizer.")
+        # Default authentication
+        name, auth_dict = self._validate_auth_type_and_config(auth)
+        api.AuthenticationType = auth.Type
+        if name:
+            setattr(api, name, auth_dict)
 
+        # Additional authentication
         additional_auths: List[AdditionalAuthenticationProviderType] = []
+        if auth.Additional:
+            for index, additional in enumerate(auth.Additional):
+                name, auth_dict = self._validate_auth_type_and_config(additional, index)
+                additional_auth: AdditionalAuthenticationProviderType = {"AuthenticationType": additional.Type}
+                if name and auth_dict:
+                    additional_auth[name] = auth_dict
 
-        # In each Auth index, you should only define a max of two properties. The "Type" property, and if
-        # necessary the associated config as well.
-        MAX_AUTH_PROPERTIES = 2
-
-        for index, auth in enumerate(auths):
-            # Check if more than one authentication config is defined, throw error if so
-            keys = remove_none_values(auth.dict()).keys()
-            if len(keys) > MAX_AUTH_PROPERTIES:
-                raise InvalidResourceException(
-                    self.logical_id, f"Index {index} in 'Auth' has more than one authentication configuration defined."
-                )
-
-            name, auth_dict = self._validate_auth_type_and_config(auth, index)
-
-            # The first index in authentication is the primary authentication
-            if index == 0:
-                api.AuthenticationType = auth.Type
-                if name:
-                    setattr(api, name, auth_dict)
-                continue
-
-            # All auths after the first are put into AdditionalAuthenticationProviders
-            additional_auth: AdditionalAuthenticationProviderType = {"AuthenticationType": auth.Type}
-            if name and auth_dict:
-                additional_auth[name] = auth_dict
-
-            additional_auths.append(additional_auth)
+                additional_auths.append(additional_auth)
 
         if additional_auths:
             api.AdditionalAuthenticationProviders = additional_auths
 
     def _validate_auth_type_and_config(
-        self, auth: aws_serverless_graphqlapi.Auth, index: int
+        self,
+        auth: Union[aws_serverless_graphqlapi.Auth, aws_serverless_graphqlapi.AdditionalAuth],
+        index: Optional[int] = None,
     ) -> Tuple[
         Optional[Literal["LambdaAuthorizerConfig", "OpenIDConnectConfig", "UserPoolConfig"]],
         Optional[
@@ -2299,30 +2285,45 @@ class SamGraphQLApi(SamResourceMacro):
         """
         Validates the authentication type and returns the name of the config property and the respective dictionary.
 
-        This function will throw an error if auth.Type is not a recognized value.
+        The index parameter is only required if you are validating an AdditionalAuth, so that we can correctly
+        format the key path for any errors that are thrown. It is not necessary for Auth.
         """
+        # In each Auth index, you should only define a max of two properties. The "Type" property, and if
+        # necessary the associated config as well.
+        MAX_AUTH_PROPERTIES = 2
+
+        keys = remove_none_values(auth.dict()).keys()
+        if len(keys) > MAX_AUTH_PROPERTIES:
+            key_path = "'Auth'" if not index else f"'Auth.Additional.{index}'"
+            raise InvalidResourceException(
+                self.logical_id, f"{key_path} has more than one authentication configuration defined."
+            )
+
         if auth.Type == "API_KEY" or auth.Type == "AWS_IAM":
             return None, None
 
         if auth.Type == "AWS_LAMBDA":
-            lambda_authorizer = sam_expect(
-                auth.LambdaAuthorizer, self.logical_id, f"Auth.{index}.LambdaAuthorizer"
-            ).to_not_be_none("'LambdaAuthorizer' must be defined if type is 'AWS_LAMBDA'.")
+            key_path = "Auth.LambdaAuthorizer" if not index else f"Auth.Additional.{index}.LambdaAuthorizer"
+            lambda_authorizer = sam_expect(auth.LambdaAuthorizer, self.logical_id, key_path).to_not_be_none(
+                "'LambdaAuthorizer' must be defined if type is 'AWS_LAMBDA'."
+            )
             return "LambdaAuthorizerConfig", cast(
                 LambdaAuthorizerConfigType, remove_none_values(lambda_authorizer.dict())
             )
 
         if auth.Type == "OPENID_CONNECT":
-            openid_connect = sam_expect(
-                auth.OpenIDConnect, self.logical_id, f"Auth.{index}.OpenIDConnect"
-            ).to_not_be_none("'OpenIDConnect' must be defined if type is 'OPENID_CONNECT'.")
+            key_path = "Auth.OpenIDConnect" if not index else f"Auth.Additional.{index}.OpenIDConnect"
+            openid_connect = sam_expect(auth.OpenIDConnect, self.logical_id, key_path).to_not_be_none(
+                "'OpenIDConnect' must be defined if type is 'OPENID_CONNECT'."
+            )
             return "OpenIDConnectConfig", cast(OpenIDConnectConfigType, remove_none_values(openid_connect.dict()))
 
         if auth.Type == "AMAZON_COGNITO_USER_POOLS":
-            user_pool = sam_expect(auth.UserPool, self.logical_id, f"Auth.{index}.UserPool").to_not_be_none(
+            key_path = "Auth.UserPool" if not index else f"Auth.Additional.{index}.UserPool"
+            user_pool = sam_expect(auth.UserPool, self.logical_id, key_path).to_not_be_none(
                 "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
             )
-            if index != 0:
+            if index is not None:
                 # UserPoolConfig does not have the DefaultAction property UNLESS it is the primary authentication
                 # method (first index). If it is an additional authentication, we nullify this value.
                 user_pool.DefaultAction = None
