@@ -4,7 +4,7 @@
     "Number of errors found: 1. ",
     "Resource with id [TriggeredFunction] is invalid. ",
     "Event with id [TriggeredFunctionOnTerminate] is invalid. ",
-    "The only valid value for 'Type' property of DeadLetterConfig is 'SQS'"
+    "The only valid value for 'Type' property of DeadLetterConfig is 'SQS'."
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [TriggeredFunction] is invalid. Event with id [TriggeredFunctionOnTerminate] is invalid. The only valid value for 'Type' property of DeadLetterConfig is 'SQS'"
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [TriggeredFunction] is invalid. Event with id [TriggeredFunctionOnTerminate] is invalid. The only valid value for 'Type' property of DeadLetterConfig is 'SQS'."
 }
