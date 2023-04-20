@@ -58,7 +58,7 @@ class SchedulerEventSource(ResourceMacro):
     # - pass-through to AWS::Scheduler::Schedule
     ScheduleExpression: str
     FlexibleTimeWindow: Optional[Dict[str, Any]]
-    Name: Optional[Union[PassThrough, bool]]
+    Name: Optional[PassThrough]
     State: Optional[PassThrough]
     Description: Optional[PassThrough]
     StartDate: Optional[PassThrough]
