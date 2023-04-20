@@ -3,6 +3,8 @@ import copy
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
+from typing_extensions import Literal
+
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.cloudwatchlogs
 import samtranslator.model.eventsources.pull
@@ -12,16 +14,21 @@ from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
+    AdditionalAuthenticationProviderType,
     AppSyncRuntimeType,
     CachingConfigType,
+    CognitoUserPoolConfigType,
     DataSource,
     DynamoDBConfigType,
     FunctionConfiguration,
     GraphQLApi,
     GraphQLSchema,
+    LambdaAuthorizerConfigType,
     LogConfigType,
+    OpenIDConnectConfigType,
     Resolver,
     SyncConfigType,
+    UserPoolConfigType,
 )
 from samtranslator.internal.schema_source import aws_serverless_graphqlapi
 from samtranslator.internal.schema_source.common import PermissionsType
@@ -2151,7 +2158,7 @@ class SamGraphQLApi(SamResourceMacro):
         "AppSyncResolvers": Property(False, IS_DICT),
     }
 
-    Auth: Dict[str, Any]
+    Auth: List[Dict[str, Any]]
     Tags: Optional[Dict[str, Any]]
     XrayEnabled: Optional[PassThrough]
     Name: Optional[str]
@@ -2220,9 +2227,10 @@ class SamGraphQLApi(SamResourceMacro):
     ) -> Tuple[GraphQLApi, Optional[IAMRole]]:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
-        api.AuthenticationType = model.Auth.Type
         api.Name = model.Name or self.logical_id
         api.XrayEnabled = model.XrayEnabled
+
+        self._parse_auth_properties(api, model.Auth)
 
         if model.Tags:
             api.Tags = get_tag_list(model.Tags)
@@ -2236,6 +2244,97 @@ class SamGraphQLApi(SamResourceMacro):
         api.LogConfig, cloudwatch_role = self._parse_logging_properties(model)
 
         return api, cloudwatch_role
+
+    def _parse_auth_properties(self, api: GraphQLApi, auth: aws_serverless_graphqlapi.Auth) -> None:
+        """
+        Parse the Auth properties in a Serverless::GraphQLApi resource.
+
+        This function does not return a value. The GraphQLApi object is modified directly so that we don't
+        return multiple config properties which are mostly None values.
+        """
+        # Default authentication
+        name, auth_dict = self._validate_auth_type_and_config(auth)
+        api.AuthenticationType = auth.Type
+
+        # This would be much easier and type-safe if accessing the properties in Resource
+        # was a dictionary. Currently, top level properties are class attributes, but nested
+        # properties are dictionaries...
+        # TODO: Access properties in Resource class as dict?
+        if name:
+            setattr(api, name, auth_dict)
+
+        # Additional authentication
+        additional_auths: List[AdditionalAuthenticationProviderType] = []
+        if auth.Additional:
+            for index, additional in enumerate(auth.Additional):
+                name, auth_dict = self._validate_auth_type_and_config(additional, index)
+                additional_auth: AdditionalAuthenticationProviderType = {"AuthenticationType": additional.Type}
+                if name and auth_dict:
+                    additional_auth[name] = auth_dict
+
+                additional_auths.append(additional_auth)
+
+        if additional_auths:
+            api.AdditionalAuthenticationProviders = additional_auths
+
+    def _validate_auth_type_and_config(
+        self,
+        auth: Union[aws_serverless_graphqlapi.Auth, aws_serverless_graphqlapi.AdditionalAuth],
+        index: Optional[int] = None,
+    ) -> Tuple[
+        Optional[Literal["LambdaAuthorizerConfig", "OpenIDConnectConfig", "UserPoolConfig"]],
+        Optional[
+            Union[LambdaAuthorizerConfigType, OpenIDConnectConfigType, UserPoolConfigType, CognitoUserPoolConfigType]
+        ],
+    ]:
+        """
+        Validates the authentication type and returns the name of the config property and the respective dictionary.
+
+        The index parameter is only required if you are validating an AdditionalAuth, so that we can correctly
+        format the key path for any errors that are thrown. It is not necessary for Auth.
+        """
+        # In each Auth index, you should only define a max of two properties. The "Type" property, and if
+        # necessary the associated config as well.
+        MAX_AUTH_PROPERTIES = 2
+
+        keys = remove_none_values(auth.dict()).keys()
+        if len(keys) > MAX_AUTH_PROPERTIES:
+            key_path = "'Auth'" if not index else f"'Auth.Additional.{index}'"
+            raise InvalidResourceException(
+                self.logical_id, f"{key_path} has more than one authentication configuration defined."
+            )
+
+        # auth.Type is certain to be one of the following values because of our model validation.
+        if auth.Type == "API_KEY" or auth.Type == "AWS_IAM":
+            return None, None
+
+        if auth.Type == "AWS_LAMBDA":
+            key_path = "Auth.LambdaAuthorizer" if not index else f"Auth.Additional.{index}.LambdaAuthorizer"
+            lambda_authorizer = sam_expect(auth.LambdaAuthorizer, self.logical_id, key_path).to_not_be_none(
+                "'LambdaAuthorizer' must be defined if type is 'AWS_LAMBDA'."
+            )
+            return "LambdaAuthorizerConfig", cast(
+                LambdaAuthorizerConfigType, remove_none_values(lambda_authorizer.dict())
+            )
+
+        if auth.Type == "OPENID_CONNECT":
+            key_path = "Auth.OpenIDConnect" if not index else f"Auth.Additional.{index}.OpenIDConnect"
+            openid_connect = sam_expect(auth.OpenIDConnect, self.logical_id, key_path).to_not_be_none(
+                "'OpenIDConnect' must be defined if type is 'OPENID_CONNECT'."
+            )
+            return "OpenIDConnectConfig", cast(OpenIDConnectConfigType, remove_none_values(openid_connect.dict()))
+
+        # Last possible type is "AMAZON_COGNITO_USER_POOLS"
+        key_path = "Auth.UserPool" if not index else f"Auth.Additional.{index}.UserPool"
+        user_pool = sam_expect(auth.UserPool, self.logical_id, key_path).to_not_be_none(
+            "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
+        )
+        if index is not None:
+            # UserPoolConfig does not have the DefaultAction property UNLESS it is the primary authentication
+            # method (first index). If it is an additional authentication, we nullify this value.
+            user_pool.DefaultAction = None
+            return "UserPoolConfig", cast(CognitoUserPoolConfigType, remove_none_values(user_pool.dict()))
+        return "UserPoolConfig", cast(UserPoolConfigType, remove_none_values(user_pool.dict()))
 
     def _create_logging_default(self) -> Tuple[LogConfigType, IAMRole]:
         """
