@@ -2299,6 +2299,7 @@ class SamGraphQLApi(SamResourceMacro):
                 self.logical_id, f"{key_path} has more than one authentication configuration defined."
             )
 
+        # auth.Type is certain to be one of the following values because of our model validation.
         if auth.Type == "API_KEY" or auth.Type == "AWS_IAM":
             return None, None
 
@@ -2318,20 +2319,17 @@ class SamGraphQLApi(SamResourceMacro):
             )
             return "OpenIDConnectConfig", cast(OpenIDConnectConfigType, remove_none_values(openid_connect.dict()))
 
-        if auth.Type == "AMAZON_COGNITO_USER_POOLS":
-            key_path = "Auth.UserPool" if not index else f"Auth.Additional.{index}.UserPool"
-            user_pool = sam_expect(auth.UserPool, self.logical_id, key_path).to_not_be_none(
-                "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
-            )
-            if index is not None:
-                # UserPoolConfig does not have the DefaultAction property UNLESS it is the primary authentication
-                # method (first index). If it is an additional authentication, we nullify this value.
-                user_pool.DefaultAction = None
-                return "UserPoolConfig", cast(CognitoUserPoolConfigType, remove_none_values(user_pool.dict()))
-            return "UserPoolConfig", cast(UserPoolConfigType, remove_none_values(user_pool.dict()))
-
-        # auth.Type is not a recognized value
-        raise InvalidResourceException(self.logical_id, f"'{auth.Type}' is not a valid authentication type.")
+        # Last possible type is "AMAZON_COGNITO_USER_POOLS"
+        key_path = "Auth.UserPool" if not index else f"Auth.Additional.{index}.UserPool"
+        user_pool = sam_expect(auth.UserPool, self.logical_id, key_path).to_not_be_none(
+            "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
+        )
+        if index is not None:
+            # UserPoolConfig does not have the DefaultAction property UNLESS it is the primary authentication
+            # method (first index). If it is an additional authentication, we nullify this value.
+            user_pool.DefaultAction = None
+            return "UserPoolConfig", cast(CognitoUserPoolConfigType, remove_none_values(user_pool.dict()))
+        return "UserPoolConfig", cast(UserPoolConfigType, remove_none_values(user_pool.dict()))
 
     def _create_logging_default(self) -> Tuple[LogConfigType, IAMRole]:
         """

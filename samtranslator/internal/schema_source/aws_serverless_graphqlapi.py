@@ -10,6 +10,8 @@ from samtranslator.internal.schema_source.common import (
     get_prop,
 )
 
+AuthenticationTypes = Literal["AWS_IAM", "API_KEY", "AWS_LAMBDA", "OPENID_CONNECT", "AMAZON_COGNITO_USER_POOLS"]
+
 properties = get_prop("sam-resource-graphqlapi")
 
 
@@ -35,14 +37,14 @@ class UserPool(BaseModel):
 
 
 class AdditionalAuth(BaseModel):
-    Type: str
+    Type: AuthenticationTypes
     LambdaAuthorizer: Optional[LambdaAuthorizer]
     OpenIDConnect: Optional[OpenIDConnect]
     UserPool: Optional[UserPool]
 
 
 class Auth(BaseModel):
-    Type: str
+    Type: AuthenticationTypes
     LambdaAuthorizer: Optional[LambdaAuthorizer]
     OpenIDConnect: Optional[OpenIDConnect]
     UserPool: Optional[UserPool]

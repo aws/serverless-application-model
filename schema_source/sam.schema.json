@@ -11,6 +11,13 @@
           "$ref": "#/definitions/OpenIDConnect"
         },
         "Type": {
+          "enum": [
+            "AWS_IAM",
+            "API_KEY",
+            "AWS_LAMBDA",
+            "OPENID_CONNECT",
+            "AMAZON_COGNITO_USER_POOLS"
+          ],
           "title": "Type",
           "type": "string"
         },
@@ -6295,6 +6302,13 @@
           "$ref": "#/definitions/OpenIDConnect"
         },
         "Type": {
+          "enum": [
+            "AWS_IAM",
+            "API_KEY",
+            "AWS_LAMBDA",
+            "OPENID_CONNECT",
+            "AMAZON_COGNITO_USER_POOLS"
+          ],
           "title": "Type",
           "type": "string"
         },
