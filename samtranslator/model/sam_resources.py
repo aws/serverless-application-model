@@ -2255,6 +2255,11 @@ class SamGraphQLApi(SamResourceMacro):
         # Default authentication
         name, auth_dict = self._validate_auth_type_and_config(auth)
         api.AuthenticationType = auth.Type
+
+        # This would be much easier and type-safe if accessing the properties in Resource
+        # was a dictionary. Currently, top level properties are class attributes, but nested
+        # properties are dictionaries...
+        # TODO: Access properties in Resource class as dict?
         if name:
             setattr(api, name, auth_dict)
 
