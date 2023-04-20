@@ -1,0 +1,23 @@
+# This test exists so we can confirm that we are translating over the "DefaultAction" property over, since
+# this is nullified when it is in the additional authentications.
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AMAZON_COGNITO_USER_POOLS
+        UserPool:
+          AppIdClientRegex: myregex
+          AwsRegion: na-east-1
+          # This default action will exist post transform since this is our default authentication.
+          DefaultAction: something
+          UserPoolId: myid
+      Tags:
+        key1: value1
+        key2: value2
