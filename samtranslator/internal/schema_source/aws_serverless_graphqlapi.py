@@ -46,7 +46,6 @@ class DynamoDBDataSource(BaseModel):
 class LambdaDataSource(BaseModel):
     FunctionArn: PassThroughProp
     ServiceRoleArn: Optional[PassThroughProp]
-    Permissions: Optional[PermissionsType]
     Name: Optional[str]
     Description: Optional[PassThroughProp]
 

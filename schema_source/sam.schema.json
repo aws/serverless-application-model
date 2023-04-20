@@ -1898,17 +1898,6 @@
           "title": "Name",
           "type": "string"
         },
-        "Permissions": {
-          "items": {
-            "enum": [
-              "Read",
-              "Write"
-            ],
-            "type": "string"
-          },
-          "title": "Permissions",
-          "type": "array"
-        },
         "ServiceRoleArn": {
           "$ref": "#/definitions/PassThroughProp"
         }

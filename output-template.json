@@ -74,83 +74,89 @@
       "ApiId"
      ]
     },
-    "Name": "MyDataSource",
-    "Type": "AMAZON_LAMBDA",
-    "ServiceRoleArn": {
+    "Description": "lambda datasources are nice",
+    "Name": "PradsLambdaDataSource",
+    "Type": "AWS_LAMBDA",
+    "ServiceRoleArn": "some-role-arn",
+    "LambdaConfig": {
+     "LambdaFunctionArn": "my-lambda-arn"
+    }
+   }
+  },
+  "SuperCoolAPIMyFunction": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
      "Fn::GetAtt": [
-      "SuperCoolAPILambdaMyDataSourceRole",
-      "Arn"
+      "SuperCoolAPI",
+      "ApiId"
      ]
     },
-    "LambdaConfig": {
-     "LambdaFunctionArn": "blah"
-    }
-   }
-  },
-  "SuperCoolAPILambdaMyDataSourceRole": {
-   "Type": "AWS::IAM::Role",
-   "Properties": {
-    "AssumeRolePolicyDocument": {
-     "Version": "2012-10-17",
-     "Statement": [
-      {
-       "Action": [
-        "sts:AssumeRole"
-       ],
-       "Effect": "Allow",
-       "Principal": {
-        "Service": [
-         "appsync.amazonaws.com"
-        ]
-       }
-      }
+    "Code": "this is my epic code",
+    "DataSourceName": {
+     "Fn::GetAtt": [
+      "SuperCoolAPILambdaMyDataSource",
+      "Name"
      ]
+    },
+    "MaxBatchSize": 10,
+    "Name": "MyFunction",
+    "Runtime": {
+     "Name": "some-runtime",
+     "RuntimeVersion": "1.2.3"
     }
    }
   },
-  "SuperCoolAPILambdaMyDataSourceToLambdaConnectorPolicy": {
-   "Type": "AWS::IAM::ManagedPolicy",
-   "Metadata": {
-    "aws:sam:connectors": {
-     "SuperCoolAPILambdaMyDataSourceToLambdaConnector": {
-      "Source": {
-       "Type": "AWS::AppSync::DataSource"
-      },
-      "Destination": {
-       "Type": "AWS::Lambda::Function"
-      }
-     }
-    }
-   },
+  "SuperCoolAPIMutationmyResolver": {
+   "Type": "AWS::AppSync::Resolver",
+   "DependsOn": [
+    "SuperCoolAPISchema"
+   ],
    "Properties": {
-    "PolicyDocument": {
-     "Version": "2012-10-17",
-     "Statement": [
+    "ApiId": {
+     "Fn::GetAtt": [
+      "SuperCoolAPI",
+      "ApiId"
+     ]
+    },
+    "CachingConfig": {
+     "Ttl": 20,
+     "CachingKeys": [
+      "key1",
+      "key2"
+     ]
+    },
+    "Code": "\nexport function request(ctx) {\n    return {};\n}\n\nexport function response(ctx) {\n    return ctx.prev.result;\n}\n",
+    "FieldName": "my_field",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
       {
-       "Effect": "Allow",
-       "Action": [
-        "lambda:InvokeAsync",
-        "lambda:InvokeFunction"
-       ],
-       "Resource": [
-        "blah",
-        {
-         "Fn::Sub": [
-          "${DestinationArn}:*",
-          {
-           "DestinationArn": "blah"
-          }
-         ]
-        }
+       "Fn::GetAtt": [
+        "SuperCoolAPIMyFunction",
+        "FunctionId"
        ]
       }
      ]
     },
-    "Roles": [
-     {
-      "Ref": "SuperCoolAPILambdaMyDataSourceRole"
-     }
-    ]
+    "Runtime": {
+     "Name": "some-runtime",
+     "RuntimeVersion": "1.2.3"
+    },
+    "TypeName": "Mutation"
+   }
+  },
+  "SuperCoolAPINoneDataSource": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "SuperCoolAPI",
+      "ApiId"
+     ]
+    },
+    "Name": "SuperCoolAPINoneDataSource",
+    "Type": "NONE"
    }
   }
  }

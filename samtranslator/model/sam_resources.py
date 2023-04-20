@@ -2488,8 +2488,6 @@ class SamGraphQLApi(SamResourceMacro):
         if lambda_datasource.ServiceRoleArn:
             return passthrough_value(lambda_datasource.ServiceRoleArn), []
 
-        permissions = lambda_datasource.Permissions or ["Write"]
-
         role_logical_id = f"{datasource_logical_id}Role"
         role = IAMRole(
             logical_id=role_logical_id,
@@ -2502,7 +2500,7 @@ class SamGraphQLApi(SamResourceMacro):
         role_arn = role.get_runtime_attr("arn")
 
         connector_resources = self._construct_lambda_datasource_connector_resources(
-            datasource_logical_id, datasource_arn, function_arn, permissions, role.get_runtime_attr("name"), kwargs
+            datasource_logical_id, datasource_arn, function_arn, role.get_runtime_attr("name"), kwargs
         )
 
         return role_arn, [role, *connector_resources]
@@ -2512,7 +2510,6 @@ class SamGraphQLApi(SamResourceMacro):
         datasource_id: str,
         source_arn: Intrinsicable[str],
         destination_arn: Intrinsicable[str],
-        permissions: PermissionsType,
         role_name: Intrinsicable[str],
         kwargs: Dict[str, Any],
     ) -> List[Resource]:
@@ -2525,7 +2522,7 @@ class SamGraphQLApi(SamResourceMacro):
                     "Type": "AWS::Lambda::Function",
                     "Arn": destination_arn,
                 },
-                "Permissions": permissions,
+                "Permissions": ["Write"],
             },
         }
 
