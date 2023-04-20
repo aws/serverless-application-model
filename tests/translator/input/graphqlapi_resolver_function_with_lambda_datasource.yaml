@@ -39,4 +39,3 @@ Resources:
             - MyFunction:
                 InlineCode: this is my epic code
                 DataSource: MyDataSource
-

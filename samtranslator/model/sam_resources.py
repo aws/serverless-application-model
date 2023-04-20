@@ -2560,7 +2560,7 @@ class SamGraphQLApi(SamResourceMacro):
             cfn_datasource.Type = "AWS_LAMBDA"
             cfn_datasource.ApiId = api_id
             cfn_datasource.Description = passthrough_value(lambda_datasource.Description)
-            cfn_datasource.LambdaConfig = {"LambdaFunctionArn": lambda_datasource.FunctionArn}
+            cfn_datasource.LambdaConfig = {"LambdaFunctionArn": passthrough_value(lambda_datasource.FunctionArn)}
 
             cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_lambda_datasource_role(
                 lambda_datasource,
