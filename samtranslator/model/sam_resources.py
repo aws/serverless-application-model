@@ -2418,8 +2418,8 @@ class SamGraphQLApi(SamResourceMacro):
         self, api_keys: Dict[str, aws_serverless_graphqlapi.ApiKey], api_id: Intrinsicable[str]
     ) -> List[Resource]:
         resources: List[Resource] = []
-        # TODO: ask slava about how expires and parsing date stuff. what timezone is the date assumed to be in, etc
-        # make expires a required value
+
+        # TODO: Add datetime parsing for ExpiresOn
         for relative_id, api_key in api_keys.items():
             cfn_api_key = ApiKey(
                 logical_id=f"{self.logical_id}{relative_id}",
@@ -2429,7 +2429,7 @@ class SamGraphQLApi(SamResourceMacro):
             cfn_api_key.ApiId = api_id
             cfn_api_key.ApiKeyId = passthrough_value(api_key.ApiKeyId)
             cfn_api_key.Description = passthrough_value(api_key.Description)
-            cfn_api_key.ExpiresOn = passthrough_value(api_key.Expires)
+            cfn_api_key.Expires = passthrough_value(api_key.ExpiresOn)
             resources.append(cfn_api_key)
 
         return resources
