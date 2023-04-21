@@ -116,6 +116,22 @@
       "title": "ApiAuth",
       "type": "object"
     },
+    "ApiKey": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiKeyId": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ExpiresOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "title": "ApiKey",
+      "type": "object"
+    },
     "AppSyncResolver": {
       "additionalProperties": false,
       "properties": {
@@ -6418,6 +6434,13 @@
     "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties": {
       "additionalProperties": false,
       "properties": {
+        "ApiKey": {
+          "additionalProperties": {
+            "$ref": "#/definitions/ApiKey"
+          },
+          "title": "Apikey",
+          "type": "object"
+        },
         "AppSyncResolvers": {
           "additionalProperties": {
             "additionalProperties": {

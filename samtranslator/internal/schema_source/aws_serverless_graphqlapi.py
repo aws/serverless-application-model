@@ -51,6 +51,12 @@ class Auth(BaseModel):
     Additional: Optional[List[AdditionalAuth]]
 
 
+class ApiKey(BaseModel):
+    ApiKeyId: Optional[PassThroughProp]
+    Description: Optional[PassThroughProp]
+    ExpiresOn: Optional[PassThroughProp]
+
+
 class Logging(BaseModel):
     CloudWatchLogsRoleArn: Optional[PassThroughProp]
     ExcludeVerboseContent: Optional[PassThroughProp]
@@ -166,6 +172,7 @@ class Properties(BaseModel):
     ResolverCodeSettings: Optional[ResolverCodeSettings]
     Functions: Optional[Dict[str, Function]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, AppSyncResolver]]]
+    ApiKey: Optional[Dict[str, ApiKey]]
     DomainName: Optional[DomainName]
     Cache: Optional[Cache]
 

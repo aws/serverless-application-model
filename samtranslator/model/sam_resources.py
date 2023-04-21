@@ -16,6 +16,7 @@ from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
     AdditionalAuthenticationProviderType,
     ApiCache,
+    ApiKey,
     AppSyncRuntimeType,
     CachingConfigType,
     CognitoUserPoolConfigType,
@@ -2159,6 +2160,7 @@ class SamGraphQLApi(SamResourceMacro):
         "ResolverCodeSettings": Property(False, IS_DICT),
         "Functions": Property(False, IS_DICT),
         "AppSyncResolvers": Property(False, IS_DICT),
+        "ApiKey": Property(False, IS_DICT),
         "DomainName": Property(False, IS_DICT),
         "Cache": Property(False, IS_DICT),
     }
@@ -2174,6 +2176,7 @@ class SamGraphQLApi(SamResourceMacro):
     ResolverCodeSettings: Optional[Dict[str, Any]]
     Functions: Optional[Dict[str, Dict[str, Any]]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
+    ApiKey: Optional[Dict[str, Dict[str, Any]]]
     DomainName: Optional[Dict[str, Any]]
     Cache: Optional[Dict[str, Any]]
 
@@ -2204,6 +2207,10 @@ class SamGraphQLApi(SamResourceMacro):
 
         if cloudwatch_role:
             resources.append(cloudwatch_role)
+
+        if model.ApiKey:
+            api_keys = self._construct_appsync_api_keys(model.ApiKey, api_id)
+            resources.extend(api_keys)
 
         if model.Cache:
             api_cache = self._construct_appsync_api_cache(model.Cache, api_id)
@@ -2421,6 +2428,26 @@ class SamGraphQLApi(SamResourceMacro):
         schema.DefinitionS3Location = passthrough_value(model.SchemaUri)
 
         return schema
+
+    def _construct_appsync_api_keys(
+        self, api_keys: Dict[str, aws_serverless_graphqlapi.ApiKey], api_id: Intrinsicable[str]
+    ) -> List[Resource]:
+        resources: List[Resource] = []
+
+        # TODO: Add datetime parsing for ExpiresOn; currently expects Unix timestamp
+        for relative_id, api_key in api_keys.items():
+            cfn_api_key = ApiKey(
+                logical_id=f"{self.logical_id}{relative_id}",
+                depends_on=self.depends_on,
+                attributes=self.resource_attributes,
+            )
+            cfn_api_key.ApiId = api_id
+            cfn_api_key.ApiKeyId = passthrough_value(api_key.ApiKeyId)
+            cfn_api_key.Description = passthrough_value(api_key.Description)
+            cfn_api_key.Expires = passthrough_value(api_key.ExpiresOn)
+            resources.append(cfn_api_key)
+
+        return resources
 
     def _construct_domain_name_resources(
         self, domain_name: aws_serverless_graphqlapi.DomainName, api_id: Intrinsicable[str]
