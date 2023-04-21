@@ -140,6 +140,12 @@ class AppSyncResolver(BaseModel):
     Sync: Optional[Sync]
 
 
+class DomainName(BaseModel):
+    CertificateArn: PassThroughProp
+    DomainName: PassThroughProp
+    Description: Optional[PassThroughProp]
+
+
 class Cache(BaseModel):
     ApiCachingBehavior: PassThroughProp
     Ttl: PassThroughProp
@@ -160,6 +166,7 @@ class Properties(BaseModel):
     ResolverCodeSettings: Optional[ResolverCodeSettings]
     Functions: Optional[Dict[str, Function]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, AppSyncResolver]]]
+    DomainName: Optional[DomainName]
     Cache: Optional[Cache]
 
 

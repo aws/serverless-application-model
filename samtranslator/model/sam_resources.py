@@ -20,6 +20,8 @@ from samtranslator.internal.model.appsync import (
     CachingConfigType,
     CognitoUserPoolConfigType,
     DataSource,
+    DomainName,
+    DomainNameApiAssociation,
     DynamoDBConfigType,
     FunctionConfiguration,
     GraphQLApi,
@@ -2157,6 +2159,7 @@ class SamGraphQLApi(SamResourceMacro):
         "ResolverCodeSettings": Property(False, IS_DICT),
         "Functions": Property(False, IS_DICT),
         "AppSyncResolvers": Property(False, IS_DICT),
+        "DomainName": Property(False, IS_DICT),
         "Cache": Property(False, IS_DICT),
     }
 
@@ -2171,6 +2174,7 @@ class SamGraphQLApi(SamResourceMacro):
     ResolverCodeSettings: Optional[Dict[str, Any]]
     Functions: Optional[Dict[str, Dict[str, Any]]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
+    DomainName: Optional[Dict[str, Any]]
     Cache: Optional[Dict[str, Any]]
 
     # stop validation so we can use class variables for tracking state
@@ -2208,6 +2212,10 @@ class SamGraphQLApi(SamResourceMacro):
         if model.DataSources:
             datasource_resources = self._construct_datasource_resources(model.DataSources, api_id, kwargs)
             resources.extend(datasource_resources)
+
+        if model.DomainName:
+            domain_name_resources = self._construct_domain_name_resources(model.DomainName, api_id)
+            resources.extend(domain_name_resources)
 
         if model.ResolverCodeSettings:
             self._set_resolver_code_settings(model.ResolverCodeSettings)
@@ -2413,6 +2421,26 @@ class SamGraphQLApi(SamResourceMacro):
         schema.DefinitionS3Location = passthrough_value(model.SchemaUri)
 
         return schema
+
+    def _construct_domain_name_resources(
+        self, domain_name: aws_serverless_graphqlapi.DomainName, api_id: Intrinsicable[str]
+    ) -> List[Resource]:
+        cfn_domain_name = DomainName(
+            logical_id=f"{self.logical_id}DomainName", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+        cfn_domain_name.CertificateArn = passthrough_value(domain_name.CertificateArn)
+        cfn_domain_name.DomainName = passthrough_value(domain_name.DomainName)
+        cfn_domain_name.Description = passthrough_value(domain_name.Description)
+
+        cfn_domain_name_api_association = DomainNameApiAssociation(
+            logical_id=f"{self.logical_id}DomainNameApiAssociation",
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
+        cfn_domain_name_api_association.ApiId = api_id
+        cfn_domain_name_api_association.DomainName = cfn_domain_name.get_runtime_attr("domain_name")
+
+        return [cfn_domain_name, cfn_domain_name_api_association]
 
     def _construct_appsync_api_cache(
         self, cache: aws_serverless_graphqlapi.Cache, api_id: Intrinsicable[str]
