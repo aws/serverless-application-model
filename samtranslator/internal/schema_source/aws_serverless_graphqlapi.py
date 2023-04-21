@@ -140,7 +140,7 @@ class AppSyncResolver(BaseModel):
     Sync: Optional[Sync]
 
 
-class ApiCache(BaseModel):
+class Cache(BaseModel):
     ApiCachingBehavior: PassThroughProp
     Ttl: PassThroughProp
     Type: PassThroughProp
@@ -160,7 +160,7 @@ class Properties(BaseModel):
     ResolverCodeSettings: Optional[ResolverCodeSettings]
     Functions: Optional[Dict[str, Function]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, AppSyncResolver]]]
-    ApiCache: Optional[ApiCache]
+    Cache: Optional[Cache]
 
 
 class Resource(BaseModel):

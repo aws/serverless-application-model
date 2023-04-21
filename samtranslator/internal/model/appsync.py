@@ -224,7 +224,6 @@ class Resolver(Resource):
     TypeName: str
 
 
-
 class ApiCache(Resource):
     resource_type = "AWS::AppSync::ApiCache"
     property_types = {
