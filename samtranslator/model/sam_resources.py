@@ -15,8 +15,8 @@ from samtranslator.internal.intrinsics import resolve_string_parameter_in_resour
 from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
     AdditionalAuthenticationProviderType,
-    ApiKey,
     ApiCache,
+    ApiKey,
     AppSyncRuntimeType,
     CachingConfigType,
     CognitoUserPoolConfigType,
@@ -2448,6 +2448,7 @@ class SamGraphQLApi(SamResourceMacro):
             resources.append(cfn_api_key)
 
         return resources
+
     def _construct_domain_name_resources(
         self, domain_name: aws_serverless_graphqlapi.DomainName, api_id: Intrinsicable[str]
     ) -> List[Resource]:

@@ -237,6 +237,8 @@ class ApiKey(Resource):
     ApiKeyId: Optional[str]
     Description: Optional[str]
     Expires: Optional[float]
+
+
 class DomainName(Resource):
     resource_type = "AWS::AppSync::DomainName"
     property_types = {
