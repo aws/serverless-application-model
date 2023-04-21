@@ -3,6 +3,8 @@ import copy
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
+from typing_extensions import Literal
+
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.cloudwatchlogs
 import samtranslator.model.eventsources.pull
@@ -13,16 +15,21 @@ from samtranslator.internal.intrinsics import resolve_string_parameter_in_resour
 from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
     ApiCache,
+    AdditionalAuthenticationProviderType,
     AppSyncRuntimeType,
     CachingConfigType,
+    CognitoUserPoolConfigType,
     DataSource,
     DynamoDBConfigType,
     FunctionConfiguration,
     GraphQLApi,
     GraphQLSchema,
+    LambdaAuthorizerConfigType,
     LogConfigType,
+    OpenIDConnectConfigType,
     Resolver,
     SyncConfigType,
+    UserPoolConfigType,
 )
 from samtranslator.internal.schema_source import aws_serverless_graphqlapi
 from samtranslator.internal.schema_source.common import PermissionsType
@@ -2153,7 +2160,7 @@ class SamGraphQLApi(SamResourceMacro):
         "ApiCache": Property(False, IS_DICT),
     }
 
-    Auth: Dict[str, Any]
+    Auth: List[Dict[str, Any]]
     Tags: Optional[Dict[str, Any]]
     XrayEnabled: Optional[PassThrough]
     Name: Optional[str]
@@ -2227,9 +2234,10 @@ class SamGraphQLApi(SamResourceMacro):
     ) -> Tuple[GraphQLApi, Optional[IAMRole]]:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
-        api.AuthenticationType = model.Auth.Type
         api.Name = model.Name or self.logical_id
         api.XrayEnabled = model.XrayEnabled
+
+        self._parse_auth_properties(api, model.Auth)
 
         if model.Tags:
             api.Tags = get_tag_list(model.Tags)
@@ -2243,6 +2251,97 @@ class SamGraphQLApi(SamResourceMacro):
         api.LogConfig, cloudwatch_role = self._parse_logging_properties(model)
 
         return api, cloudwatch_role
+
+    def _parse_auth_properties(self, api: GraphQLApi, auth: aws_serverless_graphqlapi.Auth) -> None:
+        """
+        Parse the Auth properties in a Serverless::GraphQLApi resource.
+
+        This function does not return a value. The GraphQLApi object is modified directly so that we don't
+        return multiple config properties which are mostly None values.
+        """
+        # Default authentication
+        name, auth_dict = self._validate_auth_type_and_config(auth)
+        api.AuthenticationType = auth.Type
+
+        # This would be much easier and type-safe if accessing the properties in Resource
+        # was a dictionary. Currently, top level properties are class attributes, but nested
+        # properties are dictionaries...
+        # TODO: Access properties in Resource class as dict?
+        if name:
+            setattr(api, name, auth_dict)
+
+        # Additional authentication
+        additional_auths: List[AdditionalAuthenticationProviderType] = []
+        if auth.Additional:
+            for index, additional in enumerate(auth.Additional):
+                name, auth_dict = self._validate_auth_type_and_config(additional, index)
+                additional_auth: AdditionalAuthenticationProviderType = {"AuthenticationType": additional.Type}
+                if name and auth_dict:
+                    additional_auth[name] = auth_dict
+
+                additional_auths.append(additional_auth)
+
+        if additional_auths:
+            api.AdditionalAuthenticationProviders = additional_auths
+
+    def _validate_auth_type_and_config(
+        self,
+        auth: Union[aws_serverless_graphqlapi.Auth, aws_serverless_graphqlapi.AdditionalAuth],
+        index: Optional[int] = None,
+    ) -> Tuple[
+        Optional[Literal["LambdaAuthorizerConfig", "OpenIDConnectConfig", "UserPoolConfig"]],
+        Optional[
+            Union[LambdaAuthorizerConfigType, OpenIDConnectConfigType, UserPoolConfigType, CognitoUserPoolConfigType]
+        ],
+    ]:
+        """
+        Validates the authentication type and returns the name of the config property and the respective dictionary.
+
+        The index parameter is only required if you are validating an AdditionalAuth, so that we can correctly
+        format the key path for any errors that are thrown. It is not necessary for Auth.
+        """
+        # In each Auth index, you should only define a max of two properties. The "Type" property, and if
+        # necessary the associated config as well.
+        MAX_AUTH_PROPERTIES = 2
+
+        keys = remove_none_values(auth.dict()).keys()
+        if len(keys) > MAX_AUTH_PROPERTIES:
+            key_path = "'Auth'" if not index else f"'Auth.Additional.{index}'"
+            raise InvalidResourceException(
+                self.logical_id, f"{key_path} has more than one authentication configuration defined."
+            )
+
+        # auth.Type is certain to be one of the following values because of our model validation.
+        if auth.Type == "API_KEY" or auth.Type == "AWS_IAM":
+            return None, None
+
+        if auth.Type == "AWS_LAMBDA":
+            key_path = "Auth.LambdaAuthorizer" if not index else f"Auth.Additional.{index}.LambdaAuthorizer"
+            lambda_authorizer = sam_expect(auth.LambdaAuthorizer, self.logical_id, key_path).to_not_be_none(
+                "'LambdaAuthorizer' must be defined if type is 'AWS_LAMBDA'."
+            )
+            return "LambdaAuthorizerConfig", cast(
+                LambdaAuthorizerConfigType, remove_none_values(lambda_authorizer.dict())
+            )
+
+        if auth.Type == "OPENID_CONNECT":
+            key_path = "Auth.OpenIDConnect" if not index else f"Auth.Additional.{index}.OpenIDConnect"
+            openid_connect = sam_expect(auth.OpenIDConnect, self.logical_id, key_path).to_not_be_none(
+                "'OpenIDConnect' must be defined if type is 'OPENID_CONNECT'."
+            )
+            return "OpenIDConnectConfig", cast(OpenIDConnectConfigType, remove_none_values(openid_connect.dict()))
+
+        # Last possible type is "AMAZON_COGNITO_USER_POOLS"
+        key_path = "Auth.UserPool" if not index else f"Auth.Additional.{index}.UserPool"
+        user_pool = sam_expect(auth.UserPool, self.logical_id, key_path).to_not_be_none(
+            "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
+        )
+        if index is not None:
+            # UserPoolConfig does not have the DefaultAction property UNLESS it is the primary authentication
+            # method (first index). If it is an additional authentication, we nullify this value.
+            user_pool.DefaultAction = None
+            return "UserPoolConfig", cast(CognitoUserPoolConfigType, remove_none_values(user_pool.dict()))
+        return "UserPoolConfig", cast(UserPoolConfigType, remove_none_values(user_pool.dict()))
 
     def _create_logging_default(self) -> Tuple[LogConfigType, IAMRole]:
         """
@@ -2338,7 +2437,9 @@ class SamGraphQLApi(SamResourceMacro):
         kwargs: Dict[str, Any],
     ) -> List[Resource]:
         ddb_datasources = self._construct_ddb_datasources(datasources.DynamoDb, api_id, kwargs)
-        return [*ddb_datasources]
+        lambda_datasources = self._construct_lambda_datasources(datasources.Lambda, api_id, kwargs)
+
+        return [*ddb_datasources, *lambda_datasources]
 
     def _construct_ddb_datasources(
         self,
@@ -2361,13 +2462,10 @@ class SamGraphQLApi(SamResourceMacro):
             cfn_datasource.Name = ddb_datasource.Name or relative_id
             cfn_datasource.Type = "AMAZON_DYNAMODB"
             cfn_datasource.ApiId = api_id
-
-            if ddb_datasource.Description:
-                cfn_datasource.Description = cast(PassThrough, ddb_datasource.Description)
-
+            cfn_datasource.Description = passthrough_value(ddb_datasource.Description)
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
 
-            cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_datasource_role(
+            cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_ddb_datasource_role(
                 ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, datasource_logical_id, kwargs
             )
 
@@ -2377,7 +2475,7 @@ class SamGraphQLApi(SamResourceMacro):
 
         return resources
 
-    def _parse_datasource_role(
+    def _parse_ddb_datasource_role(
         self,
         ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource,
         datasource_arn: Intrinsicable[str],
@@ -2462,6 +2560,100 @@ class SamGraphQLApi(SamResourceMacro):
             SamConnector,
             SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
         )
+        return connector.to_cloudformation(**kwargs)
+
+    def _construct_lambda_datasources(
+        self,
+        lambda_datasources: Optional[Dict[str, aws_serverless_graphqlapi.LambdaDataSource]],
+        api_id: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        if not lambda_datasources:
+            return []
+
+        resources: List[Resource] = []
+
+        for relative_id, lambda_datasource in lambda_datasources.items():
+            datasource_logical_id = f"{self.logical_id}Lambda{relative_id}"
+            cfn_datasource = DataSource(
+                logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
+            )
+
+            cfn_datasource.Name = lambda_datasource.Name or relative_id
+            cfn_datasource.Type = "AWS_LAMBDA"
+            cfn_datasource.ApiId = api_id
+            cfn_datasource.Description = passthrough_value(lambda_datasource.Description)
+            cfn_datasource.LambdaConfig = {"LambdaFunctionArn": passthrough_value(lambda_datasource.FunctionArn)}
+
+            cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_lambda_datasource_role(
+                lambda_datasource,
+                cfn_datasource.get_runtime_attr("arn"),
+                lambda_datasource.FunctionArn,
+                datasource_logical_id,
+                kwargs,
+            )
+
+            self._datasource_name_map[relative_id] = cfn_datasource.get_runtime_attr("name")
+
+            resources.extend([cfn_datasource, *permissions_resources])
+
+        return resources
+
+    def _parse_lambda_datasource_role(
+        self,
+        lambda_datasource: aws_serverless_graphqlapi.LambdaDataSource,
+        datasource_arn: Intrinsicable[str],
+        function_arn: PassThrough,
+        datasource_logical_id: str,
+        kwargs: Dict[str, Any],
+    ) -> Tuple[str, List[Resource]]:
+        if lambda_datasource.ServiceRoleArn:
+            return passthrough_value(lambda_datasource.ServiceRoleArn), []
+
+        role_logical_id = f"{datasource_logical_id}Role"
+        role = IAMRole(
+            logical_id=role_logical_id,
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
+        role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+            "appsync.amazonaws.com"
+        )
+        role_arn = role.get_runtime_attr("arn")
+
+        connector_resources = self._construct_lambda_datasource_connector_resources(
+            datasource_logical_id, datasource_arn, function_arn, role.get_runtime_attr("name"), kwargs
+        )
+
+        return role_arn, [role, *connector_resources]
+
+    @staticmethod
+    def _construct_lambda_datasource_connector_resources(
+        datasource_id: str,
+        source_arn: Intrinsicable[str],
+        destination_arn: Intrinsicable[str],
+        role_name: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        logical_id = f"{datasource_id}ToLambdaConnector"
+        connector_dict = {
+            "Type": "AWS::Serverless::Connector",
+            "Properties": {
+                "Source": {"Type": "AWS::AppSync::DataSource", "Arn": source_arn, "RoleName": role_name},
+                "Destination": {
+                    "Type": "AWS::Lambda::Function",
+                    "Arn": destination_arn,
+                },
+                "Permissions": ["Write"],
+            },
+        }
+
+        # mypy thinks from_dict method returns "Resource" class instead of the inheriting parent class "SamResourceMacro"
+        connector = cast(
+            SamConnector,
+            SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
+        )
+
         return connector.to_cloudformation(**kwargs)
 
     @staticmethod
