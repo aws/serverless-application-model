@@ -222,3 +222,22 @@ class Resolver(Resource):
     Runtime: Optional[AppSyncRuntimeType]
     SyncConfig: Optional[SyncConfigType]
     TypeName: str
+
+
+class ApiCache(Resource):
+    resource_type = "AWS::AppSync::ApiCache"
+    property_types = {
+        "ApiCachingBehavior": GeneratedProperty(),
+        "ApiId": GeneratedProperty(),
+        "AtRestEncryptionEnabled": GeneratedProperty(),
+        "TransitEncryptionEnabled": GeneratedProperty(),
+        "Ttl": GeneratedProperty(),
+        "Type": GeneratedProperty(),
+    }
+
+    ApiCachingBehavior: str
+    ApiId: Intrinsicable[str]
+    Type: str
+    Ttl: float
+    AtRestEncryptionEnabled: Optional[bool]
+    TransitEncryptionEnabled: Optional[bool]
