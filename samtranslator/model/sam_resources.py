@@ -2414,7 +2414,9 @@ class SamGraphQLApi(SamResourceMacro):
 
         return schema
 
-    def _construct_appsync_api_cache(self, cache: aws_serverless_graphqlapi.Cache, api_id: Intrinsicable[str]) -> ApiCache:
+    def _construct_appsync_api_cache(
+        self, cache: aws_serverless_graphqlapi.Cache, api_id: Intrinsicable[str]
+    ) -> ApiCache:
         cfn_api_cache = ApiCache(
             logical_id=f"{self.logical_id}ApiCache", depends_on=self.depends_on, attributes=self.resource_attributes
         )
