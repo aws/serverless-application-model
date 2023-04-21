@@ -16,10 +16,13 @@ from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
     AdditionalAuthenticationProviderType,
     ApiKey,
+    ApiCache,
     AppSyncRuntimeType,
     CachingConfigType,
     CognitoUserPoolConfigType,
     DataSource,
+    DomainName,
+    DomainNameApiAssociation,
     DynamoDBConfigType,
     FunctionConfiguration,
     GraphQLApi,
@@ -2158,6 +2161,8 @@ class SamGraphQLApi(SamResourceMacro):
         "Functions": Property(False, IS_DICT),
         "AppSyncResolvers": Property(False, IS_DICT),
         "ApiKey": Property(False, IS_DICT),
+        "DomainName": Property(False, IS_DICT),
+        "Cache": Property(False, IS_DICT),
     }
 
     Auth: List[Dict[str, Any]]
@@ -2172,6 +2177,8 @@ class SamGraphQLApi(SamResourceMacro):
     Functions: Optional[Dict[str, Dict[str, Any]]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
     ApiKey: Optional[Dict[str, Dict[str, Any]]]
+    DomainName: Optional[Dict[str, Any]]
+    Cache: Optional[Dict[str, Any]]
 
     # stop validation so we can use class variables for tracking state
     validate_setattr = False
@@ -2205,9 +2212,17 @@ class SamGraphQLApi(SamResourceMacro):
             api_keys = self._construct_appsync_api_keys(model.ApiKey, api_id)
             resources.extend(api_keys)
 
+        if model.Cache:
+            api_cache = self._construct_appsync_api_cache(model.Cache, api_id)
+            resources.append(api_cache)
+
         if model.DataSources:
             datasource_resources = self._construct_datasource_resources(model.DataSources, api_id, kwargs)
             resources.extend(datasource_resources)
+
+        if model.DomainName:
+            domain_name_resources = self._construct_domain_name_resources(model.DomainName, api_id)
+            resources.extend(domain_name_resources)
 
         if model.ResolverCodeSettings:
             self._set_resolver_code_settings(model.ResolverCodeSettings)
@@ -2433,6 +2448,41 @@ class SamGraphQLApi(SamResourceMacro):
             resources.append(cfn_api_key)
 
         return resources
+    def _construct_domain_name_resources(
+        self, domain_name: aws_serverless_graphqlapi.DomainName, api_id: Intrinsicable[str]
+    ) -> List[Resource]:
+        cfn_domain_name = DomainName(
+            logical_id=f"{self.logical_id}DomainName", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+        cfn_domain_name.CertificateArn = passthrough_value(domain_name.CertificateArn)
+        cfn_domain_name.DomainName = passthrough_value(domain_name.DomainName)
+        cfn_domain_name.Description = passthrough_value(domain_name.Description)
+
+        cfn_domain_name_api_association = DomainNameApiAssociation(
+            logical_id=f"{self.logical_id}DomainNameApiAssociation",
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
+        cfn_domain_name_api_association.ApiId = api_id
+        cfn_domain_name_api_association.DomainName = cfn_domain_name.get_runtime_attr("domain_name")
+
+        return [cfn_domain_name, cfn_domain_name_api_association]
+
+    def _construct_appsync_api_cache(
+        self, cache: aws_serverless_graphqlapi.Cache, api_id: Intrinsicable[str]
+    ) -> ApiCache:
+        cfn_api_cache = ApiCache(
+            logical_id=f"{self.logical_id}ApiCache", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
+        cfn_api_cache.ApiId = api_id
+        cfn_api_cache.ApiCachingBehavior = passthrough_value(cache.ApiCachingBehavior)
+        cfn_api_cache.Type = passthrough_value(cache.Type)
+        cfn_api_cache.Ttl = passthrough_value(cache.Ttl)
+        cfn_api_cache.AtRestEncryptionEnabled = passthrough_value(cache.AtRestEncryptionEnabled)
+        cfn_api_cache.TransitEncryptionEnabled = passthrough_value(cache.TransitEncryptionEnabled)
+
+        return cfn_api_cache
 
     def _construct_datasource_resources(
         self,
