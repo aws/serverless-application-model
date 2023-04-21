@@ -2435,7 +2435,9 @@ class SamGraphQLApi(SamResourceMacro):
         kwargs: Dict[str, Any],
     ) -> List[Resource]:
         ddb_datasources = self._construct_ddb_datasources(datasources.DynamoDb, api_id, kwargs)
-        return [*ddb_datasources]
+        lambda_datasources = self._construct_lambda_datasources(datasources.Lambda, api_id, kwargs)
+
+        return [*ddb_datasources, *lambda_datasources]
 
     def _construct_ddb_datasources(
         self,
@@ -2458,13 +2460,10 @@ class SamGraphQLApi(SamResourceMacro):
             cfn_datasource.Name = ddb_datasource.Name or relative_id
             cfn_datasource.Type = "AMAZON_DYNAMODB"
             cfn_datasource.ApiId = api_id
-
-            if ddb_datasource.Description:
-                cfn_datasource.Description = cast(PassThrough, ddb_datasource.Description)
-
+            cfn_datasource.Description = passthrough_value(ddb_datasource.Description)
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
 
-            cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_datasource_role(
+            cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_ddb_datasource_role(
                 ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, datasource_logical_id, kwargs
             )
 
@@ -2474,7 +2473,7 @@ class SamGraphQLApi(SamResourceMacro):
 
         return resources
 
-    def _parse_datasource_role(
+    def _parse_ddb_datasource_role(
         self,
         ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource,
         datasource_arn: Intrinsicable[str],
@@ -2559,6 +2558,100 @@ class SamGraphQLApi(SamResourceMacro):
             SamConnector,
             SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
         )
+        return connector.to_cloudformation(**kwargs)
+
+    def _construct_lambda_datasources(
+        self,
+        lambda_datasources: Optional[Dict[str, aws_serverless_graphqlapi.LambdaDataSource]],
+        api_id: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        if not lambda_datasources:
+            return []
+
+        resources: List[Resource] = []
+
+        for relative_id, lambda_datasource in lambda_datasources.items():
+            datasource_logical_id = f"{self.logical_id}Lambda{relative_id}"
+            cfn_datasource = DataSource(
+                logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
+            )
+
+            cfn_datasource.Name = lambda_datasource.Name or relative_id
+            cfn_datasource.Type = "AWS_LAMBDA"
+            cfn_datasource.ApiId = api_id
+            cfn_datasource.Description = passthrough_value(lambda_datasource.Description)
+            cfn_datasource.LambdaConfig = {"LambdaFunctionArn": passthrough_value(lambda_datasource.FunctionArn)}
+
+            cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_lambda_datasource_role(
+                lambda_datasource,
+                cfn_datasource.get_runtime_attr("arn"),
+                lambda_datasource.FunctionArn,
+                datasource_logical_id,
+                kwargs,
+            )
+
+            self._datasource_name_map[relative_id] = cfn_datasource.get_runtime_attr("name")
+
+            resources.extend([cfn_datasource, *permissions_resources])
+
+        return resources
+
+    def _parse_lambda_datasource_role(
+        self,
+        lambda_datasource: aws_serverless_graphqlapi.LambdaDataSource,
+        datasource_arn: Intrinsicable[str],
+        function_arn: PassThrough,
+        datasource_logical_id: str,
+        kwargs: Dict[str, Any],
+    ) -> Tuple[str, List[Resource]]:
+        if lambda_datasource.ServiceRoleArn:
+            return passthrough_value(lambda_datasource.ServiceRoleArn), []
+
+        role_logical_id = f"{datasource_logical_id}Role"
+        role = IAMRole(
+            logical_id=role_logical_id,
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
+        role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+            "appsync.amazonaws.com"
+        )
+        role_arn = role.get_runtime_attr("arn")
+
+        connector_resources = self._construct_lambda_datasource_connector_resources(
+            datasource_logical_id, datasource_arn, function_arn, role.get_runtime_attr("name"), kwargs
+        )
+
+        return role_arn, [role, *connector_resources]
+
+    @staticmethod
+    def _construct_lambda_datasource_connector_resources(
+        datasource_id: str,
+        source_arn: Intrinsicable[str],
+        destination_arn: Intrinsicable[str],
+        role_name: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        logical_id = f"{datasource_id}ToLambdaConnector"
+        connector_dict = {
+            "Type": "AWS::Serverless::Connector",
+            "Properties": {
+                "Source": {"Type": "AWS::AppSync::DataSource", "Arn": source_arn, "RoleName": role_name},
+                "Destination": {
+                    "Type": "AWS::Lambda::Function",
+                    "Arn": destination_arn,
+                },
+                "Permissions": ["Write"],
+            },
+        }
+
+        # mypy thinks from_dict method returns "Resource" class instead of the inheriting parent class "SamResourceMacro"
+        connector = cast(
+            SamConnector,
+            SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
+        )
+
         return connector.to_cloudformation(**kwargs)
 
     @staticmethod

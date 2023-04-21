@@ -544,6 +544,13 @@
           },
           "title": "Dynamodb",
           "type": "object"
+        },
+        "Lambda": {
+          "additionalProperties": {
+            "$ref": "#/definitions/LambdaDataSource"
+          },
+          "title": "Lambda",
+          "type": "object"
         }
       },
       "title": "DataSources",
@@ -1853,6 +1860,29 @@
         "LambdaConflictHandlerArn"
       ],
       "title": "LambdaConflictHandlerConfig",
+      "type": "object"
+    },
+    "LambdaDataSource": {
+      "additionalProperties": false,
+      "properties": {
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FunctionArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "ServiceRoleArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "FunctionArn"
+      ],
+      "title": "LambdaDataSource",
       "type": "object"
     },
     "LambdaRequestAuthorizer": {
