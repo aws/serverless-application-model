@@ -14,8 +14,8 @@ from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
-    ApiKey,
     AdditionalAuthenticationProviderType,
+    ApiKey,
     AppSyncRuntimeType,
     CachingConfigType,
     CognitoUserPoolConfigType,
@@ -2202,8 +2202,8 @@ class SamGraphQLApi(SamResourceMacro):
             resources.append(cloudwatch_role)
 
         if model.ApiKey:
-            api_key = self._construct_appsync_api_key(model.ApiKey, api_id)
-            resources.append(api_key)
+            api_keys = self._construct_appsync_api_keys(model.ApiKey, api_id)
+            resources.extend(api_keys)
 
         if model.DataSources:
             datasource_resources = self._construct_datasource_resources(model.DataSources, api_id, kwargs)
@@ -2414,19 +2414,25 @@ class SamGraphQLApi(SamResourceMacro):
 
         return schema
 
-    def _construct_appsync_api_key(self, api_keys: Dict[str, aws_serverless_graphqlapi.ApiKey], api_id: Intrinsicable[str]):
-        if len(api_keys) != 1:
-            raise InvalidResourceException(self.logical_id, "One and only one API Key can be defined at a time.")
-        
-        relative_id, api_key = list(api_keys.items())[0]
+    def _construct_appsync_api_keys(
+        self, api_keys: Dict[str, aws_serverless_graphqlapi.ApiKey], api_id: Intrinsicable[str]
+    ) -> List[Resource]:
+        resources: List[Resource] = []
+        # TODO: ask slava about how expires and parsing date stuff. what timezone is the date assumed to be in, etc
+        # make expires a required value
+        for relative_id, api_key in api_keys.items():
+            cfn_api_key = ApiKey(
+                logical_id=f"{self.logical_id}{relative_id}",
+                depends_on=self.depends_on,
+                attributes=self.resource_attributes,
+            )
+            cfn_api_key.ApiId = api_id
+            cfn_api_key.ApiKeyId = passthrough_value(api_key.ApiKeyId)
+            cfn_api_key.Description = passthrough_value(api_key.Description)
+            cfn_api_key.Expires = passthrough_value(api_key.Expires)
+            resources.append(cfn_api_key)
 
-        cfn_api_key = ApiKey(logical_id=f"{self.logical_id}{relative_id}", depends_on=self.depends_on, attributes=self.resource_attributes)
-        cfn_api_key.ApiId = api_id
-        cfn_api_key.ApiKeyId = passthrough_value(api_key.ApiKeyId)
-        cfn_api_key.Description = passthrough_value(api_key.Description)
-        cfn_api_key.Expires = passthrough_value(api_key.Expires)
-        
-        return cfn_api_key
+        return resources
 
     def _construct_datasource_resources(
         self,

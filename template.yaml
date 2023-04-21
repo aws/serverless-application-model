@@ -16,4 +16,9 @@ Resources:
       ApiKey:
         MyApiKey:
           Description: an api key
+        AnotherApiKey:
+          Description: another api key
+          ApiKeyId: some-id
+          Expires: 
+
           
