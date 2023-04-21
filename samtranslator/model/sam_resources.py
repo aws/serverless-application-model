@@ -2417,15 +2417,21 @@ class SamGraphQLApi(SamResourceMacro):
 
     def _construct_domain_name_resources(
         self, domain_name: aws_serverless_graphqlapi.DomainName, api_id: Intrinsicable[str]
-    ):
-        cfn_domain_name = DomainName(logical_id=f"{self.logical_id}DomainName", depends_on=self.depends_on, attributes=self.resource_attributes)
-        cfn_domain_name.CertificateArn = domain_name.CertificateArn
-        cfn_domain_name.DomainName = domain_name.DomainName
-        cfn_domain_name.Description = domain_name.Description
+    ) -> List[Resource]:
+        cfn_domain_name = DomainName(
+            logical_id=f"{self.logical_id}DomainName", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+        cfn_domain_name.CertificateArn = passthrough_value(domain_name.CertificateArn)
+        cfn_domain_name.DomainName = passthrough_value(domain_name.DomainName)
+        cfn_domain_name.Description = passthrough_value(domain_name.Description)
 
-        cfn_domain_name_api_association = DomainNameApiAssociation(logical_id=f"{self.logical_id}DomainNameApiAssociation", depends_on=self.depends_on, attributes=self.resource_attributes)
+        cfn_domain_name_api_association = DomainNameApiAssociation(
+            logical_id=f"{self.logical_id}DomainNameApiAssociation",
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
         cfn_domain_name_api_association.ApiId = api_id
-        cfn_domain_name_api_association.DomainName = domain_name.DomainName
+        cfn_domain_name_api_association.DomainName = passthrough_value(domain_name.DomainName)
 
         return [cfn_domain_name, cfn_domain_name_api_association]
 
