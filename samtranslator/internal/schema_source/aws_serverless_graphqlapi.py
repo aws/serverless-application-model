@@ -54,7 +54,7 @@ class Auth(BaseModel):
 class ApiKey(BaseModel):
     ApiKeyId: Optional[PassThroughProp]
     Description: Optional[PassThroughProp]
-    Expires: Optional[PassThroughProp]
+    ExpiresOn: Optional[PassThroughProp]
 
 
 class Logging(BaseModel):

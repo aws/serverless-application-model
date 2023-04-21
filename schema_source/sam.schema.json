@@ -125,7 +125,7 @@
         "Description": {
           "$ref": "#/definitions/PassThroughProp"
         },
-        "Expires": {
+        "ExpiresOn": {
           "$ref": "#/definitions/PassThroughProp"
         }
       },

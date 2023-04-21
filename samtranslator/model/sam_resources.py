@@ -2429,7 +2429,7 @@ class SamGraphQLApi(SamResourceMacro):
             cfn_api_key.ApiId = api_id
             cfn_api_key.ApiKeyId = passthrough_value(api_key.ApiKeyId)
             cfn_api_key.Description = passthrough_value(api_key.Description)
-            cfn_api_key.Expires = passthrough_value(api_key.Expires)
+            cfn_api_key.ExpiresOn = passthrough_value(api_key.Expires)
             resources.append(cfn_api_key)
 
         return resources

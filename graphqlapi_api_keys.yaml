@@ -19,6 +19,6 @@ Resources:
         AnotherApiKey:
           Description: another api key
           ApiKeyId: some-id
-          Expires: 
+          ExpiresOn: 1234567890
 
           
