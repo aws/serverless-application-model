@@ -170,6 +170,33 @@
       "title": "AppSyncResolver",
       "type": "object"
     },
+    "Cache": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiCachingBehavior": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "AtRestEncryptionEnabled": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "TransitEncryptionEnabled": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Ttl": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Type": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "ApiCachingBehavior",
+        "Ttl",
+        "Type"
+      ],
+      "title": "Cache",
+      "type": "object"
+    },
     "Caching": {
       "additionalProperties": false,
       "properties": {
@@ -6403,6 +6430,9 @@
         },
         "Auth": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
+        },
+        "Cache": {
+          "$ref": "#/definitions/Cache"
         },
         "DataSources": {
           "$ref": "#/definitions/DataSources"

@@ -15,6 +15,7 @@ from samtranslator.internal.intrinsics import resolve_string_parameter_in_resour
 from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
     AdditionalAuthenticationProviderType,
+    ApiCache,
     AppSyncRuntimeType,
     CachingConfigType,
     CognitoUserPoolConfigType,
@@ -2159,6 +2160,7 @@ class SamGraphQLApi(SamResourceMacro):
         "Functions": Property(False, IS_DICT),
         "AppSyncResolvers": Property(False, IS_DICT),
         "DomainName": Property(False, IS_DICT),
+        "Cache": Property(False, IS_DICT),
     }
 
     Auth: List[Dict[str, Any]]
@@ -2173,6 +2175,7 @@ class SamGraphQLApi(SamResourceMacro):
     Functions: Optional[Dict[str, Dict[str, Any]]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
     DomainName: Optional[Dict[str, Any]]
+    Cache: Optional[Dict[str, Any]]
 
     # stop validation so we can use class variables for tracking state
     validate_setattr = False
@@ -2201,6 +2204,10 @@ class SamGraphQLApi(SamResourceMacro):
 
         if cloudwatch_role:
             resources.append(cloudwatch_role)
+
+        if model.Cache:
+            api_cache = self._construct_appsync_api_cache(model.Cache, api_id)
+            resources.append(api_cache)
 
         if model.DataSources:
             datasource_resources = self._construct_datasource_resources(model.DataSources, api_id, kwargs)
@@ -2434,6 +2441,22 @@ class SamGraphQLApi(SamResourceMacro):
         cfn_domain_name_api_association.DomainName = passthrough_value(domain_name.DomainName)
 
         return [cfn_domain_name, cfn_domain_name_api_association]
+
+    def _construct_appsync_api_cache(
+        self, cache: aws_serverless_graphqlapi.Cache, api_id: Intrinsicable[str]
+    ) -> ApiCache:
+        cfn_api_cache = ApiCache(
+            logical_id=f"{self.logical_id}ApiCache", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
+        cfn_api_cache.ApiId = api_id
+        cfn_api_cache.ApiCachingBehavior = passthrough_value(cache.ApiCachingBehavior)
+        cfn_api_cache.Type = passthrough_value(cache.Type)
+        cfn_api_cache.Ttl = passthrough_value(cache.Ttl)
+        cfn_api_cache.AtRestEncryptionEnabled = passthrough_value(cache.AtRestEncryptionEnabled)
+        cfn_api_cache.TransitEncryptionEnabled = passthrough_value(cache.TransitEncryptionEnabled)
+
+        return cfn_api_cache
 
     def _construct_datasource_resources(
         self,

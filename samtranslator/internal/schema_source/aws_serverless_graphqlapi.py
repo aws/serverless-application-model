@@ -146,6 +146,14 @@ class DomainName(BaseModel):
     Description: Optional[PassThroughProp]
 
 
+class Cache(BaseModel):
+    ApiCachingBehavior: PassThroughProp
+    Ttl: PassThroughProp
+    Type: PassThroughProp
+    AtRestEncryptionEnabled: Optional[PassThroughProp]
+    TransitEncryptionEnabled: Optional[PassThroughProp]
+
+
 class Properties(BaseModel):
     Auth: Auth
     Tags: Optional[DictStrAny]
@@ -159,6 +167,7 @@ class Properties(BaseModel):
     Functions: Optional[Dict[str, Function]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, AppSyncResolver]]]
     DomainName: Optional[DomainName]
+    Cache: Optional[Cache]
 
 
 class Resource(BaseModel):
