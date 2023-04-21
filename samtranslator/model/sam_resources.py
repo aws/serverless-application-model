@@ -2434,7 +2434,7 @@ class SamGraphQLApi(SamResourceMacro):
     ) -> List[Resource]:
         resources: List[Resource] = []
 
-        # TODO: Add datetime parsing for ExpiresOn
+        # TODO: Add datetime parsing for ExpiresOn; currently expects Unix timestamp
         for relative_id, api_key in api_keys.items():
             cfn_api_key = ApiKey(
                 logical_id=f"{self.logical_id}{relative_id}",
