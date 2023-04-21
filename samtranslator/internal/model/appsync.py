@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 from typing_extensions import TypedDict
 
 from samtranslator.model import GeneratedProperty, Resource
-from samtranslator.model.intrinsics import fnGetAtt
+from samtranslator.model.intrinsics import fnGetAtt, ref
 from samtranslator.utils.types import Intrinsicable
 
 # This JavaScript default resolver code is the template AppSync provides by default as well in the AWS Console.
@@ -235,6 +235,8 @@ class DomainName(Resource):
     CertificateArn: str
     DomainName: str
     Description: Optional[str]
+
+    runtime_attrs = {"domain_name": lambda self: ref(self.logical_id)}
 
 
 class DomainNameApiAssociation(Resource):

@@ -2438,7 +2438,7 @@ class SamGraphQLApi(SamResourceMacro):
             attributes=self.resource_attributes,
         )
         cfn_domain_name_api_association.ApiId = api_id
-        cfn_domain_name_api_association.DomainName = passthrough_value(domain_name.DomainName)
+        cfn_domain_name_api_association.DomainName = cfn_domain_name.get_runtime_attr("domain_name")
 
         return [cfn_domain_name, cfn_domain_name_api_association]
 

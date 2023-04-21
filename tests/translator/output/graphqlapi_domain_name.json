@@ -71,7 +71,9 @@
             "ApiId"
           ]
         },
-        "DomainName": "prad.com"
+        "DomainName": {
+          "Ref": "SuperCoolAPIDomainName"
+        }
       },
       "Type": "AWS::AppSync::DomainNameApiAssociation"
     },
