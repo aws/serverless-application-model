@@ -93,6 +93,28 @@ class TestServerlessAppPlugin_init(TestCase):
         self.assertEqual(self.plugin._parameters, parameters)
 
 
+class TestServerlessAppPlugin_sar_client_creator(TestCase):
+    def setUp(self):
+        self.client_mock = Mock()
+
+        def sar_client_creator():
+            return self.client_mock("serverlessrepo")
+
+        self.sar_client_creator = sar_client_creator
+
+    def test_lazy_load(self):
+        plugin = ServerlessAppPlugin(sar_client_creator=self.sar_client_creator)
+        self.client_mock.assert_not_called()
+
+        self.assertEqual(plugin._sar_client, self.client_mock("serverlessrepo"))
+
+    def test_not_used_when_sar_client_provided(self):
+        sar_client = Mock()
+        plugin = ServerlessAppPlugin(sar_client_creator=self.sar_client_creator, sar_client=sar_client)
+        self.assertEqual(plugin._sar_client, sar_client)
+        self.client_mock.assert_not_called()
+
+
 class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
     def setUp(self):
         client = boto3.client("serverlessrepo", region_name="us-east-1")
