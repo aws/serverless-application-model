@@ -69,7 +69,7 @@ class TestGraphQLApiPipelineResolver(BaseTest):
         self.assertEqual(add_post["title"], title)
         self.assertEqual(add_post["content"], content)
 
-        query = f"""
+        query = """
             query getPost {{
               getPost(id:"1") {{
                 id

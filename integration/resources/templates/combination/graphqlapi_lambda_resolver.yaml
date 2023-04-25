@@ -41,7 +41,7 @@ Resources:
             - lambda.amazonaws.com
           Action:
           - sts:AssumeRole
-      Path: "/"
+      Path: /
       Policies:
       - PolicyName: AppendToLogsPolicy
         PolicyDocument:
@@ -52,7 +52,7 @@ Resources:
             - logs:CreateLogGroup
             - logs:CreateLogStream
             - logs:PutLogEvents
-            Resource: "*"
+            Resource: '*'
 
   SuperCoolAPI:
     Type: AWS::Serverless::GraphQLApi
