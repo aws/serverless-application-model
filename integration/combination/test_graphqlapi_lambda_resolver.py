@@ -32,7 +32,7 @@ def execute_and_verify_appsync_query(url, api_key, query):
 @skipIf(current_region_does_not_support([APP_SYNC]), "AppSync is not supported in this testing region")
 class TestGraphQLApiPipelineResolver(BaseTest):
     def test_api(self):
-        file_name = "combination/graphqlapi_lambda_datasource"
+        file_name = "combination/graphqlapi_lambda_resolver"
         self.create_and_verify_stack(file_name)
 
         outputs = self.get_stack_outputs()
