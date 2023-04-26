@@ -149,7 +149,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: too-man
                 if not policy_arn:
                     raise InvalidResourceException(
                         resource_logical_id,
-                        f"Invalid policy '{policy_arn}'; make sure the value is a valid AWS managed policy ARN",
+                        f"Invalid policy '{policy_entry.data}'; make sure the value is a valid AWS managed policy ARN",
                     )
 
             # De-Duplicate managed policy arns before inserting. Mainly useful
