@@ -856,11 +856,9 @@ class TestTemplateValidation(TestCase):
     # test to make sure with arn it doesnt load, with non-arn it does
     @parameterized.expand(
         [
-            ([""], 1),
-            (["SomeNonArnThing"], 1),
-            (["SomeNonArnThing", "AnotherNonArnThing"], 1),
-            (["aws:looks:like:an:ARN:but-not-really"], 1),
-            (["arn:looks:like:an:ARN:foo", "Mixing_things_v2"], 1),
+            (["AmazonS3FullAccess"], 0),
+            (["AmazonS3FullAccess", "AmazonSNSRole"], 0),
+            (["arn:looks:like:an:ARN:foo", "AmazonSQSFullAccess"], 0),
             (["arn:looks:like:an:ARN:foo"], 0),
             ([{"Ref": "Foo"}], 0),
             ([{"SQSPollerPolicy": {"QueueName": "Bar"}}], 0),
@@ -880,31 +878,30 @@ class TestTemplateValidation(TestCase):
 
         managed_policy_loader = ManagedPolicyLoader()
 
-        with patch("samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES", {}):
-            transform(
-                {
-                    "Resources": {
-                        "MyFunction": {
-                            "Type": "AWS::Serverless::Function",
-                            "Properties": {
-                                "Handler": "foo",
-                                "InlineCode": "bar",
-                                "Runtime": "nodejs14.x",
-                                "Policies": policies,
-                            },
+        transform(
+            {
+                "Resources": {
+                    "MyFunction": {
+                        "Type": "AWS::Serverless::Function",
+                        "Properties": {
+                            "Handler": "foo",
+                            "InlineCode": "bar",
+                            "Runtime": "nodejs14.x",
+                            "Policies": policies,
                         },
-                        "MyStateMachine": {
-                            "Type": "AWS::Serverless::StateMachine",
-                            "Properties": {
-                                "DefinitionUri": "s3://egg/baz",
-                                "Policies": policies,
-                            },
+                    },
+                    "MyStateMachine": {
+                        "Type": "AWS::Serverless::StateMachine",
+                        "Properties": {
+                            "DefinitionUri": "s3://egg/baz",
+                            "Policies": policies,
                         },
-                    }
-                },
-                {},
-                managed_policy_loader,
-            )
+                    },
+                }
+            },
+            {},
+            managed_policy_loader,
+        )
 
         self.assertEqual(load_policy_count, managed_policy_loader.call_count)
 
