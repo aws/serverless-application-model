@@ -1,0 +1,7 @@
+Resources:
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: s3://foo/bar
+      Policies:
+      - AnyNonOfficialManagedPolicy

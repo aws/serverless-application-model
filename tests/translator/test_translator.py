@@ -175,9 +175,9 @@ class AbstractTestTranslator(TestCase):
                     "AWSXRayDaemonWriteAccess"
                 ] = f"arn:{partition}:iam::aws:policy/AWSXRayDaemonWriteAccess"
 
-            # For the managed_policies_minimal.yaml transform test
-            # For aws and aws-cn, AmazonS3FullAccess is a bundled policy (see https://github.com/aws/serverless-application-model/pull/2839)
-            # However we don't bundle managed policies in aws-us-gov, so instead we simulate passing the
+            # For the managed_policies_minimal.yaml transform test.
+            # For aws and aws-cn, these policies are cached (see https://github.com/aws/serverless-application-model/pull/2839),
+            # however we don't bundle managed policies in aws-us-gov, so instead we simulate passing the
             # fallback policy loader
             if partition == "aws-us-gov":
                 mock_policy_loader.load.return_value[
@@ -497,6 +497,7 @@ def test_transform_invalid_document(testcase):
     expected = json.load(open(os.path.join(OUTPUT_FOLDER, testcase + ".json")))
 
     mock_policy_loader = MagicMock()
+    mock_policy_loader.load.return_value = None
     parameter_values = get_template_parameter_values()
 
     with pytest.raises(InvalidDocumentException) as e:
@@ -864,10 +865,6 @@ class TestTemplateValidation(TestCase):
                     parameters,
                     get_managed_policy_map=get_managed_policy_map,
                 )
-
-    # TODO: add transform test with 1 correct and 1 wrong policy and errors correctly for both function and statemachine
-    # TODO: maybe add correct transform as well (with hardcoded arn adn valid name) so it's clear we have one...
-    # TODO: how to add transform test? we don't bundle us-gov managed policies
 
     # test to make sure with arn it doesnt load, with non-arn it does
     @parameterized.expand(
