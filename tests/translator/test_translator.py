@@ -175,6 +175,15 @@ class AbstractTestTranslator(TestCase):
                     "AWSXRayDaemonWriteAccess"
                 ] = f"arn:{partition}:iam::aws:policy/AWSXRayDaemonWriteAccess"
 
+            # For the managed_policies_minimal.yaml transform test
+            # For aws and aws-cn, AmazonS3FullAccess is a bundled policy (see https://github.com/aws/serverless-application-model/pull/2839)
+            # However we don't bundle managed policies in aws-us-gov, so instead we simulate passing the
+            # fallback policy loader
+            if partition == "aws-us-gov":
+                mock_policy_loader.load.return_value[
+                    "AmazonS3FullAccess"
+                ] = "arn:aws-us-gov:iam::aws:policy/AmazonS3FullAccess-mock-from-fallback-policy-loader"
+
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
         print(json.dumps(output_fragment, indent=2))
