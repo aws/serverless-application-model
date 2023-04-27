@@ -855,6 +855,7 @@ class TestTemplateValidation(TestCase):
 
     # TODO: add transform test with 1 correct and 1 wrong policy and errors correctly for both function and statemachine
     # TODO: maybe add correct transform as well (with hardcoded arn adn valid name) so it's clear we have one...
+    # TODO: how to add transform test? we don't bundle us-gov managed policies
 
     # test to make sure with arn it doesnt load, with non-arn it does
     @parameterized.expand(
