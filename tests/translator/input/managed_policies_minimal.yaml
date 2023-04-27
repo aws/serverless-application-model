@@ -6,7 +6,9 @@ Resources:
       Handler: foo
       InlineCode: bar
       Policies:
-      - AnyNonOfficialManagedPolicy
+      - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+      - arn:aws-cn:iam::aws:policy/AmazonRedshiftFullAccess
+      - arn:looks:like::an/arn
       - AmazonS3FullAccess
 
   MyStateMachine:
@@ -14,5 +16,7 @@ Resources:
     Properties:
       DefinitionUri: s3://foo/bar
       Policies:
-      - AnyNonOfficialManagedPolicy
+      - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+      - arn:aws-cn:iam::aws:policy/AmazonRedshiftFullAccess
+      - arn:looks:like::an/arn
       - AmazonS3FullAccess

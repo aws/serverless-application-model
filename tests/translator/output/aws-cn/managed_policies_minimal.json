@@ -42,7 +42,9 @@
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "AnyNonOfficialManagedPolicy",
+          "arn:aws:iam::aws:policy/AmazonSQSFullAccess",
+          "arn:aws-cn:iam::aws:policy/AmazonRedshiftFullAccess",
+          "arn:looks:like::an/arn",
           "arn:aws-cn:iam::aws:policy/AmazonS3FullAccess"
         ],
         "Tags": [
@@ -94,7 +96,9 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "AnyNonOfficialManagedPolicy",
+          "arn:aws:iam::aws:policy/AmazonSQSFullAccess",
+          "arn:aws-cn:iam::aws:policy/AmazonRedshiftFullAccess",
+          "arn:looks:like::an/arn",
           "arn:aws-cn:iam::aws:policy/AmazonS3FullAccess"
         ],
         "Tags": [
