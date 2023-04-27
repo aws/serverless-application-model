@@ -10,6 +10,7 @@ Resources:
       - arn:aws-cn:iam::aws:policy/AmazonRedshiftFullAccess
       - arn:looks:like::an/arn
       - AmazonS3FullAccess
+      - AmazonAPIGatewayPushToCloudWatchLogs
 
   MyStateMachine:
     Type: AWS::Serverless::StateMachine
@@ -20,3 +21,4 @@ Resources:
       - arn:aws-cn:iam::aws:policy/AmazonRedshiftFullAccess
       - arn:looks:like::an/arn
       - AmazonS3FullAccess
+      - AmazonAPIGatewayPushToCloudWatchLogs

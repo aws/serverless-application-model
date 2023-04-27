@@ -186,6 +186,9 @@ class AbstractTestTranslator(TestCase):
                 mock_policy_loader.load.return_value[
                     "AWSXrayWriteOnlyAccess"
                 ] = "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess-mock-from-fallback-policy-loader"
+                mock_policy_loader.load.return_value[
+                    "AmazonAPIGatewayPushToCloudWatchLogs"
+                ] = "arn:aws-us-gov:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs-mock-from-fallback-policy-loader"
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
