@@ -7,18 +7,17 @@ Known limitations: cannot transform CodeUri pointing at local directory.
 import argparse
 import json
 import logging
-import os
 import platform
 import subprocess
 import sys
 from functools import reduce
 from pathlib import Path
+from typing import List
 
 import boto3
 
 # To allow this script to be executed from other directories
-my_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, my_path + "/..")
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from samtranslator.model.exceptions import InvalidDocumentException
 from samtranslator.public.translator import ManagedPolicyLoader
@@ -67,7 +66,7 @@ else:
     logging.basicConfig()
 
 
-def execute_command(command, args):  # type: ignore[no-untyped-def]
+def execute_command(command: str, args: List[str]) -> None:
     try:
         aws_cmd = "aws" if platform.system().lower() != "windows" else "aws.cmd"
         command_with_args = [aws_cmd, "cloudformation", command, *list(args)]
@@ -83,9 +82,9 @@ def execute_command(command, args):  # type: ignore[no-untyped-def]
         sys.exit(e.returncode)
 
 
-def package(input_file_path, output_file_path):  # type: ignore[no-untyped-def]
+def package(input_file_path: Path) -> Path:
     template_file = input_file_path
-    package_output_template_file = input_file_path + "._sam_packaged_.yaml"
+    package_output_template_file = Path(str(input_file_path) + "._sam_packaged_.yaml")
     s3_bucket = cli_options.s3_bucket
     args = [
         "--template-file",
@@ -96,23 +95,22 @@ def package(input_file_path, output_file_path):  # type: ignore[no-untyped-def]
         s3_bucket,
     ]
 
-    execute_command("package", args)  # type: ignore[no-untyped-call]
+    execute_command("package", args)
 
     return package_output_template_file
 
 
-def transform_template(input_file_path, output_file_path):  # type: ignore[no-untyped-def]
-    with open(input_file_path) as f:
+def transform_template(input_file_path: Path, output_file_path: Path):  # type: ignore[no-untyped-def]
+    with input_file_path.open() as f:
         sam_template = yaml_parse(f)  # type: ignore[no-untyped-call]
 
     try:
         cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))
         cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=1)
 
-        with open(output_file_path, "w") as f:
-            f.write(cloud_formation_template_prettified)
+        output_file_path.write_text(cloud_formation_template_prettified, encoding="utf-8")
 
-        print("Wrote transformed CloudFormation template to: " + output_file_path)
+        print("Wrote transformed CloudFormation template to: ", output_file_path)
     except InvalidDocumentException as e:
         error_message = reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
         LOG.error(error_message)
@@ -120,26 +118,24 @@ def transform_template(input_file_path, output_file_path):  # type: ignore[no-un
         LOG.error(errors)
 
 
-def deploy(template_file):  # type: ignore[no-untyped-def]
+def deploy(template_file: Path) -> None:
     capabilities = cli_options.capabilities
     stack_name = cli_options.stack_name
     args = ["--template-file", template_file, "--capabilities", capabilities, "--stack-name", stack_name]
 
-    execute_command("deploy", args)  # type: ignore[no-untyped-call]
-
-    return package_output_template_file
+    execute_command("deploy", args)
 
 
 if __name__ == "__main__":
-    input_file_path = str(cli_options.template_file)
-    output_file_path = str(cli_options.output_template)
+    input_file_path = Path(cli_options.template_file)
+    output_file_path = Path(cli_options.output_template)
 
     if cli_options.command == "package":
-        package_output_template_file = package(input_file_path, output_file_path)  # type: ignore[no-untyped-call]
-        transform_template(package_output_template_file, output_file_path)  # type: ignore[no-untyped-call]
+        package_output_template_file = package(input_file_path)
+        transform_template(package_output_template_file, output_file_path)
     elif cli_options.command == "deploy":
-        package_output_template_file = package(input_file_path, output_file_path)  # type: ignore[no-untyped-call]
-        transform_template(package_output_template_file, output_file_path)  # type: ignore[no-untyped-call]
-        deploy(output_file_path)  # type: ignore[no-untyped-call]
+        package_output_template_file = package(input_file_path)
+        transform_template(package_output_template_file, output_file_path)
+        deploy(output_file_path)
     else:
-        transform_template(input_file_path, output_file_path)  # type: ignore[no-untyped-call]
+        transform_template(input_file_path, output_file_path)

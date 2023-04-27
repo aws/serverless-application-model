@@ -1,6 +1,8 @@
 import json
 import os
 import re
+from pathlib import Path
+from typing import Any
 
 import jsonschema
 
@@ -28,7 +30,7 @@ class SamTemplateValidator:
             Path to a schema to use for validation, by default None, the default schema.json will be used
         """
         if not schema:
-            schema = self._read_json(sam_schema.SCHEMA_NEW_FILE)  # type: ignore[no-untyped-call]
+            schema = self._read_json(sam_schema.SCHEMA_NEW_FILE)
 
         # Helps resolve the $Ref to external files
         # For cross platform resolving, we have to load the sub schemas into
@@ -36,11 +38,11 @@ class SamTemplateValidator:
         # of referencing inside a "$ref" of a schema as this will lead to mixups
         # on Windows because of different path separator: \\ instead of /
         schema_store = {}
-        definitions_dir = os.path.join(sam_schema.SCHEMA_DIR, "definitions")
+        definitions_dir = sam_schema.SCHEMA_DIR / "definitions"
 
         for sub_schema in os.listdir(definitions_dir):
             if sub_schema.endswith(".json"):
-                with open(os.path.join(definitions_dir, sub_schema), encoding="utf-8") as f:
+                with (definitions_dir / sub_schema).open(encoding="utf-8") as f:
                     schema_content = f.read()
                 schema_store[sub_schema] = json.loads(schema_content)
 
@@ -173,13 +175,13 @@ class SamTemplateValidator:
 
         return final_message
 
-    def _read_json(self, filepath):  # type: ignore[no-untyped-def]
+    def _read_json(self, filepath: Path) -> Any:
         """
         Returns the content of a JSON file
 
         Parameters
         ----------
-        filepath : str
+        filepath : Path
             File path
 
         Returns
@@ -187,7 +189,7 @@ class SamTemplateValidator:
         dict
             Dictionary representing the JSON content
         """
-        with open(filepath, encoding="utf-8") as fp:
+        with filepath.open(encoding="utf-8") as fp:
             return json.load(fp)
 
 

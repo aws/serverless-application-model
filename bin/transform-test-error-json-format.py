@@ -5,13 +5,13 @@ Transform test error JSON file formatter (without prettier).
 It makes error json easier to review by breaking down "errorMessage"
 into list of strings (delimiter: ". ").
 """
-import os
 import sys
+from pathlib import Path
 
 from typing_extensions import Final
 
-my_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, my_path + "/..")
+# To allow this script to be executed from other directories
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 import json
 from typing import Type
