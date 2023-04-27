@@ -60,7 +60,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "AWSXrayWriteOnlyAccess",
+          "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess-mock-from-fallback-policy-loader",
           "arn:aws-us-gov:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
@@ -170,7 +170,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "AWSXrayWriteOnlyAccess",
+          "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess-mock-from-fallback-policy-loader",
           "arn:aws-us-gov:iam::aws:policy/AWSXRayDaemonWriteAccess"
         ],
         "Policies": [

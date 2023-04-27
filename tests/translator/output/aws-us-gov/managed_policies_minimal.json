@@ -42,8 +42,11 @@
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "AnyNonOfficialManagedPolicy",
-          "AmazonS3FullAccess"
+          "arn:aws:iam::aws:policy/AmazonSQSFullAccess",
+          "arn:aws-cn:iam::aws:policy/AmazonRedshiftFullAccess",
+          "arn:looks:like::an/arn",
+          "arn:aws-us-gov:iam::aws:policy/AmazonS3FullAccess-mock-from-fallback-policy-loader",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs-mock-from-fallback-policy-loader"
         ],
         "Tags": [
           {
@@ -94,8 +97,11 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "AnyNonOfficialManagedPolicy",
-          "AmazonS3FullAccess"
+          "arn:aws:iam::aws:policy/AmazonSQSFullAccess",
+          "arn:aws-cn:iam::aws:policy/AmazonRedshiftFullAccess",
+          "arn:looks:like::an/arn",
+          "arn:aws-us-gov:iam::aws:policy/AmazonS3FullAccess-mock-from-fallback-policy-loader",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs-mock-from-fallback-policy-loader"
         ],
         "Tags": [
           {
