@@ -759,7 +759,6 @@ class TestTemplateValidation(TestCase):
                     "InlineCode": "bar",
                     "Policies": [
                         "foo",
-                        "bar",
                     ],
                 },
             },
@@ -769,7 +768,6 @@ class TestTemplateValidation(TestCase):
                     "DefinitionUri": "s3://foo/bar",
                     "Policies": [
                         "foo",
-                        "bar",
                     ],
                 },
             },
@@ -786,7 +784,6 @@ class TestTemplateValidation(TestCase):
             (None, None, {"foo": "a3"}, "a3"),
             (None, {"foo": "a2"}, None, "a2"),
             ({"foo": "a1"}, None, None, "a1"),
-            (None, None, None, "foo"),
         ]
     )
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -826,6 +823,35 @@ class TestTemplateValidation(TestCase):
 
         self.assertEqual(function_arn, expected_arn)
         self.assertEqual(sfn_arn, expected_arn)
+
+    @parameterized.expand(
+        [
+            (None, None, None, "foo"),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_managed_policies_translator_translate_no_match(
+        self,
+        managed_policy_map,
+        bundled_managed_policy_map,
+        get_managed_policy_map_value,
+        expected_arn,
+    ):
+        def get_managed_policy_map():
+            return get_managed_policy_map_value
+
+        with patch(
+            "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
+            {"aws": bundled_managed_policy_map},
+        ):
+            parameters = {}
+            with self.assertRaises(InvalidDocumentException):
+                Translator(managed_policy_map, Parser()).translate(
+                    self._MANAGED_POLICIES_TEMPLATE,
+                    parameters,
+                    get_managed_policy_map=get_managed_policy_map,
+                )
 
     # test to make sure with arn it doesnt load, with non-arn it does
     @parameterized.expand(
