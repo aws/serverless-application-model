@@ -971,7 +971,7 @@ class Api(PushEventSource):
         - otherwise include key-value pairs from both definitions
         """
         merged_definition_body = source_definition_body.copy()
-        source_body_paths = merged_definition_body.get("paths", {})
+        source_body_paths = merged_definition_body.get("paths") or {}
 
         try:
             path_method_body = dict_deep_get(source_body_paths, [self.Path, self.Method]) or {}

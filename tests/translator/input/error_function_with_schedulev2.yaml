@@ -70,3 +70,30 @@ Resources:
               Mode: 'OFF'
             DeadLetterConfig:
               Type: SNS
+
+  ScheduledFunction5:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ScheduleInvalidType:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            OmitName: !Ref Env  # cannot be intrinsic
+
+  ScheduledFunction6:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ScheduleInvalidType:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)
+            OmitName: true
+            Name: This should not be set when OmitName is True

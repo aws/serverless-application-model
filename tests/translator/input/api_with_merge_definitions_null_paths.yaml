@@ -1,0 +1,26 @@
+Resources:
+  WebhooksApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: live
+      MergeDefinitions: true
+      DefinitionBody:
+        swagger: 2
+        paths:
+        x-amazon-apigateway-policy:
+          Version: '2012-10-17'
+
+
+  WebhooksReceiver:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: code/handler
+      Runtime: python3.8
+      Events:
+        AllEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WebhooksApi
+            Path: /proxy
+            Method: any
