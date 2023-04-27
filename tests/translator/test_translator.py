@@ -853,6 +853,9 @@ class TestTemplateValidation(TestCase):
                     get_managed_policy_map=get_managed_policy_map,
                 )
 
+    # TODO: add transform test with 1 correct and 1 wrong policy and errors correctly for both function and statemachine
+    # TODO: maybe add correct transform as well (with hardcoded arn adn valid name) so it's clear we have one...
+
     # test to make sure with arn it doesnt load, with non-arn it does
     @parameterized.expand(
         [
@@ -876,7 +879,13 @@ class TestTemplateValidation(TestCase):
 
             def load(self):
                 self.call_count += 1
-                return {}
+                return {
+                    "": "arn:",
+                    "SomeNonArnThing": "arn:SomeNonArnThing",
+                    "AnotherNonArnThing": "arn:AnotherNonArnThing",
+                    "aws:looks:like:an:ARN:but-not-really": "arn:aws:looks:like:an:ARN:but-not-really",
+                    "Mixing_things_v2": "arn:Mixing_things_v2",
+                }
 
         managed_policy_loader = ManagedPolicyLoader()
 
