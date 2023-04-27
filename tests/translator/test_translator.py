@@ -923,7 +923,6 @@ class TestTemplateValidation(TestCase):
             ({"foo": "a1"}, {"foo": "a2"}, "a2"),
             ({"foo": "a1"}, None, "a1"),
             (None, {"foo": "a2"}, "a2"),
-            (None, None, "foo"),
         ]
     )
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -960,6 +959,35 @@ class TestTemplateValidation(TestCase):
         self.assertEqual(function_arn, expected_arn)
         self.assertEqual(sfn_arn, expected_arn)
 
+    @parameterized.expand(
+        [
+            (None, None, "foo"),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_managed_policies_transform_no_match(
+        self,
+        managed_policy_map,
+        bundled_managed_policy_map,
+        expected_arn,
+    ):
+        class ManagedPolicyLoader:
+            def load(self):
+                return managed_policy_map
+
+        with patch(
+            "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
+            {"aws": bundled_managed_policy_map},
+        ):
+            parameters = {}
+            with self.assertRaises(InvalidDocumentException):
+                transform(
+                    self._MANAGED_POLICIES_TEMPLATE,
+                    parameters,
+                    ManagedPolicyLoader(),
+                )
+
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_managed_policies_transform_policies_loaded_once(self):
@@ -973,7 +1001,12 @@ class TestTemplateValidation(TestCase):
 
             def load(self):
                 self.call_count += 1
-                return {}
+                return {
+                    "foo": "arn:foo",
+                    "bar": "arn:bar",
+                    "egg": "arn:egg",
+                    "baz": "arn:baz",
+                }
 
         managed_policy_loader = ManagedPolicyLoader()
 
