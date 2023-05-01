@@ -6644,7 +6644,7 @@
     "samtranslator__internal__schema_source__aws_serverless_simpletable__Properties": {
       "additionalProperties": false,
       "properties": {
-        "PointInTimeRecovery": {
+        "PointInTimeRecoverySpecification": {
           "$ref": "#/definitions/PassThroughProp"
         },
         "PrimaryKey": {
