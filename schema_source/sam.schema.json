@@ -6644,6 +6644,10 @@
     "samtranslator__internal__schema_source__aws_serverless_simpletable__Properties": {
       "additionalProperties": false,
       "properties": {
+        "PointInTimeRecovery": {
+          "title": "Pointintimerecovery",
+          "type": "boolean"
+        },
         "PrimaryKey": {
           "allOf": [
             {
