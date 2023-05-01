@@ -1403,7 +1403,7 @@ class SamSimpleTable(SamResourceMacro):
         "SSESpecification": PropertyType(False, IS_DICT),
     }
 
-    PointInTimeRecovery: Optional[bool]
+    PointInTimeRecovery: Optional[PassThrough]
     PrimaryKey: Optional[Dict[str, str]]
     ProvisionedThroughput: Optional[Dict[str, Any]]
     TableName: Optional[Intrinsicable[str]]
@@ -1441,7 +1441,7 @@ class SamSimpleTable(SamResourceMacro):
 
         if self.PointInTimeRecovery:
             dynamodb_table.PointInTimeRecoverySpecification = {
-                "PointInTimeRecoveryEnabled": True,
+                "PointInTimeRecoveryEnabled": self.PointInTimeRecovery,
             }
 
         if self.ProvisionedThroughput:
