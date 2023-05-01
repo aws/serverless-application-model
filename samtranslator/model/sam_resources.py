@@ -1440,9 +1440,7 @@ class SamSimpleTable(SamResourceMacro):
         dynamodb_table.KeySchema = [{"AttributeName": primary_key["AttributeName"], "KeyType": "HASH"}]
 
         if self.PointInTimeRecovery:
-            dynamodb_table.PointInTimeRecoverySpecification = {
-                "PointInTimeRecoveryEnabled": self.PointInTimeRecovery,
-            }
+            dynamodb_table.PointInTimeRecoverySpecification = self.PointInTimeRecovery
 
         if self.ProvisionedThroughput:
             dynamodb_table.ProvisionedThroughput = self.ProvisionedThroughput
