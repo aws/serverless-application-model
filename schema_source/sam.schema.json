@@ -6645,8 +6645,7 @@
       "additionalProperties": false,
       "properties": {
         "PointInTimeRecovery": {
-          "title": "Pointintimerecovery",
-          "type": "boolean"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "PrimaryKey": {
           "allOf": [
