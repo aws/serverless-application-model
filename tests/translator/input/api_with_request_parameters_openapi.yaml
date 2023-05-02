@@ -1,0 +1,49 @@
+Globals:
+  Api:
+    OpenApiVersion: 3.0.1
+    CacheClusterEnabled: true
+    CacheClusterSize: '0.5'
+    MethodSettings:
+    - ResourcePath: /one
+      HttpMethod: GET
+      CachingEnabled: true
+      CacheTtlInSeconds: 15
+Resources:
+  ApiParameterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = function(event, context, callback) {
+            var returnVal = "undef";
+            if (event.queryStringParameters.type === "time") {
+                returnVal = "time" + Date.now();
+            }
+
+            if (event.queryStringParameters.type === "date") {
+                returnVal = "Random" + Math.random();
+            }
+
+            callback(null, {
+                "statusCode": 200,
+                "body": returnVal
+            });
+        }
+      Handler: index.handler
+      Runtime: nodejs14.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /one
+            Method: get
+            RequestParameters:
+            - method.request.querystring.type:
+                Required: true
+                Caching: true
+        AnotherGetHtml:
+          Type: Api
+          Properties:
+            Path: /two
+            Method: get
+Metadata:
+  SamTransformTest: true

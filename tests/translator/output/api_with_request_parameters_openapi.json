@@ -1,0 +1,183 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Resources": {
+    "ApiParameterFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = function(event, context, callback) {\n    var returnVal = \"undef\";\n    if (event.queryStringParameters.type === \"time\") {\n        returnVal = \"time\" + Date.now();\n    }\n\n    if (event.queryStringParameters.type === \"date\") {\n        returnVal = \"Random\" + Math.random();\n    }\n\n    callback(null, {\n        \"statusCode\": 200,\n        \"body\": returnVal\n    });\n}\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "ApiParameterFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "ApiParameterFunctionAnotherGetHtmlPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiParameterFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/two",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "ApiParameterFunctionGetHtmlPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiParameterFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/one",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "ApiParameterFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ServerlessRestApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {
+            "/one": {
+              "get": {
+                "parameters": [
+                  {
+                    "in": "query",
+                    "name": "type",
+                    "required": true,
+                    "type": "string"
+                  }
+                ],
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "cacheKeyParameters": [
+                    "method.request.querystring.type"
+                  ],
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiParameterFunction.Arn}/invocations"
+                  }
+                }
+              }
+            },
+            "/two": {
+              "get": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiParameterFunction.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ServerlessRestApiDeployment6f594c4e03": {
+      "Properties": {
+        "Description": "RestApi deployment id: 6f594c4e03f986f5ca9a86d332d29fe48db9c05e",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ServerlessRestApiProdStage": {
+      "Properties": {
+        "CacheClusterEnabled": true,
+        "CacheClusterSize": "0.5",
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment6f594c4e03"
+        },
+        "MethodSettings": [
+          {
+            "CacheTtlInSeconds": 15,
+            "CachingEnabled": true,
+            "HttpMethod": "GET",
+            "ResourcePath": "/one"
+          }
+        ],
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    }
+  }
+}
