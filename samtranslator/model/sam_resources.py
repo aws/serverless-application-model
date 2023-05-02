@@ -1395,6 +1395,7 @@ class SamSimpleTable(SamResourceMacro):
 
     resource_type = "AWS::Serverless::SimpleTable"
     property_types = {
+        "PointInTimeRecoverySpecification": PassThroughProperty(False),
         "PrimaryKey": PropertyType(False, dict_of(IS_STR, IS_STR)),
         "ProvisionedThroughput": PropertyType(False, dict_of(IS_STR, one_of(IS_INT, IS_DICT))),
         "TableName": PropertyType(False, one_of(IS_STR, IS_DICT)),
@@ -1402,6 +1403,7 @@ class SamSimpleTable(SamResourceMacro):
         "SSESpecification": PropertyType(False, IS_DICT),
     }
 
+    PointInTimeRecoverySpecification: Optional[PassThrough]
     PrimaryKey: Optional[Dict[str, str]]
     ProvisionedThroughput: Optional[Dict[str, Any]]
     TableName: Optional[Intrinsicable[str]]
@@ -1436,6 +1438,9 @@ class SamSimpleTable(SamResourceMacro):
 
         dynamodb_table.AttributeDefinitions = [primary_key]
         dynamodb_table.KeySchema = [{"AttributeName": primary_key["AttributeName"], "KeyType": "HASH"}]
+
+        if self.PointInTimeRecoverySpecification:
+            dynamodb_table.PointInTimeRecoverySpecification = self.PointInTimeRecoverySpecification
 
         if self.ProvisionedThroughput:
             dynamodb_table.ProvisionedThroughput = self.ProvisionedThroughput
