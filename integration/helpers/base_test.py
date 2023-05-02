@@ -54,6 +54,8 @@ FEATURE_TOGGLE_JSON_FILES = [
     "api_with_custom_domains_regional_ownership_verification",
 ]
 
+nonblocking = pytest.mark.xfail
+
 
 class BaseTest(TestCase):
     @pytest.fixture(autouse=True)
