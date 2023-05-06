@@ -2,7 +2,7 @@
 name: Bug report
 about: Report a bug concerning the AWS SAM transform
 title: ''
-labels: stage/needs-triage, type/bug
+labels: stage/needs-triage
 assignees: ''
 
 ---
