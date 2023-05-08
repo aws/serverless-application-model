@@ -1455,6 +1455,7 @@
     "AmazonMQFullAccess": "arn:aws-cn:iam::aws:policy/AmazonMQFullAccess",
     "AmazonMQServiceRolePolicy": "arn:aws-cn:iam::aws:policy/aws-service-role/AmazonMQServiceRolePolicy",
     "AmazonMSKFullAccess": "arn:aws-cn:iam::aws:policy/AmazonMSKFullAccess",
+    "AmazonMWAAServiceRolePolicy": "arn:aws-cn:iam::aws:policy/aws-service-role/AmazonMWAAServiceRolePolicy",
     "AmazonOpenSearchServiceCognitoAccess": "arn:aws-cn:iam::aws:policy/AmazonOpenSearchServiceCognitoAccess",
     "AmazonOpenSearchServiceFullAccess": "arn:aws-cn:iam::aws:policy/AmazonOpenSearchServiceFullAccess",
     "AmazonOpenSearchServiceReadOnlyAccess": "arn:aws-cn:iam::aws:policy/AmazonOpenSearchServiceReadOnlyAccess",
