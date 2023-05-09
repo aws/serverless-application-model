@@ -217,6 +217,9 @@ def _get_resource_queue_url(logical_id: str, resource_type: str) -> Optional[Dic
 def _get_resource_id(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
     if resource_type in ["AWS::ApiGateway::RestApi", "AWS::ApiGatewayV2::Api"]:
         return ref(logical_id)
+    if resource_type == "AWS::AppSync::GraphQLApi":
+        # unfortunately ref(AppSyncApi) == arn
+        return fnGetAtt(logical_id, "ApiId")
     return None
 
 

@@ -26,6 +26,7 @@ class TestConnectors(BaseTest):
 
     @parameterized.expand(
         [
+            ("combination/connector_appsync_api_to_lambda",),
             ("combination/connector_appsync_to_lambda",),
             ("combination/connector_appsync_to_table",),
             ("combination/connector_function_to_function",),

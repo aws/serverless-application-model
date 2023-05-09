@@ -1,0 +1,169 @@
+Resources:
+  Api:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: Api
+      AuthenticationType: AWS_LAMBDA
+      LambdaAuthorizerConfig:
+        AuthorizerUri: !GetAtt Authorizer.Arn
+
+  ApiSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt Api.ApiId
+      Definition: |
+        type Query {
+          sayHello: String!
+        }
+        schema {
+          query: Query
+        }
+
+  NoneDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      Type: NONE
+      ApiId: !GetAtt Api.ApiId
+      Name: NoneDataSource
+
+  SayHelloResolver:
+    DependsOn: ApiSchema
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !GetAtt Api.ApiId
+      TypeName: Query
+      FieldName: sayHello
+      Kind: PIPELINE
+      PipelineConfig:
+        Functions:
+        - !GetAtt SayHelloFunc.FunctionId
+      Code: |
+        export function request(ctx) {
+            return {};
+        }
+
+        export function response(ctx) {
+            return ctx.prev.result;
+        }
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: 1.0.0
+
+  SayHelloFunc:
+    Type: AWS::AppSync::FunctionConfiguration
+    Properties:
+      ApiId: !GetAtt Api.ApiId
+      Name: SayHelloFunc
+      DataSourceName: !GetAtt NoneDataSource.Name
+      Code: |
+        export function request(ctx) {
+          return {};
+        }
+
+        export function response(ctx) {
+          return "Hello World";
+        }
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: 1.0.0
+
+  GraphQlApiToLambdaConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: Api
+      Destination:
+        Id: Authorizer
+      Permissions:
+      - Write
+
+  Authorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (_) => {
+          return {
+            isAuthorized: true,
+            deniedFields: [],
+          }
+        }
+      PackageType: Zip
+      Runtime: nodejs14.x
+      Handler: index.handler
+
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          GRAPHQL_URL: !GetAtt Api.GraphQLUrl
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const https = require("https");
+
+        exports.handler = async (_) => {
+          const queries = {
+            sayHello: /* GraphQL */ `
+              query {
+                sayHello
+              }
+            `,
+          };
+
+
+          const fetch = async (url, options) =>
+            new Promise((resolve, reject) => {
+              const req = https.request(url, options, (res) => {
+                const body = [];
+                res.on("data", (chunk) => body.push(chunk));
+                res.on("end", () => {
+                  const resString = Buffer.concat(body).toString();
+                  resolve(resString);
+                });
+              });
+
+              req.on("error", (err) => {
+                reject(err);
+              });
+
+              req.on("timeout", () => {
+                req.destroy();
+                reject(new Error("Request time out"));
+              });
+
+              req.write(options.body);
+              req.end();
+            });
+
+
+          const makeRequest = async (queryName) => {
+            const options = {
+              method: "POST",
+              headers: {
+                "Authorization": "n'importe quoi",
+              },
+              body: JSON.stringify({ query: queries[queryName] }),
+              timeout: 10000, // ms
+            };
+
+            const response = await fetch(process.env.GRAPHQL_URL, options);
+            const body = JSON.parse(response);
+            const data = body.data?.[queryName];
+
+            if (body.errors !== undefined) {
+              throw JSON.stringify(body.errors);
+            }
+            
+            if (data !== "Hello World") {
+              throw new Error(`${queryName} error: '${data}' must be 'Hello World'`);
+            }
+
+            return body.data;
+          };
+
+
+          return await makeRequest("sayHello");
+        };
+Metadata:
+  SamTransformTest: true
