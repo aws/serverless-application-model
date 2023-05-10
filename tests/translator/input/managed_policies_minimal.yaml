@@ -6,19 +6,13 @@ Resources:
       Handler: foo
       InlineCode: bar
       Policies:
-      - arn:aws:iam::aws:policy/AmazonSQSFullAccess
-      - arn:aws-cn:iam::aws:policy/AmazonRedshiftFullAccess
-      - arn:looks:like::an/arn
+      - AnyNonOfficialManagedPolicy
       - AmazonS3FullAccess
-      - AmazonAPIGatewayPushToCloudWatchLogs
 
   MyStateMachine:
     Type: AWS::Serverless::StateMachine
     Properties:
       DefinitionUri: s3://foo/bar
       Policies:
-      - arn:aws:iam::aws:policy/AmazonSQSFullAccess
-      - arn:aws-cn:iam::aws:policy/AmazonRedshiftFullAccess
-      - arn:looks:like::an/arn
+      - AnyNonOfficialManagedPolicy
       - AmazonS3FullAccess
-      - AmazonAPIGatewayPushToCloudWatchLogs

@@ -13,7 +13,7 @@ def _get_managed_policy_arn(
     name: str,
     managed_policy_map: Optional[Dict[str, str]],
     get_managed_policy_map: Optional[GetManagedPolicyMap],
-) -> Optional[str]:
+) -> str:
     """
     Get the ARN of a AWS managed policy name. Used in Policies property of
     AWS::Serverless::Function and AWS::Serverless::StateMachine.
@@ -57,7 +57,7 @@ def _get_managed_policy_arn(
             if arn:
                 return arn
 
-    return None
+    return name
 
 
 def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
@@ -146,11 +146,6 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: too-man
                     managed_policy_map,
                     get_managed_policy_map,
                 )
-                if not policy_arn:
-                    raise InvalidResourceException(
-                        resource_logical_id,
-                        f"Invalid policy '{policy_entry.data}'; make sure the value is a valid AWS managed policy ARN.",
-                    )
 
             # De-Duplicate managed policy arns before inserting. Mainly useful
             # when customer specifies a managed policy which is already inserted
