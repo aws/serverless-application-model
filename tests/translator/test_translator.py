@@ -175,21 +175,6 @@ class AbstractTestTranslator(TestCase):
                     "AWSXRayDaemonWriteAccess"
                 ] = f"arn:{partition}:iam::aws:policy/AWSXRayDaemonWriteAccess"
 
-            # For the managed_policies_minimal.yaml transform test.
-            # For aws and aws-cn, these policies are cached (see https://github.com/aws/serverless-application-model/pull/2839),
-            # however we don't bundle managed policies in aws-us-gov, so instead we simulate passing the
-            # fallback policy loader
-            if partition == "aws-us-gov":
-                mock_policy_loader.load.return_value[
-                    "AmazonS3FullAccess"
-                ] = "arn:aws-us-gov:iam::aws:policy/AmazonS3FullAccess-mock-from-fallback-policy-loader"
-                mock_policy_loader.load.return_value[
-                    "AWSXrayWriteOnlyAccess"
-                ] = "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess-mock-from-fallback-policy-loader"
-                mock_policy_loader.load.return_value[
-                    "AmazonAPIGatewayPushToCloudWatchLogs"
-                ] = "arn:aws-us-gov:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs-mock-from-fallback-policy-loader"
-
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
         print(json.dumps(output_fragment, indent=2))
@@ -500,7 +485,6 @@ def test_transform_invalid_document(testcase):
     expected = json.load(open(os.path.join(OUTPUT_FOLDER, testcase + ".json")))
 
     mock_policy_loader = MagicMock()
-    mock_policy_loader.load.return_value = None
     parameter_values = get_template_parameter_values()
 
     with pytest.raises(InvalidDocumentException) as e:
@@ -775,6 +759,7 @@ class TestTemplateValidation(TestCase):
                     "InlineCode": "bar",
                     "Policies": [
                         "foo",
+                        "bar",
                     ],
                 },
             },
@@ -784,6 +769,7 @@ class TestTemplateValidation(TestCase):
                     "DefinitionUri": "s3://foo/bar",
                     "Policies": [
                         "foo",
+                        "bar",
                     ],
                 },
             },
@@ -800,6 +786,7 @@ class TestTemplateValidation(TestCase):
             (None, None, {"foo": "a3"}, "a3"),
             (None, {"foo": "a2"}, None, "a2"),
             ({"foo": "a1"}, None, None, "a1"),
+            (None, None, None, "foo"),
         ]
     )
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -840,35 +827,6 @@ class TestTemplateValidation(TestCase):
         self.assertEqual(function_arn, expected_arn)
         self.assertEqual(sfn_arn, expected_arn)
 
-    @parameterized.expand(
-        [
-            (None, None, None, "foo"),
-        ]
-    )
-    @patch("boto3.session.Session.region_name", "ap-southeast-1")
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_managed_policies_translator_translate_no_match(
-        self,
-        managed_policy_map,
-        bundled_managed_policy_map,
-        get_managed_policy_map_value,
-        expected_arn,
-    ):
-        def get_managed_policy_map():
-            return get_managed_policy_map_value
-
-        with patch(
-            "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
-            {"aws": bundled_managed_policy_map},
-        ):
-            parameters = {}
-            with self.assertRaises(InvalidDocumentException):
-                Translator(managed_policy_map, Parser()).translate(
-                    self._MANAGED_POLICIES_TEMPLATE,
-                    parameters,
-                    get_managed_policy_map=get_managed_policy_map,
-                )
-
     # test to make sure with arn it doesnt load, with non-arn it does
     @parameterized.expand(
         [
@@ -892,13 +850,7 @@ class TestTemplateValidation(TestCase):
 
             def load(self):
                 self.call_count += 1
-                return {
-                    "": "arn:",
-                    "SomeNonArnThing": "arn:SomeNonArnThing",
-                    "AnotherNonArnThing": "arn:AnotherNonArnThing",
-                    "aws:looks:like:an:ARN:but-not-really": "arn:aws:looks:like:an:ARN:but-not-really",
-                    "Mixing_things_v2": "arn:Mixing_things_v2",
-                }
+                return {}
 
         managed_policy_loader = ManagedPolicyLoader()
 
@@ -936,6 +888,7 @@ class TestTemplateValidation(TestCase):
             ({"foo": "a1"}, {"foo": "a2"}, "a2"),
             ({"foo": "a1"}, None, "a1"),
             (None, {"foo": "a2"}, "a2"),
+            (None, None, "foo"),
         ]
     )
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -972,35 +925,6 @@ class TestTemplateValidation(TestCase):
         self.assertEqual(function_arn, expected_arn)
         self.assertEqual(sfn_arn, expected_arn)
 
-    @parameterized.expand(
-        [
-            (None, None, "foo"),
-        ]
-    )
-    @patch("boto3.session.Session.region_name", "ap-southeast-1")
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_managed_policies_transform_no_match(
-        self,
-        managed_policy_map,
-        bundled_managed_policy_map,
-        expected_arn,
-    ):
-        class ManagedPolicyLoader:
-            def load(self):
-                return managed_policy_map
-
-        with patch(
-            "samtranslator.internal.managed_policies._BUNDLED_MANAGED_POLICIES",
-            {"aws": bundled_managed_policy_map},
-        ):
-            parameters = {}
-            with self.assertRaises(InvalidDocumentException):
-                transform(
-                    self._MANAGED_POLICIES_TEMPLATE,
-                    parameters,
-                    ManagedPolicyLoader(),
-                )
-
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_managed_policies_transform_policies_loaded_once(self):
@@ -1014,12 +938,7 @@ class TestTemplateValidation(TestCase):
 
             def load(self):
                 self.call_count += 1
-                return {
-                    "foo": "arn:foo",
-                    "bar": "arn:bar",
-                    "egg": "arn:egg",
-                    "baz": "arn:baz",
-                }
+                return {}
 
         managed_policy_loader = ManagedPolicyLoader()
 
