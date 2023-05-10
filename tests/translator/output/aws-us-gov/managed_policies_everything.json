@@ -51,6 +51,17 @@
           {
             "Fn::Sub": "SomethingPassThrough"
           },
+          {
+            "Fn::If": [
+              "SomeCondition",
+              {
+                "Ref": "NewSecurityGroup"
+              },
+              {
+                "Ref": "ExistingSecurityGroup"
+              }
+            ]
+          },
           "{{resolve:ssm:passedthrough:2}}",
           "{{resolve:ssm-secure:PassedThrough:10}}"
         ],
@@ -81,7 +92,7 @@
                 }
               ]
             },
-            "PolicyName": "MyFunctionRolePolicy7"
+            "PolicyName": "MyFunctionRolePolicy8"
           },
           {
             "PolicyDocument": {
@@ -89,7 +100,7 @@
                 "Some": "Statement"
               }
             },
-            "PolicyName": "MyFunctionRolePolicy10"
+            "PolicyName": "MyFunctionRolePolicy11"
           }
         ],
         "Tags": [
@@ -150,6 +161,17 @@
           {
             "Fn::Sub": "SomethingPassThrough"
           },
+          {
+            "Fn::If": [
+              "SomeCondition",
+              {
+                "Ref": "NewSecurityGroup"
+              },
+              {
+                "Ref": "ExistingSecurityGroup"
+              }
+            ]
+          },
           "{{resolve:ssm:passedthrough:2}}",
           "{{resolve:ssm-secure:PassedThrough:10}}"
         ],
@@ -180,7 +202,7 @@
                 }
               ]
             },
-            "PolicyName": "MyStateMachineRolePolicy7"
+            "PolicyName": "MyStateMachineRolePolicy8"
           },
           {
             "PolicyDocument": {
@@ -188,7 +210,7 @@
                 "Some": "Statement"
               }
             },
-            "PolicyName": "MyStateMachineRolePolicy10"
+            "PolicyName": "MyStateMachineRolePolicy11"
           }
         ],
         "Tags": [

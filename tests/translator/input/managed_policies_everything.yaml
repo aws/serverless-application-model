@@ -17,6 +17,7 @@ Resources:
       - arn:looks:like::an/arn-also-passed-through
       # Intrinsic (pass-through)
       - !Sub SomethingPassThrough
+      - !If [SomeCondition, !Ref NewSecurityGroup, !Ref ExistingSecurityGroup]
       # Policy template (added to Policies property of Role)
       - SQSPollerPolicy:
           QueueName: !Ref SomeQueue
@@ -43,6 +44,7 @@ Resources:
       - arn:looks:like::an/arn-also-passed-through
       # Intrinsic (pass-through)
       - !Sub SomethingPassThrough
+      - !If [SomeCondition, !Ref NewSecurityGroup, !Ref ExistingSecurityGroup]
       # Policy template (added to Policies property of Role)
       - SQSPollerPolicy:
           QueueName: !Ref SomeQueue
