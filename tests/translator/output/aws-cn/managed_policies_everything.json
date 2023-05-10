@@ -60,7 +60,7 @@
           "arn:aws-cn:iam::aws:policy/AmazonS3FullAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
           "AnyNonOfficialManagedPolicy",
-          "arn:aws-cn:iam::aws:policy/ThisIsPassedThroughAsIs",
+          "arn:aws:iam::aws:policy/ThisIsPassedThroughAsIs",
           "arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough",
           "arn:looks:like::an/arn-also-passed-through",
           {
@@ -180,7 +180,7 @@
           "arn:aws-cn:iam::aws:policy/AmazonS3FullAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
           "AnyNonOfficialManagedPolicy",
-          "arn:aws-cn:iam::aws:policy/ThisIsPassedThroughAsIs",
+          "arn:aws:iam::aws:policy/ThisIsPassedThroughAsIs",
           "arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough",
           "arn:looks:like::an/arn-also-passed-through",
           {
