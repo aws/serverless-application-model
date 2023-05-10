@@ -1,0 +1,54 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.8
+      Handler: foo
+      InlineCode: bar
+      Policies:
+      # Valid AWS managed policy name (converted to ARN)
+      - AmazonS3FullAccess
+      - AmazonAPIGatewayPushToCloudWatchLogs
+      # Unknown managed policy name (pass-through)
+      - AnyNonOfficialManagedPolicy
+      # ARN (pass-through)
+      - arn:aws:iam::aws:policy/ThisIsPassedThroughAsIs
+      - arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough
+      - arn:looks:like::an/arn-also-passed-through
+      # Intrinsic (pass-through)
+      - !Sub SomethingPassThrough
+      # Policy template (added to Policies property of Role)
+      - SQSPollerPolicy:
+          QueueName: !Ref SomeQueue
+      # Dynamic references (pass-through)
+      # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/dynamic-references.html
+      - '{{resolve:ssm:passedthrough:2}}'
+      - '{{resolve:ssm-secure:PassedThrough:10}}'
+      # Inline statement (added to Policies property of Role)
+      - {Statement: {Some: Statement}}
+
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: s3://foo/bar
+      Policies:
+      # Valid AWS managed policy name (converted to ARN)
+      - AmazonS3FullAccess
+      - AmazonAPIGatewayPushToCloudWatchLogs
+      # Unknown managed policy name (pass-through)
+      - AnyNonOfficialManagedPolicy
+      # ARN (pass-through)
+      - arn:aws:iam::aws:policy/ThisIsPassedThroughAsIs
+      - arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough
+      - arn:looks:like::an/arn-also-passed-through
+      # Intrinsic (pass-through)
+      - !Sub SomethingPassThrough
+      # Policy template (added to Policies property of Role)
+      - SQSPollerPolicy:
+          QueueName: !Ref SomeQueue
+      # Dynamic references (pass-through)
+      # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/dynamic-references.html
+      - '{{resolve:ssm:passedthrough:2}}'
+      - '{{resolve:ssm-secure:PassedThrough:10}}'
+      # Inline statement (added to Policies property of Role)
+      - {Statement: {Some: Statement}}
