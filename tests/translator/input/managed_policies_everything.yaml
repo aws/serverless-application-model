@@ -1,4 +1,15 @@
+Parameters:
+  SomeParameter:
+    Type: String
+Conditions:
+  SomeCondition: !Equals [!Ref SomeParameter, true]
 Resources:
+  MyQueue:
+    Type: AWS::SQS::Queue
+  MyManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument: {}
   MyFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -16,17 +27,16 @@ Resources:
       - arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough
       - arn:looks:like::an/arn-also-passed-through
       # Intrinsic (pass-through)
-      - !Sub SomethingPassThrough
-      - !If [SomeCondition, !Ref NewSecurityGroup, !Ref ExistingSecurityGroup]
+      - !Sub "${MyQueue}WhateverPassThrough"
+      - !If [SomeCondition, !Ref MyManagedPolicy, !Ref MyManagedPolicy]
       # Policy template (added to Policies property of Role)
       - SQSPollerPolicy:
-          QueueName: !Ref SomeQueue
+          QueueName: !Ref MyQueue
       # Dynamic references (pass-through)
       # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/dynamic-references.html
       - '{{resolve:ssm:passedthrough:2}}'
-      - '{{resolve:ssm-secure:PassedThrough:10}}'
       # Inline statement (added to Policies property of Role)
-      - {Statement: {Some: Statement}}
+      - {Statement: {Effect: Allow, Action: '*', Resource: '*'}}
 
   MyStateMachine:
     Type: AWS::Serverless::StateMachine
@@ -43,14 +53,13 @@ Resources:
       - arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough
       - arn:looks:like::an/arn-also-passed-through
       # Intrinsic (pass-through)
-      - !Sub SomethingPassThrough
-      - !If [SomeCondition, !Ref NewSecurityGroup, !Ref ExistingSecurityGroup]
+      - !Sub "${MyQueue}WhateverPassThrough"
+      - !If [SomeCondition, !Ref MyManagedPolicy, !Ref MyManagedPolicy]
       # Policy template (added to Policies property of Role)
       - SQSPollerPolicy:
-          QueueName: !Ref SomeQueue
+          QueueName: !Ref MyQueue
       # Dynamic references (pass-through)
       # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/dynamic-references.html
       - '{{resolve:ssm:passedthrough:2}}'
-      - '{{resolve:ssm-secure:PassedThrough:10}}'
       # Inline statement (added to Policies property of Role)
-      - {Statement: {Some: Statement}}
+      - {Statement: {Effect: Allow, Action: '*', Resource: '*'}}

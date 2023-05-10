@@ -1,4 +1,19 @@
 {
+  "Conditions": {
+    "SomeCondition": {
+      "Fn::Equals": [
+        {
+          "Ref": "SomeParameter"
+        },
+        true
+      ]
+    }
+  },
+  "Parameters": {
+    "SomeParameter": {
+      "Type": "String"
+    }
+  },
   "Resources": {
     "MyFunction": {
       "Properties": {
@@ -49,21 +64,20 @@
           "arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough",
           "arn:looks:like::an/arn-also-passed-through",
           {
-            "Fn::Sub": "SomethingPassThrough"
+            "Fn::Sub": "${MyQueue}WhateverPassThrough"
           },
           {
             "Fn::If": [
               "SomeCondition",
               {
-                "Ref": "NewSecurityGroup"
+                "Ref": "MyManagedPolicy"
               },
               {
-                "Ref": "ExistingSecurityGroup"
+                "Ref": "MyManagedPolicy"
               }
             ]
           },
-          "{{resolve:ssm:passedthrough:2}}",
-          "{{resolve:ssm-secure:PassedThrough:10}}"
+          "{{resolve:ssm:passedthrough:2}}"
         ],
         "Policies": [
           {
@@ -84,7 +98,7 @@
                       "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
                       {
                         "queueName": {
-                          "Ref": "SomeQueue"
+                          "Ref": "MyQueue"
                         }
                       }
                     ]
@@ -97,10 +111,12 @@
           {
             "PolicyDocument": {
               "Statement": {
-                "Some": "Statement"
+                "Action": "*",
+                "Effect": "Allow",
+                "Resource": "*"
               }
             },
-            "PolicyName": "MyFunctionRolePolicy11"
+            "PolicyName": "MyFunctionRolePolicy10"
           }
         ],
         "Tags": [
@@ -111,6 +127,15 @@
         ]
       },
       "Type": "AWS::IAM::Role"
+    },
+    "MyManagedPolicy": {
+      "Properties": {
+        "PolicyDocument": {}
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyQueue": {
+      "Type": "AWS::SQS::Queue"
     },
     "MyStateMachine": {
       "Properties": {
@@ -159,21 +184,20 @@
           "arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough",
           "arn:looks:like::an/arn-also-passed-through",
           {
-            "Fn::Sub": "SomethingPassThrough"
+            "Fn::Sub": "${MyQueue}WhateverPassThrough"
           },
           {
             "Fn::If": [
               "SomeCondition",
               {
-                "Ref": "NewSecurityGroup"
+                "Ref": "MyManagedPolicy"
               },
               {
-                "Ref": "ExistingSecurityGroup"
+                "Ref": "MyManagedPolicy"
               }
             ]
           },
-          "{{resolve:ssm:passedthrough:2}}",
-          "{{resolve:ssm-secure:PassedThrough:10}}"
+          "{{resolve:ssm:passedthrough:2}}"
         ],
         "Policies": [
           {
@@ -194,7 +218,7 @@
                       "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
                       {
                         "queueName": {
-                          "Ref": "SomeQueue"
+                          "Ref": "MyQueue"
                         }
                       }
                     ]
@@ -207,10 +231,12 @@
           {
             "PolicyDocument": {
               "Statement": {
-                "Some": "Statement"
+                "Action": "*",
+                "Effect": "Allow",
+                "Resource": "*"
               }
             },
-            "PolicyName": "MyStateMachineRolePolicy11"
+            "PolicyName": "MyStateMachineRolePolicy10"
           }
         ],
         "Tags": [
