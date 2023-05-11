@@ -129,6 +129,9 @@ each version and flip between them (sourcing the activate script). Typically, we
 one python version locally and then have our ci (appveyor) run all supported versions.
 
 ### Transform tests
+
+Transform tests ensure a SAM template transforms into the expected CloudFormation template.
+
 When adding new transform tests, we have provided a script to help generate the transform test input 
 and output files in the correct directory given a template.yaml file.
 ```bash

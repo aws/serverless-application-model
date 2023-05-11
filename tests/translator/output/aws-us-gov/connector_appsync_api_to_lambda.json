@@ -1,0 +1,110 @@
+{
+  "Resources": {
+    "Api": {
+      "Properties": {
+        "AuthenticationType": "AWS_LAMBDA",
+        "LambdaAuthorizerConfig": {
+          "AuthorizerUri": {
+            "Fn::GetAtt": [
+              "Authorizer",
+              "Arn"
+            ]
+          }
+        },
+        "Name": "Api"
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "Authorizer": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (_) => {\n  return {\n    isAuthorized: true,\n    deniedFields: [],\n  }\n}\n"
+        },
+        "Handler": "index.handler",
+        "PackageType": "Zip",
+        "Role": {
+          "Fn::GetAtt": [
+            "AuthorizerRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "AuthorizerRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "GraphQlApiToLambdaConnectorWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "GraphQlApiToLambdaConnector": {
+            "Destination": {
+              "Type": "AWS::Serverless::Function"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::GraphQLApi"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "Authorizer",
+            "Arn"
+          ]
+        },
+        "Principal": "appsync.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:appsync:${AWS::Region}:${AWS::AccountId}:apis/${SourceResourceId}",
+            {
+              "SourceResourceId": {
+                "Fn::GetAtt": [
+                  "Api",
+                  "ApiId"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    }
+  }
+}

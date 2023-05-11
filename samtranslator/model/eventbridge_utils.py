@@ -30,15 +30,15 @@ class EventBridgeRuleUtils:
         is_type_defined = "Type" in dead_letter_config
         if is_arn_defined and is_type_defined:
             raise InvalidEventException(
-                source_logical_id, "You can either define 'Arn' or 'Type' property of DeadLetterConfig"
+                source_logical_id, "You can either define 'Arn' or 'Type' property of DeadLetterConfig."
             )
         if is_type_defined and dead_letter_config.get("Type") not in supported_types:
             raise InvalidEventException(
                 source_logical_id,
-                "The only valid value for 'Type' property of DeadLetterConfig is 'SQS'",
+                "The only valid value for 'Type' property of DeadLetterConfig is 'SQS'.",
             )
         if not is_arn_defined and not is_type_defined:
-            raise InvalidEventException(source_logical_id, "No 'Arn' or 'Type' property provided for DeadLetterConfig")
+            raise InvalidEventException(source_logical_id, "No 'Arn' or 'Type' property provided for DeadLetterConfig.")
 
     @staticmethod
     def get_dlq_queue_arn_and_resources(cw_event_source, source_arn, attributes):  # type: ignore[no-untyped-def]

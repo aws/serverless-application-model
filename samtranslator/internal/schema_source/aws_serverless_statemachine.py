@@ -72,6 +72,7 @@ class ScheduleV2EventProperties(BaseModel):
     ScheduleExpressionTimezone: Optional[PassThroughProp] = scheduleeventv2properties("ScheduleExpressionTimezone")
     StartDate: Optional[PassThroughProp] = scheduleeventv2properties("StartDate")
     State: Optional[PassThroughProp] = scheduleeventv2properties("State")
+    OmitName: Optional[bool]  # TODO: add doc
 
 
 class ScheduleV2Event(BaseModel):

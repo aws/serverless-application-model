@@ -4,7 +4,7 @@ pytest-xdist>=2.5,<4
 pytest-env>=0.6,<1
 pytest-rerunfailures>=9.1,<12
 pyyaml~=6.0
-ruff==0.0.261  # loose the requirement once it is more stable
+ruff==0.0.263  # loose the requirement once it is more stable
 
 # Test requirements
 pytest>=6.2,<8
@@ -29,3 +29,7 @@ mypy~=1.1.0
 boto3-stubs[appconfig,serverlessrepo]>=1.19.5,==1.*
 types-PyYAML~=6.0
 types-jsonschema~=3.2
+
+# Check package version (backport importlib.metadata for python 3.7)
+# https://docs.python.org/3/library/importlib.metadata.html
+importlib_metadata; python_version < '3.8'

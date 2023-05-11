@@ -67,6 +67,15 @@ class ScheduleV2EventSourceInSamFunction(TestCase):
             {"Arn": {"Fn::GetAtt": ["func", "Arn"]}, "RoleArn": {"Fn::GetAtt": ["ScheduleEventRole", "Arn"]}},
         )
         self.assertIsNone(schedule.State)
+        self.assertEqual(schedule.Name, self.logical_id)
+
+    def test_to_cloudformation_when_omit_name(self):
+        self.schedule_event_source.OmitName = True
+        resources = self.schedule_event_source.to_cloudformation(function=self.func)
+        self.assertEqual(resources[0].resource_type, "AWS::Scheduler::Schedule")
+
+        schedule = resources[0]
+        self.assertEqual(schedule.Name, None)
 
     def test_to_cloudformation_when_role_is_provided(self):
         self.schedule_event_source.RoleArn = "arn"
