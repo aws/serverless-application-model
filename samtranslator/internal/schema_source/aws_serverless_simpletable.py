@@ -37,6 +37,7 @@ SSESpecification = Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
+    PointInTimeRecoverySpecification: Optional[PassThroughProp]  # TODO: add docs
     PrimaryKey: Optional[PrimaryKey] = properties("PrimaryKey")
     ProvisionedThroughput: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,

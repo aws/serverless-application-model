@@ -199,6 +199,69 @@
       },
       "Type": "AWS::Scheduler::Schedule"
     },
+    "ScheduledFunctionScheduleV2FalseName": {
+      "Properties": {
+        "FlexibleTimeWindow": {
+          "Mode": "OFF"
+        },
+        "ScheduleExpression": "rate(1 minute)",
+        "Target": {
+          "Arn": {
+            "Fn::GetAtt": [
+              "ScheduledFunction",
+              "Arn"
+            ]
+          },
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "ScheduledFunctionScheduleV2FalseNameRole",
+              "Arn"
+            ]
+          }
+        }
+      },
+      "Type": "AWS::Scheduler::Schedule"
+    },
+    "ScheduledFunctionScheduleV2FalseNameRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "scheduler.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "lambda:InvokeFunction",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "ScheduledFunction",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "ScheduledFunctionScheduleV2FalseNameLambdaPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
     "ScheduledFunctionScheduleV2MoreProperties": {
       "Properties": {
         "Description": "Test Schedule",

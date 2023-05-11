@@ -9,6 +9,7 @@ class DynamoDBTable(Resource):
         "GlobalSecondaryIndexes": GeneratedProperty(),
         "KeySchema": GeneratedProperty(),
         "LocalSecondaryIndexes": GeneratedProperty(),
+        "PointInTimeRecoverySpecification": GeneratedProperty(),
         "ProvisionedThroughput": GeneratedProperty(),
         "StreamSpecification": GeneratedProperty(),
         "TableName": GeneratedProperty(),
