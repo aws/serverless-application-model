@@ -1,9 +1,0 @@
-Resources:
-  MyFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Runtime: python3.8
-      Handler: foo
-      InlineCode: bar
-      Policies:
-      - AnyNonOfficialManagedPolicy
