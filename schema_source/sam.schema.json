@@ -1,36 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "definitions": {
-    "AdditionalAuth": {
-      "additionalProperties": false,
-      "properties": {
-        "LambdaAuthorizer": {
-          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__LambdaAuthorizer"
-        },
-        "OpenIDConnect": {
-          "$ref": "#/definitions/OpenIDConnect"
-        },
-        "Type": {
-          "enum": [
-            "AWS_IAM",
-            "API_KEY",
-            "AWS_LAMBDA",
-            "OPENID_CONNECT",
-            "AMAZON_COGNITO_USER_POOLS"
-          ],
-          "title": "Type",
-          "type": "string"
-        },
-        "UserPool": {
-          "$ref": "#/definitions/UserPool"
-        }
-      },
-      "required": [
-        "Type"
-      ],
-      "title": "AdditionalAuth",
-      "type": "object"
-    },
     "AlexaSkillEvent": {
       "additionalProperties": false,
       "properties": {
@@ -184,6 +154,36 @@
         }
       },
       "title": "AppSyncResolver",
+      "type": "object"
+    },
+    "Authoriser": {
+      "additionalProperties": false,
+      "properties": {
+        "LambdaAuthorizer": {
+          "$ref": "#/definitions/LambdaAuthoriserConfig"
+        },
+        "OpenIDConnect": {
+          "$ref": "#/definitions/OpenIDConnectConfig"
+        },
+        "Type": {
+          "enum": [
+            "AWS_IAM",
+            "API_KEY",
+            "AWS_LAMBDA",
+            "OPENID_CONNECT",
+            "AMAZON_COGNITO_USER_POOLS"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "UserPool": {
+          "$ref": "#/definitions/UserPoolConfig"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "title": "Authoriser",
       "type": "object"
     },
     "Cache": {
@@ -1852,6 +1852,94 @@
       "title": "KinesisEventProperties",
       "type": "object"
     },
+    "LambdaAuthoriserConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizerResultTtlInSeconds": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "AuthorizerUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "IdentityValidationExpression": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "AuthorizerUri"
+      ],
+      "title": "LambdaAuthoriserConfig",
+      "type": "object"
+    },
+    "LambdaAuthorizer": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizerPayloadFormatVersion": {
+          "anyOf": [
+            {
+              "enum": [
+                "1.0",
+                "2.0"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "markdownDescription": "Specifies the format of the payload sent to an HTTP API Lambda authorizer\\. Required for HTTP API Lambda authorizers\\.  \nThis is passed through to the `authorizerPayloadFormatVersion` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Valid values*: `1.0` or `2.0`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "AuthorizerPayloadFormatVersion"
+        },
+        "EnableFunctionDefaultPermissions": {
+          "title": "Enablefunctiondefaultpermissions",
+          "type": "boolean"
+        },
+        "EnableSimpleResponses": {
+          "markdownDescription": "Specifies whether a Lambda authorizer returns a response in a simple format\\. By default, a Lambda authorizer must return an AWS Identity and Access Management \\(IAM\\) policy\\. If enabled, the Lambda authorizer can return a boolean value instead of an IAM policy\\.  \nThis is passed through to the `enableSimpleResponses` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "EnableSimpleResponses",
+          "type": "boolean"
+        },
+        "FunctionArn": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "The Amazon Resource Name \\(ARN\\) of the Lambda function that provides authorization for the API\\.  \nThis is passed through to the `authorizerUri` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "FunctionArn"
+        },
+        "FunctionInvokeRole": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "The ARN of the IAM role that has the credentials required for API Gateway to invoke the authorizer function\\. Specify this parameter if your function's resource\\-based policy doesn't grant API Gateway `lambda:InvokeFunction` permission\\.  \nThis is passed through to the `authorizerCredentials` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \nFor more information, see [Create a Lambda authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html#http-api-lambda-authorizer.example-create) in the *API Gateway Developer Guide*\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "FunctionInvokeRole"
+        },
+        "Identity": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/LambdaAuthorizerIdentity"
+            }
+          ],
+          "markdownDescription": "Specifies an `IdentitySource` in an incoming request for an authorizer\\.  \nThis is passed through to the `identitySource` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: [LambdaAuthorizationIdentity](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-httpapi-lambdaauthorizationidentity.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "Identity"
+        }
+      },
+      "required": [
+        "AuthorizerPayloadFormatVersion",
+        "FunctionArn"
+      ],
+      "title": "LambdaAuthorizer",
+      "type": "object"
+    },
     "LambdaAuthorizerIdentity": {
       "additionalProperties": false,
       "properties": {
@@ -2431,7 +2519,7 @@
       "title": "OAuth2Authorizer",
       "type": "object"
     },
-    "OpenIDConnect": {
+    "OpenIDConnectConfig": {
       "additionalProperties": false,
       "properties": {
         "AuthTTL": {
@@ -2447,7 +2535,7 @@
           "$ref": "#/definitions/PassThroughProp"
         }
       },
-      "title": "OpenIDConnect",
+      "title": "OpenIDConnectConfig",
       "type": "object"
     },
     "PassThroughProp": {},
@@ -3277,7 +3365,7 @@
       "title": "UsagePlan",
       "type": "object"
     },
-    "UserPool": {
+    "UserPoolConfig": {
       "additionalProperties": false,
       "properties": {
         "AppIdClientRegex": {
@@ -3293,7 +3381,10 @@
           "$ref": "#/definitions/PassThroughProp"
         }
       },
-      "title": "UserPool",
+      "required": [
+        "UserPoolId"
+      ],
+      "title": "UserPoolConfig",
       "type": "object"
     },
     "__main____Globals": {
@@ -5815,7 +5906,7 @@
               "type": "array"
             }
           ],
-          "markdownDescription": "Permission policies for this function\\. Policies will be appended to the function's default AWS Identity and Access Management \\(IAM\\) execution role\\.  \nThis property accepts a single value or list of values\\. Allowed values include:  \n+ [AWS SAM policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html)\\.\n+ The ARN of an [AWS managed policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#aws-managed-policies)\\.\n+ The name of an AWS managed policy from the following [ list](https://github.com/aws/serverless-application-model/blob/develop/samtranslator/internal/data/aws_managed_policies.json)\\.\n+ An [ inline IAM policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#inline-policies) formatted in YAML as a map\\.\nIf you set the `Role` property, this property is ignored\\.\n*Type*: String \\| List \\| Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Policies`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-policies) property of an `AWS::IAM::Role` resource\\.",
+          "markdownDescription": "Permission policies for this function\\. Policies will be appended to the function's default AWS Identity and Access Management \\(IAM\\) execution role\\.  \nThis property accepts a single value or list of values\\. Allowed values include:  \n+ [AWS SAM policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html)\\.\n+ The ARN of an [AWS managed policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#aws-managed-policies) or [ customer managed policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#customer-managed-policies)\\.\n+ The name of an AWS managed policy from the following [ list](https://github.com/aws/serverless-application-model/blob/develop/samtranslator/internal/data/aws_managed_policies.json)\\.\n+ An [ inline IAM policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#inline-policies) formatted in YAML as a map\\.\nIf you set the `Role` property, this property is ignored\\.\n*Type*: String \\| List \\| Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Policies`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-policies) property of an `AWS::IAM::Role` resource\\.",
           "title": "Policies"
         },
         "ProvisionedConcurrencyConfig": {
@@ -6387,16 +6478,16 @@
       "properties": {
         "Additional": {
           "items": {
-            "$ref": "#/definitions/AdditionalAuth"
+            "$ref": "#/definitions/Authoriser"
           },
           "title": "Additional",
           "type": "array"
         },
         "LambdaAuthorizer": {
-          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__LambdaAuthorizer"
+          "$ref": "#/definitions/LambdaAuthoriserConfig"
         },
         "OpenIDConnect": {
-          "$ref": "#/definitions/OpenIDConnect"
+          "$ref": "#/definitions/OpenIDConnectConfig"
         },
         "Type": {
           "enum": [
@@ -6410,29 +6501,13 @@
           "type": "string"
         },
         "UserPool": {
-          "$ref": "#/definitions/UserPool"
+          "$ref": "#/definitions/UserPoolConfig"
         }
       },
       "required": [
         "Type"
       ],
       "title": "Auth",
-      "type": "object"
-    },
-    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__LambdaAuthorizer": {
-      "additionalProperties": false,
-      "properties": {
-        "AuthorizerResultTtlInSeconds": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
-        "AuthorizerUri": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
-        "IdentityValidationExpression": {
-          "$ref": "#/definitions/PassThroughProp"
-        }
-      },
-      "title": "LambdaAuthorizer",
       "type": "object"
     },
     "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties": {
@@ -6544,7 +6619,7 @@
                 "$ref": "#/definitions/OAuth2Authorizer"
               },
               {
-                "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__LambdaAuthorizer"
+                "$ref": "#/definitions/LambdaAuthorizer"
               }
             ]
           },
@@ -6762,75 +6837,6 @@
         }
       },
       "title": "Globals",
-      "type": "object"
-    },
-    "samtranslator__internal__schema_source__aws_serverless_httpapi__LambdaAuthorizer": {
-      "additionalProperties": false,
-      "properties": {
-        "AuthorizerPayloadFormatVersion": {
-          "anyOf": [
-            {
-              "enum": [
-                "1.0",
-                "2.0"
-              ],
-              "type": "string"
-            },
-            {
-              "type": "number"
-            }
-          ],
-          "markdownDescription": "Specifies the format of the payload sent to an HTTP API Lambda authorizer\\. Required for HTTP API Lambda authorizers\\.  \nThis is passed through to the `authorizerPayloadFormatVersion` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Valid values*: `1.0` or `2.0`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "AuthorizerPayloadFormatVersion"
-        },
-        "EnableFunctionDefaultPermissions": {
-          "title": "Enablefunctiondefaultpermissions",
-          "type": "boolean"
-        },
-        "EnableSimpleResponses": {
-          "markdownDescription": "Specifies whether a Lambda authorizer returns a response in a simple format\\. By default, a Lambda authorizer must return an AWS Identity and Access Management \\(IAM\\) policy\\. If enabled, the Lambda authorizer can return a boolean value instead of an IAM policy\\.  \nThis is passed through to the `enableSimpleResponses` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "EnableSimpleResponses",
-          "type": "boolean"
-        },
-        "FunctionArn": {
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "type": "string"
-            }
-          ],
-          "markdownDescription": "The Amazon Resource Name \\(ARN\\) of the Lambda function that provides authorization for the API\\.  \nThis is passed through to the `authorizerUri` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "FunctionArn"
-        },
-        "FunctionInvokeRole": {
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "type": "string"
-            }
-          ],
-          "markdownDescription": "The ARN of the IAM role that has the credentials required for API Gateway to invoke the authorizer function\\. Specify this parameter if your function's resource\\-based policy doesn't grant API Gateway `lambda:InvokeFunction` permission\\.  \nThis is passed through to the `authorizerCredentials` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \nFor more information, see [Create a Lambda authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html#http-api-lambda-authorizer.example-create) in the *API Gateway Developer Guide*\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "FunctionInvokeRole"
-        },
-        "Identity": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/LambdaAuthorizerIdentity"
-            }
-          ],
-          "markdownDescription": "Specifies an `IdentitySource` in an incoming request for an authorizer\\.  \nThis is passed through to the `identitySource` section of an `x-amazon-apigateway-authorizer` in the `securitySchemes` section of an OpenAPI definition\\.  \n*Type*: [LambdaAuthorizationIdentity](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-httpapi-lambdaauthorizationidentity.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "Identity"
-        }
-      },
-      "required": [
-        "AuthorizerPayloadFormatVersion",
-        "FunctionArn"
-      ],
-      "title": "LambdaAuthorizer",
       "type": "object"
     },
     "samtranslator__internal__schema_source__aws_serverless_httpapi__Properties": {
@@ -7799,7 +7805,7 @@
               "type": "array"
             }
           ],
-          "markdownDescription": "Permission policies for this state machine\\. Policies will be appended to the state machine's default AWS Identity and Access Management \\(IAM\\) execution role\\.  \nThis property accepts a single value or list of values\\. Allowed values include:  \n+ [AWS SAM policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html)\\.\n+ The ARN of an [AWS managed policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#aws-managed-policies)\\.\n+ The name of an AWS managed policy from the following [ list](https://github.com/aws/serverless-application-model/blob/develop/samtranslator/internal/data/aws_managed_policies.json)\\.\n+ An [ inline IAM policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#inline-policies) formatted in YAML as a map\\.\nIf you set the `Role` property, this property is ignored\\.\n*Type*: String \\| List \\| Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "markdownDescription": "Permission policies for this state machine\\. Policies will be appended to the state machine's default AWS Identity and Access Management \\(IAM\\) execution role\\.  \nThis property accepts a single value or list of values\\. Allowed values include:  \n+ [AWS SAM policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html)\\.\n+ The ARN of an [AWS managed policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#aws-managed-policies) or [customer managed policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#customer-managed-policies)\\.\n+ The name of an AWS managed policy from the following [ list](https://github.com/aws/serverless-application-model/blob/develop/samtranslator/internal/data/aws_managed_policies.json)\\.\n+ An [ inline IAM policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#inline-policies) formatted in YAML as a map\\.\nIf you set the `Role` property, this property is ignored\\.\n*Type*: String \\| List \\| Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "Policies"
         },
         "Role": {
