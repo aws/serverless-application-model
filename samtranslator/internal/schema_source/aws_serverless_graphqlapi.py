@@ -16,7 +16,7 @@ properties = get_prop("sam-resource-graphqlapi")
 
 
 # TODO: add docs
-class LambdaAuthoriserConfig(BaseModel):
+class LambdaAuthorizerConfig(BaseModel):
     AuthorizerResultTtlInSeconds: Optional[PassThroughProp]
     AuthorizerUri: PassThroughProp
     IdentityValidationExpression: Optional[PassThroughProp]
@@ -36,15 +36,15 @@ class UserPoolConfig(BaseModel):
     UserPoolId: PassThroughProp
 
 
-class Authoriser(BaseModel):
+class Authorizer(BaseModel):
     Type: AuthenticationTypes
-    LambdaAuthorizer: Optional[LambdaAuthoriserConfig]
+    LambdaAuthorizer: Optional[LambdaAuthorizerConfig]
     OpenIDConnect: Optional[OpenIDConnectConfig]
     UserPool: Optional[UserPoolConfig]
 
 
-class Auth(Authoriser):
-    Additional: Optional[List[Authoriser]]
+class Auth(Authorizer):
+    Additional: Optional[List[Authorizer]]
 
 
 class ApiKey(BaseModel):

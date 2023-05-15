@@ -2291,10 +2291,10 @@ class SamGraphQLApi(SamResourceMacro):
         lambda_auth_arns: List[Intrinsicable[str]] = []
 
         # Default authoriser
-        default_auth = aws_serverless_graphqlapi.Authoriser.parse_obj(
+        default_auth = aws_serverless_graphqlapi.Authorizer.parse_obj(
             {k: v for k, v in auth.dict().items() if k != "Additional"}
         )
-        name, auth_dict = self._validate_and_extract_authoriser_config(default_auth)
+        name, auth_dict = self._validate_and_extract_authorizer_config(default_auth)
         api.AuthenticationType = auth.Type
 
         # This would be much easier and type-safe if accessing the properties in Resource
@@ -2310,7 +2310,7 @@ class SamGraphQLApi(SamResourceMacro):
         additional_auths: List[AdditionalAuthenticationProviderType] = []
         if auth.Additional:
             for index, additional in enumerate(auth.Additional):
-                name, auth_dict = self._validate_and_extract_authoriser_config(additional, index)
+                name, auth_dict = self._validate_and_extract_authorizer_config(additional, index)
                 additional_auth: AdditionalAuthenticationProviderType = {"AuthenticationType": additional.Type}
                 if name and auth_dict:
                     additional_auth[name] = auth_dict
@@ -2324,9 +2324,9 @@ class SamGraphQLApi(SamResourceMacro):
 
         return lambda_auth_arns
 
-    def _validate_and_extract_authoriser_config(
+    def _validate_and_extract_authorizer_config(
         self,
-        auth: aws_serverless_graphqlapi.Authoriser,
+        auth: aws_serverless_graphqlapi.Authorizer,
         index: Optional[int] = None,
     ) -> Tuple[
         Optional[Literal["LambdaAuthorizerConfig", "OpenIDConnectConfig", "UserPoolConfig"]],

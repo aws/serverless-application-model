@@ -156,11 +156,11 @@
       "title": "AppSyncResolver",
       "type": "object"
     },
-    "Authoriser": {
+    "Authorizer": {
       "additionalProperties": false,
       "properties": {
         "LambdaAuthorizer": {
-          "$ref": "#/definitions/LambdaAuthoriserConfig"
+          "$ref": "#/definitions/LambdaAuthorizerConfig"
         },
         "OpenIDConnect": {
           "$ref": "#/definitions/OpenIDConnectConfig"
@@ -183,7 +183,7 @@
       "required": [
         "Type"
       ],
-      "title": "Authoriser",
+      "title": "Authorizer",
       "type": "object"
     },
     "Cache": {
@@ -1852,25 +1852,6 @@
       "title": "KinesisEventProperties",
       "type": "object"
     },
-    "LambdaAuthoriserConfig": {
-      "additionalProperties": false,
-      "properties": {
-        "AuthorizerResultTtlInSeconds": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
-        "AuthorizerUri": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
-        "IdentityValidationExpression": {
-          "$ref": "#/definitions/PassThroughProp"
-        }
-      },
-      "required": [
-        "AuthorizerUri"
-      ],
-      "title": "LambdaAuthoriserConfig",
-      "type": "object"
-    },
     "LambdaAuthorizer": {
       "additionalProperties": false,
       "properties": {
@@ -1938,6 +1919,25 @@
         "FunctionArn"
       ],
       "title": "LambdaAuthorizer",
+      "type": "object"
+    },
+    "LambdaAuthorizerConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizerResultTtlInSeconds": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "AuthorizerUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "IdentityValidationExpression": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "AuthorizerUri"
+      ],
+      "title": "LambdaAuthorizerConfig",
       "type": "object"
     },
     "LambdaAuthorizerIdentity": {
@@ -6478,13 +6478,13 @@
       "properties": {
         "Additional": {
           "items": {
-            "$ref": "#/definitions/Authoriser"
+            "$ref": "#/definitions/Authorizer"
           },
           "title": "Additional",
           "type": "array"
         },
         "LambdaAuthorizer": {
-          "$ref": "#/definitions/LambdaAuthoriserConfig"
+          "$ref": "#/definitions/LambdaAuthorizerConfig"
         },
         "OpenIDConnect": {
           "$ref": "#/definitions/OpenIDConnectConfig"
