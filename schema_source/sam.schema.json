@@ -2645,28 +2645,6 @@
       "title": "RequestParameters",
       "type": "object"
     },
-    "ResolverCodeSettings": {
-      "additionalProperties": false,
-      "properties": {
-        "CodeRootPath": {
-          "title": "Coderootpath",
-          "type": "string"
-        },
-        "FunctionsFolder": {
-          "title": "Functionsfolder",
-          "type": "string"
-        },
-        "Runtime": {
-          "$ref": "#/definitions/Runtime"
-        }
-      },
-      "required": [
-        "CodeRootPath",
-        "Runtime"
-      ],
-      "title": "ResolverCodeSettings",
-      "type": "object"
-    },
     "ResourceReference": {
       "additionalProperties": false,
       "properties": {
@@ -6563,9 +6541,6 @@
         "Name": {
           "title": "Name",
           "type": "string"
-        },
-        "ResolverCodeSettings": {
-          "$ref": "#/definitions/ResolverCodeSettings"
         },
         "SchemaInline": {
           "$ref": "#/definitions/PassThroughProp"
