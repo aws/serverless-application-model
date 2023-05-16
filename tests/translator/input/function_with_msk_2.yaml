@@ -1,0 +1,69 @@
+Parameters:
+  PreCreatedSubnetOne:
+    Type: String
+  PreCreatedSubnetTwo:
+    Type: String
+  MskClusterName:
+    Type: String
+
+Resources:
+  MyLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: [sts:AssumeRole]
+          Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+      Policies:
+      - PolicyName: IntegrationTestExecution
+        PolicyDocument:
+          Statement:
+          - Action: [kafka:DescribeCluster, kafka:GetBootstrapBrokers, ec2:CreateNetworkInterface,
+              ec2:DescribeNetworkInterfaces, ec2:DescribeVpcs, ec2:DeleteNetworkInterface,
+              ec2:DescribeSubnets, ec2:DescribeSecurityGroups, logs:CreateLogGroup,
+              logs:CreateLogStream, logs:PutLogEvents]
+            Effect: Allow
+            Resource: '*'
+      ManagedPolicyArns: [arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole]
+      Tags:
+      - {Value: SAM, Key: lambda:createdBy}
+
+  MyMskCluster:
+    Type: AWS::MSK::Cluster
+    Properties:
+      BrokerNodeGroupInfo:
+        ClientSubnets:
+        - Ref: PreCreatedSubnetOne
+        - Ref: PreCreatedSubnetTwo
+        InstanceType: kafka.t3.small
+        StorageInfo:
+          EBSStorageInfo:
+            VolumeSize: 1
+      ClusterName:
+        Ref: MskClusterName
+      KafkaVersion: 2.4.1.1
+      NumberOfBrokerNodes: 2
+
+  MyMskStreamProcessor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      CodeUri: s3://foo/bar
+      Role:
+        Fn::GetAtt: [MyLambdaExecutionRole, Arn]
+      Events:
+        MyMskEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream:
+              Ref: MyMskCluster
+            Topics:
+            - MyDummyTestTopic
+
+Metadata:
+  SamTransformTest: true
