@@ -163,7 +163,7 @@ Resources:
         NoDataSourceProperties:
           CodeUri: my-code
 
-  NoInlineCodeOrCodeUriDefinedWithoutResolverCodeSettings:
+  NeitherInlineCodeNorCodeUriDefined:
     Type: AWS::Serverless::GraphQLApi
     Properties:
       Name: SomeApi

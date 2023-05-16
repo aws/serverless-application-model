@@ -2162,7 +2162,6 @@ class SamGraphQLApi(SamResourceMacro):
         "SchemaUri": Property(False, IS_STR),
         "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
         "DataSources": Property(False, IS_DICT),
-        "ResolverCodeSettings": Property(False, IS_DICT),
         "Functions": Property(False, IS_DICT),
         "AppSyncResolvers": Property(False, IS_DICT),
         "ApiKey": Property(False, IS_DICT),
@@ -2178,7 +2177,6 @@ class SamGraphQLApi(SamResourceMacro):
     SchemaUri: Optional[str]
     Logging: Optional[Union[Dict[str, Any], bool]]
     DataSources: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
-    ResolverCodeSettings: Optional[Dict[str, Any]]
     Functions: Optional[Dict[str, Dict[str, Any]]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
     ApiKey: Optional[Dict[str, Dict[str, Any]]]
@@ -2233,18 +2231,13 @@ class SamGraphQLApi(SamResourceMacro):
             domain_name_resources = self._construct_domain_name_resources(model.DomainName, api_id)
             resources.extend(domain_name_resources)
 
-        if model.ResolverCodeSettings:
-            self._set_resolver_code_settings(model.ResolverCodeSettings)
-
         if model.Functions:
-            function_configurations = self._construct_appsync_function_configurations(
-                model.Functions, model.ResolverCodeSettings, api_id
-            )
+            function_configurations = self._construct_appsync_function_configurations(model.Functions, api_id)
             resources.extend(function_configurations)
 
         if model.AppSyncResolvers:
             appsync_resolver_resources = self._construct_appsync_resolver_resources(
-                model.AppSyncResolvers, model.ResolverCodeSettings, api_id, appsync_schema.logical_id
+                model.AppSyncResolvers, api_id, appsync_schema.logical_id
             )
             resources.extend(appsync_resolver_resources)
 
@@ -2761,14 +2754,9 @@ class SamGraphQLApi(SamResourceMacro):
 
         return connector.to_cloudformation(**kwargs)
 
-    @staticmethod
-    def _set_resolver_code_settings(resolver_code_settings: aws_serverless_graphqlapi.ResolverCodeSettings) -> None:
-        resolver_code_settings.FunctionsFolder = resolver_code_settings.FunctionsFolder or "functions"
-
     def _construct_appsync_function_configurations(
         self,
         functions: Dict[str, aws_serverless_graphqlapi.Function],
-        resolver_code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         api_id: Intrinsicable[str],
     ) -> List[FunctionConfiguration]:
         func_configs: List[FunctionConfiguration] = []
@@ -2797,12 +2785,12 @@ class SamGraphQLApi(SamResourceMacro):
             func_config.ApiId = api_id
             func_config.Name = function.Name or relative_id
             func_config.Code, func_config.CodeS3Location = self._parse_function_code_properties(
-                function, resolver_code_settings, func_config.Name, relative_id
+                function, func_config.Name, relative_id
             )
             func_config.DataSourceName = self._parse_datasource_name(relative_id, function)
             func_config.MaxBatchSize = passthrough_value(function.MaxBatchSize)
             func_config.Description = passthrough_value(function.Description)
-            func_config.Runtime = self._parse_runtime(function, resolver_code_settings, relative_id)
+            func_config.Runtime = self._parse_runtime(function, relative_id)
 
             if function.Sync:
                 func_config.SyncConfig = cast(SyncConfigType, remove_none_values(function.Sync.dict()))
@@ -2902,7 +2890,6 @@ class SamGraphQLApi(SamResourceMacro):
     @staticmethod
     def _parse_function_code_properties(
         function: aws_serverless_graphqlapi.Function,
-        code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         name: str,
         relative_id: str,
     ) -> Tuple[Optional[PassThrough], Optional[PassThrough]]:
@@ -2924,47 +2911,28 @@ class SamGraphQLApi(SamResourceMacro):
         if function.CodeUri:
             return None, passthrough_value(function.CodeUri)
 
-        if not code_settings:
-            raise InvalidResourceException(
-                relative_id, "One of 'InlineCode', 'CodeUri', or 'ResolverCodeSettings' must be set."
-            )
-
-        return None, f"{code_settings.CodeRootPath}/{code_settings.FunctionsFolder}/{name}.js"
+        raise InvalidResourceException(relative_id, "One of 'InlineCode' or 'CodeUri' must be set.")
 
     @staticmethod
     def _parse_runtime(
         resource: Union[aws_serverless_graphqlapi.Function, aws_serverless_graphqlapi.AppSyncResolver],
-        code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         relative_id: str,
     ) -> AppSyncRuntimeType:
         """
         Parse Runtime property of Function and Resolver.
-
-        Runtime must be defined by the customer, either within the resource or in the
-        ResolverCodeSettings property. This function parses Runtime and returns it in the
-        correct form for the respective CFN resource. We throw an error if Runtime is not
-        defined anywhere.
         """
-
-        # Runtime can exist in either the resource or in ResolverCodeSettings as a default.
-        def make_runtime_dict(r: aws_serverless_graphqlapi.Runtime) -> AppSyncRuntimeType:
-            return {"Name": passthrough_value(r.Name), "RuntimeVersion": passthrough_value(r.Version)}
-
         if resource.Runtime:
-            return make_runtime_dict(resource.Runtime)
-
-        if code_settings:
-            return make_runtime_dict(code_settings.Runtime)
+            return {
+                "Name": passthrough_value(resource.Runtime.Name),
+                "RuntimeVersion": passthrough_value(resource.Runtime.Version),
+            }
 
         # Runtime is not defined, raise error.
-        raise InvalidResourceException(
-            relative_id, f"'Runtime' must be defined as a property in {relative_id} or in 'ResolverCodeSettings.'"
-        )
+        raise InvalidResourceException(relative_id, f"'Runtime' must be defined as a property in {relative_id}.")
 
     def _construct_appsync_resolver_resources(
         self,
         appsync_resolvers: Dict[str, Dict[str, aws_serverless_graphqlapi.AppSyncResolver]],
-        resolver_code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         api_id: Intrinsicable[str],
         schema_logical_id: str,
     ) -> List[Resource]:
@@ -3009,12 +2977,12 @@ class SamGraphQLApi(SamResourceMacro):
                 cfn_resolver.ApiId = api_id
                 cfn_resolver.FieldName = appsync_resolver.FieldName or relative_id
                 cfn_resolver.TypeName = type_name
-                cfn_resolver.Runtime = self._parse_runtime(appsync_resolver, resolver_code_settings, relative_id)
+                cfn_resolver.Runtime = self._parse_runtime(appsync_resolver, relative_id)
 
                 if appsync_resolver.Functions:
                     cfn_resolver.Kind = "PIPELINE"
                     functions, function_ids = self._parse_appsync_resolver_functions(
-                        appsync_resolver, resolver_code_settings, relative_id, api_id
+                        appsync_resolver, relative_id, api_id
                     )
                     cfn_resolver.PipelineConfig = {"Functions": function_ids}
                     resources.extend(functions)
@@ -3038,7 +3006,6 @@ class SamGraphQLApi(SamResourceMacro):
     def _parse_appsync_resolver_functions(
         self,
         appsync_resolver: aws_serverless_graphqlapi.AppSyncResolver,
-        resolver_code_settings: Optional[aws_serverless_graphqlapi.ResolverCodeSettings],
         relative_id: str,
         api_id: Intrinsicable[str],
     ) -> Tuple[List[FunctionConfiguration], List[Intrinsicable[str]]]:
@@ -3051,7 +3018,7 @@ class SamGraphQLApi(SamResourceMacro):
         FunctionConfiguration resources to build as well if new functions were created.
         """
         inline_functions = self._get_inline_functions(appsync_resolver)
-        func_configs = self._construct_appsync_function_configurations(inline_functions, resolver_code_settings, api_id)
+        func_configs = self._construct_appsync_function_configurations(inline_functions, api_id)
 
         function_ids = []
 
