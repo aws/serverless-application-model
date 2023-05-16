@@ -158,7 +158,7 @@ Please always check the generated output is as expected. This tool does not guar
 
 #### Transform failures
 
-To test a SAM template results in a specific transform error, add the SAM template under [`tests/translator/input`](https://github.com/aws/serverless-application-model/tree/develop/tests/translator/input), and a JSON file with the expected `errorMessage` as a top-level value under [`tests/translator/output`](https://github.com/aws/serverless-application-model/tree/develop/tests/translator/output). The JSON file must be prefixed with `error_` and have the same basename as the input SAM template (e.g. `error_my_cool_template.yaml` for input, and `error_my_cool_template.json` for the expected error).
+To test a SAM template results in a specific transform error, add the SAM template under [`tests/translator/input`](https://github.com/aws/serverless-application-model/tree/develop/tests/translator/input), and a JSON file with the expected `errorMessage` as a top-level value under [`tests/translator/output`](https://github.com/aws/serverless-application-model/tree/develop/tests/translator/output). Both files must have the same basename and be prefixed with `error_` (e.g. `error_my_cool_template.yaml` for input, and `error_my_cool_template.json` for the expected error).
 
 See https://github.com/aws/serverless-application-model/pull/2993 for an example.
 
