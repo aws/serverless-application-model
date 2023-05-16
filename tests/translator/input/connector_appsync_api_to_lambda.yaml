@@ -1,0 +1,32 @@
+Resources:
+  Api:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: Api
+      AuthenticationType: AWS_LAMBDA
+      LambdaAuthorizerConfig:
+        AuthorizerUri: !GetAtt Authorizer.Arn
+
+  GraphQlApiToLambdaConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: Api
+      Destination:
+        Id: Authorizer
+      Permissions:
+      - Write
+
+  Authorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (_) => {
+          return {
+            isAuthorized: true,
+            deniedFields: [],
+          }
+        }
+      PackageType: Zip
+      Runtime: nodejs14.x
+      Handler: index.handler

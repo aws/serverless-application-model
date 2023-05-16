@@ -1,0 +1,252 @@
+{
+  "Conditions": {
+    "SomeCondition": {
+      "Fn::Equals": [
+        {
+          "Ref": "SomeParameter"
+        },
+        true
+      ]
+    }
+  },
+  "Parameters": {
+    "SomeParameter": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "bar"
+        },
+        "Handler": "foo",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+          "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+          "AnyNonOfficialManagedPolicy",
+          "arn:aws:iam::aws:policy/ThisIsPassedThroughAsIs",
+          "arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough",
+          "arn:looks:like::an/arn-also-passed-through",
+          {
+            "Fn::Sub": "${MyQueue}WhateverPassThrough"
+          },
+          {
+            "Fn::If": [
+              "SomeCondition",
+              {
+                "Ref": "MyManagedPolicy"
+              },
+              {
+                "Ref": "MyManagedPolicy"
+              }
+            ]
+          },
+          "{{resolve:ssm:passedthrough:2}}"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sqs:ChangeMessageVisibility",
+                    "sqs:ChangeMessageVisibilityBatch",
+                    "sqs:DeleteMessage",
+                    "sqs:DeleteMessageBatch",
+                    "sqs:GetQueueAttributes",
+                    "sqs:ReceiveMessage"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                      {
+                        "queueName": {
+                          "Ref": "MyQueue"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MyFunctionRolePolicy8"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": {
+                "Action": "*",
+                "Effect": "Allow",
+                "Resource": "*"
+              }
+            },
+            "PolicyName": "MyFunctionRolePolicy10"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyManagedPolicy": {
+      "Properties": {
+        "PolicyDocument": {}
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyStateMachine": {
+      "Properties": {
+        "DefinitionS3Location": {
+          "Bucket": "foo",
+          "Key": "bar"
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MyStateMachineRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "MyStateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+          "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+          "AnyNonOfficialManagedPolicy",
+          "arn:aws:iam::aws:policy/ThisIsPassedThroughAsIs",
+          "arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough",
+          "arn:looks:like::an/arn-also-passed-through",
+          {
+            "Fn::Sub": "${MyQueue}WhateverPassThrough"
+          },
+          {
+            "Fn::If": [
+              "SomeCondition",
+              {
+                "Ref": "MyManagedPolicy"
+              },
+              {
+                "Ref": "MyManagedPolicy"
+              }
+            ]
+          },
+          "{{resolve:ssm:passedthrough:2}}"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sqs:ChangeMessageVisibility",
+                    "sqs:ChangeMessageVisibilityBatch",
+                    "sqs:DeleteMessage",
+                    "sqs:DeleteMessageBatch",
+                    "sqs:GetQueueAttributes",
+                    "sqs:ReceiveMessage"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                      {
+                        "queueName": {
+                          "Ref": "MyQueue"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MyStateMachineRolePolicy8"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": {
+                "Action": "*",
+                "Effect": "Allow",
+                "Resource": "*"
+              }
+            },
+            "PolicyName": "MyStateMachineRolePolicy10"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

@@ -791,6 +791,21 @@
           }
         }
       }
+    },
+    "AWS::AppSync::GraphQLApi": {
+      "AWS::Lambda::Function": {
+        "Type": "AWS_LAMBDA_PERMISSION",
+        "Properties": {
+          "SourcePolicy": false,
+          "AccessCategories": {
+            "Write": {
+              "Action": "lambda:InvokeFunction",
+              "Principal": "appsync.amazonaws.com",
+              "SourceArn": "arn:${AWS::Partition}:appsync:${AWS::Region}:${AWS::AccountId}:apis/%{Source.ResourceId}"
+            }
+          }
+        }
+      }
     }
   }
 }
