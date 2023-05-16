@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Union
 
-from typing_extensions import TypedDict
+from typing_extensions import Required, TypedDict
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
@@ -21,7 +21,7 @@ export function response(ctx) {
 
 class LambdaAuthorizerConfigType(TypedDict, total=False):
     AuthorizerResultTtlInSeconds: float
-    AuthorizerUri: str
+    AuthorizerUri: Required[str]
     IdentityValidationExpression: str
 
 
@@ -36,20 +36,14 @@ class UserPoolConfigType(TypedDict, total=False):
     AppIdClientRegex: str
     AwsRegion: str
     DefaultAction: str
-    UserPoolId: str
-
-
-class CognitoUserPoolConfigType(TypedDict, total=False):
-    AppIdClientRegex: str
-    AwsRegion: str
-    UserPoolId: str
+    UserPoolId: Required[str]
 
 
 class AdditionalAuthenticationProviderType(TypedDict, total=False):
     AuthenticationType: str
     LambdaAuthorizerConfig: LambdaAuthorizerConfigType
     OpenIDConnectConfig: OpenIDConnectConfigType
-    UserPoolConfig: CognitoUserPoolConfigType
+    UserPoolConfig: UserPoolConfigType
 
 
 class DeltaSyncConfigType(TypedDict):

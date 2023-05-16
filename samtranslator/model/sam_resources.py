@@ -19,7 +19,6 @@ from samtranslator.internal.model.appsync import (
     ApiKey,
     AppSyncRuntimeType,
     CachingConfigType,
-    CognitoUserPoolConfigType,
     DataSource,
     DomainName,
     DomainNameApiAssociation,
@@ -79,6 +78,7 @@ from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMManagedPolicy, IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import (
+    fnGetAtt,
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
@@ -2204,11 +2204,15 @@ class SamGraphQLApi(SamResourceMacro):
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
         model = self.validate_properties_and_return_model(aws_serverless_graphqlapi.Properties)
-        appsync_api, cloudwatch_role = self._construct_appsync_api_resources(model)
+
+        appsync_api, cloudwatch_role, auth_connectors = self._construct_appsync_api_resources(model)
         api_id = appsync_api.get_runtime_attr("api_id")
         appsync_schema = self._construct_appsync_schema(model, api_id)
 
         resources: List[Resource] = [appsync_api, appsync_schema]
+
+        for connector in auth_connectors:
+            resources.extend(connector.to_cloudformation(**kwargs))
 
         if cloudwatch_role:
             resources.append(cloudwatch_role)
@@ -2251,13 +2255,16 @@ class SamGraphQLApi(SamResourceMacro):
 
     def _construct_appsync_api_resources(
         self, model: aws_serverless_graphqlapi.Properties
-    ) -> Tuple[GraphQLApi, Optional[IAMRole]]:
+    ) -> Tuple[GraphQLApi, Optional[IAMRole], List[SamConnector]]:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         api.Name = model.Name or self.logical_id
         api.XrayEnabled = model.XrayEnabled
 
-        self._parse_auth_properties(api, model.Auth)
+        lambda_auth_arns = self._parse_and_set_auth_properties(api, model.Auth)
+        auth_connectors = [
+            self._construct_lambda_auth_connector(api, arn, i) for i, arn in enumerate(lambda_auth_arns, 1)
+        ]
 
         if model.Tags:
             api.Tags = get_tag_list(model.Tags)
@@ -2266,53 +2273,64 @@ class SamGraphQLApi(SamResourceMacro):
         # GraphQLApi will not include logging if and only if the user explicity sets Logging as false boolean.
         # It will for every other value (including true boolean which is essentially same as None).
         if isinstance(model.Logging, bool) and model.Logging is False:
-            return api, None
+            return api, None, auth_connectors
 
         api.LogConfig, cloudwatch_role = self._parse_logging_properties(model)
 
-        return api, cloudwatch_role
+        return api, cloudwatch_role, auth_connectors
 
-    def _parse_auth_properties(self, api: GraphQLApi, auth: aws_serverless_graphqlapi.Auth) -> None:
+    def _parse_and_set_auth_properties(
+        self, api: GraphQLApi, auth: aws_serverless_graphqlapi.Auth
+    ) -> List[Intrinsicable[str]]:
         """
         Parse the Auth properties in a Serverless::GraphQLApi resource.
 
-        This function does not return a value. The GraphQLApi object is modified directly so that we don't
-        return multiple config properties which are mostly None values.
+        Returns: List of Lambda Function arns of Lambda authorizers. If no Lambda authorizer is used, the list is empty.
         """
-        # Default authentication
-        name, auth_dict = self._validate_auth_type_and_config(auth)
+        # Keep all lambda authorizers together to create connectors later
+        lambda_auth_arns: List[Intrinsicable[str]] = []
+
+        # Default authoriser
+        default_auth = aws_serverless_graphqlapi.Authorizer.parse_obj(
+            {k: v for k, v in auth.dict().items() if k != "Additional"}
+        )
+        name, auth_dict = self._validate_and_extract_authorizer_config(default_auth)
         api.AuthenticationType = auth.Type
 
         # This would be much easier and type-safe if accessing the properties in Resource
         # was a dictionary. Currently, top level properties are class attributes, but nested
         # properties are dictionaries...
         # TODO: Access properties in Resource class as dict?
-        if name:
+        if name and auth_dict:
             setattr(api, name, auth_dict)
+            if name == "LambdaAuthorizerConfig":
+                lambda_auth_arns.append(cast(LambdaAuthorizerConfigType, auth_dict)["AuthorizerUri"])
 
         # Additional authentication
         additional_auths: List[AdditionalAuthenticationProviderType] = []
         if auth.Additional:
             for index, additional in enumerate(auth.Additional):
-                name, auth_dict = self._validate_auth_type_and_config(additional, index)
+                name, auth_dict = self._validate_and_extract_authorizer_config(additional, index)
                 additional_auth: AdditionalAuthenticationProviderType = {"AuthenticationType": additional.Type}
                 if name and auth_dict:
                     additional_auth[name] = auth_dict
+                    if name == "LambdaAuthorizerConfig":
+                        lambda_auth_arns.append(cast(LambdaAuthorizerConfigType, auth_dict)["AuthorizerUri"])
 
                 additional_auths.append(additional_auth)
 
         if additional_auths:
             api.AdditionalAuthenticationProviders = additional_auths
 
-    def _validate_auth_type_and_config(
+        return lambda_auth_arns
+
+    def _validate_and_extract_authorizer_config(
         self,
-        auth: Union[aws_serverless_graphqlapi.Auth, aws_serverless_graphqlapi.AdditionalAuth],
+        auth: aws_serverless_graphqlapi.Authorizer,
         index: Optional[int] = None,
     ) -> Tuple[
         Optional[Literal["LambdaAuthorizerConfig", "OpenIDConnectConfig", "UserPoolConfig"]],
-        Optional[
-            Union[LambdaAuthorizerConfigType, OpenIDConnectConfigType, UserPoolConfigType, CognitoUserPoolConfigType]
-        ],
+        Optional[Union[LambdaAuthorizerConfigType, OpenIDConnectConfigType, UserPoolConfigType]],
     ]:
         """
         Validates the authentication type and returns the name of the config property and the respective dictionary.
@@ -2331,10 +2349,6 @@ class SamGraphQLApi(SamResourceMacro):
                 self.logical_id, f"{key_path} has more than one authentication configuration defined."
             )
 
-        # auth.Type is certain to be one of the following values because of our model validation.
-        if auth.Type == "API_KEY" or auth.Type == "AWS_IAM":
-            return None, None
-
         if auth.Type == "AWS_LAMBDA":
             key_path = "Auth.LambdaAuthorizer" if not index else f"Auth.Additional.{index}.LambdaAuthorizer"
             lambda_authorizer = sam_expect(auth.LambdaAuthorizer, self.logical_id, key_path).to_not_be_none(
@@ -2352,16 +2366,47 @@ class SamGraphQLApi(SamResourceMacro):
             return "OpenIDConnectConfig", cast(OpenIDConnectConfigType, remove_none_values(openid_connect.dict()))
 
         # Last possible type is "AMAZON_COGNITO_USER_POOLS"
-        key_path = "Auth.UserPool" if not index else f"Auth.Additional.{index}.UserPool"
-        user_pool = sam_expect(auth.UserPool, self.logical_id, key_path).to_not_be_none(
-            "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
+        if auth.Type == "AMAZON_COGNITO_USER_POOLS":
+            key_path = "Auth.UserPool" if not index else f"Auth.Additional.{index}.UserPool"
+            user_pool = sam_expect(auth.UserPool, self.logical_id, key_path).to_not_be_none(
+                "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
+            )
+            if index is not None:
+                # UserPoolConfig does not have the DefaultAction property UNLESS it is the primary authentication
+                # method (first index). If it is an additional authentication, we nullify this value.
+                user_pool.DefaultAction = None
+            return "UserPoolConfig", cast(UserPoolConfigType, remove_none_values(user_pool.dict()))
+
+        return None, None
+
+    @staticmethod
+    def _construct_lambda_auth_connector(
+        api: GraphQLApi,
+        lambda_arn: Intrinsicable[str],
+        auth_number: int,
+    ) -> SamConnector:
+        logical_id = f"{api.logical_id}ToLambdaAuthConnector{auth_number}"
+        connector_dict = {
+            "Type": "AWS::Serverless::Connector",
+            "Properties": {
+                "Source": {
+                    "Type": "AWS::AppSync::GraphQLApi",
+                    "Arn": ref(api.logical_id),
+                    "ResourceId": fnGetAtt(api.logical_id, "ApiId"),
+                },
+                "Destination": {
+                    "Type": "AWS::Lambda::Function",
+                    "Arn": lambda_arn,
+                },
+                "Permissions": ["Write"],
+            },
+        }
+
+        # mypy thinks from_dict method returns "Resource" class instead of the inheriting parent class "SamResourceMacro"
+        return cast(
+            SamConnector,
+            SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
         )
-        if index is not None:
-            # UserPoolConfig does not have the DefaultAction property UNLESS it is the primary authentication
-            # method (first index). If it is an additional authentication, we nullify this value.
-            user_pool.DefaultAction = None
-            return "UserPoolConfig", cast(CognitoUserPoolConfigType, remove_none_values(user_pool.dict()))
-        return "UserPoolConfig", cast(UserPoolConfigType, remove_none_values(user_pool.dict()))
 
     def _create_logging_default(self) -> Tuple[LogConfigType, IAMRole]:
         """

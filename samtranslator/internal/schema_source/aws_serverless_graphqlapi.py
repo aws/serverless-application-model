@@ -16,39 +16,35 @@ properties = get_prop("sam-resource-graphqlapi")
 
 
 # TODO: add docs
-class LambdaAuthorizer(BaseModel):
+class LambdaAuthorizerConfig(BaseModel):
     AuthorizerResultTtlInSeconds: Optional[PassThroughProp]
-    AuthorizerUri: Optional[PassThroughProp]
+    AuthorizerUri: PassThroughProp
     IdentityValidationExpression: Optional[PassThroughProp]
 
 
-class OpenIDConnect(BaseModel):
+class OpenIDConnectConfig(BaseModel):
     AuthTTL: Optional[PassThroughProp]
     ClientId: Optional[PassThroughProp]
     IatTTL: Optional[PassThroughProp]
     Issuer: Optional[PassThroughProp]
 
 
-class UserPool(BaseModel):
+class UserPoolConfig(BaseModel):
     AppIdClientRegex: Optional[PassThroughProp]
     AwsRegion: Optional[PassThroughProp]
     DefaultAction: Optional[PassThroughProp]
-    UserPoolId: Optional[PassThroughProp]
+    UserPoolId: PassThroughProp
 
 
-class AdditionalAuth(BaseModel):
+class Authorizer(BaseModel):
     Type: AuthenticationTypes
-    LambdaAuthorizer: Optional[LambdaAuthorizer]
-    OpenIDConnect: Optional[OpenIDConnect]
-    UserPool: Optional[UserPool]
+    LambdaAuthorizer: Optional[LambdaAuthorizerConfig]
+    OpenIDConnect: Optional[OpenIDConnectConfig]
+    UserPool: Optional[UserPoolConfig]
 
 
-class Auth(BaseModel):
-    Type: AuthenticationTypes
-    LambdaAuthorizer: Optional[LambdaAuthorizer]
-    OpenIDConnect: Optional[OpenIDConnect]
-    UserPool: Optional[UserPool]
-    Additional: Optional[List[AdditionalAuth]]
+class Auth(Authorizer):
+    Additional: Optional[List[Authorizer]]
 
 
 class ApiKey(BaseModel):

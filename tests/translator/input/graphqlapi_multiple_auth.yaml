@@ -9,14 +9,17 @@ Resources:
         }
       XrayEnabled: true
       Auth:
-        Type: AWS_IAM
+        Type: AWS_LAMBDA
+        LambdaAuthorizer:
+          AuthorizerUri: !GetAtt Authorizer1.Arn
+          AuthorizerResultTtlInSeconds: 10
+          IdentityValidationExpression: hello
         Additional:
+        - Type: AWS_IAM
         - Type: API_KEY
         - Type: AWS_LAMBDA
           LambdaAuthorizer:
-            AuthorizerUri: blah
-            AuthorizerResultTtlInSeconds: 10
-            IdentityValidationExpression: hello
+            AuthorizerUri: !GetAtt Authorizer2.Arn
         - Type: OPENID_CONNECT
           OpenIDConnect:
             AuthTTL: 10
@@ -33,3 +36,31 @@ Resources:
       Tags:
         key1: value1
         key2: value2
+
+  Authorizer1:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (_) => {
+          return {
+            isAuthorized: true,
+            deniedFields: [],
+          }
+        }
+      PackageType: Zip
+      Runtime: nodejs14.x
+      Handler: index.handler
+
+  Authorizer2:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (_) => {
+          return {
+            isAuthorized: true,
+            deniedFields: [],
+          }
+        }
+      PackageType: Zip
+      Runtime: nodejs14.x
+      Handler: index.handler
