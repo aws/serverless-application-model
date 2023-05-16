@@ -33,7 +33,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Policies": [
           {
