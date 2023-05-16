@@ -1,0 +1,43 @@
+Parameters:
+  PreCreatedSubnetOne:
+    Type: String
+  PreCreatedSubnetTwo:
+    Type: String
+  MskClusterName2:
+    Type: String
+
+Resources:
+  MyMskCluster:
+    Type: AWS::MSK::Cluster
+    Properties:
+      BrokerNodeGroupInfo:
+        ClientSubnets:
+        - Ref: PreCreatedSubnetOne
+        - Ref: PreCreatedSubnetTwo
+        InstanceType: kafka.t3.small
+        StorageInfo:
+          EBSStorageInfo:
+            VolumeSize: 1
+      ClusterName:
+        Ref: MskClusterName2
+      KafkaVersion: 2.4.1.1
+      NumberOfBrokerNodes: 2
+
+  MyMskStreamProcessor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      CodeUri: s3://foo/bar
+      Events:
+        MyMskEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream:
+              Ref: MyMskCluster
+            Topics:
+            - MyDummyTestTopic
+
+Metadata:
+  SamTransformTest: true
