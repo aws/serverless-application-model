@@ -2,7 +2,7 @@ import copy
 import json
 import logging
 from time import sleep
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import boto3
 from botocore.client import BaseClient
@@ -28,7 +28,7 @@ PLUGIN_METRICS_PREFIX = "Plugin-ServerlessApp"
 
 class ServerlessAppPlugin(BasePlugin):
     """
-    Resolves all of the ApplicationId and Semantic Version pairs
+    Resolves all the ApplicationId and Semantic Version pairs
     for AWS::Serverless::Application to template URLs.
 
     To retrieve a template from the Serverless Application Repository (SAR),
@@ -57,6 +57,7 @@ class ServerlessAppPlugin(BasePlugin):
         wait_for_template_active_status: bool = False,
         validate_only: bool = False,
         parameters: Optional[Dict[str, Any]] = None,
+        sar_client_creator: Optional[Callable[[], BaseClient]] = None,
     ) -> None:
         """
         Initialize the plugin.
@@ -65,6 +66,8 @@ class ServerlessAppPlugin(BasePlugin):
         :param boto3.client sar_client: The boto3 client to use to access the Serverless Application Repository
         :param bool wait_for_template_active_status: Flag to wait for all templates to become active
         :param bool validate_only: Flag to only validate application access (uses get_application API instead)
+        :param bool sar_client_creator: A function to return a SAR client.
+                                        Only used when sar_client is None and SAR calls are made.
         """
         super().__init__()
         if parameters is None:
@@ -72,6 +75,7 @@ class ServerlessAppPlugin(BasePlugin):
         self._applications: Dict[Tuple[str, str], Any] = {}
         self._in_progress_templates: List[Tuple[str, str]] = []
         self.__sar_client = sar_client
+        self._sar_client_creator = sar_client_creator
         self._wait_for_template_active_status = wait_for_template_active_status
         self._validate_only = validate_only
         self._parameters = parameters
@@ -84,11 +88,14 @@ class ServerlessAppPlugin(BasePlugin):
 
     @property
     def _sar_client(self) -> BaseClient:
-        # Lazy initialization of the client- create it when it is needed
+        # Lazy initialization of the client-create it when it is needed
         if not self.__sar_client:
-            # a SAR call could take a while to finish, leaving the read_timeout default (60s).
-            client_config = Config(connect_timeout=BOTO3_CONNECT_TIMEOUT)
-            self.__sar_client = boto3.client("serverlessrepo", config=client_config)
+            if self._sar_client_creator:
+                self.__sar_client = self._sar_client_creator()
+            else:
+                # a SAR call could take a while to finish, leaving the read_timeout default (60s).
+                client_config = Config(connect_timeout=BOTO3_CONNECT_TIMEOUT)
+                self.__sar_client = boto3.client("serverlessrepo", config=client_config)
         return self.__sar_client
 
     @staticmethod

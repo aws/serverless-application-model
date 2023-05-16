@@ -1,9 +1,14 @@
 import os.path
+import sys
 
-import jsonschema
 from parameterized import parameterized
 
 from tests.validator.test_validator import TestValidatorBase
+
+if sys.version_info.major == 3 and sys.version_info.minor < 8:
+    from importlib_metadata import version
+else:
+    from importlib.metadata import version
 
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = os.path.join(BASE_PATH, "input", "api")
@@ -13,7 +18,8 @@ OUTPUT_FOLDER = os.path.join(BASE_PATH, "output", "api")
 class TestValidatorApi(TestValidatorBase):
     # jsonschema 4.* is more restrictive than 3, so we need a separate check
     # See https://github.com/aws/serverless-application-model/issues/2426
-    jsonschemaMajorVersion = int(jsonschema.__version__.split(".")[0])
+    jsonschemaVersion = version("jsonschema")
+    jsonschemaMajorVersion = int(jsonschemaVersion.split(".")[0])
     _error_definitionuri = "error_definitionuri" if jsonschemaMajorVersion > 3 else "error_definitionuri_jsonschema3"
 
     @parameterized.expand(

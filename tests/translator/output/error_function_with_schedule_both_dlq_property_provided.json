@@ -4,7 +4,7 @@
     "Number of errors found: 1. ",
     "Resource with id [ScheduledFunction] is invalid. ",
     "Event with id [ScheduledFunctionSchedule] is invalid. ",
-    "You can either define 'Arn' or 'Type' property of DeadLetterConfig"
+    "You can either define 'Arn' or 'Type' property of DeadLetterConfig."
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ScheduledFunction] is invalid. Event with id [ScheduledFunctionSchedule] is invalid. You can either define 'Arn' or 'Type' property of DeadLetterConfig"
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ScheduledFunction] is invalid. Event with id [ScheduledFunctionSchedule] is invalid. You can either define 'Arn' or 'Type' property of DeadLetterConfig."
 }

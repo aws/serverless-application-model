@@ -2,14 +2,14 @@ from enum import Enum, auto
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import PropertyType, Resource, ResourceMacro
+from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.scheduler import SchedulerSchedule
 from samtranslator.model.sqs import SQSQueue
-from samtranslator.model.types import IS_DICT, IS_STR
+from samtranslator.model.types import IS_BOOL, IS_DICT, IS_STR, PassThrough
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 
 
@@ -49,6 +49,7 @@ class SchedulerEventSource(ResourceMacro):
         "RoleArn": PropertyType(False, IS_STR),
         "DeadLetterConfig": PropertyType(False, IS_DICT),
         "RetryPolicy": PropertyType(False, IS_DICT),
+        "OmitName": Property(False, IS_BOOL),
     }
 
     # Below are type hints, must maintain consistent with properties_types
@@ -57,19 +58,20 @@ class SchedulerEventSource(ResourceMacro):
     # - pass-through to AWS::Scheduler::Schedule
     ScheduleExpression: str
     FlexibleTimeWindow: Optional[Dict[str, Any]]
-    Name: Optional[str]
-    State: Optional[str]
-    Description: Optional[str]
-    StartDate: Optional[str]
-    EndDate: Optional[str]
-    ScheduleExpressionTimezone: Optional[str]
-    GroupName: Optional[str]
-    KmsKeyArn: Optional[str]
+    Name: Optional[PassThrough]
+    State: Optional[PassThrough]
+    Description: Optional[PassThrough]
+    StartDate: Optional[PassThrough]
+    EndDate: Optional[PassThrough]
+    ScheduleExpressionTimezone: Optional[PassThrough]
+    GroupName: Optional[PassThrough]
+    KmsKeyArn: Optional[PassThrough]
     # - pass-through to AWS::Scheduler::Schedule's Target
-    Input: Optional[str]
-    RoleArn: Optional[str]
+    Input: Optional[PassThrough]
+    RoleArn: Optional[PassThrough]
     DeadLetterConfig: Optional[Dict[str, Any]]
-    RetryPolicy: Optional[Dict[str, Any]]
+    RetryPolicy: Optional[PassThrough]
+    OmitName: Optional[bool]
 
     DEFAULT_FLEXIBLE_TIME_WINDOW = {"Mode": "OFF"}
 
@@ -138,8 +140,17 @@ class SchedulerEventSource(ResourceMacro):
         if self.State:
             scheduler_schedule.State = self.State
 
-        # Scheduler schedule's Name is a required property
-        scheduler_schedule.Name = self.Name or self.logical_id
+        if self.OmitName:
+            # Originally SAM always generates AWS::Scheduler::Schedule's Name
+            # which caused issues like deploying the same template to multiple stacks
+            # To avoid breaking the backward compatibility, a new property "OmitName"
+            # is introduced and when it is set to True, AWS::Scheduler::Schedule's Name
+            # will not be generated.
+            # https://github.com/aws/serverless-application-model/issues/3109
+            if self.Name:
+                raise InvalidEventException(self.logical_id, "Name cannot be set when OmitName is True")
+        else:
+            scheduler_schedule.Name = self.Name or self.logical_id
 
         # pass-through other properties
         scheduler_schedule.Description = self.Description

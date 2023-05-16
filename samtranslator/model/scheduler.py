@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt
+from samtranslator.model.types import PassThrough
 
 
 class SchedulerSchedule(Resource):
@@ -20,16 +21,16 @@ class SchedulerSchedule(Resource):
         "Target": GeneratedProperty(),
     }
 
-    ScheduleExpression: str
-    FlexibleTimeWindow: Dict[str, Any]
-    Name: str
-    State: Optional[str]
-    Description: Optional[str]
-    StartDate: Optional[str]
-    EndDate: Optional[str]
-    ScheduleExpressionTimezone: Optional[str]
-    GroupName: Optional[str]
-    KmsKeyArn: Optional[str]
+    ScheduleExpression: PassThrough
+    FlexibleTimeWindow: PassThrough
+    Name: Optional[PassThrough]
+    State: Optional[PassThrough]
+    Description: Optional[PassThrough]
+    StartDate: Optional[PassThrough]
+    EndDate: Optional[PassThrough]
+    ScheduleExpressionTimezone: Optional[PassThrough]
+    GroupName: Optional[PassThrough]
+    KmsKeyArn: Optional[PassThrough]
     Target: Dict[str, Any]
 
     runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
