@@ -95,12 +95,6 @@ class Runtime(BaseModel):
     Version: PassThroughProp
 
 
-class ResolverCodeSettings(BaseModel):
-    CodeRootPath: str
-    Runtime: Runtime
-    FunctionsFolder: Optional[str]
-
-
 class LambdaConflictHandlerConfig(BaseModel):
     LambdaConflictHandlerArn: PassThroughProp
 
@@ -165,7 +159,6 @@ class Properties(BaseModel):
     SchemaUri: Optional[PassThroughProp]
     Logging: Optional[Union[Logging, bool]]
     DataSources: Optional[DataSources]
-    ResolverCodeSettings: Optional[ResolverCodeSettings]
     Functions: Optional[Dict[str, Function]]
     AppSyncResolvers: Optional[Dict[str, Dict[str, AppSyncResolver]]]
     ApiKey: Optional[Dict[str, ApiKey]]
