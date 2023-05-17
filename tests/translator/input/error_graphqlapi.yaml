@@ -219,7 +219,7 @@ Resources:
           Runtime:
             Name: some-runtime
             Version: 1.2.3
-      AppSyncResolvers:
+      Resolvers:
         Mutation:
           ReferenceFunctionThatDoesNotExist:
             InlineCode: blahblahblah
@@ -227,7 +227,7 @@ Resources:
             Runtime:
               Name: some-runtime
               Version: 1.2.3
-            Functions:
+            Pipeline:
             - ThisFunctionDoesntExist
 
   ResolverWithNoFunctions:
@@ -244,7 +244,7 @@ Resources:
       Tags:
         key1: value1
         key2: value2
-      AppSyncResolvers:
+      Resolvers:
         Mutation:
           HasNoFunctions:
             InlineCode: blahblahblah
@@ -268,7 +268,7 @@ Resources:
       Tags:
         key1: value1
         key2: value2
-      AppSyncResolvers:
+      Resolvers:
         Mutation:
           BothCodePropertiesDefined:
             InlineCode: blahblahblah
@@ -278,7 +278,7 @@ Resources:
             Runtime:
               Name: some-runtime
               Version: 1.2.3
-            Functions:
+            Pipeline:
             - MyFunction
       Functions:
         MyFunction:
@@ -302,7 +302,7 @@ Resources:
       Tags:
         key1: value1
         key2: value2
-      AppSyncResolvers:
+      Resolvers:
         Mutation:
           BothDatasourcePropertiesDefined:
             FieldName: my_field
@@ -311,7 +311,7 @@ Resources:
             Runtime:
               Name: some-runtime
               Version: 1.2.3
-            Functions:
+            Pipeline:
             - MyFunction
       Functions:
         MyFunction:
@@ -335,12 +335,12 @@ Resources:
       Tags:
         key1: value1
         key2: value2
-      AppSyncResolvers:
+      Resolvers:
         Mutation:
           NoRuntimeForResolver:
             FieldName: my_field
             DataSource: NONE
-            Functions:
+            Pipeline:
             - MyFunction
       Functions:
         MyFunction:

@@ -106,20 +106,20 @@ Resources:
             export function response(ctx) {
               return ctx.result;
             }
-      AppSyncResolvers:
+      Resolvers:
         Mutation:
           addPost:
             Runtime:
               Name: APPSYNC_JS
               Version: 1.0.0
-            Functions:
+            Pipeline:
             - lambdaInvoker
         Query:
           getPost:
             Runtime:
               Name: APPSYNC_JS
               Version: 1.0.0
-            Functions:
+            Pipeline:
             - lambdaInvoker
 
 Outputs:

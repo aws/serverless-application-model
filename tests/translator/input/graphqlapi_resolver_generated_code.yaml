@@ -14,7 +14,7 @@ Resources:
       Tags:
         key1: value1
         key2: value2
-      AppSyncResolvers:
+      Resolvers:
         Mutation:
           saveNote:
             FieldName: my_field
@@ -28,7 +28,7 @@ Resources:
               CachingKeys:
               - key1
               - key2
-            Functions:
+            Pipeline:
             - MyFunction
       Functions:
         MyFunction:

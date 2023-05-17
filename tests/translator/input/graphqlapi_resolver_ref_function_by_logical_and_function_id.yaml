@@ -23,7 +23,7 @@ Resources:
           Runtime:
             Name: some-runtime
             Version: 1.2.3
-      AppSyncResolvers:
+      Resolvers:
         Mutation:
           saveNote:
             InlineCode: blahblahblah
@@ -38,7 +38,7 @@ Resources:
               CachingKeys:
               - key1
               - key2
-            Functions:
+            Pipeline:
             - MyFunction
             - MyOtherFunction
 

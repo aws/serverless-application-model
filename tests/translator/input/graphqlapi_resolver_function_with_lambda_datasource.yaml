@@ -21,7 +21,7 @@ Resources:
             ServiceRoleArn: some-role-arn
             Name: PradsLambdaDataSource
             Description: lambda datasources are nice
-      AppSyncResolvers:
+      Resolvers:
         Mutation:
           myResolver:
             FieldName: my_field
@@ -35,7 +35,7 @@ Resources:
               CachingKeys:
               - key1
               - key2
-            Functions:
+            Pipeline:
             - MyFunction
       Functions:
         MyFunction:

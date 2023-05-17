@@ -2163,7 +2163,7 @@ class SamGraphQLApi(SamResourceMacro):
         "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
         "DataSources": Property(False, IS_DICT),
         "Functions": Property(False, IS_DICT),
-        "AppSyncResolvers": Property(False, IS_DICT),
+        "Resolvers": Property(False, IS_DICT),
         "ApiKey": Property(False, IS_DICT),
         "DomainName": Property(False, IS_DICT),
         "Cache": Property(False, IS_DICT),
@@ -2178,7 +2178,7 @@ class SamGraphQLApi(SamResourceMacro):
     Logging: Optional[Union[Dict[str, Any], bool]]
     DataSources: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
     Functions: Optional[Dict[str, Dict[str, Any]]]
-    AppSyncResolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
+    Resolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
     ApiKey: Optional[Dict[str, Dict[str, Any]]]
     DomainName: Optional[Dict[str, Any]]
     Cache: Optional[Dict[str, Any]]
@@ -2235,9 +2235,9 @@ class SamGraphQLApi(SamResourceMacro):
             function_configurations = self._construct_appsync_function_configurations(model.Functions, api_id)
             resources.extend(function_configurations)
 
-        if model.AppSyncResolvers:
+        if model.Resolvers:
             appsync_resolver_resources = self._construct_appsync_resolver_resources(
-                model.AppSyncResolvers, api_id, appsync_schema.logical_id
+                model.Resolvers, api_id, appsync_schema.logical_id
             )
             resources.extend(appsync_resolver_resources)
 
@@ -2806,9 +2806,7 @@ class SamGraphQLApi(SamResourceMacro):
 
     def _check_and_construct_none_datasource(
         self,
-        resources: Union[
-            Dict[str, aws_serverless_graphqlapi.Function], Dict[str, aws_serverless_graphqlapi.AppSyncResolver]
-        ],
+        resources: Union[Dict[str, aws_serverless_graphqlapi.Function], Dict[str, aws_serverless_graphqlapi.Resolver]],
         api_id: Intrinsicable[str],
     ) -> None:
         """
@@ -2846,7 +2844,7 @@ class SamGraphQLApi(SamResourceMacro):
     def _parse_datasource_name(
         self,
         relative_id: str,
-        resource: Union[aws_serverless_graphqlapi.Function, aws_serverless_graphqlapi.AppSyncResolver],
+        resource: Union[aws_serverless_graphqlapi.Function, aws_serverless_graphqlapi.Resolver],
     ) -> Intrinsicable[str]:
         """
         Parse DataSource name from a Serverless::GraphQLApi function or resolver.
@@ -2915,7 +2913,7 @@ class SamGraphQLApi(SamResourceMacro):
 
     @staticmethod
     def _parse_runtime(
-        resource: Union[aws_serverless_graphqlapi.Function, aws_serverless_graphqlapi.AppSyncResolver],
+        resource: Union[aws_serverless_graphqlapi.Function, aws_serverless_graphqlapi.Resolver],
         relative_id: str,
     ) -> AppSyncRuntimeType:
         """
@@ -2932,14 +2930,14 @@ class SamGraphQLApi(SamResourceMacro):
 
     def _construct_appsync_resolver_resources(
         self,
-        appsync_resolvers: Dict[str, Dict[str, aws_serverless_graphqlapi.AppSyncResolver]],
+        appsync_resolvers: Dict[str, Dict[str, aws_serverless_graphqlapi.Resolver]],
         api_id: Intrinsicable[str],
         schema_logical_id: str,
     ) -> List[Resource]:
         resources: List[Resource] = []
 
         # Because resolvers are stored in a unique manner with the parent TypeName dictionary,
-        # we must first gather all relative id to AppSyncResolver pairs and put them into one dictionary
+        # we must first gather all relative id to Resolver pairs and put them into one dictionary
         # before passing it to _check_and_construct_none_datasource() which expects a dictionary in format
         # {logical_id: resource}.
         resolvers = {}
@@ -2979,14 +2977,14 @@ class SamGraphQLApi(SamResourceMacro):
                 cfn_resolver.TypeName = type_name
                 cfn_resolver.Runtime = self._parse_runtime(appsync_resolver, relative_id)
 
-                if appsync_resolver.Functions:
+                if appsync_resolver.Pipeline:
                     cfn_resolver.Kind = "PIPELINE"
                     function_ids = self._parse_appsync_resolver_functions(appsync_resolver, relative_id)
                     cfn_resolver.PipelineConfig = {"Functions": function_ids}
                 else:
                     raise InvalidResourceException(
                         relative_id,
-                        f"Resolver '{relative_id}' must have Functions defined. Unit resolvers are not supported. If you need a Unit resolver you can use AppSync resource.",
+                        f"Resolver '{relative_id}' must have Pipeline defined. Unit resolvers are not supported. If you need a Unit resolver you can use AppSync resource.",
                     )
 
                 if appsync_resolver.Caching:
@@ -2999,7 +2997,7 @@ class SamGraphQLApi(SamResourceMacro):
         return resources
 
     def _parse_appsync_resolver_functions(
-        self, appsync_resolver: aws_serverless_graphqlapi.AppSyncResolver, relative_id: str
+        self, appsync_resolver: aws_serverless_graphqlapi.Resolver, relative_id: str
     ) -> List[Intrinsicable[str]]:
         """
         Parse functions property in GraphQLApi Resolver.
@@ -3012,7 +3010,7 @@ class SamGraphQLApi(SamResourceMacro):
         # This function is only called if it is a pipeline resolver, in which case this property is checked to exist before.
         # Because the type of the variable does not update, we must cast here.
 
-        for resolver_function in appsync_resolver.Functions or []:
+        for resolver_function in appsync_resolver.Pipeline or []:
             if resolver_function not in self._function_id_map:
                 raise InvalidResourceException(relative_id, f"Function '{resolver_function}' does not exist.")
             function_ids.append(self._function_id_map[resolver_function])
