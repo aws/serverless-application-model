@@ -131,7 +131,9 @@ class AppSyncResolver(BaseModel):
     DataSource: Optional[str]
     DataSourceName: Optional[str]
     MaxBatchSize: Optional[PassThroughProp]
-    Functions: Optional[List[Union[str, Dict[str, Function]]]]
+    Functions: Optional[
+        List[str]
+    ]  # keeping it optional allows for easier validation in to_cloudformation with better error messages
     Runtime: Optional[Runtime]
     Sync: Optional[Sync]
 

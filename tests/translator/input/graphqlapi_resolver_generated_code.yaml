@@ -29,5 +29,12 @@ Resources:
               - key1
               - key2
             Functions:
-            - MyFunction:
-                InlineCode: this is my epic code
+            - MyFunction
+      Functions:
+        MyFunction:
+          DataSource: NONE
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+          InlineCode: this is my epic code
+          MaxBatchSize: 10
