@@ -123,7 +123,7 @@ class Caching(BaseModel):
     CachingKeys: Optional[List[PassThroughProp]]
 
 
-class AppSyncResolver(BaseModel):
+class Resolver(BaseModel):
     FieldName: Optional[str]
     Caching: Optional[Caching]
     InlineCode: Optional[PassThroughProp]
@@ -131,7 +131,7 @@ class AppSyncResolver(BaseModel):
     DataSource: Optional[str]
     DataSourceName: Optional[str]
     MaxBatchSize: Optional[PassThroughProp]
-    Functions: Optional[
+    Pipeline: Optional[
         List[str]
     ]  # keeping it optional allows for easier validation in to_cloudformation with better error messages
     Runtime: Optional[Runtime]
@@ -162,7 +162,7 @@ class Properties(BaseModel):
     Logging: Optional[Union[Logging, bool]]
     DataSources: Optional[DataSources]
     Functions: Optional[Dict[str, Function]]
-    AppSyncResolvers: Optional[Dict[str, Dict[str, AppSyncResolver]]]
+    Resolvers: Optional[Dict[str, Dict[str, Resolver]]]
     ApiKey: Optional[Dict[str, ApiKey]]
     DomainName: Optional[DomainName]
     Cache: Optional[Cache]

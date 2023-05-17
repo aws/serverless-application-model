@@ -102,50 +102,6 @@
       "title": "ApiKey",
       "type": "object"
     },
-    "AppSyncResolver": {
-      "additionalProperties": false,
-      "properties": {
-        "Caching": {
-          "$ref": "#/definitions/Caching"
-        },
-        "CodeUri": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
-        "DataSource": {
-          "title": "Datasource",
-          "type": "string"
-        },
-        "DataSourceName": {
-          "title": "Datasourcename",
-          "type": "string"
-        },
-        "FieldName": {
-          "title": "Fieldname",
-          "type": "string"
-        },
-        "Functions": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Functions",
-          "type": "array"
-        },
-        "InlineCode": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
-        "MaxBatchSize": {
-          "$ref": "#/definitions/PassThroughProp"
-        },
-        "Runtime": {
-          "$ref": "#/definitions/Runtime"
-        },
-        "Sync": {
-          "$ref": "#/definitions/Sync"
-        }
-      },
-      "title": "AppSyncResolver",
-      "type": "object"
-    },
     "Authorizer": {
       "additionalProperties": false,
       "properties": {
@@ -2633,6 +2589,50 @@
         }
       },
       "title": "RequestParameters",
+      "type": "object"
+    },
+    "Resolver": {
+      "additionalProperties": false,
+      "properties": {
+        "Caching": {
+          "$ref": "#/definitions/Caching"
+        },
+        "CodeUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DataSource": {
+          "title": "Datasource",
+          "type": "string"
+        },
+        "DataSourceName": {
+          "title": "Datasourcename",
+          "type": "string"
+        },
+        "FieldName": {
+          "title": "Fieldname",
+          "type": "string"
+        },
+        "InlineCode": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "MaxBatchSize": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Pipeline": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Pipeline",
+          "type": "array"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        },
+        "Sync": {
+          "$ref": "#/definitions/Sync"
+        }
+      },
+      "title": "Resolver",
       "type": "object"
     },
     "ResourceReference": {
@@ -6488,16 +6488,6 @@
           "title": "Apikey",
           "type": "object"
         },
-        "AppSyncResolvers": {
-          "additionalProperties": {
-            "additionalProperties": {
-              "$ref": "#/definitions/AppSyncResolver"
-            },
-            "type": "object"
-          },
-          "title": "Appsyncresolvers",
-          "type": "object"
-        },
         "Auth": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
         },
@@ -6531,6 +6521,16 @@
         "Name": {
           "title": "Name",
           "type": "string"
+        },
+        "Resolvers": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "$ref": "#/definitions/Resolver"
+            },
+            "type": "object"
+          },
+          "title": "Resolvers",
+          "type": "object"
         },
         "SchemaInline": {
           "$ref": "#/definitions/PassThroughProp"
