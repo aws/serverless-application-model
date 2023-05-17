@@ -202,63 +202,6 @@ Resources:
           DataSource: MyDataSource
           InlineCode: blahblahblah
 
-  MultipleInlineFunctionsWithSameName:
-    Type: AWS::Serverless::GraphQLApi
-    Properties:
-      Name: SomeApi
-      SchemaInline: |
-        type Mutation {
-          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
-        }
-      XrayEnabled: true
-      Auth:
-        Type: AWS_IAM
-      Tags:
-        key1: value1
-        key2: value2
-      AppSyncResolvers:
-        Mutation:
-          FunctionsHaveSameName:
-            InlineCode: blahblahblah
-            DataSource: NONE
-            Runtime:
-              Name: some-runtime
-              Version: 1.2.3
-            Functions:
-            - MyFunction:
-                InlineCode: this is my epic code
-            - MyFunction:
-                InlineCode: this is my epic code
-
-  InlineAndStandaloneFunctionWithSameName:
-    Type: AWS::Serverless::GraphQLApi
-    Properties:
-      Name: SomeApi
-      SchemaInline: |
-        type Mutation {
-          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
-        }
-      Auth:
-        Type: AWS_IAM
-      Functions:
-        MyFunction:
-          CodeUri: my-code-uri
-          DataSourceName: SomeDataSourceName
-          Runtime:
-            Name: some-runtime
-            Version: 1.2.3
-      AppSyncResolvers:
-        Mutation:
-          InlineFunctionHasSameName:
-            InlineCode: blahblahblah
-            DataSource: NONE
-            Runtime:
-              Name: some-runtime
-              Version: 1.2.3
-            Functions:
-            - MyFunction:
-                InlineCode: this is my epic code
-
   ResolverFunctionDoesNotExist:
     Type: AWS::Serverless::GraphQLApi
     Properties:
@@ -336,8 +279,14 @@ Resources:
               Name: some-runtime
               Version: 1.2.3
             Functions:
-            - MyFunction:
-                InlineCode: this is my epic code
+            - MyFunction
+      Functions:
+        MyFunction:
+          DataSource: NONE
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+          InlineCode: this is my epic code
 
   ResolverBothDatasourcePropertiesDefined:
     Type: AWS::Serverless::GraphQLApi
@@ -363,8 +312,14 @@ Resources:
               Name: some-runtime
               Version: 1.2.3
             Functions:
-            - MyFunction:
-                InlineCode: this is my epic code
+            - MyFunction
+      Functions:
+        MyFunction:
+          DataSource: NONE
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+          InlineCode: this is my epic code
 
   ResolverWithNoRuntime:
     Type: AWS::Serverless::GraphQLApi
@@ -386,11 +341,14 @@ Resources:
             FieldName: my_field
             DataSource: NONE
             Functions:
-            - MyFunction:
-                InlineCode: this is my epic code
-                Runtime:
-                  Name: some-runtime
-                  Version: 1.2.3
+            - MyFunction
+      Functions:
+        MyFunction:
+          DataSource: NONE
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+          InlineCode: this is my epic code
 
   MultipleAuthConfigs:
     Type: AWS::Serverless::GraphQLApi

@@ -107,6 +107,69 @@ Resources:
             Version: 1.0.0
           DataSource: PostsLogDataSource
           InlineCode: !Ref DDBPutItemCode
+        formatPostLogItem:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: NONE
+          InlineCode: |
+            import { util } from '@aws-appsync/utils';
+
+            export function request(ctx) {
+              const id = util.autoId();
+              const author = ctx.args.author
+              const time = "1234567890"
+              return { payload: { key: {id}, values: {"author": author, "time": time} } };
+            }
+
+            export function response(ctx) {
+              return ctx.result;
+            }
+        formatPostItem:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: NONE
+          InlineCode: |
+            import { util } from '@aws-appsync/utils';
+
+            export function request(ctx) {
+              const id = util.autoId();
+              const { ...values } = ctx.args;
+              values.ups = 1;
+              values.downs = 0;
+              values.version = 1;
+              return { payload: { key: {id}, values: values } } 
+            }
+
+            export function response(ctx) {
+              return ctx.result;
+            }
+        getPostFromTable:
+          DataSource: PostsDataSource
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          InlineCode: |
+            import { util } from '@aws-appsync/utils';
+
+            export function request(ctx) {
+              return dynamoDBGetItemRequest({ id: ctx.args.id });
+            }
+
+            export function response(ctx) {
+              return ctx.result;
+            }
+
+            /**
+            * A helper function to get a DynamoDB item
+            */
+            function dynamoDBGetItemRequest(key) {
+              return {
+                operation: 'GetItem',
+                key: util.dynamodb.toMapValues(key),
+              };
+            }
       AppSyncResolvers:
         Mutation:
           addPost:
@@ -114,39 +177,9 @@ Resources:
               Name: APPSYNC_JS
               Version: 1.0.0
             Functions:
-            - formatPostLogItem:
-                DataSource: NONE
-                InlineCode: |
-                  import { util } from '@aws-appsync/utils';
-
-                  export function request(ctx) {
-                    const id = util.autoId();
-                    const author = ctx.args.author
-                    const time = "1234567890"
-                    return { payload: { key: {id}, values: {"author": author, "time": time} } };
-                  }
-
-                  export function response(ctx) {
-                    return ctx.result;
-                  }
+            - formatPostLogItem
             - createPostLogItem
-            - formatPostItem:
-                DataSource: NONE
-                InlineCode: |
-                  import { util } from '@aws-appsync/utils';
-
-                  export function request(ctx) {
-                    const id = util.autoId();
-                    const { ...values } = ctx.args;
-                    values.ups = 1;
-                    values.downs = 0;
-                    values.version = 1;
-                    return { payload: { key: {id}, values: values } } 
-                  }
-
-                  export function response(ctx) {
-                    return ctx.result;
-                  }
+            - formatPostItem
             - createPostItem
         Query:
           getPost:
@@ -155,27 +188,8 @@ Resources:
               Name: APPSYNC_JS
               Version: 1.0.0
             Functions:
-            - getPostFromTable:
-                InlineCode: |
-                  import { util } from '@aws-appsync/utils';
+            - getPostFromTable
 
-                  export function request(ctx) {
-                    return dynamoDBGetItemRequest({ id: ctx.args.id });
-                  }
-
-                  export function response(ctx) {
-                    return ctx.result;
-                  }
-
-                  /**
-                  * A helper function to get a DynamoDB item
-                  */
-                  function dynamoDBGetItemRequest(key) {
-                    return {
-                      operation: 'GetItem',
-                      key: util.dynamodb.toMapValues(key),
-                    };
-                  }
 Outputs:
   SuperCoolAPI:
     Description: AppSync API

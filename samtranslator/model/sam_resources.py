@@ -2981,17 +2981,12 @@ class SamGraphQLApi(SamResourceMacro):
 
                 if appsync_resolver.Functions:
                     cfn_resolver.Kind = "PIPELINE"
-                    functions, function_ids = self._parse_appsync_resolver_functions(
-                        appsync_resolver, relative_id, api_id
-                    )
+                    function_ids = self._parse_appsync_resolver_functions(appsync_resolver, relative_id)
                     cfn_resolver.PipelineConfig = {"Functions": function_ids}
-                    resources.extend(functions)
                 else:
-                    # Add unit resolver code once AppSync has support for them in CFN.
-                    # For now, we just raise an error.
                     raise InvalidResourceException(
                         relative_id,
-                        f"Resolver '{relative_id}' must have Functions defined. JavaScript Unit resolvers are not supported in CloudFormation currently.",
+                        f"Resolver '{relative_id}' must have Functions defined. Unit resolvers are not supported. If you need a Unit resolver you can use AppSync resource.",
                     )
 
                 if appsync_resolver.Caching:
@@ -3004,112 +2999,22 @@ class SamGraphQLApi(SamResourceMacro):
         return resources
 
     def _parse_appsync_resolver_functions(
-        self,
-        appsync_resolver: aws_serverless_graphqlapi.AppSyncResolver,
-        relative_id: str,
-        api_id: Intrinsicable[str],
-    ) -> Tuple[List[FunctionConfiguration], List[Intrinsicable[str]]]:
+        self, appsync_resolver: aws_serverless_graphqlapi.AppSyncResolver, relative_id: str
+    ) -> List[Intrinsicable[str]]:
         """
         Parse functions property in GraphQLApi Resolver.
 
         When a resolver has the functions property defined, it is a pipeline resolver. These functions are
-        executed in the order they are listed in the template. Because functions can be created inline in the
-        functions property, we return not only a list of function IDs for the PipelineConfig, but a list of
-        FunctionConfiguration resources to build as well if new functions were created.
+        executed in the order they are listed in the template.
         """
-        inline_functions = self._get_inline_functions(appsync_resolver)
-        func_configs = self._construct_appsync_function_configurations(inline_functions, api_id)
-
         function_ids = []
 
         # This function is only called if it is a pipeline resolver, in which case this property is checked to exist before.
         # Because the type of the variable does not update, we must cast here.
-        appsync_resolver.Functions = cast(
-            List[Union[str, Dict[str, aws_serverless_graphqlapi.Function]]], appsync_resolver.Functions
-        )
 
-        for resolver_function in appsync_resolver.Functions:
-            if isinstance(resolver_function, str):
-                # If the function is a string which references logical ID of a function, then we append the ID of the
-                # referenced function and continue. If the function does not exist, throw an error.
-                if resolver_function not in self._function_id_map:
-                    raise InvalidResourceException(relative_id, f"Function '{resolver_function}' does not exist.")
-                function_ids.append(self._function_id_map[resolver_function])
-                continue
+        for resolver_function in appsync_resolver.Functions or []:
+            if resolver_function not in self._function_id_map:
+                raise InvalidResourceException(relative_id, f"Function '{resolver_function}' does not exist.")
+            function_ids.append(self._function_id_map[resolver_function])
 
-            # If the user defines resolvers inline, they are declared in the same way as GraphQLApi.Functions property,
-            # in a dictionary. This means that they can define multiple resolver functions in the same index. This is not a
-            # recommended approach, but it works because dictionaries in Python are ordered. So we can still iterate over the
-            # add the functions in the user defined order. "graphqlapi_resolver_multiple_inline_functions_in_same_dict.yaml"
-            # is a transform test with an example of this in action.
-            for function_relative_id in resolver_function:
-                function_ids.append(self._function_id_map[function_relative_id])
-
-        return func_configs, function_ids
-
-    @staticmethod
-    def _parse_inline_function_datasource_properties(
-        function: aws_serverless_graphqlapi.Function, appsync_resolver: aws_serverless_graphqlapi.AppSyncResolver
-    ) -> Tuple[Optional[str], Optional[str]]:
-        """
-        Parses the code properties for an inline function defined in an AppSync resolver in Serverless::GraphQLApi.
-
-        When a function is defined inline within a resolver, it can inherit these code properties from the resolver.
-        This function ensures that only one code property is defined at a time, so we don't inherit if it is already
-        defined in the inline function.
-        """
-        if function.DataSource:
-            return function.DataSource, None
-
-        if function.DataSourceName:
-            return None, function.DataSourceName
-
-        # While a pipeline resolver itself does not use these DataSource properties, they can still be defined.
-        # This is so they can be used in inline functions for when they do not have defined DataSource properties.
-        return appsync_resolver.DataSource, appsync_resolver.DataSourceName
-
-    def _get_inline_functions(
-        self,
-        appsync_resolver: aws_serverless_graphqlapi.AppSyncResolver,
-    ) -> Dict[str, aws_serverless_graphqlapi.Function]:
-        """
-        Return a dictionary with relative ID to Function objects from an AppSyncResolver.
-
-        Functions in resolvers are either strings (logical ID of a function declared in GraphQLApi.Functions) or
-        dictionaries that represent functions (inline function). This method takes all inline functions and puts them
-        in a dictionary, the key is the relative ID and the value is the Function.
-        """
-        inline_functions: Dict[str, aws_serverless_graphqlapi.Function] = {}
-
-        # This function is only called if it is a pipeline resolver, in which case this property is checked to exist before.
-        # Because the type of the variable does not update, we must cast here.
-        appsync_resolver.Functions = cast(
-            List[Union[str, Dict[str, aws_serverless_graphqlapi.Function]]], appsync_resolver.Functions
-        )
-
-        for resolver_function in appsync_resolver.Functions:
-            # We only care about inline functions. Skip strings.
-            if isinstance(resolver_function, str):
-                continue
-
-            for relative_id, function in resolver_function.items():
-                # Check if function with same logical ID has already been defined. Throw an error if so.
-                if relative_id in self._function_id_map or relative_id in inline_functions:
-                    raise InvalidResourceException(
-                        self.logical_id, f"There are multiple instances of function '{relative_id}'."
-                    )
-
-                if not function.Id:
-                    # DataSource, DataSourceName, MaxBatchSize, and Sync are all properties that the resolver resource
-                    # itself does not use, but can be set as a default for the inline functions to use. Function properties
-                    # take priority over these defaults so customers can override whenever it is necessary.
-                    function.Runtime = function.Runtime or appsync_resolver.Runtime
-                    function.DataSource, function.DataSourceName = self._parse_inline_function_datasource_properties(
-                        function, appsync_resolver
-                    )
-                    function.MaxBatchSize = function.MaxBatchSize or appsync_resolver.MaxBatchSize
-                    function.Sync = function.Sync or appsync_resolver.Sync
-
-                inline_functions.update({relative_id: function})
-
-        return inline_functions
+        return function_ids

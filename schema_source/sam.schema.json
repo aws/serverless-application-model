@@ -125,17 +125,7 @@
         },
         "Functions": {
           "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "additionalProperties": {
-                  "$ref": "#/definitions/Function"
-                },
-                "type": "object"
-              }
-            ]
+            "type": "string"
           },
           "title": "Functions",
           "type": "array"
