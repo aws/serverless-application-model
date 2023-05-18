@@ -3,7 +3,7 @@ name: Update schema
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * 1-5" # Weekdays
+    - cron: "0 18 * * 1-5" # Weekdays
 
 jobs:
   update:
