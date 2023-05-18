@@ -99,11 +99,7 @@ class SwaggerEditor(BaseEditor):
                     dict_deep_set(config, disable_execute_api_endpoint_path, disable_execute_api_endpoint)
                 except InvalidValueType as ex:
                     raise InvalidDocumentException(
-                        [
-                            InvalidTemplateException(
-                                f"Invalid OpenAPI definition of '{self._SERVERS}[{index}]': {str(ex)}."
-                            )
-                        ]
+                        [InvalidTemplateException(f"Invalid OpenAPI definition of '{self._SERVERS}[{index}]': {ex!s}.")]
                     ) from ex
 
             self._doc[self._SERVERS] = servers_configurations
@@ -112,7 +108,7 @@ class SwaggerEditor(BaseEditor):
                 dict_deep_set(self._doc, disable_execute_api_endpoint_path, disable_execute_api_endpoint)
             except InvalidValueType as ex:
                 raise InvalidDocumentException(
-                    [InvalidTemplateException(f"Invalid OpenAPI definition: {str(ex)}.")]
+                    [InvalidTemplateException(f"Invalid OpenAPI definition: {ex!s}.")]
                 ) from ex
 
     def add_lambda_integration(  # noqa: too-many-arguments

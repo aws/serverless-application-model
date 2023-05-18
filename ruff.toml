@@ -27,12 +27,13 @@ select = [
     "T20", # flake8-print
 ]
 
+ignore = [
+    "UP006", # https://github.com/charliermarsh/ruff/pull/4427
+    "UP007", # https://github.com/charliermarsh/ruff/pull/4427
+]
+
 # Mininal python version we support is 3.7
 target-version = "py37"
-
-# https://github.com/charliermarsh/ruff/issues/2382
-[pyupgrade]
-keep-runtime-typing = true
 
 [per-file-ignores]
 # python scripts in bin/ needs some python path configurations before import

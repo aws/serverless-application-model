@@ -1184,7 +1184,7 @@ class ApiGenerator:
                                     raise InvalidDocumentException(
                                         [
                                             InvalidTemplateException(
-                                                f"Invalid responses in options method for path {path}: {str(ex)}.",
+                                                f"Invalid responses in options method for path {path}: {ex!s}.",
                                             )
                                         ]
                                     ) from ex
