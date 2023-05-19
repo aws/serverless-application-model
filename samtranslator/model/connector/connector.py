@@ -199,14 +199,14 @@ def _get_resource_role_property(
     properties: Dict[str, Any],
 ) -> Any:
     role_property = cfn_resource_properties.get("Inputs", {}).get("Role")
-    if not role_property:
-        return None
 
     if isinstance(role_property, str):
         return properties.get(role_property)
 
     if isinstance(role_property, dict) and role_property.get("Function") == "GetEventsRuleRole":
         return _get_events_rule_role(connecting_obj_id, connecting_obj_arn, properties)
+
+    return None
 
 
 def _get_resource_role_name(
