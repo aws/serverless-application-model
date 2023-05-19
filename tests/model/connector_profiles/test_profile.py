@@ -113,7 +113,7 @@ class TestProfile(TestCase):
         )
 
         output = replace_cfn_resource_properties("AWS::Fake::Resource", "hello-world")
-        self.assertEqual(output, None)
+        self.assertEqual(output, {})
 
     def test_profile_replace_dict_input(self):
         input = {

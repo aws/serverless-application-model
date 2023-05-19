@@ -151,7 +151,7 @@ def get_resource_reference(
         raise ConnectorResourceError("'Type' is missing or not a string.")
     properties = resource.get("Properties", {})
 
-    cfn_resource_properties = replace_cfn_resource_properties(resource_type, logical_id) or {}
+    cfn_resource_properties = replace_cfn_resource_properties(resource_type, logical_id)
 
     arn = _get_resource_arn(cfn_resource_properties)
 
@@ -181,7 +181,7 @@ def get_resource_reference(
 
 def _get_events_rule_role(
     connecting_obj_id: Optional[str], connecting_obj_arn: Optional[Any], properties: Dict[str, Any]
-):
+) -> Optional[Any]:
     for target in properties.get("Targets", []):
         target_arn = target.get("Arn")
         target_logical_id = get_logical_id_from_intrinsic(target_arn)
@@ -207,7 +207,6 @@ def _get_resource_role_property(
 
     if isinstance(role_property, dict) and role_property.get("Function") == "GetEventsRuleRole":
         return _get_events_rule_role(connecting_obj_id, connecting_obj_arn, properties)
-    return None
 
 
 def _get_resource_role_name(
@@ -227,19 +226,19 @@ def _get_resource_role_name(
     return ref(logical_id)
 
 
-def _get_resource_queue_url(properties) -> Optional[Dict[str, Any]]:
+def _get_resource_queue_url(properties: Dict[str, Any]) -> Optional[Any]:
     return properties.get("Outputs", {}).get("Url")
 
 
-def _get_resource_id(properties) -> Optional[Dict[str, Any]]:
+def _get_resource_id(properties: Dict[str, Any]) -> Optional[Any]:
     return properties.get("Outputs", {}).get("Id")
 
 
-def _get_resource_name(properties: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def _get_resource_name(properties: Dict[str, Any]) -> Optional[Any]:
     return properties.get("Outputs", {}).get("Name")
 
 
-def _get_resource_qualifier(properties: Dict[str, Any]) -> Optional[str]:
+def _get_resource_qualifier(properties: Dict[str, Any]) -> Optional[Any]:
     # Qualifier is used as the execute-api ARN suffix; by default allow whole API
     return properties.get("Outputs", {}).get("Qualifier")
 
