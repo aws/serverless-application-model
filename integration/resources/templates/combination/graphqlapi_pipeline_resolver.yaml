@@ -28,7 +28,6 @@ Resources:
   DynamoDBPostsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: posts-table
       AttributeDefinitions:
       - AttributeName: id
         AttributeType: S
@@ -42,7 +41,6 @@ Resources:
   DynamoDBPostsLogTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: posts-log-table
       AttributeDefinitions:
       - AttributeName: id
         AttributeType: S

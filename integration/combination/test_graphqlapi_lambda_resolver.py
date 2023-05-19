@@ -70,16 +70,16 @@ class TestGraphQLApiPipelineResolver(BaseTest):
         self.assertEqual(add_post["content"], content)
 
         query = """
-            query getPost {{
-              getPost(id:"1") {{
+            query getPost {
+              getPost(id:"1") {
                 id
                 author
                 title
                 content
                 ups
                 downs
-              }}
-            }}
+              }
+            }
         """
 
         response = execute_and_verify_appsync_query(url, api_key, query)

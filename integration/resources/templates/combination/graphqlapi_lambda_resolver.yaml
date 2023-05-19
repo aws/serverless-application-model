@@ -3,7 +3,6 @@ Resources:
   MyLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: AwsLambdaMinimalExample
       Handler: index.handler
       Runtime: nodejs14.x
       Role: !GetAtt LambdaFunctionRole.Arn
