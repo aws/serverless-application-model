@@ -16,18 +16,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Ensure origin has no commits not in upstream
+      - name: Fetch
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-
           git remote add upstream https://github.com/aws/serverless-application-model.git
 
           git fetch upstream
           git fetch origin
           
           git checkout -b upstream-branch upstream/develop
-          git checkout -b origin-branch origin/${{ github.ref_name }}
+          git checkout -b origin-branch "origin/${{ github.ref_name }}"
+
+      - name: Merge upstream to origin
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
 
           git merge upstream-branch --ff-only
           git push this "refs/heads/origin-branch:${{ github.ref_name }}"
