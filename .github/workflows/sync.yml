@@ -20,7 +20,6 @@ jobs:
         run: |
           git remote add upstream https://github.com/aws/serverless-application-model.git
           git fetch upstream
-          git fetch origin
 
       - name: Merge upstream to origin
         run: |
