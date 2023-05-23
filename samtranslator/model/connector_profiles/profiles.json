@@ -807,5 +807,162 @@
         }
       }
     }
+  },
+  "CfnResourceProperties": {
+    "AWS::Lambda::Function": {
+      "Inputs": {
+        "Role": "Role"
+      },
+      "Outputs": {
+        "Arn": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "AWS::StepFunctions::StateMachine": {
+      "Inputs": {
+        "Role": "RoleArn"
+      },
+      "Outputs": {
+        "Arn": {
+          "Ref": "%{logicalId}"
+        },
+        "Name": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "Name"
+          ]
+        }
+      }
+    },
+    "AWS::AppSync::GraphQLApi": {
+      "Outputs": {
+        "Id": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "ApiId"
+          ]
+        },
+        "Arn": {
+          "Ref": "%{logicalId}"
+        }
+      }
+    },
+    "AWS::AppSync::DataSource": {
+      "Inputs": {
+        "Role": "ServiceRoleArn"
+      },
+      "Outputs": {
+        "Arn": {
+          "Ref": "%{logicalId}"
+        }
+      }
+    },
+    "AWS::Events::Rule": {
+      "Inputs": {
+        "Role": {
+          "Function": "GetEventsRuleRole"
+        }
+      },
+      "Outputs": {
+        "Arn": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "AWS::SQS::Queue": {
+      "Outputs": {
+        "Arn": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "Arn"
+          ]
+        },
+        "Url": {
+          "Ref": "%{logicalId}"
+        }
+      }
+    },
+    "AWS::SNS::Topic": {
+      "Outputs": {
+        "Arn": {
+          "Ref": "%{logicalId}"
+        }
+      }
+    },
+    "AWS::DynamoDB::Table": {
+      "Outputs": {
+        "Arn": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "AWS::S3::Bucket": {
+      "Outputs": {
+        "Arn": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "AWS::Location::PlaceIndex": {
+      "Outputs": {
+        "Arn": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "AWS::ApiGatewayV2::Api": {
+      "Outputs": {
+        "Arn": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "Arn"
+          ]
+        },
+        "Qualifier": "*",
+        "Id": {
+          "Ref": "%{logicalId}"
+        }
+      }
+    },
+    "AWS::ApiGateway::RestApi": {
+      "Outputs": {
+        "Arn": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "Arn"
+          ]
+        },
+        "Qualifier": "*",
+        "Id": {
+          "Ref": "%{logicalId}"
+        }
+      }
+    },
+    "AWS::Events::EventBus": {
+      "Outputs": {
+        "Arn": {
+          "Fn::GetAtt": [
+            "%{logicalId}",
+            "Arn"
+          ]
+        }
+      }
+    }
   }
 }
