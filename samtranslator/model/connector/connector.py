@@ -153,19 +153,21 @@ def get_resource_reference(
 
     cfn_resource_properties = replace_cfn_resource_properties(resource_type, logical_id)
 
-    arn = _get_resource_arn(cfn_resource_properties)
+    cfn_resource_properties_output = cfn_resource_properties.get("Outputs", {})
+
+    arn = _get_resource_arn(cfn_resource_properties_output)
 
     role_name = _get_resource_role_name(
         connecting_obj.get("Id"), connecting_obj.get("Arn"), cfn_resource_properties, properties
     )
 
-    queue_url = _get_resource_queue_url(cfn_resource_properties)
+    queue_url = _get_resource_queue_url(cfn_resource_properties_output)
 
-    resource_id = _get_resource_id(cfn_resource_properties)
+    resource_id = _get_resource_id(cfn_resource_properties_output)
 
-    name = _get_resource_name(cfn_resource_properties)
+    name = _get_resource_name(cfn_resource_properties_output)
 
-    qualifier = obj.get("Qualifier") if "Qualifier" in obj else _get_resource_qualifier(cfn_resource_properties)
+    qualifier = obj.get("Qualifier") if "Qualifier" in obj else _get_resource_qualifier(cfn_resource_properties_output)
 
     return ConnectorResourceReference(
         logical_id=logical_id,
@@ -227,20 +229,20 @@ def _get_resource_role_name(
 
 
 def _get_resource_queue_url(properties: Dict[str, Any]) -> Optional[Any]:
-    return properties.get("Outputs", {}).get("Url")
+    return properties.get("Url")
 
 
 def _get_resource_id(properties: Dict[str, Any]) -> Optional[Any]:
-    return properties.get("Outputs", {}).get("Id")
+    return properties.get("Id")
 
 
 def _get_resource_name(properties: Dict[str, Any]) -> Optional[Any]:
-    return properties.get("Outputs", {}).get("Name")
+    return properties.get("Name")
 
 
 def _get_resource_qualifier(properties: Dict[str, Any]) -> Optional[Any]:
     # Qualifier is used as the execute-api ARN suffix; by default allow whole API
-    return properties.get("Outputs", {}).get("Qualifier")
+    return properties.get("Qualifier")
 
 
 def _get_resource_arn(properties: Dict[str, Any]) -> Any:
@@ -248,4 +250,4 @@ def _get_resource_arn(properties: Dict[str, Any]) -> Any:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#aws-resource-stepfunctions-statemachine-return-values
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-topic.html#aws-resource-sns-topic-return-values
     # For all other supported resources, we can typically use Fn::GetAtt LogicalId.Arn to obtain ARNs
-    return properties.get("Outputs", {}).get("Arn")
+    return properties.get("Arn")
