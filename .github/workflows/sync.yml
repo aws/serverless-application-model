@@ -1,0 +1,37 @@
+name: Sync repository
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  sync:
+    if: github.repository_owner == 'aws' && github.repository != 'aws/serverless-application-model'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Ensure origin has no commits not in upstream
+        run: |
+          git remote add upstream https://github.com/aws/serverless-application-model.git
+
+          git fetch upstream
+          git fetch origin
+          
+          git checkout -b upstream-branch upstream/develop
+          git checkout -b origin-branch origin/${{ github.ref_name }}
+          
+          if [[ $(git log --no-merges origin-branch ^upstream-branch) ]]; then
+            echo 'Origin branch contains commits that are not in upstream branch'
+            exit 1
+          fi
+          
+      - name: Merge upstream into origin
+        run: |
+          git merge upstream-branch
+          git push this "refs/heads/origin-branch:${{ github.ref_name }}"
