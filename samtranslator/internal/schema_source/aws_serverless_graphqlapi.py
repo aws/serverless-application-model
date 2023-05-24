@@ -152,7 +152,19 @@ class Cache(BaseModel):
     TransitEncryptionEnabled: Optional[PassThroughProp]
 
 
+class Defaults(BaseModel):
+    # properties common for Resolvers and Functions
+    Runtime: Optional[Runtime]
+    MaxBatchSize: Optional[PassThroughProp]
+    Sync: Optional[Sync]
+    # only Resolver properties
+    Resolvers: Optional[Resolver]
+    # only Function properties
+    Functions: Optional[Function]
+
+
 class Properties(BaseModel):
+    Defaults: Optional[Defaults]
     Auth: Auth
     Tags: Optional[DictStrAny]
     Name: Optional[str]

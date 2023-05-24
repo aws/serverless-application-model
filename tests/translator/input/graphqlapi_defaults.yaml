@@ -1,0 +1,42 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: some schema goes here
+      Auth:
+        Type: AWS_IAM
+      Defaults:
+        Runtime:
+          Name: some-runtime
+          Version: 1.2.3
+        MaxBatchSize: 10
+        Resolvers:
+          MaxBatchSize: 20
+          Caching:
+            Ttl: 20
+            CachingKeys:
+            - key1
+            - key2
+        Functions:
+          DataSource: NONE
+      Resolvers:
+        Mutation:
+          saveNote:
+            Pipeline:
+            - MyFunction1
+            - MyFunction2
+        Query:
+          getNote:
+            Pipeline:
+            - MyFunction3
+            - MyFunction4
+      Functions:
+        MyFunction1:
+          InlineCode: this is my epic code1
+        MyFunction2:
+          InlineCode: this is my epic code2
+        MyFunction3:
+          InlineCode: this is my epic code3
+        MyFunction4:
+          Id: AppSyncFunctionConfigurationId

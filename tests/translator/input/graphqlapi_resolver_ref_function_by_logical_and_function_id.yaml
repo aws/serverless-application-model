@@ -28,7 +28,6 @@ Resources:
           saveNote:
             InlineCode: blahblahblah
             FieldName: my_field
-            DataSource: NONE
             MaxBatchSize: 10
             Runtime:
               Name: some-runtime

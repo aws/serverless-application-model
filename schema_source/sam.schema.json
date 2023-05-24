@@ -554,6 +554,28 @@
       "title": "DeadLetterQueue",
       "type": "object"
     },
+    "Defaults": {
+      "additionalProperties": false,
+      "properties": {
+        "Functions": {
+          "$ref": "#/definitions/Function"
+        },
+        "MaxBatchSize": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Resolvers": {
+          "$ref": "#/definitions/Resolver"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        },
+        "Sync": {
+          "$ref": "#/definitions/Sync"
+        }
+      },
+      "title": "Defaults",
+      "type": "object"
+    },
     "DeltaSync": {
       "additionalProperties": false,
       "properties": {
@@ -6496,6 +6518,9 @@
         },
         "DataSources": {
           "$ref": "#/definitions/DataSources"
+        },
+        "Defaults": {
+          "$ref": "#/definitions/Defaults"
         },
         "DomainName": {
           "$ref": "#/definitions/DomainName"
