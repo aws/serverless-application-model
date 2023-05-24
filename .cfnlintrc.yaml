@@ -122,6 +122,7 @@ ignore_templates:
   - tests/translator/output/**/function_with_runtime_config.json  # RuntimeManagementConfig
   - tests/translator/output/**/managed_policies_minimal.json  # Intentionally has non-existent managed policy name
   - tests/translator/output/**/function_with_mq.json  # Property "EventSourceArn" can Fn::GetAtt to a resource of types [AWS::DynamoDB::GlobalTable, AWS::DynamoDB::Table, AWS::Kinesis::Stream, AWS::Kinesis::StreamConsumer, AWS::SQS::Queue]
+  - tests/translator/output/**/function_with_mq_using_autogen_role.json  # Property "EventSourceArn" can Fn::GetAtt to a resource of types [AWS::DynamoDB::GlobalTable, AWS::DynamoDB::Table, AWS::Kinesis::Stream, AWS::Kinesis::StreamConsumer, AWS::SQS::Queue]
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
   - W2531 # EOL runtime; not relevant for transform tests
