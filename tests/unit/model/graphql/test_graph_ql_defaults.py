@@ -39,7 +39,7 @@ def test_common_and_individual():
             "Auth": {"Type": "AWS_IAM"},
             "Defaults": {
                 "Runtime": {"Name": "CommonRuntime", "Version": "1"},
-                "Resolvers": {"FieldName": "Hidden"},
+                "Resolvers": {"InlineCode": "super code"},
                 "Functions": {"DataSourceName": "SomeAppSyncDataSource"},
             },
         }
@@ -52,7 +52,7 @@ def test_common_and_individual():
         and defaults.resolver.Runtime.Name == "CommonRuntime"
         and defaults.resolver.Runtime.Version == "1"
     )
-    assert defaults.resolver.FieldName == "Hidden"
+    assert defaults.resolver.InlineCode == "super code"
 
     assert defaults.function is not None
     assert (
@@ -61,34 +61,3 @@ def test_common_and_individual():
         and defaults.function.Runtime.Version == "1"
     )
     assert defaults.function.DataSourceName == "SomeAppSyncDataSource"
-
-
-def test_merge_and_override():
-    model = Properties.parse_obj(
-        {
-            "Auth": {"Type": "AWS_IAM"},
-            "Defaults": {
-                "MaxBatchSize": 10,
-                "Sync": {"ConflictDetection": "Yes"},
-                "Resolvers": {"MaxBatchSize": 20},
-                "Functions": {"Sync": {"ConflictDetection": "Yes", "ConflictHandler": "OPTIMISTIC_CONCURRENCY"}},
-            },
-        }
-    )
-    defaults = Defaults.from_sam_graphql(model)
-
-    assert defaults.resolver is not None
-    assert (
-        defaults.resolver.Sync is not None
-        and defaults.resolver.Sync.ConflictDetection == "Yes"
-        and defaults.resolver.Sync.ConflictHandler is None
-    )
-    assert defaults.resolver.MaxBatchSize == 20
-
-    assert defaults.function is not None
-    assert (
-        defaults.function.Sync is not None
-        and defaults.function.Sync.ConflictDetection == "Yes"
-        and defaults.function.Sync.ConflictHandler == "OPTIMISTIC_CONCURRENCY"
-    )
-    assert defaults.function.MaxBatchSize == 10

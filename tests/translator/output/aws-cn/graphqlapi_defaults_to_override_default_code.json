@@ -1,0 +1,233 @@
+{
+  "Resources": {
+    "SuperCoolAPI": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "LogConfig": {
+          "CloudWatchLogsRoleArn": {
+            "Fn::GetAtt": [
+              "SuperCoolAPICloudWatchRole",
+              "Arn"
+            ]
+          },
+          "FieldLogLevel": "ALL"
+        },
+        "Name": "SuperCoolAPI"
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "SuperCoolAPICloudWatchRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPILambdaSwissKnifeLambda": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "LambdaConfig": {
+          "LambdaFunctionArn": "swiss-knife-lambda-arn"
+        },
+        "Name": "SwissKnifeLambda",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "SuperCoolAPILambdaSwissKnifeLambdaRole",
+            "Arn"
+          ]
+        },
+        "Type": "AWS_LAMBDA"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPILambdaSwissKnifeLambdaRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPILambdaSwissKnifeLambdaToLambdaConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SuperCoolAPILambdaSwissKnifeLambdaToLambdaConnector": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::DataSource"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "lambda:InvokeAsync",
+                "lambda:InvokeFunction"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "swiss-knife-lambda-arn",
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}:*",
+                    {
+                      "DestinationArn": "swiss-knife-lambda-arn"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SuperCoolAPILambdaSwissKnifeLambdaRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "SuperCoolAPIMutationsaveNote": {
+      "DependsOn": [
+        "SuperCoolAPISchema"
+      ],
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Code": "redirect to pipeline and do smth else",
+        "FieldName": "saveNote",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Fn::GetAtt": [
+                "SuperCoolAPIRedirector",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        },
+        "TypeName": "Mutation"
+      },
+      "Type": "AWS::AppSync::Resolver"
+    },
+    "SuperCoolAPIQuerygetNote": {
+      "DependsOn": [
+        "SuperCoolAPISchema"
+      ],
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Code": "redirect to pipeline and do smth else",
+        "FieldName": "getNote",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Fn::GetAtt": [
+                "SuperCoolAPIRedirector",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        },
+        "TypeName": "Query"
+      },
+      "Type": "AWS::AppSync::Resolver"
+    },
+    "SuperCoolAPIRedirector": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Code": "redirect to Lambda Function and do something more",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPILambdaSwissKnifeLambda",
+            "Name"
+          ]
+        },
+        "Name": "Redirector",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "SuperCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Definition": "some schema goes here"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    }
+  }
+}

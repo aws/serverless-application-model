@@ -558,19 +558,13 @@
       "additionalProperties": false,
       "properties": {
         "Functions": {
-          "$ref": "#/definitions/Function"
-        },
-        "MaxBatchSize": {
-          "$ref": "#/definitions/PassThroughProp"
+          "$ref": "#/definitions/FunctionDefaults"
         },
         "Resolvers": {
-          "$ref": "#/definitions/Resolver"
+          "$ref": "#/definitions/ResolverDefaults"
         },
         "Runtime": {
           "$ref": "#/definitions/Runtime"
-        },
-        "Sync": {
-          "$ref": "#/definitions/Sync"
         }
       },
       "title": "Defaults",
@@ -1415,6 +1409,21 @@
         }
       },
       "title": "Function",
+      "type": "object"
+    },
+    "FunctionDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "DataSource": {
+          "title": "Datasource",
+          "type": "string"
+        },
+        "DataSourceName": {
+          "title": "Datasourcename",
+          "type": "string"
+        }
+      },
+      "title": "FunctionDefaults",
       "type": "object"
     },
     "FunctionUrlConfig": {
@@ -2622,14 +2631,6 @@
         "CodeUri": {
           "$ref": "#/definitions/PassThroughProp"
         },
-        "DataSource": {
-          "title": "Datasource",
-          "type": "string"
-        },
-        "DataSourceName": {
-          "title": "Datasourcename",
-          "type": "string"
-        },
         "FieldName": {
           "title": "Fieldname",
           "type": "string"
@@ -2655,6 +2656,26 @@
         }
       },
       "title": "Resolver",
+      "type": "object"
+    },
+    "ResolverDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "CodeUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "InlineCode": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Pipeline": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Pipeline",
+          "type": "array"
+        }
+      },
+      "title": "ResolverDefaults",
       "type": "object"
     },
     "ResourceReference": {

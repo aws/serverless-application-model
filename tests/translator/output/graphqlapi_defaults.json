@@ -53,17 +53,9 @@
             "ApiId"
           ]
         },
-        "CachingConfig": {
-          "CachingKeys": [
-            "key1",
-            "key2"
-          ],
-          "Ttl": 20
-        },
         "Code": "\nexport function request(ctx) {\n    return {};\n}\n\nexport function response(ctx) {\n    return ctx.prev.result;\n}\n",
         "FieldName": "saveNote",
         "Kind": "PIPELINE",
-        "MaxBatchSize": 20,
         "PipelineConfig": {
           "Functions": [
             {
@@ -103,7 +95,6 @@
             "Name"
           ]
         },
-        "MaxBatchSize": 10,
         "Name": "MyFunction1",
         "Runtime": {
           "Name": "some-runtime",
@@ -127,7 +118,6 @@
             "Name"
           ]
         },
-        "MaxBatchSize": 10,
         "Name": "MyFunction2",
         "Runtime": {
           "Name": "some-runtime",
@@ -151,7 +141,6 @@
             "Name"
           ]
         },
-        "MaxBatchSize": 10,
         "Name": "MyFunction3",
         "Runtime": {
           "Name": "some-runtime",
@@ -184,17 +173,9 @@
             "ApiId"
           ]
         },
-        "CachingConfig": {
-          "CachingKeys": [
-            "key1",
-            "key2"
-          ],
-          "Ttl": 20
-        },
         "Code": "\nexport function request(ctx) {\n    return {};\n}\n\nexport function response(ctx) {\n    return ctx.prev.result;\n}\n",
         "FieldName": "getNote",
         "Kind": "PIPELINE",
-        "MaxBatchSize": 20,
         "PipelineConfig": {
           "Functions": [
             {
