@@ -26,7 +26,7 @@ class Defaults:
         """Create Defaults from SAM GraphQLApi model.
 
         SAM GraphQLApi object has optional Defaults property which allows to set defaults for all
-        Functions, Resolvers, or some properties like Runtime for both Functioins and Resolvers.
+        Functions, Resolvers, or some properties like Runtime for both Functions and Resolvers.
         This constructor method parses SAM GraphQLApi Defaults and merges common default properties
         into both Resolvers and Functions defaults before storing them separately.
 
