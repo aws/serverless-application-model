@@ -4,7 +4,7 @@ import pytest
 from parameterized import parameterized
 
 from integration.config.service_names import MQ
-from integration.helpers.base_test import BaseTest
+from integration.helpers.base_test import BaseTest, nonblocking
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
 
 
@@ -25,6 +25,7 @@ class TestFunctionWithMq(BaseTest):
             ),
         ]
     )
+    @nonblocking
     def test_function_with_mq(self, file_name, mq_broker, mq_secret, subnet_key):
         # Temporarily skip this test and we should either re-enable this once the AZ issue is fixed
         # or once we figure out a way to trigger integ test only when transform output changes.
