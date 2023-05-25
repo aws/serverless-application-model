@@ -92,6 +92,7 @@
         "Code": "\nexport function request(ctx) {\n    return {};\n}\n\nexport function response(ctx) {\n    return ctx.prev.result;\n}\n",
         "FieldName": "my_field",
         "Kind": "PIPELINE",
+        "MaxBatchSize": 10,
         "PipelineConfig": {
           "Functions": [
             {
@@ -133,19 +134,6 @@
         }
       },
       "Type": "AWS::AppSync::FunctionConfiguration"
-    },
-    "SuperCoolAPINoneDataSource": {
-      "Properties": {
-        "ApiId": {
-          "Fn::GetAtt": [
-            "SuperCoolAPI",
-            "ApiId"
-          ]
-        },
-        "Name": "SuperCoolAPINoneDataSource",
-        "Type": "NONE"
-      },
-      "Type": "AWS::AppSync::DataSource"
     },
     "SuperCoolAPISchema": {
       "Properties": {

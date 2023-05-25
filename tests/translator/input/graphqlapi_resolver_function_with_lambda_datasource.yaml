@@ -25,7 +25,6 @@ Resources:
         Mutation:
           myResolver:
             FieldName: my_field
-            DataSource: NONE
             MaxBatchSize: 10
             Runtime:
               Name: some-runtime

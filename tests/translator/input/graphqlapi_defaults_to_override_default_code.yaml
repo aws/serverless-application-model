@@ -1,0 +1,29 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: some schema goes here
+      Auth:
+        Type: AWS_IAM
+      DataSources:
+        Lambda:
+          SwissKnifeLambda:
+            FunctionArn: swiss-knife-lambda-arn
+      Defaults:
+        Runtime:
+          Name: some-runtime
+          Version: 1.2.3
+        Resolvers:
+          InlineCode: redirect to pipeline and do smth else
+          Pipeline:
+          - Redirector
+      Resolvers:
+        Mutation:
+          saveNote: {}
+        Query:
+          getNote: {}
+      Functions:
+        Redirector:
+          InlineCode: redirect to Lambda Function and do something more
+          DataSource: SwissKnifeLambda

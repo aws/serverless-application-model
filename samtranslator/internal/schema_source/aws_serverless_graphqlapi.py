@@ -128,8 +128,6 @@ class Resolver(BaseModel):
     Caching: Optional[Caching]
     InlineCode: Optional[PassThroughProp]
     CodeUri: Optional[PassThroughProp]
-    DataSource: Optional[str]
-    DataSourceName: Optional[str]
     MaxBatchSize: Optional[PassThroughProp]
     Pipeline: Optional[
         List[str]
@@ -152,7 +150,28 @@ class Cache(BaseModel):
     TransitEncryptionEnabled: Optional[PassThroughProp]
 
 
+class ResolverDefaults(BaseModel):
+    InlineCode: Optional[PassThroughProp]
+    CodeUri: Optional[PassThroughProp]
+    Pipeline: Optional[List[str]]
+
+
+class FunctionDefaults(BaseModel):
+    DataSource: Optional[str]
+    DataSourceName: Optional[str]
+
+
+class Defaults(BaseModel):
+    # properties common for Resolvers and Functions
+    Runtime: Optional[Runtime]
+    # only Resolver properties
+    Resolvers: Optional[ResolverDefaults]
+    # only Function properties
+    Functions: Optional[FunctionDefaults]
+
+
 class Properties(BaseModel):
+    Defaults: Optional[Defaults]
     Auth: Auth
     Tags: Optional[DictStrAny]
     Name: Optional[str]

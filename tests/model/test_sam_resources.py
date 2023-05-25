@@ -2,7 +2,6 @@ from unittest import TestCase
 from unittest.mock import patch
 
 import pytest
-from samtranslator.internal.schema_source import aws_serverless_graphqlapi
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model import InvalidResourceException, ResourceResolver
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestApi, ApiGatewayStage
@@ -712,44 +711,7 @@ class TestInvalidSamConnectors(TestCase):
             connector.to_cloudformation(**self.kwargs)[0]
 
 
-class TestGraphQLApiNoneDataSource(TestCase):
-    kwargs = {
-        "intrinsics_resolver": IntrinsicsResolver({}),
-        "event_resources": [],
-        "managed_policy_map": {"foo": "bar"},
-    }
-
-    def test_function_datasource_name_set(self):
-        api = SamGraphQLApi("MyApi")
-
-        functions = {
-            "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSourceName="my-name"),
-            "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSourceName="my-name"),
-        }
-        api._check_and_construct_none_datasource(functions, "foo")
-
-        self.assertIsNone(api._none_datasource)
-
-    def test_function_datasource_set_with_logical_id(self):
-        api = SamGraphQLApi("MyApi")
-
-        functions = {
-            "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource="SomeId"),
-            "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource="SomeOtherId"),
-        }
-        res = api._check_and_construct_none_datasource(functions, "foo")
-
-        self.assertIsNone(res)
-
-
-@pytest.mark.parametrize("data", ["NONE", "None", "none"])
-def test_function_datasource_set_with_none(data):
+def test_function_datasource_set_with_none():
     api = SamGraphQLApi("MyApi")
-
-    functions = {
-        "MyFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource=data),
-        "MyOtherFunction": aws_serverless_graphqlapi.Function(CodeUri="my-code", DataSource="SomeOtherId"),
-    }
-    api._check_and_construct_none_datasource(functions, "foo")
-
-    assert api._none_datasource
+    none_datasource = api._construct_none_datasource("foo")
+    assert none_datasource

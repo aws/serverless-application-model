@@ -181,7 +181,6 @@ Resources:
             - createPostItem
         Query:
           getPost:
-            DataSource: PostsDataSource
             Runtime:
               Name: APPSYNC_JS
               Version: 1.0.0
