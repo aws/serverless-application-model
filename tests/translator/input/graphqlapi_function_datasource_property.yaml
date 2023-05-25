@@ -1,0 +1,25 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      DataSources:
+        DynamoDb:
+          MyDataSource:
+            Name: MyDataSource
+            TableName: SomeTable
+            ServiceRoleArn: SomeRoleArn
+      Functions:
+        MyFunction:
+          InlineCode: this is my epic code
+          DataSource: MyDataSource
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
