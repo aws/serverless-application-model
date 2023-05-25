@@ -6,8 +6,9 @@ from typing_extensions import TypeGuard
 from samtranslator.model import ResourceResolver
 from samtranslator.model.apigateway import ApiGatewayRestApi
 from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
+from samtranslator.model.connector_profiles.profile import replace_cfn_resource_properties
 from samtranslator.model.dynamodb import DynamoDBTable
-from samtranslator.model.intrinsics import fnGetAtt, get_logical_id_from_intrinsic, ref
+from samtranslator.model.intrinsics import get_logical_id_from_intrinsic, ref
 from samtranslator.model.lambda_ import (
     LambdaFunction,
 )
@@ -150,17 +151,23 @@ def get_resource_reference(
         raise ConnectorResourceError("'Type' is missing or not a string.")
     properties = resource.get("Properties", {})
 
-    arn = _get_resource_arn(logical_id, resource_type)
+    cfn_resource_properties = replace_cfn_resource_properties(resource_type, logical_id)
 
-    role_name = _get_resource_role_name(connecting_obj.get("Id"), connecting_obj.get("Arn"), resource_type, properties)
+    cfn_resource_properties_output = cfn_resource_properties.get("Outputs", {})
 
-    queue_url = _get_resource_queue_url(logical_id, resource_type)
+    arn = _get_resource_arn(cfn_resource_properties_output)
 
-    resource_id = _get_resource_id(logical_id, resource_type)
+    role_name = _get_resource_role_name(
+        connecting_obj.get("Id"), connecting_obj.get("Arn"), cfn_resource_properties, properties
+    )
 
-    name = _get_resource_name(logical_id, resource_type)
+    queue_url = _get_resource_queue_url(cfn_resource_properties_output)
 
-    qualifier = obj.get("Qualifier") if "Qualifier" in obj else _get_resource_qualifier(resource_type)
+    resource_id = _get_resource_id(cfn_resource_properties_output)
+
+    name = _get_resource_name(cfn_resource_properties_output)
+
+    qualifier = obj.get("Qualifier") if "Qualifier" in obj else _get_resource_qualifier(cfn_resource_properties_output)
 
     return ConnectorResourceReference(
         logical_id=logical_id,
@@ -174,30 +181,43 @@ def get_resource_reference(
     )
 
 
+def _get_events_rule_role(
+    connecting_obj_id: Optional[str], connecting_obj_arn: Optional[Any], properties: Dict[str, Any]
+) -> Optional[Any]:
+    for target in properties.get("Targets", []):
+        target_arn = target.get("Arn")
+        target_logical_id = get_logical_id_from_intrinsic(target_arn)
+        if (target_logical_id and target_logical_id == connecting_obj_id) or (
+            connecting_obj_arn and target_arn == connecting_obj_arn
+        ):
+            return target.get("RoleArn")
+    return None
+
+
 def _get_resource_role_property(
-    connecting_obj_id: Optional[str], connecting_obj_arn: Optional[Any], resource_type: str, properties: Dict[str, Any]
+    connecting_obj_id: Optional[str],
+    connecting_obj_arn: Optional[Any],
+    cfn_resource_properties: Dict[str, Any],
+    properties: Dict[str, Any],
 ) -> Any:
-    if resource_type == "AWS::Lambda::Function":
-        return properties.get("Role")
-    if resource_type == "AWS::StepFunctions::StateMachine":
-        return properties.get("RoleArn")
-    if resource_type == "AWS::AppSync::DataSource":
-        return properties.get("ServiceRoleArn")
-    if resource_type == "AWS::Events::Rule":
-        for target in properties.get("Targets", []):
-            target_arn = target.get("Arn")
-            target_logical_id = get_logical_id_from_intrinsic(target_arn)
-            if (target_logical_id and target_logical_id == connecting_obj_id) or (
-                connecting_obj_arn and target_arn == connecting_obj_arn
-            ):
-                return target.get("RoleArn")
+    role_property = cfn_resource_properties.get("Inputs", {}).get("Role")
+
+    if isinstance(role_property, str):
+        return properties.get(role_property)
+
+    if isinstance(role_property, dict) and role_property.get("Function") == "GetEventsRuleRole":
+        return _get_events_rule_role(connecting_obj_id, connecting_obj_arn, properties)
+
     return None
 
 
 def _get_resource_role_name(
-    connecting_obj_id: Optional[str], connecting_obj_arn: Optional[Any], resource_type: str, properties: Dict[str, Any]
+    connecting_obj_id: Optional[str],
+    connecting_obj_arn: Optional[Any],
+    cfn_resource_properties: Dict[str, Any],
+    properties: Dict[str, Any],
 ) -> Any:
-    role = _get_resource_role_property(connecting_obj_id, connecting_obj_arn, resource_type, properties)
+    role = _get_resource_role_property(connecting_obj_id, connecting_obj_arn, cfn_resource_properties, properties)
     if not role:
         return None
 
@@ -208,39 +228,26 @@ def _get_resource_role_name(
     return ref(logical_id)
 
 
-def _get_resource_queue_url(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
-    if resource_type == "AWS::SQS::Queue":
-        return ref(logical_id)
-    return None
+def _get_resource_queue_url(properties: Dict[str, Any]) -> Optional[Any]:
+    return properties.get("Url")
 
 
-def _get_resource_id(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
-    if resource_type in ["AWS::ApiGateway::RestApi", "AWS::ApiGatewayV2::Api"]:
-        return ref(logical_id)
-    if resource_type == "AWS::AppSync::GraphQLApi":
-        # unfortunately ref(AppSyncApi) == arn
-        return fnGetAtt(logical_id, "ApiId")
-    return None
+def _get_resource_id(properties: Dict[str, Any]) -> Optional[Any]:
+    return properties.get("Id")
 
 
-def _get_resource_name(logical_id: str, resource_type: str) -> Optional[Dict[str, Any]]:
-    if resource_type == "AWS::StepFunctions::StateMachine":
-        return fnGetAtt(logical_id, "Name")
-    return None
+def _get_resource_name(properties: Dict[str, Any]) -> Optional[Any]:
+    return properties.get("Name")
 
 
-def _get_resource_qualifier(resource_type: str) -> Optional[str]:
+def _get_resource_qualifier(properties: Dict[str, Any]) -> Optional[Any]:
     # Qualifier is used as the execute-api ARN suffix; by default allow whole API
-    if resource_type in ["AWS::ApiGateway::RestApi", "AWS::ApiGatewayV2::Api"]:
-        return "*"
-    return None
+    return properties.get("Qualifier")
 
 
-def _get_resource_arn(logical_id: str, resource_type: str) -> Any:
-    if resource_type in ["AWS::SNS::Topic", "AWS::StepFunctions::StateMachine"]:
-        # according to documentation, Ref returns ARNs for these two resource types
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#aws-resource-stepfunctions-statemachine-return-values
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-topic.html#aws-resource-sns-topic-return-values
-        return ref(logical_id)
+def _get_resource_arn(properties: Dict[str, Any]) -> Any:
+    # according to documentation, Ref returns ARNs for these two resource types
+    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#aws-resource-stepfunctions-statemachine-return-values
+    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-topic.html#aws-resource-sns-topic-return-values
     # For all other supported resources, we can typically use Fn::GetAtt LogicalId.Arn to obtain ARNs
-    return fnGetAtt(logical_id, "Arn")
+    return properties.get("Arn")

@@ -4,6 +4,7 @@ from parameterized import parameterized
 from samtranslator.model.connector_profiles.profile import (
     get_profile,
     profile_replace,
+    replace_cfn_resource_properties,
     verify_profile_variables_replaced,
 )
 
@@ -104,6 +105,15 @@ class TestProfile(TestCase):
                 "%DestinationArn",
             ],
         )
+
+    def test_replace_cfn_resource_properties(self):
+        output = replace_cfn_resource_properties("AWS::Lambda::Function", "hello-world")
+        self.assertEqual(
+            output, {"Inputs": {"Role": "Role"}, "Outputs": {"Arn": {"Fn::GetAtt": ["hello-world", "Arn"]}}}
+        )
+
+        output = replace_cfn_resource_properties("AWS::Fake::Resource", "hello-world")
+        self.assertEqual(output, {})
 
     def test_profile_replace_dict_input(self):
         input = {

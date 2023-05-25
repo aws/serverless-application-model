@@ -1,0 +1,113 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Parameters": {
+    "MskClusterName2": {
+      "Type": "String"
+    },
+    "PreCreatedSubnetOne": {
+      "Type": "String"
+    },
+    "PreCreatedSubnetTwo": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "MyMskCluster": {
+      "Properties": {
+        "BrokerNodeGroupInfo": {
+          "ClientSubnets": [
+            {
+              "Ref": "PreCreatedSubnetOne"
+            },
+            {
+              "Ref": "PreCreatedSubnetTwo"
+            }
+          ],
+          "InstanceType": "kafka.t3.small",
+          "StorageInfo": {
+            "EBSStorageInfo": {
+              "VolumeSize": 1
+            }
+          }
+        },
+        "ClusterName": {
+          "Ref": "MskClusterName2"
+        },
+        "KafkaVersion": "2.4.1.1",
+        "NumberOfBrokerNodes": 2
+      },
+      "Type": "AWS::MSK::Cluster"
+    },
+    "MyMskStreamProcessor": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "foo",
+          "S3Key": "bar"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyMskStreamProcessorRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyMskStreamProcessorMyMskEvent": {
+      "Properties": {
+        "EventSourceArn": {
+          "Ref": "MyMskCluster"
+        },
+        "FunctionName": {
+          "Ref": "MyMskStreamProcessor"
+        },
+        "StartingPosition": "LATEST",
+        "Topics": [
+          "MyDummyTestTopic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyMskStreamProcessorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
