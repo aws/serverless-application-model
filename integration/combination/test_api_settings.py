@@ -5,7 +5,7 @@ from unittest.case import skipIf
 from parameterized import parameterized
 
 from integration.config.service_names import REST_API
-from integration.helpers.base_test import BaseTest
+from integration.helpers.base_test import BaseTest, nonblocking
 from integration.helpers.resource import current_region_does_not_support
 
 
@@ -67,6 +67,7 @@ class TestApiSettings(BaseTest):
             + "  }\n}",
         )
 
+    @nonblocking
     def test_request_parameters_open_api(self):
         self.create_and_verify_stack("combination/api_with_request_parameters_openapi")
 

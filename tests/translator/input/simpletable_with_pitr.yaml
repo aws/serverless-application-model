@@ -1,0 +1,6 @@
+Resources:
+  MyTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true

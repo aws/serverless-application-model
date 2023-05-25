@@ -22,6 +22,9 @@ select = [
     "UP", # pyupgrade
     "C4", # flake8-comprehensions
     "PTH", # flake8-use-pathlib
+    "G", # flake8-logging-format
+    "INP", # flake8-no-pep420
+    "T20", # flake8-print
 ]
 
 # Mininal python version we support is 3.7
@@ -33,7 +36,16 @@ keep-runtime-typing = true
 
 [per-file-ignores]
 # python scripts in bin/ needs some python path configurations before import
-"bin/*.py" = ["E402"]  # E402: module-import-not-at-top-of-file
+"bin/*.py" = [
+    # E402: module-import-not-at-top-of-file
+    "E402",
+    # S603: `subprocess` call: check for execution of untrusted input
+    # these are dev tools and do not have risks of malicious inputs.
+    "S603",
+    # T201 `print` found
+    # print() is allowed in bin/ as they are dev tools.
+    "T201",
+]
 
 [pylint]
 max-args = 6  # We have many functions reaching 6 args
