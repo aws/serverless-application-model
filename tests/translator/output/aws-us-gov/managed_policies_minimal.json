@@ -43,7 +43,7 @@
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "AnyNonOfficialManagedPolicy",
-          "AmazonS3FullAccess"
+          "arn:aws-us-gov:iam::aws:policy/AmazonS3FullAccess"
         ],
         "Tags": [
           {
@@ -95,7 +95,7 @@
         },
         "ManagedPolicyArns": [
           "AnyNonOfficialManagedPolicy",
-          "AmazonS3FullAccess"
+          "arn:aws-us-gov:iam::aws:policy/AmazonS3FullAccess"
         ],
         "Tags": [
           {
