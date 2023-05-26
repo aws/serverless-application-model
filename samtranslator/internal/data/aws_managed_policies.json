@@ -2224,7 +2224,6 @@
     "IAMFullAccess": "arn:aws-us-gov:iam::aws:policy/IAMFullAccess",
     "IAMReadOnlyAccess": "arn:aws-us-gov:iam::aws:policy/IAMReadOnlyAccess",
     "IAMUserChangePassword": "arn:aws-us-gov:iam::aws:policy/IAMUserChangePassword",
-    "IsengardControllerPolicy": "arn:aws-us-gov:iam::aws:policy/aws-service-role/IsengardControllerPolicy",
     "KafkaServiceRolePolicy": "arn:aws-us-gov:iam::aws:policy/aws-service-role/KafkaServiceRolePolicy",
     "LakeFormationDataAccessServiceRolePolicy": "arn:aws-us-gov:iam::aws:policy/aws-service-role/LakeFormationDataAccessServiceRolePolicy",
     "NeptuneConsoleFullAccess": "arn:aws-us-gov:iam::aws:policy/NeptuneConsoleFullAccess",
