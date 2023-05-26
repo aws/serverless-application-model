@@ -2260,4 +2260,3 @@
     "WAFV2LoggingServiceRolePolicy": "arn:aws-us-gov:iam::aws:policy/aws-service-role/WAFV2LoggingServiceRolePolicy"
   }
 }
-
