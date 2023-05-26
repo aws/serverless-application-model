@@ -212,7 +212,7 @@ The AWS SAM specification includes a JSON schema (see https://github.com/aws/ser
 
 To add new properties, do the following:
 
-1. Add the property to the relevant resource schema under [`samtranslator/schema`](https://github.com/aws/serverless-application-model/tree/develop/samtranslator/schema) (e.g. [`samtranslator/schema/aws_serverless_function.py`](https://github.com/aws/serverless-application-model/blob/develop/samtranslator/schema/aws_serverless_function.py) for `AWS::Serverless::Function`).
+1. Add the property to the relevant resource schema under [`samtranslator/internal/schema_source`](https://github.com/aws/serverless-application-model/tree/develop/samtranslator/internal/schema_source) (e.g. [`samtranslator/internal/schema_source/aws_serverless_function.py`](https://github.com/aws/serverless-application-model/blob/develop/samtranslator/internal/schema_source/aws_serverless_function.py) for `AWS::Serverless::Function`).
 2. You can leave out the assignement part; it adds documentation to the schema properties. The team will take care of documentation updates once code changes are merged. Typically we update documentation by running `make update-schema-data`.
 3. Run `make schema`.
 
