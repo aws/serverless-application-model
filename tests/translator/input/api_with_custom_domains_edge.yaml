@@ -1,0 +1,50 @@
+Parameters:
+  MyEdgeDomainName:
+    Type: String
+  MyEdgeDomainCert:
+    Type: String
+  HostedZoneId:
+    Type: String
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs14.x
+      Events:
+        Fetch:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: Get
+            Path: /get
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: Prod
+      Domain:
+        DomainName:
+          Ref: MyEdgeDomainName
+        CertificateArn:
+          Ref: MyEdgeDomainCert
+        EndpointConfiguration: EDGE
+        BasePath:
+        - /get
+        Route53:
+          HostedZoneId:
+            Ref: HostedZoneId
+          IpV6: true
+Metadata:
+  SamTransformTest: true
