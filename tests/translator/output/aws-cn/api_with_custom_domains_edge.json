@@ -1,0 +1,219 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Parameters": {
+    "HostedZoneId": {
+      "Type": "String"
+    },
+    "MyEdgeDomainCert": {
+      "Type": "String"
+    },
+    "MyEdgeDomainName": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "ApiGatewayDomainName9005ff2ee8": {
+      "Properties": {
+        "CertificateArn": {
+          "Ref": "MyEdgeDomainCert"
+        },
+        "DomainName": {
+          "Ref": "MyEdgeDomainName"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        }
+      },
+      "Type": "AWS::ApiGateway::DomainName"
+    },
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {
+            "/get": {
+              "get": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiDeployment20b93025b0": {
+      "Properties": {
+        "Description": "RestApi deployment id: 20b93025b03c3181aee23bb65e7c9b2b768029ac",
+        "RestApiId": {
+          "Ref": "MyApi"
+        }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment20b93025b0"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyApigetBasePathMapping": {
+      "Properties": {
+        "BasePath": "get",
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName9005ff2ee8"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionFetchPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/get",
+            {
+              "__ApiId__": {
+                "Ref": "MyApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "RecordSetGroup1194dea82a": {
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "HostedZoneId"
+        },
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName9005ff2ee8",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": {
+              "Ref": "MyEdgeDomainName"
+            },
+            "Type": "A"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName9005ff2ee8",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": {
+              "Ref": "MyEdgeDomainName"
+            },
+            "Type": "AAAA"
+          }
+        ]
+      },
+      "Type": "AWS::Route53::RecordSetGroup"
+    }
+  }
+}

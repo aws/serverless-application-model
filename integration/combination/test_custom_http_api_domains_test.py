@@ -2,6 +2,7 @@ from unittest.case import skipIf
 
 from integration.config.service_names import CUSTOM_DOMAIN
 from integration.helpers.base_internal_test import BaseInternalTest
+from integration.helpers.base_test import nonblocking
 from integration.helpers.resource import current_region_not_included
 
 
@@ -9,6 +10,7 @@ from integration.helpers.resource import current_region_not_included
     current_region_not_included([CUSTOM_DOMAIN]),
     "CustomDomain is not supported in this testing region",
 )
+@nonblocking
 class TestCustomHttpApiDomains(BaseInternalTest):
     def test_custom_http_api_domains_regional(self):
         self.create_and_verify_stack("combination/http_api_with_custom_domains_regional")
