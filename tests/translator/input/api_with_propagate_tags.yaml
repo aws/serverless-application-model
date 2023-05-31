@@ -1,0 +1,17 @@
+Parameters:
+  TagValueParam:
+    Type: String
+    Default: value
+
+Resources:
+  MyApiWithPropagateTags:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      PropagateTags: true
+      Tags:
+        TagKey1: TagValue1
+        TagKey2: ''
+        TagKey3:
+          Ref: TagValueParam
+        TagKey4: '123'

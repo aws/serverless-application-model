@@ -3425,6 +3425,10 @@
           "markdownDescription": "Version of OpenApi to use\\. This can either be `2.0` for the Swagger specification, or one of the OpenApi 3\\.0 versions, like `3.0.1`\\. For more information about OpenAPI, see the [OpenAPI Specification](https://swagger.io/specification/)\\.  \n AWS SAM creates a stage called `Stage` by default\\. Setting this property to any valid value will prevent the creation of the stage `Stage`\\. \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "OpenApiVersion"
         },
+        "PropagateTags": {
+          "title": "Propagatetags",
+          "type": "boolean"
+        },
         "TracingEnabled": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
@@ -3790,6 +3794,10 @@
           ],
           "markdownDescription": "Version of OpenApi to use\\. This can either be `2.0` for the Swagger specification, or one of the OpenApi 3\\.0 versions, like `3.0.1`\\. For more information about OpenAPI, see the [OpenAPI Specification](https://swagger.io/specification/)\\.  \n AWS SAM creates a stage called `Stage` by default\\. Setting this property to any valid value will prevent the creation of the stage `Stage`\\. \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "OpenApiVersion"
+        },
+        "PropagateTags": {
+          "title": "Propagatetags",
+          "type": "boolean"
         },
         "StageName": {
           "anyOf": [
@@ -6204,6 +6212,10 @@
           "markdownDescription": "Specifies whether to roll back the HTTP API creation \\(`true`\\) or not \\(`false`\\) when a warning is encountered\\. The default value is `false`\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FailOnWarnings`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-failonwarnings) property of an `AWS::ApiGatewayV2::Api` resource\\.",
           "title": "FailOnWarnings"
         },
+        "PropagateTags": {
+          "title": "Propagatetags",
+          "type": "boolean"
+        },
         "RouteSettings": {
           "allOf": [
             {
@@ -6327,6 +6339,10 @@
           ],
           "markdownDescription": "The name of the HTTP API resource\\.  \nWhen you specify `Name`, AWS SAM will modify the HTTP API resource's OpenAPI definition by setting the `title` field\\. The following scenarios will result in an error:  \n+ The `DefinitionBody` property is specified with the `title` field set in the Open API definition \u2013 This results in a conflict of the `title` field that AWS SAM won't resolve\\.\n+ The `DefinitionUri` property is specified \u2013 AWS SAM won't modify an Open API definition that is retrieved from Amazon S3\\.\n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "Name"
+        },
+        "PropagateTags": {
+          "title": "Propagatetags",
+          "type": "boolean"
         },
         "RouteSettings": {
           "allOf": [

@@ -536,6 +536,25 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
         # customer's knowledge.
         return get_tag_list(sam_tag) + get_tag_list(additional_tags) + get_tag_list(tags)
 
+    def propagate_tags(
+        self, propagate_tags: Optional[bool], resources: List[Resource], tags: Optional[Dict[str, Any]]
+    ) -> None:
+        """
+        Propagates tags to the resources.
+
+        :param resources: List of resources
+        :param tags: dictionary of tags to propagate to the resources.
+
+        :return: None
+        """
+        if not propagate_tags:
+            return
+
+        tags_list = get_tag_list(tags)
+        for resource in resources:
+            if "Tags" in resource.property_types:
+                resource.Tags = tags_list
+
     def _check_tag(self, reserved_tag_name, tags):  # type: ignore[no-untyped-def]
         if reserved_tag_name in tags:
             raise InvalidResourceException(

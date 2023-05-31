@@ -20,6 +20,7 @@ class ApiGatewayV2HttpApi(Resource):
         "FailOnWarnings": GeneratedProperty(),
         "DisableExecuteApiEndpoint": GeneratedProperty(),
         "BasePath": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
         "CorsConfiguration": GeneratedProperty(),
     }
 

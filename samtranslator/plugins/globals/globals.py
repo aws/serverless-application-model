@@ -76,6 +76,7 @@ class Globals:
             "OpenApiVersion",
             "Domain",
             "AlwaysDeploy",
+            "PropagateTags",
         ],
         SamResourceType.HttpApi.value: [
             "Auth",
@@ -87,6 +88,7 @@ class Globals:
             "Domain",
             "RouteSettings",
             "FailOnWarnings",
+            "PropagateTags",
         ],
         SamResourceType.SimpleTable.value: ["SSESpecification"],
     }

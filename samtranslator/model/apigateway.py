@@ -28,6 +28,7 @@ class ApiGatewayRestApi(Resource):
         "MinimumCompressionSize": GeneratedProperty(),
         "Mode": GeneratedProperty(),
         "ApiKeySourceType": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
     }
 
     Body: Optional[Dict[str, Any]]
@@ -42,6 +43,7 @@ class ApiGatewayRestApi(Resource):
     MinimumCompressionSize: Optional[PassThrough]
     Mode: Optional[PassThrough]
     ApiKeySourceType: Optional[PassThrough]
+    Tags: Optional[PassThrough]
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
 
@@ -214,6 +216,7 @@ class ApiGatewayDomainName(Resource):
         "MutualTlsAuthentication": GeneratedProperty(),
         "SecurityPolicy": GeneratedProperty(),
         "CertificateArn": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
         "OwnershipVerificationCertificateArn": GeneratedProperty(),
     }
 
@@ -223,6 +226,7 @@ class ApiGatewayDomainName(Resource):
     MutualTlsAuthentication: Optional[Dict[str, Any]]
     SecurityPolicy: Optional[PassThrough]
     CertificateArn: Optional[PassThrough]
+    Tags: Optional[PassThrough]
     OwnershipVerificationCertificateArn: Optional[PassThrough]
 
 
@@ -266,6 +270,7 @@ class ApiGatewayApiKey(Resource):
         "Enabled": GeneratedProperty(),
         "GenerateDistinctId": GeneratedProperty(),
         "Name": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
         "StageKeys": GeneratedProperty(),
         "Value": GeneratedProperty(),
     }
