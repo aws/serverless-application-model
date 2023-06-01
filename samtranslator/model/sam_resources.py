@@ -1,4 +1,4 @@
-""" SAM macro definitions """
+﻿""" SAM macro definitions """
 import copy
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
@@ -1155,6 +1155,7 @@ class SamApi(SamResourceMacro):
         "Name": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "StageName": PropertyType(True, one_of(IS_STR, IS_DICT)),
         "Tags": PropertyType(False, IS_DICT),
+        "PropagateTags": PropertyType(False, IS_BOOL),
         "DefinitionBody": PropertyType(False, IS_DICT),
         "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "MergeDefinitions": Property(False, IS_BOOL),
@@ -1185,6 +1186,7 @@ class SamApi(SamResourceMacro):
     Name: Optional[Intrinsicable[str]]
     StageName: Optional[Intrinsicable[str]]
     Tags: Optional[Dict[str, Any]]
+    PropagateTags: Optional[bool]
     DefinitionBody: Optional[Dict[str, Any]]
     DefinitionUri: Optional[Intrinsicable[str]]
     MergeDefinitions: Optional[bool]
@@ -1276,7 +1278,11 @@ class SamApi(SamResourceMacro):
             always_deploy=self.AlwaysDeploy,
         )
 
-        return api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
+        generated_resources = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
+
+        self.propagate_tags(generated_resources, self.Tags, self.PropagateTags)
+
+        return generated_resources
 
 
 class SamHttpApi(SamResourceMacro):
@@ -1293,6 +1299,7 @@ class SamHttpApi(SamResourceMacro):
         "Name": PassThroughProperty(False),
         "StageName": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "Tags": PropertyType(False, IS_DICT),
+        "PropagateTags": PropertyType(False, IS_BOOL),
         "DefinitionBody": PropertyType(False, IS_DICT),
         "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "StageVariables": PropertyType(False, IS_DICT),
@@ -1310,6 +1317,7 @@ class SamHttpApi(SamResourceMacro):
     Name: Optional[Any]
     StageName: Optional[Intrinsicable[str]]
     Tags: Optional[Dict[str, Any]]
+    PropagateTags: Optional[bool]
     DefinitionBody: Optional[Dict[str, Any]]
     DefinitionUri: Optional[Intrinsicable[str]]
     StageVariables: Optional[Dict[str, Intrinsicable[str]]]
@@ -1386,6 +1394,8 @@ class SamHttpApi(SamResourceMacro):
         # Stage is now optional. Only add it if one is created.
         if stage:
             resources.append(stage)
+
+        self.propagate_tags(resources, self.Tags, self.PropagateTags)
 
         return resources
 

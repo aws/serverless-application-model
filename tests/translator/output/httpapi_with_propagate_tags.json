@@ -1,0 +1,130 @@
+{
+  "Resources": {
+    "ApiGatewayDomainNameV25fe29fe649": {
+      "Properties": {
+        "DomainName": "admin.one.amazon.com",
+        "DomainNameConfigurations": [
+          {
+            "CertificateArn": "arn::cert::abc",
+            "EndpointType": "REGIONAL"
+          }
+        ],
+        "Tags": {
+          "TagKey1": "Value1",
+          "TagKey2": "Value2",
+          "httpapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::DomainName"
+    },
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {},
+          "tags": [
+            {
+              "name": "TagKey1",
+              "x-amazon-apigateway-tag-value": "Value1"
+            },
+            {
+              "name": "TagKey2",
+              "x-amazon-apigateway-tag-value": "Value2"
+            },
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ],
+          "x-amazon-apigateway-cors": {
+            "allowOrigins": [
+              "*"
+            ]
+          }
+        },
+        "FailOnWarnings": true,
+        "Tags": {
+          "TagKey1": "Value1",
+          "TagKey2": "Value2",
+          "httpapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "MyApiApiMapping": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        },
+        "DomainName": {
+          "Ref": "ApiGatewayDomainNameV25fe29fe649"
+        },
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::ApiMapping"
+    },
+    "MyApiProdStage": {
+      "Properties": {
+        "AccessLogSettings": {
+          "DestinationArn": "random-arn",
+          "Format": "$context.requestId"
+        },
+        "ApiId": {
+          "Ref": "MyApi"
+        },
+        "AutoDeploy": true,
+        "RouteSettings": {
+          "$default": {
+            "DataTraceEnabled": true,
+            "ThrottlingBurstLimit": 200,
+            "ThrottlingRateLimit": 0.7
+          }
+        },
+        "StageName": "Prod",
+        "StageVariables": {
+          "VarName": "VarValue"
+        },
+        "Tags": {
+          "TagKey1": "Value1",
+          "TagKey2": "Value2",
+          "httpapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    },
+    "RecordSetGroup370194ff6e": {
+      "Properties": {
+        "HostedZoneId": "abc123456",
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV25fe29fe649",
+                  "RegionalDomainName"
+                ]
+              },
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV25fe29fe649",
+                  "RegionalHostedZoneId"
+                ]
+              }
+            },
+            "Name": "admin.one.amazon.com",
+            "Type": "A"
+          }
+        ]
+      },
+      "Type": "AWS::Route53::RecordSetGroup"
+    }
+  }
+}

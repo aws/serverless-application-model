@@ -1,0 +1,69 @@
+{
+  "Resources": {
+    "MyApiWithPropagateTags": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {},
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        },
+        "Tags": [
+          {
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
+          {
+            "Key": "TagKey2",
+            "Value": ""
+          }
+        ]
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiWithPropagateTagsDeployment5332c373d4": {
+      "Properties": {
+        "Description": "RestApi deployment id: 5332c373d45c69e6c0f562b4a419aa8eb311adc7",
+        "RestApiId": {
+          "Ref": "MyApiWithPropagateTags"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiWithPropagateTagsProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithPropagateTagsDeployment5332c373d4"
+        },
+        "RestApiId": {
+          "Ref": "MyApiWithPropagateTags"
+        },
+        "StageName": "Prod",
+        "Tags": [
+          {
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
+          {
+            "Key": "TagKey2",
+            "Value": ""
+          }
+        ]
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    }
+  }
+}
