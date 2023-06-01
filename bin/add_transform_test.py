@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """Automatically create transform tests input and output files given an input template."""
 import argparse
 import json
