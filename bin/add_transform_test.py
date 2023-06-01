@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from samtranslator.translator.arn_generator import ArnGenerator
 
 """Automatically create transform tests input and output files given an input template."""
 import argparse
