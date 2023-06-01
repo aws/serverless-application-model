@@ -437,12 +437,10 @@ class Resource(ABC):
     def assign_tags(self, tags: Dict[str, Any]) -> None:
         """
         Assigns tags to the resource. This function assumes that generated resources always have
-        the tags property called `Tags`
+        the tags property called `Tags` that takes a list of key-value objects.
 
-        There are CFN resources that do not follow the assumption such as 'AWS::Backup::Framework'
-        We may need to modify the code to account for thia scenario in the future. We could do this
-        by function overriding this function in the class definition of that resource. An example
-        is provided in 'AWS::ApiGatewayV2::Api'
+        Override this function if the above assumptions do not apply to the resource (e.g. different
+        property name or type (see e.g. 'AWS::ApiGatewayV2::Api').
 
         :param tags: Dictionary of tags to be assigned to the resource
         """
