@@ -8,10 +8,10 @@ import sys
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict
+from unittest.mock import patch
 
 import boto3
 
-from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
@@ -28,16 +28,6 @@ parser.add_argument(
     type=Path,
     default=Path("template.yaml"),
 )
-parser.add_argument(
-    "--disable-api-configuration",
-    help="Disable adding REGIONAL configuration to AWS::ApiGateway::RestApi",
-    action="store_true",
-)
-parser.add_argument(
-    "--disable-update-partition",
-    help="Disable updating the partition of arn to aws-cn/aws-us-gov",
-    action="store_true",
-)
 CLI_OPTIONS = parser.parse_args()
 
 
@@ -49,25 +39,6 @@ def read_json_file(file_path: Path) -> Dict[str, Any]:
 def write_json_file(obj: Dict[str, Any], file_path: Path) -> None:
     with file_path.open("w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2, sort_keys=True)
-
-
-def add_regional_endpoint_configuration_if_needed(template: Dict[str, Any]) -> Dict[str, Any]:
-    for _, resource in template["Resources"].items():
-        if resource["Type"] == "AWS::ApiGateway::RestApi":
-            properties = resource["Properties"]
-            if "EndpointConfiguration" not in properties:
-                properties["EndpointConfiguration"] = {"Types": ["REGIONAL"]}
-            if "Parameters" not in properties:
-                properties["Parameters"] = {"endpointConfigurationTypes": "REGIONAL"}
-
-    return template
-
-
-def replace_aws_partition(partition: str, file_path: Path) -> None:
-    template = read_json_file(file_path)
-    updated_template = json.loads(json.dumps(template).replace("arn:aws:", f"arn:{partition}:"))
-    file_path.write_text(json.dumps(updated_template, indent=2), encoding="utf-8")
-    print(f"Transform Test output files generated {file_path}")
 
 
 def generate_transform_test_output_files(input_file_path: Path, file_basename: str) -> None:
@@ -82,20 +53,13 @@ def generate_transform_test_output_files(input_file_path: Path, file_basename: s
         "aws-us-gov": ("us-gov-west-1", TRANSFORM_TEST_DIR / "output" / "aws-us-gov" / output_file_option),
     }
 
-    for partition, (region, output_path) in transform_test_output_paths.items():
-        # Set Boto Session Region to guarantee the same hash input as transform tests for API deployment id
-        ArnGenerator.BOTO_SESSION_REGION_NAME = region
-        # Implicit API Plugin may alter input template file, thus passing a copy here.
-        output_fragment = transform(deepcopy(manifest), {}, ManagedPolicyLoader(iam_client))
-
-        if not CLI_OPTIONS.disable_api_configuration and partition != "aws":
-            output_fragment = add_regional_endpoint_configuration_if_needed(output_fragment)
-
-        write_json_file(output_fragment, output_path)
-
-        # Update arn partition if necessary
-        if not CLI_OPTIONS.disable_update_partition:
-            replace_aws_partition(partition, output_path)
+    for _, (region, output_path) in transform_test_output_paths.items():
+        with patch("samtranslator.translator.arn_generator._get_region_from_session", return_value=region), patch(
+            "boto3.session.Session.region_name", region
+        ):
+            # Implicit API Plugin may alter input template file, thus passing a copy here.
+            output_fragment = transform(deepcopy(manifest), {}, ManagedPolicyLoader(iam_client))
+            write_json_file(output_fragment, output_path)
 
 
 def get_input_file_path() -> Path:

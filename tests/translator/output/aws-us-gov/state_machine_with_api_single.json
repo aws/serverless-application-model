@@ -1,0 +1,259 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Outputs": {
+    "ApiEndpoint": {
+      "Value": {
+        "Fn::Sub": "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/echo"
+      }
+    }
+  },
+  "Resources": {
+    "HelloWorldFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "def handler(event, context):\n    print(event)\n    return \"do nothing\"\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "HelloWorldFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "HelloWorldFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/echo": {
+              "post": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "PostPostEchoRole",
+                      "Arn"
+                    ]
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\"\\\\'\",\"'\")\", \"stateMachineArn\": \"${Post}\"}"
+                    }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
+                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
+                }
+              }
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiDeployment5866b9014d": {
+      "Properties": {
+        "Description": "RestApi deployment id: 5866b9014d5a1c815da161bacc3b15b4a19f95ef",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment5866b9014d"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "Post": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"One\",",
+              "    \"States\": {",
+              "        \"One\": {",
+              "            \"End\": true,",
+              "            \"Resource\": \"${definition_substitution_1}\",",
+              "            \"Type\": \"Task\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "DefinitionSubstitutions": {
+          "definition_substitution_1": {
+            "Fn::GetAtt": [
+              "HelloWorldFunction",
+              "Arn"
+            ]
+          }
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "PostRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "PostPostEchoRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "Post"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "PostPostEchoRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "PostRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
