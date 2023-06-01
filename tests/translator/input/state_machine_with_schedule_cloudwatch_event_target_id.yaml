@@ -1,0 +1,48 @@
+Resources:
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: Pass
+            Result: Hello
+            Next: World
+          World:
+            Type: Pass
+            Result: World
+            End: true
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
+
+      Events:
+        CWSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Description: test schedule
+            Enabled: false
+            Target:
+              Id: ThisMyTargetID
+
+Outputs:
+  MyStateMachineArn:
+    Description: ARN of the State Machine
+    Value:
+      Ref: MyStateMachine
+  MyScheduleName:
+    Description: Name of the Schedule rule created
+    Value:
+      Ref: MyStateMachineCWSchedule
+  MyEventRole:
+    Description: ARN of the role created for the Schedule rule
+    Value:
+      Ref: MyStateMachineCWScheduleRole
+Metadata:
+  SamTransformTest: true
