@@ -1280,7 +1280,7 @@ class SamApi(SamResourceMacro):
 
         generated_resources = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
 
-        self.propagate_tags(self.PropagateTags, generated_resources, self.Tags)
+        self.propagate_tags(generated_resources, self.Tags, self.PropagateTags)
 
         return generated_resources
 
@@ -1395,7 +1395,7 @@ class SamHttpApi(SamResourceMacro):
         if stage:
             resources.append(stage)
 
-        self.propagate_tags(self.PropagateTags, resources, self.Tags)
+        self.propagate_tags(resources, self.Tags, self.PropagateTags)
 
         return resources
 

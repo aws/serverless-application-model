@@ -9,20 +9,11 @@
             "EndpointType": "REGIONAL"
           }
         ],
-        "Tags": [
-          {
-            "Key": "TagKey1",
-            "Value": "Value1"
-          },
-          {
-            "Key": "TagKey2",
-            "Value": "Value2"
-          },
-          {
-            "Key": "httpapi:createdBy",
-            "Value": "SAM"
-          }
-        ]
+        "Tags": {
+          "TagKey1": "Value1",
+          "TagKey2": "Value2",
+          "httpapi:createdBy": "SAM"
+        }
       },
       "Type": "AWS::ApiGatewayV2::DomainName"
     },
@@ -58,20 +49,11 @@
           }
         },
         "FailOnWarnings": true,
-        "Tags": [
-          {
-            "Key": "TagKey1",
-            "Value": "Value1"
-          },
-          {
-            "Key": "TagKey2",
-            "Value": "Value2"
-          },
-          {
-            "Key": "httpapi:createdBy",
-            "Value": "SAM"
-          }
-        ]
+        "Tags": {
+          "TagKey1": "Value1",
+          "TagKey2": "Value2",
+          "httpapi:createdBy": "SAM"
+        }
       },
       "Type": "AWS::ApiGatewayV2::Api"
     },
@@ -110,20 +92,11 @@
         "StageVariables": {
           "VarName": "VarValue"
         },
-        "Tags": [
-          {
-            "Key": "TagKey1",
-            "Value": "Value1"
-          },
-          {
-            "Key": "TagKey2",
-            "Value": "Value2"
-          },
-          {
-            "Key": "httpapi:createdBy",
-            "Value": "SAM"
-          }
-        ]
+        "Tags": {
+          "TagKey1": "Value1",
+          "TagKey2": "Value2",
+          "httpapi:createdBy": "SAM"
+        }
       },
       "Type": "AWS::ApiGatewayV2::Stage"
     },
