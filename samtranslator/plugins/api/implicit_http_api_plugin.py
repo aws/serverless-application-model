@@ -60,6 +60,12 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin[Type[OpenApiEditor]]):
             if not event_properties:
                 event["Properties"] = event_properties  # We are updating its Properties
 
+            # if the API ID is not provided in the event source properties, this implies that SAM-T will
+            # construct an implicit API resource for this API event source, and we need to add tags to the
+            # implicit API resource if customers specify `PropagateTags` property
+            if self.API_ID_EVENT_PROPERTY not in event_properties:
+                self._maybe_add_tags_to_implicit_api(function, template)
+
             self._add_implicit_api_id_if_necessary(event_properties)  # type: ignore[no-untyped-call]
 
             path = event_properties.get("Path", "")

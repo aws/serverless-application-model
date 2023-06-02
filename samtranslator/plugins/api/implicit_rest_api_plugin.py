@@ -61,6 +61,12 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
 
             sam_expect(event_properties, event_id, "", is_sam_event=True).to_be_a_map("Properties should be a map.")
 
+            # if the API ID is not provided in the event source properties, this implies that SAM-T will
+            # construct an implicit API resource for this API event source, and we need to add tags to the
+            # implicit API resource if customers specify `PropagateTags` property
+            if self.API_ID_EVENT_PROPERTY not in event_properties:
+                self._maybe_add_tags_to_implicit_api(function, template)
+
             self._add_implicit_api_id_if_necessary(event_properties)  # type: ignore[no-untyped-call]
 
             api_id, path, method = self._validate_api_event(event_id, event_properties)

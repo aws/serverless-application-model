@@ -6,7 +6,7 @@ from samtranslator.model.intrinsics import fnGetAtt, ref
 
 class SQSQueue(Resource):
     resource_type = "AWS::SQS::Queue"
-    property_types: Dict[str, PropertyType] = {}
+    property_types: Dict[str, PropertyType] = {"Tags": GeneratedProperty()}
     runtime_attrs = {
         "queue_url": lambda self: ref(self.logical_id),
         "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),
