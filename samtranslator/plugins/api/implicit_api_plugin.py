@@ -93,7 +93,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         Helper function implemented by child classes that create a new implicit API resource
         """
 
-    def _maybe_add_tags_to_implicit_api(self, resource: SamResource, template: SamTemplate) -> None:
+    def _add_tags_to_implicit_api_if_necessary(self, resource: SamResource, template: SamTemplate) -> None:
         """
         Decides whether to add tags to the implicit api resource.
         :param dict template_dict: SAM template dictionary

@@ -9,6 +9,33 @@ Parameters:
     Type: String
 
 Resources:
+  DeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - codedeploy.amazonaws.com
+
+      Policies:
+      - PolicyName: root
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Resource: '*'
+            Action:
+            - cloudwatch:DescribeAlarms
+            - lambda:UpdateAlias
+            - lambda:GetAlias
+            - lambda:InvokeFunction
+            - s3:Get*
+            - sns:Publish
 # All Event Types
   MyAwesomeFunction:
     Type: AWS::Serverless::Function
@@ -17,6 +44,10 @@ Resources:
         exports.handler = async () => ‘Hello World!'
       Handler: index.handler
       Runtime: nodejs14.x
+      DeploymentPreference:
+        Type: AllAtOnce
+        Role:
+          Fn::GetAtt: [DeploymentRole, Arn]
       Tags:
         Key1: Value1
         Key2: Value2

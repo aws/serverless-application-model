@@ -64,7 +64,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin[Type[OpenApiEditor]]):
             # construct an implicit API resource for this API event source, and we need to add tags to the
             # implicit API resource if customers specify `PropagateTags` property
             if self.API_ID_EVENT_PROPERTY not in event_properties:
-                self._maybe_add_tags_to_implicit_api(function, template)
+                self._add_tags_to_implicit_api_if_necessary(function, template)
 
             self._add_implicit_api_id_if_necessary(event_properties)  # type: ignore[no-untyped-call]
 

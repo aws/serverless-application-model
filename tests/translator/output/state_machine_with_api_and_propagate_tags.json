@@ -314,6 +314,74 @@
       },
       "Type": "AWS::IAM::Role"
     },
+    "PostScheduleEvent": {
+      "Properties": {
+        "Name": "TestSchedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "Post"
+            },
+            "Id": "PostScheduleEventStepFunctionsTarget",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "PostScheduleEventRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "PostScheduleEventRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "Post"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "PostScheduleEventRoleStartExecutionPolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Key1",
+            "Value": "Value1"
+          },
+          {
+            "Key": "Key2",
+            "Value": "Value2"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
     "ServerlessRestApi": {
       "Properties": {
         "Body": {

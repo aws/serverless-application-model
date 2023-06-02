@@ -15,6 +15,49 @@
       },
       "Type": "AWS::Logs::LogGroup"
     },
+    "DeploymentRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "codedeploy.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "cloudwatch:DescribeAlarms",
+                    "lambda:UpdateAlias",
+                    "lambda:GetAlias",
+                    "lambda:InvokeFunction",
+                    "s3:Get*",
+                    "sns:Publish"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "root"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
     "Images": {
       "DependsOn": [
         "MyAwesomeFunctionS3TriggerPermission"
@@ -82,7 +125,17 @@
         },
         "Name": "Live"
       },
-      "Type": "AWS::Lambda::Alias"
+      "Type": "AWS::Lambda::Alias",
+      "UpdatePolicy": {
+        "CodeDeployLambdaAliasUpdate": {
+          "ApplicationName": {
+            "Ref": "ServerlessDeploymentApplication"
+          },
+          "DeploymentGroupName": {
+            "Ref": "MyAwesomeFunctionDeploymentGroup"
+          }
+        }
+      }
     },
     "MyAwesomeFunctionApiEventPermissionProd": {
       "Properties": {
@@ -227,6 +280,40 @@
         "StartingPosition": "LATEST"
       },
       "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyAwesomeFunctionDeploymentGroup": {
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "ServerlessDeploymentApplication"
+        },
+        "AutoRollbackConfiguration": {
+          "Enabled": true,
+          "Events": [
+            "DEPLOYMENT_FAILURE",
+            "DEPLOYMENT_STOP_ON_ALARM",
+            "DEPLOYMENT_STOP_ON_REQUEST"
+          ]
+        },
+        "DeploymentConfigName": {
+          "Fn::Sub": [
+            "CodeDeployDefault.Lambda${ConfigName}",
+            {
+              "ConfigName": "AllAtOnce"
+            }
+          ]
+        },
+        "DeploymentStyle": {
+          "DeploymentOption": "WITH_TRAFFIC_CONTROL",
+          "DeploymentType": "BLUE_GREEN"
+        },
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "DeploymentRole",
+            "Arn"
+          ]
+        }
+      },
+      "Type": "AWS::CodeDeploy::DeploymentGroup"
     },
     "MyAwesomeFunctionImplicitApiPermission": {
       "Properties": {
@@ -430,6 +517,12 @@
     },
     "Notifications": {
       "Type": "AWS::SNS::Topic"
+    },
+    "ServerlessDeploymentApplication": {
+      "Properties": {
+        "ComputePlatform": "Lambda"
+      },
+      "Type": "AWS::CodeDeploy::Application"
     },
     "ServerlessHttpApi": {
       "Properties": {

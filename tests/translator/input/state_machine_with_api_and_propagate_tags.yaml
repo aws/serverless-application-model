@@ -33,6 +33,12 @@ Resources:
             Method: POST
             UnescapeMappingTemplate: true
 
+        ScheduleEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Name: TestSchedule
+
   Post2:
     Type: AWS::Serverless::StateMachine
     Properties:
