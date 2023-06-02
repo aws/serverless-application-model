@@ -61,7 +61,7 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
 
             sam_expect(event_properties, event_id, "", is_sam_event=True).to_be_a_map("Properties should be a map.")
 
-            self._add_tags_to_implicit_api_if_necessary(function, template)
+            self._add_tags_to_implicit_api_if_necessary(event_properties, function, template)
 
             self._add_implicit_api_id_if_necessary(event_properties)  # type: ignore[no-untyped-call]
 

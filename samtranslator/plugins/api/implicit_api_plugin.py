@@ -111,6 +111,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         should_propagate_tags = resource.properties.get("PropagateTags") or globals_var.get("PropagateTags")
 
         if implicit_api_resource and resource.properties.get("Tags") and should_propagate_tags:
+            # This makes an assumption that the SAM resource has 'Tags' property and is a dictionary.
             implicit_api_resource.properties.setdefault("Tags", {}).update(resource.properties["Tags"])
             implicit_api_resource.properties["PropagateTags"] = True
 
