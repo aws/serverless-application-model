@@ -60,6 +60,8 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin[Type[OpenApiEditor]]):
             if not event_properties:
                 event["Properties"] = event_properties  # We are updating its Properties
 
+            self._add_tags_to_implicit_api_if_necessary(event_properties, function, template)
+
             self._add_implicit_api_id_if_necessary(event_properties)  # type: ignore[no-untyped-call]
 
             path = event_properties.get("Path", "")

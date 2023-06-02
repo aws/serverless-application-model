@@ -93,6 +93,28 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         Helper function implemented by child classes that create a new implicit API resource
         """
 
+    def _add_tags_to_implicit_api_if_necessary(
+        self, event_properties: Dict[str, Any], resource: SamResource, template: SamTemplate
+    ) -> None:
+        """
+        Decides whether to add tags to the implicit api resource.
+        :param dict template_dict: SAM template dictionary
+        """
+        # if the API ID provided in the event source properties, this implies that SAM-T will
+        # construct an implicit API resource for this API event source, and we need to add tags to the
+        # implicit API resource if customers specify `PropagateTags` property; otherwise, don't add tags
+        if self.API_ID_EVENT_PROPERTY in event_properties:
+            return
+
+        implicit_api_resource = template.get(self.IMPLICIT_API_LOGICAL_ID)
+        globals_var = template.get_globals().get(SamResourceType(resource.type).name, {})
+        should_propagate_tags = resource.properties.get("PropagateTags") or globals_var.get("PropagateTags")
+
+        if implicit_api_resource and resource.properties.get("Tags") and should_propagate_tags:
+            # This makes an assumption that the SAM resource has 'Tags' property and is a dictionary.
+            implicit_api_resource.properties.setdefault("Tags", {}).update(resource.properties["Tags"])
+            implicit_api_resource.properties["PropagateTags"] = True
+
     @cw_timer(prefix="Plugin-ImplicitApi")
     def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
         """

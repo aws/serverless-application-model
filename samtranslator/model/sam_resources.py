@@ -127,6 +127,7 @@ class SamFunction(SamResourceMacro):
         "Environment": PropertyType(False, dict_of(IS_STR, IS_DICT)),
         "Events": PropertyType(False, dict_of(IS_STR, IS_DICT)),
         "Tags": PropertyType(False, IS_DICT),
+        "PropagateTags": PropertyType(False, IS_BOOL),
         "Tracing": PropertyType(False, one_of(IS_DICT, IS_STR)),
         "KmsKeyArn": PassThroughProperty(False),
         "DeploymentPreference": PropertyType(False, IS_DICT),
@@ -169,6 +170,7 @@ class SamFunction(SamResourceMacro):
     Environment: Optional[Dict[str, Any]]
     Events: Optional[Dict[str, Any]]
     Tags: Optional[Dict[str, Any]]
+    PropagateTags: Optional[bool]
     Tracing: Optional[Dict[str, Any]]
     KmsKeyArn: Optional[Intrinsicable[str]]
     DeploymentPreference: Optional[Dict[str, Any]]
@@ -311,6 +313,8 @@ class SamFunction(SamResourceMacro):
             )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message) from e
+
+        self.propagate_tags(resources, self.Tags, self.PropagateTags)
 
         return resources
 
@@ -1716,6 +1720,7 @@ class SamStateMachine(SamResourceMacro):
         "Name": PropertyType(False, IS_STR),
         "Type": PropertyType(False, IS_STR),
         "Tags": PropertyType(False, IS_DICT),
+        "PropagateTags": PropertyType(False, IS_BOOL),
         "Policies": PropertyType(False, one_of(IS_STR, list_of(one_of(IS_STR, IS_DICT, IS_DICT)))),
         "Tracing": PropertyType(False, IS_DICT),
         "PermissionsBoundary": PropertyType(False, IS_STR),
@@ -1731,6 +1736,7 @@ class SamStateMachine(SamResourceMacro):
     Name: Optional[Intrinsicable[str]]
     Type: Optional[Intrinsicable[str]]
     Tags: Optional[Dict[str, Any]]
+    PropagateTags: Optional[bool]
     Policies: Optional[List[Any]]
     Tracing: Optional[Dict[str, Any]]
     PermissionsBoundary: Optional[Intrinsicable[str]]
@@ -1772,7 +1778,11 @@ class SamStateMachine(SamResourceMacro):
             get_managed_policy_map=get_managed_policy_map,
         )
 
-        return state_machine_generator.to_cloudformation()
+        generated_resources = state_machine_generator.to_cloudformation()
+
+        self.propagate_tags(generated_resources, self.Tags, self.PropagateTags)
+
+        return generated_resources
 
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
