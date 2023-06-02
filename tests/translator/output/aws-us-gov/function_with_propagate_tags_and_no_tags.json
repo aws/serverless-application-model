@@ -153,41 +153,6 @@
       },
       "Type": "AWS::Lambda::Permission"
     },
-    "MyAwesomeFunctionCWSchedule": {
-      "Properties": {
-        "Description": "test schedule",
-        "Name": {
-          "Ref": "ScheduleName"
-        },
-        "ScheduleExpression": "rate(1 minute)",
-        "State": "DISABLED",
-        "Targets": [
-          {
-            "Arn": {
-              "Ref": "MyAwesomeFunctionAliasLive"
-            },
-            "Id": "MyAwesomeFunctionCWScheduleLambdaTarget"
-          }
-        ]
-      },
-      "Type": "AWS::Events::Rule"
-    },
-    "MyAwesomeFunctionCWSchedulePermission": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "MyAwesomeFunctionAliasLive"
-        },
-        "Principal": "events.amazonaws.com",
-        "SourceArn": {
-          "Fn::GetAtt": [
-            "MyAwesomeFunctionCWSchedule",
-            "Arn"
-          ]
-        }
-      },
-      "Type": "AWS::Lambda::Permission"
-    },
     "MyAwesomeFunctionDDBStream": {
       "Properties": {
         "BatchSize": 200,

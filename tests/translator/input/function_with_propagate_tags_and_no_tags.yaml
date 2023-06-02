@@ -9,15 +9,6 @@ Resources:
       # PropagateTags: True
       AutoPublishAlias: Live
       Events:
-        CWSchedule:
-          Type: Schedule
-          Properties:
-            Schedule: rate(1 minute)
-            Name:
-              Ref: ScheduleName
-            Description: test schedule
-            Enabled: false
-
         CWEvent:
           Type: CloudWatchEvent
           Properties:
