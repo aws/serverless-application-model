@@ -1,0 +1,101 @@
+{
+  "Resources": {
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "bar"
+        },
+        "Handler": "foo",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionCloudWatchEvent": {
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "eventName": [
+              "CreateLogGroup"
+            ],
+            "eventSource": [
+              "logs.amazonaws.com"
+            ]
+          },
+          "source": [
+            "aws.logs"
+          ]
+        },
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "MyFunction",
+                "Arn"
+              ]
+            },
+            "Id": "MyFunctionCloudWatchEventLambdaTarget"
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "MyFunctionCloudWatchEventPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "MyFunctionCloudWatchEvent",
+            "Arn"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
