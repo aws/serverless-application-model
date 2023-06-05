@@ -2,6 +2,12 @@ Parameters:
   TagValueParam:
     Type: String
     Default: value
+  MyEdgeDomainName:
+    Type: String
+  MyEdgeDomainCert:
+    Type: String
+  HostedZoneId:
+    Type: String
 
 Resources:
   MyApiWithPropagateTags:
@@ -15,3 +21,26 @@ Resources:
         TagKey3:
           Ref: TagValueParam
         TagKey4: '123'
+      Domain:
+        DomainName:
+          Ref: MyEdgeDomainName
+        CertificateArn:
+          Ref: MyEdgeDomainCert
+        EndpointConfiguration: EDGE
+        BasePath:
+        - /get
+        Route53:
+          HostedZoneId:
+            Ref: HostedZoneId
+          IpV6: true
+      Auth:
+        ApiKeyRequired: true
+        UsagePlan:
+          CreateUsagePlan: SHARED
+          Description: My test usage plan
+          Quota:
+            Limit: 500
+            Period: MONTH
+          Throttle:
+            BurstLimit: 100
+            RateLimit: 50

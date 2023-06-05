@@ -1,0 +1,160 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Globals:
+  Function:
+    PropagateTags: true
+
+Parameters:
+  ScheduleName:
+    Type: String
+
+Resources:
+  DeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - codedeploy.amazonaws.com
+
+      Policies:
+      - PolicyName: root
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Resource: '*'
+            Action:
+            - cloudwatch:DescribeAlarms
+            - lambda:UpdateAlias
+            - lambda:GetAlias
+            - lambda:InvokeFunction
+            - s3:Get*
+            - sns:Publish
+# All Event Types
+  MyAwesomeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async () => ‘Hello World!'
+      Handler: index.handler
+      Runtime: nodejs14.x
+      DeploymentPreference:
+        Type: AllAtOnce
+        Role:
+          Fn::GetAtt: [DeploymentRole, Arn]
+      Tags:
+        Key1: Value1
+        Key2: Value2
+      AutoPublishAlias: Live
+      Events:
+        CWSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Name:
+              Ref: ScheduleName
+            Description: test schedule
+            Enabled: false
+
+        CWEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail:
+                state:
+                - terminated
+
+        CWLog:
+          Type: CloudWatchLogs
+          Properties:
+            LogGroupName:
+              Ref: CloudWatchLambdaLogsGroup
+            FilterPattern: My pattern
+
+        IoTRule:
+          Type: IoTRule
+          Properties:
+            Sql: SELECT * FROM 'topic/test'
+            AwsIotSqlVersion: beta
+
+        S3Trigger:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*
+
+        NotificationTopic:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: Notifications
+
+        KinesisStream:
+          Type: Kinesis
+          Properties:
+            Stream:
+              Fn::GetAtt: [MyStream, Arn]
+            BatchSize: 100
+            MaximumBatchingWindowInSeconds: 20
+            StartingPosition: TRIM_HORIZON
+
+        DDBStream:
+          Type: DynamoDB
+          Properties:
+            Stream:
+              Fn::GetAtt: [MyDynamoDB, StreamArn]
+            BatchSize: 200
+            MaximumBatchingWindowInSeconds: 20
+            StartingPosition: LATEST
+
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+
+        ImplicitApi:
+          Type: HttpApi
+          Properties:
+            Method: GET
+            Path: /path
+            TimeoutInMillis: 15000
+            PayloadFormatVersion: '1.0'
+
+  Notifications:
+    Type: AWS::SNS::Topic
+
+  Images:
+    Type: AWS::S3::Bucket
+
+  CloudWatchLambdaLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+
+  MyStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 1
+
+  MyDynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+Metadata:
+  SamTransformTest: true
