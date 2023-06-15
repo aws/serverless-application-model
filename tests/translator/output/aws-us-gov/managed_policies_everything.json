@@ -57,8 +57,8 @@
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "AmazonS3FullAccess",
-          "AmazonAPIGatewayPushToCloudWatchLogs",
+          "arn:aws-us-gov:iam::aws:policy/AmazonS3FullAccess",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
           "AnyNonOfficialManagedPolicy",
           "arn:aws:iam::aws:policy/ThisIsPassedThroughAsIs",
           "arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough",
@@ -177,8 +177,8 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "AmazonS3FullAccess",
-          "AmazonAPIGatewayPushToCloudWatchLogs",
+          "arn:aws-us-gov:iam::aws:policy/AmazonS3FullAccess",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
           "AnyNonOfficialManagedPolicy",
           "arn:aws:iam::aws:policy/ThisIsPassedThroughAsIs",
           "arn:aws-cn:iam::aws:policy/ThisIsAlsoPassedThrough",

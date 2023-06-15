@@ -130,10 +130,12 @@ one python version locally and then have our ci (appveyor) run all supported ver
 
 ### Transform tests
 
+#### Successful transforms
+
 Transform tests ensure a SAM template transforms into the expected CloudFormation template.
 
 When adding new transform tests, we have provided a script to help generate the transform test input 
-and output files in the correct directory given a template.yaml file.
+and output files in the correct directory given a `template.yaml` file.
 ```bash
 python3 bin/add_transform_test.py --template-file template.yaml
 ```
@@ -141,7 +143,7 @@ python3 bin/add_transform_test.py --template-file template.yaml
 This script will automatically generate the input and output files. It will guarantee that the output
 files have the correct AWS partition (e.g. aws-cn, aws-us-gov). 
 
-For `AWS::ApiGateway::RestApi`, the script will automatically append `REGIONAL` EndpointConfiguration.
+For `AWS::ApiGateway::RestApi`, the script will automatically append `REGIONAL` `EndpointConfiguration`.
 To disable this feature, run the following command instead.
 ```bash
 python3 bin/add_transform_test.py --template-file template.yaml --disable-api-configuration
@@ -152,8 +154,13 @@ The script automatically updates hardcoded ARN partitions to match the output pa
 python3 bin/add_transform_test.py --template-file template.yaml --disable-update-partition
 ```
 
-Note that please always check the generated output is as expected. This tool does not guarantee correct output.
+Please always check the generated output is as expected. This tool does not guarantee correct output.
 
+#### Transform failures
+
+To test a SAM template results in a specific transform error, add the SAM template under [`tests/translator/input`](https://github.com/aws/serverless-application-model/tree/develop/tests/translator/input), and a JSON file with the expected `errorMessage` as a top-level value under [`tests/translator/output`](https://github.com/aws/serverless-application-model/tree/develop/tests/translator/output). Both files must have the same basename and be prefixed with `error_` (e.g. `error_my_cool_template.yaml` for input, and `error_my_cool_template.json` for the expected error).
+
+See https://github.com/aws/serverless-application-model/pull/2993 for an example.
 
 ### Integration tests
 
@@ -205,7 +212,7 @@ The AWS SAM specification includes a JSON schema (see https://github.com/aws/ser
 
 To add new properties, do the following:
 
-1. Add the property to the relevant resource schema under [`samtranslator/schema`](https://github.com/aws/serverless-application-model/tree/develop/samtranslator/schema) (e.g. [`samtranslator/schema/aws_serverless_function.py`](https://github.com/aws/serverless-application-model/blob/develop/samtranslator/schema/aws_serverless_function.py) for `AWS::Serverless::Function`).
+1. Add the property to the relevant resource schema under [`samtranslator/internal/schema_source`](https://github.com/aws/serverless-application-model/tree/develop/samtranslator/internal/schema_source) (e.g. [`samtranslator/internal/schema_source/aws_serverless_function.py`](https://github.com/aws/serverless-application-model/blob/develop/samtranslator/internal/schema_source/aws_serverless_function.py) for `AWS::Serverless::Function`).
 2. You can leave out the assignement part; it adds documentation to the schema properties. The team will take care of documentation updates once code changes are merged. Typically we update documentation by running `make update-schema-data`.
 3. Run `make schema`.
 

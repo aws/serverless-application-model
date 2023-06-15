@@ -1,0 +1,26 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      DataSources:
+        Lambda:
+          MyDataSource:
+            FunctionArn: blah
+            ServiceRoleArn: my-lambda-role
+        DynamoDb:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
+            ServiceRoleArn: my-ddb-role

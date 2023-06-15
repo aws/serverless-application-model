@@ -17,6 +17,12 @@ def get_profile(source_type: str, dest_type: str):  # type: ignore[no-untyped-de
     return copy.deepcopy(profile)
 
 
+def replace_cfn_resource_properties(resource_type: str, logical_id: str) -> Any:
+    properties = copy.deepcopy(PROFILE["CfnResourceProperties"].get(resource_type, {}))
+
+    return profile_replace(properties, {"logicalId": logical_id})
+
+
 def verify_profile_variables_replaced(obj: Any) -> None:
     """
     Verifies all profile variables have been replaced; throws ValueError if not.

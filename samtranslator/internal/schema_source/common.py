@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, TypeVar, Union
 
 import pydantic
 from pydantic import Extra, Field
+from typing_extensions import Literal
 
 from samtranslator.model.types import PassThrough
 
@@ -33,6 +34,10 @@ LenientBaseModel = pydantic.BaseModel
 
 _docdir = Path(__file__).absolute().parent
 _DOCS = json.loads((_docdir / "sam-docs.json").read_bytes())
+
+
+# Connector Permissions
+PermissionsType = List[Literal["Read", "Write"]]
 
 
 def get_prop(stem: str) -> Any:

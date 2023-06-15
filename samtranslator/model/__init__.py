@@ -342,10 +342,8 @@ class Resource(ABC):
         except ValidationError as e:
             error_properties: str = ""
             with suppress(KeyError):
-                error_properties = ", ".join([str(error["loc"][0]) for error in e.errors()])
-            raise InvalidResourceException(
-                self.logical_id, f"Given resource property '{error_properties}' is invalid"
-            ) from e
+                error_properties = ".".join(str(x) for x in e.errors()[0]["loc"])
+            raise InvalidResourceException(self.logical_id, f"Property '{error_properties}' is invalid.") from e
 
     def validate_properties(self) -> None:
         """Validates that the required properties for this Resource have been populated, and that all properties have

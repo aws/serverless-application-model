@@ -1,0 +1,50 @@
+[
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "LambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPI",
+    "ResourceType": "AWS::AppSync::GraphQLApi"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPISchema",
+    "ResourceType": "AWS::AppSync::GraphQLSchema"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPICloudWatchRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIMyApiKey",
+    "ResourceType": "AWS::AppSync::ApiKey"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIMyLambdaDataSourceLambdaDataSource",
+    "ResourceType": "AWS::AppSync::DataSource"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIMyLambdaDataSourceLambdaDataSourceRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIMyLambdaDataSourceLambdaDataSourceToLambdaConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIlambdaInvoker",
+    "ResourceType": "AWS::AppSync::FunctionConfiguration"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIMutationaddPost",
+    "ResourceType": "AWS::AppSync::Resolver"
+  },
+  {
+    "LogicalResourceId": "SuperCoolAPIQuerygetPost",
+    "ResourceType": "AWS::AppSync::Resolver"
+  }
+]
