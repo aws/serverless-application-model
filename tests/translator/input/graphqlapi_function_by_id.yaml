@@ -1,0 +1,26 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      Functions:
+        MyFunction:
+          Id: !GetAtt MyFunction.FunctionId
+
+  MyFunction:
+    Type: AWS::AppSync::FunctionConfiguration
+    Properties:
+      ApiId: !GetAtt SuperCoolAPI.ApiId
+      Code: this is my epic code
+      DataSourceName: some-cool-datasource
+      Name: MyFunction
+      Runtime:
+        Name: some-runtime
+        RuntimeVersion: 1.2.3

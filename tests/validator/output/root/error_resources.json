@@ -2,5 +2,5 @@
   "[Resources.EmptyResource] Must not be empty",
   "[Resources.TypeCustomThreePartsInsteadOfTwo.Type] 'Custom::My::Custom' must use format Custom::X",
   "[Resources.TypeMissingSemiColon.Type] 'AWS::Serverless:Api' must use format X::Y::Z",
-  "[Resources.TypeUnknownServerless.Type] 'AWS::Serverless::UnknownType' is not one of ['AWS::Serverless::Api', 'AWS::Serverless::Application', 'AWS::Serverless::Function', 'AWS::Serverless::HttpApi', 'AWS::Serverless::LayerVersion', 'AWS::Serverless::SimpleTable', 'AWS::Serverless::StateMachine', 'AWS::Serverless::Connector']"
+  "[Resources.TypeUnknownServerless.Type] 'AWS::Serverless::UnknownType' is not one of ['AWS::Serverless::Api', 'AWS::Serverless::Application', 'AWS::Serverless::Function', 'AWS::Serverless::HttpApi', 'AWS::Serverless::LayerVersion', 'AWS::Serverless::SimpleTable', 'AWS::Serverless::StateMachine', 'AWS::Serverless::Connector', 'AWS::Serverless::GraphQLApi']"
 ]

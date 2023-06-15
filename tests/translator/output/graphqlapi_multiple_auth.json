@@ -1,0 +1,297 @@
+{
+  "Resources": {
+    "Authorizer1": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (_) => {\n  return {\n    isAuthorized: true,\n    deniedFields: [],\n  }\n}\n"
+        },
+        "Handler": "index.handler",
+        "PackageType": "Zip",
+        "Role": {
+          "Fn::GetAtt": [
+            "Authorizer1Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "Authorizer1Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "Authorizer2": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (_) => {\n  return {\n    isAuthorized: true,\n    deniedFields: [],\n  }\n}\n"
+        },
+        "Handler": "index.handler",
+        "PackageType": "Zip",
+        "Role": {
+          "Fn::GetAtt": [
+            "Authorizer2Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "Authorizer2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPI": {
+      "Properties": {
+        "AdditionalAuthenticationProviders": [
+          {
+            "AuthenticationType": "AWS_IAM"
+          },
+          {
+            "AuthenticationType": "API_KEY"
+          },
+          {
+            "AuthenticationType": "AWS_LAMBDA",
+            "LambdaAuthorizerConfig": {
+              "AuthorizerUri": {
+                "Fn::GetAtt": [
+                  "Authorizer2",
+                  "Arn"
+                ]
+              }
+            }
+          },
+          {
+            "AuthenticationType": "OPENID_CONNECT",
+            "OpenIDConnectConfig": {
+              "AuthTTL": 10,
+              "ClientId": "myid",
+              "IatTTL": 10,
+              "Issuer": "prad"
+            }
+          },
+          {
+            "AuthenticationType": "AMAZON_COGNITO_USER_POOLS",
+            "UserPoolConfig": {
+              "AppIdClientRegex": "myregex",
+              "AwsRegion": "na-east-1",
+              "UserPoolId": "myid"
+            }
+          }
+        ],
+        "AuthenticationType": "AWS_LAMBDA",
+        "LambdaAuthorizerConfig": {
+          "AuthorizerResultTtlInSeconds": 10,
+          "AuthorizerUri": {
+            "Fn::GetAtt": [
+              "Authorizer1",
+              "Arn"
+            ]
+          },
+          "IdentityValidationExpression": "hello"
+        },
+        "LogConfig": {
+          "CloudWatchLogsRoleArn": {
+            "Fn::GetAtt": [
+              "SuperCoolAPICloudWatchRole",
+              "Arn"
+            ]
+          },
+          "FieldLogLevel": "ALL"
+        },
+        "Name": "SuperCoolAPI",
+        "Tags": [
+          {
+            "Key": "key1",
+            "Value": "value1"
+          },
+          {
+            "Key": "key2",
+            "Value": "value2"
+          }
+        ],
+        "XrayEnabled": true
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "SuperCoolAPICloudWatchRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    },
+    "SuperCoolAPIToLambdaAuthConnector1WriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SuperCoolAPIToLambdaAuthConnector1": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::GraphQLApi"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "Authorizer1",
+            "Arn"
+          ]
+        },
+        "Principal": "appsync.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:appsync:${AWS::Region}:${AWS::AccountId}:apis/${SourceResourceId}",
+            {
+              "SourceResourceId": {
+                "Fn::GetAtt": [
+                  "SuperCoolAPI",
+                  "ApiId"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "SuperCoolAPIToLambdaAuthConnector2WriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SuperCoolAPIToLambdaAuthConnector2": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::GraphQLApi"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "Authorizer2",
+            "Arn"
+          ]
+        },
+        "Principal": "appsync.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:appsync:${AWS::Region}:${AWS::AccountId}:apis/${SourceResourceId}",
+            {
+              "SourceResourceId": {
+                "Fn::GetAtt": [
+                  "SuperCoolAPI",
+                  "ApiId"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    }
+  }
+}

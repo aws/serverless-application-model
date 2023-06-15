@@ -86,6 +86,99 @@
       "title": "ApiAuth",
       "type": "object"
     },
+    "ApiKey": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiKeyId": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ExpiresOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "title": "ApiKey",
+      "type": "object"
+    },
+    "Authorizer": {
+      "additionalProperties": false,
+      "properties": {
+        "LambdaAuthorizer": {
+          "$ref": "#/definitions/LambdaAuthorizerConfig"
+        },
+        "OpenIDConnect": {
+          "$ref": "#/definitions/OpenIDConnectConfig"
+        },
+        "Type": {
+          "enum": [
+            "AWS_IAM",
+            "API_KEY",
+            "AWS_LAMBDA",
+            "OPENID_CONNECT",
+            "AMAZON_COGNITO_USER_POOLS"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "UserPool": {
+          "$ref": "#/definitions/UserPoolConfig"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "title": "Authorizer",
+      "type": "object"
+    },
+    "Cache": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiCachingBehavior": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "AtRestEncryptionEnabled": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "TransitEncryptionEnabled": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Ttl": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Type": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "ApiCachingBehavior",
+        "Ttl",
+        "Type"
+      ],
+      "title": "Cache",
+      "type": "object"
+    },
+    "Caching": {
+      "additionalProperties": false,
+      "properties": {
+        "CachingKeys": {
+          "items": {
+            "$ref": "#/definitions/PassThroughProp"
+          },
+          "title": "Cachingkeys",
+          "type": "array"
+        },
+        "Ttl": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Ttl"
+      ],
+      "title": "Caching",
+      "type": "object"
+    },
     "CloudWatchLogsEvent": {
       "additionalProperties": false,
       "properties": {
@@ -415,6 +508,27 @@
       "title": "Cors",
       "type": "object"
     },
+    "DataSources": {
+      "additionalProperties": false,
+      "properties": {
+        "DynamoDb": {
+          "additionalProperties": {
+            "$ref": "#/definitions/DynamoDBDataSource"
+          },
+          "title": "Dynamodb",
+          "type": "object"
+        },
+        "Lambda": {
+          "additionalProperties": {
+            "$ref": "#/definitions/LambdaDataSource"
+          },
+          "title": "Lambda",
+          "type": "object"
+        }
+      },
+      "title": "DataSources",
+      "type": "object"
+    },
     "DeadLetterQueue": {
       "additionalProperties": false,
       "properties": {
@@ -438,6 +552,30 @@
         "Type"
       ],
       "title": "DeadLetterQueue",
+      "type": "object"
+    },
+    "DeltaSync": {
+      "additionalProperties": false,
+      "properties": {
+        "BaseTableTTL": {
+          "title": "Basetablettl",
+          "type": "string"
+        },
+        "DeltaSyncTableName": {
+          "title": "Deltasynctablename",
+          "type": "string"
+        },
+        "DeltaSyncTableTTL": {
+          "title": "Deltasynctablettl",
+          "type": "string"
+        }
+      },
+      "required": [
+        "BaseTableTTL",
+        "DeltaSyncTableName",
+        "DeltaSyncTableTTL"
+      ],
+      "title": "DeltaSync",
       "type": "object"
     },
     "DeploymentPreference": {
@@ -680,6 +818,75 @@
         "SourceAccessConfigurations"
       ],
       "title": "DocumentDBEventProperties",
+      "type": "object"
+    },
+    "DomainName": {
+      "additionalProperties": false,
+      "properties": {
+        "CertificateArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DomainName": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "CertificateArn",
+        "DomainName"
+      ],
+      "title": "DomainName",
+      "type": "object"
+    },
+    "DynamoDBDataSource": {
+      "additionalProperties": false,
+      "properties": {
+        "DeltaSync": {
+          "$ref": "#/definitions/DeltaSync"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "Permissions": {
+          "items": {
+            "enum": [
+              "Read",
+              "Write"
+            ],
+            "type": "string"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "Region": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ServiceRoleArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "TableArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "TableName": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "UseCallerCredentials": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Versioned": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "TableName"
+      ],
+      "title": "DynamoDBDataSource",
       "type": "object"
     },
     "DynamoDBEvent": {
@@ -1146,6 +1353,49 @@
         }
       },
       "title": "EventsScheduleProperties",
+      "type": "object"
+    },
+    "Function": {
+      "additionalProperties": false,
+      "properties": {
+        "CodeUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DataSource": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Datasource"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Id": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "InlineCode": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "MaxBatchSize": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        },
+        "Sync": {
+          "$ref": "#/definitions/Sync"
+        }
+      },
+      "title": "Function",
       "type": "object"
     },
     "FunctionUrlConfig": {
@@ -1620,6 +1870,25 @@
       "title": "LambdaAuthorizer",
       "type": "object"
     },
+    "LambdaAuthorizerConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizerResultTtlInSeconds": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "AuthorizerUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "IdentityValidationExpression": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "AuthorizerUri"
+      ],
+      "title": "LambdaAuthorizerConfig",
+      "type": "object"
+    },
     "LambdaAuthorizerIdentity": {
       "additionalProperties": false,
       "properties": {
@@ -1662,6 +1931,42 @@
         }
       },
       "title": "LambdaAuthorizerIdentity",
+      "type": "object"
+    },
+    "LambdaConflictHandlerConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "LambdaConflictHandlerArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "LambdaConflictHandlerArn"
+      ],
+      "title": "LambdaConflictHandlerConfig",
+      "type": "object"
+    },
+    "LambdaDataSource": {
+      "additionalProperties": false,
+      "properties": {
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FunctionArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "ServiceRoleArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "FunctionArn"
+      ],
+      "title": "LambdaDataSource",
       "type": "object"
     },
     "LambdaRequestAuthorizer": {
@@ -1891,6 +2196,23 @@
         "SemanticVersion"
       ],
       "title": "Location",
+      "type": "object"
+    },
+    "Logging": {
+      "additionalProperties": false,
+      "properties": {
+        "CloudWatchLogsRoleArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ExcludeVerboseContent": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FieldLogLevel": {
+          "title": "Fieldloglevel",
+          "type": "string"
+        }
+      },
+      "title": "Logging",
       "type": "object"
     },
     "MQEvent": {
@@ -2146,6 +2468,25 @@
       "title": "OAuth2Authorizer",
       "type": "object"
     },
+    "OpenIDConnectConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthTTL": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ClientId": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "IatTTL": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Issuer": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "title": "OpenIDConnectConfig",
+      "type": "object"
+    },
     "PassThroughProp": {},
     "PrimaryKey": {
       "additionalProperties": false,
@@ -2253,6 +2594,42 @@
       "title": "RequestParameters",
       "type": "object"
     },
+    "Resolver": {
+      "additionalProperties": false,
+      "properties": {
+        "Caching": {
+          "$ref": "#/definitions/Caching"
+        },
+        "CodeUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FieldName": {
+          "title": "Fieldname",
+          "type": "string"
+        },
+        "InlineCode": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "MaxBatchSize": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Pipeline": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Pipeline",
+          "type": "array"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        },
+        "Sync": {
+          "$ref": "#/definitions/Sync"
+        }
+      },
+      "title": "Resolver",
+      "type": "object"
+    },
     "ResourceReference": {
       "additionalProperties": false,
       "properties": {
@@ -2322,6 +2699,23 @@
         }
       },
       "title": "ResourceReference",
+      "type": "object"
+    },
+    "Runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Version": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Name",
+        "Version"
+      ],
+      "title": "Runtime",
       "type": "object"
     },
     "S3Event": {
@@ -2843,6 +3237,25 @@
       "title": "SqsSubscription",
       "type": "object"
     },
+    "Sync": {
+      "additionalProperties": false,
+      "properties": {
+        "ConflictDetection": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ConflictHandler": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "LambdaConflictHandlerConfig": {
+          "$ref": "#/definitions/LambdaConflictHandlerConfig"
+        }
+      },
+      "required": [
+        "ConflictDetection"
+      ],
+      "title": "Sync",
+      "type": "object"
+    },
     "UsagePlan": {
       "additionalProperties": false,
       "properties": {
@@ -2913,6 +3326,28 @@
         "CreateUsagePlan"
       ],
       "title": "UsagePlan",
+      "type": "object"
+    },
+    "UserPoolConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AppIdClientRegex": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "AwsRegion": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DefaultAction": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "UserPoolId": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "UserPoolId"
+      ],
+      "title": "UserPoolConfig",
       "type": "object"
     },
     "__main____Globals": {
@@ -6001,6 +6436,139 @@
       "title": "ScheduleV2EventProperties",
       "type": "object"
     },
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth": {
+      "additionalProperties": false,
+      "properties": {
+        "Additional": {
+          "items": {
+            "$ref": "#/definitions/Authorizer"
+          },
+          "title": "Additional",
+          "type": "array"
+        },
+        "LambdaAuthorizer": {
+          "$ref": "#/definitions/LambdaAuthorizerConfig"
+        },
+        "OpenIDConnect": {
+          "$ref": "#/definitions/OpenIDConnectConfig"
+        },
+        "Type": {
+          "enum": [
+            "AWS_IAM",
+            "API_KEY",
+            "AWS_LAMBDA",
+            "OPENID_CONNECT",
+            "AMAZON_COGNITO_USER_POOLS"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "UserPool": {
+          "$ref": "#/definitions/UserPoolConfig"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "title": "Auth",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiKeys": {
+          "additionalProperties": {
+            "$ref": "#/definitions/ApiKey"
+          },
+          "title": "Apikeys",
+          "type": "object"
+        },
+        "Auth": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
+        },
+        "Cache": {
+          "$ref": "#/definitions/Cache"
+        },
+        "DataSources": {
+          "$ref": "#/definitions/DataSources"
+        },
+        "DomainName": {
+          "$ref": "#/definitions/DomainName"
+        },
+        "Functions": {
+          "additionalProperties": {
+            "$ref": "#/definitions/Function"
+          },
+          "title": "Functions",
+          "type": "object"
+        },
+        "Logging": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Logging"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Logging"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "Resolvers": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "$ref": "#/definitions/Resolver"
+            },
+            "type": "object"
+          },
+          "title": "Resolvers",
+          "type": "object"
+        },
+        "SchemaInline": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "SchemaUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Tags": {
+          "title": "Tags",
+          "type": "object"
+        },
+        "XrayEnabled": {
+          "title": "Xrayenabled",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "Auth"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::GraphQLApi"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
     "samtranslator__internal__schema_source__aws_serverless_httpapi__Auth": {
       "additionalProperties": false,
       "properties": {
@@ -7693,6 +8261,9 @@
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_application__Resource"
+          },
+          {
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource"
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__any_cfn_resource__Resource"

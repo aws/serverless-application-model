@@ -1,0 +1,9 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SuperDuperCoolAPI
+      Auth:
+        Type: AWS_IAM
+      SchemaUri: https://bucket-name.s3.region-code.amazonaws.com/key-name

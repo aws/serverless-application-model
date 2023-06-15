@@ -1,0 +1,132 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            console.log('Received event {}', JSON.stringify(event, 3))
+
+            const posts = {
+              1: { id: '1', title: 'First book', author: 'Author1', content: 'Book 1 has this content', ups: '100', downs: '10', },
+            }
+
+            console.log('Got an Invoke Request.')
+            let result
+            switch (event.field) {
+              case 'getPost':
+                return posts[event.arguments.id]
+              case 'addPost':
+                // return the arguments back
+                return event.arguments
+              default:
+                throw new Error('Unknown field, unable to resolve ' + event.field)
+            }
+          }
+
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: AppendToLogsPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: '*'
+
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: MyApi
+      SchemaInline: |
+        schema {
+            query: Query
+            mutation: Mutation
+        }
+        type Query {
+            getPost(id:ID!): Post
+        }
+        type Mutation {
+            addPost(id: ID!, author: String!, title: String, content: String): Post!
+        }
+        type Post {
+            id: ID!
+            author: String!
+            title: String
+            content: String
+            ups: Int
+            downs: Int
+        }
+      Auth:
+        Type: API_KEY
+      ApiKeys:
+        MyApiKey:
+          Description: my api key
+      DataSources:
+        Lambda:
+          MyLambdaDataSource:
+            FunctionArn: !GetAtt MyLambdaFunction.Arn
+      Functions:
+        lambdaInvoker:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: MyLambdaDataSource
+          InlineCode: |
+            import { util } from '@aws-appsync/utils';
+
+            export function request(ctx) {
+              const {source, args} = ctx
+              return {
+                operation: 'Invoke',
+                payload: { field: ctx.info.fieldName, arguments: args, source },
+              };
+            }
+
+            export function response(ctx) {
+              return ctx.result;
+            }
+      Resolvers:
+        Mutation:
+          addPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+            - lambdaInvoker
+        Query:
+          getPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+            - lambdaInvoker
+
+Outputs:
+  SuperCoolAPI:
+    Description: AppSync API
+    Value: !GetAtt SuperCoolAPI.GraphQLUrl
+  SuperCoolAPIMyApiKey:
+    Description: API Key for authentication
+    Value: !GetAtt SuperCoolAPIMyApiKey.ApiKey
+Metadata:
+  SamTransformTest: true
