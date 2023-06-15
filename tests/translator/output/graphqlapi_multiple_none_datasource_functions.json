@@ -1,0 +1,163 @@
+{
+  "Resources": {
+    "SuperCoolAPI": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "LogConfig": {
+          "CloudWatchLogsRoleArn": {
+            "Fn::GetAtt": [
+              "SuperCoolAPICloudWatchRole",
+              "Arn"
+            ]
+          },
+          "FieldLogLevel": "ALL"
+        },
+        "Name": "SomeApi"
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "SuperCoolAPIAnotherFunction": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CodeS3Location": "my-code-uri",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPINoneDataSource",
+            "Name"
+          ]
+        },
+        "Name": "AnotherFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "SuperCoolAPICloudWatchRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIGoodFunction": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CodeS3Location": "my-code-uri",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPINoneDataSource",
+            "Name"
+          ]
+        },
+        "Name": "GoodFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "SuperCoolAPIMyFunction": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CodeS3Location": "my-code-uri",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPINoneDataSource",
+            "Name"
+          ]
+        },
+        "Name": "MyFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "SuperCoolAPINoneDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Name": "SuperCoolAPINoneDataSource",
+        "Type": "NONE"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    },
+    "SuperCoolAPISimilarFunction": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CodeS3Location": "my-code-uri",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPINoneDataSource",
+            "Name"
+          ]
+        },
+        "Name": "SimilarFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    }
+  }
+}

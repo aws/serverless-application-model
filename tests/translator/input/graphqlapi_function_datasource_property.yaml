@@ -1,0 +1,57 @@
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  HarcodedDataSourceName:
+    Type: String
+    Description: Harcoded Data Source name
+
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      DataSources:
+        DynamoDb:
+          InternalDataSource:
+            TableName: SomeTable
+            ServiceRoleArn: SomeRoleArn
+      Functions:
+        UseInternal:
+          InlineCode: this is my epic code
+          DataSource: InternalDataSource
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+        UseAppSync:
+          InlineCode: this is my epic code
+          DataSource: !GetAtt AppSyncHttpDataSource.Name
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+        UseHardcoded:
+          CodeUri: my-code-uri
+          DataSource: !Sub '${HarcodedDataSourceName}'
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+        UseImported:
+          CodeUri: my-code-uri
+          DataSource: !ImportValue SomeSharedDataSourceName
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+
+  AppSyncHttpDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt SuperCoolAPI.ApiId
+      Name: AppSyncHttpDataSource
+      Type: HTTP
+      HttpConfig:
+        Endpoint: https://test-generator.ai

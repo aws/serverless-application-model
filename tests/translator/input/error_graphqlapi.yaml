@@ -1,0 +1,496 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # ===== AppSync Function =====
+  MyFunction:
+    Type: AWS::AppSync::FunctionConfiguration
+    Properties:
+      ApiId: some-api-id
+      Code: this is my epic code
+      DataSourceName: some-cool-datasource
+      Name: MyFunction
+      Runtime:
+        Name: some-runtime
+        RuntimeVersion: 1.2.3
+
+  # ===== SAM Error Resources =====
+  NoAuthAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      XrayEnabled: true
+      Tags:
+        Key1: Value1
+        Key2: Value2
+
+  NoSchemaPropertiesAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+
+  BothSchemaInlineAndUriAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      SchemaUri: https://bucket-name.s3.region-code.amazonaws.com/key-name
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+
+  GraphQLApiInvalidFieldInLogging:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      Logging:
+        CloudWatchLogsRoleArn: some-arn
+        FieldLogLevel: ERROR
+        ExcludeVerboseContent: true
+        NotSupposedToBeHere: yo
+
+  DataSourceNoServiceRoleArnOrTableArn:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      DataSources:
+        DynamoDb:
+          MyDataSource:
+            TableName: some-table
+
+  IdDefinedWithOtherProperties:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      DataSources:
+        DynamoDb:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
+      Functions:
+        IdNotMutuallyExclusive:
+          Id: some-id
+          DataSource: MyDataSource
+
+  BothInlineCodeAndCodeUriDefined:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      DataSources:
+        DynamoDb:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
+      Functions:
+        BothCodeProperties:
+          DataSource: MyDataSource
+          InlineCode: blahblahblah
+          CodeUri: MyCodeUri
+          Runtime:
+            Name: some-name
+            Version: 1.2.3
+
+  NoDataSource:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      Functions:
+        NoDataSourceProperties:
+          CodeUri: my-code
+
+  UnknownDataSource:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      DataSources:
+        DynamoDb:
+          InternalDataSource:
+            TableName: SomeTable
+            ServiceRoleArn: SomeRoleArn
+      Functions:
+        UnknownDataSource:
+          CodeUri: my-code
+          DataSource: HardCodedDataSource
+
+  NeitherInlineCodeNorCodeUriDefined:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      DataSources:
+        DynamoDb:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
+      Functions:
+        BothCodeProperties:
+          DataSource: MyDataSource
+
+  RuntimeNotDefined:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      DataSources:
+        DynamoDb:
+          MyDataSource:
+            TableName: some-table
+            TableArn: big-arn
+      Functions:
+        NoRuntime:
+          DataSource: MyDataSource
+          InlineCode: blahblahblah
+
+  ResolverFunctionDoesNotExist:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Auth:
+        Type: AWS_IAM
+      Functions:
+        MyFunction:
+          CodeUri: my-code-uri
+          DataSource: !ImportValue SomeDataSourceName
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+      Resolvers:
+        Mutation:
+          ReferenceFunctionThatDoesNotExist:
+            InlineCode: blahblahblah
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Pipeline:
+            - ThisFunctionDoesntExist
+
+  ResolverWithNoFunctions:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      Resolvers:
+        Mutation:
+          HasNoFunctions:
+            InlineCode: blahblahblah
+            FieldName: my_field
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+
+  ResolverBothCodePropertiesDefined:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      Resolvers:
+        Mutation:
+          BothCodePropertiesDefined:
+            InlineCode: blahblahblah
+            CodeUri: somecodeuri
+            FieldName: my_field
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Pipeline:
+            - MyFunction
+      Functions:
+        MyFunction:
+          DataSource: NONE
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+          InlineCode: this is my epic code
+
+  ResolverBothDatasourcePropertiesDefined:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      Resolvers:
+        Mutation:
+          BothDatasourcePropertiesDefined:
+            FieldName: my_field
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Pipeline:
+            - MyFunction
+      Functions:
+        MyFunction:
+          DataSource: NONE
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+          InlineCode: this is my epic code
+
+  ResolverWithNoRuntime:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      Resolvers:
+        Mutation:
+          NoRuntimeForResolver:
+            FieldName: my_field
+            Pipeline:
+            - MyFunction
+      Functions:
+        MyFunction:
+          DataSource: NONE
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+          InlineCode: this is my epic code
+
+  MultipleAuthConfigs:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_LAMBDA
+        LambdaAuthorizer:
+          AuthorizerUri: blah
+          AuthorizerResultTtlInSeconds: 10
+          IdentityValidationExpression: hello
+        OpenIDConnect:
+          AuthTTL: 10
+          ClientId: myid
+          IatTTL: 10
+          Issuer: prad
+      Tags:
+        key1: value1
+        key2: value2
+
+  MultipleAdditionalAuthConfigs:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: API_KEY
+        Additional:
+          Type: AWS_LAMBDA
+          LambdaAuthorizer:
+            AuthorizerUri: blah
+            AuthorizerResultTtlInSeconds: 10
+            IdentityValidationExpression: hello
+          OpenIDConnect:
+            AuthTTL: 10
+            ClientId: myid
+            IatTTL: 10
+            Issuer: prad
+      Tags:
+        key1: value1
+        key2: value2
+
+  AuthTypeLambdaAuthorizerWithNoConfig:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_LAMBDA
+      Tags:
+        key1: value1
+        key2: value2
+
+  AdditionalAuthTypeLambdaAuthorizerWithNoConfig:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: API_KEY
+        Additional:
+          Type: AWS_LAMBDA
+      Tags:
+        key1: value1
+        key2: value2
+
+  AuthTypeOpenIDWithNoConfig:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: OPENID_CONNECT
+      Tags:
+        key1: value1
+        key2: value2
+
+  AdditionalAuthTypeOpenIDWithNoConfig:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: API_KEY
+        Additional:
+          Type: OPENID_CONNECT
+      Tags:
+        key1: value1
+        key2: value2
+
+  AuthTypeUserPoolWithNoConfig:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AMAZON_COGNITO_USER_POOLS
+      Tags:
+        key1: value1
+        key2: value2
+
+  AdditionalAuthUserPoolWithNoConfig:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: API_KEY
+        Additional:
+          Type: AMAZON_COGNITO_USER_POOLS
+      Tags:
+        key1: value1
+        key2: value2
+
+  NotAnAuthType:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: PRAD_AUTH
+      Tags:
+        key1: value1
+        key2: value2

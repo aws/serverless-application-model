@@ -1,0 +1,198 @@
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  DDBPutItemCode:
+    Type: String
+    Default: |
+      import { util } from "@aws-appsync/utils";
+
+      export function request(ctx) {
+          const { key, values } = ctx.prev.result;
+          return {
+            operation: "PutItem",
+            key: util.dynamodb.toMapValues(key),
+            attributeValues: util.dynamodb.toMapValues(values),
+          };
+      }
+
+      export function response(ctx) {
+          return ctx.result;
+      }
+
+Resources:
+  MyApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt SuperCoolAPI.ApiId
+
+  DynamoDBPostsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  DynamoDBPostsLogTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: PradsApi
+      SchemaInline: |
+        schema {
+            query: Query
+            mutation: Mutation
+        }
+
+        type Query {
+            getPost(id: String!): Post
+        }
+
+        type Mutation {
+            addPost(
+            author: String!,
+            title: String!,
+            content: String!,
+            ): Post!
+        }
+
+        type Post {
+            id: String!
+            author: String
+            title: String
+            content: String
+            ups: Int!
+            downs: Int!
+            version: Int!
+        }
+      Auth:
+        Type: API_KEY
+      DataSources:
+        DynamoDb:
+          PostsDataSource:
+            TableName: !Ref DynamoDBPostsTable
+            TableArn: !GetAtt DynamoDBPostsTable.Arn
+          PostsLogDataSource:
+            TableName: !Ref DynamoDBPostsLogTable
+            TableArn: !GetAtt DynamoDBPostsLogTable.Arn
+      Functions:
+        createPostItem:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: PostsDataSource
+          InlineCode: !Ref DDBPutItemCode
+        createPostLogItem:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: PostsLogDataSource
+          InlineCode: !Ref DDBPutItemCode
+        formatPostLogItem:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: NONE
+          InlineCode: |
+            import { util } from '@aws-appsync/utils';
+
+            export function request(ctx) {
+              const id = util.autoId();
+              const author = ctx.args.author
+              const time = "1234567890"
+              return { payload: { key: {id}, values: {"author": author, "time": time} } };
+            }
+
+            export function response(ctx) {
+              return ctx.result;
+            }
+        formatPostItem:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: NONE
+          InlineCode: |
+            import { util } from '@aws-appsync/utils';
+
+            export function request(ctx) {
+              const id = util.autoId();
+              const { ...values } = ctx.args;
+              values.ups = 1;
+              values.downs = 0;
+              values.version = 1;
+              return { payload: { key: {id}, values: values } } 
+            }
+
+            export function response(ctx) {
+              return ctx.result;
+            }
+        getPostFromTable:
+          DataSource: PostsDataSource
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          InlineCode: |
+            import { util } from '@aws-appsync/utils';
+
+            export function request(ctx) {
+              return dynamoDBGetItemRequest({ id: ctx.args.id });
+            }
+
+            export function response(ctx) {
+              return ctx.result;
+            }
+
+            /**
+            * A helper function to get a DynamoDB item
+            */
+            function dynamoDBGetItemRequest(key) {
+              return {
+                operation: 'GetItem',
+                key: util.dynamodb.toMapValues(key),
+              };
+            }
+      Resolvers:
+        Mutation:
+          addPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+            - formatPostLogItem
+            - createPostLogItem
+            - formatPostItem
+            - createPostItem
+        Query:
+          getPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+            - getPostFromTable
+
+Outputs:
+  SuperCoolAPI:
+    Description: AppSync API
+    Value: !GetAtt SuperCoolAPI.GraphQLUrl
+  MyApiKey:
+    Description: API Key for authentication
+    Value: !GetAtt MyApiKey.ApiKey
+Metadata:
+  SamTransformTest: true
