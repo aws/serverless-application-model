@@ -1,0 +1,62 @@
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  StateMachine:
+    PropagateTags: true
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+  Post:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Tags:
+        Key1: Value1
+        Key2: Value2
+      Policies:
+      - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+      Definition:
+        StartAt: One
+        States:
+          One:
+            Type: Task
+            Resource: random-resource
+            End: true
+      Events:
+        PostEcho:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /echo
+            Method: POST
+            UnescapeMappingTemplate: true
+
+        ScheduleEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Name: TestSchedule
+
+  Post2:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Tags:
+        Key3: Value3
+        Key4: Value4
+      Policies:
+      - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+      Definition:
+        StartAt: One
+        States:
+          One:
+            Type: Task
+            Resource: random-resource
+            End: true
+      Events:
+        PostEcho2:
+          Type: Api
+          Properties:
+            Path: /echo
+            Method: POST

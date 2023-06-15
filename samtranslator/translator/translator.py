@@ -154,6 +154,7 @@ class Translator:
         mappings_resolver = IntrinsicsResolver(
             template.get("Mappings", {}), {FindInMapAction.intrinsic_name: FindInMapAction()}
         )
+
         deployment_preference_collection = DeploymentPreferenceCollection()
         supported_resource_refs = SupportedResourceReferences()
         shared_api_usage_plan = SharedApiUsagePlan()

@@ -1,0 +1,470 @@
+{
+  "Resources": {
+    "CloudWatchLambdaLogsGroup": {
+      "Properties": {
+        "RetentionInDays": 7
+      },
+      "Type": "AWS::Logs::LogGroup"
+    },
+    "Images": {
+      "DependsOn": [
+        "MyAwesomeFunctionS3TriggerPermission"
+      ],
+      "Properties": {
+        "NotificationConfiguration": {
+          "LambdaConfigurations": [
+            {
+              "Event": "s3:ObjectCreated:*",
+              "Function": {
+                "Ref": "MyAwesomeFunctionAliasLive"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::S3::Bucket"
+    },
+    "MyAwesomeFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyAwesomeFunctionAliasLive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyAwesomeFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionVersionbd19bb9f99",
+            "Version"
+          ]
+        },
+        "Name": "Live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "MyAwesomeFunctionApiEventPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/hello",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyAwesomeFunctionCWEvent": {
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "state": [
+              "terminated"
+            ]
+          }
+        },
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "MyAwesomeFunctionAliasLive"
+            },
+            "Id": "MyAwesomeFunctionCWEventLambdaTarget"
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "MyAwesomeFunctionCWEventPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionCWEvent",
+            "Arn"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyAwesomeFunctionCWLog": {
+      "DependsOn": [
+        "MyAwesomeFunctionCWLogPermission"
+      ],
+      "Properties": {
+        "DestinationArn": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "FilterPattern": "My pattern",
+        "LogGroupName": {
+          "Ref": "CloudWatchLambdaLogsGroup"
+        }
+      },
+      "Type": "AWS::Logs::SubscriptionFilter"
+    },
+    "MyAwesomeFunctionCWLogPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "Principal": "logs.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:${__LogGroupName__}:*",
+            {
+              "__LogGroupName__": {
+                "Ref": "CloudWatchLambdaLogsGroup"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyAwesomeFunctionDDBStream": {
+      "Properties": {
+        "BatchSize": 200,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MyDynamoDB",
+            "StreamArn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "MaximumBatchingWindowInSeconds": 20,
+        "StartingPosition": "LATEST"
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyAwesomeFunctionImplicitApiPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/path",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessHttpApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyAwesomeFunctionIoTRule": {
+      "Properties": {
+        "TopicRulePayload": {
+          "Actions": [
+            {
+              "Lambda": {
+                "FunctionArn": {
+                  "Ref": "MyAwesomeFunctionAliasLive"
+                }
+              }
+            }
+          ],
+          "AwsIotSqlVersion": "beta",
+          "RuleDisabled": false,
+          "Sql": "SELECT * FROM 'topic/test'"
+        }
+      },
+      "Type": "AWS::IoT::TopicRule"
+    },
+    "MyAwesomeFunctionIoTRulePermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "Principal": "iot.amazonaws.com",
+        "SourceAccount": {
+          "Fn::Sub": "${AWS::AccountId}"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:iot:${AWS::Region}:${AWS::AccountId}:rule/${RuleName}",
+            {
+              "RuleName": {
+                "Ref": "MyAwesomeFunctionIoTRule"
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyAwesomeFunctionKinesisStream": {
+      "Properties": {
+        "BatchSize": 100,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MyStream",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "MaximumBatchingWindowInSeconds": 20,
+        "StartingPosition": "TRIM_HORIZON"
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyAwesomeFunctionNotificationTopic": {
+      "Properties": {
+        "Endpoint": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "Protocol": "lambda",
+        "TopicArn": {
+          "Ref": "Notifications"
+        }
+      },
+      "Type": "AWS::SNS::Subscription"
+    },
+    "MyAwesomeFunctionNotificationTopicPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "Principal": "sns.amazonaws.com",
+        "SourceArn": {
+          "Ref": "Notifications"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyAwesomeFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyAwesomeFunctionS3TriggerPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyAwesomeFunctionVersionbd19bb9f99": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyAwesomeFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "MyDynamoDB": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "StreamSpecification": {
+          "StreamViewType": "NEW_IMAGE"
+        }
+      },
+      "Type": "AWS::DynamoDB::Table"
+    },
+    "MyStream": {
+      "Properties": {
+        "ShardCount": 1
+      },
+      "Type": "AWS::Kinesis::Stream"
+    },
+    "Notifications": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "ServerlessHttpApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {
+            "/path": {
+              "get": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "payloadFormatVersion": "1.0",
+                  "timeoutInMillis": 15000,
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyAwesomeFunctionAliasLive}/invocations"
+                  }
+                }
+              }
+            }
+          },
+          "tags": [
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "ServerlessHttpApiApiGatewayDefaultStage": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "ServerlessHttpApi"
+        },
+        "AutoDeploy": true,
+        "StageName": "$default",
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    },
+    "ServerlessRestApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/hello": {
+              "get": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyAwesomeFunctionAliasLive}/invocations"
+                  }
+                }
+              }
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ServerlessRestApiDeployment2707c63e7b": {
+      "Properties": {
+        "Description": "RestApi deployment id: 2707c63e7b2c18ba386dc76aa42d85a262030780",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ServerlessRestApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment2707c63e7b"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    }
+  }
+}

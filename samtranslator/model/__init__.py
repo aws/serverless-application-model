@@ -14,7 +14,7 @@ from samtranslator.model.exceptions import (
     InvalidResourcePropertyTypeException,
 )
 from samtranslator.model.tags.resource_tagging import get_tag_list
-from samtranslator.model.types import IS_DICT, IS_STR, Validator, any_type, is_type
+from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
 
 RT = TypeVar("RT", bound=BaseModel)  # return type
@@ -126,6 +126,7 @@ class Resource(ABC):
     # are in "property_types" or "_keywords". We can set this to False in the inheriting class definition so we can
     # update other class variables as well after instantiation.
     validate_setattr: bool = True
+    Tags: Optional[PassThrough]
 
     def __init__(
         self,
@@ -431,6 +432,19 @@ class Resource(ABC):
                 attributes[resource_attribute] = self.resource_attributes.get(resource_attribute)
         return attributes
 
+    def assign_tags(self, tags: Dict[str, Any]) -> None:
+        """
+        Assigns tags to the resource. This function assumes that generated resources always have
+        the tags property called `Tags` that takes a list of key-value objects.
+
+        Override this function if the above assumptions do not apply to the resource (e.g. different
+        property name or type (see e.g. 'AWS::ApiGatewayV2::Api').
+
+        :param tags: Dictionary of tags to be assigned to the resource
+        """
+        if "Tags" in self.property_types:
+            self.Tags = get_tag_list(tags)
+
 
 class ResourceMacro(Resource, metaclass=ABCMeta):
     """A ResourceMacro object represents a CloudFormation macro. A macro appears in the CloudFormation template in the
@@ -533,6 +547,25 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
         # does not change the actual content of the tags, we don't want to trigger update of a resource without
         # customer's knowledge.
         return get_tag_list(sam_tag) + get_tag_list(additional_tags) + get_tag_list(tags)
+
+    @staticmethod
+    def propagate_tags(
+        resources: List[Resource], tags: Optional[Dict[str, Any]], propagate_tags: Optional[bool] = False
+    ) -> None:
+        """
+        Propagates tags to the resources.
+
+        :param propagate_tags: Whether we should pass the tags to generated resources.
+        :param resources: List of generated resources
+        :param tags: dictionary of tags to propagate to the resources.
+
+        :return: None
+        """
+        if not propagate_tags or not tags:
+            return
+
+        for resource in resources:
+            resource.assign_tags(tags)
 
     def _check_tag(self, reserved_tag_name, tags):  # type: ignore[no-untyped-def]
         if reserved_tag_name in tags:

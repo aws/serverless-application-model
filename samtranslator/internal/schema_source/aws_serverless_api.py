@@ -308,6 +308,7 @@ class Properties(BaseModel):
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
     StageName: SamIntrinsicable[str] = properties("StageName")
     Tags: Optional[DictStrAny] = properties("Tags")
+    PropagateTags: Optional[bool]  # TODO: add docs
     TracingEnabled: Optional[TracingEnabled] = passthrough_prop(
         PROPERTIES_STEM,
         "TracingEnabled",
@@ -373,6 +374,7 @@ class Globals(BaseModel):
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
     Domain: Optional[Domain] = properties("Domain")
     AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
+    PropagateTags: Optional[bool]  # TODO: add docs
 
 
 class Resource(ResourceAttributes):

@@ -1,0 +1,35 @@
+Resources:
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: Pass
+            Result: Hello
+            Next: World
+          World:
+            Type: Pass
+            Result: World
+            End: true
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
+      Tags:
+        TagOne: ValueOne
+        TagTwo: ValueTwo
+      Tracing:
+        Enabled: true
+
+Outputs:
+  MyStateMachineArn:
+    Description: ARN of the state machine
+    Value:
+      Ref: MyStateMachine
+Metadata:
+  SamTransformTest: true

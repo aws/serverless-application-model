@@ -32,6 +32,7 @@ class Globals:
             "VpcConfig",
             "Environment",
             "Tags",
+            "PropagateTags",
             "Tracing",
             "KmsKeyArn",
             "AutoPublishAlias",
@@ -76,6 +77,7 @@ class Globals:
             "OpenApiVersion",
             "Domain",
             "AlwaysDeploy",
+            "PropagateTags",
         ],
         SamResourceType.HttpApi.value: [
             "Auth",
@@ -87,8 +89,10 @@ class Globals:
             "Domain",
             "RouteSettings",
             "FailOnWarnings",
+            "PropagateTags",
         ],
         SamResourceType.SimpleTable.value: ["SSESpecification"],
+        SamResourceType.StateMachine.value: ["PropagateTags"],
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {

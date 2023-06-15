@@ -4,12 +4,12 @@
     "Number of errors found: 1. ",
     "'Globals' section is invalid. ",
     "'NewType' is not supported. ",
-    "Must be one of the following values - ['Api', 'Function', 'HttpApi', 'SimpleTable']"
+    "Must be one of the following values - ['Api', 'Function', 'HttpApi', 'SimpleTable', 'StateMachine']"
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. 'Globals' section is invalid. 'NewType' is not supported. Must be one of the following values - ['Api', 'Function', 'HttpApi', 'SimpleTable']",
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. 'Globals' section is invalid. 'NewType' is not supported. Must be one of the following values - ['Api', 'Function', 'HttpApi', 'SimpleTable', 'StateMachine']",
   "errors": [
     {
-      "errorMessage": "'Globals' section is invalid. 'NewType' is not supported. Must be one of the following values - ['Api', 'Function', 'HttpApi', 'SimpleTable']"
+      "errorMessage": "'Globals' section is invalid. 'NewType' is not supported. Must be one of the following values - ['Api', 'Function', 'HttpApi', 'SimpleTable', 'StateMachine']"
     }
   ]
 }

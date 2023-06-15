@@ -1,0 +1,69 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Tags:
+        Key1: Value1
+        Key2: Value2
+      PropagateTags: true
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Events:
+        RestApi:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Path: /iam
+            Auth:
+              Authorizer: AWS_IAM
+
+        PostApi:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: MyHttpApi
+            Method: POST
+            Path: /post
+
+  MyHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Tags:
+        Tag1: value1
+        Tag2: value2
+
+Outputs:
+  ApiArn:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub:
+      - arn:${AWS::Partition}:apigateway:${AWS::Region}::/restapis/${ApiId}
+      - ApiId: !Ref MyApi
+
+  HttpApiArn:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub:
+      - arn:${AWS::Partition}:apigateway:${AWS::Region}::/apis/${ApiId}
+      - ApiId: !Ref MyHttpApi
+Metadata:
+  SamTransformTest: true

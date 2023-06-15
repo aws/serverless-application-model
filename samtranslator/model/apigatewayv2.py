@@ -20,10 +20,22 @@ class ApiGatewayV2HttpApi(Resource):
         "FailOnWarnings": GeneratedProperty(),
         "DisableExecuteApiEndpoint": GeneratedProperty(),
         "BasePath": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
         "CorsConfiguration": GeneratedProperty(),
     }
 
     runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}
+    Tags: Optional[PassThrough]
+
+    def assign_tags(self, tags: Dict[str, Any]) -> None:
+        """Overriding default 'assign_tags' function in Resource class
+
+        Function to assign tags to the resource
+        :param tags: Tags to be assigned to the resource
+
+        """
+        if tags is not None and "Tags" in self.property_types:
+            self.Tags = tags
 
 
 class ApiGatewayV2Stage(Resource):
@@ -42,6 +54,17 @@ class ApiGatewayV2Stage(Resource):
     }
 
     runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
+    Tags: Optional[PassThrough]
+
+    def assign_tags(self, tags: Dict[str, Any]) -> None:
+        """Overriding default 'assign_tags' function in Resource class
+
+        Function to assign tags to the resource
+        :param tags: Tags to be assigned to the resource
+
+        """
+        if tags is not None and "Tags" in self.property_types:
+            self.Tags = tags
 
 
 class ApiGatewayV2DomainName(Resource):
@@ -56,7 +79,17 @@ class ApiGatewayV2DomainName(Resource):
     DomainName: Intrinsicable[str]
     DomainNameConfigurations: Optional[List[Dict[str, Any]]]
     MutualTlsAuthentication: Optional[Dict[str, Any]]
-    Tags: Optional[Dict[str, Any]]
+    Tags: Optional[PassThrough]
+
+    def assign_tags(self, tags: Dict[str, Any]) -> None:
+        """Overriding default 'assign_tags' function in Resource class
+
+        Function to assign tags to the resource
+        :param tags: Tags to be assigned to the resource
+
+        """
+        if tags is not None and "Tags" in self.property_types:
+            self.Tags = tags
 
 
 class ApiGatewayV2ApiMapping(Resource):

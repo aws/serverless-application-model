@@ -3,7 +3,7 @@ from unittest.case import skipIf
 from parameterized import parameterized
 
 from integration.config.service_names import STATE_MACHINE_CWE_CWS
-from integration.helpers.base_test import BaseTest
+from integration.helpers.base_test import BaseTest, nonblocking
 from integration.helpers.common_api import get_policy_statements
 from integration.helpers.resource import current_region_does_not_support
 
@@ -12,6 +12,7 @@ from integration.helpers.resource import current_region_does_not_support
     current_region_does_not_support([STATE_MACHINE_CWE_CWS]),
     "StateMachine CweCws is not supported in this testing region",
 )
+@nonblocking
 class TestStateMachineWithSchedule(BaseTest):
     @parameterized.expand(
         [
