@@ -7,7 +7,6 @@ from parameterized import parameterized
 from integration.config.service_names import (
     ARM,
     CODE_DEPLOY,
-    EPHEMERAL_STORAGE,
     EVENT_INVOKE_CONFIG,
     HTTP_API,
     KMS,
