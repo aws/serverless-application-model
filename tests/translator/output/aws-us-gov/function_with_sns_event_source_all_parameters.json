@@ -32,6 +32,11 @@
           ]
         },
         "FilterPolicy": {
+          "before": {
+            "owner": [
+              "0x0"
+            ]
+          },
           "customer_interests": [
             "rugby",
             "football",
