@@ -68,8 +68,7 @@ fetch-schema-data:
 	rm -rf .tmp/aws-sam-developer-guide
 	git clone --branch main --depth 1 https://github.com/awsdocs/aws-sam-developer-guide.git .tmp/aws-sam-developer-guide
 
-	rm -rf .tmp/aws-cloudformation-user-guide
-	git clone --depth 1 https://github.com/awsdocs/aws-cloudformation-user-guide.git .tmp/aws-cloudformation-user-guide
+	curl -o .tmp/cfn-docs.json https://raw.githubusercontent.com/aws/aws-cdk/main/packages/%40aws-cdk/cfnspec/spec-source/cfn-docs/cfn-docs.json
 
 	curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
 
