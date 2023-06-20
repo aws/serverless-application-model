@@ -66,7 +66,7 @@ fetch-schema-data:
 	mkdir -p .tmp
 
 	rm -rf .tmp/aws-sam-developer-guide
-	git clone --depth 1 https://github.com/awsdocs/aws-sam-developer-guide.git .tmp/aws-sam-developer-guide
+	git clone --branch main --depth 1 https://github.com/awsdocs/aws-sam-developer-guide.git .tmp/aws-sam-developer-guide
 
 	rm -rf .tmp/aws-cloudformation-user-guide
 	git clone --depth 1 https://github.com/awsdocs/aws-cloudformation-user-guide.git .tmp/aws-cloudformation-user-guide
