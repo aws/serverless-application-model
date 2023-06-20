@@ -7,40 +7,25 @@ To this format:
 
 Originally used https://github.com/awsdocs/aws-cloudformation-user-guide, but switched since retired.
 See https://aws.amazon.com/blogs/aws/retiring-the-aws-documentation-on-github/
+
+Expects input from stdin; outputs to stdout.
 """
 
-import argparse
 import json
-from pathlib import Path
+import sys
 from typing import Any, Dict
 
 
-def convert(obj: Dict[str, Any]) -> Dict[str, Any]:
-    out = {
-        "properties": {},
-    }
+def main() -> None:
+    obj = json.load(sys.stdin)
 
+    out: Dict[str, Any] = {"properties": {}}
     for k, v in obj["Types"].items():
         kk = k.replace(".", " ")
         vv = v["properties"]
         out["properties"][kk] = vv
 
-    return out
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--docs", type=Path, required=True)
-    args = parser.parse_args()
-
-    obj = json.loads(args.docs.read_text())
-    print(
-        json.dumps(
-            convert(obj),
-            indent=2,
-            sort_keys=True,
-        )
-    )
+    print(json.dumps(out, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":
