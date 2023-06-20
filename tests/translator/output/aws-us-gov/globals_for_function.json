@@ -49,12 +49,12 @@
             "Value": "SAM"
           },
           {
-            "Key": "tag1",
-            "Value": "value1"
-          },
-          {
             "Key": "newtag1",
             "Value": "newvalue1"
+          },
+          {
+            "Key": "tag1",
+            "Value": "value1"
           }
         ],
         "Timeout": 100,
@@ -117,12 +117,12 @@
             "Value": "SAM"
           },
           {
-            "Key": "tag1",
-            "Value": "value1"
-          },
-          {
             "Key": "newtag1",
             "Value": "newvalue1"
+          },
+          {
+            "Key": "tag1",
+            "Value": "value1"
           }
         ]
       },
