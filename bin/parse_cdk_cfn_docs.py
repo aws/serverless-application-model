@@ -12,7 +12,7 @@ See https://aws.amazon.com/blogs/aws/retiring-the-aws-documentation-on-github/
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 def convert(obj: Dict[str, Any]) -> Dict[str, Any]:
