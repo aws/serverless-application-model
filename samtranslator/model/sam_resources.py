@@ -198,7 +198,7 @@ class SamFunction(SamResourceMacro):
     Events: Optional[Dict[str, Any]]
     Tags: Optional[Dict[str, Any]]
     PropagateTags: Optional[bool]
-    Tracing: Optional[Dict[str, Any]]
+    Tracing: Optional[Intrinsicable[str]]
     KmsKeyArn: Optional[Intrinsicable[str]]
     DeploymentPreference: Optional[Dict[str, Any]]
     ReservedConcurrentExecutions: Optional[Any]

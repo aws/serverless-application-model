@@ -1,0 +1,427 @@
+{
+  "Parameters": {
+    "TracingParamActive": {
+      "Default": "Active",
+      "Type": "String"
+    },
+    "TracingParamPassThrough": {
+      "Default": "PassThrough",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "ActiveIntrinsicTracingFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n    return {\n      statusCode: 200,\n      body: 'Success'\n    }\n  }\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "ActiveIntrinsicTracingFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "TracingConfig": {
+          "Mode": {
+            "Ref": "TracingParamActive"
+          }
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "ActiveIntrinsicTracingFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
+          "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ActiveTracingFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n    return {\n      statusCode: 200,\n      body: 'Success'\n    }\n  }\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "ActiveTracingFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "TracingConfig": {
+          "Mode": "Active"
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "ActiveTracingFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
+          "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "EmptyTracingFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n    return {\n      statusCode: 200,\n      body: 'Success'\n    }\n  }\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "EmptyTracingFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "EmptyTracingFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
+          "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "NumberValueTracingFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n    return {\n      statusCode: 200,\n      body: 'Success'\n    }\n  }\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "NumberValueTracingFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "TracingConfig": {
+          "Mode": "123"
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "NumberValueTracingFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
+          "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "PassThroughIntrinsicTracingFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n    return {\n      statusCode: 200,\n      body: 'Success'\n    }\n  }\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "PassThroughIntrinsicTracingFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "TracingConfig": {
+          "Mode": {
+            "Ref": "TracingParamPassThrough"
+          }
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "PassThroughIntrinsicTracingFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
+          "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "PassThroughTracingFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n    return {\n      statusCode: 200,\n      body: 'Success'\n    }\n  }\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "PassThroughTracingFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "TracingConfig": {
+          "Mode": "PassThrough"
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "PassThroughTracingFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
+          "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "RandomValueTracingFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n    return {\n      statusCode: 200,\n      body: 'Success'\n    }\n  }\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "RandomValueTracingFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "TracingConfig": {
+          "Mode": "Hi"
+        }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "RandomValueTracingFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
+          "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
