@@ -49,12 +49,12 @@
             "Value": "SAM"
           },
           {
-            "Key": "newtag1",
-            "Value": "newvalue1"
-          },
-          {
             "Key": "tag1",
             "Value": "value1"
+          },
+          {
+            "Key": "newtag1",
+            "Value": "newvalue1"
           }
         ],
         "Timeout": 100,
@@ -108,7 +108,6 @@
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ],
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary",
@@ -118,12 +117,12 @@
             "Value": "SAM"
           },
           {
-            "Key": "newtag1",
-            "Value": "newvalue1"
-          },
-          {
             "Key": "tag1",
             "Value": "value1"
+          },
+          {
+            "Key": "newtag1",
+            "Value": "newvalue1"
           }
         ]
       },

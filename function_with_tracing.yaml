@@ -1,0 +1,135 @@
+Parameters:
+  TracingParamPassThrough:
+    Type: String
+    Default: PassThrough
+  TracingParamActive:
+    Type: String
+    Default: Active
+
+Resources:
+  RandomValueTracingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+            return {
+              statusCode: 200,
+              body: 'Success'
+            }
+          }
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+      Tracing: Hi
+
+  NumberValueTracingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+            return {
+              statusCode: 200,
+              body: 'Success'
+            }
+          }
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+      Tracing: '123'
+
+  EmptyTracingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+            return {
+              statusCode: 200,
+              body: 'Success'
+            }
+          }
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+      Tracing:
+
+  ActiveTracingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+            return {
+              statusCode: 200,
+              body: 'Success'
+            }
+          }
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+      Tracing: Active
+
+  ActiveIntrinsicTracingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+            return {
+              statusCode: 200,
+              body: 'Success'
+            }
+          }
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+      Tracing: !Ref TracingParamActive
+
+  PassThroughTracingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+            return {
+              statusCode: 200,
+              body: 'Success'
+            }
+          }
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+      Tracing: PassThrough
+
+  PassThroughIntrinsicTracingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      MemorySize: 128
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+            return {
+              statusCode: 200,
+              body: 'Success'
+            }
+          }
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+      Tracing:
+        Ref: TracingParamPassThrough

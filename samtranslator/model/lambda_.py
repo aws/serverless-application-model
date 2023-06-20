@@ -4,6 +4,8 @@ from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
 from samtranslator.utils.types import Intrinsicable
 
+TRACING_CONFIG_ACTIVE = "Active"
+
 
 class LambdaFunction(Resource):
     resource_type = "AWS::Lambda::Function"

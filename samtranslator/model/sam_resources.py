@@ -1,4 +1,4 @@
-﻿""" SAM macro definitions """
+""" SAM macro definitions """
 import copy
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
@@ -88,6 +88,7 @@ from samtranslator.model.intrinsics import (
     ref,
 )
 from samtranslator.model.lambda_ import (
+    TRACING_CONFIG_ACTIVE,
     LambdaAlias,
     LambdaEventInvokeConfig,
     LambdaFunction,
@@ -325,6 +326,7 @@ class SamFunction(SamResourceMacro):
             execution_role = self._construct_role(
                 managed_policy_map,
                 event_invoke_policies,
+                intrinsics_resolver,
                 get_managed_policy_map,
             )
             lambda_function.Role = execution_role.get_runtime_attr("arn")
@@ -608,6 +610,7 @@ class SamFunction(SamResourceMacro):
         self,
         managed_policy_map: Dict[str, Any],
         event_invoke_policies: List[Dict[str, Any]],
+        intrinsics_resolver: IntrinsicsResolver,
         get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
     ) -> IAMRole:
         """Constructs a Lambda execution role based on this SAM function's Policies property.
@@ -624,7 +627,9 @@ class SamFunction(SamResourceMacro):
         )
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
-        if self.Tracing:
+
+        tracing = intrinsics_resolver.resolve_parameter_refs(self.Tracing)
+        if tracing == TRACING_CONFIG_ACTIVE:
             managed_policy_name = get_xray_managed_policy_name()
             managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
         if self.VpcConfig:

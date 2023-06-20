@@ -231,7 +231,6 @@
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
           "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
         ],
@@ -292,7 +291,6 @@
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
           "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
         ],
@@ -351,7 +349,6 @@
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
           "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
         ],
@@ -410,7 +407,6 @@
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
           "arn:aws-cn:iam::aws:policy/AmazonS3ReadOnlyAccess"
         ],
