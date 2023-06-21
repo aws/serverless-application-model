@@ -1,4 +1,4 @@
-﻿""" SAM macro definitions """
+""" SAM macro definitions """
 import copy
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
@@ -88,6 +88,7 @@ from samtranslator.model.intrinsics import (
     ref,
 )
 from samtranslator.model.lambda_ import (
+    LAMBDA_TRACING_CONFIG_DISABLED,
     LambdaAlias,
     LambdaEventInvokeConfig,
     LambdaFunction,
@@ -265,7 +266,7 @@ class SamFunction(SamResourceMacro):
         if self.DeadLetterQueue:
             self._validate_dlq(self.DeadLetterQueue)
 
-        lambda_function = self._construct_lambda_function()
+        lambda_function = self._construct_lambda_function(intrinsics_resolver)
         resources.append(lambda_function)
 
         if self.ProvisionedConcurrencyConfig and not self.AutoPublishAlias:
@@ -325,6 +326,7 @@ class SamFunction(SamResourceMacro):
             execution_role = self._construct_role(
                 managed_policy_map,
                 event_invoke_policies,
+                intrinsics_resolver,
                 get_managed_policy_map,
             )
             lambda_function.Role = execution_role.get_runtime_attr("arn")
@@ -543,7 +545,7 @@ class SamFunction(SamResourceMacro):
 
         return resolved_alias_name
 
-    def _construct_lambda_function(self) -> LambdaFunction:
+    def _construct_lambda_function(self, intrinsics_resolver: IntrinsicsResolver) -> LambdaFunction:
         """Constructs and returns the Lambda function.
 
         :returns: a list containing the Lambda function and execution role resources
@@ -576,7 +578,10 @@ class SamFunction(SamResourceMacro):
         lambda_function.SnapStart = self.SnapStart
         lambda_function.EphemeralStorage = self.EphemeralStorage
 
-        if self.Tracing:
+        tracing = intrinsics_resolver.resolve_parameter_refs(self.Tracing)
+
+        # Explicitly setting Trace to 'Disabled' is the same as omitting Tracing property.
+        if self.Tracing and tracing != LAMBDA_TRACING_CONFIG_DISABLED:
             lambda_function.TracingConfig = {"Mode": self.Tracing}
 
         if self.DeadLetterQueue:
@@ -608,6 +613,7 @@ class SamFunction(SamResourceMacro):
         self,
         managed_policy_map: Dict[str, Any],
         event_invoke_policies: List[Dict[str, Any]],
+        intrinsics_resolver: IntrinsicsResolver,
         get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
     ) -> IAMRole:
         """Constructs a Lambda execution role based on this SAM function's Policies property.
@@ -624,7 +630,11 @@ class SamFunction(SamResourceMacro):
         )
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
-        if self.Tracing:
+
+        tracing = intrinsics_resolver.resolve_parameter_refs(self.Tracing)
+
+        # Do not add xray policy to generated IAM role if users explicitly specify 'Disabled' in Tracing property.
+        if self.Tracing and tracing != LAMBDA_TRACING_CONFIG_DISABLED:
             managed_policy_name = get_xray_managed_policy_name()
             managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
         if self.VpcConfig:

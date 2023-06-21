@@ -5432,7 +5432,8 @@
             {
               "enum": [
                 "Active",
-                "PassThrough"
+                "PassThrough",
+                "Disabled"
               ],
               "type": "string"
             }
@@ -6009,7 +6010,8 @@
             {
               "enum": [
                 "Active",
-                "PassThrough"
+                "PassThrough",
+                "Disabled"
               ],
               "type": "string"
             }

@@ -5,8 +5,47 @@ Parameters:
   TracingParamActive:
     Type: String
     Default: Active
+  TracingParamDisabled:
+    Type: String
+    Default: Disabled
 
 Resources:
+  DisabledTracingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+            return {
+              statusCode: 200,
+              body: 'Success'
+            }
+          }
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+      Tracing: Disabled
+
+  DisabledIntrinsicsTracingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+            return {
+              statusCode: 200,
+              body: 'Success'
+            }
+          }
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+      Tracing: !Ref TracingParamDisabled
+
   RandomValueTracingFunction:
     Type: AWS::Serverless::Function
     Properties:
