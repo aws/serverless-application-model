@@ -58,6 +58,11 @@ parser.add_argument(
     help="Enables verbose logging",
     action="store_true",
 )
+parser.add_argument(
+    "--stdout",
+    help="Write transformed template to stdout instead of a file",
+    action="store_true",
+)
 cli_options = parser.parse_args()
 
 if cli_options.verbose:
@@ -100,13 +105,17 @@ def package(input_file_path: Path) -> Path:
     return package_output_template_file
 
 
-def transform_template(input_file_path: Path, output_file_path: Path):  # type: ignore[no-untyped-def]
+def transform_template(input_file_path: Path, output_file_path: Path, stdout: bool):  # type: ignore[no-untyped-def]
     with input_file_path.open() as f:
         sam_template = yaml_parse(f)  # type: ignore[no-untyped-call]
 
     try:
         cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))
         cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=1)
+
+        if stdout:
+            print(cloud_formation_template_prettified)
+            return
 
         output_file_path.write_text(cloud_formation_template_prettified, encoding="utf-8")
 
@@ -132,10 +141,10 @@ if __name__ == "__main__":
 
     if cli_options.command == "package":
         package_output_template_file = package(input_file_path)
-        transform_template(package_output_template_file, output_file_path)
+        transform_template(package_output_template_file, output_file_path, cli_options.stdout)
     elif cli_options.command == "deploy":
         package_output_template_file = package(input_file_path)
-        transform_template(package_output_template_file, output_file_path)
+        transform_template(package_output_template_file, output_file_path, cli_options.stdout)
         deploy(output_file_path)
     else:
-        transform_template(input_file_path, output_file_path)
+        transform_template(input_file_path, output_file_path, cli_options.stdout)
