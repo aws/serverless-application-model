@@ -1,0 +1,151 @@
+{
+  "Resources": {
+    "SuperCoolAPI": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "LogConfig": {
+          "CloudWatchLogsRoleArn": {
+            "Fn::GetAtt": [
+              "SuperCoolAPICloudWatchRole",
+              "Arn"
+            ]
+          },
+          "FieldLogLevel": "ALL"
+        },
+        "Name": "SomeApi",
+        "Tags": [
+          {
+            "Key": "key1",
+            "Value": "value1"
+          },
+          {
+            "Key": "key2",
+            "Value": "value2"
+          }
+        ],
+        "XrayEnabled": true
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "SuperCoolAPICloudWatchRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIMutationmyResolver": {
+      "DependsOn": [
+        "SuperCoolAPISchema"
+      ],
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CachingConfig": {
+          "CachingKeys": [
+            "key1",
+            "key2"
+          ],
+          "Ttl": 20
+        },
+        "Code": "\nexport function request(ctx) {\n    return {};\n}\n\nexport function response(ctx) {\n    return ctx.prev.result;\n}\n",
+        "FieldName": "my_field",
+        "Kind": "PIPELINE",
+        "MaxBatchSize": 10,
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Fn::GetAtt": [
+                "SuperCoolAPIMyFunction",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        },
+        "TypeName": "Mutation"
+      },
+      "Type": "AWS::AppSync::Resolver"
+    },
+    "SuperCoolAPIMyDataSourceLambdaDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Description": "lambda datasources are nice",
+        "LambdaConfig": {
+          "LambdaFunctionArn": "my-lambda-arn"
+        },
+        "Name": "PradsLambdaDataSource",
+        "ServiceRoleArn": "some-role-arn",
+        "Type": "AWS_LAMBDA"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPIMyFunction": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Code": "this is my epic code",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPIMyDataSourceLambdaDataSource",
+            "Name"
+          ]
+        },
+        "MaxBatchSize": 10,
+        "Name": "MyFunction",
+        "Runtime": {
+          "Name": "some-runtime",
+          "RuntimeVersion": "1.2.3"
+        }
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "SuperCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    }
+  }
+}

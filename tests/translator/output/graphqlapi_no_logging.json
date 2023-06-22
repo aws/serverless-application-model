@@ -1,0 +1,34 @@
+{
+  "Resources": {
+    "SuperCoolAPI": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "Name": "SuperCoolAPI",
+        "Tags": [
+          {
+            "Key": "key1",
+            "Value": "value1"
+          },
+          {
+            "Key": "key2",
+            "Value": "value2"
+          }
+        ],
+        "XrayEnabled": true
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "SuperCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    }
+  }
+}

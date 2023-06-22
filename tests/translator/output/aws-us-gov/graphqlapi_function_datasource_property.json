@@ -1,0 +1,186 @@
+{
+  "Parameters": {
+    "HarcodedDataSourceName": {
+      "Description": "Harcoded Data Source name",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "AppSyncHttpDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "HttpConfig": {
+          "Endpoint": "https://test-generator.ai"
+        },
+        "Name": "AppSyncHttpDataSource",
+        "Type": "HTTP"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPI": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "LogConfig": {
+          "CloudWatchLogsRoleArn": {
+            "Fn::GetAtt": [
+              "SuperCoolAPICloudWatchRole",
+              "Arn"
+            ]
+          },
+          "FieldLogLevel": "ALL"
+        },
+        "Name": "SomeApi"
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "SuperCoolAPICloudWatchRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIInternalDataSourceDynamoDBDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "DynamoDBConfig": {
+          "AwsRegion": {
+            "Ref": "AWS::Region"
+          },
+          "TableName": "SomeTable"
+        },
+        "Name": "InternalDataSource",
+        "ServiceRoleArn": "SomeRoleArn",
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    },
+    "SuperCoolAPIUseAppSync": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Code": "this is my epic code",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "AppSyncHttpDataSource",
+            "Name"
+          ]
+        },
+        "Name": "UseAppSync",
+        "Runtime": {
+          "Name": "APPSYNC_JS",
+          "RuntimeVersion": "1.0.0"
+        }
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "SuperCoolAPIUseHardcoded": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CodeS3Location": "my-code-uri",
+        "DataSourceName": {
+          "Fn::Sub": "${HarcodedDataSourceName}"
+        },
+        "Name": "UseHardcoded",
+        "Runtime": {
+          "Name": "APPSYNC_JS",
+          "RuntimeVersion": "1.0.0"
+        }
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "SuperCoolAPIUseImported": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CodeS3Location": "my-code-uri",
+        "DataSourceName": {
+          "Fn::ImportValue": "SomeSharedDataSourceName"
+        },
+        "Name": "UseImported",
+        "Runtime": {
+          "Name": "APPSYNC_JS",
+          "RuntimeVersion": "1.0.0"
+        }
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    },
+    "SuperCoolAPIUseInternal": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Code": "this is my epic code",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "SuperCoolAPIInternalDataSourceDynamoDBDataSource",
+            "Name"
+          ]
+        },
+        "Name": "UseInternal",
+        "Runtime": {
+          "Name": "APPSYNC_JS",
+          "RuntimeVersion": "1.0.0"
+        }
+      },
+      "Type": "AWS::AppSync::FunctionConfiguration"
+    }
+  }
+}

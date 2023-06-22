@@ -3,6 +3,8 @@ import copy
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
+from typing_extensions import Literal
+
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.cloudwatchlogs
 import samtranslator.model.eventsources.pull
@@ -10,7 +12,31 @@ import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.scheduler
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
+from samtranslator.internal.model.appsync import (
+    APPSYNC_PIPELINE_RESOLVER_JS_CODE,
+    AdditionalAuthenticationProviderType,
+    ApiCache,
+    ApiKey,
+    AppSyncRuntimeType,
+    CachingConfigType,
+    DataSource,
+    DomainName,
+    DomainNameApiAssociation,
+    DynamoDBConfigType,
+    FunctionConfiguration,
+    GraphQLApi,
+    GraphQLSchema,
+    LambdaAuthorizerConfigType,
+    LogConfigType,
+    OpenIDConnectConfigType,
+    Resolver,
+    SyncConfigType,
+    UserPoolConfigType,
+)
+from samtranslator.internal.schema_source import aws_serverless_graphqlapi
+from samtranslator.internal.schema_source.common import PermissionsType
 from samtranslator.internal.types import GetManagedPolicyMap
+from samtranslator.internal.utils.utils import passthrough_value, remove_none_values
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
@@ -53,6 +79,7 @@ from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMManagedPolicy, IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import (
+    fnGetAtt,
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
@@ -2127,3 +2154,842 @@ class SamConnector(SamResourceMacro):
             except KeyError:
                 original_metadata = {}
             resource.set_resource_attribute("Metadata", {**original_metadata, **metadata})
+
+
+class SamGraphQLApi(SamResourceMacro):
+    """SAM GraphQL API Macro (WIP)."""
+
+    resource_type = "AWS::Serverless::GraphQLApi"
+    property_types = {
+        "Name": Property(False, IS_STR),
+        "Tags": Property(False, IS_DICT),
+        "XrayEnabled": PassThroughProperty(False),
+        "Auth": Property(True, IS_DICT),
+        "SchemaInline": Property(False, IS_STR),
+        "SchemaUri": Property(False, IS_STR),
+        "Logging": Property(False, one_of(IS_DICT, IS_BOOL)),
+        "DataSources": Property(False, IS_DICT),
+        "Functions": Property(False, IS_DICT),
+        "Resolvers": Property(False, IS_DICT),
+        "ApiKeys": Property(False, IS_DICT),
+        "DomainName": Property(False, IS_DICT),
+        "Cache": Property(False, IS_DICT),
+    }
+
+    Auth: List[Dict[str, Any]]
+    Tags: Optional[Dict[str, Any]]
+    XrayEnabled: Optional[PassThrough]
+    Name: Optional[str]
+    SchemaInline: Optional[str]
+    SchemaUri: Optional[str]
+    Logging: Optional[Union[Dict[str, Any], bool]]
+    DataSources: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
+    Functions: Optional[Dict[str, Dict[str, Any]]]
+    Resolvers: Optional[Dict[str, Dict[str, Dict[str, Any]]]]
+    ApiKeys: Optional[Dict[str, Dict[str, Any]]]
+    DomainName: Optional[Dict[str, Any]]
+    Cache: Optional[Dict[str, Any]]
+
+    # stop validation so we can use class variables for tracking state
+    validate_setattr = False
+
+    def __init__(
+        self,
+        logical_id: Optional[Any],
+        relative_id: Optional[str] = None,
+        depends_on: Optional[List[str]] = None,
+        attributes: Optional[Dict[str, Any]] = None,
+    ):
+        super().__init__(logical_id, relative_id=relative_id, depends_on=depends_on, attributes=attributes)
+
+        self._none_datasource: Optional[DataSource] = None
+        self._datasource_name_map: Dict[str, Intrinsicable[str]] = {}
+        self._function_id_map: Dict[str, Intrinsicable[str]] = {}
+
+    @cw_timer
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
+        model = self.validate_properties_and_return_model(aws_serverless_graphqlapi.Properties)
+
+        appsync_api, cloudwatch_role, auth_connectors = self._construct_appsync_api_resources(model)
+        api_id = appsync_api.get_runtime_attr("api_id")
+        appsync_schema = self._construct_appsync_schema(model, api_id)
+
+        resources: List[Resource] = [appsync_api, appsync_schema]
+
+        for connector in auth_connectors:
+            resources.extend(connector.to_cloudformation(**kwargs))
+
+        if cloudwatch_role:
+            resources.append(cloudwatch_role)
+
+        if model.ApiKeys:
+            api_keys = self._construct_appsync_api_keys(model.ApiKeys, api_id)
+            resources.extend(api_keys)
+
+        if model.Cache:
+            api_cache = self._construct_appsync_api_cache(model.Cache, api_id)
+            resources.append(api_cache)
+
+        if model.DataSources:
+            datasource_resources = self._construct_datasource_resources(model.DataSources, api_id, kwargs)
+            resources.extend(datasource_resources)
+
+        if model.DomainName:
+            domain_name_resources = self._construct_domain_name_resources(model.DomainName, api_id)
+            resources.extend(domain_name_resources)
+
+        if model.Functions:
+            function_configurations = self._construct_appsync_function_configurations(model.Functions, api_id)
+            resources.extend(function_configurations)
+
+        if model.Resolvers:
+            appsync_resolver_resources = self._construct_appsync_resolver_resources(
+                model.Resolvers, api_id, appsync_schema.logical_id
+            )
+            resources.extend(appsync_resolver_resources)
+
+        if self._none_datasource:
+            resources.append(self._none_datasource)
+
+        return resources
+
+    def _construct_appsync_api_resources(
+        self, model: aws_serverless_graphqlapi.Properties
+    ) -> Tuple[GraphQLApi, Optional[IAMRole], List[SamConnector]]:
+        api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
+
+        api.Name = model.Name or self.logical_id
+        api.XrayEnabled = model.XrayEnabled
+
+        lambda_auth_arns = self._parse_and_set_auth_properties(api, model.Auth)
+        auth_connectors = [
+            self._construct_lambda_auth_connector(api, arn, i) for i, arn in enumerate(lambda_auth_arns, 1)
+        ]
+
+        if model.Tags:
+            api.Tags = get_tag_list(model.Tags)
+
+        # Logging has 3 possible types: dict, bool, and None.
+        # GraphQLApi will not include logging if and only if the user explicity sets Logging as false boolean.
+        # It will for every other value (including true boolean which is essentially same as None).
+        if isinstance(model.Logging, bool) and model.Logging is False:
+            return api, None, auth_connectors
+
+        api.LogConfig, cloudwatch_role = self._parse_logging_properties(model)
+
+        return api, cloudwatch_role, auth_connectors
+
+    def _parse_and_set_auth_properties(
+        self, api: GraphQLApi, auth: aws_serverless_graphqlapi.Auth
+    ) -> List[Intrinsicable[str]]:
+        """
+        Parse the Auth properties in a Serverless::GraphQLApi resource.
+
+        Returns: List of Lambda Function arns of Lambda authorizers. If no Lambda authorizer is used, the list is empty.
+        """
+        # Keep all lambda authorizers together to create connectors later
+        lambda_auth_arns: List[Intrinsicable[str]] = []
+
+        # Default authoriser
+        default_auth = aws_serverless_graphqlapi.Authorizer.parse_obj(
+            {k: v for k, v in auth.dict().items() if k != "Additional"}
+        )
+        name, auth_dict = self._validate_and_extract_authorizer_config(default_auth)
+        api.AuthenticationType = auth.Type
+
+        # This would be much easier and type-safe if accessing the properties in Resource
+        # was a dictionary. Currently, top level properties are class attributes, but nested
+        # properties are dictionaries...
+        # TODO: Access properties in Resource class as dict?
+        if name and auth_dict:
+            setattr(api, name, auth_dict)
+            if name == "LambdaAuthorizerConfig":
+                lambda_auth_arns.append(cast(LambdaAuthorizerConfigType, auth_dict)["AuthorizerUri"])
+
+        # Additional authentication
+        additional_auths: List[AdditionalAuthenticationProviderType] = []
+        if auth.Additional:
+            for index, additional in enumerate(auth.Additional):
+                name, auth_dict = self._validate_and_extract_authorizer_config(additional, index)
+                additional_auth: AdditionalAuthenticationProviderType = {"AuthenticationType": additional.Type}
+                if name and auth_dict:
+                    additional_auth[name] = auth_dict
+                    if name == "LambdaAuthorizerConfig":
+                        lambda_auth_arns.append(cast(LambdaAuthorizerConfigType, auth_dict)["AuthorizerUri"])
+
+                additional_auths.append(additional_auth)
+
+        if additional_auths:
+            api.AdditionalAuthenticationProviders = additional_auths
+
+        return lambda_auth_arns
+
+    def _validate_and_extract_authorizer_config(
+        self,
+        auth: aws_serverless_graphqlapi.Authorizer,
+        index: Optional[int] = None,
+    ) -> Tuple[
+        Optional[Literal["LambdaAuthorizerConfig", "OpenIDConnectConfig", "UserPoolConfig"]],
+        Optional[Union[LambdaAuthorizerConfigType, OpenIDConnectConfigType, UserPoolConfigType]],
+    ]:
+        """
+        Validates the authentication type and returns the name of the config property and the respective dictionary.
+
+        The index parameter is only required if you are validating an AdditionalAuth, so that we can correctly
+        format the key path for any errors that are thrown. It is not necessary for Auth.
+        """
+        # In each Auth index, you should only define a max of two properties. The "Type" property, and if
+        # necessary the associated config as well.
+        MAX_AUTH_PROPERTIES = 2
+
+        keys = remove_none_values(auth.dict()).keys()
+        if len(keys) > MAX_AUTH_PROPERTIES:
+            key_path = "'Auth'" if not index else f"'Auth.Additional.{index}'"
+            raise InvalidResourceException(
+                self.logical_id, f"{key_path} has more than one authentication configuration defined."
+            )
+
+        if auth.Type == "AWS_LAMBDA":
+            key_path = "Auth.LambdaAuthorizer" if not index else f"Auth.Additional.{index}.LambdaAuthorizer"
+            lambda_authorizer = sam_expect(auth.LambdaAuthorizer, self.logical_id, key_path).to_not_be_none(
+                "'LambdaAuthorizer' must be defined if type is 'AWS_LAMBDA'."
+            )
+            return "LambdaAuthorizerConfig", cast(
+                LambdaAuthorizerConfigType, remove_none_values(lambda_authorizer.dict())
+            )
+
+        if auth.Type == "OPENID_CONNECT":
+            key_path = "Auth.OpenIDConnect" if not index else f"Auth.Additional.{index}.OpenIDConnect"
+            openid_connect = sam_expect(auth.OpenIDConnect, self.logical_id, key_path).to_not_be_none(
+                "'OpenIDConnect' must be defined if type is 'OPENID_CONNECT'."
+            )
+            return "OpenIDConnectConfig", cast(OpenIDConnectConfigType, remove_none_values(openid_connect.dict()))
+
+        # Last possible type is "AMAZON_COGNITO_USER_POOLS"
+        if auth.Type == "AMAZON_COGNITO_USER_POOLS":
+            key_path = "Auth.UserPool" if not index else f"Auth.Additional.{index}.UserPool"
+            user_pool = sam_expect(auth.UserPool, self.logical_id, key_path).to_not_be_none(
+                "'UserPool' must be defined if type is 'AMAZON_COGNITO_USER_POOLS'."
+            )
+            if index is not None:
+                # UserPoolConfig does not have the DefaultAction property UNLESS it is the primary authentication
+                # method (first index). If it is an additional authentication, we nullify this value.
+                user_pool.DefaultAction = None
+            return "UserPoolConfig", cast(UserPoolConfigType, remove_none_values(user_pool.dict()))
+
+        return None, None
+
+    @staticmethod
+    def _construct_lambda_auth_connector(
+        api: GraphQLApi,
+        lambda_arn: Intrinsicable[str],
+        auth_number: int,
+    ) -> SamConnector:
+        logical_id = f"{api.logical_id}ToLambdaAuthConnector{auth_number}"
+        connector_dict = {
+            "Type": "AWS::Serverless::Connector",
+            "Properties": {
+                "Source": {
+                    "Type": "AWS::AppSync::GraphQLApi",
+                    "Arn": ref(api.logical_id),
+                    "ResourceId": fnGetAtt(api.logical_id, "ApiId"),
+                },
+                "Destination": {
+                    "Type": "AWS::Lambda::Function",
+                    "Arn": lambda_arn,
+                },
+                "Permissions": ["Write"],
+            },
+        }
+
+        # mypy thinks from_dict method returns "Resource" class instead of the inheriting parent class "SamResourceMacro"
+        return cast(
+            SamConnector,
+            SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
+        )
+
+    def _create_logging_default(self) -> Tuple[LogConfigType, IAMRole]:
+        """
+        Create a default logging configuration.
+
+        This function is used when "Logging" property is a False boolean or NoneType.
+        """
+        log_config: LogConfigType = {}
+        log_config["FieldLogLevel"] = "ALL"
+        cloudwatch_role = self._construct_cloudwatch_role()
+        log_config["CloudWatchLogsRoleArn"] = cloudwatch_role.get_runtime_attr("arn")
+
+        return log_config, cloudwatch_role
+
+    def _parse_logging_properties(
+        self, model: aws_serverless_graphqlapi.Properties
+    ) -> Tuple[LogConfigType, Optional[IAMRole]]:
+        """Parse logging properties from SAM template, and use defaults if required keys dont exist."""
+        if not isinstance(model.Logging, aws_serverless_graphqlapi.Logging):
+            return self._create_logging_default()
+
+        log_config: LogConfigType = {}
+
+        if model.Logging.ExcludeVerboseContent:
+            log_config["ExcludeVerboseContent"] = cast(PassThrough, model.Logging.ExcludeVerboseContent)
+
+        log_config["FieldLogLevel"] = model.Logging.FieldLogLevel or "ALL"
+        log_config["CloudWatchLogsRoleArn"] = cast(PassThrough, model.Logging.CloudWatchLogsRoleArn)
+
+        if log_config["CloudWatchLogsRoleArn"]:
+            return log_config, None
+
+        cloudwatch_role = self._construct_cloudwatch_role()
+        log_config["CloudWatchLogsRoleArn"] = cloudwatch_role.get_runtime_attr("arn")
+
+        return log_config, cloudwatch_role
+
+    def _construct_cloudwatch_role(self) -> IAMRole:
+        role = IAMRole(
+            logical_id=f"{self.logical_id}CloudWatchRole",
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
+        role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+            "appsync.amazonaws.com"
+        )
+        role.ManagedPolicyArns = [
+            {"Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"}
+        ]
+        return role
+
+    def _construct_appsync_schema(
+        self, model: aws_serverless_graphqlapi.Properties, api_id: Intrinsicable[str]
+    ) -> GraphQLSchema:
+        schema = GraphQLSchema(
+            logical_id=f"{self.logical_id}Schema", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
+        if not model.SchemaInline and not model.SchemaUri:
+            raise InvalidResourceException(self.logical_id, "One of 'SchemaInline' or 'SchemaUri' must be set.")
+
+        if model.SchemaInline and model.SchemaUri:
+            raise InvalidResourceException(
+                self.logical_id, "Both 'SchemaInline' and 'SchemaUri' cannot be defined at the same time."
+            )
+
+        schema.ApiId = api_id
+        schema.Definition = passthrough_value(model.SchemaInline)
+        schema.DefinitionS3Location = passthrough_value(model.SchemaUri)
+
+        return schema
+
+    def _construct_appsync_api_keys(
+        self, api_keys: Dict[str, aws_serverless_graphqlapi.ApiKey], api_id: Intrinsicable[str]
+    ) -> List[Resource]:
+        resources: List[Resource] = []
+
+        # TODO: Add datetime parsing for ExpiresOn; currently expects Unix timestamp
+        for relative_id, api_key in api_keys.items():
+            cfn_api_key = ApiKey(
+                logical_id=f"{self.logical_id}{relative_id}",
+                depends_on=self.depends_on,
+                attributes=self.resource_attributes,
+            )
+            cfn_api_key.ApiId = api_id
+            cfn_api_key.ApiKeyId = passthrough_value(api_key.ApiKeyId)
+            cfn_api_key.Description = passthrough_value(api_key.Description)
+            cfn_api_key.Expires = passthrough_value(api_key.ExpiresOn)
+            resources.append(cfn_api_key)
+
+        return resources
+
+    def _construct_domain_name_resources(
+        self, domain_name: aws_serverless_graphqlapi.DomainName, api_id: Intrinsicable[str]
+    ) -> List[Resource]:
+        cfn_domain_name = DomainName(
+            logical_id=f"{self.logical_id}DomainName", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+        cfn_domain_name.CertificateArn = passthrough_value(domain_name.CertificateArn)
+        cfn_domain_name.DomainName = passthrough_value(domain_name.DomainName)
+        cfn_domain_name.Description = passthrough_value(domain_name.Description)
+
+        cfn_domain_name_api_association = DomainNameApiAssociation(
+            logical_id=f"{self.logical_id}DomainNameApiAssociation",
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
+        cfn_domain_name_api_association.ApiId = api_id
+        cfn_domain_name_api_association.DomainName = cfn_domain_name.get_runtime_attr("domain_name")
+
+        return [cfn_domain_name, cfn_domain_name_api_association]
+
+    def _construct_appsync_api_cache(
+        self, cache: aws_serverless_graphqlapi.Cache, api_id: Intrinsicable[str]
+    ) -> ApiCache:
+        cfn_api_cache = ApiCache(
+            logical_id=f"{self.logical_id}ApiCache", depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+
+        cfn_api_cache.ApiId = api_id
+        cfn_api_cache.ApiCachingBehavior = passthrough_value(cache.ApiCachingBehavior)
+        cfn_api_cache.Type = passthrough_value(cache.Type)
+        cfn_api_cache.Ttl = passthrough_value(cache.Ttl)
+        cfn_api_cache.AtRestEncryptionEnabled = passthrough_value(cache.AtRestEncryptionEnabled)
+        cfn_api_cache.TransitEncryptionEnabled = passthrough_value(cache.TransitEncryptionEnabled)
+
+        return cfn_api_cache
+
+    def _construct_datasource_resources(
+        self,
+        datasources: aws_serverless_graphqlapi.DataSources,
+        api_id: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        ddb_datasources = self._construct_ddb_datasources(datasources.DynamoDb, api_id, kwargs)
+        lambda_datasources = self._construct_lambda_datasources(datasources.Lambda, api_id, kwargs)
+
+        return [*ddb_datasources, *lambda_datasources]
+
+    def _construct_ddb_datasources(
+        self,
+        ddb_datasources: Optional[Dict[str, aws_serverless_graphqlapi.DynamoDBDataSource]],
+        api_id: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        if not ddb_datasources:
+            return []
+
+        resources: List[Resource] = []
+
+        for relative_id, ddb_datasource in ddb_datasources.items():
+            datasource_logical_id = self._create_appsync_data_source_logical_id(
+                self.logical_id, "DynamoDB", relative_id
+            )
+            cfn_datasource = DataSource(
+                logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
+            )
+
+            # Datasource "Name" property must be unique from all other datasources.
+            cfn_datasource.Name = ddb_datasource.Name or relative_id
+            cfn_datasource.Type = "AMAZON_DYNAMODB"
+            cfn_datasource.ApiId = api_id
+            cfn_datasource.Description = passthrough_value(ddb_datasource.Description)
+            cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
+
+            cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_ddb_datasource_role(
+                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, datasource_logical_id, kwargs
+            )
+
+            self._datasource_name_map[relative_id] = cfn_datasource.get_runtime_attr("name")
+
+            resources.extend([cfn_datasource, *permissions_resources])
+
+        return resources
+
+    def _parse_ddb_datasource_role(
+        self,
+        ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource,
+        datasource_arn: Intrinsicable[str],
+        relative_id: str,
+        datasource_logical_id: str,
+        kwargs: Dict[str, Any],
+    ) -> Tuple[str, List[Resource]]:
+        # If the user defined a role, then there's no need to generate role/policy for them, so we return fast.
+        if ddb_datasource.ServiceRoleArn:
+            return cast(PassThrough, ddb_datasource.ServiceRoleArn), []
+
+        # If the user doesn't have their own role, then we will create for them if TableArn is defined.
+        table_arn = passthrough_value(
+            sam_expect(
+                ddb_datasource.TableArn, relative_id, f"DataSources.DynamoDb.{relative_id}.TableArn"
+            ).to_not_be_none(
+                "'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined."
+            )
+        )
+
+        permissions = ddb_datasource.Permissions or ["Read", "Write"]
+
+        role_id = f"{datasource_logical_id}Role"
+        role = IAMRole(
+            logical_id=role_id,
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
+        role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+            "appsync.amazonaws.com"
+        )
+        role_arn = role.get_runtime_attr("arn")
+
+        connector_resources = self._construct_ddb_datasource_connector_resources(
+            datasource_logical_id, datasource_arn, table_arn, permissions, role.get_runtime_attr("name"), kwargs
+        )
+
+        return role_arn, [role, *connector_resources]
+
+    def _parse_ddb_config(self, ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource) -> DynamoDBConfigType:
+        ddb_config: DynamoDBConfigType = {}
+
+        ddb_config["AwsRegion"] = cast(PassThrough, ddb_datasource.Region) or ref("AWS::Region")
+        ddb_config["TableName"] = passthrough_value(ddb_datasource.TableName)
+
+        if ddb_datasource.UseCallerCredentials:
+            ddb_config["UseCallerCredentials"] = cast(PassThrough, ddb_datasource.UseCallerCredentials)
+
+        if ddb_datasource.Versioned:
+            ddb_config["Versioned"] = cast(PassThrough, ddb_datasource.Versioned)
+
+        if ddb_datasource.DeltaSync:
+            deltasync_properties = ddb_datasource.DeltaSync.dict()
+            ddb_config["DeltaSyncConfig"] = cast(PassThrough, deltasync_properties)
+
+        return ddb_config
+
+    @staticmethod
+    def _construct_ddb_datasource_connector_resources(
+        datasource_id: str,
+        source_arn: Intrinsicable[str],
+        destination_arn: str,
+        permissions: PermissionsType,
+        role_name: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        logical_id = f"{datasource_id}ToTableConnector"
+        connector_dict = {
+            "Type": "AWS::Serverless::Connector",
+            "Properties": {
+                "Source": {"Type": "AWS::AppSync::DataSource", "Arn": source_arn, "RoleName": role_name},
+                "Destination": {
+                    "Type": "AWS::DynamoDB::Table",
+                    "Arn": destination_arn,
+                },
+                "Permissions": permissions,
+            },
+        }
+
+        # mypy thinks from_dict method returns "Resource" class instead of the inheriting parent class "SamResourceMacro"
+        connector = cast(
+            SamConnector,
+            SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
+        )
+        return connector.to_cloudformation(**kwargs)
+
+    def _construct_lambda_datasources(
+        self,
+        lambda_datasources: Optional[Dict[str, aws_serverless_graphqlapi.LambdaDataSource]],
+        api_id: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        if not lambda_datasources:
+            return []
+
+        resources: List[Resource] = []
+
+        for relative_id, lambda_datasource in lambda_datasources.items():
+            datasource_logical_id = self._create_appsync_data_source_logical_id(self.logical_id, "Lambda", relative_id)
+            cfn_datasource = DataSource(
+                logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
+            )
+
+            cfn_datasource.Name = lambda_datasource.Name or relative_id
+            cfn_datasource.Type = "AWS_LAMBDA"
+            cfn_datasource.ApiId = api_id
+            cfn_datasource.Description = passthrough_value(lambda_datasource.Description)
+            cfn_datasource.LambdaConfig = {"LambdaFunctionArn": passthrough_value(lambda_datasource.FunctionArn)}
+
+            cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_lambda_datasource_role(
+                lambda_datasource,
+                cfn_datasource.get_runtime_attr("arn"),
+                lambda_datasource.FunctionArn,
+                datasource_logical_id,
+                kwargs,
+            )
+
+            self._datasource_name_map[relative_id] = cfn_datasource.get_runtime_attr("name")
+
+            resources.extend([cfn_datasource, *permissions_resources])
+
+        return resources
+
+    def _parse_lambda_datasource_role(
+        self,
+        lambda_datasource: aws_serverless_graphqlapi.LambdaDataSource,
+        datasource_arn: Intrinsicable[str],
+        function_arn: PassThrough,
+        datasource_logical_id: str,
+        kwargs: Dict[str, Any],
+    ) -> Tuple[str, List[Resource]]:
+        if lambda_datasource.ServiceRoleArn:
+            return passthrough_value(lambda_datasource.ServiceRoleArn), []
+
+        role_logical_id = f"{datasource_logical_id}Role"
+        role = IAMRole(
+            logical_id=role_logical_id,
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes,
+        )
+        role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+            "appsync.amazonaws.com"
+        )
+        role_arn = role.get_runtime_attr("arn")
+
+        connector_resources = self._construct_lambda_datasource_connector_resources(
+            datasource_logical_id, datasource_arn, function_arn, role.get_runtime_attr("name"), kwargs
+        )
+
+        return role_arn, [role, *connector_resources]
+
+    @staticmethod
+    def _construct_lambda_datasource_connector_resources(
+        datasource_id: str,
+        source_arn: Intrinsicable[str],
+        destination_arn: Intrinsicable[str],
+        role_name: Intrinsicable[str],
+        kwargs: Dict[str, Any],
+    ) -> List[Resource]:
+        logical_id = f"{datasource_id}ToLambdaConnector"
+        connector_dict = {
+            "Type": "AWS::Serverless::Connector",
+            "Properties": {
+                "Source": {"Type": "AWS::AppSync::DataSource", "Arn": source_arn, "RoleName": role_name},
+                "Destination": {
+                    "Type": "AWS::Lambda::Function",
+                    "Arn": destination_arn,
+                },
+                "Permissions": ["Write"],
+            },
+        }
+
+        # mypy thinks from_dict method returns "Resource" class instead of the inheriting parent class "SamResourceMacro"
+        connector = cast(
+            SamConnector,
+            SamConnector(logical_id=logical_id).from_dict(logical_id=logical_id, resource_dict=connector_dict),
+        )
+
+        return connector.to_cloudformation(**kwargs)
+
+    def _construct_appsync_function_configurations(
+        self,
+        functions: Dict[str, aws_serverless_graphqlapi.Function],
+        api_id: Intrinsicable[str],
+    ) -> List[FunctionConfiguration]:
+        func_configs: List[FunctionConfiguration] = []
+
+        for relative_id, function in functions.items():
+            # "Id" refers to the "FunctionId" attribute for a "AppSync::FunctionConfiguration" resource.
+            # "Id" is a mutually exclusive property to every other property. If this function has it
+            # defined, then we make sure it's the only property, and continue to next function.
+            if function.Id:
+                keys = remove_none_values(function.dict()).keys()  # remove undefined properties, then get keys
+                if len(keys) != 1:
+                    raise InvalidResourceException(
+                        relative_id, "'Id' cannot be defined with other properties in Function."
+                    )
+                self._function_id_map[relative_id] = passthrough_value(function.Id)
+                continue
+
+            func_config = FunctionConfiguration(
+                logical_id=self.logical_id + relative_id,
+                depends_on=self.depends_on,
+                attributes=self.resource_attributes,
+            )
+
+            func_config.ApiId = api_id
+            func_config.Name = function.Name or relative_id
+            func_config.Code, func_config.CodeS3Location = self._parse_function_code_properties(function, relative_id)
+            func_config.DataSourceName = self._parse_datasource_name(relative_id, function, api_id)
+            func_config.MaxBatchSize = passthrough_value(function.MaxBatchSize)
+            func_config.Description = passthrough_value(function.Description)
+            func_config.Runtime = self._parse_runtime(function, relative_id)
+
+            if function.Sync:
+                func_config.SyncConfig = cast(SyncConfigType, remove_none_values(function.Sync.dict()))
+
+            self._function_id_map[relative_id] = func_config.get_runtime_attr("function_id")
+            func_configs.append(func_config)
+
+        return func_configs
+
+    @staticmethod
+    def _is_none_datasource_input(datasource: Optional[str]) -> bool:
+        return datasource is not None and datasource.lower() == "none"
+
+    def _construct_none_datasource(
+        self,
+        api_id: Intrinsicable[str],
+    ) -> DataSource:
+        """
+        Create DataSource with type "NONE".
+
+        Within a Serverless::GraphQLApi Function or Resolver resource, customers can create
+        a DataSource of Type "NONE" for quick use. To do so, a customer can input "none" case
+        insensitive in the "DataSource" property. Only one DataSource will be created for each
+        GraphQLApi, and all GraphQLApi functions and resolvers with this none input will reference it.
+
+        If a datasource is created, it is assigned to the class variable "none_datasource". This is so
+        we can reference when parsing both functions and resolvers. This function does not return any
+        value itself.
+        """
+        none_datasource_logical_id = f"{self.logical_id}NoneDataSource"
+        none_datasource = DataSource(
+            logical_id=none_datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
+        none_datasource.ApiId = api_id
+        none_datasource.Name = none_datasource_logical_id
+        none_datasource.Type = "NONE"
+
+        return none_datasource
+
+    def _parse_datasource_name(
+        self, relative_id: str, function: aws_serverless_graphqlapi.Function, api_id: Intrinsicable[str]
+    ) -> Intrinsicable[str]:
+        """
+        Parse DataSource name from a Serverless::GraphQLApi function or resolver.
+
+        There are 3 different cases for the DataSource name:
+
+        1. Customer defines the "DataSource" property as a string or intrinsics, and we can simply return this value.
+
+        2. Customer defines "DataSource" propery as "NONE", so we return the name of the NoneDataSource
+           for this Serverless::GraphQLApi resource.
+
+        3. Customer defines "DataSource" property with a logical id of a datasource defined in
+           Serverless::GraphQLApi. We can then search if this DataSource exists, and return the name.
+           If it does not exist, throw an InvalidResourceException.
+        """
+        if not function.DataSource:
+            raise InvalidResourceException(relative_id, "'DataSource' must be set.")
+
+        if isinstance(function.DataSource, str):
+            if self._is_none_datasource_input(function.DataSource):
+                if not self._none_datasource:
+                    self._none_datasource = self._construct_none_datasource(api_id)
+                return cast(Intrinsicable[str], self._none_datasource.get_runtime_attr("name"))
+
+            if function.DataSource in self._datasource_name_map:
+                return self._datasource_name_map[function.DataSource]
+
+            raise InvalidResourceException(
+                relative_id,
+                f"Either define DataSource '{function.DataSource}' in 'DataSources' or use intrinsic function like GetAtt, ImportValue, Sub or another one to reference a DataSource defined outside of this GraphQLApi resource.",
+            )
+
+        # if DataSource is intrinsic function like !GetAttr AppSyncDataSource.Name
+        # but it can also be ImportValue or Sub or maybe something else
+        return function.DataSource  # it's an intrinsic function Dict here
+
+    @staticmethod
+    def _parse_function_code_properties(
+        function: aws_serverless_graphqlapi.Function,
+        relative_id: str,
+    ) -> Tuple[Optional[PassThrough], Optional[PassThrough]]:
+        """
+        Parses the code properties from Serverless::GraphQLApi function.
+
+        This function parses the "CodeUri" and "InlineCode" properties for Function resources.
+        It also raises exceptions when the customer template is invalid. The return is a tuple of the values
+        (InlineCode, CodeUri).
+        """
+        if function.InlineCode and function.CodeUri:
+            raise InvalidResourceException(
+                relative_id, "Both 'InlineCode' and 'CodeUri' cannot be defined at the same time."
+            )
+
+        if function.InlineCode:
+            return passthrough_value(function.InlineCode), None
+
+        if function.CodeUri:
+            return None, passthrough_value(function.CodeUri)
+
+        raise InvalidResourceException(relative_id, "One of 'InlineCode' or 'CodeUri' must be set.")
+
+    @staticmethod
+    def _parse_runtime(
+        resource: Union[aws_serverless_graphqlapi.Function, aws_serverless_graphqlapi.Resolver],
+        relative_id: str,
+    ) -> AppSyncRuntimeType:
+        """
+        Parse Runtime property of Function and Resolver.
+        """
+        if resource.Runtime:
+            return {
+                "Name": passthrough_value(resource.Runtime.Name),
+                "RuntimeVersion": passthrough_value(resource.Runtime.Version),
+            }
+
+        # Runtime is not defined, raise error.
+        raise InvalidResourceException(relative_id, f"'Runtime' must be defined as a property in {relative_id}.")
+
+    def _construct_appsync_resolver_resources(
+        self,
+        resolvers: Dict[str, Dict[str, aws_serverless_graphqlapi.Resolver]],
+        api_id: Intrinsicable[str],
+        schema_logical_id: str,
+    ) -> List[Resource]:
+        resources: List[Resource] = []
+
+        for type_name, relative_id_to_resolver in resolvers.items():
+            for relative_id, resolver in relative_id_to_resolver.items():
+                cfn_resolver = Resolver(
+                    logical_id=self.logical_id + type_name + relative_id,
+                    depends_on=[schema_logical_id],
+                    attributes=self.resource_attributes,
+                )
+
+                if resolver.CodeUri and resolver.InlineCode:
+                    raise InvalidResourceException(
+                        relative_id, "Both 'InlineCode' and 'CodeUri' cannot be defined at the same time."
+                    )
+
+                cfn_resolver.Code = passthrough_value(resolver.InlineCode)
+                cfn_resolver.CodeS3Location = passthrough_value(resolver.CodeUri)
+
+                # If InlineCode and CodeUri were not defined, then we will set the resolver code
+                # to a default snippet which has basic definition of request/response functions.
+                if not cfn_resolver.Code and not cfn_resolver.CodeS3Location:
+                    cfn_resolver.Code = APPSYNC_PIPELINE_RESOLVER_JS_CODE
+
+                cfn_resolver.ApiId = api_id
+                cfn_resolver.FieldName = resolver.FieldName or relative_id
+                cfn_resolver.TypeName = type_name
+                cfn_resolver.Runtime = self._parse_runtime(resolver, relative_id)
+
+                if resolver.Pipeline:
+                    cfn_resolver.Kind = "PIPELINE"
+                    function_ids = self._parse_appsync_resolver_functions(resolver, relative_id)
+                    cfn_resolver.PipelineConfig = {"Functions": function_ids}
+                else:
+                    raise InvalidResourceException(
+                        relative_id,
+                        f"Resolver '{relative_id}' must have Pipeline defined. Unit resolvers are not supported. If you need a Unit resolver you can use AppSync resource.",
+                    )
+
+                if resolver.Caching:
+                    cfn_resolver.CachingConfig = cast(CachingConfigType, resolver.Caching.dict(exclude_none=True))
+
+                if resolver.MaxBatchSize:
+                    cfn_resolver.MaxBatchSize = passthrough_value(resolver.MaxBatchSize)
+
+                resources.append(cfn_resolver)
+
+        return resources
+
+    def _parse_appsync_resolver_functions(
+        self, appsync_resolver: aws_serverless_graphqlapi.Resolver, relative_id: str
+    ) -> List[Intrinsicable[str]]:
+        """
+        Parse functions property in GraphQLApi Resolver.
+
+        When a resolver has the functions property defined, it is a pipeline resolver. These functions are
+        executed in the order they are listed in the template.
+        """
+        function_ids = []
+
+        # This function is only called if it is a pipeline resolver, in which case this property is checked to exist before.
+        # Because the type of the variable does not update, we must cast here.
+
+        for resolver_function in appsync_resolver.Pipeline or []:
+            if resolver_function not in self._function_id_map:
+                raise InvalidResourceException(relative_id, f"Function '{resolver_function}' does not exist.")
+            function_ids.append(self._function_id_map[resolver_function])
+
+        return function_ids
+
+    @staticmethod
+    def _create_appsync_data_source_logical_id(api_id: str, data_source_type: str, data_source_relative_id: str) -> str:
+        return f"{api_id}{data_source_relative_id}{data_source_type}DataSource"

@@ -1,0 +1,46 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: SomeApi
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      DataSources:
+        Lambda:
+          MyDataSource:
+            FunctionArn: my-lambda-arn
+            ServiceRoleArn: some-role-arn
+            Name: PradsLambdaDataSource
+            Description: lambda datasources are nice
+      Resolvers:
+        Mutation:
+          myResolver:
+            FieldName: my_field
+            MaxBatchSize: 10
+            Runtime:
+              Name: some-runtime
+              Version: 1.2.3
+            Caching:
+              Ttl: 20
+              CachingKeys:
+              - key1
+              - key2
+            Pipeline:
+            - MyFunction
+      Functions:
+        MyFunction:
+          Runtime:
+            Name: some-runtime
+            Version: 1.2.3
+          InlineCode: this is my epic code
+          DataSource: MyDataSource
+          MaxBatchSize: 10

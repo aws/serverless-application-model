@@ -75,7 +75,7 @@ class TestResourceValidatorFailure(TestCase):
             InvalidResourceException,
         ):
             invalid_connector.validate_properties_and_return_model(ConnectorProperties)
-            self.assertRegex(".+Given resource property 'Source'.+ is invalid.")
+            self.assertRegex(".+Property 'Source'.+ is invalid.")
 
     def test_connector_with_invalid_permission(self):
         invalid_connector = SamConnector("foo")
@@ -86,7 +86,7 @@ class TestResourceValidatorFailure(TestCase):
             InvalidResourceException,
         ):
             invalid_connector.validate_properties_and_return_model(ConnectorProperties)
-            self.assertRegex(".+Given resource property 'Permissions'.+ is invalid.")
+            self.assertRegex(".+Property 'Permissions'.+ is invalid.")
 
     def test_connector_with_invalid_permission_type(self):
         invalid_connector = SamConnector("foo")
@@ -97,4 +97,4 @@ class TestResourceValidatorFailure(TestCase):
             InvalidResourceException,
         ):
             invalid_connector.validate_properties_and_return_model(ConnectorProperties)
-            self.assertRegex(".+Given resource property 'Permissions'.+ is invalid.")
+            self.assertRegex(".+Property 'Permissions'.+ is invalid.")

@@ -13,6 +13,7 @@ from samtranslator.model.sam_resources import (
     SamApi,
     SamConnector,
     SamFunction,
+    SamGraphQLApi,
     SamHttpApi,
     SamLayerVersion,
 )
@@ -708,3 +709,9 @@ class TestInvalidSamConnectors(TestCase):
             "Unsupported 'Permissions' provided for connector from AWS::SQS::Queue to AWS::Lambda::Function; valid combinations are: Read \\+ Write.",
         ):
             connector.to_cloudformation(**self.kwargs)[0]
+
+
+def test_function_datasource_set_with_none():
+    api = SamGraphQLApi("MyApi")
+    none_datasource = api._construct_none_datasource("foo")
+    assert none_datasource
