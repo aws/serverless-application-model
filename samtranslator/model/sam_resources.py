@@ -14,6 +14,7 @@ from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import (
+    MutatedPassThroughProperty,
     PassThroughProperty,
     Property,
     PropertyType,
@@ -1709,6 +1710,8 @@ class SamStateMachine(SamResourceMacro):
         "Policies": PropertyType(False, one_of(IS_STR, list_of(one_of(IS_STR, IS_DICT, IS_DICT)))),
         "Tracing": PropertyType(False, IS_DICT),
         "PermissionsBoundary": PropertyType(False, IS_STR),
+        "AutoPublishAlias": PassThroughProperty(False),
+        "DeploymentPreference": MutatedPassThroughProperty(False),
     }
 
     Definition: Optional[Dict[str, Any]]
@@ -1724,6 +1727,8 @@ class SamStateMachine(SamResourceMacro):
     Policies: Optional[List[Any]]
     Tracing: Optional[Dict[str, Any]]
     PermissionsBoundary: Optional[Intrinsicable[str]]
+    AutoPublishAlias: Optional[PassThrough]
+    DeploymentPreference: Optional[PassThrough]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.stepfunctions.events,
@@ -1760,6 +1765,8 @@ class SamStateMachine(SamResourceMacro):
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             get_managed_policy_map=get_managed_policy_map,
+            auto_publish_alias=self.AutoPublishAlias,
+            deployment_preference=self.DeploymentPreference,
         )
 
         return state_machine_generator.to_cloudformation()
