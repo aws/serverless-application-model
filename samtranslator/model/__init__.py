@@ -74,6 +74,14 @@ class PassThroughProperty(PropertyType):
         super().__init__(required, any_type(), False)
 
 
+class MutatedPassThroughProperty(PassThroughProperty):
+    """
+    Mutated pass-through property.
+
+    SAM Translator may read and add/remove/modify the value before passing it to underlaying CFN resources.
+    """
+
+
 class GeneratedProperty(PropertyType):
     """
     Property of a generated CloudFormation resource.
@@ -629,6 +637,7 @@ __all__: List[str] = [
     "PropertyType",
     "Property",
     "PassThroughProperty",
+    "MutatedPassThroughProperty",
     "Resource",
     "ResourceMacro",
     "SamResourceMacro",

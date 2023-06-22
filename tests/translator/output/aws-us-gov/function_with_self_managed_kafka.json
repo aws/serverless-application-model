@@ -55,6 +55,8 @@
             "URI": "security_group:sg-67890"
           }
         ],
+        "StartingPosition": "AT_TIMESTAMP",
+        "StartingPositionTimestamp": 1672560000,
         "Topics": [
           "Topic1"
         ]

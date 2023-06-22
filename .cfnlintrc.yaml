@@ -118,6 +118,12 @@ ignore_templates:
   - tests/translator/output/**/state_machine_with_event_schedule_state.json
   - tests/translator/output/**/state_machine_with_schedule.json
   - tests/translator/output/**/state_machine_with_schedule_dlq_retry_policy.json
+  - tests/translator/output/**/state_machine_with_auto_publish_alias.json
+  - tests/translator/output/**/state_machine_with_deployment_preference_all_at_once.json
+  - tests/translator/output/**/state_machine_with_deployment_preference_canary.json
+  - tests/translator/output/**/state_machine_with_deployment_preference_linear.json
+  - tests/translator/output/**/state_machine_with_deletion_policy.json
+  - tests/translator/output/**/state_machine_with_update_replace_policy.json
   - tests/translator/output/**/globals_for_function.json  # RuntimeManagementConfig
   - tests/translator/output/**/function_with_runtime_config.json  # RuntimeManagementConfig
   - tests/translator/output/**/managed_policies_minimal.json  # Intentionally has non-existent managed policy name

@@ -171,6 +171,8 @@ class Properties(BaseModel):
     Tags: Optional[DictStrAny] = properties("Tags")
     Tracing: Optional[PassThroughProp] = properties("Tracing")
     Type: Optional[PassThroughProp] = properties("Type")
+    AutoPublishAlias: Optional[PassThroughProp]
+    DeploymentPreference: Optional[PassThroughProp]
 
 
 class Resource(ResourceAttributes):
