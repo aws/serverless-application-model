@@ -1,0 +1,15 @@
+Resources:
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      Definition:
+        StartAt: HelloWorld
+        States:
+          HelloWorld:
+            Type: Pass
+            Result: 1
+            End: true
+      Role: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/doesNotExist"
+      DeploymentPreference:
+        Type: ALL_AT_ONCE

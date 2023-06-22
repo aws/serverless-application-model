@@ -1,0 +1,21 @@
+Resources:
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      Definition:
+        StartAt: HelloWorld
+        States:
+          HelloWorld:
+            Type: Pass
+            Result: 1
+            End: true
+      Role: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/doesNotExist"
+      AutoPublishAlias: test
+      DeploymentPreference:
+        Type: CANARY
+        Percentage: 1
+        Interval: 1
+        Alarms:
+        - alarm 1
+        - alarm 2
