@@ -2753,6 +2753,12 @@
           "markdownDescription": "An array of the authentication protocol, VPC components, or virtual host to secure and define your event source\\.  \n*Valid values*: `BASIC_AUTH | CLIENT_CERTIFICATE_TLS_AUTH | SASL_SCRAM_256_AUTH | SASL_SCRAM_512_AUTH | SERVER_ROOT_CA_CERTIFICATE`  \n*Type*: List of [SourceAccessConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-sourceaccessconfiguration.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ SourceAccessConfigurations](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "SourceAccessConfigurations"
         },
+        "StartingPosition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "StartingPositionTimestamp": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Topics": {
           "allOf": [
             {

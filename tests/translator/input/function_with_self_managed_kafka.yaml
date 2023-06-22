@@ -24,3 +24,5 @@ Resources:
             - Type: VPC_SECURITY_GROUP
               URI: security_group:sg-67890
             ConsumerGroupId: consumergroup1
+            StartingPosition: AT_TIMESTAMP
+            StartingPositionTimestamp: 1672560000
