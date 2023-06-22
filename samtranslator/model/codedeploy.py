@@ -6,6 +6,7 @@ class CodeDeployApplication(Resource):
     resource_type = "AWS::CodeDeploy::Application"
     property_types = {
         "ComputePlatform": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
@@ -21,6 +22,7 @@ class CodeDeployDeploymentGroup(Resource):
         "DeploymentStyle": GeneratedProperty(),
         "ServiceRoleArn": GeneratedProperty(),
         "TriggerConfigurations": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}

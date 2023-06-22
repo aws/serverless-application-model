@@ -169,6 +169,7 @@ class Properties(BaseModel):
     Role: Optional[PassThroughProp] = properties("Role")
     RolePath: Optional[PassThroughProp] = properties("RolePath")
     Tags: Optional[DictStrAny] = properties("Tags")
+    PropagateTags: Optional[bool]  # TODO: add docs
     Tracing: Optional[PassThroughProp] = properties("Tracing")
     Type: Optional[PassThroughProp] = properties("Type")
     AutoPublishAlias: Optional[PassThroughProp]
@@ -179,3 +180,7 @@ class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::StateMachine"]
     Properties: Properties
     Connectors: Optional[Dict[str, EmbeddedConnector]]
+
+
+class Globals(BaseModel):
+    PropagateTags: Optional[bool]  # TODO: add docs

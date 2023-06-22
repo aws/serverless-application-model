@@ -1,0 +1,32 @@
+Globals:
+  HttpApi:
+    RouteSettings:
+      $default:
+        DataTraceEnabled: true
+        ThrottlingBurstLimit: 100
+    FailOnWarnings: true
+Resources:
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: Prod
+      PropagateTags: true
+      Domain:
+        DomainName: admin.one.amazon.com
+        CertificateArn: arn::cert::abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: abc123456
+      StageVariables:
+        VarName: VarValue
+      Tags:
+        TagKey1: Value1
+        TagKey2: Value2
+      RouteSettings:
+        $default:
+          ThrottlingBurstLimit: 200
+          ThrottlingRateLimit: 0.7
+      AccessLogSettings:
+        DestinationArn: random-arn
+        Format: $context.requestId
+      CorsConfiguration: true

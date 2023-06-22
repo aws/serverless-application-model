@@ -127,6 +127,7 @@ class Properties(BaseModel):
     StageName: Optional[PassThroughProp] = properties("StageName")
     StageVariables: Optional[StageVariables] = properties("StageVariables")
     Tags: Optional[Tags] = properties("Tags")
+    PropagateTags: Optional[bool]  # TODO: add docs
     Name: Optional[PassThroughProp] = properties("Name")
 
 
@@ -140,6 +141,7 @@ class Globals(BaseModel):
     Domain: Optional[Domain] = properties("Domain")
     CorsConfiguration: Optional[CorsConfigurationType] = properties("CorsConfiguration")
     DefaultRouteSettings: Optional[DefaultRouteSettings] = properties("DefaultRouteSettings")
+    PropagateTags: Optional[bool]  # TODO: add docs
 
 
 class Resource(ResourceAttributes):

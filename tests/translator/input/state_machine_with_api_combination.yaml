@@ -1,0 +1,76 @@
+Resources:
+
+  # Create one API resource. This will be referred to by the State machine
+  ExistingRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Dev
+
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: Pass
+            Result: Hello
+            Next: World
+          World:
+            Type: Pass
+            Result: World
+            End: true
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Deny
+          Action: '*'
+          Resource: '*'
+
+      Events:
+        GetApi:
+          Type: Api
+          Properties:
+            Path: /pathget
+            Method: get
+            RestApiId:
+              Ref: ExistingRestApi
+
+        PostApi:
+          Type: Api
+          Properties:
+            Path: /pathpost
+            Method: post
+
+Outputs:
+  Region:
+    Description: Region
+    Value:
+      Ref: AWS::Region
+  Partition:
+    Description: Partition
+    Value:
+      Ref: AWS::Partition
+  MyStateMachineArn:
+    Description: ARN of the State Machine
+    Value:
+      Ref: MyStateMachine
+  MyImplicitApiRoleName:
+    Description: Name of the role created for the implicit Api method
+    Value:
+      Ref: MyStateMachinePostApiRole
+  MyImplicitApiRoleArn:
+    Description: ARN of the role created for the implicit Api method
+    Value:
+      Fn::GetAtt: MyStateMachinePostApiRole.Arn
+  MyExplicitApiRoleName:
+    Description: Name of the role created for the explicit Api method
+    Value:
+      Ref: MyStateMachineGetApiRole
+  MyExplicitApiRoleArn:
+    Description: ARN of the role created for the explicit Api method
+    Value:
+      Fn::GetAtt: MyStateMachineGetApiRole.Arn
+Metadata:
+  SamTransformTest: true

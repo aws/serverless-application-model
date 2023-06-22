@@ -28,6 +28,7 @@ class Globals(BaseModel):
     Api: Optional[aws_serverless_api.Globals]
     HttpApi: Optional[aws_serverless_httpapi.Globals]
     SimpleTable: Optional[aws_serverless_simpletable.Globals]
+    StateMachine: Optional[aws_serverless_statemachine.Globals]
 
 
 Resources = Union[

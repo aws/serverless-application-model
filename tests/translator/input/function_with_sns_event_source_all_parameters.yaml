@@ -5,7 +5,6 @@ Resources:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
       Runtime: python2.7
-
       Events:
         NotificationTopic:
           Type: SNS
@@ -25,4 +24,7 @@ Resources:
               - numeric:
                 - '>='
                 - 100
+              before:
+                owner:
+                - '0x0'
             FilterPolicyScope: MessageAttributes
