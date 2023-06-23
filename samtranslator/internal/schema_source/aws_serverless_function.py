@@ -441,6 +441,8 @@ class SelfManagedKafkaEventProperties(BaseModel):
         "KafkaBootstrapServers"
     )
     SourceAccessConfigurations: PassThroughProp = selfmanagedkafkaeventproperties("SourceAccessConfigurations")
+    StartingPosition: Optional[PassThroughProp]  # TODO: add documentation
+    StartingPositionTimestamp: Optional[PassThroughProp]  # TODO: add documentation
     Topics: PassThroughProp = selfmanagedkafkaeventproperties("Topics")
 
 

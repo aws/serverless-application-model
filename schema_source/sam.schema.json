@@ -3147,6 +3147,12 @@
           "markdownDescription": "An array of the authentication protocol, VPC components, or virtual host to secure and define your event source\\.  \n*Valid values*: `BASIC_AUTH | CLIENT_CERTIFICATE_TLS_AUTH | SASL_SCRAM_256_AUTH | SASL_SCRAM_512_AUTH | SERVER_ROOT_CA_CERTIFICATE`  \n*Type*: List of [SourceAccessConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-sourceaccessconfiguration.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ SourceAccessConfigurations](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "SourceAccessConfigurations"
         },
+        "StartingPosition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "StartingPositionTimestamp": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Topics": {
           "allOf": [
             {
@@ -7710,6 +7716,9 @@
     "samtranslator__internal__schema_source__aws_serverless_statemachine__Properties": {
       "additionalProperties": false,
       "properties": {
+        "AutoPublishAlias": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Definition": {
           "markdownDescription": "The state machine definition is an object, where the format of the object matches the format of your AWS SAM template file, for example, JSON or YAML\\. State machine definitions adhere to the [Amazon States Language](https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html)\\.  \nFor an example of an inline state machine definition, see [Examples](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-resource-statemachine--examples.html#sam-resource-statemachine--examples)\\.  \nYou must provide either a `Definition` or a `DefinitionUri`\\.  \n*Type*: Map  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "Definition",
@@ -7731,6 +7740,9 @@
           ],
           "markdownDescription": "The Amazon Simple Storage Service \\(Amazon S3\\) URI or local file path of the state machine definition written in the [Amazon States Language](https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html)\\.  \nIf you provide a local file path, the template must go through the workflow that includes the `sam deploy` or `sam package` command to correctly transform the definition\\. To do this, you must use version 0\\.52\\.0 or later of the AWS SAM CLI\\.  \nYou must provide either a `Definition` or a `DefinitionUri`\\.  \n*Type*: String \\| [S3Location](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-definitions3location)  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DefinitionS3Location`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-definitions3location) property of an `AWS::StepFunctions::StateMachine` resource\\.",
           "title": "DefinitionUri"
+        },
+        "DeploymentPreference": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Events": {
           "additionalProperties": {

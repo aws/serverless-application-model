@@ -1,0 +1,70 @@
+{
+  "Resources": {
+    "MyStateMachine": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"HelloWorld\",",
+              "    \"States\": {",
+              "        \"HelloWorld\": {",
+              "            \"End\": true,",
+              "            \"Result\": 1,",
+              "            \"Type\": \"Pass\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "RoleArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/doesNotExist"
+        },
+        "StateMachineType": "STANDARD",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "MyStateMachineAliastest": {
+      "Properties": {
+        "DeploymentPreference": {
+          "Alarms": [
+            "alarm 1",
+            "alarm 2"
+          ],
+          "Interval": 1,
+          "Percentage": 1,
+          "StateMachineVersionArn": {
+            "Ref": "MyStateMachineVersion"
+          },
+          "Type": "CANARY"
+        },
+        "Name": "test"
+      },
+      "Type": "AWS::StepFunctions::StateMachineAlias"
+    },
+    "MyStateMachineVersion": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "StateMachineArn": {
+          "Ref": "MyStateMachine"
+        },
+        "StateMachineRevisionId": {
+          "Fn::GetAtt": [
+            "MyStateMachine",
+            "StateMachineRevisionId"
+          ]
+        }
+      },
+      "Type": "AWS::StepFunctions::StateMachineVersion",
+      "UpdateReplacePolicy": "Retain"
+    }
+  }
+}
