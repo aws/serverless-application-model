@@ -1,6 +1,7 @@
 # AWS SAM transform
 
 [![Tests](https://github.com/aws/serverless-application-model/actions/workflows/build.yml/badge.svg)](https://github.com/aws/serverless-application-model/actions/workflows/build.yml)
+[![Update schema](https://github.com/aws/serverless-application-model/actions/workflows/schema.yml/badge.svg)](https://github.com/aws/serverless-application-model/actions/workflows/schema.yml)
 [![PyPI](https://img.shields.io/pypi/v/aws-sam-translator?label=PyPI)](https://pypi.org/project/aws-sam-translator/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aws-sam-translator?label=Python)](https://pypi.org/project/aws-sam-translator/)
 [![Contribute with Gitpod](https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/aws/serverless-application-model.git)
