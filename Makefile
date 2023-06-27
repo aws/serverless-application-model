@@ -68,15 +68,14 @@ fetch-schema-data:
 	rm -rf .tmp/aws-sam-developer-guide
 	git clone --branch main --depth 1 https://github.com/awsdocs/aws-sam-developer-guide.git .tmp/aws-sam-developer-guide
 
-	rm -rf .tmp/aws-cloudformation-user-guide
-	git clone --depth 1 https://github.com/awsdocs/aws-cloudformation-user-guide.git .tmp/aws-cloudformation-user-guide
+	curl -o .tmp/cfn-docs.json https://raw.githubusercontent.com/aws/aws-cdk/main/packages/%40aws-cdk/cfnspec/spec-source/cfn-docs/cfn-docs.json
 
 	curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
 
 update-schema-data:
 	# Parse docs
 	bin/parse_docs.py .tmp/aws-sam-developer-guide/doc_source > samtranslator/internal/schema_source/sam-docs.json
-	bin/parse_docs.py --cfn .tmp/aws-cloudformation-user-guide/doc_source > schema_source/cloudformation-docs.json
+	bin/parse_cdk_cfn_docs.py < .tmp/cfn-docs.json > schema_source/cloudformation-docs.json
 
 	# Add CloudFormation docs to CloudFormation schema
 	python bin/add_docs_cfn_schema.py --schema .tmp/cloudformation.schema.json --docs schema_source/cloudformation-docs.json > schema_source/cloudformation.schema.json
