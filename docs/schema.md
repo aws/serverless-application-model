@@ -14,7 +14,7 @@ flowchart TD
     cfnschema(["CloudFormation schema"])
   end
   
-  subgraph repocfndocs["awsdocs/aws-cloudformation-user-guide"]
+  subgraph repocfndocs["aws/aws-cdk"]
     cfndocs(["CloudFormation documentation"])
   end
 
