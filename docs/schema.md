@@ -18,9 +18,7 @@ flowchart TD
     cfndocs(["CloudFormation documentation"])
   end
 
-  subgraph reposamdocs["awsdocs/aws-sam-developer-guide"]
-    samdocs(["SAM documentation"])
-  end
+  samdocs(["SAM documentation"])
   
   samschema(["SAM schema"])
   cfnschemadocs(["CloudFormation schema with documentation"])
