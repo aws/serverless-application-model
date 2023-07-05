@@ -33,4 +33,20 @@ class StepFunctionsStateMachine(Resource):
     runtime_attrs = {
         "arn": lambda self: ref(self.logical_id),
         "name": lambda self: fnGetAtt(self.logical_id, "Name"),
+        "state_machine_revision_id": lambda self: fnGetAtt(self.logical_id, "StateMachineRevisionId"),
     }
+
+
+class StepFunctionsStateMachineVersion(Resource):
+    resource_type = "AWS::StepFunctions::StateMachineVersion"
+
+    property_types = {"StateMachineArn": GeneratedProperty(), "StateMachineRevisionId": GeneratedProperty()}
+
+    runtime_attrs = {"arn": lambda self: ref(self.logical_id)}
+
+
+class StepFunctionsStateMachineAlias(Resource):
+    resource_type = "AWS::StepFunctions::StateMachineAlias"
+    property_types = {"Name": GeneratedProperty(), "DeploymentPreference": GeneratedProperty()}
+
+    runtime_attrs = {"arn": lambda self: ref(self.logical_id)}

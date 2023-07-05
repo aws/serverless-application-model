@@ -172,6 +172,8 @@ class Properties(BaseModel):
     PropagateTags: Optional[bool]  # TODO: add docs
     Tracing: Optional[PassThroughProp] = properties("Tracing")
     Type: Optional[PassThroughProp] = properties("Type")
+    AutoPublishAlias: Optional[PassThroughProp]
+    DeploymentPreference: Optional[PassThroughProp]
 
 
 class Resource(ResourceAttributes):
