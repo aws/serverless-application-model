@@ -27,5 +27,6 @@ class SNSTopic(Resource):
     resource_type = "AWS::SNS::Topic"
     property_types = {
         "TopicName": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
     }
     runtime_attrs = {"arn": lambda self: ref(self.logical_id)}

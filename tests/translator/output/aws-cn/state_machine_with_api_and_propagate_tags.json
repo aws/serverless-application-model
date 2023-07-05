@@ -1,0 +1,498 @@
+{
+  "Resources": {
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/echo": {
+              "post": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "PostPostEchoRole",
+                      "Arn"
+                    ]
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\"\\\\'\",\"'\")\", \"stateMachineArn\": \"${Post}\"}"
+                    }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
+                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
+                }
+              }
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiDeployment5866b9014d": {
+      "Properties": {
+        "Description": "RestApi deployment id: 5866b9014d5a1c815da161bacc3b15b4a19f95ef",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment5866b9014d"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "Post": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"One\",",
+              "    \"States\": {",
+              "        \"One\": {",
+              "            \"End\": true,",
+              "            \"Resource\": \"random-resource\",",
+              "            \"Type\": \"Task\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "PostRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Key1",
+            "Value": "Value1"
+          },
+          {
+            "Key": "Key2",
+            "Value": "Value2"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "Post2": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"One\",",
+              "    \"States\": {",
+              "        \"One\": {",
+              "            \"End\": true,",
+              "            \"Resource\": \"random-resource\",",
+              "            \"Type\": \"Task\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "Post2Role",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Key3",
+            "Value": "Value3"
+          },
+          {
+            "Key": "Key4",
+            "Value": "Value4"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "Post2PostEcho2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "Post2"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "Post2PostEcho2RoleStartExecutionPolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Key3",
+            "Value": "Value3"
+          },
+          {
+            "Key": "Key4",
+            "Value": "Value4"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "Post2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "Key3",
+            "Value": "Value3"
+          },
+          {
+            "Key": "Key4",
+            "Value": "Value4"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "PostPostEchoRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "Post"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "PostPostEchoRoleStartExecutionPolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Key1",
+            "Value": "Value1"
+          },
+          {
+            "Key": "Key2",
+            "Value": "Value2"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "PostRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "Key1",
+            "Value": "Value1"
+          },
+          {
+            "Key": "Key2",
+            "Value": "Value2"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "PostScheduleEvent": {
+      "Properties": {
+        "Name": "TestSchedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "Post"
+            },
+            "Id": "PostScheduleEventStepFunctionsTarget",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "PostScheduleEventRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "PostScheduleEventRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "Post"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "PostScheduleEventRoleStartExecutionPolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Key1",
+            "Value": "Value1"
+          },
+          {
+            "Key": "Key2",
+            "Value": "Value2"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ServerlessRestApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/echo": {
+              "post": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::GetAtt": [
+                      "Post2PostEcho2Role",
+                      "Arn"
+                    ]
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${Post2}\"}"
+                    }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
+                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
+                }
+              }
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        },
+        "Tags": [
+          {
+            "Key": "Key3",
+            "Value": "Value3"
+          },
+          {
+            "Key": "Key4",
+            "Value": "Value4"
+          }
+        ]
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ServerlessRestApiDeployment301f7e9179": {
+      "Properties": {
+        "Description": "RestApi deployment id: 301f7e9179d9952ea2bed3e3710d8d324df39e04",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ServerlessRestApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment301f7e9179"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod",
+        "Tags": [
+          {
+            "Key": "Key3",
+            "Value": "Value3"
+          },
+          {
+            "Key": "Key4",
+            "Value": "Value4"
+          }
+        ]
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    }
+  }
+}

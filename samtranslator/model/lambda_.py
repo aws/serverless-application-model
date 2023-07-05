@@ -4,6 +4,8 @@ from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
 from samtranslator.utils.types import Intrinsicable
 
+LAMBDA_TRACING_CONFIG_DISABLED = "Disabled"
+
 
 class LambdaFunction(Resource):
     resource_type = "AWS::Lambda::Function"

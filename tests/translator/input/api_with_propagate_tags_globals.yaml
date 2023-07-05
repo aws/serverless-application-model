@@ -1,0 +1,12 @@
+Globals:
+  Api:
+    PropagateTags: true
+
+Resources:
+  MyApiWithPropagateTags:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Tags:
+        TagKey1: TagValue1
+        TagKey2: ''

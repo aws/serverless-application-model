@@ -1,0 +1,20 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.8
+      Handler: foo
+      InlineCode: bar
+      Events:
+        CloudWatchEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              source:
+              - aws.logs
+              detail:
+                eventSource:
+                - logs.amazonaws.com
+                eventName:
+                - CreateLogGroup

@@ -55,6 +55,14 @@ class SamTemplate:
 
         self.resources[logical_id] = resource_dict
 
+    def get_globals(self) -> Dict[str, Any]:
+        """
+        Gets the global section of the template
+
+        :return dict: Global section of the template
+        """
+        return self.template_dict.get("Globals") or {}
+
     def get(self, logical_id: str) -> Optional[SamResource]:
         """
         Gets the resource at the given logical_id if present

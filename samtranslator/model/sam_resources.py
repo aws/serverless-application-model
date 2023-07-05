@@ -89,6 +89,7 @@ from samtranslator.model.intrinsics import (
     ref,
 )
 from samtranslator.model.lambda_ import (
+    LAMBDA_TRACING_CONFIG_DISABLED,
     LambdaAlias,
     LambdaEventInvokeConfig,
     LambdaFunction,
@@ -155,6 +156,7 @@ class SamFunction(SamResourceMacro):
         "Environment": PropertyType(False, dict_of(IS_STR, IS_DICT)),
         "Events": PropertyType(False, dict_of(IS_STR, IS_DICT)),
         "Tags": PropertyType(False, IS_DICT),
+        "PropagateTags": PropertyType(False, IS_BOOL),
         "Tracing": PropertyType(False, one_of(IS_DICT, IS_STR)),
         "KmsKeyArn": PassThroughProperty(False),
         "DeploymentPreference": PropertyType(False, IS_DICT),
@@ -197,7 +199,8 @@ class SamFunction(SamResourceMacro):
     Environment: Optional[Dict[str, Any]]
     Events: Optional[Dict[str, Any]]
     Tags: Optional[Dict[str, Any]]
-    Tracing: Optional[Dict[str, Any]]
+    PropagateTags: Optional[bool]
+    Tracing: Optional[Intrinsicable[str]]
     KmsKeyArn: Optional[Intrinsicable[str]]
     DeploymentPreference: Optional[Dict[str, Any]]
     ReservedConcurrentExecutions: Optional[Any]
@@ -264,7 +267,7 @@ class SamFunction(SamResourceMacro):
         if self.DeadLetterQueue:
             self._validate_dlq(self.DeadLetterQueue)
 
-        lambda_function = self._construct_lambda_function()
+        lambda_function = self._construct_lambda_function(intrinsics_resolver)
         resources.append(lambda_function)
 
         if self.ProvisionedConcurrencyConfig and not self.AutoPublishAlias:
@@ -324,6 +327,7 @@ class SamFunction(SamResourceMacro):
             execution_role = self._construct_role(
                 managed_policy_map,
                 event_invoke_policies,
+                intrinsics_resolver,
                 get_managed_policy_map,
             )
             lambda_function.Role = execution_role.get_runtime_attr("arn")
@@ -339,6 +343,8 @@ class SamFunction(SamResourceMacro):
             )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message) from e
+
+        self.propagate_tags(resources, self.Tags, self.PropagateTags)
 
         return resources
 
@@ -540,7 +546,7 @@ class SamFunction(SamResourceMacro):
 
         return resolved_alias_name
 
-    def _construct_lambda_function(self) -> LambdaFunction:
+    def _construct_lambda_function(self, intrinsics_resolver: IntrinsicsResolver) -> LambdaFunction:
         """Constructs and returns the Lambda function.
 
         :returns: a list containing the Lambda function and execution role resources
@@ -573,7 +579,10 @@ class SamFunction(SamResourceMacro):
         lambda_function.SnapStart = self.SnapStart
         lambda_function.EphemeralStorage = self.EphemeralStorage
 
-        if self.Tracing:
+        tracing = intrinsics_resolver.resolve_parameter_refs(self.Tracing)
+
+        # Explicitly setting Trace to 'Disabled' is the same as omitting Tracing property.
+        if self.Tracing and tracing != LAMBDA_TRACING_CONFIG_DISABLED:
             lambda_function.TracingConfig = {"Mode": self.Tracing}
 
         if self.DeadLetterQueue:
@@ -605,6 +614,7 @@ class SamFunction(SamResourceMacro):
         self,
         managed_policy_map: Dict[str, Any],
         event_invoke_policies: List[Dict[str, Any]],
+        intrinsics_resolver: IntrinsicsResolver,
         get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
     ) -> IAMRole:
         """Constructs a Lambda execution role based on this SAM function's Policies property.
@@ -621,7 +631,11 @@ class SamFunction(SamResourceMacro):
         )
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
-        if self.Tracing:
+
+        tracing = intrinsics_resolver.resolve_parameter_refs(self.Tracing)
+
+        # Do not add xray policy to generated IAM role if users explicitly specify 'Disabled' in Tracing property.
+        if self.Tracing and tracing != LAMBDA_TRACING_CONFIG_DISABLED:
             managed_policy_name = get_xray_managed_policy_name()
             managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
         if self.VpcConfig:
@@ -1183,6 +1197,7 @@ class SamApi(SamResourceMacro):
         "Name": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "StageName": PropertyType(True, one_of(IS_STR, IS_DICT)),
         "Tags": PropertyType(False, IS_DICT),
+        "PropagateTags": PropertyType(False, IS_BOOL),
         "DefinitionBody": PropertyType(False, IS_DICT),
         "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "MergeDefinitions": Property(False, IS_BOOL),
@@ -1213,6 +1228,7 @@ class SamApi(SamResourceMacro):
     Name: Optional[Intrinsicable[str]]
     StageName: Optional[Intrinsicable[str]]
     Tags: Optional[Dict[str, Any]]
+    PropagateTags: Optional[bool]
     DefinitionBody: Optional[Dict[str, Any]]
     DefinitionUri: Optional[Intrinsicable[str]]
     MergeDefinitions: Optional[bool]
@@ -1304,7 +1320,11 @@ class SamApi(SamResourceMacro):
             always_deploy=self.AlwaysDeploy,
         )
 
-        return api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
+        generated_resources = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
+
+        self.propagate_tags(generated_resources, self.Tags, self.PropagateTags)
+
+        return generated_resources
 
 
 class SamHttpApi(SamResourceMacro):
@@ -1321,6 +1341,7 @@ class SamHttpApi(SamResourceMacro):
         "Name": PassThroughProperty(False),
         "StageName": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "Tags": PropertyType(False, IS_DICT),
+        "PropagateTags": PropertyType(False, IS_BOOL),
         "DefinitionBody": PropertyType(False, IS_DICT),
         "DefinitionUri": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "StageVariables": PropertyType(False, IS_DICT),
@@ -1338,6 +1359,7 @@ class SamHttpApi(SamResourceMacro):
     Name: Optional[Any]
     StageName: Optional[Intrinsicable[str]]
     Tags: Optional[Dict[str, Any]]
+    PropagateTags: Optional[bool]
     DefinitionBody: Optional[Dict[str, Any]]
     DefinitionUri: Optional[Intrinsicable[str]]
     StageVariables: Optional[Dict[str, Intrinsicable[str]]]
@@ -1414,6 +1436,8 @@ class SamHttpApi(SamResourceMacro):
         # Stage is now optional. Only add it if one is created.
         if stage:
             resources.append(stage)
+
+        self.propagate_tags(resources, self.Tags, self.PropagateTags)
 
         return resources
 
@@ -1734,6 +1758,7 @@ class SamStateMachine(SamResourceMacro):
         "Name": PropertyType(False, IS_STR),
         "Type": PropertyType(False, IS_STR),
         "Tags": PropertyType(False, IS_DICT),
+        "PropagateTags": PropertyType(False, IS_BOOL),
         "Policies": PropertyType(False, one_of(IS_STR, list_of(one_of(IS_STR, IS_DICT, IS_DICT)))),
         "Tracing": PropertyType(False, IS_DICT),
         "PermissionsBoundary": PropertyType(False, IS_STR),
@@ -1751,6 +1776,7 @@ class SamStateMachine(SamResourceMacro):
     Name: Optional[Intrinsicable[str]]
     Type: Optional[Intrinsicable[str]]
     Tags: Optional[Dict[str, Any]]
+    PropagateTags: Optional[bool]
     Policies: Optional[List[Any]]
     Tracing: Optional[Dict[str, Any]]
     PermissionsBoundary: Optional[Intrinsicable[str]]
@@ -1796,7 +1822,11 @@ class SamStateMachine(SamResourceMacro):
             deployment_preference=self.DeploymentPreference,
         )
 
-        return state_machine_generator.to_cloudformation()
+        generated_resources = state_machine_generator.to_cloudformation()
+
+        self.propagate_tags(generated_resources, self.Tags, self.PropagateTags)
+
+        return generated_resources
 
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:

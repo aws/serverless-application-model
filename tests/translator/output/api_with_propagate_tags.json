@@ -1,0 +1,295 @@
+{
+  "Parameters": {
+    "HostedZoneId": {
+      "Type": "String"
+    },
+    "MyEdgeDomainCert": {
+      "Type": "String"
+    },
+    "MyEdgeDomainName": {
+      "Type": "String"
+    },
+    "TagValueParam": {
+      "Default": "value",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "ApiGatewayDomainName9005ff2ee8": {
+      "Properties": {
+        "CertificateArn": {
+          "Ref": "MyEdgeDomainCert"
+        },
+        "DomainName": {
+          "Ref": "MyEdgeDomainName"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
+          {
+            "Key": "TagKey2",
+            "Value": ""
+          },
+          {
+            "Key": "TagKey3",
+            "Value": {
+              "Ref": "TagValueParam"
+            }
+          },
+          {
+            "Key": "TagKey4",
+            "Value": "123"
+          }
+        ]
+      },
+      "Type": "AWS::ApiGateway::DomainName"
+    },
+    "MyApiWithPropagateTags": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {},
+          "securityDefinitions": {
+            "api_key": {
+              "in": "header",
+              "name": "x-api-key",
+              "type": "apiKey"
+            }
+          },
+          "swagger": "2.0"
+        },
+        "Tags": [
+          {
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
+          {
+            "Key": "TagKey2",
+            "Value": ""
+          },
+          {
+            "Key": "TagKey3",
+            "Value": {
+              "Ref": "TagValueParam"
+            }
+          },
+          {
+            "Key": "TagKey4",
+            "Value": "123"
+          }
+        ]
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiWithPropagateTagsDeployment1bc35aa4ab": {
+      "Properties": {
+        "Description": "RestApi deployment id: 1bc35aa4abf782d59144ae761065530119626dbb",
+        "RestApiId": {
+          "Ref": "MyApiWithPropagateTags"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiWithPropagateTagsProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithPropagateTagsDeployment1bc35aa4ab"
+        },
+        "RestApiId": {
+          "Ref": "MyApiWithPropagateTags"
+        },
+        "StageName": "Prod",
+        "Tags": [
+          {
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
+          {
+            "Key": "TagKey2",
+            "Value": ""
+          },
+          {
+            "Key": "TagKey3",
+            "Value": {
+              "Ref": "TagValueParam"
+            }
+          },
+          {
+            "Key": "TagKey4",
+            "Value": "123"
+          }
+        ]
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyApiWithPropagateTagsgetBasePathMapping": {
+      "Properties": {
+        "BasePath": "get",
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName9005ff2ee8"
+        },
+        "RestApiId": {
+          "Ref": "MyApiWithPropagateTags"
+        },
+        "Stage": {
+          "Ref": "MyApiWithPropagateTagsProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "RecordSetGroup1194dea82a": {
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "HostedZoneId"
+        },
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName9005ff2ee8",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": {
+              "Ref": "MyEdgeDomainName"
+            },
+            "Type": "A"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainName9005ff2ee8",
+                  "DistributionDomainName"
+                ]
+              },
+              "HostedZoneId": "Z2FDTNDATAQYW2"
+            },
+            "Name": {
+              "Ref": "MyEdgeDomainName"
+            },
+            "Type": "AAAA"
+          }
+        ]
+      },
+      "Type": "AWS::Route53::RecordSetGroup"
+    },
+    "ServerlessApiKey": {
+      "DependsOn": [
+        "ServerlessUsagePlan"
+      ],
+      "Properties": {
+        "Enabled": true,
+        "StageKeys": [
+          {
+            "RestApiId": {
+              "Ref": "MyApiWithPropagateTags"
+            },
+            "StageName": {
+              "Ref": "MyApiWithPropagateTagsProdStage"
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
+          {
+            "Key": "TagKey2",
+            "Value": ""
+          },
+          {
+            "Key": "TagKey3",
+            "Value": {
+              "Ref": "TagValueParam"
+            }
+          },
+          {
+            "Key": "TagKey4",
+            "Value": "123"
+          }
+        ]
+      },
+      "Type": "AWS::ApiGateway::ApiKey"
+    },
+    "ServerlessUsagePlan": {
+      "DependsOn": [
+        "MyApiWithPropagateTags"
+      ],
+      "Properties": {
+        "ApiStages": [
+          {
+            "ApiId": {
+              "Ref": "MyApiWithPropagateTags"
+            },
+            "Stage": {
+              "Ref": "MyApiWithPropagateTagsProdStage"
+            }
+          }
+        ],
+        "Description": "My test usage plan",
+        "Quota": {
+          "Limit": 500,
+          "Period": "MONTH"
+        },
+        "Tags": [
+          {
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
+          {
+            "Key": "TagKey2",
+            "Value": ""
+          },
+          {
+            "Key": "TagKey3",
+            "Value": {
+              "Ref": "TagValueParam"
+            }
+          },
+          {
+            "Key": "TagKey4",
+            "Value": "123"
+          }
+        ],
+        "Throttle": {
+          "BurstLimit": 100,
+          "RateLimit": 50
+        }
+      },
+      "Type": "AWS::ApiGateway::UsagePlan"
+    },
+    "ServerlessUsagePlanKey": {
+      "DependsOn": [
+        "ServerlessApiKey"
+      ],
+      "Properties": {
+        "KeyId": {
+          "Ref": "ServerlessApiKey"
+        },
+        "KeyType": "API_KEY",
+        "UsagePlanId": {
+          "Ref": "ServerlessUsagePlan"
+        }
+      },
+      "Type": "AWS::ApiGateway::UsagePlanKey"
+    }
+  }
+}

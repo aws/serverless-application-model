@@ -134,27 +134,16 @@ one python version locally and then have our ci (appveyor) run all supported ver
 
 Transform tests ensure a SAM template transforms into the expected CloudFormation template.
 
-When adding new transform tests, we have provided a script to help generate the transform test input 
-and output files in the correct directory given a `template.yaml` file.
+We provide a script to help generate the transform test input
+and output files in the correct directory given a SAM template. For example:
+
 ```bash
 python3 bin/add_transform_test.py --template-file template.yaml
 ```
 
-This script will automatically generate the input and output files. It will guarantee that the output
-files have the correct AWS partition (e.g. aws-cn, aws-us-gov). 
-
-For `AWS::ApiGateway::RestApi`, the script will automatically append `REGIONAL` `EndpointConfiguration`.
-To disable this feature, run the following command instead.
-```bash
-python3 bin/add_transform_test.py --template-file template.yaml --disable-api-configuration
-```
-
-The script automatically updates hardcoded ARN partitions to match the output partition. To disable this, use:
-```bash
-python3 bin/add_transform_test.py --template-file template.yaml --disable-update-partition
-```
-
-Please always check the generated output is as expected. This tool does not guarantee correct output.
+> **Warning**
+>
+> Always check the generated output is as expected. This tool does not guarantee correct output.
 
 #### Transform failures
 
