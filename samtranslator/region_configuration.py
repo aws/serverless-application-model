@@ -38,7 +38,8 @@ class RegionConfiguration:
         :return: True, if the service is supported in the region
         """
 
-        session = boto3.Session()
+        # Attempt to re-use an existing session if present.
+        session = boto3.Session() if not boto3.DEFAULT_SESSION else boto3.DEFAULT_SESSION
 
         if not region:
             # get the current region

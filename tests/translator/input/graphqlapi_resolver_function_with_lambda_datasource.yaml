@@ -26,9 +26,20 @@ Resources:
           myResolver:
             FieldName: my_field
             MaxBatchSize: 10
+            Caching:
+              Ttl: 20
+              CachingKeys:
+              - key1
+              - key2
+            Pipeline:
+            - MyFunction
+          myResolverWithCustomCode:
+            FieldName: my_field
+            InlineCode: custom code
             Runtime:
-              Name: some-runtime
+              Name: APPSYNC_JS
               Version: 1.2.3
+            MaxBatchSize: 10
             Caching:
               Ttl: 20
               CachingKeys:

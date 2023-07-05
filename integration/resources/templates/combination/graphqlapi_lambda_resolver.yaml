@@ -108,16 +108,10 @@ Resources:
       Resolvers:
         Mutation:
           addPost:
-            Runtime:
-              Name: APPSYNC_JS
-              Version: 1.0.0
             Pipeline:
             - lambdaInvoker
         Query:
           getPost:
-            Runtime:
-              Name: APPSYNC_JS
-              Version: 1.0.0
             Pipeline:
             - lambdaInvoker
 

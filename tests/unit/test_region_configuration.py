@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+import boto3
 from parameterized import parameterized
 from samtranslator.region_configuration import RegionConfiguration
 
@@ -50,6 +51,11 @@ class TestRegionConfiguration(TestCase):
     )
     def test_is_service_supported_positive(self, service, region):
         self.assertTrue(RegionConfiguration.is_service_supported(service, region))
+
+    def test_is_service_supported_positive_boto3_default_session(self):
+        new_region = "us-west-2"
+        boto3.setup_default_session(region_name=new_region)
+        self.assertTrue(RegionConfiguration.is_service_supported("ec2", new_region))
 
     def test_is_service_supported_negative(self):
         # use an unknown service name
