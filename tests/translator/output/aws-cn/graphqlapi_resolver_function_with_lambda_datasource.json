@@ -86,7 +86,47 @@
           ]
         },
         "Runtime": {
-          "Name": "some-runtime",
+          "Name": "APPSYNC_JS",
+          "RuntimeVersion": "1.0.0"
+        },
+        "TypeName": "Mutation"
+      },
+      "Type": "AWS::AppSync::Resolver"
+    },
+    "SuperCoolAPIMutationmyResolverWithCustomCode": {
+      "DependsOn": [
+        "SuperCoolAPISchema"
+      ],
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "CachingConfig": {
+          "CachingKeys": [
+            "key1",
+            "key2"
+          ],
+          "Ttl": 20
+        },
+        "Code": "custom code",
+        "FieldName": "my_field",
+        "Kind": "PIPELINE",
+        "MaxBatchSize": 10,
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Fn::GetAtt": [
+                "SuperCoolAPIMyFunction",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "Runtime": {
+          "Name": "APPSYNC_JS",
           "RuntimeVersion": "1.2.3"
         },
         "TypeName": "Mutation"

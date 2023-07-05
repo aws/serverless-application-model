@@ -75,6 +75,13 @@ class AppSyncRuntimeType(TypedDict):
     RuntimeVersion: str
 
 
+# Runtime for the default generated resolver code (see APPSYNC_PIPELINE_RESOLVER_JS_CODE above)
+APPSYNC_PIPELINE_RESOLVER_JS_RUNTIME: AppSyncRuntimeType = {
+    "Name": "APPSYNC_JS",
+    "RuntimeVersion": "1.0.0",
+}
+
+
 class LambdaConflictHandlerConfigType(TypedDict):
     LambdaConflictHandlerArn: str
 

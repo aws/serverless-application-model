@@ -14,6 +14,7 @@ from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
+    APPSYNC_PIPELINE_RESOLVER_JS_RUNTIME,
     AdditionalAuthenticationProviderType,
     ApiCache,
     ApiKey,
@@ -2187,7 +2188,7 @@ class SamConnector(SamResourceMacro):
 
 
 class SamGraphQLApi(SamResourceMacro):
-    """SAM GraphQL API Macro (WIP)."""
+    """SAM GraphQL API Macro."""
 
     resource_type = "AWS::Serverless::GraphQLApi"
     property_types = {
@@ -2973,11 +2974,13 @@ class SamGraphQLApi(SamResourceMacro):
                 # to a default snippet which has basic definition of request/response functions.
                 if not cfn_resolver.Code and not cfn_resolver.CodeS3Location:
                     cfn_resolver.Code = APPSYNC_PIPELINE_RESOLVER_JS_CODE
+                    cfn_resolver.Runtime = APPSYNC_PIPELINE_RESOLVER_JS_RUNTIME
+                else:
+                    cfn_resolver.Runtime = self._parse_runtime(resolver, relative_id)
 
                 cfn_resolver.ApiId = api_id
                 cfn_resolver.FieldName = resolver.FieldName or relative_id
                 cfn_resolver.TypeName = type_name
-                cfn_resolver.Runtime = self._parse_runtime(resolver, relative_id)
 
                 if resolver.Pipeline:
                     cfn_resolver.Kind = "PIPELINE"

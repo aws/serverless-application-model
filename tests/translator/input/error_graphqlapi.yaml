@@ -284,37 +284,6 @@ Resources:
             Version: 1.2.3
           InlineCode: this is my epic code
 
-  ResolverBothDatasourcePropertiesDefined:
-    Type: AWS::Serverless::GraphQLApi
-    Properties:
-      Name: SomeApi
-      SchemaInline: |
-        type Mutation {
-          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
-        }
-      XrayEnabled: true
-      Auth:
-        Type: AWS_IAM
-      Tags:
-        key1: value1
-        key2: value2
-      Resolvers:
-        Mutation:
-          BothDatasourcePropertiesDefined:
-            FieldName: my_field
-            Runtime:
-              Name: some-runtime
-              Version: 1.2.3
-            Pipeline:
-            - MyFunction
-      Functions:
-        MyFunction:
-          DataSource: NONE
-          Runtime:
-            Name: some-runtime
-            Version: 1.2.3
-          InlineCode: this is my epic code
-
   ResolverWithNoRuntime:
     Type: AWS::Serverless::GraphQLApi
     Properties:
@@ -333,6 +302,7 @@ Resources:
         Mutation:
           NoRuntimeForResolver:
             FieldName: my_field
+            InlineCode: overridden code must be supplied with Runtime
             Pipeline:
             - MyFunction
       Functions:
