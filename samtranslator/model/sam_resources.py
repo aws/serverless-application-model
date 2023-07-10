@@ -81,6 +81,7 @@ from samtranslator.model.exceptions import InvalidEventException, InvalidResourc
 from samtranslator.model.iam import IAMManagedPolicy, IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import (
     fnGetAtt,
+    fnSub,
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
@@ -2604,7 +2605,7 @@ class SamGraphQLApi(SamResourceMacro):
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
 
             cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_ddb_datasource_role(
-                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, datasource_logical_id, kwargs
+                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), datasource_logical_id, kwargs
             )
 
             self._datasource_name_map[relative_id] = cfn_datasource.get_runtime_attr("name")
@@ -2617,7 +2618,6 @@ class SamGraphQLApi(SamResourceMacro):
         self,
         ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource,
         datasource_arn: Intrinsicable[str],
-        relative_id: str,
         datasource_logical_id: str,
         kwargs: Dict[str, Any],
     ) -> Tuple[str, List[Resource]]:
@@ -2625,13 +2625,9 @@ class SamGraphQLApi(SamResourceMacro):
         if ddb_datasource.ServiceRoleArn:
             return cast(PassThrough, ddb_datasource.ServiceRoleArn), []
 
-        # If the user doesn't have their own role, then we will create for them if TableArn is defined.
-        table_arn = passthrough_value(
-            sam_expect(
-                ddb_datasource.TableArn, relative_id, f"DataSources.DynamoDb.{relative_id}.TableArn"
-            ).to_not_be_none(
-                "'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined."
-            )
+        table_arn = cast(
+            Intrinsicable[str],
+            (ddb_datasource.TableArn if ddb_datasource.TableArn else self._compose_dynamodb_table_arn(ddb_datasource)),
         )
 
         permissions = ddb_datasource.Permissions or ["Read", "Write"]
@@ -2675,7 +2671,7 @@ class SamGraphQLApi(SamResourceMacro):
     def _construct_ddb_datasource_connector_resources(
         datasource_id: str,
         source_arn: Intrinsicable[str],
-        destination_arn: str,
+        destination_arn: Intrinsicable[str],
         permissions: PermissionsType,
         role_name: Intrinsicable[str],
         kwargs: Dict[str, Any],
@@ -3026,3 +3022,15 @@ class SamGraphQLApi(SamResourceMacro):
     @staticmethod
     def _create_appsync_data_source_logical_id(api_id: str, data_source_type: str, data_source_relative_id: str) -> str:
         return f"{api_id}{data_source_relative_id}{data_source_type}DataSource"
+
+    @staticmethod
+    def _compose_dynamodb_table_arn(ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource) -> Intrinsicable[str]:
+        return fnSub(
+            ArnGenerator.generate_dynamodb_table_arn(
+                partition="${AWS::Partition}", table_name="${__TableName__}", region="${__Region__}"
+            ),
+            {
+                "__TableName__": ddb_datasource.TableName,
+                "__Region__": passthrough_value(ddb_datasource.Region) or ref("AWS::Region"),
+            },
+        )
