@@ -30,3 +30,34 @@ class TestArnGenerator(TestCase):
         self.assertEqual(actual, "aws")
 
         ArnGenerator.BOTO_SESSION_REGION_NAME = None
+
+    def test_generate_dynamodb_table_arn(self):
+        region = "us-west-1"
+
+        actual = ArnGenerator.generate_dynamodb_table_arn(
+            table_name="DdbTable", region=region, partition="${AWS::Partition}"
+        )
+        expected = f"arn:${{AWS::Partition}}:dynamodb:{region}:${{AWS::AccountId}}:table/DdbTable"
+
+        self.assertEqual(expected, actual)
+
+    def test_generate_arn_with_empty_region(self):
+        actual = ArnGenerator.generate_arn(
+            partition="aws",
+            service="weirdo",
+            resource="my_resource",
+            region="",
+        )
+        expected = "arn:aws:weirdo::${AWS::AccountId}:my_resource"
+
+        self.assertEqual(expected, actual)
+
+    def test_generate_arn_without_region_provided(self):
+        actual = ArnGenerator.generate_arn(
+            partition="aws",
+            service="weirdo",
+            resource="my_resource",
+        )
+        expected = "arn:aws:weirdo:${AWS::Region}:${AWS::AccountId}:my_resource"
+
+        self.assertEqual(expected, actual)

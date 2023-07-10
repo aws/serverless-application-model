@@ -1,0 +1,45 @@
+Transform: AWS::Serverless-2016-10-31
+
+Mappings:
+  TablesToRegions:
+    Table1:
+      Region: us-west-2
+
+Resources:
+  Table1:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: Table1
+
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Todo {
+          id: ID!
+          description: String!
+        }
+        type Mutation {
+          addTodo(id: ID!, description: String!): Todo!
+        }
+        type Query {
+          getTodo(id: ID!): Todo
+        }
+        schema {
+          mutation: Mutation
+          query: Query
+        }
+      Auth:
+        Type: AWS_IAM
+      DataSources:
+        DynamoDb:
+          HardcodedTableName:
+            TableName: Table1
+          TableNameIntrinsic:
+            TableName: !Ref Table1
+          RegionHardcoded:
+            TableName: Table1
+            Region: us-west-2
+          RegionIntrinsic:
+            TableName: !Ref Table1
+            Region: !FindInMap [TablesToRegions, Table1, Region]
