@@ -34,19 +34,54 @@ class ArnGenerator:
 
     @classmethod
     def generate_arn(
-        cls, partition: str, service: str, resource: str, include_account_id: Optional[bool] = True
+        cls,
+        partition: str,
+        service: str,
+        resource: str,
+        include_account_id: bool = True,
+        region: Optional[str] = None,
     ) -> str:
+        """Generate AWS ARN.
+
+        Parameters
+        ----------
+        partition
+            AWS partition, ie "aws" or "aws-cn"
+        service
+            AWS service name
+        resource
+            Resource name, it must include service specific prefixes is "table/" for DynamoDB table
+        include_account_id, optional
+            include account ID in the ARN or not, by default True
+        region, optional
+            resource region, by default None.
+            To omit region in ARN (ie for a S3 bucket) pass "" (empty string).
+            Don't set it to any other default value because None can be passed by a caller and
+            must be handled in the function itself.
+
+        Returns
+        -------
+            Generated ARN
+
+        Raises
+        ------
+        RuntimeError
+            if service or resource are not provided
+        """
         if not service or not resource:
             raise RuntimeError("Could not construct ARN for resource.")
 
-        arn = "arn:{0}:{1}:${{AWS::Region}}:"
+        if region is None:
+            region = "${AWS::Region}"
+
+        arn = "arn:{0}:{1}:{region}:"
 
         if include_account_id:
             arn += "${{AWS::AccountId}}:"
 
         arn += "{2}"
 
-        return arn.format(partition, service, resource)
+        return arn.format(partition, service, resource, region=region)
 
     @classmethod
     def generate_aws_managed_policy_arn(cls, policy_name: str) -> str:
@@ -89,3 +124,24 @@ class ArnGenerator:
             raise NoRegionFound("AWS Region cannot be found")
 
         return _region_to_partition(region)
+
+    @classmethod
+    def generate_dynamodb_table_arn(cls, partition: str, region: str, table_name: str) -> str:
+        """Generate DynamoDB table ARN.
+
+        Parameters
+        ----------
+        partition
+            _description_
+        region
+            DynamoDB table region
+        table_name
+            DynamoDB table name
+
+        Returns
+        -------
+            DynamoDB table ARN.
+        """
+        return ArnGenerator.generate_arn(
+            partition=partition, service="dynamodb", resource=f"table/{table_name}", region=region
+        )
