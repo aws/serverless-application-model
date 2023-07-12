@@ -38,7 +38,13 @@
         },
         "Name": {
           "Ref": "ApiName"
-        }
+        },
+        "Tags": [
+          {
+            "Key": "graphqlapi:createdBy",
+            "Value": "SAM"
+          }
+        ]
       },
       "Type": "AWS::AppSync::GraphQLApi"
     },

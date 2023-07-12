@@ -12,7 +12,13 @@
           },
           "FieldLogLevel": "ALL"
         },
-        "Name": "SuperDuperCoolAPI"
+        "Name": "SuperDuperCoolAPI",
+        "Tags": [
+          {
+            "Key": "graphqlapi:createdBy",
+            "Value": "SAM"
+          }
+        ]
       },
       "Type": "AWS::AppSync::GraphQLApi"
     },

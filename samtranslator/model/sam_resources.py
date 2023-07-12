@@ -2298,8 +2298,10 @@ class SamGraphQLApi(SamResourceMacro):
             self._construct_lambda_auth_connector(api, arn, i) for i, arn in enumerate(lambda_auth_arns, 1)
         ]
 
-        if model.Tags:
-            api.Tags = get_tag_list(model.Tags)
+        if not model.Tags:
+            model.Tags = {}
+        model.Tags["graphqlapi:createdBy"] = "SAM"
+        api.Tags = get_tag_list(model.Tags)
 
         # Logging has 3 possible types: dict, bool, and None.
         # GraphQLApi will not include logging if and only if the user explicity sets Logging as false boolean.
