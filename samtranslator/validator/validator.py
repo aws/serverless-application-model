@@ -1,7 +1,14 @@
 import re
 
+from samtranslator.internal.deprecation_control import deprecated
 
+
+@deprecated()
 class SamTemplateValidator:
+    """
+    Using dummy values; unused code.
+    """
+
     UNICODE_TYPE_REGEX = re.compile("u('[^']+')")
 
     def __init__(self, schema=None) -> None:  # type: ignore[no-untyped-def]
