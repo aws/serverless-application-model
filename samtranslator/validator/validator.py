@@ -3,7 +3,6 @@ import re
 from samtranslator.internal.deprecation_control import deprecated
 
 
-@deprecated()
 class SamTemplateValidator:
     """
     Using dummy values; unused code.
@@ -11,13 +10,16 @@ class SamTemplateValidator:
 
     UNICODE_TYPE_REGEX = re.compile("u('[^']+')")
 
+    @deprecated()
     def __init__(self, schema=None) -> None:  # type: ignore[no-untyped-def]
         pass
 
     @staticmethod
+    @deprecated()
     def validate(template_dict, schema=None):  # type: ignore[no-untyped-def]
         return ""
 
+    @deprecated()
     def get_errors(self, template_dict):  # type: ignore[no-untyped-def]
         return []
 
