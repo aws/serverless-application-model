@@ -1,8 +1,6 @@
-import warnings
 from unittest import TestCase
 
 import pytest
-
 from samtranslator.internal.deprecation_control import deprecated
 
 
