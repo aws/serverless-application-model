@@ -2193,7 +2193,7 @@ class SamGraphQLApi(SamResourceMacro):
 
     resource_type = "AWS::Serverless::GraphQLApi"
     property_types = {
-        "Name": Property(False, IS_STR),
+        "Name": PassThroughProperty(False),
         "Tags": Property(False, IS_DICT),
         "XrayEnabled": PassThroughProperty(False),
         "Auth": Property(True, IS_DICT),
@@ -2211,7 +2211,7 @@ class SamGraphQLApi(SamResourceMacro):
     Auth: List[Dict[str, Any]]
     Tags: Optional[Dict[str, Any]]
     XrayEnabled: Optional[PassThrough]
-    Name: Optional[str]
+    Name: Optional[PassThrough]
     SchemaInline: Optional[str]
     SchemaUri: Optional[str]
     Logging: Optional[Union[Dict[str, Any], bool]]
@@ -2290,7 +2290,7 @@ class SamGraphQLApi(SamResourceMacro):
     ) -> Tuple[GraphQLApi, Optional[IAMRole], List[SamConnector]]:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
-        api.Name = model.Name or self.logical_id
+        api.Name = passthrough_value(model.Name) or self.logical_id
         api.XrayEnabled = model.XrayEnabled
 
         lambda_auth_arns = self._parse_and_set_auth_properties(api, model.Auth)
@@ -2298,8 +2298,10 @@ class SamGraphQLApi(SamResourceMacro):
             self._construct_lambda_auth_connector(api, arn, i) for i, arn in enumerate(lambda_auth_arns, 1)
         ]
 
-        if model.Tags:
-            api.Tags = get_tag_list(model.Tags)
+        if not model.Tags:
+            model.Tags = {}
+        model.Tags["graphqlapi:createdBy"] = "SAM"
+        api.Tags = get_tag_list(model.Tags)
 
         # Logging has 3 possible types: dict, bool, and None.
         # GraphQLApi will not include logging if and only if the user explicity sets Logging as false boolean.
@@ -2465,7 +2467,7 @@ class SamGraphQLApi(SamResourceMacro):
         if model.Logging.ExcludeVerboseContent:
             log_config["ExcludeVerboseContent"] = cast(PassThrough, model.Logging.ExcludeVerboseContent)
 
-        log_config["FieldLogLevel"] = model.Logging.FieldLogLevel or "ALL"
+        log_config["FieldLogLevel"] = passthrough_value(model.Logging.FieldLogLevel) or "ALL"
         log_config["CloudWatchLogsRoleArn"] = cast(PassThrough, model.Logging.CloudWatchLogsRoleArn)
 
         if log_config["CloudWatchLogsRoleArn"]:
@@ -2598,7 +2600,7 @@ class SamGraphQLApi(SamResourceMacro):
             )
 
             # Datasource "Name" property must be unique from all other datasources.
-            cfn_datasource.Name = ddb_datasource.Name or relative_id
+            cfn_datasource.Name = passthrough_value(ddb_datasource.Name) or relative_id
             cfn_datasource.Type = "AMAZON_DYNAMODB"
             cfn_datasource.ApiId = api_id
             cfn_datasource.Description = passthrough_value(ddb_datasource.Description)
@@ -2652,7 +2654,7 @@ class SamGraphQLApi(SamResourceMacro):
     def _parse_ddb_config(self, ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource) -> DynamoDBConfigType:
         ddb_config: DynamoDBConfigType = {}
 
-        ddb_config["AwsRegion"] = cast(PassThrough, ddb_datasource.Region) or ref("AWS::Region")
+        ddb_config["AwsRegion"] = passthrough_value(ddb_datasource.Region) or ref("AWS::Region")
         ddb_config["TableName"] = passthrough_value(ddb_datasource.TableName)
 
         if ddb_datasource.UseCallerCredentials:
@@ -2713,7 +2715,7 @@ class SamGraphQLApi(SamResourceMacro):
                 logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
 
-            cfn_datasource.Name = lambda_datasource.Name or relative_id
+            cfn_datasource.Name = passthrough_value(lambda_datasource.Name) or relative_id
             cfn_datasource.Type = "AWS_LAMBDA"
             cfn_datasource.ApiId = api_id
             cfn_datasource.Description = passthrough_value(lambda_datasource.Description)

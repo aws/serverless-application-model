@@ -173,6 +173,10 @@
           {
             "Key": "key2",
             "Value": "value2"
+          },
+          {
+            "Key": "graphqlapi:createdBy",
+            "Value": "SAM"
           }
         ],
         "XrayEnabled": true

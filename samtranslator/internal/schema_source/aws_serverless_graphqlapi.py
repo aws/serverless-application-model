@@ -57,13 +57,13 @@ class ApiKey(BaseModel):
 class Logging(BaseModel):
     CloudWatchLogsRoleArn: Optional[PassThroughProp]
     ExcludeVerboseContent: Optional[PassThroughProp]
-    FieldLogLevel: Optional[str]
+    FieldLogLevel: Optional[PassThroughProp]
 
 
 class DeltaSync(BaseModel):
-    BaseTableTTL: str
-    DeltaSyncTableName: str
-    DeltaSyncTableTTL: str
+    BaseTableTTL: PassThroughProp
+    DeltaSyncTableName: PassThroughProp
+    DeltaSyncTableTTL: PassThroughProp
 
 
 class DynamoDBDataSource(BaseModel):
@@ -71,7 +71,7 @@ class DynamoDBDataSource(BaseModel):
     ServiceRoleArn: Optional[PassThroughProp]
     TableArn: Optional[PassThroughProp]
     Permissions: Optional[PermissionsType]
-    Name: Optional[str]
+    Name: Optional[PassThroughProp]
     Description: Optional[PassThroughProp]
     Region: Optional[PassThroughProp]
     DeltaSync: Optional[DeltaSync]
@@ -82,7 +82,7 @@ class DynamoDBDataSource(BaseModel):
 class LambdaDataSource(BaseModel):
     FunctionArn: PassThroughProp
     ServiceRoleArn: Optional[PassThroughProp]
-    Name: Optional[str]
+    Name: Optional[PassThroughProp]
     Description: Optional[PassThroughProp]
 
 
@@ -153,7 +153,7 @@ class Cache(BaseModel):
 class Properties(BaseModel):
     Auth: Auth
     Tags: Optional[DictStrAny]
-    Name: Optional[str]
+    Name: Optional[PassThroughProp]
     XrayEnabled: Optional[bool]
     SchemaInline: Optional[PassThroughProp]
     SchemaUri: Optional[PassThroughProp]

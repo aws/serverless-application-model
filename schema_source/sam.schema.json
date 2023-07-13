@@ -558,16 +558,13 @@
       "additionalProperties": false,
       "properties": {
         "BaseTableTTL": {
-          "title": "Basetablettl",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "DeltaSyncTableName": {
-          "title": "Deltasynctablename",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "DeltaSyncTableTTL": {
-          "title": "Deltasynctablettl",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
@@ -850,8 +847,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Name": {
-          "title": "Name",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Permissions": {
           "items": {
@@ -1956,8 +1952,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Name": {
-          "title": "Name",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "ServiceRoleArn": {
           "$ref": "#/definitions/PassThroughProp"
@@ -2208,8 +2203,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "FieldLogLevel": {
-          "title": "Fieldloglevel",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "title": "Logging",
@@ -6541,8 +6535,7 @@
           "title": "Logging"
         },
         "Name": {
-          "title": "Name",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Resolvers": {
           "additionalProperties": {
