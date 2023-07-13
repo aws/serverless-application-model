@@ -1,9 +1,6 @@
 import re
 
-from samtranslator.internal.deprecation_control import deprecated
 
-
-@deprecated()
 class SamTemplateValidator:
     UNICODE_TYPE_REGEX = re.compile("u('[^']+')")
 
