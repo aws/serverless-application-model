@@ -1,7 +1,0 @@
-# Transform is empty
-Transform:
-Resources:
-  MyApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: Stage Name
