@@ -1,0 +1,168 @@
+# Complete API
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApiWithValues:
+    Type: AWS::Serverless::Api
+    Properties:
+      AccessLogSetting:
+        DestinationArn: My destination ARN
+        Format: My format
+      Auth:
+        AddDefaultAuthorizerToCorsPreflight: true
+        ApiKeyRequired: false
+        Authorizers:
+          MyCognitoAuthorizer:
+            AuthorizationScopes:
+            - Scope1
+            - Scope2
+            Identity:
+              Header: My header
+              ReauthorizeEvery: 5
+              ValidationExpression: My validation expression
+            UserPoolArn: My user pool ARN
+          MyLambdaTokenAuthorizer:
+            AuthorizationScopes:
+            - Scope3
+            - Scope4
+            FunctionArn: My function ARN
+            FunctionInvokeRole: My invoke role
+            FunctionPayloadType: TOKEN
+            Identity:
+              ReauthorizeEvery: 6
+              ValidationExpression: My other validation expression
+          MyLambdaRequestAuthorizer:
+            AuthorizationScopes:
+            - Scope5
+            FunctionArn: My other function ARN
+            FunctionInvokeRole: My other invoke role
+            FunctionPayloadType: REQUEST
+            Identity:
+              Context:
+              - Context1
+              Headers:
+              - Header1
+              - Header2
+              QueryStrings:
+              - QueryString1
+              ReauthorizeEvery: 7
+              StageVariables:
+              - StageVariable1
+        DefaultAuthorizer: MyDefaultAuthorizer
+        InvokeRole: IAMRoleArn
+        ResourcePolicy:
+          AwsAccountBlacklist:
+          - Account1
+          AwsAccountWhitelist:
+          - Account2
+          CustomStatements:
+          - Effect: Allow
+            Principal: '*'
+          IntrinsicVpcBlacklist:
+          - Ref: Vpc1
+          IntrinsicVpcWhitelist:
+          - Ref: Vpc2
+          IntrinsicVpceBlacklist:
+          - Ref: Vpce1
+          IntrinsicVpceWhitelist:
+          - Ref: Vpce2
+          IpRangeBlacklist:
+          - 1.2.3.4
+          IpRangeWhitelist:
+          - 2.3.4.5
+          SourceVpcBlacklist:
+          - vpc-3
+          SourceVpcWhitelist:
+          - vpce-4
+        UsagePlan:
+          CreateUsagePlan: SHARED
+          Description: My usage plan description
+          Quota:
+            Limit: 1
+            Offset: 2
+            Period: DAY
+          Tags:
+          - Key: Tag1Key
+            Value: Tag1Value
+          - Key: Tag2Key
+            Value: Tag2Value
+          Throttle:
+            BurstLimit: 3
+            RateLimit: 50.4
+          UsagePlanName: My usage plan name
+      BinaryMediaTypes:
+      - image/png
+      CacheClusterEnabled: true
+      CacheClusterSize: '32'
+      CanarySetting:
+        DeploymentId: MyDeploymentId
+        PercentTraffic: 10.1
+        StageVariableOverrides:
+          MyKey: MyValue
+          MyKey2: MyValue2
+        UseStageCache: false
+      Cors: "'*'"
+      DefinitionBody: '{}'
+      DefinitionUri: MyDefinitionUri
+      Description: My API description
+      Domain:
+        BasePath:
+        - BasePath1
+        - BasePath2
+        CertificateArn: My certificate ARN
+        DomainName: My domain name
+        EndpointConfiguration: REGIONAL
+        MutualTlsAuthentication:
+          TruststoreUri: My truststore URI
+          TruststoreVersion: My truststore version
+        Route53:
+          DistributionDomainName: My distribution domain name
+          EvaluateTargetHealth: false
+          HostedZoneId: My hosted zone ID
+          HostedZoneName: My hosted zone name
+          IpV6: true
+        SecurityPolicy: My security policy
+      EndpointConfiguration:
+        Type: EDGE
+        VPCEndpointIds:
+        - VpcId1
+        - VpcId2
+        - VpcId3
+      GatewayResponses:
+        ACCESS_DENIED:
+          ResponseParameters:
+            Param1: Param1Value
+          ResponseTemplates:
+            Template1: Template1Value
+          StatusCode: '403'
+      MethodSettings:
+      - CacheDataEncrypted: true
+        CacheTtlInSeconds: 3
+        CachingEnabled: true
+        DataTraceEnabled: false
+        HttpMethod: GET
+        LoggingLevel: INFO
+        MetricsEnabled: true
+        ResourcePath: /
+        ThrottlingBurstLimit: 45
+        ThrottlingRateLimit: 80.5
+      MinimumCompressionSize: 30
+      Models:
+        MyModel:
+          MyModelProp: Value
+      Name: MyApi
+      OpenApiVersion: 3.0.1
+      StageName: Stage name
+      Tags:
+        ApiTag1: ApiTag1Value
+        A:p-i.T/a=g+with_special_chars: ApiTag2Value
+        ? VeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLong
+        : VeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTagValue
+        ApiTagWithIntrinsicValue:
+          Ref: MyTagValue
+      TracingEnabled: true
+      Variables:
+        MyVariable1: MyVariable1Value
+        MyVariable2: MyVariable2Value
+        MyVariable3: MyVariable3Value
+    Metadata:
+      Meta: data

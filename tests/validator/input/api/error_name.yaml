@@ -1,0 +1,14 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # Name is empty
+  ApiNameEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name:
+      StageName: Stage name
+  # Name not string
+  ApiNameNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: 3
+      StageName: Stage name

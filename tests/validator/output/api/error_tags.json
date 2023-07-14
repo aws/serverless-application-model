@@ -1,0 +1,9 @@
+[
+  "[Resources.ApiTagsEmpty.Properties.Tags] Must not be empty",
+  "[Resources.ApiTagsItemEmpty.Properties.Tags.MyTag] Must not be empty",
+  "[Resources.ApiTagsItemInvalidCharacter.Properties.Tags] 'My$Tag' can only contain a-zA-Z0-9 _./=+-: characters (max length 128)",
+  "[Resources.ApiTagsItemTooLong.Properties.Tags] 'MyVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTag' can only contain a-zA-Z0-9 _./=+-: characters (max length 128)",
+  "[Resources.ApiTagsItemValueNotString.Properties.Tags.MyTag] 3 is not of type 'string', 'intrinsic'",
+  "[Resources.ApiTagsItemValueTooLong.Properties.Tags.MyTag] 'MyVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongValue' is too long",
+  "[Resources.ApiTagsNotObject.Properties.Tags] 3 is not of type 'object'"
+]

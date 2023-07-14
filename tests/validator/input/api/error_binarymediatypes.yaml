@@ -1,0 +1,31 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # BinaryMediaTypes is empty
+  ApiBinaryMediaTypesEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      BinaryMediaTypes:
+
+  # BinaryMediaTypes is not a list
+  ApiBinaryMediaTypesNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      BinaryMediaTypes: My binary media type
+
+  # BinaryMediaTypes item is not an intrinsic
+  ApiBinaryMediaTypesNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      BinaryMediaTypes:
+        Not: Intrinsic
+
+  # BinaryMediaTypes item is not a string
+  ApiBinaryMediaTypesItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      BinaryMediaTypes:
+      - 3

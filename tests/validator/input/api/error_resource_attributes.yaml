@@ -1,0 +1,79 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  ApiConditionEmpty:
+    Condition:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiConditionNotString:
+    Condition: 3
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiDeletionPolicyEmpty:
+    DeletionPolicy:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiDeletionPolicyNotString:
+    DeletionPolicy: 3
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiDeletionPolicyUnknown:
+    DeletionPolicy: SNAPSHOT
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiDependsOnEmpty:
+    DependsOn:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiDependsOnNotString:
+    DependsOn: 3
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiUpdatePolicyEmpty:
+    UpdatePolicy:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiUpdatePolicyNotString:
+    UpdatePolicy: 3
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiUpdatePolicyUnknown:
+    UpdatePolicy: SNAPSHOT
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiUpdateReplacePolicyEmpty:
+    UpdateReplacePolicy:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiUpdateReplacePolicyNotString:
+    UpdateReplacePolicy: 3
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiUpdateReplacePolicyUnknown:
+    UpdateReplacePolicy: SNAPSHOT
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name

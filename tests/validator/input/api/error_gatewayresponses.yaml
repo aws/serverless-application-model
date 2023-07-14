@@ -1,0 +1,96 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # GatewayResponses
+  ApiGatewayResponsesEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+      StageName: Stage name
+  ApiGatewayResponsesNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses: 3
+      StageName: Stage name
+
+  # GatewayResponses Response
+  ApiGatewayResponsesResponseUnknown:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        UNKNOWN: Response
+      StageName: Stage name
+  ApiGatewayResponsesResponseEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        DEFAULT_4XX:
+      StageName: Stage name
+  ApiGatewayResponsesResponseNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        DEFAULT_4XX: 3
+      StageName: Stage name
+  ApiGatewayResponsesResponseUnknownProperty:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        DEFAULT_4XX:
+          Unknown: Property
+      StageName: Stage name
+
+  # GatewayResponse ResponseParameters
+  ApiGatewayResponsesResponseParametersEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+      StageName: Stage name
+  ApiGatewayResponsesResponseParametersNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters: 3
+      StageName: Stage name
+
+  # GatewayResponse ResponseTemplates
+  ApiGatewayResponsesResponseTemplatesEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseTemplates:
+      StageName: Stage name
+  ApiGatewayResponsesResponseTemplatesNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseTemplates: 3
+      StageName: Stage name
+
+  # GatewayResponse StatusCode
+  ApiGatewayResponsesStatusCodeEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        DEFAULT_4XX:
+          StatusCode:
+      StageName: Stage name
+  ApiGatewayResponsesStatusCodeNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        DEFAULT_4XX:
+          StatusCode: 3
+      StageName: Stage name
+  ApiGatewayResponsesStatusCodeNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      GatewayResponses:
+        DEFAULT_4XX:
+          StatusCode:
+            Not: Intrinsic
+      StageName: Stage name

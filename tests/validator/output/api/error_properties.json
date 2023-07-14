@@ -1,0 +1,5 @@
+[
+  "[Resources.ApiPropertiesEmpty.Properties] Must not be empty",
+  "[Resources.ApiPropertiesMissing] 'Properties' is a required property",
+  "[Resources.ApiPropertiesNotObject.Properties] 'MyProps' is not of type 'object'"
+]

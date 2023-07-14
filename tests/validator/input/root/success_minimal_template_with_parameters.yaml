@@ -1,0 +1,189 @@
+# Smallest possible API template
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  StringParameter:
+    Type: String
+    Default: String
+  NumberParameter:
+    Type: Number
+    Default: 2
+  CommaDelimitedListParameter:
+    Type: CommaDelimitedList
+    Default: String,1,6
+  AWSZoneParameter:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: us-east-1
+  AWSImageId:
+    Type: AWS::EC2::Image::Id
+    Default: Image_ID_1
+  AWSInstanceID:
+    Type: AWS::EC2::Instance::Id
+    Default: Instance_ID_1
+  AWSKeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: Key_Name_1
+  AWSSecurityGroupName:
+    Type: AWS::EC2::SecurityGroup::GroupName
+    Default: Group_Name_1
+  AWSSecurityGroupID:
+    Type: AWS::EC2::SecurityGroup::Id
+    Default: Sec_Group_ID_1
+  AWSSubnetID:
+    Type: AWS::EC2::Subnet::Id
+    Default: Sub_net_ID_1
+  AWSVolumeID:
+    Type: AWS::EC2::Volume::Id
+    Default: Vol_ID_1
+  AWSVPCID:
+    Type: AWS::EC2::VPC::Id
+    Default: VPC_ID_1
+  AWSHostedZoneID:
+    Type: AWS::Route53::HostedZone::Id
+    Default: Hosted_Zone_ID_1
+  AWSParameterSSMValueString:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: Parameter_SSM_String_1
+  AWSParameterSSMValueCommaDelimitedList:
+    Type: AWS::SSM::Parameter::Value<CommaDelimitedList>
+    Default: Parameter_SSM_Delimited_List_1
+  AWSParameterSSMValueListString:
+    Type: AWS::SSM::Parameter::Value<List<String>>
+    Default: Parameter_SSM_List_String_1
+  AWSParameterSSMValueName:
+    Type: AWS::SSM::Parameter::Name
+    Default: Parameter_SSM_Name_1
+  AWSParameterSSMAvailabilityZoneName:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::AvailabilityZone::Name>
+    Default: Parameter_SSM_AvailabilityZone_Name_1
+  AWSParameterSSMImageId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: Parameter_SSM_Image_Id_1
+  AWSParameterSSMInstanceId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Instance::Id>
+    Default: Parameter_SSM_Instance_Id_1
+  AWSParameterSSMKeyPairKeyName:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::KeyPair::KeyName>
+    Default: Parameter_SSM_KeyPair_KeyName_1
+  AWSParameterSSMSecurityGroupName:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::GroupName>
+    Default: Parameter_SSM_Security_GroupName_1
+  AWSParameterSSMSecurityGroupID:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::Id>
+    Default: Parameter_SSM_Security_GroupId_1
+  AWSParameterSSMSubnetID:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Subnet::Id>
+    Default: Parameter_SSM_Subnet_Id_1
+  AWSParameterSSMVolumeID:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Volume::Id>
+    Default: Parameter_SSM_Volume_Id_1
+  AWSParameterSSMVPCID:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::VPC::Id>
+    Default: Parameter_SSM_VPC_Id_1
+  AWSParameterSSMHostedZoneId:
+    Type: AWS::SSM::Parameter::Value<AWS::Route53::HostedZone::Id>
+    Default: Parameter_SSM_HostedZone_Id_1
+  AWSParameterSSMListAvailabilityZoneName:
+    Type: AWS::SSM::Parameter::Value<List<AWS::EC2::AvailabilityZone::Name>>
+    Default:
+    - Parameter_SSM_List_AvailabilityZone_Name_1
+    - Parameter_SSM_List_AvailabilityZone_Name_2
+  AWSParameterSSMListImageId:
+    Type: AWS::SSM::Parameter::Value<List<AWS::EC2::Image::Id>>
+    Default:
+    - Parameter_SSM_List_Image_Id_1
+    - Parameter_SSM_List_Image_Id_2
+  AWSParameterSSMListInstanceId:
+    Type: AWS::SSM::Parameter::Value<List<AWS::EC2::Instance::Id>>
+    Default:
+    - Parameter_SSM_List_Instance_Id_1
+    - Parameter_SSM_List_Instance_Id_2
+  AWSParameterSSMListSecurityGroupName:
+    Type: AWS::SSM::Parameter::Value<List<AWS::EC2::SecurityGroup::GroupName>>
+    Default:
+    - Parameter_SSM_List_Security_GroupName_1
+    - Parameter_SSM_List_Security_GroupName_2
+  AWSParameterSSMListSecurityGroupId:
+    Type: AWS::SSM::Parameter::Value<List<AWS::EC2::SecurityGroup::Id>>
+    Default:
+    - Parameter_SSM_List_SecurityGroup_Id_1
+    - Parameter_SSM_List_SecurityGroup_Id_2
+  AWSParameterSSMListSubnetId:
+    Type: AWS::SSM::Parameter::Value<List<AWS::EC2::Subnet::Id>>
+    Default:
+    - Parameter_SSM_List_Subnet_Id_1
+    - Parameter_SSM_List_Subnet_Id_2
+  AWSParameterSSMListVolumeId:
+    Type: AWS::SSM::Parameter::Value<List<AWS::EC2::Volume::Id>>
+    Default:
+    - Parameter_SSM_List_Volume_Id_1
+    - Parameter_SSM_List_Volume_Id_2
+  AWSParameterSSMListVPCId:
+    Type: AWS::SSM::Parameter::Value<List<AWS::EC2::VPC::Id>>
+    Default:
+    - Parameter_SSM_List_VPC_Id_1
+    - Parameter_SSM_List_VPC_Id_2
+  AWSParameterSSMListHostedZoneId:
+    Type: AWS::SSM::Parameter::Value<List<AWS::Route53::HostedZone::Id>>
+    Default:
+    - Parameter_SSM_List_HostedZone_Id_1
+    - Parameter_SSM_List_HostedZone_Id_2
+  StringParameterList:
+    Type: List<String>
+    Default:
+    - String
+    - Other string
+  NumberParameterList:
+    Type: List<Number>
+    Default:
+    - 1
+    - 2
+  AWSZoneParameterList:
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+    Default:
+    - us-east-1
+    - us-east-2
+  AWSImageIDList:
+    Type: List<AWS::EC2::Image::Id>
+    Default:
+    - Image_ID_1
+    - Image_ID_2
+  AWSInstanceIDList:
+    Type: List<AWS::EC2::Instance::Id>
+    Default:
+    - Instance_ID_1
+    - Instance_ID_2
+  AWSSecurityGroupNameList:
+    Type: AWS::EC2::SecurityGroup::GroupName
+    Default:
+    - Group_Name_1
+    - Group_Name_2
+  AWSSecurityGroupIDList:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Default:
+    - Sec_Group_ID_1
+    - Sec_Group_ID_2
+  AWSSubnetIDList:
+    Type: List<AWS::EC2::Subnet::Id>
+    Default:
+    - Sub_net_ID_1
+    - Sub_net_ID_2
+  AWSVolumeIDList:
+    Type: List<AWS::EC2::Volume::Id>
+    Default:
+    - Vol_ID_1
+    - Vol_ID_2
+  AWSVPCIDList:
+    Type: List<AWS::EC2::VPC::Id>
+    Default:
+    - VPC_ID_1
+    - VPC_ID_2
+  AWSHostedZoneIDList:
+    Type: List<AWS::Route53::HostedZone::Id>
+    Default:
+    - Hosted_Zone_ID_1
+    - Hosted_Zone_ID_2
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage Name

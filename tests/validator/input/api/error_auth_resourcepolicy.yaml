@@ -1,0 +1,431 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # ResourcePolicy
+  ApiResourcePolicyEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+  ApiResourcePolicyNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy: 3
+
+  # ResourcePolicy - AwsAccountBlacklist
+  ApiResourcePolicyAwsAccountBlacklistEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          AwsAccountBlacklist:
+  ApiResourcePolicyAwsAccountBlacklistNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          AwsAccountBlacklist: 3
+  ApiResourcePolicyAwsAccountBlacklistItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          AwsAccountBlacklist:
+          - 
+  ApiResourcePolicyAwsAccountBlacklistItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          AwsAccountBlacklist:
+          - 3
+  ApiResourcePolicyAwsAccountBlacklistItemNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          AwsAccountBlacklist:
+          - Not: Intrinsic
+
+  # ResourcePolicy - AwsAccountWhitelist
+  ApiResourcePolicyAwsAccountWhitelistEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          AwsAccountWhitelist:
+  ApiResourcePolicyAwsAccountWhitelistNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          AwsAccountWhitelist: 3
+  ApiResourcePolicyAwsAccountWhitelistItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          AwsAccountWhitelist:
+          - 
+  ApiResourcePolicyAwsAccountWhitelistItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          AwsAccountWhitelist:
+          - 3
+  ApiResourcePolicyAwsAccountWhitelistItemNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          AwsAccountWhitelist:
+          - Not: Intrinsic
+
+  # ResourcePolicy - CustomStatements
+  ApiResourcePolicyCustomStatementsEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+  ApiResourcePolicyCustomStatementsNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          CustomStatements: 3
+  ApiResourcePolicyCustomStatementsItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+          - 
+  ApiResourcePolicyCustomStatementsItemNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+          - 3
+
+  # ResourcePolicy - IntrinsicVpcBlacklist
+  ApiResourcePolicyIntrinsicVpcBlacklistEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpcBlacklist:
+  ApiResourcePolicyIntrinsicVpcBlacklistNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpcBlacklist: 3
+  ApiResourcePolicyIntrinsicVpcBlacklistItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpcBlacklist:
+          - 
+  ApiResourcePolicyIntrinsicVpcBlacklistItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpcBlacklist:
+          - 3
+  ApiResourcePolicyIntrinsicVpcBlacklistItemNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpcBlacklist:
+          - Not: Intrinsic
+
+  # ResourcePolicy - IntrinsicVpcWhitelist
+  ApiResourcePolicyIntrinsicVpcWhitelistEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpcWhitelist:
+  ApiResourcePolicyIntrinsicVpcWhitelistNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpcWhitelist: 3
+  ApiResourcePolicyIntrinsicVpcWhitelistItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpcWhitelist:
+          - 
+  ApiResourcePolicyIntrinsicVpcWhitelistItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpcWhitelist:
+          - 3
+  ApiResourcePolicyIntrinsicVpcWhitelistItemNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpcWhitelist:
+          - Not: Intrinsic
+
+  # ResourcePolicy - IntrinsicVpceBlacklist
+  ApiResourcePolicyIntrinsicVpceBlacklistEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpceBlacklist:
+  ApiResourcePolicyIntrinsicVpceBlacklistNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpceBlacklist: 3
+  ApiResourcePolicyIntrinsicVpceBlacklistItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpceBlacklist:
+          - 
+  ApiResourcePolicyIntrinsicVpceBlacklistItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpceBlacklist:
+          - 3
+  ApiResourcePolicyIntrinsicVpceBlacklistItemNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpceBlacklist:
+          - Not: Intrinsic
+
+  # ResourcePolicy - IntrinsicVpceWhitelist
+  ApiResourcePolicyIntrinsicVpceWhitelistEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpceWhitelist:
+  ApiResourcePolicyIntrinsicVpceWhitelistNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpceWhitelist: 3
+  ApiResourcePolicyIntrinsicVpceWhitelistItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpceWhitelist:
+          - 
+  ApiResourcePolicyIntrinsicVpceWhitelistItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpceWhitelist:
+          - 3
+  ApiResourcePolicyIntrinsicVpceWhitelistItemNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IntrinsicVpceWhitelist:
+          - Not: Intrinsic
+
+  # ResourcePolicy - IpRangeBlacklist
+  ApiResourcePolicyIpRangeBlacklistEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IpRangeBlacklist:
+  ApiResourcePolicyIpRangeBlacklistNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IpRangeBlacklist: 3
+  ApiResourcePolicyIpRangeBlacklistItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IpRangeBlacklist:
+          - 
+  ApiResourcePolicyIpRangeBlacklistItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IpRangeBlacklist:
+          - 3
+
+  # ResourcePolicy - IpRangeWhitelist
+  ApiResourcePolicyIpRangeWhitelistEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IpRangeWhitelist:
+  ApiResourcePolicyIpRangeWhitelistNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IpRangeWhitelist: 3
+  ApiResourcePolicyIpRangeWhitelistItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IpRangeWhitelist:
+          - 
+  ApiResourcePolicyIpRangeWhitelistItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          IpRangeWhitelist:
+          - 3
+
+  # ResourcePolicy - SourceVpcBlacklist
+  ApiResourcePolicySourceVpcBlacklistEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          SourceVpcBlacklist:
+  ApiResourcePolicySourceVpcBlacklistNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          SourceVpcBlacklist: 3
+  ApiResourcePolicySourceVpcBlacklistItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          SourceVpcBlacklist:
+          - 
+  ApiResourcePolicySourceVpcBlacklistItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          SourceVpcBlacklist:
+          - 3
+  ApiResourcePolicySourceVpcBlacklistItemWrongFormat:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          SourceVpcBlacklist:
+          - myvpc
+
+  # ResourcePolicy - SourceVpcWhitelist
+  ApiResourcePolicySourceVpcWhitelistEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          SourceVpcWhitelist:
+  ApiResourcePolicySourceVpcWhitelistNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          SourceVpcWhitelist: 3
+  ApiResourcePolicySourceVpcWhitelistItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          SourceVpcWhitelist:
+          - 
+  ApiResourcePolicySourceVpcWhitelistItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          SourceVpcWhitelist:
+          - 3
+  ApiResourcePolicySourceVpcWhitelistItemWrongFormat:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ResourcePolicy:
+          SourceVpcWhitelist:
+          - myvpc

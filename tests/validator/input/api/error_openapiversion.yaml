@@ -1,0 +1,25 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  ApiOpenApiVersionEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion:
+      StageName: Stage name
+
+  ApiOpenApiVersionNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3
+      StageName: Stage name
+
+  ApiOpenApiVersion2Unknown:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 2.0.1
+      StageName: Stage name
+
+  ApiOpenApiVersion3Unknown:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: '3.1'
+      StageName: Stage name

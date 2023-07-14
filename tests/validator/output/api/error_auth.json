@@ -1,0 +1,18 @@
+[
+  "[Resources.ApiAddDefaultAuthorizerToCorsPreflightEmpty.Properties.Auth.AddDefaultAuthorizerToCorsPreflight] Must not be empty",
+  "[Resources.ApiAddDefaultAuthorizerToCorsPreflightNotBoolean.Properties.Auth.AddDefaultAuthorizerToCorsPreflight] 'true' is not of type 'boolean'",
+  "[Resources.ApiApiKeyRequiredEmpty.Properties.Auth.ApiKeyRequired] Must not be empty",
+  "[Resources.ApiApiKeyRequiredNotBoolean.Properties.Auth.ApiKeyRequired] 'true' is not of type 'boolean'",
+  "[Resources.ApiAuthEmpty.Properties.Auth] Must not be empty",
+  "[Resources.ApiAuthorizersEmpty.Properties.Auth.Authorizers] Must not be empty",
+  "[Resources.ApiAuthorizersItemEmpty.Properties.Auth.Authorizers.EmptyAuth] Must not be empty",
+  "[Resources.ApiAuthorizersNotObject.Properties.Auth.Authorizers] 3 is not of type 'object'",
+  "[Resources.ApiAuthorizersUnknown.Properties.Auth.Authorizers.Unknown] 'FunctionArn' is a required property",
+  "[Resources.ApiAuthorizersUnknown.Properties.Auth.Authorizers.Unknown] 'UserPoolArn' is a required property",
+  "[Resources.ApiDefaultAuthorizerEmpty.Properties.Auth.DefaultAuthorizer] Must not be empty",
+  "[Resources.ApiDefaultAuthorizerNotString.Properties.Auth.DefaultAuthorizer] 3 is not of type 'string'",
+  "[Resources.ApiInvokeRoleEmpty.Properties.Auth.InvokeRole] Must not be empty",
+  "[Resources.ApiInvokeRoleNotString.Properties.Auth.InvokeRole] 3 is not of type 'string'",
+  "[Resources.ApiInvokeRoleNotString.Properties.Auth.InvokeRole] 3 is not one of ['CALLER_CREDENTIALS', 'NONE', 'IAMRoleArn']",
+  "[Resources.ApiInvokeRoleNotUnknown.Properties.Auth.InvokeRole] 'UNKNOWN' is not one of ['CALLER_CREDENTIALS', 'NONE', 'IAMRoleArn']"
+]

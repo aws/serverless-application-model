@@ -1,0 +1,49 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  ApiCondition:
+    Condition: MyCondition
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiDeletionPolicyDelete:
+    DeletionPolicy: Delete
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiDeletionPolicyRetain:
+    DeletionPolicy: Retain
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiDeletionPolicySnapshot:
+    DeletionPolicy: Snapshot
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiDependsOn:
+    DependsOn: MyOtherResource
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiUpdateReplacePolicyDelete:
+    UpdateReplacePolicy: Delete
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiUpdateReplacePolicyRetain:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+
+  ApiUpdateReplacePolicySnapshot:
+    UpdateReplacePolicy: Snapshot
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name

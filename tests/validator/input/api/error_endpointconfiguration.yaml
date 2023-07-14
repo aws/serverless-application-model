@@ -1,0 +1,56 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # EndpointConfiguration
+  ApiEndpointConfigurationEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration:
+      StageName: Stage name
+  ApiEndpointConfigurationNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration: 3
+      StageName: Stage name
+
+  # Type
+  ApiEndpointConfigurationTypeNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration:
+        Type: 3
+      StageName: Stage name
+  ApiEndpointConfigurationTypeNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration:
+        Type:
+          Not: Intrinsic
+      StageName: Stage name
+  ApiEndpointConfigurationTypeUnknown:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration:
+        Type: Unknown
+      StageName: Stage name
+
+  # VPCEndpointIds
+  ApiEndpointConfigurationVPCEndpointIdsNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration:
+        VPCEndpointIds: 3
+      StageName: Stage name
+  ApiEndpointConfigurationVPCEndpointIdsNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration:
+        VPCEndpointIds:
+          Not: Intrinsic
+      StageName: Stage name
+  ApiEndpointConfigurationVPCEndpointIdsItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration:
+        VPCEndpointIds:
+        - 3
+      StageName: Stage name

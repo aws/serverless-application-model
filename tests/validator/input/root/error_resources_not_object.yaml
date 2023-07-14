@@ -1,0 +1,3 @@
+# Resources is present but not an object
+Transform: AWS::Serverless-2016-10-31
+Resources: 3

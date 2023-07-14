@@ -1,0 +1,87 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # DefinitionUri is empty
+  ApiDefinitionUriEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri:
+      StageName: Stage name
+
+  # DefinitionUri is not a string or an object
+  ApiDefinitionUriNotStringOrObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri: 3
+      StageName: Stage name
+
+  # DefinitionUri Bucket missing
+  ApiDefinitionUriBucketMissing:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri:
+        Key: mykey
+      StageName: Stage name
+
+  # DefinitionUri Bucket empty
+  ApiDefinitionUriBucketEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri:
+        Bucket:
+        Key: mykey
+      StageName: Stage name
+
+  # DefinitionUri Bucket not string
+  ApiDefinitionUriBucketNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri:
+        Bucket: 3
+        Key: mykey
+      StageName: Stage name
+
+  # DefinitionUri Bucket not string
+  ApiDefinitionUriBucketNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri:
+        Bucket:
+          Not: Intrinsic
+        Key: mykey
+      StageName: Stage name
+
+  # DefinitionUri Key missing
+  ApiDefinitionUriKeyMissing:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri:
+        Bucket: mybucket
+      StageName: Stage name
+
+  # DefinitionUri Key empty
+  ApiDefinitionUriKeyEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri:
+        Bucket: mybucket
+        Key:
+      StageName: Stage name
+
+  # DefinitionUri Key not string
+  ApiDefinitionUriKeyNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri:
+        Bucket: mybucket
+        Key: 3
+      StageName: Stage name
+
+  # DefinitionUri Key not intrinsic
+  ApiDefinitionUriKeyNotStringIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri:
+        Bucket: mybucket
+        Key:
+          Not: Intrinsic
+      StageName: Stage name

@@ -1,0 +1,7 @@
+[
+  "[Resources.ApiAccessLogSettingDestinationArnNotString.Properties.AccessLogSetting.DestinationArn] 3 is not of type 'string', 'intrinsic'",
+  "[Resources.ApiAccessLogSettingEmpty.Properties.AccessLogSetting] Must not be empty",
+  "[Resources.ApiAccessLogSettingFormatNotString.Properties.AccessLogSetting.Format] 3 is not of type 'string'",
+  "[Resources.ApiAccessLogSettingNotObject.Properties.AccessLogSetting] 3 is not of type 'object'",
+  "[Resources.ApiAccessLogSettingUnknownProperty.Properties.AccessLogSetting] Additional properties are not allowed ('Unknown' was unexpected)"
+]

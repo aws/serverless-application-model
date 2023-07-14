@@ -1,0 +1,34 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          CognitoMinimal:
+            UserPoolArn: User.pool.arn
+
+          CognitoComplete:
+            AuthorizationScopes:
+            - Scope1
+            - Scope2
+            Identity:
+              Header: Identity header
+              ReauthorizeEvery: 3
+              ValidationExpression: '[a-z]+'
+            UserPoolArn: User.pool.arn
+
+          CognitoCompleteIntrinsics:
+            AuthorizationScopes:
+            - Scope1
+            - Scope2
+            Identity:
+              Header: Identity header
+              ReauthorizeEvery:
+                Ref: ParamReauthorizeEvery
+              ValidationExpression: '[a-z]+'
+            UserPoolArn:
+              Fn::GetAtt:
+              - MyCognitoUserPool
+              - Arn

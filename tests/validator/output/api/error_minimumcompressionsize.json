@@ -1,0 +1,6 @@
+[
+  "[Resources.ApiMinimumCompressionSizeNotInt.Properties.MinimumCompressionSize] '3' is not of type 'integer', 'intrinsic', 'null'",
+  "[Resources.ApiMinimumCompressionSizeNotIntrinsic.Properties.MinimumCompressionSize] {'Not': 'Intrinsic'} is not of type 'integer', 'intrinsic', 'null'",
+  "[Resources.ApiMinimumCompressionSizeTooHigh.Properties.MinimumCompressionSize] 10485761 is greater than the maximum of 10485760",
+  "[Resources.ApiMinimumCompressionSizeTooLow.Properties.MinimumCompressionSize] -1 is less than the minimum of 0"
+]

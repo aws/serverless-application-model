@@ -1,0 +1,18 @@
+[
+  "[Resources.ApiConditionEmpty.Condition] Must not be empty",
+  "[Resources.ApiConditionNotString.Condition] 3 is not of type 'string'",
+  "[Resources.ApiDeletionPolicyEmpty.DeletionPolicy] Must not be empty",
+  "[Resources.ApiDeletionPolicyNotString.DeletionPolicy] 3 is not of type 'string'",
+  "[Resources.ApiDeletionPolicyNotString.DeletionPolicy] 3 is not one of ['Delete', 'Retain', 'Snapshot']",
+  "[Resources.ApiDeletionPolicyUnknown.DeletionPolicy] 'SNAPSHOT' is not one of ['Delete', 'Retain', 'Snapshot']",
+  "[Resources.ApiDependsOnEmpty.DependsOn] Must not be empty",
+  "[Resources.ApiDependsOnNotString.DependsOn] 3 is not of type 'string', 'array'",
+  "[Resources.ApiUpdatePolicyEmpty.UpdatePolicy] Must not be empty",
+  "[Resources.ApiUpdatePolicyNotString.UpdatePolicy] 3 is not of type 'string'",
+  "[Resources.ApiUpdatePolicyNotString.UpdatePolicy] 3 is not one of ['Delete', 'Retain', 'Snapshot']",
+  "[Resources.ApiUpdatePolicyUnknown.UpdatePolicy] 'SNAPSHOT' is not one of ['Delete', 'Retain', 'Snapshot']",
+  "[Resources.ApiUpdateReplacePolicyEmpty.UpdateReplacePolicy] Must not be empty",
+  "[Resources.ApiUpdateReplacePolicyNotString.UpdateReplacePolicy] 3 is not of type 'string'",
+  "[Resources.ApiUpdateReplacePolicyNotString.UpdateReplacePolicy] 3 is not one of ['Delete', 'Retain', 'Snapshot']",
+  "[Resources.ApiUpdateReplacePolicyUnknown.UpdateReplacePolicy] 'SNAPSHOT' is not one of ['Delete', 'Retain', 'Snapshot']"
+]
