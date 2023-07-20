@@ -160,7 +160,7 @@ class Translator:
         shared_api_usage_plan = SharedApiUsagePlan()
         changed_logical_ids = {}
         route53_record_set_groups: Dict[Any, Any] = {}
-        #test
+        # test
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
                 macro = macro_resolver.resolve_resource_type(resource_dict).from_dict(
