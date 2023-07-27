@@ -2,9 +2,7 @@
   "Resources": {
     "FunctionWithOverrides": {
       "Properties": {
-        "Architectures": [
-          "x86_64"
-        ],
+        "Architectures": ["x86_64"],
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
@@ -31,10 +29,7 @@
         "MemorySize": 512,
         "ReservedConcurrentExecutions": 100,
         "Role": {
-          "Fn::GetAtt": [
-            "FunctionWithOverridesRole",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["FunctionWithOverridesRole", "Arn"]
         },
         "Runtime": "nodejs12.x",
         "RuntimeManagementConfig": {
@@ -62,13 +57,8 @@
           "Mode": "PassThrough"
         },
         "VpcConfig": {
-          "SecurityGroupIds": [
-            "sg-edcd9784",
-            "sg-123"
-          ],
-          "SubnetIds": [
-            "sub-id-2"
-          ]
+          "SecurityGroupIds": ["sg-edcd9784", "sg-123"],
+          "SubnetIds": ["sub-id-2"]
         }
       },
       "Type": "AWS::Lambda::Function"
@@ -79,10 +69,7 @@
           "Ref": "FunctionWithOverrides"
         },
         "FunctionVersion": {
-          "Fn::GetAtt": [
-            "FunctionWithOverridesVersion096ed3b52b",
-            "Version"
-          ]
+          "Fn::GetAtt": ["FunctionWithOverridesVersion096ed3b52b", "Version"]
         },
         "Name": "prod"
       },
@@ -93,14 +80,10 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": [
-                "sts:AssumeRole"
-              ],
+              "Action": ["sts:AssumeRole"],
               "Effect": "Allow",
               "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
+                "Service": ["lambda.amazonaws.com"]
               }
             }
           ],
@@ -134,18 +117,13 @@
       "Properties": {
         "FunctionName": {
           "Ref": "FunctionWithOverrides"
-        },
-        "RuntimeManagementConfig": {
-          "UpdateRuntimeOn": "FunctionChange"
         }
       },
       "Type": "AWS::Lambda::Version"
     },
     "MinimalFunction": {
       "Properties": {
-        "Architectures": [
-          "x86_64"
-        ],
+        "Architectures": ["x86_64"],
         "Code": {
           "S3Bucket": "global-bucket",
           "S3Key": "global.zip"
@@ -168,10 +146,7 @@
         "MemorySize": 1024,
         "ReservedConcurrentExecutions": 50,
         "Role": {
-          "Fn::GetAtt": [
-            "MinimalFunctionRole",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["MinimalFunctionRole", "Arn"]
         },
         "Runtime": "python2.7",
         "RuntimeManagementConfig": {
@@ -195,12 +170,8 @@
           "Mode": "Active"
         },
         "VpcConfig": {
-          "SecurityGroupIds": [
-            "sg-edcd9784"
-          ],
-          "SubnetIds": [
-            "sub-id-2"
-          ]
+          "SecurityGroupIds": ["sg-edcd9784"],
+          "SubnetIds": ["sub-id-2"]
         }
       },
       "Type": "AWS::Lambda::Function"
@@ -211,10 +182,7 @@
           "Ref": "MinimalFunction"
         },
         "FunctionVersion": {
-          "Fn::GetAtt": [
-            "MinimalFunctionVersione7c6f56e4d",
-            "Version"
-          ]
+          "Fn::GetAtt": ["MinimalFunctionVersione7c6f56e4d", "Version"]
         },
         "Name": "live"
       },
@@ -225,14 +193,10 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": [
-                "sts:AssumeRole"
-              ],
+              "Action": ["sts:AssumeRole"],
               "Effect": "Allow",
               "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
+                "Service": ["lambda.amazonaws.com"]
               }
             }
           ],
@@ -262,9 +226,6 @@
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"
-        },
-        "RuntimeManagementConfig": {
-          "UpdateRuntimeOn": "Auto"
         }
       },
       "Type": "AWS::Lambda::Version"

@@ -70,7 +70,6 @@ class LambdaVersion(Resource):
         "CodeSha256": GeneratedProperty(),
         "Description": GeneratedProperty(),
         "FunctionName": GeneratedProperty(),
-        "RuntimeManagementConfig": GeneratedProperty(),
     }
 
     runtime_attrs = {

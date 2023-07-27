@@ -934,8 +934,6 @@ class SamFunction(SamResourceMacro):
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr("name")
         lambda_version.Description = self.VersionDescription
-        # Copy the same runtime policy for the version and the function
-        lambda_version.RuntimeManagementConfig = function.RuntimeManagementConfig
 
         return lambda_version
 
