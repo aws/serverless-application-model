@@ -34,7 +34,13 @@
           },
           "FieldLogLevel": "ALL"
         },
-        "Name": "SomeApi"
+        "Name": "SomeApi",
+        "Tags": [
+          {
+            "Key": "graphqlapi:createdBy",
+            "Value": "SAM"
+          }
+        ]
       },
       "Type": "AWS::AppSync::GraphQLApi"
     },

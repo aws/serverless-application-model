@@ -558,16 +558,13 @@
       "additionalProperties": false,
       "properties": {
         "BaseTableTTL": {
-          "title": "Basetablettl",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "DeltaSyncTableName": {
-          "title": "Deltasynctablename",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "DeltaSyncTableTTL": {
-          "title": "Deltasynctablettl",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
@@ -850,8 +847,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Name": {
-          "title": "Name",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Permissions": {
           "items": {
@@ -1956,8 +1952,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "Name": {
-          "title": "Name",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "ServiceRoleArn": {
           "$ref": "#/definitions/PassThroughProp"
@@ -2208,8 +2203,7 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "FieldLogLevel": {
-          "title": "Fieldloglevel",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "title": "Logging",
@@ -2401,7 +2395,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The position in a stream from which to start reading\\.  \n+ `AT_TIMESTAMP` \u2013 Specify a time from which to start reading records\\.\n+ `LATEST` \u2013 Read only new records\\.\n+ `TRIM_HORIZON` \u2013 Process all available records\\.\n*Valid values*: `AT_TIMESTAMP` \\| `LATEST` \\| `TRIM_HORIZON`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "The position in a stream from which to start reading\\.  \n+ `AT_TIMESTAMP` \u2013 Specify a time from which to start reading records\\.\n+ `LATEST` \u2013 Read only new records\\.\n+ `TRIM_HORIZON` \u2013 Process all available records\\.\n*Valid values*: `AT_TIMESTAMP` \\| `LATEST` \\| `TRIM_HORIZON`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "StartingPosition"
         },
         "StartingPositionTimestamp": {
@@ -5098,7 +5092,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Describes which events are routed to the specified target\\. For more information, see [Events and Event Patterns in EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [EventPattern](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventPattern`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern) property of an `AWS::Events::Rule` resource\\.",
+          "markdownDescription": "Describes which events are routed to the specified target\\. For more information, see [Amazon EventBridge events](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-events.html) and [EventBridge event patterns](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [EventPattern](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventPattern`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern) property of an `AWS::Events::Rule` resource\\.",
           "title": "Pattern"
         },
         "RetryPolicy": {
@@ -5444,7 +5438,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\. For more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `Active` or `PassThrough`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\. If the `Tracing` property is set to `Active` and the `Role` property is not specified, then AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.",
+          "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\.  \n+ `Active` \u2013 Activates X\\-Ray tracing for the function\\.\n+ `Disabled` \u2013 Deactivates X\\-Ray for the function\\.\n+ `PassThrough` \u2013 Activates X\\-Ray tracing for the function\\. Sampling decision is delegated to the downstream services\\.\nIf specified as `Active` or `PassThrough` and the `Role` property is not set, AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.  \nFor more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: \\[`Active`\\|`Disabled`\\|`PassThrough`\\]  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Tracing"
         },
         "VpcConfig": {
@@ -6022,7 +6016,7 @@
               "type": "string"
             }
           ],
-          "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\. For more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `Active` or `PassThrough`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\. If the `Tracing` property is set to `Active` and the `Role` property is not specified, then AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.",
+          "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\.  \n+ `Active` \u2013 Activates X\\-Ray tracing for the function\\.\n+ `Disabled` \u2013 Deactivates X\\-Ray for the function\\.\n+ `PassThrough` \u2013 Activates X\\-Ray tracing for the function\\. Sampling decision is delegated to the downstream services\\.\nIf specified as `Active` or `PassThrough` and the `Role` property is not set, AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.  \nFor more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: \\[`Active`\\|`Disabled`\\|`PassThrough`\\]  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Tracing"
         },
         "VersionDescription": {
@@ -6541,8 +6535,7 @@
           "title": "Logging"
         },
         "Name": {
-          "title": "Name",
-          "type": "string"
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Resolvers": {
           "additionalProperties": {

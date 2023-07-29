@@ -14,6 +14,7 @@ from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.internal.intrinsics import resolve_string_parameter_in_resource
 from samtranslator.internal.model.appsync import (
     APPSYNC_PIPELINE_RESOLVER_JS_CODE,
+    APPSYNC_PIPELINE_RESOLVER_JS_RUNTIME,
     AdditionalAuthenticationProviderType,
     ApiCache,
     ApiKey,
@@ -80,6 +81,7 @@ from samtranslator.model.exceptions import InvalidEventException, InvalidResourc
 from samtranslator.model.iam import IAMManagedPolicy, IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import (
     fnGetAtt,
+    fnSub,
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
@@ -2187,11 +2189,11 @@ class SamConnector(SamResourceMacro):
 
 
 class SamGraphQLApi(SamResourceMacro):
-    """SAM GraphQL API Macro (WIP)."""
+    """SAM GraphQL API Macro."""
 
     resource_type = "AWS::Serverless::GraphQLApi"
     property_types = {
-        "Name": Property(False, IS_STR),
+        "Name": PassThroughProperty(False),
         "Tags": Property(False, IS_DICT),
         "XrayEnabled": PassThroughProperty(False),
         "Auth": Property(True, IS_DICT),
@@ -2209,7 +2211,7 @@ class SamGraphQLApi(SamResourceMacro):
     Auth: List[Dict[str, Any]]
     Tags: Optional[Dict[str, Any]]
     XrayEnabled: Optional[PassThrough]
-    Name: Optional[str]
+    Name: Optional[PassThrough]
     SchemaInline: Optional[str]
     SchemaUri: Optional[str]
     Logging: Optional[Union[Dict[str, Any], bool]]
@@ -2288,7 +2290,7 @@ class SamGraphQLApi(SamResourceMacro):
     ) -> Tuple[GraphQLApi, Optional[IAMRole], List[SamConnector]]:
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
-        api.Name = model.Name or self.logical_id
+        api.Name = passthrough_value(model.Name) or self.logical_id
         api.XrayEnabled = model.XrayEnabled
 
         lambda_auth_arns = self._parse_and_set_auth_properties(api, model.Auth)
@@ -2296,8 +2298,10 @@ class SamGraphQLApi(SamResourceMacro):
             self._construct_lambda_auth_connector(api, arn, i) for i, arn in enumerate(lambda_auth_arns, 1)
         ]
 
-        if model.Tags:
-            api.Tags = get_tag_list(model.Tags)
+        if not model.Tags:
+            model.Tags = {}
+        model.Tags["graphqlapi:createdBy"] = "SAM"
+        api.Tags = get_tag_list(model.Tags)
 
         # Logging has 3 possible types: dict, bool, and None.
         # GraphQLApi will not include logging if and only if the user explicity sets Logging as false boolean.
@@ -2463,7 +2467,7 @@ class SamGraphQLApi(SamResourceMacro):
         if model.Logging.ExcludeVerboseContent:
             log_config["ExcludeVerboseContent"] = cast(PassThrough, model.Logging.ExcludeVerboseContent)
 
-        log_config["FieldLogLevel"] = model.Logging.FieldLogLevel or "ALL"
+        log_config["FieldLogLevel"] = passthrough_value(model.Logging.FieldLogLevel) or "ALL"
         log_config["CloudWatchLogsRoleArn"] = cast(PassThrough, model.Logging.CloudWatchLogsRoleArn)
 
         if log_config["CloudWatchLogsRoleArn"]:
@@ -2596,14 +2600,14 @@ class SamGraphQLApi(SamResourceMacro):
             )
 
             # Datasource "Name" property must be unique from all other datasources.
-            cfn_datasource.Name = ddb_datasource.Name or relative_id
+            cfn_datasource.Name = passthrough_value(ddb_datasource.Name) or relative_id
             cfn_datasource.Type = "AMAZON_DYNAMODB"
             cfn_datasource.ApiId = api_id
             cfn_datasource.Description = passthrough_value(ddb_datasource.Description)
             cfn_datasource.DynamoDBConfig = self._parse_ddb_config(ddb_datasource)
 
             cfn_datasource.ServiceRoleArn, permissions_resources = self._parse_ddb_datasource_role(
-                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), relative_id, datasource_logical_id, kwargs
+                ddb_datasource, cfn_datasource.get_runtime_attr("arn"), datasource_logical_id, kwargs
             )
 
             self._datasource_name_map[relative_id] = cfn_datasource.get_runtime_attr("name")
@@ -2616,7 +2620,6 @@ class SamGraphQLApi(SamResourceMacro):
         self,
         ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource,
         datasource_arn: Intrinsicable[str],
-        relative_id: str,
         datasource_logical_id: str,
         kwargs: Dict[str, Any],
     ) -> Tuple[str, List[Resource]]:
@@ -2624,13 +2627,9 @@ class SamGraphQLApi(SamResourceMacro):
         if ddb_datasource.ServiceRoleArn:
             return cast(PassThrough, ddb_datasource.ServiceRoleArn), []
 
-        # If the user doesn't have their own role, then we will create for them if TableArn is defined.
-        table_arn = passthrough_value(
-            sam_expect(
-                ddb_datasource.TableArn, relative_id, f"DataSources.DynamoDb.{relative_id}.TableArn"
-            ).to_not_be_none(
-                "'TableArn' must be defined to create the role and policy if 'ServiceRoleArn' is not defined."
-            )
+        table_arn = cast(
+            Intrinsicable[str],
+            (ddb_datasource.TableArn if ddb_datasource.TableArn else self._compose_dynamodb_table_arn(ddb_datasource)),
         )
 
         permissions = ddb_datasource.Permissions or ["Read", "Write"]
@@ -2655,7 +2654,7 @@ class SamGraphQLApi(SamResourceMacro):
     def _parse_ddb_config(self, ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource) -> DynamoDBConfigType:
         ddb_config: DynamoDBConfigType = {}
 
-        ddb_config["AwsRegion"] = cast(PassThrough, ddb_datasource.Region) or ref("AWS::Region")
+        ddb_config["AwsRegion"] = passthrough_value(ddb_datasource.Region) or ref("AWS::Region")
         ddb_config["TableName"] = passthrough_value(ddb_datasource.TableName)
 
         if ddb_datasource.UseCallerCredentials:
@@ -2674,7 +2673,7 @@ class SamGraphQLApi(SamResourceMacro):
     def _construct_ddb_datasource_connector_resources(
         datasource_id: str,
         source_arn: Intrinsicable[str],
-        destination_arn: str,
+        destination_arn: Intrinsicable[str],
         permissions: PermissionsType,
         role_name: Intrinsicable[str],
         kwargs: Dict[str, Any],
@@ -2716,7 +2715,7 @@ class SamGraphQLApi(SamResourceMacro):
                 logical_id=datasource_logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
             )
 
-            cfn_datasource.Name = lambda_datasource.Name or relative_id
+            cfn_datasource.Name = passthrough_value(lambda_datasource.Name) or relative_id
             cfn_datasource.Type = "AWS_LAMBDA"
             cfn_datasource.ApiId = api_id
             cfn_datasource.Description = passthrough_value(lambda_datasource.Description)
@@ -2973,11 +2972,13 @@ class SamGraphQLApi(SamResourceMacro):
                 # to a default snippet which has basic definition of request/response functions.
                 if not cfn_resolver.Code and not cfn_resolver.CodeS3Location:
                     cfn_resolver.Code = APPSYNC_PIPELINE_RESOLVER_JS_CODE
+                    cfn_resolver.Runtime = APPSYNC_PIPELINE_RESOLVER_JS_RUNTIME
+                else:
+                    cfn_resolver.Runtime = self._parse_runtime(resolver, relative_id)
 
                 cfn_resolver.ApiId = api_id
                 cfn_resolver.FieldName = resolver.FieldName or relative_id
                 cfn_resolver.TypeName = type_name
-                cfn_resolver.Runtime = self._parse_runtime(resolver, relative_id)
 
                 if resolver.Pipeline:
                     cfn_resolver.Kind = "PIPELINE"
@@ -3023,3 +3024,15 @@ class SamGraphQLApi(SamResourceMacro):
     @staticmethod
     def _create_appsync_data_source_logical_id(api_id: str, data_source_type: str, data_source_relative_id: str) -> str:
         return f"{api_id}{data_source_relative_id}{data_source_type}DataSource"
+
+    @staticmethod
+    def _compose_dynamodb_table_arn(ddb_datasource: aws_serverless_graphqlapi.DynamoDBDataSource) -> Intrinsicable[str]:
+        return fnSub(
+            ArnGenerator.generate_dynamodb_table_arn(
+                partition="${AWS::Partition}", table_name="${__TableName__}", region="${__Region__}"
+            ),
+            {
+                "__TableName__": ddb_datasource.TableName,
+                "__Region__": passthrough_value(ddb_datasource.Region) or ref("AWS::Region"),
+            },
+        )
