@@ -207,7 +207,7 @@ class CloudWatchEvent(PushEventSource):
         "Target": PropertyType(False, IS_DICT),
         "Enabled": PropertyType(False, IS_BOOL),
         "State": PropertyType(False, IS_STR),
-        "InputTransformer": PropertyType(False, IS_DICT)
+        "InputTransformer": PropertyType(False, IS_DICT),
     }
 
     EventBusName: Optional[PassThrough]
