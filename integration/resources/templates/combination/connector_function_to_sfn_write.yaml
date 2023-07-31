@@ -7,7 +7,7 @@ Resources:
           console.log("Hello world!")
         };
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
 
   StateMachine:
     Type: AWS::Serverless::StateMachine
@@ -27,7 +27,7 @@ Resources:
   TriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
       Handler: index.handler
       InlineCode: |
         const AWS = require('aws-sdk');

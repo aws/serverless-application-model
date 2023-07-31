@@ -16,7 +16,7 @@ Resources:
   MyFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
       Handler: index.handler
       InlineCode: |
         exports.handler = async (event) => {
