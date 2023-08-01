@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Optional, TypeVar, Union
 
 from typing_extensions import Literal
 
-from samtranslator.model.types import PassThrough
 from samtranslator.compat import pydantic
+from samtranslator.model.types import PassThrough
 
 
 # If using PassThrough as-is, pydantic will mark the field as not required:
