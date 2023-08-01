@@ -51,7 +51,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
       CodeUri:
         Bucket:
           Ref: Bucket
