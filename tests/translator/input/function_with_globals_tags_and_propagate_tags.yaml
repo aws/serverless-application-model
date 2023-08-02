@@ -1,0 +1,26 @@
+Globals:
+  Function:
+    Tags:
+      test: 'yes'
+
+Resources:
+  ApiFunction: # Adds a GET api endpoint at "/" to the ApiGatewayApi via an Api event
+    Type: AWS::Serverless::Function
+    Properties:
+      PropagateTags: true
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RequestParameters:
+            - method.request.header.Authorization
+            - method.request.querystring.keyword:
+                Required: true
+                Caching: false
+      Runtime: python3.7
+      Handler: index.handler
+      InlineCode: |-
+        def handler(event, context):
+            return {'body': 'Hello World!', 'statusCode': 200}
