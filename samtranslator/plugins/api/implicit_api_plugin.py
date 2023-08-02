@@ -109,10 +109,11 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         implicit_api_resource = template.get(self.IMPLICIT_API_LOGICAL_ID)
         globals_var = template.get_globals().get(SamResourceType(resource.type).name, {})
         should_propagate_tags = resource.properties.get("PropagateTags") or globals_var.get("PropagateTags")
+        tags_properties = resource.properties.get("Tags") or globals_var.get("Tags")
 
-        if implicit_api_resource and resource.properties.get("Tags") and should_propagate_tags:
+        if implicit_api_resource and tags_properties and should_propagate_tags:
             # This makes an assumption that the SAM resource has 'Tags' property and is a dictionary.
-            implicit_api_resource.properties.setdefault("Tags", {}).update(resource.properties["Tags"])
+            implicit_api_resource.properties.setdefault("Tags", {}).update(tags_properties)
             implicit_api_resource.properties["PropagateTags"] = True
 
     @cw_timer(prefix="Plugin-ImplicitApi")
