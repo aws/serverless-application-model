@@ -1028,6 +1028,9 @@ class Api(PushEventSource):
         if method_authorizer:
             api_authorizers = api_auth and api_auth.get("Authorizers")
 
+            if api_authorizers:
+                sam_expect(api_authorizers, api_id, "Auth.Authorizers").to_be_a_map()
+
             if method_authorizer != "AWS_IAM":
                 if method_authorizer != "NONE":
                     if not api_authorizers:
@@ -1038,7 +1041,6 @@ class Api(PushEventSource):
                                 authorizer=method_authorizer, method=method, path=path
                             ),
                         )
-                    sam_expect(api_authorizers, api_id, "Auth.Authorizers").to_be_a_map()
 
                     _check_valid_authorizer_types(  # type: ignore[no-untyped-call]
                         event_id, method, path, method_authorizer, api_authorizers, False
