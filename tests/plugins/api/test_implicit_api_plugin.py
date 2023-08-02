@@ -369,6 +369,7 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         api_events = {"Api1": {"Type": "Api", "Properties": {"Path": "/", "Methid": "POST"}}}
 
         template = Mock()
+        template.get_globals.return_value = {}
         function_events_mock = Mock()
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": {"Events": function_events_mock}})
         function_events_mock.update = Mock()
@@ -380,6 +381,7 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         api_events = {"Api1": {"Type": "Api", "Properties": {"Path": "/", "Method": ["POST"]}}}
 
         template = Mock()
+        template.get_globals.return_value = {}
         function_events_mock = Mock()
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": {"Events": function_events_mock}})
         function_events_mock.update = Mock()
@@ -411,6 +413,7 @@ class TestImplicitRestApiPlugin_process_api_events(TestCase):
         api_events = {"Api1": {"Type": "Api", "Properties": {"Path": ["/"], "Method": "POST"}}}
 
         template = Mock()
+        template.get_globals.return_value = {}
         function_events_mock = Mock()
         function = SamResource({"Type": SamResourceType.Function.value, "Properties": {"Events": function_events_mock}})
         function_events_mock.update = Mock()
