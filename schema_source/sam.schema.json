@@ -5087,13 +5087,8 @@
           "title": "InputPath"
         },
         "InputTransformer": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "markdownDescription": "",
-          "title": "InputTransformer"
+          "title": "InputTransformer",
+          "type": "object"
         },
         "Pattern": {
           "allOf": [
