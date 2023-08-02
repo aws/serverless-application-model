@@ -268,7 +268,7 @@ Resources:
         Ref: stage
       Auth:
         Authorizers:
-          - FunctionArn: test
+        - FunctionArn: test
 
   NonDictExternalApiAuthorizerFunction:
     Type: AWS::Serverless::Function
