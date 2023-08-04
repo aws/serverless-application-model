@@ -260,3 +260,29 @@ Resources:
           MyAuth:
             FunctionArn: !GetAtt MyAuthFn.Arn
             DisableFunctionDefaultPermissions: foo
+
+  NonDictExternalApiAuthorizer:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName:
+        Ref: stage
+      Auth:
+        Authorizers:
+        - FunctionArn: test
+
+  NonDictExternalApiAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: NonDictExternalApiAuthorizer
+            Path: /hello
+            Method: get
+            Auth:
+              ApiKeyRequired: true
+              Authorizer: AWS_IAM

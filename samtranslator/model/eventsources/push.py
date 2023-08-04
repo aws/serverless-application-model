@@ -207,6 +207,7 @@ class CloudWatchEvent(PushEventSource):
         "Target": PropertyType(False, IS_DICT),
         "Enabled": PropertyType(False, IS_BOOL),
         "State": PropertyType(False, IS_STR),
+        "InputTransformer": PropertyType(False, IS_DICT),
     }
 
     EventBusName: Optional[PassThrough]
@@ -219,6 +220,7 @@ class CloudWatchEvent(PushEventSource):
     Target: Optional[PassThrough]
     Enabled: Optional[bool]
     State: Optional[PassThrough]
+    InputTransformer: Optional[PassThrough]
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -290,6 +292,9 @@ class CloudWatchEvent(PushEventSource):
 
         if self.RetryPolicy is not None:
             target["RetryPolicy"] = self.RetryPolicy
+
+        if self.InputTransformer is not None:
+            target["InputTransformer"] = self.InputTransformer
 
         return target
 
@@ -1023,6 +1028,9 @@ class Api(PushEventSource):
         if method_authorizer:
             api_authorizers = api_auth and api_auth.get("Authorizers")
 
+            if api_authorizers:
+                sam_expect(api_authorizers, api_id, "Auth.Authorizers").to_be_a_map()
+
             if method_authorizer != "AWS_IAM":
                 if method_authorizer != "NONE":
                     if not api_authorizers:
@@ -1033,7 +1041,6 @@ class Api(PushEventSource):
                                 authorizer=method_authorizer, method=method, path=path
                             ),
                         )
-                    sam_expect(api_authorizers, api_id, "Auth.Authorizers").to_be_a_map()
 
                     _check_valid_authorizer_types(  # type: ignore[no-untyped-call]
                         event_id, method, path, method_authorizer, api_authorizers, False
