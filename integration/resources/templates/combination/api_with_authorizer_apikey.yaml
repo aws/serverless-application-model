@@ -73,7 +73,7 @@ Resources:
     - MyUsagePlan
     Properties:
       Enabled: true
-      Value: at_least_20_characters
+      Value: needatleast20characters
       StageKeys:
       - RestApiId:
           Ref: MyApi
