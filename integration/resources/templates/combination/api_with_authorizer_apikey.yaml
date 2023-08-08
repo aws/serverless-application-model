@@ -61,7 +61,7 @@ Resources:
           
           return {
             principalId: 'user',
-            usageIdentifierKey: 'at_least_20_characters',
+            usageIdentifierKey: 'needatleast20characters',
             context: { },
             policyDocument
           }
