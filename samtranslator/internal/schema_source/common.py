@@ -3,10 +3,9 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Dict, List, Optional, TypeVar, Union
 
-import pydantic
-from pydantic import Extra, Field
 from typing_extensions import Literal
 
+from samtranslator.compat import pydantic
 from samtranslator.model.types import PassThrough
 
 
@@ -53,7 +52,7 @@ def passthrough_prop(sam_docs_stem: str, sam_docs_name: str, prop_path: List[str
     for s in prop_path[1:]:
         path.extend(["properties", s])
     docs = _DOCS["properties"][sam_docs_stem][sam_docs_name]
-    return Field(
+    return pydantic.Field(
         title=sam_docs_name,
         # We add a custom value to the schema containing the path to the pass-through
         # documentation; the dict containing the value is replaced in the final schema
@@ -68,7 +67,7 @@ def passthrough_prop(sam_docs_stem: str, sam_docs_name: str, prop_path: List[str
 
 def _get_prop(stem: str, name: str) -> Any:
     docs = _DOCS["properties"][stem][name]
-    return Field(
+    return pydantic.Field(
         title=name,
         # https://code.visualstudio.com/docs/languages/json#_use-rich-formatting-in-hovers
         markdownDescription=docs,
@@ -78,7 +77,7 @@ def _get_prop(stem: str, name: str) -> Any:
 # By default strict: https://pydantic-docs.helpmanual.io/usage/model_config/#change-behaviour-globally
 class BaseModel(LenientBaseModel):
     class Config:
-        extra = Extra.forbid
+        extra = pydantic.Extra.forbid
 
     def __getattribute__(self, __name: str) -> Any:
         """Overloading get attribute operation to allow access PassThroughProp without using __root__"""

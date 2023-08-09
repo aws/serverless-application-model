@@ -6,8 +6,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Type, Union
 
-import pydantic
-
+from samtranslator.compat import pydantic
 from samtranslator.internal.schema_source import (
     any_cfn_resource,
     aws_serverless_api,
