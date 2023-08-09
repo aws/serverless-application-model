@@ -333,6 +333,7 @@ class EventBridgeRuleEventProperties(BaseModel):
     Pattern: PassThroughProp = eventbridgeruleeventproperties("Pattern")
     RetryPolicy: Optional[PassThroughProp] = eventbridgeruleeventproperties("RetryPolicy")
     Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
+    InputTransformer: Optional[PassThroughProp]  # TODO: add docs
 
 
 class EventBridgeRuleEvent(BaseModel):

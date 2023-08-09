@@ -134,9 +134,6 @@
       "Properties": {
         "FunctionName": {
           "Ref": "FunctionWithOverrides"
-        },
-        "RuntimeManagementConfig": {
-          "UpdateRuntimeOn": "FunctionChange"
         }
       },
       "Type": "AWS::Lambda::Version"
@@ -262,9 +259,6 @@
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"
-        },
-        "RuntimeManagementConfig": {
-          "UpdateRuntimeOn": "Auto"
         }
       },
       "Type": "AWS::Lambda::Version"
