@@ -536,9 +536,7 @@ class BaseTest(TestCase):
         response = self.do_get_request_with_logging(url, headers)
         if response.status_code != expected_status_code:
             raise StatusCodeError(
-                "Request to {} failed with status: {}, expected status: {}".format(
-                    url, response.status_code, expected_status_code
-                )
+                f"Request to {url} failed with status: {response.status_code}, expected status: {expected_status_code}"
             )
         return response
 
@@ -565,9 +563,7 @@ class BaseTest(TestCase):
         response = self.do_options_request_with_logging(url, headers)
         if response.status_code != expected_status_code:
             raise StatusCodeError(
-                "Request to {} failed with status: {}, expected status: {}".format(
-                    url, response.status_code, expected_status_code
-                )
+                f"Request to {url} failed with status: {response.status_code}, expected status: {expected_status_code}"
             )
         return response
 
@@ -576,9 +572,7 @@ class BaseTest(TestCase):
         response = self.do_post_request(url, body_obj)
         if response.status_code != expected_status_code:
             raise StatusCodeError(
-                "Request to {} failed with status: {}, expected status: {}".format(
-                    url, response.status_code, expected_status_code
-                )
+                f"Request to {url} failed with status: {response.status_code}, expected status: {expected_status_code}"
             )
         return response
 

@@ -108,7 +108,7 @@ JwtConfiguration = Dict[str, Union[str, List[str]]]
 
 
 class ApiGatewayV2Authorizer:
-    def __init__(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
+    def __init__(  # type: ignore[no-untyped-def] # noqa: PLR0913
         self,
         api_logical_id=None,
         name=None,

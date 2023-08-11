@@ -63,9 +63,7 @@ class DeploymentPreferenceCollection:
         """
         if logical_id in self._resource_preferences:
             raise ValueError(
-                "logical_id {logical_id} previously added to this deployment_preference_collection".format(
-                    logical_id=logical_id
-                )
+                f"logical_id {logical_id} previously added to this deployment_preference_collection"
             )
 
         self._resource_preferences[logical_id] = DeploymentPreference.from_dict(  # type: ignore[no-untyped-call]

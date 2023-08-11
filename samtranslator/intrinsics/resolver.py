@@ -195,7 +195,7 @@ class IntrinsicsResolver:
         if not self._is_intrinsic_dict(_input):
             return _input
 
-        function_type = list(_input.keys())[0]
+        function_type = next(iter(_input.keys()))
         return self.supported_intrinsics[function_type].resolve_parameter_refs(_input, parameters)
 
     def _try_resolve_sam_resource_refs(
@@ -214,7 +214,7 @@ class IntrinsicsResolver:
         if not self._is_intrinsic_dict(_input):
             return _input
 
-        function_type = list(_input.keys())[0]
+        function_type = next(iter(_input.keys()))
         return self.supported_intrinsics[function_type].resolve_resource_refs(_input, supported_resource_refs)
 
     def _try_resolve_sam_resource_id_refs(
@@ -232,7 +232,7 @@ class IntrinsicsResolver:
         if not self._is_intrinsic_dict(_input):
             return _input
 
-        function_type = list(_input.keys())[0]
+        function_type = next(iter(_input.keys()))
         return self.supported_intrinsics[function_type].resolve_resource_id_refs(_input, supported_resource_id_refs)
 
     def _is_intrinsic_dict(self, _input: Dict[str, Any]) -> bool:
@@ -243,4 +243,4 @@ class IntrinsicsResolver:
         :return: True, if the _input contains a supported intrinsic function.  False otherwise
         """
         # All intrinsic functions are dictionaries with just one key
-        return isinstance(_input, dict) and len(_input) == 1 and list(_input.keys())[0] in self.supported_intrinsics
+        return isinstance(_input, dict) and len(_input) == 1 and next(iter(_input.keys())) in self.supported_intrinsics

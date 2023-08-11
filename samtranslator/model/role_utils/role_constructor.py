@@ -60,7 +60,7 @@ def _get_managed_policy_arn(
     return name
 
 
-def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
+def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
     resource_logical_id,
     attributes,
     managed_policy_map,
@@ -156,9 +156,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: too-man
             # Policy Templates are not supported here in the "core"
             raise InvalidResourceException(
                 resource_logical_id,
-                "Policy at index {} in the '{}' property is not valid".format(
-                    index, resource_policies.POLICIES_PROPERTY_NAME
-                ),
+                f"Policy at index {index} in the '{resource_policies.POLICIES_PROPERTY_NAME}' property is not valid",
             )
 
     execution_role.ManagedPolicyArns = list(managed_policy_arns)

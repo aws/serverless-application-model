@@ -12,7 +12,7 @@ class SamResource:
     with any CloudFormation constructs, like DependsOn, Conditions etc.
     """
 
-    type = None  # noqa: builtin-attribute-shadowing
+    type = None  # noqa: A003
     properties: Dict[str, Any] = {}  # TODO: Replace `Any` with something more specific
 
     def __init__(self, resource_dict: Dict[str, Any]) -> None:

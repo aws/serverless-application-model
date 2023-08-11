@@ -39,7 +39,7 @@ class SamTemplate:
             if needs_filter:
                 yield logicalId, resource
 
-    def set(  # noqa: builtin-attribute-shadowing
+    def set(  # noqa: A003
         self, logical_id: str, resource: Union[SamResource, Dict[str, Any]]
     ) -> None:
         """

@@ -35,7 +35,7 @@ HttpApiTagName = "httpapi:createdBy"
 
 
 class HttpApiGenerator:
-    def __init__(  # noqa: too-many-arguments
+    def __init__(  # noqa: PLR0913
         self,
         logical_id: str,
         stage_variables: Optional[Dict[str, Intrinsicable[str]]],
@@ -239,7 +239,7 @@ class HttpApiGenerator:
         if DefaultStageName in paths:
             paths[f"/{DefaultStageName}"] = paths.pop(DefaultStageName)
 
-    def _construct_api_domain(  # noqa: too-many-branches
+    def _construct_api_domain(  # noqa: PLR0912, PLR0915
         self, http_api: ApiGatewayV2HttpApi, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
     ) -> Tuple[
         Optional[ApiGatewayV2DomainName],

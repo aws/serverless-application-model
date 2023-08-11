@@ -111,7 +111,7 @@ class SwaggerEditor(BaseEditor):
                     [InvalidTemplateException(f"Invalid OpenAPI definition: {ex!s}.")]
                 ) from ex
 
-    def add_lambda_integration(  # noqa: too-many-arguments
+    def add_lambda_integration(  # noqa: PLR0913
         self,
         path: str,
         method: str,
@@ -168,7 +168,7 @@ class SwaggerEditor(BaseEditor):
             if condition:
                 path_item[method] = make_conditional(condition, path_item[method])
 
-    def add_state_machine_integration(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
+    def add_state_machine_integration(  # type: ignore[no-untyped-def] # noqa: PLR0913
         self,
         path,
         method,
@@ -264,7 +264,7 @@ class SwaggerEditor(BaseEditor):
                     normalized_method_name = self._normalize_method_name(method_name)
                     yield normalized_method_name, method_definition
 
-    def add_cors(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
+    def add_cors(  # type: ignore[no-untyped-def] # noqa: PLR0913
         self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None, allow_credentials=None
     ):
         """
@@ -514,7 +514,7 @@ class SwaggerEditor(BaseEditor):
         if "api_key" not in self.security_definitions:
             self.security_definitions.update(api_key_security_definition)
 
-    def set_path_default_authorizer(  # noqa: too-many-branches
+    def set_path_default_authorizer(  # noqa: PLR0912
         self,
         path: str,
         default_authorizer: str,
@@ -557,9 +557,7 @@ class SwaggerEditor(BaseEditor):
             for security in existing_security:
                 SwaggerEditor.validate_is_dict(
                     security,
-                    "{} in Security for path {} method {} is not a valid dictionary.".format(
-                        security, path, method_name
-                    ),
+                    f"{security} in Security for path {path} method {method_name} is not a valid dictionary.",
                 )
                 if authorizer_names.isdisjoint(security.keys()):
                     existing_non_authorizer_security.append(security)
@@ -634,9 +632,7 @@ class SwaggerEditor(BaseEditor):
             for security in existing_security:
                 SwaggerEditor.validate_is_dict(
                     security,
-                    "{} in Security for path {} method {} is not a valid dictionary.".format(
-                        security, path, method_name
-                    ),
+                    f"{security} in Security for path {path} method {method_name} is not a valid dictionary.",
                 )
                 if apikey_security_names.isdisjoint(security.keys()):
                     existing_non_apikey_security.append(security)
@@ -1063,7 +1059,7 @@ class SwaggerEditor(BaseEditor):
                 statement.extend([deny_statement])
             self.resource_policy["Statement"] = statement
 
-    def _add_vpc_resource_policy_for_method(  # noqa: too-many-branches
+    def _add_vpc_resource_policy_for_method(  # noqa: PLR0912
         self, endpoint_dict: Dict[str, Any], conditional: str, resource_list: PassThrough
     ) -> None:
         """

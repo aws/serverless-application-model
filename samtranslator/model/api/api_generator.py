@@ -169,7 +169,7 @@ class SharedApiUsagePlan:
 
 
 class ApiGenerator:
-    def __init__(  # noqa: too-many-arguments
+    def __init__(  # noqa: PLR0913
         self,
         logical_id: str,
         cache_cluster_enabled: Optional[Intrinsicable[bool]],
@@ -450,7 +450,7 @@ class ApiGenerator:
 
         return stage
 
-    def _construct_api_domain(  # noqa: too-many-branches
+    def _construct_api_domain(  # noqa: PLR0912, PLR0915
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
     ) -> ApiDomainResponse:
         """
@@ -856,7 +856,7 @@ class ApiGenerator:
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
-    def _construct_usage_plan(self, rest_api_stage: Optional[ApiGatewayStage] = None) -> Any:  # noqa: too-many-branches
+    def _construct_usage_plan(self, rest_api_stage: Optional[ApiGatewayStage] = None) -> Any:  # noqa: PLR0912
         """Constructs and returns the ApiGateway UsagePlan, ApiGateway UsagePlanKey, ApiGateway ApiKey for Auth.
 
         :param model.apigateway.ApiGatewayStage stage: the stage of rest api
@@ -1044,16 +1044,14 @@ class ApiGenerator:
             if not isinstance(responses_value, dict):
                 raise InvalidResourceException(
                     self.logical_id,
-                    "Invalid property type '{}' for GatewayResponses. "
-                    "Expected an object of type 'GatewayResponse'.".format(type(responses_value).__name__),
+                    f"Invalid property type '{type(responses_value).__name__}' for GatewayResponses. "
+                    "Expected an object of type 'GatewayResponse'.",
                 )
             for response_key in responses_value:
                 if response_key not in GatewayResponseProperties:
                     raise InvalidResourceException(
                         self.logical_id,
-                        "Invalid property '{}' in 'GatewayResponses' property '{}'.".format(
-                            response_key, responses_key
-                        ),
+                        f"Invalid property '{response_key}' in 'GatewayResponses' property '{responses_key}'.",
                     )
 
         if not SwaggerEditor.is_valid(self.definition_body):
@@ -1119,7 +1117,7 @@ class ApiGenerator:
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
-    def _openapi_postprocess(self, definition_body: Dict[str, Any]) -> Dict[str, Any]:  # noqa: too-many-branches
+    def _openapi_postprocess(self, definition_body: Dict[str, Any]) -> Dict[str, Any]:  # noqa: PLR0912
         """
         Convert definitions to openapi 3 in definition body if OpenApiVersion flag is specified.
 
@@ -1168,8 +1166,8 @@ class ApiGenerator:
                     if path_item.get("options"):
                         SwaggerEditor.validate_is_dict(
                             path_item.get("options"),
-                            "Value of options method for path {} must be a "
-                            "dictionary according to Swagger spec.".format(path),
+                            f"Value of options method for path {path} must be a "
+                            "dictionary according to Swagger spec.",
                         )
                         options = path_item.get("options").copy()
                         for field, field_val in options.items():
@@ -1192,8 +1190,8 @@ class ApiGenerator:
                                     continue
                                 SwaggerEditor.validate_is_dict(
                                     response_200_headers,
-                                    "Value of response's headers in options method for path {} must be a "
-                                    "dictionary according to Swagger spec.".format(path),
+                                    f"Value of response's headers in options method for path {path} must be a "
+                                    "dictionary according to Swagger spec.",
                                 )
                                 for header, header_val in response_200_headers.items():
                                     new_header_val_with_schema = Py27Dict()

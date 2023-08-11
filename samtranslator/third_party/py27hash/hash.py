@@ -33,7 +33,7 @@ class Hash:
 
     @staticmethod
     @lru_cache(maxsize=2048)
-    def hash(value):  # type: ignore[no-untyped-def]  # noqa: builtin-attribute-shadowing
+    def hash(value):  # type: ignore[no-untyped-def]  # noqa: A003
         """
         Returns a Python 2.7 hash for a value.
 

@@ -20,7 +20,7 @@ unicode_string_type = str  # TODO: remove it, python 2 legacy code
 long_int_type = int  # TODO: remove it, python 2 legacy code
 
 
-def to_py27_compatible_template(  # noqa: too-many-branches
+def to_py27_compatible_template(  # noqa: PLR0912
     template: Dict[str, Any], parameter_values: Optional[Dict[str, Any]] = None
 ) -> None:
     """

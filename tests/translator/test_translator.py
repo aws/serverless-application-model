@@ -159,9 +159,7 @@ class AbstractTestTranslator(TestCase):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
             mock_policy_loader.load.return_value = {
-                "AWSLambdaBasicExecutionRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole".format(
-                    partition
-                ),
+                "AWSLambdaBasicExecutionRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
                 "AmazonDynamoDBFullAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBFullAccess",
                 "AmazonDynamoDBReadOnlyAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess",
                 "AWSLambdaRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaRole",
@@ -356,9 +354,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
             mock_policy_loader.load.return_value = {
-                "AWSLambdaBasicExecutionRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole".format(
-                    partition
-                ),
+                "AWSLambdaBasicExecutionRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
                 "AmazonDynamoDBFullAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBFullAccess",
                 "AmazonDynamoDBReadOnlyAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess",
                 "AWSLambdaRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaRole",
@@ -412,9 +408,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
             mock_policy_loader.load.return_value = {
-                "AWSLambdaBasicExecutionRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole".format(
-                    partition
-                ),
+                "AWSLambdaBasicExecutionRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
                 "AmazonDynamoDBFullAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBFullAccess",
                 "AmazonDynamoDBReadOnlyAccess": f"arn:{partition}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess",
                 "AWSLambdaRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaRole",

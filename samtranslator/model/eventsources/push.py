@@ -61,7 +61,7 @@ class PushEventSource(ResourceMacro, metaclass=ABCMeta):
     principal: str = None  # type: ignore
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
 
-    def _construct_permission(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
+    def _construct_permission(  # type: ignore[no-untyped-def] # noqa: PLR0913
         self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None
     ):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
@@ -591,7 +591,7 @@ class SNS(PushEventSource):
         resources.append(subscription)
         return resources
 
-    def _inject_subscription(  # noqa: too-many-arguments
+    def _inject_subscription(  # noqa: PLR0913
         self,
         protocol: str,
         endpoint: str,
@@ -782,7 +782,7 @@ class Api(PushEventSource):
 
         return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)  # type: ignore[no-untyped-call]
 
-    def _add_swagger_integration(  # type: ignore[no-untyped-def] # noqa: too-many-statements
+    def _add_swagger_integration(  # type: ignore[no-untyped-def] # noqa: PLR0912, PLR0915
         self, api, api_id, function, intrinsics_resolver
     ):
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
@@ -807,9 +807,7 @@ class Api(PushEventSource):
             # Cannot add the Lambda Integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
-                'API method "{method}" defined multiple times for path "{path}".'.format(
-                    method=self.Method, path=self.Path
-                ),
+                f'API method "{self.Method}" defined multiple times for path "{self.Path}".',
             )
 
         condition = None
@@ -841,35 +839,27 @@ class Api(PushEventSource):
                 if not api_models:
                     raise InvalidEventException(
                         self.relative_id,
-                        "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
-                        "because the related API does not define any Models.".format(
-                            model=method_model, method=self.Method, path=self.Path
-                        ),
+                        f"Unable to set RequestModel [{method_model}] on API method [{self.Method}] for path [{self.Path}] "
+                        "because the related API does not define any Models.",
                     )
                 if not is_intrinsic(api_models) and not isinstance(api_models, dict):
                     raise InvalidEventException(
                         self.relative_id,
-                        "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
-                        "because the related API Models defined is of invalid type.".format(
-                            model=method_model, method=self.Method, path=self.Path
-                        ),
+                        f"Unable to set RequestModel [{method_model}] on API method [{self.Method}] for path [{self.Path}] "
+                        "because the related API Models defined is of invalid type.",
                     )
                 if not isinstance(method_model, str):
                     raise InvalidEventException(
                         self.relative_id,
-                        "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
-                        "because the related API does not contain valid Models.".format(
-                            model=method_model, method=self.Method, path=self.Path
-                        ),
+                        f"Unable to set RequestModel [{method_model}] on API method [{self.Method}] for path [{self.Path}] "
+                        "because the related API does not contain valid Models.",
                     )
 
                 if not api_models.get(method_model):
                     raise InvalidEventException(
                         self.relative_id,
-                        "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
-                        "because it wasn't defined in the API's Models.".format(
-                            model=method_model, method=self.Method, path=self.Path
-                        ),
+                        f"Unable to set RequestModel [{method_model}] on API method [{self.Method}] for path [{self.Path}] "
+                        "because it wasn't defined in the API's Models.",
                     )
 
                 editor.add_request_model_to_method(  # type: ignore[no-untyped-call]
@@ -891,10 +881,8 @@ class Api(PushEventSource):
                     if not isinstance(validate_body, bool) or not isinstance(validate_parameters, bool):
                         raise InvalidEventException(
                             self.relative_id,
-                            "Unable to set Validator to RequestModel [{model}] on API method [{method}] for path [{path}] "
-                            "ValidateBody and ValidateParameters must be a boolean type, strings or intrinsics are not supported.".format(
-                                model=method_model, method=self.Method, path=self.Path
-                            ),
+                            f"Unable to set Validator to RequestModel [{method_model}] on API method [{self.Method}] for path [{self.Path}] "
+                            "ValidateBody and ValidateParameters must be a boolean type, strings or intrinsics are not supported.",
                         )
 
                     editor.add_request_validator_to_method(  # type: ignore[no-untyped-call]
@@ -1010,7 +998,7 @@ class Api(PushEventSource):
         return rest_api_id["Ref"] if isinstance(rest_api_id, dict) and "Ref" in rest_api_id else rest_api_id
 
     @staticmethod
-    def add_auth_to_swagger(  # noqa: too-many-arguments
+    def add_auth_to_swagger(  # noqa: PLR0912, PLR0913
         event_auth: Dict[str, Any],
         api: Dict[str, Any],
         api_id: str,
@@ -1036,10 +1024,8 @@ class Api(PushEventSource):
                     if not api_authorizers:
                         raise InvalidEventException(
                             event_id,
-                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                            "because the related API does not define any Authorizers.".format(
-                                authorizer=method_authorizer, method=method, path=path
-                            ),
+                            f"Unable to set Authorizer [{method_authorizer}] on API method [{method}] for path [{path}] "
+                            "because the related API does not define any Authorizers.",
                         )
 
                     _check_valid_authorizer_types(  # type: ignore[no-untyped-call]
@@ -1049,10 +1035,8 @@ class Api(PushEventSource):
                     if not api_authorizers.get(method_authorizer):
                         raise InvalidEventException(
                             event_id,
-                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                            "because it wasn't defined in the API's Authorizers.".format(
-                                authorizer=method_authorizer, method=method, path=path
-                            ),
+                            f"Unable to set Authorizer [{method_authorizer}] on API method [{method}] for path [{path}] "
+                            "because it wasn't defined in the API's Authorizers.",
                         )
                 else:
                     _check_valid_authorizer_types(  # type: ignore[no-untyped-call]
@@ -1061,10 +1045,8 @@ class Api(PushEventSource):
                     if not api_auth or not api_auth.get("DefaultAuthorizer"):
                         raise InvalidEventException(
                             event_id,
-                            "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
-                            "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                                method=method, path=path
-                            ),
+                            f"Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
+                            "is only a valid value when a DefaultAuthorizer on the API is specified.",
                         )
 
         auth_scopes = event_auth.get("AuthorizationScopes")
@@ -1076,8 +1058,8 @@ class Api(PushEventSource):
         if apikey_required_setting_is_false and (not api_auth or not api_auth.get("ApiKeyRequired")):
             raise InvalidEventException(
                 event_id,
-                "Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] "
-                "because the related API does not specify any ApiKeyRequired.".format(method=method, path=path),
+                f"Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] "
+                "because the related API does not specify any ApiKeyRequired.",
             )
 
         if method_authorizer or apikey_required_setting is not None:
@@ -1405,9 +1387,7 @@ class HttpApi(PushEventSource):
             # Cannot add the Lambda Integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
-                "API method '{method}' defined multiple times for path '{path}'.".format(
-                    method=self._method, path=self._path
-                ),
+                f"API method '{self._method}' defined multiple times for path '{self._path}'.",
             )
 
         condition = None
@@ -1468,10 +1448,8 @@ class HttpApi(PushEventSource):
             if not api_auth.get("DefaultAuthorizer"):
                 raise InvalidEventException(
                     self.relative_id,
-                    "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
-                    "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                        method=self._method, path=self._path
-                    ),
+                    f"Unable to set Authorizer on API method [{self._method}] for path [{self._path}] because 'NONE' "
+                    "is only a valid value when a DefaultAuthorizer on the API is specified.",
                 )
         # If the method authorizer is "AWS_IAM" but it's not enabled it's possible that's a custom authorizer, not the "official" one.
         # In that case a check needs to be performed to make sure that such an authorizer is defined.
@@ -1480,26 +1458,22 @@ class HttpApi(PushEventSource):
             if not api_authorizers:
                 raise InvalidEventException(
                     self.relative_id,
-                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                    "because the related API does not define any Authorizers.".format(
-                        authorizer=method_authorizer, method=self._method, path=self._path
-                    ),
+                    f"Unable to set Authorizer [{method_authorizer}] on API method [{self._method}] for path [{self._path}] "
+                    "because the related API does not define any Authorizers.",
                 )
 
             if not api_authorizers.get(method_authorizer):
                 raise InvalidEventException(
                     self.relative_id,
-                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                    "because it wasn't defined in the API's Authorizers.".format(
-                        authorizer=method_authorizer, method=self._method, path=self._path
-                    ),
+                    f"Unable to set Authorizer [{method_authorizer}] on API method [{self._method}] for path [{self._path}] "
+                    "because it wasn't defined in the API's Authorizers.",
                 )
 
         if auth.get("AuthorizationScopes") and not isinstance(auth.get("AuthorizationScopes"), list):
             raise InvalidEventException(
                 self.relative_id,
-                "Unable to set Authorizer on API method [{method}] for path [{path}] because "
-                "'AuthorizationScopes' must be a list of strings.".format(method=self._method, path=self._path),
+                f"Unable to set Authorizer on API method [{self._method}] for path [{self._path}] because "
+                "'AuthorizationScopes' must be a list of strings.",
             )
 
         editor.add_auth_to_method(api=api, path=self._path, method_name=self._method, auth=self.Auth)  # type: ignore[no-untyped-call]
@@ -1537,8 +1511,6 @@ def _check_valid_authorizer_types(  # type: ignore[no-untyped-def]
     if not isinstance(method_authorizer, str) or not isinstance(api_authorizers, dict):
         raise InvalidEventException(
             relative_id,
-            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}]. "
-            "The method authorizer must be a string with a corresponding dict entry in the api authorizer.".format(
-                authorizer=method_authorizer, method=method, path=path
-            ),
+            f"Unable to set Authorizer [{method_authorizer}] on API method [{method}] for path [{path}]. "
+            "The method authorizer must be a string with a corresponding dict entry in the api authorizer.",
         )
