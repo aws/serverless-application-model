@@ -333,6 +333,7 @@ class EventBridgeRuleEventProperties(BaseModel):
     Pattern: PassThroughProp = eventbridgeruleeventproperties("Pattern")
     RetryPolicy: Optional[PassThroughProp] = eventbridgeruleeventproperties("RetryPolicy")
     Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
+    InputTransformer: Optional[PassThroughProp]  # TODO: add docs
 
 
 class EventBridgeRuleEvent(BaseModel):
@@ -441,6 +442,8 @@ class SelfManagedKafkaEventProperties(BaseModel):
         "KafkaBootstrapServers"
     )
     SourceAccessConfigurations: PassThroughProp = selfmanagedkafkaeventproperties("SourceAccessConfigurations")
+    StartingPosition: Optional[PassThroughProp]  # TODO: add documentation
+    StartingPositionTimestamp: Optional[PassThroughProp]  # TODO: add documentation
     Topics: PassThroughProp = selfmanagedkafkaeventproperties("Topics")
 
 
@@ -484,7 +487,7 @@ Timeout = Optional[PassThroughProp]
 VpcConfig = Optional[PassThroughProp]
 Environment = Optional[PassThroughProp]
 Tags = Optional[DictStrAny]
-Tracing = Optional[SamIntrinsicable[Literal["Active", "PassThrough"]]]
+Tracing = Optional[SamIntrinsicable[Literal["Active", "PassThrough", "Disabled"]]]
 KmsKeyArn = Optional[PassThroughProp]
 Layers = Optional[PassThroughProp]
 AutoPublishAlias = Optional[SamIntrinsicable[str]]

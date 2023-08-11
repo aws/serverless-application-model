@@ -1,0 +1,19 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      XrayEnabled: true
+      Auth:
+        Type: AWS_IAM
+      Tags:
+        key1: value1
+        key2: value2
+      DomainName:
+        CertificateArn: !Sub arn:${AWS::Partition}:acm:region:123456789012:certificate/certificate_ID
+        DomainName: prad.com
+        Description: cool domain

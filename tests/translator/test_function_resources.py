@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, call, patch
 
 from parameterized import parameterized
 from samtranslator.model.exceptions import InvalidResourceException
@@ -225,7 +225,7 @@ class TestVersionsAndAliases(TestCase):
 
         preference_collection.add.assert_called_once_with(sam_func.logical_id, deploy_preference_dict, None)
         preference_collection.get.assert_called_once_with(sam_func.logical_id)
-        self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(enabled)
+        self.intrinsics_resolver_mock.resolve_parameter_refs.assert_has_calls([call(enabled), call(None)])
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
         self.assertTrue("UpdatePolicy" not in list(aliases[0].values())[0])
@@ -281,7 +281,7 @@ class TestVersionsAndAliases(TestCase):
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = enabled
         resources = sam_func.to_cloudformation(**kwargs)
 
-        self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(enabled)
+        self.intrinsics_resolver_mock.resolve_parameter_refs.assert_has_calls([call(enabled), call(None)])
         # Function, IAM Role
         self.assertEqual(len(resources), 2)
 

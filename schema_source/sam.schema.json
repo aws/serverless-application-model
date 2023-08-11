@@ -86,6 +86,99 @@
       "title": "ApiAuth",
       "type": "object"
     },
+    "ApiKey": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiKeyId": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ExpiresOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "title": "ApiKey",
+      "type": "object"
+    },
+    "Authorizer": {
+      "additionalProperties": false,
+      "properties": {
+        "LambdaAuthorizer": {
+          "$ref": "#/definitions/LambdaAuthorizerConfig"
+        },
+        "OpenIDConnect": {
+          "$ref": "#/definitions/OpenIDConnectConfig"
+        },
+        "Type": {
+          "enum": [
+            "AWS_IAM",
+            "API_KEY",
+            "AWS_LAMBDA",
+            "OPENID_CONNECT",
+            "AMAZON_COGNITO_USER_POOLS"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "UserPool": {
+          "$ref": "#/definitions/UserPoolConfig"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "title": "Authorizer",
+      "type": "object"
+    },
+    "Cache": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiCachingBehavior": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "AtRestEncryptionEnabled": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "TransitEncryptionEnabled": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Ttl": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Type": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "ApiCachingBehavior",
+        "Ttl",
+        "Type"
+      ],
+      "title": "Cache",
+      "type": "object"
+    },
+    "Caching": {
+      "additionalProperties": false,
+      "properties": {
+        "CachingKeys": {
+          "items": {
+            "$ref": "#/definitions/PassThroughProp"
+          },
+          "title": "Cachingkeys",
+          "type": "array"
+        },
+        "Ttl": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Ttl"
+      ],
+      "title": "Caching",
+      "type": "object"
+    },
     "CloudWatchLogsEvent": {
       "additionalProperties": false,
       "properties": {
@@ -415,6 +508,27 @@
       "title": "Cors",
       "type": "object"
     },
+    "DataSources": {
+      "additionalProperties": false,
+      "properties": {
+        "DynamoDb": {
+          "additionalProperties": {
+            "$ref": "#/definitions/DynamoDBDataSource"
+          },
+          "title": "Dynamodb",
+          "type": "object"
+        },
+        "Lambda": {
+          "additionalProperties": {
+            "$ref": "#/definitions/LambdaDataSource"
+          },
+          "title": "Lambda",
+          "type": "object"
+        }
+      },
+      "title": "DataSources",
+      "type": "object"
+    },
     "DeadLetterQueue": {
       "additionalProperties": false,
       "properties": {
@@ -438,6 +552,27 @@
         "Type"
       ],
       "title": "DeadLetterQueue",
+      "type": "object"
+    },
+    "DeltaSync": {
+      "additionalProperties": false,
+      "properties": {
+        "BaseTableTTL": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DeltaSyncTableName": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DeltaSyncTableTTL": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "BaseTableTTL",
+        "DeltaSyncTableName",
+        "DeltaSyncTableTTL"
+      ],
+      "title": "DeltaSync",
       "type": "object"
     },
     "DeploymentPreference": {
@@ -680,6 +815,74 @@
         "SourceAccessConfigurations"
       ],
       "title": "DocumentDBEventProperties",
+      "type": "object"
+    },
+    "DomainName": {
+      "additionalProperties": false,
+      "properties": {
+        "CertificateArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DomainName": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "CertificateArn",
+        "DomainName"
+      ],
+      "title": "DomainName",
+      "type": "object"
+    },
+    "DynamoDBDataSource": {
+      "additionalProperties": false,
+      "properties": {
+        "DeltaSync": {
+          "$ref": "#/definitions/DeltaSync"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Name": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Permissions": {
+          "items": {
+            "enum": [
+              "Read",
+              "Write"
+            ],
+            "type": "string"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "Region": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ServiceRoleArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "TableArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "TableName": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "UseCallerCredentials": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Versioned": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "TableName"
+      ],
+      "title": "DynamoDBDataSource",
       "type": "object"
     },
     "DynamoDBEvent": {
@@ -1146,6 +1349,49 @@
         }
       },
       "title": "EventsScheduleProperties",
+      "type": "object"
+    },
+    "Function": {
+      "additionalProperties": false,
+      "properties": {
+        "CodeUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DataSource": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Datasource"
+        },
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Id": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "InlineCode": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "MaxBatchSize": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        },
+        "Sync": {
+          "$ref": "#/definitions/Sync"
+        }
+      },
+      "title": "Function",
       "type": "object"
     },
     "FunctionUrlConfig": {
@@ -1620,6 +1866,25 @@
       "title": "LambdaAuthorizer",
       "type": "object"
     },
+    "LambdaAuthorizerConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthorizerResultTtlInSeconds": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "AuthorizerUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "IdentityValidationExpression": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "AuthorizerUri"
+      ],
+      "title": "LambdaAuthorizerConfig",
+      "type": "object"
+    },
     "LambdaAuthorizerIdentity": {
       "additionalProperties": false,
       "properties": {
@@ -1662,6 +1927,41 @@
         }
       },
       "title": "LambdaAuthorizerIdentity",
+      "type": "object"
+    },
+    "LambdaConflictHandlerConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "LambdaConflictHandlerArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "LambdaConflictHandlerArn"
+      ],
+      "title": "LambdaConflictHandlerConfig",
+      "type": "object"
+    },
+    "LambdaDataSource": {
+      "additionalProperties": false,
+      "properties": {
+        "Description": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FunctionArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Name": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ServiceRoleArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "FunctionArn"
+      ],
+      "title": "LambdaDataSource",
       "type": "object"
     },
     "LambdaRequestAuthorizer": {
@@ -1893,6 +2193,22 @@
       "title": "Location",
       "type": "object"
     },
+    "Logging": {
+      "additionalProperties": false,
+      "properties": {
+        "CloudWatchLogsRoleArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ExcludeVerboseContent": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FieldLogLevel": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "title": "Logging",
+      "type": "object"
+    },
     "MQEvent": {
       "additionalProperties": false,
       "properties": {
@@ -2079,7 +2395,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The position in a stream from which to start reading\\.  \n+ `AT_TIMESTAMP` \u2013 Specify a time from which to start reading records\\.\n+ `LATEST` \u2013 Read only new records\\.\n+ `TRIM_HORIZON` \u2013 Process all available records\\.\n*Valid values*: `AT_TIMESTAMP` \\| `LATEST` \\| `TRIM_HORIZON`  \n*Type*: String  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "markdownDescription": "The position in a stream from which to start reading\\.  \n+ `AT_TIMESTAMP` \u2013 Specify a time from which to start reading records\\.\n+ `LATEST` \u2013 Read only new records\\.\n+ `TRIM_HORIZON` \u2013 Process all available records\\.\n*Valid values*: `AT_TIMESTAMP` \\| `LATEST` \\| `TRIM_HORIZON`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "StartingPosition"
         },
         "StartingPositionTimestamp": {
@@ -2144,6 +2460,25 @@
         }
       },
       "title": "OAuth2Authorizer",
+      "type": "object"
+    },
+    "OpenIDConnectConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AuthTTL": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ClientId": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "IatTTL": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Issuer": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "title": "OpenIDConnectConfig",
       "type": "object"
     },
     "PassThroughProp": {},
@@ -2253,6 +2588,42 @@
       "title": "RequestParameters",
       "type": "object"
     },
+    "Resolver": {
+      "additionalProperties": false,
+      "properties": {
+        "Caching": {
+          "$ref": "#/definitions/Caching"
+        },
+        "CodeUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "FieldName": {
+          "title": "Fieldname",
+          "type": "string"
+        },
+        "InlineCode": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "MaxBatchSize": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Pipeline": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Pipeline",
+          "type": "array"
+        },
+        "Runtime": {
+          "$ref": "#/definitions/Runtime"
+        },
+        "Sync": {
+          "$ref": "#/definitions/Sync"
+        }
+      },
+      "title": "Resolver",
+      "type": "object"
+    },
     "ResourceReference": {
       "additionalProperties": false,
       "properties": {
@@ -2322,6 +2693,23 @@
         }
       },
       "title": "ResourceReference",
+      "type": "object"
+    },
+    "Runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Version": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Name",
+        "Version"
+      ],
+      "title": "Runtime",
       "type": "object"
     },
     "S3Event": {
@@ -2753,6 +3141,12 @@
           "markdownDescription": "An array of the authentication protocol, VPC components, or virtual host to secure and define your event source\\.  \n*Valid values*: `BASIC_AUTH | CLIENT_CERTIFICATE_TLS_AUTH | SASL_SCRAM_256_AUTH | SASL_SCRAM_512_AUTH | SERVER_ROOT_CA_CERTIFICATE`  \n*Type*: List of [SourceAccessConfiguration](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-sourceaccessconfiguration.html)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ SourceAccessConfigurations](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-sourceaccessconfigurations)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "SourceAccessConfigurations"
         },
+        "StartingPosition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "StartingPositionTimestamp": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Topics": {
           "allOf": [
             {
@@ -2843,6 +3237,25 @@
       "title": "SqsSubscription",
       "type": "object"
     },
+    "Sync": {
+      "additionalProperties": false,
+      "properties": {
+        "ConflictDetection": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ConflictHandler": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "LambdaConflictHandlerConfig": {
+          "$ref": "#/definitions/LambdaConflictHandlerConfig"
+        }
+      },
+      "required": [
+        "ConflictDetection"
+      ],
+      "title": "Sync",
+      "type": "object"
+    },
     "UsagePlan": {
       "additionalProperties": false,
       "properties": {
@@ -2913,6 +3326,28 @@
         "CreateUsagePlan"
       ],
       "title": "UsagePlan",
+      "type": "object"
+    },
+    "UserPoolConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AppIdClientRegex": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "AwsRegion": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DefaultAction": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "UserPoolId": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "UserPoolId"
+      ],
+      "title": "UserPoolConfig",
       "type": "object"
     },
     "__main____Globals": {
@@ -3611,7 +4046,7 @@
           "title": "Cors"
         },
         "DefinitionBody": {
-          "markdownDescription": "OpenAPI specification that describes your API\\. If neither `DefinitionUri` nor `DefinitionBody` are specified, SAM will generate a `DefinitionBody` for you based on your template configuration\\.  \n*Type*: JSON  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Body`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-body) property of an `AWS::ApiGateway::RestApi` resource\\. If certain properties are provided, content may be inserted or modified into the DefinitionBody before being passed to CloudFormation\\. Properties include `Auth`, `BinaryMediaTypes`, `Cors`, `GatewayResponses`, `Models`, and an `EventSource` of type Api for a corresponding `AWS::Serverless::Function`\\.",
+          "markdownDescription": "OpenAPI specification that describes your API\\. If neither `DefinitionUri` nor `DefinitionBody` are specified, SAM will generate a `DefinitionBody` for you based on your template configuration\\.  \nTo reference a local OpenAPI file that defines your API, use the `AWS::Include` transform\\. To learn more, see [Upload local files at deployment](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/deploy-upload-local-files.html)\\.  \n*Type*: JSON  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Body`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-body) property of an `AWS::ApiGateway::RestApi` resource\\. If certain properties are provided, content may be inserted or modified into the DefinitionBody before being passed to CloudFormation\\. Properties include `Auth`, `BinaryMediaTypes`, `Cors`, `GatewayResponses`, `Models`, and an `EventSource` of type Api for a corresponding `AWS::Serverless::Function`\\.",
           "title": "DefinitionBody",
           "type": "object"
         },
@@ -4651,13 +5086,16 @@
           "markdownDescription": "When you don't want to pass the entire matched event to the target, use the `InputPath` property to describe which part of the event to pass\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`InputPath`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-inputpath) property of an `AWS::Events::Rule Target` resource\\.",
           "title": "InputPath"
         },
+        "InputTransformer": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Pattern": {
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Describes which events are routed to the specified target\\. For more information, see [Events and Event Patterns in EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [EventPattern](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventPattern`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern) property of an `AWS::Events::Rule` resource\\.",
+          "markdownDescription": "Describes which events are routed to the specified target\\. For more information, see [Amazon EventBridge events](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-events.html) and [EventBridge event patterns](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [EventPattern](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern)  \n*Required*: Yes  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EventPattern`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern) property of an `AWS::Events::Rule` resource\\.",
           "title": "Pattern"
         },
         "RetryPolicy": {
@@ -4752,7 +5190,7 @@
               "$ref": "#/definitions/CodeUri"
             }
           ],
-          "markdownDescription": "The function code's Amazon S3 URI, path to local folder, or [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object\\. This property only applies if the `PackageType` property is set to `Zip`, otherwise it is ignored\\.  \n**Notes**:  \n1\\. If the `PackageType` property is set to `Zip` \\(default\\), then one of `CodeUri` or `InlineCode` is required\\.  \n2\\. If an Amazon S3 URI or [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object is provided, the Amazon S3 object referenced must be a valid [Lambda deployment package](https://docs.aws.amazon.com/lambda/latest/dg/deployment-package-v2.html)\\.  \n3\\. If the path to a local folder is provided, for the code to be transformed properly the template must go through the workflow that includes [sam build](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-build.html) followed by either [sam deploy](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html) or [sam package](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-package.html)\\. By default, relative paths are resolved with respect to the AWS SAM template's location\\.  \n*Type*: String \\| [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html)  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is similar to the [`Code`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code) property of an `AWS::Lambda::Function` resource\\. The nested Amazon S3 properties are named differently\\.",
+          "markdownDescription": "The code for the function\\. Accepted values include:  \n+ The function's Amazon S3 URI\\. For example, `s3://bucket-123456789/sam-app/1234567890abcdefg`\\.\n+ The local path to the function\\. For example, `hello_world/`\\.\n+ A [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object\\.\nIf you provide a function's Amazon S3 URI or [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object, you must reference a valid [Lambda deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html)\\.  \nIf you provide a local file path, use the AWS SAM CLI to upload the local file at deployment\\. To learn more, see [Using the AWS SAM CLI to upload local files at deployment](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/deploy-upload-local-files.html)\\.  \n*Type*: \\[ String \\| [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) \\]  \n*Required*: Conditional\\. When `PackageType` is set to `Zip`, one of `CodeUri` or `InlineCode` is required\\.  \n*AWS CloudFormation compatibility*: This property is similar to the `[ Code](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code)` property of an `AWS::Lambda::Function` resource\\. The nested Amazon S3 properties are named differently\\.",
           "title": "CodeUri"
         },
         "DeadLetterQueue": {
@@ -4997,12 +5435,13 @@
             {
               "enum": [
                 "Active",
-                "PassThrough"
+                "PassThrough",
+                "Disabled"
               ],
               "type": "string"
             }
           ],
-          "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\. For more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `Active` or `PassThrough`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\. If the `Tracing` property is set to `Active` and the `Role` property is not specified, then AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.",
+          "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\.  \n+ `Active` \u2013 Activates X\\-Ray tracing for the function\\.\n+ `Disabled` \u2013 Deactivates X\\-Ray for the function\\.\n+ `PassThrough` \u2013 Activates X\\-Ray tracing for the function\\. Sampling decision is delegated to the downstream services\\.\nIf specified as `Active` or `PassThrough` and the `Role` property is not set, AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.  \nFor more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: \\[`Active`\\|`Disabled`\\|`PassThrough`\\]  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Tracing"
         },
         "VpcConfig": {
@@ -5105,7 +5544,7 @@
               "$ref": "#/definitions/CodeUri"
             }
           ],
-          "markdownDescription": "The function code's Amazon S3 URI, path to local folder, or [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object\\. This property only applies if the `PackageType` property is set to `Zip`, otherwise it is ignored\\.  \n**Notes**:  \n1\\. If the `PackageType` property is set to `Zip` \\(default\\), then one of `CodeUri` or `InlineCode` is required\\.  \n2\\. If an Amazon S3 URI or [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object is provided, the Amazon S3 object referenced must be a valid [Lambda deployment package](https://docs.aws.amazon.com/lambda/latest/dg/deployment-package-v2.html)\\.  \n3\\. If the path to a local folder is provided, for the code to be transformed properly the template must go through the workflow that includes [sam build](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-build.html) followed by either [sam deploy](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html) or [sam package](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-package.html)\\. By default, relative paths are resolved with respect to the AWS SAM template's location\\.  \n*Type*: String \\| [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html)  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is similar to the [`Code`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code) property of an `AWS::Lambda::Function` resource\\. The nested Amazon S3 properties are named differently\\.",
+          "markdownDescription": "The code for the function\\. Accepted values include:  \n+ The function's Amazon S3 URI\\. For example, `s3://bucket-123456789/sam-app/1234567890abcdefg`\\.\n+ The local path to the function\\. For example, `hello_world/`\\.\n+ A [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object\\.\nIf you provide a function's Amazon S3 URI or [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object, you must reference a valid [Lambda deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html)\\.  \nIf you provide a local file path, use the AWS SAM CLI to upload the local file at deployment\\. To learn more, see [Using the AWS SAM CLI to upload local files at deployment](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/deploy-upload-local-files.html)\\.  \n*Type*: \\[ String \\| [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) \\]  \n*Required*: Conditional\\. When `PackageType` is set to `Zip`, one of `CodeUri` or `InlineCode` is required\\.  \n*AWS CloudFormation compatibility*: This property is similar to the `[ Code](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code)` property of an `AWS::Lambda::Function` resource\\. The nested Amazon S3 properties are named differently\\.",
           "title": "CodeUri"
         },
         "DeadLetterQueue": {
@@ -5574,12 +6013,13 @@
             {
               "enum": [
                 "Active",
-                "PassThrough"
+                "PassThrough",
+                "Disabled"
               ],
               "type": "string"
             }
           ],
-          "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\. For more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `Active` or `PassThrough`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\. If the `Tracing` property is set to `Active` and the `Role` property is not specified, then AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.",
+          "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\.  \n+ `Active` \u2013 Activates X\\-Ray tracing for the function\\.\n+ `Disabled` \u2013 Deactivates X\\-Ray for the function\\.\n+ `PassThrough` \u2013 Activates X\\-Ray tracing for the function\\. Sampling decision is delegated to the downstream services\\.\nIf specified as `Active` or `PassThrough` and the `Role` property is not set, AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.  \nFor more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: \\[`Active`\\|`Disabled`\\|`PassThrough`\\]  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Tracing"
         },
         "VersionDescription": {
@@ -6018,6 +6458,138 @@
         }
       },
       "title": "ScheduleV2EventProperties",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth": {
+      "additionalProperties": false,
+      "properties": {
+        "Additional": {
+          "items": {
+            "$ref": "#/definitions/Authorizer"
+          },
+          "title": "Additional",
+          "type": "array"
+        },
+        "LambdaAuthorizer": {
+          "$ref": "#/definitions/LambdaAuthorizerConfig"
+        },
+        "OpenIDConnect": {
+          "$ref": "#/definitions/OpenIDConnectConfig"
+        },
+        "Type": {
+          "enum": [
+            "AWS_IAM",
+            "API_KEY",
+            "AWS_LAMBDA",
+            "OPENID_CONNECT",
+            "AMAZON_COGNITO_USER_POOLS"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "UserPool": {
+          "$ref": "#/definitions/UserPoolConfig"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "title": "Auth",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "ApiKeys": {
+          "additionalProperties": {
+            "$ref": "#/definitions/ApiKey"
+          },
+          "title": "Apikeys",
+          "type": "object"
+        },
+        "Auth": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Auth"
+        },
+        "Cache": {
+          "$ref": "#/definitions/Cache"
+        },
+        "DataSources": {
+          "$ref": "#/definitions/DataSources"
+        },
+        "DomainName": {
+          "$ref": "#/definitions/DomainName"
+        },
+        "Functions": {
+          "additionalProperties": {
+            "$ref": "#/definitions/Function"
+          },
+          "title": "Functions",
+          "type": "object"
+        },
+        "Logging": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Logging"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Logging"
+        },
+        "Name": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Resolvers": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "$ref": "#/definitions/Resolver"
+            },
+            "type": "object"
+          },
+          "title": "Resolvers",
+          "type": "object"
+        },
+        "SchemaInline": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "SchemaUri": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Tags": {
+          "title": "Tags",
+          "type": "object"
+        },
+        "XrayEnabled": {
+          "title": "Xrayenabled",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "Auth"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::GraphQLApi"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
       "type": "object"
     },
     "samtranslator__internal__schema_source__aws_serverless_httpapi__Auth": {
@@ -7140,6 +7712,9 @@
     "samtranslator__internal__schema_source__aws_serverless_statemachine__Properties": {
       "additionalProperties": false,
       "properties": {
+        "AutoPublishAlias": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Definition": {
           "markdownDescription": "The state machine definition is an object, where the format of the object matches the format of your AWS SAM template file, for example, JSON or YAML\\. State machine definitions adhere to the [Amazon States Language](https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html)\\.  \nFor an example of an inline state machine definition, see [Examples](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-resource-statemachine--examples.html#sam-resource-statemachine--examples)\\.  \nYou must provide either a `Definition` or a `DefinitionUri`\\.  \n*Type*: Map  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "Definition",
@@ -7161,6 +7736,9 @@
           ],
           "markdownDescription": "The Amazon Simple Storage Service \\(Amazon S3\\) URI or local file path of the state machine definition written in the [Amazon States Language](https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html)\\.  \nIf you provide a local file path, the template must go through the workflow that includes the `sam deploy` or `sam package` command to correctly transform the definition\\. To do this, you must use version 0\\.52\\.0 or later of the AWS SAM CLI\\.  \nYou must provide either a `Definition` or a `DefinitionUri`\\.  \n*Type*: String \\| [S3Location](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-definitions3location)  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`DefinitionS3Location`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-definitions3location) property of an `AWS::StepFunctions::StateMachine` resource\\.",
           "title": "DefinitionUri"
+        },
+        "DeploymentPreference": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Events": {
           "additionalProperties": {
@@ -7735,6 +8313,9 @@
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_application__Resource"
+          },
+          {
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource"
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__any_cfn_resource__Resource"

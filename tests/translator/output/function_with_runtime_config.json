@@ -229,9 +229,6 @@
       "Properties": {
         "FunctionName": {
           "Ref": "FunctionWithRuntimeManagementConfigAndAlias"
-        },
-        "RuntimeManagementConfig": {
-          "UpdateRuntimeOn": "Auto"
         }
       },
       "Type": "AWS::Lambda::Version"

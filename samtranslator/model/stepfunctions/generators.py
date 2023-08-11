@@ -9,7 +9,11 @@ from samtranslator.model.intrinsics import fnJoin, is_intrinsic
 from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
-from samtranslator.model.stepfunctions.resources import StepFunctionsStateMachine
+from samtranslator.model.stepfunctions.resources import (
+    StepFunctionsStateMachine,
+    StepFunctionsStateMachineAlias,
+    StepFunctionsStateMachineVersion,
+)
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.utils.cfn_dynamic_references import is_dynamic_reference
@@ -48,6 +52,8 @@ class StateMachineGenerator:
         resource_attributes=None,
         passthrough_resource_attributes=None,
         get_managed_policy_map=None,
+        auto_publish_alias=None,
+        deployment_preference=None,
     ):
         """
         Constructs an State Machine Generator class that generates a State Machine resource
@@ -73,6 +79,8 @@ class StateMachineGenerator:
         :param tags: Tags to be associated with the State Machine resource
         :param resource_attributes: Resource attributes to add to the State Machine resource
         :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
+        :param auto_publish_alias: Name of the state machine alias to automatically create and update
+        :deployment_preference: Settings to enable gradual state machine deployments
         """
         self.logical_id = logical_id
         self.depends_on = depends_on
@@ -100,6 +108,8 @@ class StateMachineGenerator:
         )
         self.substitution_counter = 1
         self.get_managed_policy_map = get_managed_policy_map
+        self.auto_publish_alias = auto_publish_alias
+        self.deployment_preference = deployment_preference
 
     @cw_timer(prefix="Generator", name="StateMachine")
     def to_cloudformation(self):  # type: ignore[no-untyped-def]
@@ -151,6 +161,9 @@ class StateMachineGenerator:
         self.state_machine.LoggingConfiguration = self.logging
         self.state_machine.TracingConfiguration = self.tracing
         self.state_machine.Tags = self._construct_tag_list()
+
+        managed_traffic_shifting_resources = self._generate_managed_traffic_shifting_resources()
+        resources.extend(managed_traffic_shifting_resources)
 
         event_resources = self._generate_event_resources()
         resources.extend(event_resources)
@@ -240,6 +253,72 @@ class StateMachineGenerator:
         """
         sam_tag = {self._SAM_KEY: self._SAM_VALUE}
         return get_tag_list(sam_tag) + get_tag_list(self.tags)
+
+    def _construct_version(self) -> StepFunctionsStateMachineVersion:
+        """Constructs a state machine version resource that will be auto-published when the revision id of the state machine changes.
+
+        :return: Step Functions state machine version resource
+        """
+
+        # Unlike Lambda function versions, state machine versions do not need a hash suffix because
+        # they are always replaced when their corresponding state machine is updated.
+        # I.e. A SAM StateMachine resource will never have multiple version resources at the same time.
+        logical_id = f"{self.logical_id}Version"
+        attributes = self.passthrough_resource_attributes.copy()
+
+        # Both UpdateReplacePolicy and DeletionPolicy are needed to protect previous version from deletion
+        # to ensure gradual deployment works.
+        if "DeletionPolicy" not in attributes:
+            attributes["DeletionPolicy"] = "Retain"
+        if "UpdateReplacePolicy" not in attributes:
+            attributes["UpdateReplacePolicy"] = "Retain"
+
+        state_machine_version = StepFunctionsStateMachineVersion(logical_id=logical_id, attributes=attributes)
+        state_machine_version.StateMachineArn = self.state_machine.get_runtime_attr("arn")
+        state_machine_version.StateMachineRevisionId = self.state_machine.get_runtime_attr("state_machine_revision_id")
+
+        return state_machine_version
+
+    def _construct_alias(self, version: StepFunctionsStateMachineVersion) -> StepFunctionsStateMachineAlias:
+        """Constructs a state machine alias resource pointing to the given state machine version.
+        :return: Step Functions state machine alias resource
+        """
+        logical_id = f"{self.logical_id}Alias{self.auto_publish_alias}"
+        attributes = self.passthrough_resource_attributes
+
+        state_machine_alias = StepFunctionsStateMachineAlias(logical_id=logical_id, attributes=attributes)
+        state_machine_alias.Name = self.auto_publish_alias
+
+        state_machine_version_arn = version.get_runtime_attr("arn")
+
+        deployment_preference = {}
+        if self.deployment_preference:
+            deployment_preference = self.deployment_preference
+        else:
+            deployment_preference["Type"] = "ALL_AT_ONCE"
+
+        deployment_preference["StateMachineVersionArn"] = state_machine_version_arn
+        state_machine_alias.DeploymentPreference = deployment_preference
+
+        return state_machine_alias
+
+    def _generate_managed_traffic_shifting_resources(
+        self,
+    ) -> List[Any]:
+        """Generates and returns the version and alias resources associated with this state machine's managed traffic shifting.
+
+        :returns: a list containing the state machine's version and alias resources
+        :rtype: list
+        """
+        if not self.auto_publish_alias and not self.deployment_preference:
+            return []
+        if not self.auto_publish_alias and self.deployment_preference:
+            raise InvalidResourceException(
+                self.logical_id, "'DeploymentPreference' requires 'AutoPublishAlias' property to be specified."
+            )
+
+        state_machine_version = self._construct_version()
+        return [state_machine_version, self._construct_alias(state_machine_version)]
 
     def _generate_event_resources(self) -> List[Dict[str, Any]]:
         """Generates and returns the resources associated with this state machine's event sources.

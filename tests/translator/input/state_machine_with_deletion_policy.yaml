@@ -1,0 +1,17 @@
+Resources:
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    DeletionPolicy: Delete
+    Properties:
+      Type: STANDARD
+      Definition:
+        StartAt: HelloWorld
+        States:
+          HelloWorld:
+            Type: Pass
+            Result: 1
+            End: true
+      Role: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/doesNotExist"
+      AutoPublishAlias: test
+      DeploymentPreference:
+        Type: ALL_AT_ONCE

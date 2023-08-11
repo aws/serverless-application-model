@@ -5,9 +5,7 @@ from abc import ABC, ABCMeta, abstractmethod
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
-from pydantic import BaseModel
-from pydantic.error_wrappers import ValidationError
-
+from samtranslator.compat import pydantic
 from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidResourceException,
@@ -17,7 +15,7 @@ from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
 
-RT = TypeVar("RT", bound=BaseModel)  # return type
+RT = TypeVar("RT", bound=pydantic.BaseModel)  # return type
 
 
 class PropertyType:
@@ -72,6 +70,14 @@ class PassThroughProperty(PropertyType):
 
     def __init__(self, required: bool) -> None:
         super().__init__(required, any_type(), False)
+
+
+class MutatedPassThroughProperty(PassThroughProperty):
+    """
+    Mutated pass-through property.
+
+    SAM Translator may read and add/remove/modify the value before passing it to underlaying CFN resources.
+    """
 
 
 class GeneratedProperty(PropertyType):
@@ -340,13 +346,11 @@ class Resource(ABC):
         """
         try:
             return cls.parse_obj(self._generate_resource_dict()["Properties"])
-        except ValidationError as e:
+        except pydantic.error_wrappers.ValidationError as e:
             error_properties: str = ""
             with suppress(KeyError):
-                error_properties = ", ".join([str(error["loc"][0]) for error in e.errors()])
-            raise InvalidResourceException(
-                self.logical_id, f"Given resource property '{error_properties}' is invalid"
-            ) from e
+                error_properties = ".".join(str(x) for x in e.errors()[0]["loc"])
+            raise InvalidResourceException(self.logical_id, f"Property '{error_properties}' is invalid.") from e
 
     def validate_properties(self) -> None:
         """Validates that the required properties for this Resource have been populated, and that all properties have
@@ -664,6 +668,7 @@ __all__: List[str] = [
     "PropertyType",
     "Property",
     "PassThroughProperty",
+    "MutatedPassThroughProperty",
     "Resource",
     "ResourceMacro",
     "SamResourceMacro",

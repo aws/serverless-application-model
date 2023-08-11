@@ -28,7 +28,9 @@ class StepFunctionsStateMachine(TestCase):
             "event_resolver": None,
             "tags": None,
             "resource_attributes": None,
-            "passthrough_resource_attributes": None,
+            "passthrough_resource_attributes": {},
+            "auto_publish_alias": None,
+            "deployment_preference": None,
         }
 
     def test_state_machine_no_definition_source(self):
@@ -145,3 +147,43 @@ class StepFunctionsStateMachine(TestCase):
         self.kwargs["event_resources"] = {"KinesesEvent": {}}
         with self.assertRaises(InvalidEventException):
             StateMachineGenerator(**self.kwargs).to_cloudformation()
+
+    def test_state_machine_with_managed_traffic_shifting_properties(self):
+        self.kwargs["definition_uri"] = "s3://mybucket/myASLfile"
+        self.kwargs["role"] = "my-test-role-arn"
+        self.kwargs["auto_publish_alias"] = "live"
+        self.kwargs["deployment_preference"] = {"Type": "ALL_AT_ONCE"}
+        generated_managed_traffic_shifting_resources = StateMachineGenerator(
+            **self.kwargs
+        )._generate_managed_traffic_shifting_resources()
+        self.assertEqual(
+            generated_managed_traffic_shifting_resources[0].resource_type, "AWS::StepFunctions::StateMachineVersion"
+        )
+        self.assertEqual(
+            generated_managed_traffic_shifting_resources[1].resource_type, "AWS::StepFunctions::StateMachineAlias"
+        )
+
+    def test_state_machine_with_auto_publish_alias_and_no_deployment_preference(self):
+        self.kwargs["definition_uri"] = "s3://mybucket/myASLfile"
+        self.kwargs["role"] = "my-test-role-arn"
+        self.kwargs["auto_publish_alias"] = "live"
+        generated_managed_traffic_shifting_resources = StateMachineGenerator(
+            **self.kwargs
+        )._generate_managed_traffic_shifting_resources()
+        self.assertEqual(
+            generated_managed_traffic_shifting_resources[0].resource_type, "AWS::StepFunctions::StateMachineVersion"
+        )
+        self.assertEqual(
+            generated_managed_traffic_shifting_resources[1].resource_type, "AWS::StepFunctions::StateMachineAlias"
+        )
+
+    def test_state_machine_with_deployment_preference_and_no_auto_publish_alias(self):
+        self.kwargs["definition_uri"] = "s3://mybucket/myASLfile"
+        self.kwargs["role"] = "my-test-role-arn"
+        self.kwargs["deployment_preference"] = {"Type": "ALL_AT_ONCE"}
+        with self.assertRaises(InvalidResourceException) as error:
+            StateMachineGenerator(**self.kwargs).to_cloudformation()
+        self.assertEqual(
+            error.exception.message,
+            "Resource with id [StateMachineId] is invalid. 'DeploymentPreference' requires 'AutoPublishAlias' property to be specified.",
+        )

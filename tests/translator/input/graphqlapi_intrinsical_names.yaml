@@ -1,0 +1,57 @@
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  ApiName:
+    Type: String
+    Default: SomeApi
+  LambdaDSName:
+    Type: String
+    Default: MyLamdaDS
+  DDB1DSName:
+    Type: String
+    Default: MyDDB1DS
+  MyLoggingLevel:
+    Type: String
+    Default: ALL
+  PassItThrough:
+    Type: String
+    Default: SomeValue
+
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: !Ref ApiName
+      SchemaInline: |
+        type Todo {
+          id: ID!
+          description: String!
+        }
+        type Mutation {
+          addTodo(id: ID!, description: String!): Todo!
+        }
+        type Query {
+          getTodo(id: ID!): Todo
+        }
+        schema {
+          mutation: Mutation
+          query: Query
+        }
+      Auth:
+        Type: AWS_IAM
+      Logging:
+        FieldLogLevel: !Ref MyLoggingLevel
+      DataSources:
+        Lambda:
+          MyDataSource:
+            FunctionArn: my-lambda-arn
+            ServiceRoleArn: some-role-arn
+            Name: !Ref LambdaDSName
+        DynamoDb:
+          DDB1:
+            Name: !Ref DDB1DSName
+            TableName: AwesomeTable
+            DeltaSync:
+              BaseTableTTL: !Ref PassItThrough
+              DeltaSyncTableName: !Ref PassItThrough
+              DeltaSyncTableTTL: !Ref PassItThrough

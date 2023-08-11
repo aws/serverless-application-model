@@ -1,0 +1,752 @@
+{
+  "Mappings": {
+    "TablesToRegions": {
+      "Table1": {
+        "Region": "us-west-2"
+      }
+    }
+  },
+  "Resources": {
+    "SuperCoolAPI": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "LogConfig": {
+          "CloudWatchLogsRoleArn": {
+            "Fn::GetAtt": [
+              "SuperCoolAPICloudWatchRole",
+              "Arn"
+            ]
+          },
+          "FieldLogLevel": "ALL"
+        },
+        "Name": "SuperCoolAPI",
+        "Tags": [
+          {
+            "Key": "graphqlapi:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "SuperCoolAPICloudWatchRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIHardcodedTableNameDynamoDBDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "DynamoDBConfig": {
+          "AwsRegion": {
+            "Ref": "AWS::Region"
+          },
+          "TableName": "Table1"
+        },
+        "Name": "HardcodedTableName",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "SuperCoolAPIHardcodedTableNameDynamoDBDataSourceRole",
+            "Arn"
+          ]
+        },
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPIHardcodedTableNameDynamoDBDataSourceRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIHardcodedTableNameDynamoDBDataSourceToTableConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SuperCoolAPIHardcodedTableNameDynamoDBDataSourceToTableConnector": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::DataSource"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                    {
+                      "__Region__": {
+                        "Ref": "AWS::Region"
+                      },
+                      "__TableName__": "Table1"
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                          {
+                            "__Region__": {
+                              "Ref": "AWS::Region"
+                            },
+                            "__TableName__": "Table1"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                    {
+                      "__Region__": {
+                        "Ref": "AWS::Region"
+                      },
+                      "__TableName__": "Table1"
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                          {
+                            "__Region__": {
+                              "Ref": "AWS::Region"
+                            },
+                            "__TableName__": "Table1"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SuperCoolAPIHardcodedTableNameDynamoDBDataSourceRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "SuperCoolAPIRegionHardcodedDynamoDBDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "DynamoDBConfig": {
+          "AwsRegion": "us-west-2",
+          "TableName": "Table1"
+        },
+        "Name": "RegionHardcoded",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "SuperCoolAPIRegionHardcodedDynamoDBDataSourceRole",
+            "Arn"
+          ]
+        },
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPIRegionHardcodedDynamoDBDataSourceRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIRegionHardcodedDynamoDBDataSourceToTableConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SuperCoolAPIRegionHardcodedDynamoDBDataSourceToTableConnector": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::DataSource"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                    {
+                      "__Region__": "us-west-2",
+                      "__TableName__": "Table1"
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                          {
+                            "__Region__": "us-west-2",
+                            "__TableName__": "Table1"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                    {
+                      "__Region__": "us-west-2",
+                      "__TableName__": "Table1"
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                          {
+                            "__Region__": "us-west-2",
+                            "__TableName__": "Table1"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SuperCoolAPIRegionHardcodedDynamoDBDataSourceRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "SuperCoolAPIRegionIntrinsicDynamoDBDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "DynamoDBConfig": {
+          "AwsRegion": {
+            "Fn::FindInMap": [
+              "TablesToRegions",
+              "Table1",
+              "Region"
+            ]
+          },
+          "TableName": {
+            "Ref": "Table1"
+          }
+        },
+        "Name": "RegionIntrinsic",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "SuperCoolAPIRegionIntrinsicDynamoDBDataSourceRole",
+            "Arn"
+          ]
+        },
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPIRegionIntrinsicDynamoDBDataSourceRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPIRegionIntrinsicDynamoDBDataSourceToTableConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SuperCoolAPIRegionIntrinsicDynamoDBDataSourceToTableConnector": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::DataSource"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                    {
+                      "__Region__": {
+                        "Fn::FindInMap": [
+                          "TablesToRegions",
+                          "Table1",
+                          "Region"
+                        ]
+                      },
+                      "__TableName__": {
+                        "Ref": "Table1"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                          {
+                            "__Region__": {
+                              "Fn::FindInMap": [
+                                "TablesToRegions",
+                                "Table1",
+                                "Region"
+                              ]
+                            },
+                            "__TableName__": {
+                              "Ref": "Table1"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                    {
+                      "__Region__": {
+                        "Fn::FindInMap": [
+                          "TablesToRegions",
+                          "Table1",
+                          "Region"
+                        ]
+                      },
+                      "__TableName__": {
+                        "Ref": "Table1"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                          {
+                            "__Region__": {
+                              "Fn::FindInMap": [
+                                "TablesToRegions",
+                                "Table1",
+                                "Region"
+                              ]
+                            },
+                            "__TableName__": {
+                              "Ref": "Table1"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SuperCoolAPIRegionIntrinsicDynamoDBDataSourceRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "SuperCoolAPISchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Todo {\n  id: ID!\n  description: String!\n}\ntype Mutation {\n  addTodo(id: ID!, description: String!): Todo!\n}\ntype Query {\n  getTodo(id: ID!): Todo\n}\nschema {\n  mutation: Mutation\n  query: Query\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    },
+    "SuperCoolAPITableNameIntrinsicDynamoDBDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "SuperCoolAPI",
+            "ApiId"
+          ]
+        },
+        "DynamoDBConfig": {
+          "AwsRegion": {
+            "Ref": "AWS::Region"
+          },
+          "TableName": {
+            "Ref": "Table1"
+          }
+        },
+        "Name": "TableNameIntrinsic",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "SuperCoolAPITableNameIntrinsicDynamoDBDataSourceRole",
+            "Arn"
+          ]
+        },
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "SuperCoolAPITableNameIntrinsicDynamoDBDataSourceRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SuperCoolAPITableNameIntrinsicDynamoDBDataSourceToTableConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SuperCoolAPITableNameIntrinsicDynamoDBDataSourceToTableConnector": {
+            "Destination": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::DataSource"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PartiQLSelect"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                    {
+                      "__Region__": {
+                        "Ref": "AWS::Region"
+                      },
+                      "__TableName__": {
+                        "Ref": "Table1"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                          {
+                            "__Region__": {
+                              "Ref": "AWS::Region"
+                            },
+                            "__TableName__": {
+                              "Ref": "Table1"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PartiQLDelete",
+                "dynamodb:PartiQLInsert",
+                "dynamodb:PartiQLUpdate"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                    {
+                      "__Region__": {
+                        "Ref": "AWS::Region"
+                      },
+                      "__TableName__": {
+                        "Ref": "Table1"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "${DestinationArn}/index/*",
+                    {
+                      "DestinationArn": {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${__Region__}:${AWS::AccountId}:table/${__TableName__}",
+                          {
+                            "__Region__": {
+                              "Ref": "AWS::Region"
+                            },
+                            "__TableName__": {
+                              "Ref": "Table1"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SuperCoolAPITableNameIntrinsicDynamoDBDataSourceRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "Table1": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "TableName": "Table1"
+      },
+      "Type": "AWS::DynamoDB::Table"
+    }
+  }
+}
