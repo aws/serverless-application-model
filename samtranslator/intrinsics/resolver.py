@@ -1,5 +1,5 @@
 # Help resolve intrinsic functions
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union, cast
 
 from samtranslator.intrinsics.actions import Action, GetAttAction, RefAction, SubAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
@@ -49,7 +49,7 @@ class IntrinsicsResolver:
 
     def resolve_sam_resource_refs(
         self, _input: Dict[str, Any], supported_resource_refs: SupportedResourceReferences
-    ) -> Any:
+    ) -> Dict[str, Any]:
         """
         Customers can provide a reference to a "derived" SAM resource such as Alias of a Function or Stage of an API
         resource. This method recursively walks the tree, converting all derived references to the real resource name,
@@ -71,7 +71,10 @@ class IntrinsicsResolver:
             references supported in this SAM template, along with the value they should resolve to.
         :return list errors: List of dictionary containing information about invalid reference. Empty list otherwise
         """
-        return self._traverse(_input, supported_resource_refs, self._try_resolve_sam_resource_refs)
+        # The _traverse() return type is the same as the input. Here the input is Dict[str, Any]
+        return cast(
+            Dict[str, Any], self._traverse(_input, supported_resource_refs, self._try_resolve_sam_resource_refs)
+        )
 
     def resolve_sam_resource_id_refs(self, _input: Dict[str, Any], supported_resource_id_refs: Dict[str, str]) -> Any:
         """
