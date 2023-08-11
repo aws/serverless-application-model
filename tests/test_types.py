@@ -66,7 +66,9 @@ def test_list_of_validator(value, item_type, should_pass):
 def test_dict_of_validator(value, key_type, value_type, should_pass):
     validate = dict_of(is_type(key_type), is_type(value_type))
     if should_pass:
-        assert validate(value), f"dict_of validator failed for key type {key_type}, item type {value_type}, value {value}"
+        assert validate(
+            value
+        ), f"dict_of validator failed for key type {key_type}, item type {value_type}, value {value}"
     else:
         assert not validate(
             value, should_raise=False

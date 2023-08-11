@@ -222,7 +222,7 @@ class ServerlessAppPlugin(BasePlugin):
         try:
             self._sar_service_call(self._get_application, logical_id, app_id, semver)
             self._applications[key] = {"Available"}
-            LOG.info("Finished getting application %s/%s.", app_id ,semver)
+            LOG.info("Finished getting application %s/%s.", app_id, semver)
         except EndpointConnectionError as e:
             # No internet connection. Don't break verification, but do show a warning.
             warning_message = f"{e}. Unable to verify access to {app_id}/{semver}."
