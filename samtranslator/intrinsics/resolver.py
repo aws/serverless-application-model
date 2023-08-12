@@ -115,6 +115,8 @@ class IntrinsicsResolver:
         :param resolver_method: Method that will be called to actually resolve an intrinsic function. This method
             is called with the parameters `(input, resolution_data)`.
         :return: Modified `input` with intrinsics resolved
+
+        TODO: type this and make _traverse generic.
         """
 
         # There is data to help with resolution. Skip the traversal altogether
