@@ -33,6 +33,8 @@ ignore = [
     # Mutable class attributes should be annotated with `typing.ClassVar`
     # Too many violations
     "RUF012",
+    # Logging statement uses f-string
+    "G004",
 ]
 
 # Mininal python version we support is 3.7

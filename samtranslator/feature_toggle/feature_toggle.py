@@ -56,7 +56,7 @@ class FeatureToggle:
             return FeatureToggle.DIALUP_RESOLVER[dialup_type](
                 region_config, account_id=self.account_id, feature_name=feature_name
             )
-        LOG.warning("Dialup type '%s' is None or is not supported.", dialup_type)
+        LOG.warning(f"Dialup type '{dialup_type}' is None or is not supported.")
         return DisabledDialup(region_config)
 
     def is_enabled(self, feature_name: str) -> bool:
@@ -66,7 +66,7 @@ class FeatureToggle:
         :param feature_name: name of feature
         """
         if feature_name not in self.feature_config:
-            LOG.warning("Feature '%s' not available in Feature Toggle Config.", feature_name)
+            LOG.warning(f"Feature '{feature_name}' not available in Feature Toggle Config.")
             return False
 
         stage = self.stage
@@ -74,13 +74,13 @@ class FeatureToggle:
         account_id = self.account_id
         if not stage or not region or not account_id:
             LOG.warning(
-                "One or more of stage, region and account_id is not set. Feature '%s' not enabled.", feature_name
+                f"One or more of stage, region and account_id is not set. Feature '{feature_name}' not enabled."
             )
             return False
 
         stage_config = self.feature_config.get(feature_name, {}).get(stage, {})
         if not stage_config:
-            LOG.info("Stage '%s' not enabled for Feature '%s'.", stage, feature_name)
+            LOG.info(f"Stage '{stage}' not enabled for Feature '{feature_name}'.")
             return False
 
         if account_id in stage_config:
@@ -90,10 +90,10 @@ class FeatureToggle:
             region_config = stage_config[region] if region in stage_config else stage_config.get("default", {})
 
         dialup = self._get_dialup(region_config, feature_name=feature_name)  # type: ignore[no-untyped-call]
-        LOG.info("Using Dialip %s", dialup)
+        LOG.info(f"Using Dialip {dialup}")
         is_enabled: bool = dialup.is_enabled()
 
-        LOG.info("Feature '%s' is enabled: '%r'", feature_name, is_enabled)
+        LOG.info(f"Feature '{feature_name}' is enabled: '{is_enabled}'")
         return is_enabled
 
 
