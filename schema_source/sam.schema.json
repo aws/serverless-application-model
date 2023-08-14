@@ -5107,6 +5107,15 @@
           "markdownDescription": "A `RetryPolicy` object that includes information about the retry policy settings\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [RetryPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RetryPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy) property of the `AWS::Events::Rule` `Target` data type\\.",
           "title": "RetryPolicy"
         },
+        "RuleName": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The name of the rule\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-name) property of an `AWS::Events::Rule` resource\\.",
+          "title": "RuleName"
+        },
         "Target": {
           "allOf": [
             {
