@@ -80,17 +80,13 @@ def test_resource_type_validation(logical_id, resource_dict, expected_exception)
         for name, value in resource_dict["Properties"].items():
             assert (
                 getattr(resource, name) == value
-            ), "resource did not have expected property attribute {property_name} with value {property_value}".format(
-                property_name=name, property_value=value
-            )
+            ), f"resource did not have expected property attribute {name} with value {value}"
 
         actual_to_dict = resource.to_dict()
         expected_to_dict = {"id": resource_dict}
         assert (
             actual_to_dict == expected_to_dict
-        ), "to_dict() returned different values from what was passed to from_dict(); expected {expected}, got {actual}".format(
-            expected=expected_to_dict, actual=actual_to_dict
-        )
+        ), f"to_dict() returned different values from what was passed to from_dict(); expected {expected_to_dict}, got {actual_to_dict}"
     else:
         with pytest.raises(expected_exception):
             resource = DummyResource.from_dict(logical_id, resource_dict)

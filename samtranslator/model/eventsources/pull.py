@@ -98,7 +98,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         return
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: too-many-branches
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0912, PLR0915
         """Returns the Lambda EventSourceMapping to which this pull event corresponds. Adds the appropriate managed
         policy to the function's execution role, if such a role is provided.
 
@@ -632,9 +632,7 @@ class SelfManagedKafka(PullEventSource):
         if not isinstance(uri, str) and not is_intrinsic(uri):
             raise InvalidEventException(
                 self.relative_id,
-                "Wrong Type for {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(
-                    msg
-                ),
+                f"Wrong Type for {msg} URI property specified in SourceAccessConfigurations for self managed kafka event.",
             )
 
     def get_secret_manager_secret(self, authentication_uri):  # type: ignore[no-untyped-def]

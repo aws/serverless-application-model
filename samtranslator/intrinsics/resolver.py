@@ -1,5 +1,5 @@
 # Help resolve intrinsic functions
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union, cast
 
 from samtranslator.intrinsics.actions import Action, GetAttAction, RefAction, SubAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
@@ -49,7 +49,7 @@ class IntrinsicsResolver:
 
     def resolve_sam_resource_refs(
         self, _input: Dict[str, Any], supported_resource_refs: SupportedResourceReferences
-    ) -> Any:
+    ) -> Dict[str, Any]:
         """
         Customers can provide a reference to a "derived" SAM resource such as Alias of a Function or Stage of an API
         resource. This method recursively walks the tree, converting all derived references to the real resource name,
@@ -71,7 +71,10 @@ class IntrinsicsResolver:
             references supported in this SAM template, along with the value they should resolve to.
         :return list errors: List of dictionary containing information about invalid reference. Empty list otherwise
         """
-        return self._traverse(_input, supported_resource_refs, self._try_resolve_sam_resource_refs)
+        # The _traverse() return type is the same as the input. Here the input is Dict[str, Any]
+        return cast(
+            Dict[str, Any], self._traverse(_input, supported_resource_refs, self._try_resolve_sam_resource_refs)
+        )
 
     def resolve_sam_resource_id_refs(self, _input: Dict[str, Any], supported_resource_id_refs: Dict[str, str]) -> Any:
         """
@@ -112,6 +115,8 @@ class IntrinsicsResolver:
         :param resolver_method: Method that will be called to actually resolve an intrinsic function. This method
             is called with the parameters `(input, resolution_data)`.
         :return: Modified `input` with intrinsics resolved
+
+        TODO: type this and make _traverse generic.
         """
 
         # There is data to help with resolution. Skip the traversal altogether
@@ -195,7 +200,7 @@ class IntrinsicsResolver:
         if not self._is_intrinsic_dict(_input):
             return _input
 
-        function_type = list(_input.keys())[0]
+        function_type = next(iter(_input.keys()))
         return self.supported_intrinsics[function_type].resolve_parameter_refs(_input, parameters)
 
     def _try_resolve_sam_resource_refs(
@@ -214,7 +219,7 @@ class IntrinsicsResolver:
         if not self._is_intrinsic_dict(_input):
             return _input
 
-        function_type = list(_input.keys())[0]
+        function_type = next(iter(_input.keys()))
         return self.supported_intrinsics[function_type].resolve_resource_refs(_input, supported_resource_refs)
 
     def _try_resolve_sam_resource_id_refs(
@@ -232,7 +237,7 @@ class IntrinsicsResolver:
         if not self._is_intrinsic_dict(_input):
             return _input
 
-        function_type = list(_input.keys())[0]
+        function_type = next(iter(_input.keys()))
         return self.supported_intrinsics[function_type].resolve_resource_id_refs(_input, supported_resource_id_refs)
 
     def _is_intrinsic_dict(self, _input: Dict[str, Any]) -> bool:
@@ -243,4 +248,4 @@ class IntrinsicsResolver:
         :return: True, if the _input contains a supported intrinsic function.  False otherwise
         """
         # All intrinsic functions are dictionaries with just one key
-        return isinstance(_input, dict) and len(_input) == 1 and list(_input.keys())[0] in self.supported_intrinsics
+        return isinstance(_input, dict) and len(_input) == 1 and next(iter(_input.keys())) in self.supported_intrinsics

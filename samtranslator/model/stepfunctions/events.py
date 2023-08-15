@@ -362,9 +362,7 @@ class Api(EventSource):
             # Cannot add the integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
-                'API method "{method}" defined multiple times for path "{path}".'.format(
-                    method=self.Method, path=self.Path
-                ),
+                f'API method "{self.Method}" defined multiple times for path "{self.Path}".',
             )
 
         condition = None

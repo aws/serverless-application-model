@@ -79,6 +79,6 @@ class TestStateMachineWithScheduleDlqGenerated(BaseTest):
 
 
 def get_first_key_value_pair_in_dict(dictionary):
-    key = list(dictionary.keys())[0]
+    key = next(iter(dictionary.keys()))
     value = dictionary[key]
     return key, value

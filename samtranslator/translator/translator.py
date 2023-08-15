@@ -100,7 +100,7 @@ class Translator:
                     self.function_names[api_name] += str(resolved_function_name)
         return self.function_names
 
-    def translate(  # noqa: too-many-branches
+    def translate(  # noqa: PLR0912, PLR0915
         self,
         sam_template: Dict[str, Any],
         parameter_values: Dict[str, Any],
@@ -239,8 +239,7 @@ class Translator:
 
         if len(self.document_errors) == 0:
             template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)
-            template = intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)
-            return template
+            return intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)
         raise InvalidDocumentException(self.document_errors)
 
     # private methods
@@ -281,7 +280,7 @@ class Translator:
                 functions.append(data)
             elif resource["Type"] == "AWS::Serverless::StateMachine":
                 statemachines.append(data)
-            elif resource["Type"] == "AWS::Serverless::Api" or resource["Type"] == "AWS::Serverless::HttpApi":
+            elif resource["Type"] in ("AWS::Serverless::Api", "AWS::Serverless::HttpApi"):
                 apis.append(data)
             elif resource["Type"] == "AWS::Serverless::Connector":
                 connectors.append(data)

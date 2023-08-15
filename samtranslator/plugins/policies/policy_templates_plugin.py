@@ -89,8 +89,8 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
     def _process_policy_template(self, logical_id, template_data):  # type: ignore[no-untyped-def]
         # We are processing policy templates. We know they have a particular structure:
         # {"templateName": { parameter_values_dict }}
-        template_name = list(template_data.keys())[0]
-        template_parameters = list(template_data.values())[0]
+        template_name = next(iter(template_data.keys()))
+        template_parameters = next(iter(template_data.values()))
         try:
             # 'convert' will return a list of policy statements
             return self._policy_template_processor.convert(template_name, template_parameters)

@@ -49,9 +49,7 @@ def verify_stack_resources(expected_file_path, stack_resources):
     parsed_resources = _sort_resources(stack_resources["StackResourceSummaries"])
 
     if len(expected_resources) != len(parsed_resources):
-        return "'{}' resources expected, '{}' found: \n{}".format(
-            len(expected_resources), len(parsed_resources), json.dumps(parsed_resources, default=str)
-        )
+        return f"'{len(expected_resources)}' resources expected, '{len(parsed_resources)}' found: \n{json.dumps(parsed_resources, default=str)}"
 
     for i in range(len(expected_resources)):
         exp = expected_resources[i]
@@ -65,9 +63,7 @@ def verify_stack_resources(expected_file_path, stack_resources):
                 "ResourceType": parsed["ResourceType"],
             }
 
-            return "'{}' expected, '{}' found (Don't include the LogicalId random suffix)".format(
-                exp, parsed_trimed_down
-            )
+            return f"'{exp}' expected, '{parsed_trimed_down}' found (Don't include the LogicalId random suffix)"
         if exp["ResourceType"] != parsed["ResourceType"]:
             return "'{}' expected, '{}' found".format(exp["ResourceType"], parsed["ResourceType"])
     return None
@@ -292,5 +288,5 @@ def first_item_in_dict(dictionary):
     """
     if not dictionary:
         return None
-    first_key = list(dictionary.keys())[0]
+    first_key = next(iter(dictionary.keys()))
     return first_key, dictionary[first_key]

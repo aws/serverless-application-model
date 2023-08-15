@@ -330,9 +330,7 @@ class Resource(ABC):
 
         raise InvalidResourceException(
             self.logical_id,
-            "property {property_name} not defined for resource of type {resource_type}".format(
-                resource_type=self.resource_type, property_name=name
-            ),
+            f"property {name} not defined for resource of type {self.resource_type}",
         )
 
     # Note: For compabitliy issue, we should ONLY use this with new abstraction/resources.
@@ -599,7 +597,7 @@ class ResourceTypeResolver:
             for _, resource_class in inspect.getmembers(
                 module,
                 lambda cls: inspect.isclass(cls)
-                and cls.__module__ == module.__name__  # noqa: function-uses-loop-variable
+                and cls.__module__ == module.__name__  # noqa: B023
                 and hasattr(cls, "resource_type"),
             ):
                 self.resource_types[resource_class.resource_type] = resource_class
