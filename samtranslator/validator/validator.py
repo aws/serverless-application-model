@@ -6,8 +6,9 @@ from typing import Any
 
 import jsonschema
 
-from . import sam_schema
 from samtranslator.internal.deprecation_control import deprecated
+
+from . import sam_schema
 
 
 class SamTemplateValidator:
