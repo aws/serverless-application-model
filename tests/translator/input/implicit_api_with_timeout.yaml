@@ -25,17 +25,3 @@ Resources:
             Path: /getlist
             Method: get
             TimeoutInMillis: 10000
-
-  GetHtmlFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: s3://sam-demo-bucket/todo_list.zip
-      Handler: index.gethtml
-      Runtime: nodejs12.x
-      Policies: AmazonDynamoDBReadOnlyAccess
-      Events:
-        GetHtml:
-          Type: Api
-          Properties:
-            Path: /{proxy+}
-            Method: any

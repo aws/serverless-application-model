@@ -1,80 +1,5 @@
 {
   "Resources": {
-    "GetHtmlFunction": {
-      "Properties": {
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "todo_list.zip"
-        },
-        "Handler": "index.gethtml",
-        "Role": {
-          "Fn::GetAtt": [
-            "GetHtmlFunctionRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs12.x",
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::Lambda::Function"
-    },
-    "GetHtmlFunctionGetHtmlPermissionProd": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "GetHtmlFunction"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/*",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      },
-      "Type": "AWS::Lambda::Permission"
-    },
-    "GetHtmlFunctionRole": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ],
-          "Version": "2012-10-17"
-        },
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-us-gov:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      },
-      "Type": "AWS::IAM::Role"
-    },
     "RestApiFunction": {
       "Properties": {
         "Code": {
@@ -240,18 +165,6 @@
                   }
                 }
               }
-            },
-            "/{proxy+}": {
-              "x-amazon-apigateway-any-method": {
-                "responses": {},
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetHtmlFunction.Arn}/invocations"
-                  }
-                }
-              }
             }
           },
           "swagger": "2.0"
@@ -267,9 +180,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "ServerlessRestApiDeploymentb5bd53f995": {
+    "ServerlessRestApiDeployment47f4c235b9": {
       "Properties": {
-        "Description": "RestApi deployment id: b5bd53f995e4bf62fdff2d56aea55fa447457890",
+        "Description": "RestApi deployment id: 47f4c235b98a5cddea753898800525837ccda7bd",
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
@@ -280,7 +193,7 @@
     "ServerlessRestApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentb5bd53f995"
+          "Ref": "ServerlessRestApiDeployment47f4c235b9"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
