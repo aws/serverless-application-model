@@ -13,7 +13,7 @@ from . import sam_schema
 
 class SamTemplateValidator:
     """
-    Using dummy values; unused code.
+    SAM function validation, on the deprecation path.
     """
 
     UNICODE_TYPE_REGEX = re.compile("u('[^']+')")
@@ -76,7 +76,7 @@ class SamTemplateValidator:
         """
         validator = SamTemplateValidator(schema)
 
-        return ", ".join(validator.get_errors(template_dict))  # type: ignore[no-untyped-call]
+        return ", ".join(validator.get_errors(template_dict))
 
     @deprecated()
     def get_errors(self, template_dict):  # type: ignore[no-untyped-def]
