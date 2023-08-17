@@ -1,0 +1,173 @@
+Resources:
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub "${AWS::StackName}-EventBus"
+
+  EventBridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - sts:AssumeRole
+          Principal:
+            Service:
+            - appsync.amazonaws.com
+            - lambda.amazonaws.com
+
+  AppSyncApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: AppSyncApi
+      AuthenticationType: API_KEY
+
+  ApiSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Definition: |
+        type Query {
+          sayHello: String!
+        }
+        schema {
+          query: Query
+        } 
+
+  AppSyncEventBusDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: AppSyncEventBusDataSource
+      Type: AMAZON_EVENTBRIDGE
+      ServiceRoleArn: !GetAtt EventBridgeRole.Arn
+      EventBridgeConfig:
+        EventBusArn: !GetAtt 'EventBus.Arn'
+
+  AppSyncSayHelloResolver:
+    DependsOn: ApiSchema
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: Query
+      FieldName: sayHello
+      DataSourceName: !GetAtt AppSyncEventBusDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2018-05-29", 
+          "operation" : "PutEvents",
+          "events" : [{}]
+        }
+      ResponseMappingTemplate: |
+        #if($ctx.error)
+          $util.error($ctx.error.message, $ctx.error.type, $ctx.result)
+        #end
+          $util.toJson($ctx.result)
+
+  Connector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: AppSyncEventBusDataSource
+      Destination:
+        Id: EventBus
+      Permissions:
+      - Write
+
+  ApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Role: !GetAtt EventBridgeRole.Arn
+      Environment:
+        Variables:
+          API_KEY: !GetAtt ApiKey.ApiKey
+          GRAPHQL_URL: !GetAtt AppSyncApi.GraphQLUrl
+          EventBusName: !Ref EventBus
+      Runtime: nodejs16.x
+      Handler: index.handler
+      InlineCode: |
+        const https = require("https");
+        const AWS = require('aws-sdk');
+
+        exports.handler = async () => {
+          const queries = {
+            sayHello: /* GraphQL */ `
+              query {
+                sayHello
+              }
+            `,
+          };
+
+          const fetch = async (url, options) =>
+            new Promise((resolve, reject) => {
+              const req = https.request(url, options, (res) => {
+                const body = [];
+                res.on("data", (chunk) => body.push(chunk));
+                res.on("end", () => {
+                  const resString = Buffer.concat(body).toString();
+                  resolve(resString);
+                });
+              });
+              req.on("error", (err) => {
+                reject(err);
+              });
+              req.on("timeout", () => {
+                req.destroy();
+                reject(new Error("Request time out"));
+              });
+              req.write(options.body);
+              req.end();
+            });
+
+          const makeRequest = async (queryName) => {
+            const options = {
+              method: "POST",
+              headers: {
+                "x-api-key": process.env.API_KEY,
+              },
+              body: JSON.stringify({ query: queries[queryName] }),
+              timeout: 10000, // ms
+            };
+
+            const response = await fetch(process.env.GRAPHQL_URL, options);
+            let body = JSON.parse(response);
+            const data = body.data?.[queryName];
+            
+            if (body.errors !== undefined) {
+              throw JSON.stringify(body.errors);
+            }
+            
+            return body.data;
+          };
+
+          const sayHelloResponse = await makeRequest("sayHello");
+
+          var put_params = {
+            Entries: [
+              {
+                EventBusName: process.env.EventBusName,
+                Source: "com.mycompany.myapp",
+                Detail:"{ \"key1\": \"value1\", \"key2\": \"value2\" }",
+                Resources:[
+                  sayHelloResponse['sayHello']
+                ],
+                DetailType:"myDetailType"
+              }
+            ]
+          }
+
+          var eventbridge = new AWS.EventBridge();
+          await eventbridge.putEvents(put_params).promise();
+        };
+
+
+
+Metadata:
+  SamTransformTest: true
