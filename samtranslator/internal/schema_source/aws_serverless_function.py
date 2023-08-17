@@ -278,7 +278,7 @@ class ApiEventProperties(BaseModel):
     RequestModel: Optional[RequestModel] = apieventproperties("RequestModel")
     RequestParameters: Optional[RequestModelProperty] = apieventproperties("RequestParameters")
     RestApiId: Optional[Union[str, Ref]] = apieventproperties("RestApiId")
-    TimeoutInMillis: Optional[SamIntrinsicable[int]]  # TODO: add doc
+    TimeoutInMillis: Optional[PassThroughProp]  # TODO: add doc
 
 
 class ApiEvent(BaseModel):
