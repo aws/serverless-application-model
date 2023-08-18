@@ -4898,15 +4898,7 @@
           "title": "RestApiId"
         },
         "TimeoutInMillis": {
-          "anyOf": [
-            {
-              "type": "object"
-            },
-            {
-              "type": "integer"
-            }
-          ],
-          "title": "Timeoutinmillis"
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [

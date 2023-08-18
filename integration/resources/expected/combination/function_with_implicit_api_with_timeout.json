@@ -12,18 +12,6 @@
     "ResourceType": "AWS::Lambda::Function"
   },
   {
-    "LogicalResourceId": "MyOtherLambdaFunctionApiEventPermissionProd",
-    "ResourceType": "AWS::Lambda::Permission"
-  },
-  {
-    "LogicalResourceId": "MyOtherLambdaFunctionRole",
-    "ResourceType": "AWS::IAM::Role"
-  },
-  {
-    "LogicalResourceId": "MyOtherLambdaFunction",
-    "ResourceType": "AWS::Lambda::Function"
-  },
-  {
     "LogicalResourceId": "ServerlessRestApiDeployment",
     "ResourceType": "AWS::ApiGateway::Deployment"
   },

@@ -9,3 +9,13 @@ from integration.helpers.resource import current_region_does_not_support
 class TestFunctionWithImplicitApiWithTimeout(BaseTest):
     def test_function_with_implicit_api_with_timeout(self):
         self.create_and_verify_stack("combination/function_with_implicit_api_with_timeout")
+
+        # verify that TimeoutInMillis is set to expected value in the integration
+        expected_timeout = 5000
+        apigw_client = self.client_provider.api_client
+        rest_api_id = self.get_physical_id_by_type("AWS::ApiGateway::RestApi")
+        resources = apigw_client.get_resources(restApiId=rest_api_id)["items"]
+
+        method = apigw_client.get_method(restApiId=rest_api_id, resourceId=resources[0]["id"], httpMethod="GET")
+        method_integration = method["methodIntegration"]
+        self.assertEqual(method_integration["timeoutInMillis"], expected_timeout)
