@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: A template to test timeout support for implicit APIs.
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs16.x
+      MemorySize: 128
+      Timeout: 3
+      InlineCode: |
+        exports.handler = async () => ‘Hello World!'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+            TimeoutInMillis: 5000
+
+Metadata:
+  SamTransformTest: true
