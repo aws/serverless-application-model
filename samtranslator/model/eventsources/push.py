@@ -832,7 +832,7 @@ class Api(PushEventSource):
                 self.Auth, api, api_id, self.relative_id, self.Method, self.Path, stage, editor, intrinsics_resolver
             )
         if self.TimeoutInMillis:
-            editor.add_timeout_to_method(self.Path, self.Method, self.TimeoutInMillis)
+            editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)
 
         if self.RequestModel:
             sam_expect(self.RequestModel, self.relative_id, "RequestModel", is_sam_event=True).to_be_a_map()
@@ -1402,7 +1402,9 @@ class HttpApi(PushEventSource):
         if self.Auth:
             self._add_auth_to_openapi_integration(api, api_id, editor, self.Auth)
         if self.TimeoutInMillis:
-            editor.add_timeout_to_method(path=self._path, method_name=self._method, timeout=self.TimeoutInMillis)
+            editor.add_timeout_to_method(
+                api=api, path=self._path, method_name=self._method, timeout=self.TimeoutInMillis
+            )
         path_parameters = re.findall("{(.*?)}", self._path)
         if path_parameters:
             editor.add_path_parameters_to_method(  # type: ignore[no-untyped-call]

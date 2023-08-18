@@ -173,10 +173,11 @@ class BaseEditor:
         for path_item in self.get_conditional_contents(path_dict):
             path_item.setdefault(method, Py27Dict())
 
-    def add_timeout_to_method(self, path: str, method_name: str, timeout: int) -> None:
+    def add_timeout_to_method(self, api: Dict[str, Any], path: str, method_name: str, timeout: int) -> None:
         """
         Adds a timeout to the path/method.
 
+        :param api: dict containing Api to be modified
         :param path: string of path name
         :param method_name: string of method name
         :param timeout: int of timeout duration in milliseconds
