@@ -4896,6 +4896,9 @@
           ],
           "markdownDescription": "Identifier of a RestApi resource, which must contain an operation with the given path and method\\. Typically, this is set to reference an [AWS::Serverless::Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html) resource defined in this template\\.  \nIf you don't define this property, AWS SAM creates a default [AWS::Serverless::Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html) resource using a generated `OpenApi` document\\. That resource contains a union of all paths and methods defined by `Api` events in the same template that do not specify a `RestApiId`\\.  \nThis cannot reference an [AWS::Serverless::Api](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html) resource defined in another template\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "RestApiId"
+        },
+        "TimeoutInMillis": {
+          "$ref": "#/definitions/PassThroughProp"
         }
       },
       "required": [
