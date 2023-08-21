@@ -1,0 +1,27 @@
+Resources:
+  RestApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: nodejs12.x
+      Policies: AmazonDynamoDBFullAccess
+      Events:
+        AddItem:
+          Type: Api
+          Properties:
+            Path: /add
+            Method: post
+            TimeoutInMillis: 5000
+        CompleteItem:
+          Type: Api
+          Properties:
+            Path: /complete
+            Method: POST
+            TimeoutInMillis: 5000
+        GetList:
+          Type: Api
+          Properties:
+            Path: /getlist
+            Method: get
+            TimeoutInMillis: 10000
