@@ -1334,7 +1334,7 @@ class ApiGenerator:
                     rest_api.logical_id,
                     "'VPCEndpointIds' and 'VpcEndpointIds' cannot be used together in EndpointConfiguration.",
                 )
-
+            # Accept when either `VPCEndpointIds` or `VpcEndpointIds` is defined by users
             if "VPCEndpointIds" in value or "VpcEndpointIds" in value:
                 rest_api.EndpointConfiguration["VpcEndpointIds"] = value.get("VPCEndpointIds") or value.get(
                     "VpcEndpointIds"
