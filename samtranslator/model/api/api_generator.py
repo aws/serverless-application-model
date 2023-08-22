@@ -1326,8 +1326,19 @@ class ApiGenerator:
         if isinstance(value, dict) and value.get("Type"):
             rest_api.Parameters = {"endpointConfigurationTypes": value.get("Type")}
             rest_api.EndpointConfiguration = {"Types": [value.get("Type")]}
-            if "VPCEndpointIds" in value:
-                rest_api.EndpointConfiguration["VpcEndpointIds"] = value.get("VPCEndpointIds")
+
+            # SAM API `EndpointConfiguration` uses `VPCEndpointIds` but APIGateway RestApi uses `VpcEndpointIds`.
+            # Deny when both properties are defined at the same time.
+            if "VPCEndpointIds" in value and "VpcEndpointIds" in value:
+                raise InvalidResourceException(
+                    rest_api.logical_id,
+                    "'VPCEndpointIds' and 'VpcEndpointIds' cannot be used together in EndpointConfiguration.",
+                )
+            # Accept when either `VPCEndpointIds` or `VpcEndpointIds` is defined by users
+            if "VPCEndpointIds" in value or "VpcEndpointIds" in value:
+                rest_api.EndpointConfiguration["VpcEndpointIds"] = value.get("VPCEndpointIds") or value.get(
+                    "VpcEndpointIds"
+                )
         else:
             rest_api.EndpointConfiguration = {"Types": [value]}
             rest_api.Parameters = {"endpointConfigurationTypes": value}
