@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: A template to test timeout support for implicit APIs.
+
+Parameters:
+  IsDevStack: {Type: String, Default: 'true', AllowedValues: ['true', 'false']}
+Conditions:
+  IsDevStack: !Equals [!Ref IsDevStack, 'true']
+  NotIsDevStack: !Not [Condition: IsDevStack]
+
+Resources:
+  MyLambdaFunction:
+    DeletionPolicy: !If [NotIsDevStack, Retain, Delete]
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs16.x
+      MemorySize: 128
+      Timeout: 3
+      InlineCode: |
+        exports.handler = async () => 'Hello World!'
+
+Outputs:
+  IsDevStack:
+    Value: !Ref IsDevStack
+
+Metadata:
+  SamTransformTest: true
