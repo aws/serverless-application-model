@@ -34,16 +34,16 @@ Resources:
           ErrorMessage: String
           EventId: String!
         }
-        
+
         type PutEventsResult {
           Entries: [EntryDetails!]!
           FailedEntry: Int
         }
-        
+
         type Query {
           sayHello: PutEventsResult!
         }
-        
+
         schema {
           query: Query
         }
@@ -85,7 +85,7 @@ Resources:
             }]
           }
         }
-        
+
         export function response(ctx) {
           if(ctx.error)
             util.error(ctx.error.message, ctx.error.type, ctx.result)
@@ -121,7 +121,7 @@ Resources:
       Handler: index.handler
       InlineCode: |
         const https = require("https");
-        
+
         exports.handler = async () => {
           const queries = {
             sayHello: /* GraphQL */ `
@@ -137,7 +137,7 @@ Resources:
               }
             `,
           };
-        
+
           const fetch = async (url, options) =>
             new Promise((resolve, reject) => {
               const req = https.request(url, options, (res) => {
@@ -158,7 +158,7 @@ Resources:
               req.write(options.body);
               req.end();
             });
-        
+
           const makeRequest = async (queryName) => {
             const options = {
               method: "POST",
@@ -168,7 +168,7 @@ Resources:
               body: JSON.stringify({ query: queries[queryName] }),
               timeout: 600000, // ms
             };
-        
+
             const response = await fetch(process.env.GRAPHQL_URL, options);
             let body = JSON.parse(response);
             const data = body.data?.[queryName];
@@ -184,7 +184,7 @@ Resources:
             
             return body.data;
           };
-        
+
           await makeRequest("sayHello");
         };
 
