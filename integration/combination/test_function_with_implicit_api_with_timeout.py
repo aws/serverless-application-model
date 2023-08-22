@@ -16,6 +16,14 @@ class TestFunctionWithImplicitApiWithTimeout(BaseTest):
         rest_api_id = self.get_physical_id_by_type("AWS::ApiGateway::RestApi")
         resources = apigw_client.get_resources(restApiId=rest_api_id)["items"]
 
-        method = apigw_client.get_method(restApiId=rest_api_id, resourceId=resources[0]["id"], httpMethod="GET")
+        resource = get_resource_by_path(resources, "/hello")
+        method = apigw_client.get_method(restApiId=rest_api_id, resourceId=resource["id"], httpMethod="GET")
         method_integration = method["methodIntegration"]
         self.assertEqual(method_integration["timeoutInMillis"], expected_timeout)
+
+
+def get_resource_by_path(resources, path):
+    for resource in resources:
+        if resource["path"] == path:
+            return resource
+    return None
