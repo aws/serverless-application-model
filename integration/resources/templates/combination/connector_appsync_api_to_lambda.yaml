@@ -88,7 +88,7 @@ Resources:
           }
         }
       PackageType: Zip
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
 
   TriggerFunction:
@@ -97,7 +97,7 @@ Resources:
       Environment:
         Variables:
           GRAPHQL_URL: !GetAtt Api.GraphQLUrl
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       InlineCode: |
         const https = require("https");

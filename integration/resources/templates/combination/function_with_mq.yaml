@@ -136,7 +136,7 @@ Resources:
   MyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       CodeUri: ${codeuri}
       Role:
