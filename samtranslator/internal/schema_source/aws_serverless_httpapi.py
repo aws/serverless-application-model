@@ -11,6 +11,7 @@ from samtranslator.internal.schema_source.common import (
     PassThroughProp,
     ResourceAttributes,
     SamIntrinsicable,
+    SamIntrinsicableOrNoValue,
     get_prop,
 )
 
@@ -62,7 +63,7 @@ class Auth(BaseModel):
             ],
         ]
     ] = auth("Authorizers")
-    DefaultAuthorizer: Optional[str] = auth("DefaultAuthorizer")
+    DefaultAuthorizer: Optional[SamIntrinsicableOrNoValue[str]] = auth("DefaultAuthorizer")
     EnableIamAuthorizer: Optional[bool] = auth("EnableIamAuthorizer")
 
 

@@ -3438,9 +3438,22 @@
           "type": "object"
         },
         "DefaultAuthorizer": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "enum": [
+                  "AWS::NoValue"
+                ],
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
           "markdownDescription": "Specify a default authorizer for an API Gateway API, which will be used for authorizing API calls by default\\.  \nIf the Api EventSource for the function associated with this API is configured to use IAM Permissions, then this property must be set to `AWS_IAM`, otherwise an error will result\\.\n*Type*: String  \n*Required*: No  \n*Default*: None  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "DefaultAuthorizer",
-          "type": "string"
+          "title": "DefaultAuthorizer"
         },
         "InvokeRole": {
           "markdownDescription": "Sets integration credentials for all resources and methods to this value\\.  \n`CALLER_CREDENTIALS` maps to `arn:aws:iam::*:user/*`, which uses the caller credentials to invoke the endpoint\\.  \n*Valid values*: `CALLER_CREDENTIALS`, `NONE`, `IAMRoleArn`  \n*Type*: String  \n*Required*: No  \n*Default*: `CALLER_CREDENTIALS`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
@@ -6639,9 +6652,22 @@
           "type": "object"
         },
         "DefaultAuthorizer": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "enum": [
+                  "AWS::NoValue"
+                ],
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
           "markdownDescription": "Specify the default authorizer to use for authorizing API calls to your API Gateway API\\. You can specify `AWS_IAM` as a default authorizer if `EnableIamAuthorizer` is set to `true`\\. Otherwise, specify an authorizer that you've defined in `Authorizers`\\.  \n*Type*: String  \n*Required*: No  \n*Default*: None  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "DefaultAuthorizer",
-          "type": "string"
+          "title": "DefaultAuthorizer"
         },
         "EnableIamAuthorizer": {
           "markdownDescription": "Specify whether to use IAM authorization for the API route\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",

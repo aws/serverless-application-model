@@ -1,0 +1,144 @@
+Resources:
+  MyApiWithCognitoAuth:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: !Ref AWS::NoValue
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: !GetAtt MyUserPool.Arn
+
+  MyApiWithLambdaTokenAuth:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: !Ref AWS::NoValue
+        Authorizers:
+          MyLambdaTokenAuth:
+            FunctionArn: !GetAtt MyAuthFn.Arn
+
+  MyApiWithLambdaRequestAuth:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: !Ref AWS::NoValue
+        Authorizers:
+          MyLambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            Identity:
+              Headers:
+              - Authorization1
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+  MyFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        CognitoNoAuth:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognito/no-auth
+        CognitoNoAuthAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: any
+            Path: /cognito/any/no-auth
+        Cognito:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /any/cognito
+            Auth:
+              Authorizer: MyCognitoAuth
+        CognitoAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: any
+            Path: /any/cognito
+            Auth:
+              Authorizer: MyCognitoAuth
+        LambdaTokenNoAuth:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaTokenAuth
+            Method: get
+            Path: /lambda-token/no-auth
+        LambdaTokenNoAuthAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaTokenAuth
+            Method: any
+            Path: /lambda-token/any/no-auth
+        LambdaToken:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaTokenAuth
+            Method: get
+            Path: /lambda-token
+            Auth:
+              Authorizer: MyLambdaTokenAuth
+        LambdaTokenAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaTokenAuth
+            Method: any
+            Path: /any/lambda-token
+            Auth:
+              Authorizer: MyLambdaTokenAuth
+        LambdaRequestNoAuth:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaRequestAuth
+            Method: get
+            Path: /lambda-request/no-auth
+        LambdaRequestNoAuthAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaRequestAuth
+            Method: any
+            Path: /lambda-request/any/no-auth
+        LambdaRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaRequestAuth
+            Method: get
+            Path: /lambda-request
+            Auth:
+              Authorizer: MyLambdaRequestAuth
+        LambdaRequestAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaRequestAuth
+            Method: any
+            Path: /any/lambda-request
+            Auth:
+              Authorizer: MyLambdaRequestAuth
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: UserPoolName
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+      - email
+      Schema:
+      - AttributeDataType: String
+        Name: email
+        Required: false

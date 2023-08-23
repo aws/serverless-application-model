@@ -23,6 +23,8 @@ class PassThroughProp(pydantic.BaseModel):
 T = TypeVar("T")
 SamIntrinsicable = Union[Dict[str, Any], T]
 SamIntrinsic = Dict[str, Any]
+SamIntrinsicNoValue = Dict[Literal["Ref"], Literal["AWS::NoValue"]]
+SamIntrinsicableOrNoValue = Union[SamIntrinsicNoValue, T]
 
 # TODO: Get rid of this in favor of proper types
 Unknown = Optional[Any]

@@ -23,7 +23,7 @@ from samtranslator.model.exceptions import (
     InvalidResourceException,
     InvalidTemplateException,
 )
-from samtranslator.model.intrinsics import fnGetAtt, fnSub, is_intrinsic, make_or_condition, ref
+from samtranslator.model.intrinsics import fnGetAtt, fnSub, is_intrinsic, is_intrinsic_no_value, make_or_condition, ref
 from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
@@ -1289,6 +1289,9 @@ class ApiGenerator:
         add_default_auth_to_preflight: bool = True,
     ) -> None:
         if not default_authorizer:
+            return
+
+        if is_intrinsic_no_value(default_authorizer):
             return
 
         if not isinstance(default_authorizer, str):
