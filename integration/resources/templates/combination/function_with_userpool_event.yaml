@@ -29,7 +29,7 @@ Resources:
         }
       Handler: index.handler
       MemorySize: 128
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Timeout: 3
       Events:
         CognitoUserPoolPreSignup:

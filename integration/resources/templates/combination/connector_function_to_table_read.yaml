@@ -15,7 +15,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt MyRole.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Code:
         ZipFile: |
