@@ -2919,6 +2919,15 @@
           "markdownDescription": "A object that defines the criteria to determine whether Lambda should process an event\\. For more information, see [AWS Lambda event filtering](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [FilterCriteria](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FilterCriteria`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "FilterCriteria"
         },
+        "FunctionResponseTypes": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A list of the response types currently applied to the event source mapping\\. For more information, see [ Reporting batch item failures](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-batchfailurereporting) in the *AWS Lambda Developer Guide*\\.   \n *Valid values*: `ReportBatchItemFailures`   \n *Type*: List   \n *Required*: No   \n *AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionResponseTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-functionresponsetypes) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "FunctionResponseTypes"
+        },
         "MaximumBatchingWindowInSeconds": {
           "allOf": [
             {
