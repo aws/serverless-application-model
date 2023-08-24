@@ -236,6 +236,7 @@ class SQSEventProperties(BaseModel):
     BatchSize: Optional[PassThroughProp] = sqseventproperties("BatchSize")
     Enabled: Optional[PassThroughProp] = sqseventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = sqseventproperties("FilterCriteria")
+    FunctionResponseTypes: Optional[PassThroughProp] = sqseventproperties("FunctionResponseTypes")
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = sqseventproperties("MaximumBatchingWindowInSeconds")
     Queue: PassThroughProp = sqseventproperties("Queue")
     ScalingConfig: Optional[PassThroughProp]  # Update docs when live
