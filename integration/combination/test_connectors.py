@@ -16,6 +16,9 @@ retry_once = retry(
     retry=retry_if_exception(lambda e: not isinstance(e, SkipTest)),
 )
 
+# Explicitly move EB tests out to handlle the failed test in some regions.
+# In those regions, the tests should have been skipped but somehow not.
+# Test using `skipIf` to see if it helps.
 @skipIf(
     current_region_does_not_support([SCHEDULE_EVENT]),
     "SCHEDULE_EVENT is not supported in this testing region",
@@ -28,7 +31,6 @@ class TestConnectorsWithEventBus(BaseTest):
     )
     @retry_once
     def test_connector_by_invoking_a_function_with_eventbus(self, template_file_path):
-        self.skip_using_service_detector(template_file_path)
         self.create_and_verify_stack(template_file_path)
 
         lambda_function_name = self.get_physical_id_by_logical_id("TriggerFunction")
