@@ -3,7 +3,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs16.x
       CodeUri: ${codeuri}
 
       AutoPublishAlias: Live
@@ -115,14 +115,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs16.x
       CodeUri: ${codeuri}
 
   PostTrafficFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs16.x
       CodeUri: ${codeuri}
 Metadata:
   SamTransformTest: true

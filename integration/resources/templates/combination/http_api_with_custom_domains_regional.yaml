@@ -38,7 +38,7 @@ Resources:
           return response;
         };
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs16.x
       Events:
         ImplicitGet:
           Type: HttpApi

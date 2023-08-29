@@ -6,7 +6,7 @@ Resources:
     Properties:
       AutoPublishAlias: live
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs16.x
       CodeUri: ${codeuri}
       Events:
         FooEvent:
