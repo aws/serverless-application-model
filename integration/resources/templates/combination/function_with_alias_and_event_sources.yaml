@@ -8,7 +8,7 @@ Resources:
     Properties:
       CodeUri: ${codeuri}
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs16.x
 
       AutoPublishAlias: Live
 

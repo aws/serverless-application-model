@@ -25,7 +25,7 @@ Resources:
       InlineCode: |
         print("hello")
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs16.x
 
   MyApi:
     Type: AWS::Serverless::HttpApi
