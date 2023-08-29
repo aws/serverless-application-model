@@ -5,16 +5,17 @@ from unittest.case import skipIf
 from parameterized import parameterized
 from tenacity import retry, retry_if_exception, stop_after_attempt
 
-from integration.conftest import clean_bucket
 from integration.config.service_names import SCHEDULE_EVENT
+from integration.conftest import clean_bucket
 from integration.helpers.base_test import S3_BUCKET_PREFIX, BaseTest
-from integration.helpers.resource import generate_suffix, current_region_does_not_support
+from integration.helpers.resource import current_region_does_not_support, generate_suffix
 
 retry_once = retry(
     stop=stop_after_attempt(2),
     # unittest raises SkipTest for skipping tests
     retry=retry_if_exception(lambda e: not isinstance(e, SkipTest)),
 )
+
 
 # Explicitly move EB tests out to handlle the failed test in some regions.
 # In those regions, the tests should have been skipped but somehow not.
@@ -42,7 +43,8 @@ class TestConnectorsWithEventBus(BaseTest):
             "Payload": "{}",
         }
         response = lambda_client.invoke(**request_params)
-        import pdb 
+        import pdb
+
         pdb.set_trace()
         self.assertEqual(response.get("StatusCode"), 200)
         self.assertEqual(response.get("FunctionError"), None)
