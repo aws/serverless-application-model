@@ -658,6 +658,7 @@ class Api(PushEventSource):
         "RequestModel": PropertyType(False, IS_DICT),
         "RequestParameters": PropertyType(False, IS_LIST),
         "TimeoutInMillis": PropertyType(False, IS_INT),
+        "TestAuthOverride": PropertyType(False, IS_BOOL),
     }
 
     Path: str
@@ -668,6 +669,7 @@ class Api(PushEventSource):
     RequestModel: Optional[Dict[str, Any]]
     RequestParameters: Optional[List[Any]]
     TimeoutInMillis: Optional[PassThrough]
+    TestAuthOverride: Optional[bool]
 
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -727,7 +729,8 @@ class Api(PushEventSource):
         resources = []
 
         function = kwargs.get("function")
-        intrinsics_resolver = kwargs.get("intrinsics_resolver")
+        intrinsics_resolver: IntrinsicsResolver = kwargs["intrinsics_resolver"]
+        # intrinsics_resolver = kwargs.get("intrinsics_resolver")
 
         if not function:
             raise TypeError("Missing required keyword argument: function")
@@ -743,6 +746,24 @@ class Api(PushEventSource):
         if explicit_api.get("__MANAGE_SWAGGER") or explicit_api.get("MergeDefinitions"):
             self._add_swagger_integration(explicit_api, api_id, function, intrinsics_resolver)  # type: ignore[no-untyped-call]
 
+        swagger_body = explicit_api.get("DefinitionBody")
+
+        if swagger_body and self.Auth and self.Auth.get("TestAuthOverride") is True:
+            # TODO: refactor to remove this cast
+            stage = cast(str, self.Stage)
+            editor = SwaggerEditor(swagger_body)
+            self.add_auth_to_swagger(
+                self.Auth,
+                explicit_api,
+                api_id,
+                self.relative_id,
+                self.Method,
+                self.Path,
+                stage,
+                editor,
+                intrinsics_resolver,
+            )
+            explicit_api["DefinitionBody"] = editor.swagger
         return resources
 
     def _get_permissions(self, resources_to_link):  # type: ignore[no-untyped-def]

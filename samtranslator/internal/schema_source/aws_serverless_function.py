@@ -253,6 +253,7 @@ class ApiAuth(BaseModel):
     Authorizer: Optional[str] = apiauth("Authorizer")
     InvokeRole: Optional[SamIntrinsicable[str]] = apiauth("InvokeRole")
     ResourcePolicy: Optional[ResourcePolicy] = apiauth("ResourcePolicy")
+    TestAuthOverride: Optional[bool]  # TODO Add Docs
 
 
 class RequestModel(BaseModel):
@@ -280,6 +281,7 @@ class ApiEventProperties(BaseModel):
     RequestParameters: Optional[RequestModelProperty] = apieventproperties("RequestParameters")
     RestApiId: Optional[Union[str, Ref]] = apieventproperties("RestApiId")
     TimeoutInMillis: Optional[PassThroughProp]  # TODO: add doc
+    TestAuthOverride: Optional[PassThroughProp]  # TODO: add doc
 
 
 class ApiEvent(BaseModel):
