@@ -43,9 +43,6 @@ class TestConnectorsWithEventBus(BaseTest):
             "Payload": "{}",
         }
         response = lambda_client.invoke(**request_params)
-        import pdb
-
-        pdb.set_trace()
         self.assertEqual(response.get("StatusCode"), 200)
         self.assertEqual(response.get("FunctionError"), None)
 
