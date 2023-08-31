@@ -1,0 +1,18 @@
+Parameters:
+  IsDevStack: {Type: String, Default: 'true', AllowedValues: ['true', 'false']}
+Conditions:
+  IsDevStack: !Equals [!Ref IsDevStack, 'true']
+  NotIsDevStack: !Not [Condition: IsDevStack]
+
+Resources:
+  FunctionWithArchitecturesIntrinsic:
+    Type: AWS::Serverless::Function
+    UpdateReplacePolicy: !Equals [NotIsDevStack, Retain]
+    DeletionPolicy: !Equals [NotIsDevStack, Retain]
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Description: Created by SAM
+      Handler: index.handler
+      MemorySize: 1024
+      Runtime: nodejs12.x
+      Timeout: 3

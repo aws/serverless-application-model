@@ -201,10 +201,8 @@ class Globals:
             if resource_type not in self.supported_properties:
                 raise InvalidGlobalsSectionException(
                     self._KEYWORD,
-                    "'{section}' is not supported. "
-                    "Must be one of the following values - {supported}".format(
-                        section=section_name, supported=self.supported_resource_section_names
-                    ),
+                    f"'{section_name}' is not supported. "
+                    f"Must be one of the following values - {self.supported_resource_section_names}",
                 )
 
             if not isinstance(properties, dict):
@@ -218,10 +216,8 @@ class Globals:
                 if key not in supported:
                     raise InvalidGlobalsSectionException(
                         self._KEYWORD,
-                        "'{key}' is not a supported property of '{section}'. "
-                        "Must be one of the following values - {supported}".format(
-                            key=key, section=section_name, supported=supported_displayed
-                        ),
+                        f"'{key}' is not a supported property of '{section_name}'. "
+                        f"Must be one of the following values - {supported_displayed}",
                     )
 
             # Store all Global properties in a map with key being the AWS::Serverless::* resource type

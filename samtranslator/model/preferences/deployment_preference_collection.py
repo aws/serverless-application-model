@@ -62,11 +62,7 @@ class DeploymentPreferenceCollection:
         :param condition: the condition (if it exists) on the serverless function
         """
         if logical_id in self._resource_preferences:
-            raise ValueError(
-                "logical_id {logical_id} previously added to this deployment_preference_collection".format(
-                    logical_id=logical_id
-                )
-            )
+            raise ValueError(f"logical_id {logical_id} previously added to this deployment_preference_collection")
 
         self._resource_preferences[logical_id] = DeploymentPreference.from_dict(  # type: ignore[no-untyped-call]
             logical_id, deployment_preference_dict, condition

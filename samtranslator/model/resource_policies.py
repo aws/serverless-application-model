@@ -156,7 +156,7 @@ class ResourcePolicies:
             self._policy_template_processor is not None
             and isinstance(policy, dict)
             and len(policy) == 1
-            and self._policy_template_processor.has(list(policy.keys())[0]) is True
+            and self._policy_template_processor.has(next(iter(policy.keys()))) is True
         )
 
     def _get_type_from_intrinsic_if(self, policy):  # type: ignore[no-untyped-def]

@@ -33,7 +33,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin[Type[OpenApiEditor]]):
     SERVERLESS_API_RESOURCE_TYPE = SamResourceType.HttpApi.value
     EDITOR_CLASS = OpenApiEditor
 
-    def _process_api_events(  # noqa: too-many-arguments
+    def _process_api_events(  # noqa: PLR0913
         self,
         function: SamResource,
         api_events: Dict[str, Dict[str, Any]],

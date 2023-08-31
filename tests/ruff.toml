@@ -24,4 +24,5 @@ target-version = "py37"
 "**/*.py" = [
     "S101", # Use of `assert` detected
     "PLR", # pylint-refactor
+    "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
 ]

@@ -41,8 +41,8 @@ class FileFormatter(ABC):
     def file_extension() -> str:
         """Return file extension of files to format."""
 
-    @classmethod
-    def config_additional_args(cls) -> None:  # noqa: empty-method-without-abstract-decorator
+    @classmethod  # noqa: B027
+    def config_additional_args(cls) -> None:
         """Optionally configure additional args to arg parser."""
 
     def process_file(self, file_path: Path) -> None:

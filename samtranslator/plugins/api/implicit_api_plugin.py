@@ -62,7 +62,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         self.api_update_replace_policies: Dict[str, Any] = {}
 
     @abstractmethod
-    def _process_api_events(  # noqa: too-many-arguments
+    def _process_api_events(  # noqa: PLR0913
         self,
         function: SamResource,
         api_events: Dict[str, Dict[str, Any]],
@@ -107,7 +107,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
             return
 
         implicit_api_resource = template.get(self.IMPLICIT_API_LOGICAL_ID)
-        globals_var = template.get_globals().get(SamResourceType(resource.type).name, {})
+        globals_var = template.get_globals().get(SamResourceType(resource.type).name) or {}
         should_propagate_tags = resource.properties.get("PropagateTags") or globals_var.get("PropagateTags")
         tags_properties = resource.properties.get("Tags") or globals_var.get("Tags")
 
@@ -483,7 +483,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
             sam_expect(method, event_id, "Method", is_sam_event=True).to_be_a_string(),
         )
 
-    def _update_resource_attributes_from_api_event(  # noqa: too-many-arguments
+    def _update_resource_attributes_from_api_event(  # noqa: PLR0913
         self,
         api_id: str,
         path: str,

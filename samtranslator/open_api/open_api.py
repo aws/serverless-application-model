@@ -113,7 +113,7 @@ class OpenApiEditor(BaseEditor):
 
         return True
 
-    def add_lambda_integration(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
+    def add_lambda_integration(  # type: ignore[no-untyped-def] # noqa: PLR0913
         self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
     ):
         """
@@ -176,18 +176,6 @@ class OpenApiEditor(BaseEditor):
                         continue
                     normalized_method_name = self._normalize_method_name(method_name)
                     yield normalized_method_name, method_definition
-
-    def add_timeout_to_method(self, api, path, method_name, timeout):  # type: ignore[no-untyped-def]
-        """
-        Adds a timeout to this path/method.
-
-        :param dict api: Reference to the related Api's properties as defined in the template.
-        :param string path: Path name
-        :param string method_name: Method name
-        :param int timeout: Timeout amount, in milliseconds
-        """
-        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
-            method_definition[self._X_APIGW_INTEGRATION]["timeoutInMillis"] = timeout
 
     def add_path_parameters_to_method(self, api, path, method_name, path_parameters):  # type: ignore[no-untyped-def]
         """
@@ -420,7 +408,7 @@ class OpenApiEditor(BaseEditor):
 
         self._doc[self._SERVERS] = servers_configurations
 
-    def add_cors(  # type: ignore[no-untyped-def] # noqa: too-many-arguments
+    def add_cors(  # type: ignore[no-untyped-def] # noqa: PLR0913
         self,
         allow_origins,
         allow_headers=None,

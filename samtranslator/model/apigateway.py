@@ -92,7 +92,7 @@ class ApiGatewayDeployment(Resource):
 
     runtime_attrs = {"deployment_id": lambda self: ref(self.logical_id)}
 
-    def make_auto_deployable(  # noqa: too-many-arguments
+    def make_auto_deployable(  # noqa: PLR0913
         self,
         stage: ApiGatewayStage,
         openapi_version: Optional[Union[Dict[str, Any], str]] = None,
@@ -281,7 +281,7 @@ class ApiGatewayApiKey(Resource):
 class ApiGatewayAuthorizer:
     _VALID_FUNCTION_PAYLOAD_TYPES = [None, "TOKEN", "REQUEST"]
 
-    def __init__(  # type: ignore[no-untyped-def]# noqa: too-many-arguments
+    def __init__(  # type: ignore[no-untyped-def]# noqa: PLR0913
         self,
         api_logical_id=None,
         name=None,

@@ -33,11 +33,7 @@ def is_type(valid_type: Type[Any]) -> Validator:
     def validate(value: Any, should_raise: bool = True) -> bool:
         if not isinstance(value, valid_type):
             if should_raise:
-                raise TypeError(
-                    "Expected value of type {expected}, actual value was of type {actual}.".format(
-                        expected=valid_type, actual=type(value)
-                    )
-                )
+                raise TypeError(f"Expected value of type {valid_type}, actual value was of type {type(value)}.")
             return False
         return True
 

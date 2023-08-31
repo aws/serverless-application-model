@@ -146,7 +146,7 @@ def is_intrinsic(_input: Any) -> bool:
     """
 
     if _input is not None and isinstance(_input, dict) and len(_input) == 1:
-        key: str = list(_input.keys())[0]
+        key: str = next(iter(_input.keys()))
         return key == "Ref" or key == "Condition" or key.startswith("Fn::")
 
     return False
@@ -164,7 +164,7 @@ def is_intrinsic_if(_input: Any) -> bool:
     if not is_intrinsic(_input):
         return False
 
-    key: str = list(_input.keys())[0]
+    key: str = next(iter(_input.keys()))
     return key == "Fn::If"
 
 
@@ -198,7 +198,7 @@ def is_intrinsic_no_value(_input: Any) -> bool:
     if not is_intrinsic(_input):
         return False
 
-    key: str = list(_input.keys())[0]
+    key: str = next(iter(_input.keys()))
     return key == "Ref" and _input["Ref"] == "AWS::NoValue"
 
 

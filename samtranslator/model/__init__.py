@@ -5,9 +5,7 @@ from abc import ABC, ABCMeta, abstractmethod
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
-from pydantic import BaseModel
-from pydantic.error_wrappers import ValidationError
-
+from samtranslator.compat import pydantic
 from samtranslator.model.exceptions import (
     ExpectedType,
     InvalidResourceException,
@@ -17,7 +15,7 @@ from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
 
-RT = TypeVar("RT", bound=BaseModel)  # return type
+RT = TypeVar("RT", bound=pydantic.BaseModel)  # return type
 
 
 class PropertyType:
@@ -332,9 +330,7 @@ class Resource(ABC):
 
         raise InvalidResourceException(
             self.logical_id,
-            "property {property_name} not defined for resource of type {resource_type}".format(
-                resource_type=self.resource_type, property_name=name
-            ),
+            f"property {name} not defined for resource of type {self.resource_type}",
         )
 
     # Note: For compabitliy issue, we should ONLY use this with new abstraction/resources.
@@ -348,7 +344,7 @@ class Resource(ABC):
         """
         try:
             return cls.parse_obj(self._generate_resource_dict()["Properties"])
-        except ValidationError as e:
+        except pydantic.error_wrappers.ValidationError as e:
             error_properties: str = ""
             with suppress(KeyError):
                 error_properties = ".".join(str(x) for x in e.errors()[0]["loc"])
@@ -601,7 +597,7 @@ class ResourceTypeResolver:
             for _, resource_class in inspect.getmembers(
                 module,
                 lambda cls: inspect.isclass(cls)
-                and cls.__module__ == module.__name__  # noqa: function-uses-loop-variable
+                and cls.__module__ == module.__name__  # noqa: B023
                 and hasattr(cls, "resource_type"),
             ):
                 self.resource_types[resource_class.resource_type] = resource_class

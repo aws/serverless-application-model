@@ -156,8 +156,8 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
             binary_config_string = response["Content"].read()
             self.feature_toggle_config = cast(Dict[str, Any], json.loads(binary_config_string.decode("utf-8")))
             LOG.info("Finished loading feature toggle config from AppConfig.")
-        except Exception as ex:
-            LOG.error(f"Failed to load config from AppConfig: {ex}. Using empty config.")
+        except Exception:
+            LOG.exception("Failed to load config from AppConfig. Using empty config.")
             # There is chance that AppConfig is not available in a particular region.
             self.feature_toggle_config = {}
 

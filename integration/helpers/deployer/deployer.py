@@ -388,7 +388,7 @@ class Deployer:
                 ("Value", output.get("OutputValue")),
             ]:
                 pprint_columns(
-                    columns=["{k:<{0}}{v:<{0}}".format(MIN_OFFSET, k=k, v=v)],
+                    columns=[f"{k:<{MIN_OFFSET}}{v:<{MIN_OFFSET}}"],
                     width=kwargs["width"],
                     margin=kwargs["margin"],
                     format_string=OUTPUTS_FORMAT_STRING,

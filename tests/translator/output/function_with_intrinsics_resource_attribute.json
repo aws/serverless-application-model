@@ -1,0 +1,111 @@
+{
+  "Conditions": {
+    "IsDevStack": {
+      "Fn::Equals": [
+        {
+          "Ref": "IsDevStack"
+        },
+        "true"
+      ]
+    },
+    "NotIsDevStack": {
+      "Fn::Not": [
+        {
+          "Condition": "IsDevStack"
+        }
+      ]
+    }
+  },
+  "Parameters": {
+    "IsDevStack": {
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Default": "true",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "FunctionWithArchitecturesIntrinsic": {
+      "DeletionPolicy": {
+        "Fn::Equals": [
+          "NotIsDevStack",
+          "Retain"
+        ]
+      },
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": "Created by SAM",
+        "Handler": "index.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionWithArchitecturesIntrinsicRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": {
+        "Fn::Equals": [
+          "NotIsDevStack",
+          "Retain"
+        ]
+      }
+    },
+    "FunctionWithArchitecturesIntrinsicRole": {
+      "DeletionPolicy": {
+        "Fn::Equals": [
+          "NotIsDevStack",
+          "Retain"
+        ]
+      },
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": {
+        "Fn::Equals": [
+          "NotIsDevStack",
+          "Retain"
+        ]
+      }
+    }
+  }
+}
