@@ -10,23 +10,6 @@
             "version": "1.0"
           },
           "paths": {
-            "/any/cognito": {
-              "x-amazon-apigateway-any-method": {
-                "responses": {},
-                "security": [
-                  {
-                    "NONE": []
-                  }
-                ],
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
-                  }
-                }
-              }
-            },
             "/cognito": {
               "get": {
                 "responses": {},
@@ -37,14 +20,18 @@
                 ],
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST",
+                  "passthroughBehavior": "when_no_match",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 }
               }
             }
           },
+          "schemes": [
+            "https"
+          ],
           "securityDefinitions": {
             "MyCognitoAuth": {
               "in": "header",
@@ -64,7 +51,7 @@
               "x-amazon-apigateway-authtype": "cognito_user_pools"
             }
           },
-          "swagger": "2.0"
+          "swagger": 2.0
         },
         "EndpointConfiguration": {
           "Types": [
@@ -77,9 +64,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithCognitoAuthDeployment137d859db2": {
+    "MyApiWithCognitoAuthDeploymentc1b65d25f7": {
       "Properties": {
-        "Description": "RestApi deployment id: 137d859db29250f90c64fe19daa84543603d48ad",
+        "Description": "RestApi deployment id: c1b65d25f72d945875b563f02c15aff3e88b1a9d",
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
         },
@@ -90,7 +77,7 @@
     "MyApiWithCognitoAuthProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithCognitoAuthDeployment137d859db2"
+          "Ref": "MyApiWithCognitoAuthDeploymentc1b65d25f7"
         },
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
@@ -224,42 +211,35 @@
             "version": "1.0"
           },
           "paths": {
-            "/any/lambda-token": {
-              "x-amazon-apigateway-any-method": {
-                "responses": {},
-                "security": [
-                  {
-                    "NONE": []
-                  }
-                ],
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
-                  }
-                }
-              }
-            },
             "/lambda-token": {
               "get": {
                 "responses": {},
                 "security": [
                   {
-                    "NONE": []
+                    "AWS_IAM": []
                   }
                 ],
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST",
+                  "passthroughBehavior": "when_no_match",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 }
               }
             }
           },
+          "schemes": [
+            "https"
+          ],
           "securityDefinitions": {
+            "AWS_IAM": {
+              "in": "header",
+              "name": "Authorization",
+              "type": "apiKey",
+              "x-amazon-apigateway-authtype": "awsSigv4"
+            },
             "MyLambdaTokenAuth": {
               "in": "header",
               "name": "Authorization",
@@ -283,7 +263,7 @@
               "x-amazon-apigateway-authtype": "custom"
             }
           },
-          "swagger": "2.0"
+          "swagger": 2.0
         },
         "EndpointConfiguration": {
           "Types": [
@@ -296,9 +276,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithLambdaTokenAuthDeployment950b8f93fb": {
+    "MyApiWithLambdaTokenAuthDeployment809f6b532d": {
       "Properties": {
-        "Description": "RestApi deployment id: 950b8f93fb50121b8dbc1c4cccd69cd65db388ff",
+        "Description": "RestApi deployment id: 809f6b532d6f7090be44181070ce598280252ed7",
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
         },
@@ -332,7 +312,7 @@
     "MyApiWithLambdaTokenAuthProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaTokenAuthDeployment950b8f93fb"
+          "Ref": "MyApiWithLambdaTokenAuthDeployment809f6b532d"
         },
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
@@ -415,27 +395,6 @@
       },
       "Type": "AWS::Lambda::Function"
     },
-    "MyFnCognitoAnyMethodPermissionProd": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "MyFn"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/any/cognito",
-            {
-              "__ApiId__": {
-                "Ref": "MyApiWithCognitoAuth"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      },
-      "Type": "AWS::Lambda::Permission"
-    },
     "MyFnCognitoPermissionProd": {
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -457,27 +416,6 @@
       },
       "Type": "AWS::Lambda::Permission"
     },
-    "MyFnLambdaRequestAnyMethodPermissionProd": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "MyFn"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/any/lambda-request",
-            {
-              "__ApiId__": {
-                "Ref": "MyApiWithLambdaRequestAuth"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      },
-      "Type": "AWS::Lambda::Permission"
-    },
     "MyFnLambdaRequestPermissionProd": {
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -491,27 +429,6 @@
             {
               "__ApiId__": {
                 "Ref": "MyApiWithLambdaRequestAuth"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      },
-      "Type": "AWS::Lambda::Permission"
-    },
-    "MyFnLambdaTokenAnyMethodPermissionProd": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "MyFn"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/any/lambda-token",
-            {
-              "__ApiId__": {
-                "Ref": "MyApiWithLambdaTokenAuth"
               },
               "__Stage__": "*"
             }

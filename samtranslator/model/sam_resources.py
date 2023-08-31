@@ -179,7 +179,6 @@ class SamFunction(SamResourceMacro):
         "SnapStart": PropertyType(False, IS_DICT),
         "FunctionUrlConfig": PropertyType(False, IS_DICT),
         "RuntimeManagementConfig": PassThroughProperty(False),
-        "TestAuthOverride": PropertyType(False, IS_BOOL),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -221,7 +220,6 @@ class SamFunction(SamResourceMacro):
     Architectures: Optional[List[Any]]
     SnapStart: Optional[Dict[str, Any]]
     FunctionUrlConfig: Optional[Dict[str, Any]]
-    TestAuthOverride: Optional[bool]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,

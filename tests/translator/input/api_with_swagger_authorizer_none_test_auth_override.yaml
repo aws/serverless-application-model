@@ -3,6 +3,22 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          version: '1.0'
+          title: !Ref AWS::StackName
+        schemes:
+        - https
+        paths:
+          /cognito:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations
+                passthroughBehavior: when_no_match
+              responses: {}
       Auth:
         Authorizers:
           MyCognitoAuth:
@@ -13,6 +29,22 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          version: '1.0'
+          title: !Ref AWS::StackName
+        schemes:
+        - https
+        paths:
+          /lambda-token:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations
+                passthroughBehavior: when_no_match
+              responses: {}
       Auth:
         Authorizers:
           MyLambdaTokenAuth:
@@ -84,31 +116,17 @@ Resources:
             Method: get
             Auth:
               Authorizer: NONE
+              TestAuthOverride: true
             Path: /cognito
-        CognitoAnyMethod:
-          Type: Api
-          Properties:
-            RestApiId: !Ref MyApiWithCognitoAuth
-            Method: any
-            Auth:
-              Authorizer: NONE
-            Path: /any/cognito
         LambdaToken:
           Type: Api
           Properties:
             RestApiId: !Ref MyApiWithLambdaTokenAuth
             Method: get
             Auth:
-              Authorizer: NONE
+              Authorizer: AWS_IAM
+              TestAuthOverride: true
             Path: /lambda-token
-        LambdaTokenAnyMethod:
-          Type: Api
-          Properties:
-            RestApiId: !Ref MyApiWithLambdaTokenAuth
-            Method: any
-            Auth:
-              Authorizer: NONE
-            Path: /any/lambda-token
         LambdaRequest:
           Type: Api
           Properties:
@@ -118,14 +136,6 @@ Resources:
               TestAuthOverride: true
             Method: get
             Path: /lambda-request
-        LambdaRequestAnyMethod:
-          Type: Api
-          Properties:
-            RestApiId: !Ref MyApiWithLambdaRequestAuth
-            Auth:
-              Authorizer: NONE
-            Method: any
-            Path: /any/lambda-request
 
   MyUserPool:
     Type: AWS::Cognito::UserPool

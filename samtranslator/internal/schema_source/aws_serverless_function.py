@@ -281,7 +281,6 @@ class ApiEventProperties(BaseModel):
     RequestParameters: Optional[RequestModelProperty] = apieventproperties("RequestParameters")
     RestApiId: Optional[Union[str, Ref]] = apieventproperties("RestApiId")
     TimeoutInMillis: Optional[PassThroughProp]  # TODO: add doc
-    TestAuthOverride: Optional[PassThroughProp]  # TODO: add doc
 
 
 class ApiEvent(BaseModel):

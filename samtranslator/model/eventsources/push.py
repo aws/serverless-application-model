@@ -658,7 +658,6 @@ class Api(PushEventSource):
         "RequestModel": PropertyType(False, IS_DICT),
         "RequestParameters": PropertyType(False, IS_LIST),
         "TimeoutInMillis": PropertyType(False, IS_INT),
-        "TestAuthOverride": PropertyType(False, IS_BOOL),
     }
 
     Path: str
@@ -669,7 +668,6 @@ class Api(PushEventSource):
     RequestModel: Optional[Dict[str, Any]]
     RequestParameters: Optional[List[Any]]
     TimeoutInMillis: Optional[PassThrough]
-    TestAuthOverride: Optional[bool]
 
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         """
