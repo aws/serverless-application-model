@@ -730,7 +730,6 @@ class Api(PushEventSource):
 
         function = kwargs.get("function")
         intrinsics_resolver: IntrinsicsResolver = kwargs["intrinsics_resolver"]
-        # intrinsics_resolver = kwargs.get("intrinsics_resolver")
 
         if not function:
             raise TypeError("Missing required keyword argument: function")
