@@ -3,7 +3,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: python3.7
+      Runtime: python3.8
       InlineCode: |
         def handler(event, context):
             return {'body': 'Hello World!', 'statusCode': 200}

@@ -26,30 +26,10 @@ Resources:
       ApiId: !GetAtt SuperCoolAPI.ApiId
 
   DynamoDBPostsTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-      - AttributeName: id
-        AttributeType: S
-      KeySchema:
-      - AttributeName: id
-        KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+    Type: AWS::Serverless::SimpleTable
 
   DynamoDBPostsLogTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-      - AttributeName: id
-        AttributeType: S
-      KeySchema:
-      - AttributeName: id
-        KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+    Type: AWS::Serverless::SimpleTable
 
   SuperCoolAPI:
     Type: AWS::Serverless::GraphQLApi
@@ -88,10 +68,8 @@ Resources:
         DynamoDb:
           PostsDataSource:
             TableName: !Ref DynamoDBPostsTable
-            TableArn: !GetAtt DynamoDBPostsTable.Arn
           PostsLogDataSource:
             TableName: !Ref DynamoDBPostsLogTable
-            TableArn: !GetAtt DynamoDBPostsLogTable.Arn
       Functions:
         createPostItem:
           Runtime:
