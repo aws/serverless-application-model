@@ -7,7 +7,7 @@ from tenacity import retry, retry_if_exception, stop_after_attempt
 
 from integration.config.service_names import SCHEDULE_EVENT
 from integration.conftest import clean_bucket
-from integration.helpers.base_test import S3_BUCKET_PREFIX, BaseTest
+from integration.helpers.base_test import S3_BUCKET_PREFIX, BaseTest, nonblocking
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
 
 retry_once = retry(
@@ -24,6 +24,7 @@ retry_once = retry(
     current_region_does_not_support([SCHEDULE_EVENT]),
     "SCHEDULE_EVENT is not supported in this testing region",
 )
+@nonblocking
 class TestConnectorsWithEventBus(BaseTest):
     @parameterized.expand(
         [
