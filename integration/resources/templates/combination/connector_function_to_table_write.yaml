@@ -2,19 +2,24 @@ Resources:
   TriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       InlineCode: |
-        const AWS = require('aws-sdk');
+        const {
+                DynamoDBDocument
+              } = require("@aws-sdk/lib-dynamodb"),
+              {
+                DynamoDB
+              } = require("@aws-sdk/client-dynamodb");
         exports.handler = async (event) => {
           console.log(JSON.stringify(event));
-          const docClient = new AWS.DynamoDB.DocumentClient();
+          const docClient = DynamoDBDocument.from(new DynamoDB());
           const response = await docClient.put({ 
             TableName: process.env.TABLE_NAME, 
             Item: {
               Id: 'TestInput1234'
             }
-          }).promise();
+          });
           return response;
         };
       Environment:

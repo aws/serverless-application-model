@@ -15,17 +15,19 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt LambdaRole.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Code:
         ZipFile: |
-          const AWS = require('aws-sdk');
+          const {
+            SQS
+          } = require("@aws-sdk/client-sqs");
           var params = {
             QueueUrl: process.env.QUEUE_NAME,
           };
           exports.handler = async (event) => {
-            var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
-            await sqs.receiveMessage(params).promise();
+            var sqs = new SQS({apiVersion: '2012-11-05'});
+            await sqs.receiveMessage(params);
           };
       Environment:
         Variables:

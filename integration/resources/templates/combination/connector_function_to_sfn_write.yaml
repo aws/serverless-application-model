@@ -7,7 +7,7 @@ Resources:
           console.log("Hello world!")
         };
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
 
   StateMachine:
     Type: AWS::Serverless::StateMachine
@@ -27,17 +27,19 @@ Resources:
   TriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       InlineCode: |
-        const AWS = require('aws-sdk');
+        const {
+          SFN: StepFunctions
+        } = require("@aws-sdk/client-sfn");
         exports.handler = async (event) => {
           console.log(JSON.stringify(event));
           var params = {
             stateMachineArn: process.env.SFN_ARN,
           };
-          const stepfunctions = new AWS.StepFunctions();
-          await stepfunctions.startExecution(params).promise();
+          const stepfunctions = new StepFunctions();
+          await stepfunctions.startExecution(params);
         };
       Environment:
         Variables:
