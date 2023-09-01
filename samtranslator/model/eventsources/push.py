@@ -745,7 +745,7 @@ class Api(PushEventSource):
 
         swagger_body = explicit_api.get("DefinitionBody")
 
-        if swagger_body and self.Auth and self.Auth.get("TestAuthOverride") is True:
+        if swagger_body and self.Auth and self.Auth.get("OverrideApiAuth") is True:
             # TODO: refactor to remove this cast
             stage = cast(str, self.Stage)
             editor = SwaggerEditor(swagger_body)

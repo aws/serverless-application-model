@@ -253,7 +253,7 @@ class ApiAuth(BaseModel):
     Authorizer: Optional[str] = apiauth("Authorizer")
     InvokeRole: Optional[SamIntrinsicable[str]] = apiauth("InvokeRole")
     ResourcePolicy: Optional[ResourcePolicy] = apiauth("ResourcePolicy")
-    TestAuthOverride: Optional[bool]  # TODO Add Docs
+    OverrideApiAuth: Optional[bool]  # TODO Add Docs
 
 
 class RequestModel(BaseModel):

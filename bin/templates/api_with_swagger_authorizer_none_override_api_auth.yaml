@@ -9,7 +9,7 @@ Resources:
           version: '1.0'
           title: !Ref AWS::StackName
         schemes:
-        - https
+          - https
         paths:
           /cognito:
             get:
@@ -18,7 +18,7 @@ Resources:
                 type: aws_proxy
                 uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations
                 passthroughBehavior: when_no_match
-              responses: {}
+              responses: { }
       Auth:
         Authorizers:
           MyCognitoAuth:
@@ -35,7 +35,7 @@ Resources:
           version: '1.0'
           title: !Ref AWS::StackName
         schemes:
-        - https
+          - https
         paths:
           /lambda-token:
             get:
@@ -44,7 +44,7 @@ Resources:
                 type: aws_proxy
                 uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations
                 passthroughBehavior: when_no_match
-              responses: {}
+              responses: { }
       Auth:
         Authorizers:
           MyLambdaTokenAuth:
@@ -116,7 +116,7 @@ Resources:
             Method: get
             Auth:
               Authorizer: NONE
-              TestAuthOverride: true
+              OverrideApiAuth: true
             Path: /cognito
         LambdaToken:
           Type: Api
@@ -125,7 +125,7 @@ Resources:
             Method: get
             Auth:
               Authorizer: AWS_IAM
-              TestAuthOverride: true
+              OverrideApiAuth: true
             Path: /lambda-token
         LambdaRequest:
           Type: Api
@@ -133,7 +133,7 @@ Resources:
             RestApiId: !Ref MyApiWithLambdaRequestAuth
             Auth:
               Authorizer: NONE
-              TestAuthOverride: true
+              OverrideApiAuth: true
             Method: get
             Path: /lambda-request
 
