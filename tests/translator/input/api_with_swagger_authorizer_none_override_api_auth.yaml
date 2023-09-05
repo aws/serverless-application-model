@@ -125,7 +125,6 @@ Resources:
             Method: get
             Auth:
               Authorizer: AWS_IAM
-              OverrideApiAuth: true
             Path: /lambda-token
         LambdaRequest:
           Type: Api

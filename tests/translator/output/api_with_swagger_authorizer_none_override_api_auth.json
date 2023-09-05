@@ -200,7 +200,7 @@
                 "responses": {},
                 "security": [
                   {
-                    "AWS_IAM": []
+                    "MyLambdaTokenAuth": []
                   }
                 ],
                 "x-amazon-apigateway-integration": {
@@ -218,12 +218,6 @@
             "https"
           ],
           "securityDefinitions": {
-            "AWS_IAM": {
-              "in": "header",
-              "name": "Authorization",
-              "type": "apiKey",
-              "x-amazon-apigateway-authtype": "awsSigv4"
-            },
             "MyLambdaTokenAuth": {
               "in": "header",
               "name": "Authorization",
@@ -252,9 +246,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiWithLambdaTokenAuthDeploymentbb104e19f8": {
+    "MyApiWithLambdaTokenAuthDeploymentaeebfbeb36": {
       "Properties": {
-        "Description": "RestApi deployment id: bb104e19f80a8ad49620f622d472ce83fd541e2d",
+        "Description": "RestApi deployment id: aeebfbeb365dce8772ce0c34e840d25eb0c8772a",
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
         },
@@ -288,7 +282,7 @@
     "MyApiWithLambdaTokenAuthProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaTokenAuthDeploymentbb104e19f8"
+          "Ref": "MyApiWithLambdaTokenAuthDeploymentaeebfbeb36"
         },
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
