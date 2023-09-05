@@ -252,7 +252,7 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(self.logical_id, e.message) from e
 
     @cw_timer
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0915
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0912, PLR0915
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
