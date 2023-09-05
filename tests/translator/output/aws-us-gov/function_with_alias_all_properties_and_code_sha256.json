@@ -6,6 +6,7 @@
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
         },
+        "Description": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
         "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [

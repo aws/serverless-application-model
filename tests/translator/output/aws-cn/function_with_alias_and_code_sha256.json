@@ -7,12 +7,188 @@
     }
   },
   "Resources": {
+    "FunctionWithDescription": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": "My testing description 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionWithDescriptionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionWithDescriptionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FunctionWithDescription"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "FunctionWithDescriptionVersion6b86b273ff",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "FunctionWithDescriptionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "FunctionWithDescriptionVersion6b86b273ff": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "FunctionWithDescription"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "FunctionWithIntrinsicDescription": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": {
+          "Fn::Join": [
+            " ",
+            [
+              {
+                "Fn::Join": [
+                  ":",
+                  [
+                    "a",
+                    "b",
+                    "c"
+                  ]
+                ]
+              },
+              "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+            ]
+          ]
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionWithIntrinsicDescriptionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionWithIntrinsicDescriptionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FunctionWithIntrinsicDescription"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "FunctionWithIntrinsicDescriptionVersion6b86b273ff",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "FunctionWithIntrinsicDescriptionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "FunctionWithIntrinsicDescriptionVersion6b86b273ff": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "FunctionWithIntrinsicDescription"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
     "MinimalFunction": {
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
         },
+        "Description": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
         "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
