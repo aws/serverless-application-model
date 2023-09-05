@@ -290,7 +290,7 @@ class SamFunction(SamResourceMacro):
                         self.logical_id,
                         "AutoPublishCodeSha256 must be a string",
                     )
-                # Lambda doesn't create a new version if the code in the unpublished version is the same as the 
+                # Lambda doesn't create a new version if the code in the unpublished version is the same as the
                 # previous published version. To handle scenario users only update content in 'CodeUri', CloudFormation
                 # won't be able to detect any change in lambda function in the template, which would cause deployment
                 # failure. Append to description to handle this issue
