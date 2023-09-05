@@ -14,3 +14,24 @@ Resources:
       AutoPublishAlias: live
       AutoPublishCodeSha256: !Ref AutoPublishCodeSha256
       VersionDescription: sam-testing
+
+  FunctionWithIntrinsicDescription:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      AutoPublishCodeSha256: !Ref AutoPublishCodeSha256
+      VersionDescription: sam-testing
+      Description: !Join [':', [a, b, c]]
+  FunctionWithDescription:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      AutoPublishCodeSha256: !Ref AutoPublishCodeSha256
+      VersionDescription: sam-testing
+      Description: My testing description

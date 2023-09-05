@@ -252,7 +252,7 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(self.logical_id, e.message) from e
 
     @cw_timer
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0912, PLR0915
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
@@ -290,6 +290,15 @@ class SamFunction(SamResourceMacro):
                         self.logical_id,
                         "AutoPublishCodeSha256 must be a string",
                     )
+                # Lambda doesn't create a new version if the code in the unpublished version is the same as the
+                # previous published version. To address situations where users modify only the 'CodeUri' content,
+                # CloudFormation might not detect any changes in the Lambda function within the template, leading
+                # to deployment issues. To resolve this, we'll append codesha256 value to the description.
+                description = intrinsics_resolver.resolve_parameter_refs(self.Description)
+                if not description or isinstance(description, str):
+                    lambda_function.Description = f"{description} {code_sha256}" if description else code_sha256
+                else:
+                    lambda_function.Description = {"Fn::Join": [" ", [description, code_sha256]]}
             lambda_version = self._construct_version(
                 lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
             )
