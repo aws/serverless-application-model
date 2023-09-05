@@ -745,7 +745,16 @@ class Api(PushEventSource):
 
         swagger_body = explicit_api.get("DefinitionBody")
 
-        if swagger_body and self.Auth and intrinsics_resolver and self.Auth.get("OverrideApiAuth"):
+        # Previously overriding the DefaultAuthorizer in event source Auth would not work properly when DefinitionBody
+        # is included in the template. This is because call to update and save the DefinitionBody with any auth
+        # overrides was beings skipped due to the check on __MANAGE_SWAGGER above which is only set when no
+        # DefinitionBody is set.
+        # A new opt-in property, OverrideApiAuth, is added at the event source Auth level which is checked below and
+        # makes the necessary call to add_auth_to_swagger() to update and save the DefinitionBody with any auth
+        # overrides.
+        # We make the call to add_auth_to_swagger() in two separate places because _add_swagger_integration() deals
+        # specifically with cases where DefinitionBody is not defined, and below for when DefinitionBody is defined.
+        if swagger_body and self.Auth and self.Auth.get("OverrideApiAuth"):
             # TODO: refactor to remove this cast
             stage = cast(str, self.Stage)
             editor = SwaggerEditor(swagger_body)
