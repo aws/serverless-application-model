@@ -297,6 +297,8 @@ class SamFunction(SamResourceMacro):
                 description = intrinsics_resolver.resolve_parameter_refs(self.Description)
                 if not description or isinstance(description, str):
                     lambda_function.Description = f"{description} {code_sha256}" if description else code_sha256
+                else:
+                    lambda_function.Description = {"Fn::Join": [" ", [description, code_sha256]]}
             lambda_version = self._construct_version(
                 lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
             )
