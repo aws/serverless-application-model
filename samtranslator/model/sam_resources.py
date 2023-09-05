@@ -291,9 +291,9 @@ class SamFunction(SamResourceMacro):
                         "AutoPublishCodeSha256 must be a string",
                     )
                 # Lambda doesn't create a new version if the code in the unpublished version is the same as the
-                # previous published version. To handle scenario users only update content in 'CodeUri', CloudFormation
-                # won't be able to detect any change in lambda function in the template, which would cause deployment
-                # failure. Append to description to handle this issue
+                # previous published version. To address situations where users modify only the 'CodeUri' content, 
+                # CloudFormation might not detect any changes in the Lambda function within the template, leading 
+                # to deployment issues. To resolve this, we'll append codesha256 value to the description.
                 description = intrinsics_resolver.resolve_parameter_refs(self.Description)
                 if not description or isinstance(description, str):
                     lambda_function.Description = f"{description} {code_sha256}" if description else code_sha256
