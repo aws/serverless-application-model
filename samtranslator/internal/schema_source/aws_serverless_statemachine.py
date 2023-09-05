@@ -119,7 +119,7 @@ class EventBridgeRuleEventProperties(BaseModel):
     RetryPolicy: Optional[PassThroughProp] = eventbridgeruleeventproperties("RetryPolicy")
     Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
     RuleName: Optional[PassThroughProp] = eventbridgeruleeventproperties("RuleName")
-    InputTransformer: Optional[PassThroughProp] # TODO: add docs
+    InputTransformer: Optional[PassThroughProp]  # TODO: add docs
 
 
 class EventBridgeRuleEvent(BaseModel):
