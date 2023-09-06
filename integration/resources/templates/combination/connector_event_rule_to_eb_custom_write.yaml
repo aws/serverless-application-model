@@ -2,14 +2,19 @@ Resources:
   TriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Timeout: 10  # in case eb has delay
       InlineCode: |
-        const AWS = require('aws-sdk');
+        const {
+          EventBridge
+        } = require("@aws-sdk/client-eventbridge"),
+        {
+          SQS
+        } = require("@aws-sdk/client-sqs");
 
         exports.handler = async (event) => {
-          const eb = new AWS.EventBridge();
+          const eb = new EventBridge();
           const response = await eb.putEvents({
             Entries: [{
               Source: process.env.EVENT_SOURCE,
@@ -17,13 +22,13 @@ Resources:
               DetailType: "Test",
               EventBusName: process.env.EVENT_BUS_NAME,
             }]
-          }).promise();
+          });
 
-          const sqs = new AWS.SQS();
+          const sqs = new SQS();
           const data = await sqs.receiveMessage({
             QueueUrl: process.env.QUEUE_URL,
             WaitTimeSeconds: 5,
-          }).promise();
+          });
 
           if (data.Messages.length == 0) {
             throw 'No messages in the queue!';

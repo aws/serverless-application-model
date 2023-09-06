@@ -15,19 +15,21 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt LambdaRole.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Code:
         ZipFile: |
-          const AWS = require('aws-sdk');
+          const {
+            SNS
+          } = require("@aws-sdk/client-sns");
           var params = {
             Message: 'Test Message',
             TopicArn: process.env.TOPIC_ARN,
           };
           exports.handler = async (event) => {
             console.log('REQUEST RECEIVED:', JSON.stringify(event));
-            var sns = new AWS.SNS({apiVersion: '2012-11-05'});
-            await sns.publish(params).promise();
+            var sns = new SNS({apiVersion: '2012-11-05'});
+            await sns.publish(params);
           };
       Environment:
         Variables:
