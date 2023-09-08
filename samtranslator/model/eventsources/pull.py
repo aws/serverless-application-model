@@ -520,7 +520,6 @@ class SelfManagedKafka(PullEventSource):
         "SASL_SCRAM_512_AUTH",
         "BASIC_AUTH",
         "CLIENT_CERTIFICATE_TLS_AUTH",
-        "SERVER_ROOT_CA_CERTIFICATE",
     ]
 
     def get_event_source_arn(self) -> Optional[PassThrough]:
@@ -558,8 +557,12 @@ class SelfManagedKafka(PullEventSource):
 
     def generate_policy_document(self, source_access_configurations: List[Any]):  # type: ignore[no-untyped-def]
         statements = []
-        authentication_uri, has_vpc_config = self.get_secret_key(source_access_configurations)
+        authentication_uri, authentication_uri_2, has_vpc_config = self.get_secret_key(source_access_configurations)
         if authentication_uri:
+            secret_manager = self.get_secret_manager_secret(authentication_uri)  # type: ignore[no-untyped-call]
+            statements.append(secret_manager)
+
+        if authentication_uri_2:
             secret_manager = self.get_secret_manager_secret(authentication_uri)  # type: ignore[no-untyped-call]
             statements.append(secret_manager)
 
@@ -584,6 +587,7 @@ class SelfManagedKafka(PullEventSource):
         authentication_uri = None
         has_vpc_subnet = False
         has_vpc_security_group = False
+        authentication_uri_2 = None
 
         if not isinstance(source_access_configurations, list):
             raise InvalidEventException(
@@ -609,6 +613,10 @@ class SelfManagedKafka(PullEventSource):
                 self.validate_uri(config.get("URI"), "auth mechanism")
                 authentication_uri = config.get("URI")
 
+            elif config.get("Type") == "SERVER_ROOT_CA_CERTIFICATE":
+                self.validate_uri(config.get("URI"), "SERVER_ROOT_CA_CERTIFICATE")
+                authentication_uri_2 = config.get("URI")
+
             else:
                 raise InvalidEventException(
                     self.relative_id,
@@ -620,7 +628,7 @@ class SelfManagedKafka(PullEventSource):
                 self.relative_id,
                 "VPC_SUBNET and VPC_SECURITY_GROUP in SourceAccessConfigurations for SelfManagedKafka must be both provided.",
             )
-        return authentication_uri, (has_vpc_subnet and has_vpc_security_group)
+        return authentication_uri, authentication_uri_2, (has_vpc_subnet and has_vpc_security_group)
 
     def validate_uri(self, uri: Optional[Any], msg: str) -> None:
         if not uri:
