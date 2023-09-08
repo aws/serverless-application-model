@@ -73,6 +73,10 @@
           "markdownDescription": "Specifies the `InvokeRole` to use for `AWS_IAM` authorization\\.  \n*Type*: String  \n*Required*: No  \n*Default*: `CALLER_CREDENTIALS`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: `CALLER_CREDENTIALS` maps to `arn:aws:iam::*:user/*`, which uses the caller credentials to invoke the endpoint\\.",
           "title": "InvokeRole"
         },
+        "OverrideApiAuth": {
+          "title": "Overrideapiauth",
+          "type": "boolean"
+        },
         "ResourcePolicy": {
           "allOf": [
             {

@@ -253,6 +253,8 @@ class ApiAuth(BaseModel):
     Authorizer: Optional[str] = apiauth("Authorizer")
     InvokeRole: Optional[SamIntrinsicable[str]] = apiauth("InvokeRole")
     ResourcePolicy: Optional[ResourcePolicy] = apiauth("ResourcePolicy")
+    # TODO explicitly mention in docs that intrinsics are not supported for OverrideApiAuth
+    OverrideApiAuth: Optional[bool]  # TODO Add Docs
 
 
 class RequestModel(BaseModel):
