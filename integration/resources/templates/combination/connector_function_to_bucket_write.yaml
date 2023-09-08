@@ -15,11 +15,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt LambdaRole.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Code:
         ZipFile: |
-          const AWS = require('aws-sdk');
+          const {
+            S3
+          } = require("@aws-sdk/client-s3");
           var put_params = {
             Bucket: process.env.BUCKET,
             Key: "TestKey",
@@ -27,8 +29,8 @@ Resources:
           }
           exports.handler = async (event) => {
             console.log('REQUEST RECEIVED:', JSON.stringify(event));
-            var s3 = new AWS.S3();
-            await s3.putObject(put_params).promise();
+            var s3 = new S3();
+            await s3.putObject(put_params);
           };
       Environment:
         Variables:

@@ -9,24 +9,29 @@ Resources:
   TriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Timeout: 10  # in case eb has delay
       InlineCode: |
-        const AWS = require('aws-sdk');
+        const {
+                SNS
+              } = require("@aws-sdk/client-sns"),
+              {
+                SQS
+              } = require("@aws-sdk/client-sqs");
         exports.handler = async (event) => {
           var params = {
             Message: 'Test Message',
             TopicArn: process.env.TOPIC_ARN,
           };
-          var sns = new AWS.SNS();
-          var sqs = new AWS.SQS();
-          await sns.publish(params).promise();
+          var sns = new SNS();
+          var sqs = new SQS();
+          await sns.publish(params);
 
           const data = await sqs.receiveMessage({
             QueueUrl: process.env.VERIFICATION_QUEUE_URL,
             WaitTimeSeconds: 5,
-          }).promise();
+          });
           if (data.Messages.length == 0) {
             throw 'No messages in the queue!';
           }
@@ -43,16 +48,18 @@ Resources:
   InvokedFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       InlineCode: |
-        const AWS = require('aws-sdk');
+        const {
+          SQS
+        } = require("@aws-sdk/client-sqs");
         exports.handler = async (event) => {
-          const sqs = new AWS.SQS();
+          const sqs = new SQS();
           await sqs.sendMessage({
             QueueUrl: process.env.VERIFICATION_QUEUE_URL,
             MessageBody: "test"
-          }).promise();
+          });
         };
       Environment:
         Variables:

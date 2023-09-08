@@ -2,28 +2,36 @@ Resources:
   TriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Timeout: 100
       InlineCode: |
-        const AWS = require('aws-sdk');
+        const {
+          DynamoDBDocument
+        } = require("@aws-sdk/lib-dynamodb"),
+        {
+          DynamoDB
+        } = require("@aws-sdk/client-dynamodb"),
+        {
+          SQS
+        } = require("@aws-sdk/client-sqs");
         exports.handler = async (event) => {
           console.log(JSON.stringify(event));
-          const docClient = new AWS.DynamoDB.DocumentClient();
+          const docClient = DynamoDBDocument.from(new DynamoDB());
           const response = await docClient.put({ 
             TableName: process.env.TABLE_NAME, 
             Item: {
               Id: 'TestInput1234'
             }
-          }).promise();
+          });
           await new Promise(resolve => setTimeout(resolve, 10000));
 
           var retries = 5;
           while (retries-- > 0) {
-            const data = await new AWS.SQS().receiveMessage({
+            const data = await new SQS().receiveMessage({
               QueueUrl: process.env.VERIFICATION_QUEUE_URL,
               WaitTimeSeconds: 20,
-            }).promise();
+            });
             console.log(data);
             if (data.Messages && data.Messages.length > 0) {
               return;
@@ -43,16 +51,18 @@ Resources:
   InvokedFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       InlineCode: |
-        const AWS = require('aws-sdk');
+        const {
+          SQS
+        } = require("@aws-sdk/client-sqs");
         exports.handler = async (event) => {
-          const sqs = new AWS.SQS();
+          const sqs = new SQS();
           await sqs.sendMessage({
             QueueUrl: process.env.VERIFICATION_QUEUE_URL,
             MessageBody: "test"
-          }).promise();
+          });
         };
       Environment:
         Variables:
