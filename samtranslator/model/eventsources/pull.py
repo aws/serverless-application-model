@@ -583,7 +583,7 @@ class SelfManagedKafka(PullEventSource):
             "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
         }
 
-    def get_secret_key(self, source_access_configurations: List[Any]):  # type: ignore[no-untyped-def]
+    def get_secret_key(self, source_access_configurations: List[Any]) -> Optional[tuple[str, str, bool]]:
         authentication_uri = None
         has_vpc_subnet = False
         has_vpc_security_group = False
