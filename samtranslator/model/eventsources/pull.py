@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from samtranslator.internal.deprecation_control import deprecated
 from samtranslator.metrics.method_decorator import cw_timer
@@ -583,7 +583,7 @@ class SelfManagedKafka(PullEventSource):
             "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
         }
 
-    def get_secret_key(self, source_access_configurations: List[Any]) -> Optional[tuple[str, str, bool]]:
+    def get_secret_key(self, source_access_configurations: List[Any]) -> Tuple[Optional[str], Optional[str], bool]:
         authentication_uri = None
         has_vpc_subnet = False
         has_vpc_security_group = False
