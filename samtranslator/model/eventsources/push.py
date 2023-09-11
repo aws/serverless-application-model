@@ -727,7 +727,7 @@ class Api(PushEventSource):
         resources = []
 
         function = kwargs.get("function")
-        intrinsics_resolver = kwargs.get("intrinsics_resolver")
+        intrinsics_resolver: IntrinsicsResolver = kwargs["intrinsics_resolver"]
 
         if not function:
             raise TypeError("Missing required keyword argument: function")
@@ -743,6 +743,33 @@ class Api(PushEventSource):
         if explicit_api.get("__MANAGE_SWAGGER") or explicit_api.get("MergeDefinitions"):
             self._add_swagger_integration(explicit_api, api_id, function, intrinsics_resolver)  # type: ignore[no-untyped-call]
 
+        swagger_body = explicit_api.get("DefinitionBody")
+
+        # Previously overriding the DefaultAuthorizer in event source Auth would not work properly when DefinitionBody
+        # is included in the template. This is because call to update and save the DefinitionBody with any auth
+        # overrides was beings skipped due to the check on __MANAGE_SWAGGER above which is only set when no
+        # DefinitionBody is set.
+        # A new opt-in property, OverrideApiAuth, is added at the event source Auth level which is checked below and
+        # makes the necessary call to add_auth_to_swagger() to update and save the DefinitionBody with any auth
+        # overrides.
+        # We make the call to add_auth_to_swagger() in two separate places because _add_swagger_integration() deals
+        # specifically with cases where DefinitionBody is not defined, and below for when DefinitionBody is defined.
+        if swagger_body and self.Auth and self.Auth.get("OverrideApiAuth"):
+            # TODO: refactor to remove this cast
+            stage = cast(str, self.Stage)
+            editor = SwaggerEditor(swagger_body)
+            self.add_auth_to_swagger(
+                self.Auth,
+                explicit_api,
+                api_id,
+                self.relative_id,
+                self.Method,
+                self.Path,
+                stage,
+                editor,
+                intrinsics_resolver,
+            )
+            explicit_api["DefinitionBody"] = editor.swagger
         return resources
 
     def _get_permissions(self, resources_to_link):  # type: ignore[no-untyped-def]
