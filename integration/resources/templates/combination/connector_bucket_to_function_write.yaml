@@ -4,6 +4,8 @@ Parameters:
 
 Resources:
   VerificationQueue:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::SQS::Queue
 
   TriggerFunction:
