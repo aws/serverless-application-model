@@ -46,11 +46,15 @@ Resources:
           QueueName: !GetAtt VerificationQueue.QueueName
 
   CustomEventBus:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Events::EventBus
     Properties:
       Name: !Sub "${AWS::StackName}-EventBus"
 
   EventRule:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Events::Rule
     Properties:
       Description: !Sub 'EventRule-${AWS::StackName}'
@@ -86,6 +90,8 @@ Resources:
       - Write
 
   VerificationEventRule:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Events::Rule
     Properties:
       Description: !Sub 'EventRule-${AWS::StackName}-verification'
@@ -97,6 +103,8 @@ Resources:
         Id: SQSqueue
 
   VerificationQueue:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::SQS::Queue
 
   ConnectorNotBeingTested:
