@@ -23,7 +23,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
           return {
@@ -80,7 +80,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
           const token = event.type === 'TOKEN' ? event.authorizationToken : event.queryStringParameters.authorization
@@ -101,11 +101,15 @@ Resources:
         }
 
   MyCognitoUserPool:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: MyCognitoUserPool
 
   MyCognitoUserPoolClient:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Cognito::UserPoolClient
     Properties:
       UserPoolId:

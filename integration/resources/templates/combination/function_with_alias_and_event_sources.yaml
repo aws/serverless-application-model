@@ -8,7 +8,7 @@ Resources:
     Properties:
       CodeUri: ${codeuri}
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
 
       AutoPublishAlias: Live
 
@@ -70,9 +70,13 @@ Resources:
             StartingPosition: LATEST
 
   Notifications:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::SNS::Topic
 
   Images:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::S3::Bucket
 
   ExistingRestApi:
@@ -82,12 +86,16 @@ Resources:
       DefinitionUri: ${definitionuri}
 
   Stream:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Kinesis::Stream
     Properties:
       ShardCount: 1
 
   # What an irony the I can't use AWS::Serverless::SimpleTable here because it doesn't support streams specification
   MyTable:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::DynamoDB::Table
     Properties:
       # Enable DDB streams

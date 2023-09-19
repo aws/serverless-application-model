@@ -120,7 +120,7 @@ Resources:
         Variables:
           API_KEY: !GetAtt ApiKey.ApiKey
           GRAPHQL_URL: !GetAtt AppSyncApi.GraphQLUrl
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       InlineCode: |
         const https = require("https");
