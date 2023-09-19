@@ -193,6 +193,7 @@ class CloudWatchEvent(EventSource):
         "RetryPolicy": PropertyType(False, IS_DICT),
         "State": PropertyType(False, IS_STR),
         "Target": Property(False, IS_DICT),
+        "InputTransformer": PropertyType(False, IS_DICT),
     }
 
     EventBusName: Optional[PassThrough]
@@ -204,6 +205,7 @@ class CloudWatchEvent(EventSource):
     RetryPolicy: Optional[PassThrough]
     State: Optional[PassThrough]
     Target: Optional[PassThrough]
+    InputTransformer: Optional[PassThrough]
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
@@ -272,6 +274,9 @@ class CloudWatchEvent(EventSource):
 
         if self.RetryPolicy is not None:
             target["RetryPolicy"] = self.RetryPolicy
+
+        if self.InputTransformer is not None:
+            target["InputTransformer"] = self.InputTransformer
 
         return target
 
@@ -362,9 +367,7 @@ class Api(EventSource):
             # Cannot add the integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
-                'API method "{method}" defined multiple times for path "{path}".'.format(
-                    method=self.Method, path=self.Path
-                ),
+                f'API method "{self.Method}" defined multiple times for path "{self.Path}".',
             )
 
         condition = None

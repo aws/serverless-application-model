@@ -1,0 +1,88 @@
+{
+  "Resources": {
+    "ExplicitApiWithVPCEndpointIds": {
+      "Properties": {
+        "BodyS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "webpage_swagger.json"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "PRIVATE"
+          ],
+          "VpcEndpointIds": [
+            "vpc-2"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "PRIVATE"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ExplicitApiWithVPCEndpointIdsDeploymentf117c932f7": {
+      "Properties": {
+        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289",
+        "RestApiId": {
+          "Ref": "ExplicitApiWithVPCEndpointIds"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ExplicitApiWithVPCEndpointIdsProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiWithVPCEndpointIdsDeploymentf117c932f7"
+        },
+        "RestApiId": {
+          "Ref": "ExplicitApiWithVPCEndpointIds"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "ExplicitApiWithVpcEndpointIds": {
+      "Properties": {
+        "BodyS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "webpage_swagger.json"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "PRIVATE"
+          ],
+          "VpcEndpointIds": [
+            "vpc-1"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "PRIVATE"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ExplicitApiWithVpcEndpointIdsDeploymentf117c932f7": {
+      "Properties": {
+        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289",
+        "RestApiId": {
+          "Ref": "ExplicitApiWithVpcEndpointIds"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ExplicitApiWithVpcEndpointIdsProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiWithVpcEndpointIdsDeploymentf117c932f7"
+        },
+        "RestApiId": {
+          "Ref": "ExplicitApiWithVpcEndpointIds"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    }
+  }
+}

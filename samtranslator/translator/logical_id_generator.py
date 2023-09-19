@@ -62,7 +62,7 @@ class LogicalIdGenerator:
             return data_hash
 
         encoded_data_str = self.data_str.encode("utf-8")
-        data_hash = hashlib.sha1(encoded_data_str).hexdigest()  # noqa: hashlib-insecure-hash-function
+        data_hash = hashlib.sha1(encoded_data_str).hexdigest()  # noqa: S324
 
         return data_hash[:length]
 

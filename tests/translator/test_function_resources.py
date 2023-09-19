@@ -93,7 +93,7 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(len(aliases), 1)
         self.assertEqual(len(versions), 1)
 
-        alias = list(aliases[0].values())[0]["Properties"]
+        alias = next(iter(aliases[0].values()))["Properties"]
         self.assertEqual(alias["Name"], alias_name)
         # We don't need to do any deeper validation here because there is a separate SAM template -> CFN template conversion test
         # that will care of validating all properties & connections
@@ -149,8 +149,8 @@ class TestVersionsAndAliases(TestCase):
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
-        self.assertTrue("UpdatePolicy" in list(aliases[0].values())[0])
-        self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
+        self.assertTrue("UpdatePolicy" in next(iter(aliases[0].values())))
+        self.assertEqual(next(iter(aliases[0].values()))["UpdatePolicy"], self.update_policy().to_dict())
 
     @patch.object(SamFunction, "_get_resolved_alias_name")
     def test_sam_function_with_deployment_preference_missing_collection_raises_error(
@@ -228,7 +228,7 @@ class TestVersionsAndAliases(TestCase):
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_has_calls([call(enabled), call(None)])
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
-        self.assertTrue("UpdatePolicy" not in list(aliases[0].values())[0])
+        self.assertTrue("UpdatePolicy" not in next(iter(aliases[0].values())))
 
     def test_sam_function_cannot_be_with_deployment_preference_without_alias(self):
         with self.assertRaises(InvalidResourceException):
@@ -326,8 +326,8 @@ class TestVersionsAndAliases(TestCase):
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
-        self.assertTrue("UpdatePolicy" in list(aliases[0].values())[0])
-        self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
+        self.assertTrue("UpdatePolicy" in next(iter(aliases[0].values())))
+        self.assertEqual(next(iter(aliases[0].values()))["UpdatePolicy"], self.update_policy().to_dict())
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch.object(SamFunction, "_get_resolved_alias_name")
@@ -443,8 +443,8 @@ class TestVersionsAndAliases(TestCase):
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
-        self.assertTrue("UpdatePolicy" in list(aliases[0].values())[0])
-        self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
+        self.assertTrue("UpdatePolicy" in next(iter(aliases[0].values())))
+        self.assertEqual(next(iter(aliases[0].values()))["UpdatePolicy"], self.update_policy().to_dict())
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch.object(SamFunction, "_get_resolved_alias_name")
@@ -493,8 +493,8 @@ class TestVersionsAndAliases(TestCase):
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
-        self.assertTrue("UpdatePolicy" in list(aliases[0].values())[0])
-        self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
+        self.assertTrue("UpdatePolicy" in next(iter(aliases[0].values())))
+        self.assertEqual(next(iter(aliases[0].values()))["UpdatePolicy"], self.update_policy().to_dict())
 
     @parameterized.expand(
         [
@@ -759,11 +759,7 @@ class TestVersionsAndAliases(TestCase):
 
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved(self):
         property_name = "something"
-        expected_exception_msg = (
-            "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter".format(
-                self.sam_func.logical_id, property_name
-            )
-        )
+        expected_exception_msg = f"Resource with id [{self.sam_func.logical_id}] is invalid. '{property_name}' must be a string or a Ref to a template parameter"
 
         alias_value = {"Ref": "param1"}
         # Unresolved
@@ -777,11 +773,7 @@ class TestVersionsAndAliases(TestCase):
 
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved_with_list(self):
         property_name = "something"
-        expected_exception_msg = (
-            "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter".format(
-                self.sam_func.logical_id, property_name
-            )
-        )
+        expected_exception_msg = f"Resource with id [{self.sam_func.logical_id}] is invalid. '{property_name}' must be a string or a Ref to a template parameter"
 
         alias_value = ["Ref", "param1"]
         # Unresolved

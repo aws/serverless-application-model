@@ -421,8 +421,7 @@ class ServerlessAppPlugin(BasePlugin):
         :param list *args: arguments for the service call lambda
         """
         try:
-            response = service_call_lambda(*args)
-            return response
+            return service_call_lambda(*args)
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code in ("AccessDeniedException", "NotFoundException"):

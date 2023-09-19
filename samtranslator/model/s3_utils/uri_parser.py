@@ -91,9 +91,9 @@ def construct_s3_location_object(
         if _s3_pointer is None:
             raise InvalidResourceException(
                 logical_id,
-                "'{}' is not a valid S3 Uri of the form "
+                f"'{property_name}' is not a valid S3 Uri of the form "
                 "'s3://bucket/key' with optional versionId query "
-                "parameter.".format(property_name),
+                "parameter.",
             )
         s3_pointer = _s3_pointer
 

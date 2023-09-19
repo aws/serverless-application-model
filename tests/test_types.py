@@ -66,15 +66,13 @@ def test_list_of_validator(value, item_type, should_pass):
 def test_dict_of_validator(value, key_type, value_type, should_pass):
     validate = dict_of(is_type(key_type), is_type(value_type))
     if should_pass:
-        assert validate(value), "dict_of validator failed for key type {}, item type {}, value {}".format(
-            key_type, value_type, value
-        )
+        assert validate(
+            value
+        ), f"dict_of validator failed for key type {key_type}, item type {value_type}, value {value}"
     else:
         assert not validate(
             value, should_raise=False
-        ), "dict_of validator unexpectedly succeeded for key type {}, item type {}, value {}".format(
-            key_type, value_type, value
-        )
+        ), f"dict_of validator unexpectedly succeeded for key type {key_type}, item type {value_type}, value {value}"
         with pytest.raises(TypeError):
             validate(value)
 

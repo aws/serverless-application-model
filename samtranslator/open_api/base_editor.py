@@ -173,6 +173,19 @@ class BaseEditor:
         for path_item in self.get_conditional_contents(path_dict):
             path_item.setdefault(method, Py27Dict())
 
+    def add_timeout_to_method(self, api: Dict[str, Any], path: str, method_name: str, timeout: int) -> None:
+        """
+        Adds a timeout to the path/method.
+
+        :param api: dict containing Api to be modified
+        :param path: string of path name
+        :param method_name: string of method name
+        :param timeout: int of timeout duration in milliseconds
+
+        """
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+            method_definition[self._X_APIGW_INTEGRATION]["timeoutInMillis"] = timeout
+
     @staticmethod
     def _get_authorization_scopes(
         authorizers: Union[Dict[str, ApiGatewayAuthorizer], Dict[str, ApiGatewayV2Authorizer]], default_authorizer: str

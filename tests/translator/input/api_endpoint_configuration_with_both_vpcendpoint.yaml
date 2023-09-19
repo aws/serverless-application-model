@@ -1,0 +1,20 @@
+Resources:
+  ExplicitApiWithVpcEndpointIds:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
+      EndpointConfiguration:
+        Type: PRIVATE
+        VpcEndpointIds:
+        - vpc-1
+
+  ExplicitApiWithVPCEndpointIds:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
+      EndpointConfiguration:
+        Type: PRIVATE
+        VPCEndpointIds:
+        - vpc-2

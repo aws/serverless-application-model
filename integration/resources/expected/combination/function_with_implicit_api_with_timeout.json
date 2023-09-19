@@ -1,0 +1,26 @@
+[
+  {
+    "LogicalResourceId": "MyLambdaFunctionApiEventPermissionProd",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApiProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "ServerlessRestApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  }
+]

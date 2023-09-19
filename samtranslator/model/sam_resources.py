@@ -1,4 +1,4 @@
-""" SAM macro definitions """
+﻿""" SAM macro definitions """
 import copy
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
@@ -252,7 +252,7 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(self.logical_id, e.message) from e
 
     @cw_timer
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0912, PLR0915
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
@@ -290,6 +290,15 @@ class SamFunction(SamResourceMacro):
                         self.logical_id,
                         "AutoPublishCodeSha256 must be a string",
                     )
+                # Lambda doesn't create a new version if the code in the unpublished version is the same as the
+                # previous published version. To address situations where users modify only the 'CodeUri' content,
+                # CloudFormation might not detect any changes in the Lambda function within the template, leading
+                # to deployment issues. To resolve this, we'll append codesha256 value to the description.
+                description = intrinsics_resolver.resolve_parameter_refs(self.Description)
+                if not description or isinstance(description, str):
+                    lambda_function.Description = f"{description} {code_sha256}" if description else code_sha256
+                else:
+                    lambda_function.Description = {"Fn::Join": [" ", [description, code_sha256]]}
             lambda_version = self._construct_version(
                 lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
             )
@@ -350,7 +359,7 @@ class SamFunction(SamResourceMacro):
 
         return resources
 
-    def _construct_event_invoke_config(  # noqa: too-many-arguments
+    def _construct_event_invoke_config(  # noqa: PLR0913
         self,
         function_name: str,
         alias_name: str,
@@ -706,9 +715,7 @@ class SamFunction(SamResourceMacro):
             if any([lambda_function.Handler, lambda_function.Runtime, lambda_function.Layers]):
                 raise InvalidResourceException(
                     lambda_function.logical_id,
-                    "Runtime, Handler, Layers cannot be present when PackageType is of type `{image}`".format(
-                        image=IMAGE
-                    ),
+                    f"Runtime, Handler, Layers cannot be present when PackageType is of type `{IMAGE}`",
                 )
             if not lambda_function.Code.get("ImageUri"):
                 raise InvalidResourceException(
@@ -960,7 +967,7 @@ class SamFunction(SamResourceMacro):
 
         return alias
 
-    def _validate_deployment_preference_and_add_update_policy(  # noqa: too-many-arguments
+    def _validate_deployment_preference_and_add_update_policy(  # noqa: PLR0913
         self,
         deployment_preference_collection: DeploymentPreferenceCollection,
         lambda_alias: Optional[LambdaAlias],
@@ -1696,7 +1703,7 @@ class SamLayerVersion(SamResourceMacro):
             raise InvalidResourceException(
                 self.logical_id,
                 "'RetentionPolicy' does not accept intrinsic functions, "
-                "please use one of the following options: {}".format([self.RETAIN, self.DELETE]),
+                f"please use one of the following options: {[self.RETAIN, self.DELETE]}",
             )
 
         if self.RetentionPolicy is None:
@@ -1706,7 +1713,7 @@ class SamLayerVersion(SamResourceMacro):
             raise InvalidResourceException(
                 self.logical_id,
                 "Invalid 'RetentionPolicy' type, "
-                "please use one of the following options: {}".format([self.RETAIN, self.DELETE]),
+                f"please use one of the following options: {[self.RETAIN, self.DELETE]}",
             )
 
         for option in self.retention_policy_options:
@@ -1900,7 +1907,7 @@ class SamConnector(SamResourceMacro):
 
         raise InvalidResourceException(self.logical_id, "'Destination' is an empty list")
 
-    def generate_resources(  # noqa: too-many-branches
+    def generate_resources(  # noqa: PLR0912
         self,
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,
@@ -2000,7 +2007,7 @@ class SamConnector(SamResourceMacro):
             "Statement": policy_statements,
         }
 
-    def _construct_iam_policy(  # noqa: too-many-arguments
+    def _construct_iam_policy(  # noqa: PLR0913
         self,
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,

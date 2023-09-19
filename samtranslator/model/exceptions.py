@@ -40,9 +40,7 @@ class InvalidDocumentException(ExceptionWithMessage):
 
     @property
     def message(self) -> str:
-        return "Invalid Serverless Application Specification document. Number of errors found: {}.".format(
-            len(self.causes)
-        )
+        return f"Invalid Serverless Application Specification document. Number of errors found: {len(self.causes)}."
 
     @property
     def metadata(self) -> Dict[str, List[Any]]:
@@ -74,11 +72,9 @@ class DuplicateLogicalIdException(ExceptionWithMessage):
     @property
     def message(self) -> str:
         return (
-            "Transforming resource with id [{logical_id}] attempts to create a new"
-            ' resource with id [{duplicate_id}] and type "{type}". A resource with that id already'
-            " exists within this template. Please use a different id for that resource.".format(
-                logical_id=self._logical_id, type=self._type, duplicate_id=self._duplicate_id
-            )
+            f"Transforming resource with id [{self._logical_id}] attempts to create a new"
+            f' resource with id [{self._duplicate_id}] and type "{self._type}". A resource with that id already'
+            " exists within this template. Please use a different id for that resource."
         )
 
 

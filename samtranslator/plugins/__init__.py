@@ -45,7 +45,7 @@ class BasePlugin(ABC):
 
     # Plugins can choose to skip implementing certain hook methods. In which case we will default to a
     # NoOp implementation
-    def on_before_transform_resource(self, logical_id, resource_type, resource_properties):  # type: ignore[no-untyped-def] # noqa: empty-method-without-abstract-decorator
+    def on_before_transform_resource(self, logical_id, resource_type, resource_properties):  # type: ignore[no-untyped-def] # noqa: B027
         """
         Hook method to execute on `before_transform_resource` life cycle event. Plugins are free to modify the
         whole template or properties of the resource.
@@ -68,7 +68,7 @@ class BasePlugin(ABC):
 
     # Plugins can choose to skip implementing certain hook methods. In which case we will default to a
     # NoOp implementation
-    def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def] # noqa: empty-method-without-abstract-decorator
+    def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def] # noqa: B027
         """
         Hook method to execute on "before_transform_template" life cycle event. Plugins are free to modify the
         whole template, inject new resources, or modify certain sections of the template.
@@ -87,7 +87,7 @@ class BasePlugin(ABC):
 
     # Plugins can choose to skip implementing certain hook methods. In which case we will default to a
     # NoOp implementation
-    def on_after_transform_template(self, template):  # type: ignore[no-untyped-def] # noqa: empty-method-without-abstract-decorator
+    def on_after_transform_template(self, template):  # type: ignore[no-untyped-def] # noqa: B027
         """
         Hook method to execute on "after_transform_template" life cycle event. Plugins may further modify
         the template. Warning: any changes made in this lifecycle action by a plugin will not be

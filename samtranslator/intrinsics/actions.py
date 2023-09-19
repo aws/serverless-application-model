@@ -17,7 +17,7 @@ class Action(ABC):
     _resource_ref_separator = "."
     intrinsic_name: str
 
-    def resolve_parameter_refs(  # noqa: empty-method-without-abstract-decorator
+    def resolve_parameter_refs(  # noqa: B027
         self, input_dict: Optional[Any], parameters: Dict[str, Any]
     ) -> Optional[Any]:
         """
@@ -25,7 +25,7 @@ class Action(ABC):
         TODO: input_dict should not be None.
         """
 
-    def resolve_resource_refs(  # noqa: empty-method-without-abstract-decorator
+    def resolve_resource_refs(  # noqa: B027
         self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
     ) -> Optional[Any]:
         """
@@ -33,7 +33,7 @@ class Action(ABC):
         TODO: input_dict should not be None.
         """
 
-    def resolve_resource_id_refs(  # noqa: empty-method-without-abstract-decorator
+    def resolve_resource_id_refs(  # noqa: B027
         self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
     ) -> Optional[Any]:
         """

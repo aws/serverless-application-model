@@ -63,8 +63,8 @@ class CWMetricsPublisher(MetricsPublisher):
         try:
             if metric_data:
                 self.cloudwatch_client.put_metric_data(Namespace=namespace, MetricData=metric_data)
-        except Exception as e:
-            LOG.exception(f"Failed to report {len(metric_data)} metrics", exc_info=e)
+        except Exception:
+            LOG.exception(f"Failed to report {len(metric_data)} metrics")
 
 
 class DummyMetricsPublisher(MetricsPublisher):
