@@ -755,7 +755,7 @@ class Api(PushEventSource):
         # We make the call to add_auth_to_swagger() in two separate places because _add_swagger_integration() deals
         # specifically with cases where DefinitionBody is not defined, and below for when DefinitionBody is defined.
         if swagger_body and self.Auth and self.Auth.get("OverrideApiAuth"):
-            if not self.Auth.get("Authorizer") or self.Auth.get("ApiKeyRequired") or self.Auth.get("ResourcePolicy"):
+            if not (self.Auth.get("Authorizer") or self.Auth.get("ApiKeyRequired") or self.Auth.get("ResourcePolicy")):
                 raise InvalidEventException(
                     self.relative_id,
                     "Must define one of: Authorizer, ApiKeyRequired or ResourcePolicy when using the OverrideApiAuth property.",
