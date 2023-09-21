@@ -758,7 +758,7 @@ class Api(PushEventSource):
             if not self.Auth.get("Authorizer") or self.Auth.get("ApiKeyRequired") or self.Auth.get("ResourcePolicy"):
                 raise InvalidEventException(
                     self.relative_id,
-                    f"Must define one of: Authorizer, ApiKeyRequired or ResourcePolicy when using the OverrideApiAuth property.",
+                    "Must define one of: Authorizer, ApiKeyRequired or ResourcePolicy when using the OverrideApiAuth property.",
                 )
             stage = cast(str, self.Stage)
             editor = SwaggerEditor(swagger_body)
