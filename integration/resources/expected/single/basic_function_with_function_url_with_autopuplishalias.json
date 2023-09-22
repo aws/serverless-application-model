@@ -18,9 +18,5 @@
   {
     "LogicalResourceId": "MyLambdaFunctionVersion",
     "ResourceType": "AWS::Lambda::Version"
-  },
-  {
-    "LogicalResourceId": "MyLambdaFunctionUrlPublicPermissions",
-    "ResourceType": "AWS::Lambda::Permission"
   }
 ]

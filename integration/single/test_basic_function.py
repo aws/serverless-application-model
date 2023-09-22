@@ -126,7 +126,7 @@ class TestBasicFunction(BaseTest):
             "MaxAge": 10,
         }
 
-        self.assertEqual(function_url_config["AuthType"], "NONE")
+        self.assertEqual(function_url_config["AuthType"], "AWS_IAM")
         self.assertEqual(function_url_config["Cors"], cors_config)
         self._assert_invoke(lambda_client, function_name, qualifier, 200)
 
