@@ -75,7 +75,10 @@ def _delete_unused_network_interface_by_subnet(ec2_client, subnet_id):
         network_interface_ids += [ni["NetworkInterfaceId"] for ni in page["NetworkInterfaces"]]
 
     for ni_id in network_interface_ids:
-        ec2_client.delete_network_interface(NetworkInterfaceId=ni_id)
+        try:
+            ec2_client.delete_network_interface(NetworkInterfaceId=ni_id)
+        except ClientError as e:
+            LOG.error("Unable to delete network interface %s", ni_id, exc_info=e)
         time.sleep(0.5)
 
     LOG.info("Deleted %s unused network interfaces under subnet %s", len(network_interface_ids), subnet_id)
