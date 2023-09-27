@@ -1,0 +1,36 @@
+Transform: AWS::Serverless-2016-10-31
+Description: SNS Fifo
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  MyFifoTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      ContentBasedDeduplication: true
+      FifoTopic: true
+      TopicName: myFifoTopic.fifo
+
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Events:
+        FifoTrigger:
+          Type: SNS
+          Properties:
+            SqsSubscription: true
+            Topic: !Ref MyFifoTopic
+    Metadata:
+      DockerTag: nodejs12.x-v1
+      DockerContext: ./hello-world
+      Dockerfile: Dockerfile
