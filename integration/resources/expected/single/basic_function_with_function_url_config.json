@@ -10,9 +10,5 @@
   {
     "LogicalResourceId": "MyLambdaFunctionRole",
     "ResourceType": "AWS::IAM::Role"
-  },
-  {
-    "LogicalResourceId": "MyLambdaFunctionUrlPublicPermissions",
-    "ResourceType": "AWS::Lambda::Permission"
   }
 ]

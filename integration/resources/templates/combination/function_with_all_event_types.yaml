@@ -107,25 +107,35 @@ Resources:
             Method: get
 
   Notifications:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Condition: MyCondition
     Type: AWS::SNS::Topic
 
   Images:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::S3::Bucket
 
   CloudWatchLambdaLogsGroup:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Logs::LogGroup
     Condition: MyCondition
     Properties:
       RetentionInDays: 7
 
   MyStream:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Kinesis::Stream
     Condition: MyCondition
     Properties:
       ShardCount: 1
 
   MyDynamoDB:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::DynamoDB::Table
     Condition: MyCondition
     Properties:

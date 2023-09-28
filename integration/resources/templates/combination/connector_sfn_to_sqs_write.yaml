@@ -1,5 +1,7 @@
 Resources:
   TriggerStateMachine:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Serverless::StateMachine
     Properties:
       Type: EXPRESS
@@ -18,6 +20,8 @@ Resources:
           FunctionName: SomethingDoesNotMatter
 
   MyQueue:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::SQS::Queue
 
   MyConnector:

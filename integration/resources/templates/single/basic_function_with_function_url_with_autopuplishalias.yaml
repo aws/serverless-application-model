@@ -8,7 +8,7 @@ Resources:
       MemorySize: 128
       AutoPublishAlias: live
       FunctionUrlConfig:
-        AuthType: NONE
+        AuthType: AWS_IAM
         Cors:
           AllowOrigins:
           - https://foo.com
