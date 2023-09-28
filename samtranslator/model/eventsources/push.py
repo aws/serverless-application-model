@@ -525,6 +525,8 @@ class SNS(PushEventSource):
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
+        intrinsics_resolver: IntrinsicsResolver = kwargs["intrinsics_resolver"]
+
         # SNS -> Lambda
         if not self.SqsSubscription:
             subscription = self._inject_subscription(
@@ -543,7 +545,9 @@ class SNS(PushEventSource):
         if isinstance(self.SqsSubscription, bool):
             resources = []  # type: ignore[var-annotated]
 
-            fifo_topic = self._check_fifo_topic(get_logical_id_from_intrinsic(self.Topic), kwargs["original_template"])
+            fifo_topic = self._check_fifo_topic(
+                get_logical_id_from_intrinsic(self.Topic), kwargs.get("original_template"), intrinsics_resolver
+            )
             queue = self._inject_sqs_queue(function, fifo_topic)  # type: ignore[no-untyped-call]
             queue_arn = queue.get_runtime_attr("arn")
             queue_url = queue.get_runtime_attr("queue_url")
@@ -601,14 +605,18 @@ class SNS(PushEventSource):
         resources.append(subscription)
         return resources
 
-    def _check_fifo_topic(self, topic_id: str, template: Optional[Dict[str, Any]]):
+    def _check_fifo_topic(
+        self,
+        topic_id: Optional[str],
+        template: Optional[Dict[str, Any]],
+        intrinsics_resolver: IntrinsicsResolver,
+    ) -> bool:
         if not topic_id or not template:
             return False
 
         resources = template.get("Resources", {})
         properties = resources.get(topic_id, {}).get("Properties", {})
-
-        return properties.get("FifoTopic", False)
+        return intrinsics_resolver.resolve_parameter_refs(properties.get("FifoTopic", False))  # type: ignore[no-any-return]
 
     def _inject_subscription(  # noqa: PLR0913
         self,
