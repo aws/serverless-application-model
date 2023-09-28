@@ -15,16 +15,21 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt MyRole.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Code:
         ZipFile: |
-          const AWS = require('aws-sdk');
+          const {
+            DynamoDBDocument
+          } = require("@aws-sdk/lib-dynamodb"),
+          {
+            DynamoDB
+          } = require("@aws-sdk/client-dynamodb");
           exports.handler = async (event) => {
             console.log(JSON.stringify(event));
-            const docClient = new AWS.DynamoDB.DocumentClient();
+            const docClient = DynamoDBDocument.from(new DynamoDB());
             try {
-              const response = await docClient.scan({ TableName: process.env.TABLE_NAME, }).promise();
+              const response = await docClient.scan({ TableName: process.env.TABLE_NAME, });
               return response
             }
             catch (err) {

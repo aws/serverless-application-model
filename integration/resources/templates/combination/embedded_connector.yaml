@@ -34,19 +34,21 @@ Resources:
           - Write
     Properties:
       Role: !GetAtt MyRole1.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Code:
         ZipFile: |
-          const AWS = require('aws-sdk');
+          const {
+            Lambda
+          } = require("@aws-sdk/client-lambda");
           exports.handler = async (event) => {
             const params = {
               FunctionName: process.env.FUNCTION_NAME,
               InvocationType: 'RequestResponse',
               Payload: '{}',
             };
-            const lambda = new AWS.Lambda();
-            const response = await lambda.invoke(params).promise();
+            const lambda = new Lambda();
+            const response = await lambda.invoke(params);
             if(response.StatusCode !== 200){
               throw new Error('Failed to get response from lambda function')
             }
@@ -60,11 +62,10 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt MyRole2.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Code:
         ZipFile: |
-          const AWS = require('aws-sdk');
           exports.handler = async (event) => {
             console.log(JSON.stringify(event));
           };
