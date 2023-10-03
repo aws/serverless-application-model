@@ -1,0 +1,7 @@
+Resources:
+  CLOUDDELIVERY:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId: '{{resolve:ssm:/elw/test/sar-app}}'
+        SemanticVersion: 5.2.17
