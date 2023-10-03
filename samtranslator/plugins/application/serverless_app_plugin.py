@@ -158,7 +158,7 @@ class ServerlessAppPlugin(BasePlugin):
                             logical_id,
                             "Serverless Application Repostiory does not support dynamic reference in 'ApplicationId' property.",
                         )
-                
+
                     self._make_service_call_with_retry(service_call, app_id, semver, key, logical_id)  # type: ignore[no-untyped-call]
                 except InvalidResourceException as e:
                     # Catch all InvalidResourceExceptions, raise those in the before_resource_transform target.
