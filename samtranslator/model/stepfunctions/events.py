@@ -93,6 +93,7 @@ class Schedule(EventSource):
         "DeadLetterConfig": PropertyType(False, IS_DICT),
         "RetryPolicy": PropertyType(False, IS_DICT),
         "Target": Property(False, IS_DICT),
+        "Role": Property(False, IS_STR),
     }
 
     Schedule: PassThrough
@@ -104,6 +105,7 @@ class Schedule(EventSource):
     DeadLetterConfig: Optional[Dict[str, Any]]
     RetryPolicy: Optional[PassThrough]
     Target: Optional[PassThrough]
+    Role: Optional[PassThrough]
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
@@ -135,8 +137,10 @@ class Schedule(EventSource):
         events_rule.Name = self.Name
         events_rule.Description = self.Description
 
-        role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
-        resources.append(role)
+        role = None
+        if self.Role is None:
+            role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
+            resources.append(role)
 
         source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
@@ -146,11 +150,11 @@ class Schedule(EventSource):
                 self, source_arn, passthrough_resource_attributes
             )
             resources.extend(dlq_resources)
-        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]  # type: ignore[no-untyped-call]
+        events_rule.Targets = [self._construct_target(resource, role, self.Role, dlq_queue_arn)]  # type: ignore[no-untyped-call]
 
         return resources
 
-    def _construct_target(self, resource, role, dead_letter_queue_arn=None):  # type: ignore[no-untyped-def]
+    def _construct_target(self, resource, role, provided_role=None, dead_letter_queue_arn=None):  # type: ignore[no-untyped-def]
         """Constructs the Target property for the EventBridge Rule.
 
         :returns: the Target property
@@ -161,11 +165,20 @@ class Schedule(EventSource):
             if self.Target and "Id" in self.Target
             else generate_valid_target_id(self.logical_id, EVENT_RULE_SFN_TARGET_SUFFIX)
         )
-        target = {
-            "Arn": resource.get_runtime_attr("arn"),
-            "Id": target_id,
-            "RoleArn": role.get_runtime_attr("arn"),
-        }
+
+        if provided_role:
+            role_arn = fnSub("arn:aws:iam::${AWS::AccountId}:role/${Role}", {"Role": provided_role})
+            target = {
+                "Arn": resource.get_runtime_attr("arn"),
+                "Id": target_id,
+                "RoleArn": role_arn,
+            }
+        else:
+            target = {
+                "Arn": resource.get_runtime_attr("arn"),
+                "Id": target_id,
+                "RoleArn": role.get_runtime_attr("arn"),
+            }
         if self.Input is not None:
             target["Input"] = self.Input
 
