@@ -159,8 +159,10 @@ class ScheduleEventSource(TestCase):
         self.schedule_event_source.Role = role
         resources = self.schedule_event_source.to_cloudformation(resource=self.state_machine)
         event_rule = resources[0]
-        self.assertEqual(event_rule.Targets[0]["RoleArn"], fnSub("arn:aws:iam::${AWS::AccountId}:role/${Role}", {"Role": role}))
-        
+        self.assertEqual(
+            event_rule.Targets[0]["RoleArn"], fnSub("arn:aws:iam::${AWS::AccountId}:role/${Role}", {"Role": role})
+        )
+
     @parameterized.expand(
         [
             (True, "Enabled"),
