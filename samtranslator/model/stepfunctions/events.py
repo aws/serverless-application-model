@@ -1,6 +1,6 @@
 import json
 from abc import ABCMeta
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, List, Optional, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
@@ -10,6 +10,7 @@ from samtranslator.model.eventsources.push import Api as PushApi
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import fnSub
+from samtranslator.model.stepfunctions.resources import StepFunctionsStateMachine
 from samtranslator.model.types import IS_BOOL, IS_DICT, IS_STR, PassThrough
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
@@ -50,7 +51,13 @@ class EventSource(ResourceMacro, metaclass=ABCMeta):
         generator = logical_id_generator.LogicalIdGenerator(prefix + resource_type, suffix)
         return generator.gen()
 
-    def _construct_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):  # type: ignore[no-untyped-def]
+    def _construct_role(
+        self,
+        resource: StepFunctionsStateMachine,
+        permissions_boundary: Optional[str],
+        prefix: Optional[str],
+        suffix: str = "",
+    ) -> IAMRole:
         """Constructs the IAM Role resource allowing the event service to invoke
         the StartExecution API of the state machine resource it is associated with.
 
@@ -93,7 +100,7 @@ class Schedule(EventSource):
         "DeadLetterConfig": PropertyType(False, IS_DICT),
         "RetryPolicy": PropertyType(False, IS_DICT),
         "Target": Property(False, IS_DICT),
-        "Role": Property(False, IS_STR),
+        "RoleArn": Property(False, IS_STR),
     }
 
     Schedule: PassThrough
@@ -105,7 +112,7 @@ class Schedule(EventSource):
     DeadLetterConfig: Optional[Dict[str, Any]]
     RetryPolicy: Optional[PassThrough]
     Target: Optional[PassThrough]
-    Role: Optional[PassThrough]
+    RoleArn: Optional[PassThrough]
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
@@ -115,7 +122,7 @@ class Schedule(EventSource):
         :returns: a list of vanilla CloudFormation Resources, to which this Schedule event expands
         :rtype: list
         """
-        resources = []
+        resources: List[Any] = []
 
         permissions_boundary = kwargs.get("permissions_boundary")
 
@@ -138,8 +145,8 @@ class Schedule(EventSource):
         events_rule.Description = self.Description
 
         role = None
-        if self.Role is None:
-            role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
+        if self.RoleArn is None:
+            role = self._construct_role(resource, permissions_boundary, prefix=None)
             resources.append(role)
 
         source_arn = events_rule.get_runtime_attr("arn")
@@ -150,12 +157,24 @@ class Schedule(EventSource):
                 self, source_arn, passthrough_resource_attributes
             )
             resources.extend(dlq_resources)
-        events_rule.Targets = [self._construct_target(resource, role, self.Role, dlq_queue_arn)]  # type: ignore[no-untyped-call]
+        events_rule.Targets = [self._construct_target(resource, role, self.RoleArn, dlq_queue_arn)]
 
         return resources
 
-    def _construct_target(self, resource, role, provided_role=None, dead_letter_queue_arn=None):  # type: ignore[no-untyped-def]
+    def _construct_target(
+        self,
+        resource: StepFunctionsStateMachine,
+        role: Optional[IAMRole],
+        provided_role: Optional[str],
+        dead_letter_queue_arn: Optional[str],
+    ) -> Dict[str, Any]:
         """Constructs the Target property for the EventBridge Rule.
+
+        parameters:
+        resource: The State Machine resource associated with the event
+        role: An IAMRole resource
+        provided_role: User provided role ARN to be used instead of a newly generated IAMRole resource
+        dead_letter_queue_arn: ARN of the dead letter queue
 
         :returns: the Target property
         :rtype: dict
@@ -167,13 +186,12 @@ class Schedule(EventSource):
         )
 
         if provided_role:
-            role_arn = fnSub("arn:aws:iam::${AWS::AccountId}:role/${Role}", {"Role": provided_role})
             target = {
                 "Arn": resource.get_runtime_attr("arn"),
                 "Id": target_id,
-                "RoleArn": role_arn,
+                "RoleArn": provided_role,
             }
-        else:
+        elif role:
             target = {
                 "Arn": resource.get_runtime_attr("arn"),
                 "Id": target_id,
@@ -229,7 +247,7 @@ class CloudWatchEvent(EventSource):
         :returns: a list of vanilla CloudFormation Resources, to which this CloudWatch Events/EventBridge event expands
         :rtype: list
         """
-        resources = []
+        resources: List[Any] = []
 
         permissions_boundary = kwargs.get("permissions_boundary")
 
@@ -244,7 +262,11 @@ class CloudWatchEvent(EventSource):
 
         resources.append(events_rule)
 
-        role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
+        role = self._construct_role(
+            resource,
+            permissions_boundary,
+            prefix=None,
+        )
         resources.append(role)
 
         source_arn = events_rule.get_runtime_attr("arn")
@@ -344,7 +366,7 @@ class Api(EventSource):
         :returns: a list of vanilla CloudFormation Resources, to which this Api event expands
         :rtype: list
         """
-        resources = []
+        resources: List[Any] = []
 
         intrinsics_resolver = kwargs.get("intrinsics_resolver")
         permissions_boundary = kwargs.get("permissions_boundary")
@@ -353,7 +375,7 @@ class Api(EventSource):
             # Convert to lower case so that user can specify either GET or get
             self.Method = self.Method.lower()
 
-        role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
+        role = self._construct_role(resource, permissions_boundary, prefix=None)
         resources.append(role)
 
         explicit_api = kwargs["explicit_api"]

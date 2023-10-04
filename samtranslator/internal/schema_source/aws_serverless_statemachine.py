@@ -49,7 +49,7 @@ class ScheduleEventProperties(BaseModel):
     Schedule: Optional[PassThroughProp] = scheduleeventproperties("Schedule")
     State: Optional[PassThroughProp] = scheduleeventproperties("State")
     Target: Optional[ScheduleTarget] = scheduleeventproperties("Target")
-    Role: Optional[PassThroughProp]  # TODO: add doc
+    RoleArn: Optional[PassThroughProp]  # TODO: add doc
 
 
 class ScheduleEvent(BaseModel):
