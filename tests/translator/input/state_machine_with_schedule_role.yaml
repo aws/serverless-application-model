@@ -12,4 +12,10 @@ Resources:
             Schedule: rate(1 minute)
             Description: test schedule
             Enabled: false
-            RoleArn: FakeArn
+            RoleArn: arn:${AWS::Partition}:iam::role/yoyo
+        CWScheduleCreateRole:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Description: test schedule
+            Enabled: false
