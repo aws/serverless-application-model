@@ -144,10 +144,12 @@ class Schedule(EventSource):
         events_rule.Name = self.Name
         events_rule.Description = self.Description
 
-        role = self.RoleArn
+        role: Union[IAMRole, str]
         if self.RoleArn is None:
             role = self._construct_role(resource, permissions_boundary, prefix=None)
             resources.append(role)
+        else:
+            role = self.RoleArn
 
         source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
@@ -164,7 +166,7 @@ class Schedule(EventSource):
     def _construct_target(
         self,
         resource: StepFunctionsStateMachine,
-        role: Union[IAMRole, Optional[PassThrough]],
+        role: Union[IAMRole, str],
         dead_letter_queue_arn: Optional[str],
     ) -> Dict[str, Any]:
         """_summary_
@@ -180,7 +182,7 @@ class Schedule(EventSource):
 
         Returns
         -------
-            _description_
+            The Target property
         """
         target_id = (
             self.Target["Id"]
@@ -194,7 +196,7 @@ class Schedule(EventSource):
         }
 
         if role is not None:
-            target["RoleArn"] = role if isinstance(role, str) else role.get_runtime_attr("arn")
+            target["RoleArn"] = role.get_runtime_attr("arn") if isinstance(role, IAMRole) else role
 
         if self.Input is not None:
             target["Input"] = self.Input
