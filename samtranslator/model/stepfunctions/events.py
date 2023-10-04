@@ -1,6 +1,6 @@
 import json
 from abc import ABCMeta
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
@@ -144,7 +144,7 @@ class Schedule(EventSource):
         events_rule.Name = self.Name
         events_rule.Description = self.Description
 
-        role = None
+        role = self.RoleArn
         if self.RoleArn is None:
             role = self._construct_role(resource, permissions_boundary, prefix=None)
             resources.append(role)
@@ -157,27 +157,30 @@ class Schedule(EventSource):
                 self, source_arn, passthrough_resource_attributes
             )
             resources.extend(dlq_resources)
-        events_rule.Targets = [self._construct_target(resource, role, self.RoleArn, dlq_queue_arn)]
+        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]
 
         return resources
 
     def _construct_target(
         self,
         resource: StepFunctionsStateMachine,
-        role: Optional[IAMRole],
-        provided_role: Optional[str],
+        role: Union[IAMRole, Optional[PassThrough]],
         dead_letter_queue_arn: Optional[str],
     ) -> Dict[str, Any]:
-        """Constructs the Target property for the EventBridge Rule.
+        """_summary_
 
-        parameters:
-        resource: The State Machine resource associated with the event
-        role: An IAMRole resource
-        provided_role: User provided role ARN to be used instead of a newly generated IAMRole resource
-        dead_letter_queue_arn: ARN of the dead letter queue
+        Parameters
+        ----------
+        resource
+            StepFunctionsState machine resource to be generated
+        role
+            The role to be used by the Schedule event resource either generated or user provides arn
+        dead_letter_queue_arn
+            Dead letter queue associated with the resource
 
-        :returns: the Target property
-        :rtype: dict
+        Returns
+        -------
+            _description_
         """
         target_id = (
             self.Target["Id"]
@@ -185,18 +188,14 @@ class Schedule(EventSource):
             else generate_valid_target_id(self.logical_id, EVENT_RULE_SFN_TARGET_SUFFIX)
         )
 
-        if provided_role:
-            target = {
-                "Arn": resource.get_runtime_attr("arn"),
-                "Id": target_id,
-                "RoleArn": provided_role,
-            }
-        elif role:
-            target = {
-                "Arn": resource.get_runtime_attr("arn"),
-                "Id": target_id,
-                "RoleArn": role.get_runtime_attr("arn"),
-            }
+        target = {
+            "Arn": resource.get_runtime_attr("arn"),
+            "Id": target_id,
+        }
+
+        if role is not None:
+            target["RoleArn"] = role if isinstance(role, str) else role.get_runtime_attr("arn")
+
         if self.Input is not None:
             target["Input"] = self.Input
 
