@@ -1,6 +1,6 @@
 import json
 from abc import ABCMeta
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, List, Optional, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
@@ -10,6 +10,7 @@ from samtranslator.model.eventsources.push import Api as PushApi
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import fnSub
+from samtranslator.model.stepfunctions.resources import StepFunctionsStateMachine
 from samtranslator.model.types import IS_BOOL, IS_DICT, IS_STR, PassThrough
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.translator import logical_id_generator
@@ -50,7 +51,13 @@ class EventSource(ResourceMacro, metaclass=ABCMeta):
         generator = logical_id_generator.LogicalIdGenerator(prefix + resource_type, suffix)
         return generator.gen()
 
-    def _construct_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):  # type: ignore[no-untyped-def]
+    def _construct_role(
+        self,
+        resource: StepFunctionsStateMachine,
+        permissions_boundary: Optional[str],
+        prefix: Optional[str],
+        suffix: str = "",
+    ) -> IAMRole:
         """Constructs the IAM Role resource allowing the event service to invoke
         the StartExecution API of the state machine resource it is associated with.
 
@@ -93,6 +100,7 @@ class Schedule(EventSource):
         "DeadLetterConfig": PropertyType(False, IS_DICT),
         "RetryPolicy": PropertyType(False, IS_DICT),
         "Target": Property(False, IS_DICT),
+        "RoleArn": Property(False, IS_STR),
     }
 
     Schedule: PassThrough
@@ -104,6 +112,7 @@ class Schedule(EventSource):
     DeadLetterConfig: Optional[Dict[str, Any]]
     RetryPolicy: Optional[PassThrough]
     Target: Optional[PassThrough]
+    RoleArn: Optional[PassThrough]
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
@@ -113,7 +122,7 @@ class Schedule(EventSource):
         :returns: a list of vanilla CloudFormation Resources, to which this Schedule event expands
         :rtype: list
         """
-        resources = []
+        resources: List[Any] = []
 
         permissions_boundary = kwargs.get("permissions_boundary")
 
@@ -135,8 +144,12 @@ class Schedule(EventSource):
         events_rule.Name = self.Name
         events_rule.Description = self.Description
 
-        role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
-        resources.append(role)
+        role: Union[IAMRole, str, Dict[str, Any]]
+        if self.RoleArn is None:
+            role = self._construct_role(resource, permissions_boundary, prefix=None)
+            resources.append(role)
+        else:
+            role = self.RoleArn
 
         source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
@@ -146,26 +159,44 @@ class Schedule(EventSource):
                 self, source_arn, passthrough_resource_attributes
             )
             resources.extend(dlq_resources)
-        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]  # type: ignore[no-untyped-call]
+        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]
 
         return resources
 
-    def _construct_target(self, resource, role, dead_letter_queue_arn=None):  # type: ignore[no-untyped-def]
-        """Constructs the Target property for the EventBridge Rule.
+    def _construct_target(
+        self,
+        resource: StepFunctionsStateMachine,
+        role: Union[IAMRole, str, Dict[str, Any]],
+        dead_letter_queue_arn: Optional[str],
+    ) -> Dict[str, Any]:
+        """_summary_
 
-        :returns: the Target property
-        :rtype: dict
+        Parameters
+        ----------
+        resource
+            StepFunctionsState machine resource to be generated
+        role
+            The role to be used by the Schedule event resource either generated or user provides arn
+        dead_letter_queue_arn
+            Dead letter queue associated with the resource
+
+        Returns
+        -------
+            The Target property
         """
         target_id = (
             self.Target["Id"]
             if self.Target and "Id" in self.Target
             else generate_valid_target_id(self.logical_id, EVENT_RULE_SFN_TARGET_SUFFIX)
         )
+
         target = {
             "Arn": resource.get_runtime_attr("arn"),
             "Id": target_id,
-            "RoleArn": role.get_runtime_attr("arn"),
         }
+
+        target["RoleArn"] = role.get_runtime_attr("arn") if isinstance(role, IAMRole) else role
+
         if self.Input is not None:
             target["Input"] = self.Input
 
@@ -216,7 +247,7 @@ class CloudWatchEvent(EventSource):
         :returns: a list of vanilla CloudFormation Resources, to which this CloudWatch Events/EventBridge event expands
         :rtype: list
         """
-        resources = []
+        resources: List[Any] = []
 
         permissions_boundary = kwargs.get("permissions_boundary")
 
@@ -231,7 +262,11 @@ class CloudWatchEvent(EventSource):
 
         resources.append(events_rule)
 
-        role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
+        role = self._construct_role(
+            resource,
+            permissions_boundary,
+            prefix=None,
+        )
         resources.append(role)
 
         source_arn = events_rule.get_runtime_attr("arn")
@@ -331,7 +366,7 @@ class Api(EventSource):
         :returns: a list of vanilla CloudFormation Resources, to which this Api event expands
         :rtype: list
         """
-        resources = []
+        resources: List[Any] = []
 
         intrinsics_resolver = kwargs.get("intrinsics_resolver")
         permissions_boundary = kwargs.get("permissions_boundary")
@@ -340,7 +375,7 @@ class Api(EventSource):
             # Convert to lower case so that user can specify either GET or get
             self.Method = self.Method.lower()
 
-        role = self._construct_role(resource, permissions_boundary)  # type: ignore[no-untyped-call]
+        role = self._construct_role(resource, permissions_boundary, prefix=None)
         resources.append(role)
 
         explicit_api = kwargs["explicit_api"]
