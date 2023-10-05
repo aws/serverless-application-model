@@ -101,11 +101,15 @@ Resources:
         }
 
   MyCognitoUserPool:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: MyCognitoUserPool
 
   MyCognitoUserPoolClient:
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Type: AWS::Cognito::UserPoolClient
     Properties:
       UserPoolId:
