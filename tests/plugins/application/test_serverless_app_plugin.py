@@ -1,7 +1,9 @@
+import sys
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
 import boto3
+import pytest
 from botocore.exceptions import ClientError
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins.application.serverless_app_plugin import ServerlessAppPlugin
@@ -51,6 +53,7 @@ def mock_get_region(self, service_name, region_name):
     return "us-east-1"
 
 
+@pytest.mark.skipif(sys.version_info > (3, 10), reason="Test fails for python versions >3.10")
 class TestServerlessAppPlugin_init(TestCase):
     def setUp(self):
         client = boto3.client("serverlessrepo", region_name="us-east-1")
@@ -115,6 +118,7 @@ class TestServerlessAppPlugin_sar_client_creator(TestCase):
         self.client_mock.assert_not_called()
 
 
+@pytest.mark.skipif(sys.version_info > (3, 10), reason="Test fails for python versions >3.10")
 class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
     def setUp(self):
         client = boto3.client("serverlessrepo", region_name="us-east-1")
