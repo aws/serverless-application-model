@@ -1,9 +1,9 @@
+import sys
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
 import boto3
 import pytest
-import sys
 from botocore.exceptions import ClientError
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins.application.serverless_app_plugin import ServerlessAppPlugin
