@@ -31,4 +31,7 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
     - run: make init
-    - run: make pr
+    - name: Run pytest with config file
+      env:
+        PYTEST_ADDOPTS: -c pytest.ini
+      run: make pr
