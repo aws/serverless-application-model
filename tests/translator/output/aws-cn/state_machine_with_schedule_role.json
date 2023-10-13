@@ -1,0 +1,129 @@
+{
+  "Resources": {
+    "MyStateMachine": {
+      "Properties": {
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "my_state_machine.asl.json"
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MyStateMachineRole",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "MyStateMachineCWSchedule": {
+      "Properties": {
+        "Description": "test schedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "State": "DISABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "MyStateMachine"
+            },
+            "Id": "MyStateMachineCWScheduleStepFunctionsTarget",
+            "RoleArn": "arn:0000000000:iam::role/yoyo"
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "MyStateMachineCWScheduleCreateRole": {
+      "Properties": {
+        "Description": "test schedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "State": "DISABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "MyStateMachine"
+            },
+            "Id": "MyStateMachineCWScheduleCreateRoleStepFunctionsTarget",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "MyStateMachineCWScheduleCreateRoleRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "MyStateMachineCWScheduleCreateRoleRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "MyStateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MyStateMachineCWScheduleCreateRoleRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyStateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

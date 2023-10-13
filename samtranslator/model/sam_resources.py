@@ -351,6 +351,7 @@ class SamFunction(SamResourceMacro):
                 kwargs["event_resources"],
                 intrinsics_resolver,
                 lambda_alias=lambda_alias,
+                original_template=kwargs.get("original_template"),
             )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message) from e
@@ -775,13 +776,14 @@ class SamFunction(SamResourceMacro):
             return logical_id
         return event_dict.get("Properties", {}).get("Path", logical_id)
 
-    def _generate_event_resources(
+    def _generate_event_resources(  # noqa: PLR0913
         self,
         lambda_function: LambdaFunction,
         execution_role: Optional[IAMRole],
         event_resources: Any,
         intrinsics_resolver: IntrinsicsResolver,
         lambda_alias: Optional[LambdaAlias] = None,
+        original_template: Optional[Dict[str, Any]] = None,
     ) -> List[Any]:
         """Generates and returns the resources associated with this function's events.
 
@@ -811,6 +813,7 @@ class SamFunction(SamResourceMacro):
                     "function": lambda_alias or lambda_function,
                     "role": execution_role,
                     "intrinsics_resolver": intrinsics_resolver,
+                    "original_template": original_template,
                 }
 
                 for name, resource in event_resources[logical_id].items():

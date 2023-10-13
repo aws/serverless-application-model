@@ -1,0 +1,21 @@
+Resources:
+
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+
+    Properties:
+      DefinitionUri: s3://sam-demo-bucket/my_state_machine.asl.json
+      Events:
+        CWSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Description: test schedule
+            Enabled: false
+            RoleArn: arn:0000000000:iam::role/yoyo
+        CWScheduleCreateRole:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Description: test schedule
+            Enabled: false

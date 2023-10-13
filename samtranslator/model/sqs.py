@@ -2,15 +2,21 @@ from typing import Dict
 
 from samtranslator.model import GeneratedProperty, PropertyType, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
+from samtranslator.model.types import PassThrough
 
 
 class SQSQueue(Resource):
     resource_type = "AWS::SQS::Queue"
-    property_types: Dict[str, PropertyType] = {"Tags": GeneratedProperty()}
+    property_types: Dict[str, PropertyType] = {
+        "FifoQueue": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+    }
     runtime_attrs = {
         "queue_url": lambda self: ref(self.logical_id),
         "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),
     }
+
+    FifoQueue: PassThrough
 
 
 class SQSQueuePolicy(Resource):
