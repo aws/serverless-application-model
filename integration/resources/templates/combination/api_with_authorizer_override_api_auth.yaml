@@ -1,0 +1,142 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        # Simple AWS Proxy API
+        swagger: '2.0'
+        info:
+          version: '2016-09-23T22:23:23Z'
+          title: Simple Api
+        schemes:
+        - https
+        paths:
+          /lambda-request:
+            get:
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+          /lambda-request-override-none:
+            get:
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+          /lambda-request-override-cognito:
+            get:
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+      Auth:
+        Authorizers:
+          MyCognitoAuthorizer:
+            UserPoolArn:
+              Fn::GetAtt: MyCognitoUserPool.Arn
+          MyLambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn:
+              Fn::GetAtt: MyLambdaAuthFunction.Arn
+            Identity:
+              QueryStrings:
+              - authorization
+        DefaultAuthorizer: MyLambdaRequestAuth
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Events:
+        LambdaRequest:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Auth:
+              Authorizer: MyLambdaRequestAuth
+            Path: /lambda-request
+        LambdaRequestOverrideNone:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Auth:
+              Authorizer: NONE
+              OverrideApiAuth: true
+            Path: /lambda-request-override-none
+        LambdaRequestOverrideCognito:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Auth:
+              Authorizer: MyCognitoAuthorizer
+              OverrideApiAuth: true
+            Path: /lambda-request-override-cognito
+
+  MyLambdaAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs16.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          const auth = event.queryStringParameters.authorization
+          const policyDocument = {
+            Version: '2012-10-17',
+            Statement: [{
+              Action: 'execute-api:Invoke',
+              Effect: auth && auth.toLowerCase() === 'allow' ? 'Allow' : 'Deny',
+              Resource: event.methodArn
+            }]
+          }
+          
+          return {
+            principalId: 'user',
+            context: {},
+            policyDocument
+          }
+        }
+
+  MyCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MyCognitoUserPool
+
+  MyCognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId:
+        Ref: MyCognitoUserPool
+      ClientName: MyCognitoUserPoolClient
+      GenerateSecret: false
+
+Outputs:
+  ApiUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/
+
+Parameters:
+  OverrideApiAuthValue:
+    Type: String
+    Default: true
+
+Metadata:
+  SamTransformTest: true

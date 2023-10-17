@@ -252,7 +252,7 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(self.logical_id, e.message) from e
 
     @cw_timer
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0912, PLR0915
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
@@ -290,6 +290,15 @@ class SamFunction(SamResourceMacro):
                         self.logical_id,
                         "AutoPublishCodeSha256 must be a string",
                     )
+                # Lambda doesn't create a new version if the code in the unpublished version is the same as the
+                # previous published version. To address situations where users modify only the 'CodeUri' content,
+                # CloudFormation might not detect any changes in the Lambda function within the template, leading
+                # to deployment issues. To resolve this, we'll append codesha256 value to the description.
+                description = intrinsics_resolver.resolve_parameter_refs(self.Description)
+                if not description or isinstance(description, str):
+                    lambda_function.Description = f"{description} {code_sha256}" if description else code_sha256
+                else:
+                    lambda_function.Description = {"Fn::Join": [" ", [description, code_sha256]]}
             lambda_version = self._construct_version(
                 lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
             )
@@ -342,6 +351,7 @@ class SamFunction(SamResourceMacro):
                 kwargs["event_resources"],
                 intrinsics_resolver,
                 lambda_alias=lambda_alias,
+                original_template=kwargs.get("original_template"),
             )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message) from e
@@ -766,13 +776,14 @@ class SamFunction(SamResourceMacro):
             return logical_id
         return event_dict.get("Properties", {}).get("Path", logical_id)
 
-    def _generate_event_resources(
+    def _generate_event_resources(  # noqa: PLR0913
         self,
         lambda_function: LambdaFunction,
         execution_role: Optional[IAMRole],
         event_resources: Any,
         intrinsics_resolver: IntrinsicsResolver,
         lambda_alias: Optional[LambdaAlias] = None,
+        original_template: Optional[Dict[str, Any]] = None,
     ) -> List[Any]:
         """Generates and returns the resources associated with this function's events.
 
@@ -802,6 +813,7 @@ class SamFunction(SamResourceMacro):
                     "function": lambda_alias or lambda_function,
                     "role": execution_role,
                     "intrinsics_resolver": intrinsics_resolver,
+                    "original_template": original_template,
                 }
 
                 for name, resource in event_resources[logical_id].items():

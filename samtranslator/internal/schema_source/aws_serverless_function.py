@@ -236,6 +236,7 @@ class SQSEventProperties(BaseModel):
     BatchSize: Optional[PassThroughProp] = sqseventproperties("BatchSize")
     Enabled: Optional[PassThroughProp] = sqseventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = sqseventproperties("FilterCriteria")
+    FunctionResponseTypes: Optional[PassThroughProp] = sqseventproperties("FunctionResponseTypes")
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = sqseventproperties("MaximumBatchingWindowInSeconds")
     Queue: PassThroughProp = sqseventproperties("Queue")
     ScalingConfig: Optional[PassThroughProp]  # Update docs when live
@@ -252,6 +253,8 @@ class ApiAuth(BaseModel):
     Authorizer: Optional[str] = apiauth("Authorizer")
     InvokeRole: Optional[SamIntrinsicable[str]] = apiauth("InvokeRole")
     ResourcePolicy: Optional[ResourcePolicy] = apiauth("ResourcePolicy")
+    # TODO explicitly mention in docs that intrinsics are not supported for OverrideApiAuth
+    OverrideApiAuth: Optional[bool]  # TODO Add Docs
 
 
 class RequestModel(BaseModel):

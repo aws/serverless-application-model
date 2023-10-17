@@ -73,6 +73,10 @@
           "markdownDescription": "Specifies the `InvokeRole` to use for `AWS_IAM` authorization\\.  \n*Type*: String  \n*Required*: No  \n*Default*: `CALLER_CREDENTIALS`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.  \n*Additional notes*: `CALLER_CREDENTIALS` maps to `arn:aws:iam::*:user/*`, which uses the caller credentials to invoke the endpoint\\.",
           "title": "InvokeRole"
         },
+        "OverrideApiAuth": {
+          "title": "Overrideapiauth",
+          "type": "boolean"
+        },
         "ResourcePolicy": {
           "allOf": [
             {
@@ -2919,6 +2923,15 @@
           "markdownDescription": "A object that defines the criteria to determine whether Lambda should process an event\\. For more information, see [AWS Lambda event filtering](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [FilterCriteria](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FilterCriteria`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "FilterCriteria"
         },
+        "FunctionResponseTypes": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A list of the response types currently applied to the event source mapping\\. For more information, see [ Reporting batch item failures](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-batchfailurereporting) in the *AWS Lambda Developer Guide*\\.   \n *Valid values*: `ReportBatchItemFailures`   \n *Type*: List   \n *Required*: No   \n *AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionResponseTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-functionresponsetypes) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "FunctionResponseTypes"
+        },
         "MaximumBatchingWindowInSeconds": {
           "allOf": [
             {
@@ -2999,6 +3012,9 @@
           ],
           "markdownDescription": "A `RetryPolicy` object that includes information about the retry policy settings\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [RetryPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RetryPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy) property of the `AWS::Events::Rule` `Target` data type\\.",
           "title": "RetryPolicy"
+        },
+        "RoleArn": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Schedule": {
           "allOf": [
@@ -5202,7 +5218,7 @@
               "$ref": "#/definitions/CodeUri"
             }
           ],
-          "markdownDescription": "The code for the function\\. Accepted values include:  \n+ The function's Amazon S3 URI\\. For example, `s3://bucket-123456789/sam-app/1234567890abcdefg`\\.\n+ The local path to the function\\. For example, `hello_world/`\\.\n+ A [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object\\.\nIf you provide a function's Amazon S3 URI or [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object, you must reference a valid [Lambda deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html)\\.  \nIf you provide a local file path, use the AWS SAM CLI to upload the local file at deployment\\. To learn more, see [Using the AWS SAM CLI to upload local files at deployment](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/deploy-upload-local-files.html)\\.  \n*Type*: \\[ String \\| [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) \\]  \n*Required*: Conditional\\. When `PackageType` is set to `Zip`, one of `CodeUri` or `InlineCode` is required\\.  \n*AWS CloudFormation compatibility*: This property is similar to the `[ Code](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code)` property of an `AWS::Lambda::Function` resource\\. The nested Amazon S3 properties are named differently\\.",
+          "markdownDescription": "The code for the function\\. Accepted values include:  \n+ The function's Amazon S3 URI\\. For example, `s3://bucket-123456789/sam-app/1234567890abcdefg`\\.\n+ The local path to the function\\. For example, `hello_world/`\\.\n+ A [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object\\.\nIf you provide a function's Amazon S3 URI or [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object, you must reference a valid [Lambda deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html)\\.  \nIf you provide a local file path, use the AWS SAM\u00a0CLI to upload the local file at deployment\\. To learn more, see [Using the AWS SAM\u00a0CLI to upload local files at deployment](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/deploy-upload-local-files.html)\\.  \n*Type*: \\[ String \\| [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) \\]  \n*Required*: Conditional\\. When `PackageType` is set to `Zip`, one of `CodeUri` or `InlineCode` is required\\.  \n*AWS CloudFormation compatibility*: This property is similar to the `[ Code](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code)` property of an `AWS::Lambda::Function` resource\\. The nested Amazon S3 properties are named differently\\.",
           "title": "CodeUri"
         },
         "DeadLetterQueue": {
@@ -5413,7 +5429,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Configure runtime management options for your Lambda functions such as runtime environment updates, rollback behavior, and selecting a specific runtime version\\. To learn more, see [Lambda runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html) in the *AWS Lambda Developer Guide*\\.  \nIf `AutoPublishAlias` is configured, `RuntimeManagementConfig` will apply to both `$LATEST` and to the newly created version of the function\\.\n*Type*: [RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)` property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "Configure runtime management options for your Lambda functions such as runtime environment updates, rollback behavior, and selecting a specific runtime version\\. To learn more, see [Lambda runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)` property of an `AWS::Lambda::Function` resource\\.",
           "title": "RuntimeManagementConfig"
         },
         "SnapStart": {
@@ -5556,7 +5572,7 @@
               "$ref": "#/definitions/CodeUri"
             }
           ],
-          "markdownDescription": "The code for the function\\. Accepted values include:  \n+ The function's Amazon S3 URI\\. For example, `s3://bucket-123456789/sam-app/1234567890abcdefg`\\.\n+ The local path to the function\\. For example, `hello_world/`\\.\n+ A [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object\\.\nIf you provide a function's Amazon S3 URI or [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object, you must reference a valid [Lambda deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html)\\.  \nIf you provide a local file path, use the AWS SAM CLI to upload the local file at deployment\\. To learn more, see [Using the AWS SAM CLI to upload local files at deployment](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/deploy-upload-local-files.html)\\.  \n*Type*: \\[ String \\| [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) \\]  \n*Required*: Conditional\\. When `PackageType` is set to `Zip`, one of `CodeUri` or `InlineCode` is required\\.  \n*AWS CloudFormation compatibility*: This property is similar to the `[ Code](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code)` property of an `AWS::Lambda::Function` resource\\. The nested Amazon S3 properties are named differently\\.",
+          "markdownDescription": "The code for the function\\. Accepted values include:  \n+ The function's Amazon S3 URI\\. For example, `s3://bucket-123456789/sam-app/1234567890abcdefg`\\.\n+ The local path to the function\\. For example, `hello_world/`\\.\n+ A [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object\\.\nIf you provide a function's Amazon S3 URI or [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) object, you must reference a valid [Lambda deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html)\\.  \nIf you provide a local file path, use the AWS SAM\u00a0CLI to upload the local file at deployment\\. To learn more, see [Using the AWS SAM\u00a0CLI to upload local files at deployment](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/deploy-upload-local-files.html)\\.  \n*Type*: \\[ String \\| [FunctionCode](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-functioncode.html) \\]  \n*Required*: Conditional\\. When `PackageType` is set to `Zip`, one of `CodeUri` or `InlineCode` is required\\.  \n*AWS CloudFormation compatibility*: This property is similar to the `[ Code](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code)` property of an `AWS::Lambda::Function` resource\\. The nested Amazon S3 properties are named differently\\.",
           "title": "CodeUri"
         },
         "DeadLetterQueue": {
@@ -5856,7 +5872,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The deployment package type of the Lambda function\\. For more information, see [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) in the *AWS Lambda Developer Guide*\\.  \n**Notes**:  \n1\\. If this property is set to `Zip` \\(default\\), then either `CodeUri` or `InlineCode` applies, and `ImageUri` is ignored\\.  \n2\\. If this property is set to `Image`, then only `ImageUri` applies, and both `CodeUri` and `InlineCode` are ignored\\. The Amazon ECR repository required to store the function's container image can be auto created by the AWS SAM CLI\\. For more information, see [sam deploy](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html)\\.  \n*Valid values*: `Zip` or `Image`  \n*Type*: String  \n*Required*: No  \n*Default*: `Zip`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PackageType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-packagetype) property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "The deployment package type of the Lambda function\\. For more information, see [Lambda deployment packages](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) in the *AWS Lambda Developer Guide*\\.  \n**Notes**:  \n1\\. If this property is set to `Zip` \\(default\\), then either `CodeUri` or `InlineCode` applies, and `ImageUri` is ignored\\.  \n2\\. If this property is set to `Image`, then only `ImageUri` applies, and both `CodeUri` and `InlineCode` are ignored\\. The Amazon ECR repository required to store the function's container image can be auto created by the AWS SAM\u00a0CLI\\. For more information, see [sam deploy](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html)\\.  \n*Valid values*: `Zip` or `Image`  \n*Type*: String  \n*Required*: No  \n*Default*: `Zip`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`PackageType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-packagetype) property of an `AWS::Lambda::Function` resource\\.",
           "title": "PackageType"
         },
         "PermissionsBoundary": {
@@ -5991,7 +6007,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "Configure runtime management options for your Lambda functions such as runtime environment updates, rollback behavior, and selecting a specific runtime version\\. To learn more, see [Lambda runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html) in the *AWS Lambda Developer Guide*\\.  \nIf `AutoPublishAlias` is configured, `RuntimeManagementConfig` will apply to both `$LATEST` and to the newly created version of the function\\.\n*Type*: [RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)` property of an `AWS::Lambda::Function` resource\\.",
+          "markdownDescription": "Configure runtime management options for your Lambda functions such as runtime environment updates, rollback behavior, and selecting a specific runtime version\\. To learn more, see [Lambda runtime updates](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ RuntimeManagementConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-runtimemanagementconfig.html)` property of an `AWS::Lambda::Function` resource\\.",
           "title": "RuntimeManagementConfig"
         },
         "SnapStart": {
@@ -7651,14 +7667,8 @@
           "markdownDescription": "When you don't want to pass the entire matched event to the target, use the `InputPath` property to describe which part of the event to pass\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`InputPath`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-inputpath) property of an `AWS::Events::Rule Target` resource\\.",
           "title": "InputPath"
         },
-        "Name": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/PassThroughProp"
-            }
-          ],
-          "markdownDescription": "The name of the rule\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-name) property of an `AWS::Events::Rule` resource\\.",
-          "title": "Name"
+        "InputTransformer": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Pattern": {
           "allOf": [
@@ -7677,6 +7687,15 @@
           ],
           "markdownDescription": "A `RetryPolicy` object that includes information about the retry policy settings\\. For more information, see [Event retry policy and using dead\\-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/rule-dlq.html) in the *Amazon EventBridge User Guide*\\.  \n*Type*: [RetryPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`RetryPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-events-rule-target.html#cfn-events-rule-target-retrypolicy) property of the `AWS::Events::Rule` `Target` data type\\.",
           "title": "RetryPolicy"
+        },
+        "RuleName": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The name of the rule\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Name`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-name) property of an `AWS::Events::Rule` resource\\.",
+          "title": "RuleName"
         },
         "Target": {
           "allOf": [

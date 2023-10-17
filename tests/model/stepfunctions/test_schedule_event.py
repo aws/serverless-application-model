@@ -153,6 +153,13 @@ class ScheduleEventSource(TestCase):
         with self.assertRaises(InvalidEventException):
             self.schedule_event_source.to_cloudformation(resource=self.state_machine)
 
+    def test_to_cloudformation_with_role_arn_provided(self):
+        role = "not a real arn"
+        self.schedule_event_source.RoleArn = role
+        resources = self.schedule_event_source.to_cloudformation(resource=self.state_machine)
+        event_rule = resources[0]
+        self.assertEqual(event_rule.Targets[0]["RoleArn"], "not a real arn")
+
     @parameterized.expand(
         [
             (True, "Enabled"),

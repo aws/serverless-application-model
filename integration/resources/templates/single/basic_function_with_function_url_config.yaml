@@ -7,7 +7,7 @@ Resources:
       CodeUri: ${codeuri}
       MemorySize: 128
       FunctionUrlConfig:
-        AuthType: NONE
+        AuthType: AWS_IAM
         Cors:
           AllowOrigins:
           - https://foo.com

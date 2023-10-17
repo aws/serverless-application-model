@@ -15,11 +15,16 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt LambdaRole.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Code:
         ZipFile: |
-          const AWS = require('aws-sdk');
+          const {
+            SNS
+          } = require("@aws-sdk/client-sns"),
+          {
+            SQS
+          } = require("@aws-sdk/client-sqs");
           var params = {
             Message: 'Test Message',
             TopicArn: process.env.TOPIC_ARN,
@@ -28,11 +33,11 @@ Resources:
             QueueUrl: process.env.QUEUE_NAME,
           };
           exports.handler = async (event) => {
-            var sns = new AWS.SNS({apiVersion: '2012-11-05'});
-            await sns.publish(params).promise();
+            var sns = new SNS({apiVersion: '2012-11-05'});
+            await sns.publish(params);
 
-            var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
-            var data = await sqs.receiveMessage(sqs_params).promise();
+            var sqs = new SQS({apiVersion: '2012-11-05'});
+            var data = await sqs.receiveMessage(sqs_params);
             if (data.Messages.length == 0) {
               throw 'No messages in the queue!';
             }

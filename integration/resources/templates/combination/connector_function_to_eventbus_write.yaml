@@ -15,11 +15,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt LambdaRole.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       Code:
         ZipFile: |
-          const AWS = require('aws-sdk');
+          const {
+            EventBridge
+          } = require("@aws-sdk/client-eventbridge");
           var put_params = {
             Entries: [
               {
@@ -36,8 +38,8 @@ Resources:
           }
           exports.handler = async (event) => {
             console.log('REQUEST RECEIVED:', JSON.stringify(event));
-            var eventbridge = new AWS.EventBridge();
-            await eventbridge.putEvents(put_params).promise();
+            var eventbridge = new EventBridge();
+            await eventbridge.putEvents(put_params);
           };
       Environment:
         Variables:
