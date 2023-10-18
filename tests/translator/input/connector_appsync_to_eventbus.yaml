@@ -1,0 +1,66 @@
+Resources:
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub '${AWS::StackName}-EventBus'
+
+  EventBridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: appsync-eventbridge-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - sts:AssumeRole
+          Principal:
+            Service:
+            - appsync.amazonaws.com
+
+  AppSyncEventBusDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: MyDataSource
+      Type: AMAZON_EVENTBRIDGE
+      ServiceRoleArn: !GetAtt EventBridgeRole.Arn
+      EventBridgeConfig:
+        EventBusArn: !GetAtt 'EventBus.Arn'
+
+  AppSyncApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      AuthenticationType: AWS_IAM
+      Name: AppSyncApi
+
+  ApiSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Definition: |
+        type Note {
+          NoteId: ID!
+          title: String
+          content: String
+        }
+        type Query {
+          getNote(NoteId: ID!): Note
+        }
+        type Mutation {
+          saveNote(NoteId: ID!, title: String!, content: String!): Note!
+        }
+        type Schema {
+          query: Query
+          mutation: Mutation
+        }
+
+  Connector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: AppSyncEventBusDataSource
+      Destination:
+        Id: EventBus
+      Permissions:
+      - Write
