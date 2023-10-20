@@ -33,7 +33,7 @@ class GlobalsPlugin(BasePlugin):
         for logicalId, resource in template.iterate():
             try:
                 resource.properties = global_section.merge(
-                    resource.type, resource.properties, logicalId, resource.ignore_globals
+                    str(resource.type), resource.properties, logicalId, resource.ignore_globals
                 )
             except InvalidResourceAttributeTypeException as ex:
                 raise InvalidDocumentException([ex]) from ex
