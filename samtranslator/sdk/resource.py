@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional, Union
 
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.model.types import IS_STR
@@ -27,6 +27,7 @@ class SamResource:
         self.condition = resource_dict.get("Condition", None)
         self.deletion_policy = resource_dict.get("DeletionPolicy", None)
         self.update_replace_policy = resource_dict.get("UpdateReplacePolicy", None)
+        self.ignore_globals: Optional[Union[str, List[str]]] = resource_dict.get("IgnoreGlobals", None)
 
         # Properties is *not* required. Ex: SimpleTable resource has no required properties
         self.properties = resource_dict.get("Properties", {})

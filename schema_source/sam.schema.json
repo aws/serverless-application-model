@@ -1065,6 +1065,20 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
+        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -4334,6 +4348,20 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
+        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -4716,6 +4744,20 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
+        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -4799,6 +4841,20 @@
         },
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
         },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
@@ -5364,7 +5420,8 @@
           "title": "PermissionsBoundary"
         },
         "PropagateTags": {
-          "title": "Propagatetags",
+          "markdownDescription": "Indicate whether or not to pass tags from the `Tags` property to your [AWS::Serverless::Function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources-function.html) generated resources\\. Specify `True` to propagate tags in your generated resources\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: `False`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "PropagateTags",
           "type": "boolean"
         },
         "ProvisionedConcurrencyConfig": {
@@ -5920,7 +5977,8 @@
           "title": "Policies"
         },
         "PropagateTags": {
-          "title": "Propagatetags",
+          "markdownDescription": "Indicate whether or not to pass tags from the `Tags` property to your [AWS::Serverless::Function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources-function.html) generated resources\\. Specify `True` to propagate tags in your generated resources\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: `False`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "PropagateTags",
           "type": "boolean"
         },
         "ProvisionedConcurrencyConfig": {
@@ -6090,6 +6148,20 @@
         },
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
         },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
@@ -7010,6 +7082,20 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
+        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -7218,6 +7304,20 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
+        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -7367,6 +7467,20 @@
         },
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
         },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
@@ -7914,6 +8028,20 @@
         },
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
         },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
