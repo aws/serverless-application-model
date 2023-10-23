@@ -1,0 +1,12 @@
+Globals:
+  Function:
+    Runtime: python3.7
+
+Resources:
+  Function:
+    IgnoreGlobals:
+    - PropertyA
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://s3/key
+      Handler: hello.handler

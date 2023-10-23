@@ -1,0 +1,121 @@
+{
+  "Resources": {
+    "ApiSchema": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "AppSyncApi",
+            "ApiId"
+          ]
+        },
+        "Definition": "type Note {\n  NoteId: ID!\n  title: String\n  content: String\n}\ntype Query {\n  getNote(NoteId: ID!): Note\n}\ntype Mutation {\n  saveNote(NoteId: ID!, title: String!, content: String!): Note!\n}\ntype Schema {\n  query: Query\n  mutation: Mutation\n}\n"
+      },
+      "Type": "AWS::AppSync::GraphQLSchema"
+    },
+    "AppSyncApi": {
+      "Properties": {
+        "AuthenticationType": "AWS_IAM",
+        "Name": "AppSyncApi"
+      },
+      "Type": "AWS::AppSync::GraphQLApi"
+    },
+    "AppSyncEventBusDataSource": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "AppSyncApi",
+            "ApiId"
+          ]
+        },
+        "EventBridgeConfig": {
+          "EventBusArn": {
+            "Fn::GetAtt": [
+              "EventBus",
+              "Arn"
+            ]
+          }
+        },
+        "Name": "MyDataSource",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "EventBridgeRole",
+            "Arn"
+          ]
+        },
+        "Type": "AMAZON_EVENTBRIDGE"
+      },
+      "Type": "AWS::AppSync::DataSource"
+    },
+    "ConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "Connector": {
+            "Destination": {
+              "Type": "AWS::Events::EventBus"
+            },
+            "Source": {
+              "Type": "AWS::AppSync::DataSource"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "events:PutEvents"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "EventBus",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "EventBridgeRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "EventBridgeRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "appsync.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "RoleName": "appsync-eventbridge-role"
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "EventBus": {
+      "Properties": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-EventBus"
+        }
+      },
+      "Type": "AWS::Events::EventBus"
+    }
+  }
+}
