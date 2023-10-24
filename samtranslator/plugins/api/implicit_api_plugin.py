@@ -500,4 +500,6 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
         api_dict_deletion.add(deletion_policy)
 
         api_dict_update_replace = self.api_update_replace_policies.setdefault(api_id, set())
+        if update_replace_policy not in ["Retain", "Snapshot", "Delete", None]:
+            raise ValueError("UpdateReplacePolicy must be equal to Retain, Snapshot, or Delete, or must be None.")
         api_dict_update_replace.add(update_replace_policy)
