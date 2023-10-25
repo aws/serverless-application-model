@@ -201,7 +201,8 @@
           }
         ]
       },
-      "Type": "AWS::Lambda::Function"
+      "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain"
     },
     "MyFunction4ByePermissionProd": {
       "DeletionPolicy": "Retain",
@@ -223,7 +224,8 @@
           ]
         }
       },
-      "Type": "AWS::Lambda::Permission"
+      "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain"
     },
     "MyFunction4Role": {
       "DeletionPolicy": "Retain",
@@ -254,7 +256,8 @@
           }
         ]
       },
-      "Type": "AWS::IAM::Role"
+      "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain"
     },
     "MyFunctionNonePermissionProd": {
       "Properties": {
@@ -377,7 +380,7 @@
         }
       },
       "Type": "AWS::ApiGateway::RestApi",
-      "UpdateReplacePolicy": "Delete"
+      "UpdateReplacePolicy": "Retain"
     },
     "ServerlessRestApiDeployment7b2714845e": {
       "DeletionPolicy": "Retain",
@@ -389,7 +392,7 @@
         "StageName": "Stage"
       },
       "Type": "AWS::ApiGateway::Deployment",
-      "UpdateReplacePolicy": "Delete"
+      "UpdateReplacePolicy": "Retain"
     },
     "ServerlessRestApiProdStage": {
       "DeletionPolicy": "Retain",
@@ -403,7 +406,7 @@
         "StageName": "Prod"
       },
       "Type": "AWS::ApiGateway::Stage",
-      "UpdateReplacePolicy": "Delete"
+      "UpdateReplacePolicy": "Retain"
     }
   }
 }

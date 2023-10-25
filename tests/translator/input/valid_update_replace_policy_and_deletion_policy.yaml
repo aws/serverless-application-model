@@ -46,6 +46,7 @@ Resources:
   MyFunction4:
     Type: AWS::Serverless::Function
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       Handler: LambdaASP.NETCoreWebAPI2::LambdaASP.NETCoreWebAPI2.LambdaEntryPoint::FunctionHandlerAsync
       Runtime: dotnet6
