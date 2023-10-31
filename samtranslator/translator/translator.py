@@ -37,7 +37,8 @@ from samtranslator.policy_template_processor.processor import PolicyTemplatesPro
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
-from samtranslator.utils.traverse import Traverse
+from samtranslator.utils.resolve_actions import ResolveDependsOn
+from samtranslator.utils.traverse import traverse
 from samtranslator.validator.value_validator import sam_expect
 
 
@@ -239,10 +240,8 @@ class Translator:
             del template["Transform"]
 
         if len(self.document_errors) == 0:
-            traverse = Traverse()
-            template = traverse.traverse_wrapper(
-                input_value=template, resolution_data=changed_logical_ids, resolver_method_name="DependsOn"
-            )
+            resolveDependsOn = ResolveDependsOn(resolution_data=changed_logical_ids)  # Initializes ResolveDependsOn
+            template = traverse(template, [resolveDependsOn])
             template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)
             return intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)
         raise InvalidDocumentException(self.document_errors)
