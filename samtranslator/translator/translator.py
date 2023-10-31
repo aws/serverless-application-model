@@ -37,6 +37,7 @@ from samtranslator.policy_template_processor.processor import PolicyTemplatesPro
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
+from samtranslator.utils.traverse import Traverse
 from samtranslator.validator.value_validator import sam_expect
 
 
@@ -238,7 +239,10 @@ class Translator:
             del template["Transform"]
 
         if len(self.document_errors) == 0:
-            template = traverse_template_depends_on(template, changed_logical_ids)
+            traverse = Traverse()
+            template = traverse.traverse_wrapper(
+                input_value=template, resolution_data=changed_logical_ids, resolver_method_name="DependsOn"
+            )
             template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)
             return intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)
         raise InvalidDocumentException(self.document_errors)
@@ -397,81 +401,6 @@ class Translator:
             del properties["SourceReference"]
 
         return SamConnector.from_dict(full_connector_logical_id, connector)
-
-
-def traverse_template_depends_on(input_value: Dict[str, Any], resolution_data: Dict[str, str]) -> Dict[str, Any]:
-    """
-    Driver method that performs the actual traversal of input and calls _resolve_depends_on when
-    needed to perform the resolution.
-    :param input_value: Any primitive type  (dict, array, string etc) whose value might contain an intrinsic function
-    :param resolution_data: Data that will help with resolution i.e. old and new logical ids after transformation
-    :return: Modified `input` with DependsOn resolved
-    """
-    if len(resolution_data) == 0:
-        return input_value
-
-        #
-        # Traversal Algorithm:
-        #
-        # Imagine the input dictionary/list as a tree. We are doing a Pre-Order tree traversal here where we first
-        # process the root node before going to its children. Dict and Lists are the only two iterable nodes.
-        # Everything else is a leaf node. More description can be found on line 126 in _traverse in resolver.py
-        #
-
-    _resolve_depends_on(input_value, resolution_data)
-    if isinstance(input_value, dict):
-        traverse_dict(input_value, resolution_data)
-    return input_value
-
-
-def _resolve_depends_on(input_dict: Dict[str, Any], resolution_data: Dict[str, str]) -> Dict[str, Any]:
-    """
-    Resolve DependsOn when logical ids get changed when transforming (ex: AWS::Serverless::LayerVersion)
-
-    :param input_dict: Chunk of the template that is attempting to be resolved
-    :param resolution_data: Dictionary of the original and changed logical ids
-    :return: Modified dictionary with values resolved
-    """
-    # Checks if input dict is resolvable
-    if input_dict is None or not canHandle(input_dict=input_dict):
-        return input_dict
-    # Checks if DependsOn is valid
-    if not (isinstance(input_dict["DependsOn"], (list, str))):
-        return input_dict
-    # Check if DependsOn matches the original value of a changed_logical_id key
-    for old_logical_id, changed_logical_id in resolution_data.items():
-        # Done like this as there is no other way to know if this is a DependsOn vs some value named the
-        # same as the old logical id. (ex LayerName is commonly the old_logical_id)
-        if isinstance(input_dict["DependsOn"], list):
-            for index, value in enumerate(input_dict["DependsOn"]):
-                if value == old_logical_id:
-                    input_dict["DependsOn"][index] = changed_logical_id
-        elif input_dict["DependsOn"] == old_logical_id:
-            input_dict["DependsOn"] = changed_logical_id
-    return input_dict
-
-
-def traverse_dict(input_dict: Dict[str, Any], resolution_data: Dict[str, str]) -> Dict[str, Any]:
-    """
-    Traverse a dictionary to resolve intrinsic functions on every value
-
-    :param input_dict: Input dictionary to traverse
-    :param resolution_data: Data needed to resolve DependsOn
-    :return: Modified dictionary with values resolved
-    """
-    for key, value in input_dict.items():
-        input_dict[key] = traverse_template_depends_on(value, resolution_data)
-    return input_dict
-
-
-def canHandle(input_dict: Dict[str, Any]) -> bool:
-    """
-    Checks if the input dictionary is of length one and contains "DependsOn"
-
-    :param input_dict: the Dictionary that is attempting to be resolved
-    :return boolean value of validation attempt
-    """
-    return isinstance(input_dict, dict) and "DependsOn" in input_dict
 
 
 def prepare_plugins(plugins: Optional[List[BasePlugin]], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:
