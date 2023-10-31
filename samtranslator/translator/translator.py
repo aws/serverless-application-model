@@ -424,7 +424,7 @@ def traverse_template_depends_on(input_value: Dict[str, Any], resolution_data: D
     return input_value
 
 
-def _resolve_depends_on(input_dict: Dict[str, Any], resolution_data: dict[str, str]) -> Dict[str, Any]:
+def _resolve_depends_on(input_dict: Dict[str, Any], resolution_data: Dict[str, str]) -> Dict[str, Any]:
     """
     Resolve DependsOn when logical ids get changed when transforming (ex: AWS::Serverless::LayerVersion)
 
