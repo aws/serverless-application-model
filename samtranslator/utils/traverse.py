@@ -8,7 +8,7 @@ def traverse(template: Dict[str, Any], actions: List[ResolveAction]) -> Any:
     Calls the correct traversal method
 
     :param template: The template that needs modifying
-    :param actions: That actions that need to be performed to the template
+    :param actions: The actions that need to be performed to the template
     :return: Modified Template
 
     TODO: Add multiple strategies and choose between those with an Optional value
