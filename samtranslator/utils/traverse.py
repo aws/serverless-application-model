@@ -11,22 +11,15 @@ def traverse(
     Driver method that performs the actual traversal of input and calls the appropriate `resolver_method` when
     to perform the resolution.
 
-    :param input_value: Any primitive type  (dict, array, string etc) whose value might contain a changed value
-    :param actions: Method that will be called to actually resolve the function.
-    :return: Modified `input` with values resolved
-
     Traversal Algorithm:
 
     Imagine the input dictionary/list as a tree. We are doing a Pre-Order tree traversal here where we first
     process the root node before going to its children. Dict and Lists are the only two iterable nodes.
     Everything else is a leaf node.
 
-
-    We will perform actions if we can, otherwise return the original input. In some cases, actions
-    will result in a terminal state ie. {"Depends": "foo"} could resolve to a string "Foo1234". In other
-    cases, resolving values is only partial and we might need to continue traversing the tree
-    to handle nested values in the future.
-
+    :param input_value: Any primitive type  (dict, array, string etc) whose value might contain a changed value
+    :param actions: Method that will be called to actually resolve the function.
+    :return: Modified `input` with values resolved    
     """
 
     for action in actions:
