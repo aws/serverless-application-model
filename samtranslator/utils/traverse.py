@@ -8,8 +8,7 @@ def traverse(
     actions: List[Action],
 ) -> Any:
     """
-    Driver method that performs the actual traversal of input and calls the appropriate `resolver_method` when
-    to perform the resolution.
+    Driver method that performs the actual traversal of input and calls the execute method of the provided actions.
 
     Traversal Algorithm:
 
