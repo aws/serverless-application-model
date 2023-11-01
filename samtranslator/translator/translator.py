@@ -37,7 +37,7 @@ from samtranslator.policy_template_processor.processor import PolicyTemplatesPro
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
-from samtranslator.utils.resolve_actions import ResolveDependsOn
+from samtranslator.utils.actions import ResolveDependsOn
 from samtranslator.utils.traverse import traverse
 from samtranslator.validator.value_validator import sam_expect
 

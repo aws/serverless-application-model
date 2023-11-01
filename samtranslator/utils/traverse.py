@@ -1,41 +1,11 @@
 from typing import Any, Dict, List
 
-from samtranslator.utils.resolve_actions import ResolveAction
+from samtranslator.utils.actions import Action
 
 
-def traverse(template: Dict[str, Any], actions: List[ResolveAction]) -> Any:
-    """
-    Calls the correct traversal method
-
-    :param template: The template that needs modifying
-    :param actions: The actions that need to be performed to the template
-    :return: Modified Template
-
-    TODO: Add multiple strategies and choose between those with an Optional value
-    """
-    return _preorder_traverse(template, actions)
-
-
-def _execute_actions(template: Dict[str, Any], actions: List[ResolveAction]) -> Any:
-    """
-    Calls the resolver methods when they are in the list of ResolveActions. Then calls the actions passed to traverse.
-
-    :param template: The template that needs modifying
-    :param actions: actions to be executed.
-    :return: Modified Template
-    """
-    if len(actions) == 0:
-        return template
-
-    for action in actions:
-        action.execute(template)
-
-    return template
-
-
-def _preorder_traverse(
+def traverse(
     input_value: Any,
-    actions: List[ResolveAction],
+    actions: List[Action],
 ) -> Any:
     """
     Driver method that performs the actual traversal of input and calls the appropriate `resolver_method` when
@@ -44,23 +14,24 @@ def _preorder_traverse(
     :param input_value: Any primitive type  (dict, array, string etc) whose value might contain a changed value
     :param actions: Method that will be called to actually resolve the function.
     :return: Modified `input` with values resolved
+
+    Traversal Algorithm:
+
+    Imagine the input dictionary/list as a tree. We are doing a Pre-Order tree traversal here where we first
+    process the root node before going to its children. Dict and Lists are the only two iterable nodes.
+    Everything else is a leaf node.
+
+
+    We will perform actions if we can, otherwise return the original input. In some cases, actions
+    will result in a terminal state ie. {"Depends": "foo"} could resolve to a string "Foo1234". In other
+    cases, resolving values is only partial and we might need to continue traversing the tree
+    to handle nested values in the future.
+
     """
 
-    #
-    # Traversal Algorithm:
-    #
-    # Imagine the input dictionary/list as a tree. We are doing a Pre-Order tree traversal here where we first
-    # process the root node before going to its children. Dict and Lists are the only two iterable nodes.
-    # Everything else is a leaf node.
-    #
-    #
-    # We will try to resolve if we can, otherwise return the original input. In some cases, resolving
-    # an value will result in a terminal state ie. {"Depends": "foo"} could resolve to a string "Foo1234". In other
-    # cases, resolving values is only partial and we might need to continue traversing the tree
-    # to handle nested values in the future. All of these cases lend well towards a Pre-Order traversal where we try and
-    # process the value which results in a modified sub-tree to traverse.
-    #
-    input_value = _execute_actions(input_value, actions)
+    for action in actions:
+        action.execute(input_value)
+
     if isinstance(input_value, dict):
         return _traverse_dict(input_value, actions)
     if isinstance(input_value, list):
@@ -72,7 +43,7 @@ def _preorder_traverse(
 
 def _traverse_dict(
     input_dict: Dict[str, Any],
-    actions: List[ResolveAction],
+    actions: List[Action],
 ) -> Any:
     """
     Traverse a dictionary to resolves changed values on every value
@@ -82,14 +53,14 @@ def _traverse_dict(
     :return: Modified dictionary with values resolved
     """
     for key, value in input_dict.items():
-        input_dict[key] = _preorder_traverse(value, actions)
+        input_dict[key] = traverse(value, actions)
 
     return input_dict
 
 
 def _traverse_list(
     input_list: List[Any],
-    actions: List[ResolveAction],
+    actions: List[Action],
 ) -> Any:
     """
     Traverse a list to resolve changed values on every element
@@ -99,6 +70,6 @@ def _traverse_list(
     :return: Modified list with values functions resolved
     """
     for index, value in enumerate(input_list):
-        input_list[index] = _preorder_traverse(value, actions)
+        input_list[index] = traverse(value, actions)
 
     return input_list
