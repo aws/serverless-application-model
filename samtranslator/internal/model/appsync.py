@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, TypedDict, Union
 
-from typing_extensions import Required, TypedDict
+from typing_extensions import Required
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
