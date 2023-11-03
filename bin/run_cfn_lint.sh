@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eux
 
-VENV=.venv
+VENV=.venv_cfn_lint
 
 # Install to separate venv to avoid circular dependency; cfn-lint depends on samtranslator
 # See https://github.com/aws/serverless-application-model/issues/1042
