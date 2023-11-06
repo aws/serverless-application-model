@@ -1,0 +1,7 @@
+Resources:
+  MinimalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://{{resolve:ssm:/name_of_bucket_parameter_from_step_2}}/name_of_file.zip
+      Handler: hello.handler
+      Runtime: python2.7
