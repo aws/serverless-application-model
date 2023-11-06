@@ -4,7 +4,7 @@
     "Number of errors found: 1. ",
     "Resource with id [MinimalFunction] is invalid. ",
     "Dynamic reference detected in 'CodeUri'. ",
-    "Please consider using alternative 'FunctionCode' format."
+    "Please consider using alternative 'FunctionCode' object format."
   ],
   "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MinimalFunction] is invalid. Dynamic reference detected in 'CodeUri'. Please consider using alternative 'FunctionCode' object format.",
   "errors": [
