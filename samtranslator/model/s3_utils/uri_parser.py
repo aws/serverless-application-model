@@ -1,3 +1,4 @@
+from re import search
 from typing import Any, Dict, Optional, Union
 from urllib.parse import parse_qs, urlparse
 
@@ -85,6 +86,15 @@ def construct_s3_location_object(
         s3_pointer = location_uri
 
     else:
+        # SSM Pattern found here https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/dynamic-references.html
+        ssm_pattern = r"{{resolve:(ssm|ssm-secure|secretsmanager):[a-zA-Z0-9_.\-/]+(:\d+)?}}"
+        if search(ssm_pattern, location_uri):
+            raise InvalidResourceException(
+                logical_id,
+                f"Dynamic reference detected in '{property_name}'. Please "
+                "consider using alternative 'FunctionCode' object format.",
+            )
+
         # location_uri is NOT a dictionary. Parse it as a string
         _s3_pointer = parse_s3_uri(location_uri)
 
