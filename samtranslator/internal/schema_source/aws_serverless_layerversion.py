@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Union
-
-from typing_extensions import Literal
+from typing import Literal, Optional, Union
 
 from samtranslator.internal.schema_source.common import (
     BaseModel,

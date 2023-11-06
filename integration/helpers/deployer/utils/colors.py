@@ -2,9 +2,7 @@
 Wrapper to generated colored messages for printing in Terminal
 This was ported over from the sam-cli repo
 """
-from typing import Dict
-
-from typing_extensions import Literal
+from typing import Dict, Literal
 
 SupportedColor = Literal["red", "green", "yellow"]
 

@@ -1,6 +1,4 @@
-from typing import List, Optional, Union
-
-from typing_extensions import Literal
+from typing import List, Literal, Optional, Union
 
 from samtranslator.internal.schema_source.common import (
     BaseModel,

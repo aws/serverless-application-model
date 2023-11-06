@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
-
-from typing_extensions import Literal
+from typing import Any, Dict, Literal, Optional
 
 from samtranslator.internal.schema_source.aws_serverless_connector import EmbeddedConnector
 from samtranslator.internal.schema_source.common import (
