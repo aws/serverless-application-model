@@ -65,7 +65,8 @@ prepare-companion-stack:
 fetch-schema-data:
 	mkdir -p .tmp
 
-	curl -o .tmp/cfn-docs.json https://raw.githubusercontent.com/aws/aws-cdk/main/packages/%40aws-cdk/cfnspec/spec-source/cfn-docs/cfn-docs.json
+	# aws-cdk updated where they store the cfn doc json files. See https://github.com/aws/aws-cdk/blob/main/packages/%40aws-cdk/cfnspec/README.md
+	bin/git_lfs_download.sh "https://raw.githubusercontent.com/cdklabs/awscdk-service-spec/main/sources/CloudFormationDocumentation/CloudFormationDocumentation.json"
 
 	curl -o .tmp/cloudformation.schema.json https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
 
