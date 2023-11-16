@@ -172,13 +172,15 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
             # `Type` property is for sam to attach the right policies
             destination_type = on_failure.get("Type")
 
-            # SAM attaches the policies for SQS or SNS only if 'Type' is given
+            # SAM attaches the policies for SQS, SNS or S3 only if 'Type' is given
             if destination_type:
                 # delete this field as its used internally for SAM to determine the policy
                 del on_failure["Type"]
-                # the values 'SQS' and 'SNS' are allowed. No intrinsics are allowed
-                if destination_type not in ["SQS", "SNS"]:
-                    raise InvalidEventException(self.logical_id, "The only valid values for 'Type' are 'SQS' and 'SNS'")
+                # the values 'SQS', 'SNS', and 'S3' are allowed. No intrinsics are allowed
+                if destination_type not in ["SQS", "SNS", "S3"]:
+                    raise InvalidEventException(
+                        self.logical_id, "The only valid values for 'Type' are 'SQS', 'SNS', and 'S3'"
+                    )
                 if destination_type == "SQS":
                     queue_arn = on_failure.get("Destination")
                     destination_config_policy = IAMRolePolicies().sqs_send_message_role_policy(
@@ -188,6 +190,11 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                     sns_topic_arn = on_failure.get("Destination")
                     destination_config_policy = IAMRolePolicies().sns_publish_role_policy(
                         sns_topic_arn, self.logical_id
+                    )
+                elif destination_type == "S3":
+                    s3_arn = on_failure.get("Destination")
+                    destination_config_policy = IAMRolePolicies().s3_send_event_payload_role_policy(
+                        s3_arn, self.logical_id
                     )
 
             lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig

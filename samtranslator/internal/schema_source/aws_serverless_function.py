@@ -412,6 +412,7 @@ class MSKEventProperties(BaseModel):
     Stream: PassThroughProp = mskeventproperties("Stream")
     Topics: PassThroughProp = mskeventproperties("Topics")
     SourceAccessConfigurations: Optional[PassThroughProp] = mskeventproperties("SourceAccessConfigurations")
+    DestinationConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class MSKEvent(BaseModel):
@@ -504,6 +505,7 @@ Architectures = Optional[PassThroughProp]
 EphemeralStorage = Optional[PassThroughProp]
 SnapStart = Optional[PassThroughProp]  # TODO: check the type
 RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
+LoggingConfig = Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Properties(BaseModel):
@@ -629,6 +631,7 @@ class Properties(BaseModel):
     Tracing: Optional[Tracing] = prop("Tracing")
     VersionDescription: Optional[PassThroughProp] = prop("VersionDescription")
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
+    LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Globals(BaseModel):
@@ -686,6 +689,7 @@ class Globals(BaseModel):
     )
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
+    LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):

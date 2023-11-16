@@ -177,6 +177,7 @@ class SamFunction(SamResourceMacro):
         "SnapStart": PropertyType(False, IS_DICT),
         "FunctionUrlConfig": PropertyType(False, IS_DICT),
         "RuntimeManagementConfig": PassThroughProperty(False),
+        "LoggingConfig": PassThroughProperty(False),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -218,6 +219,7 @@ class SamFunction(SamResourceMacro):
     Architectures: Optional[List[Any]]
     SnapStart: Optional[Dict[str, Any]]
     FunctionUrlConfig: Optional[Dict[str, Any]]
+    LoggingConfig: Optional[Dict[str, Any]]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -601,6 +603,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.CodeSigningConfigArn = self.CodeSigningConfigArn
 
         lambda_function.RuntimeManagementConfig = self.RuntimeManagementConfig  # type: ignore[attr-defined]
+        lambda_function.LoggingConfig = self.LoggingConfig
         self._validate_package_type(lambda_function)
         return lambda_function
 
