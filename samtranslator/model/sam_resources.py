@@ -1,9 +1,7 @@
 ﻿""" SAM macro definitions """
 import copy
 from contextlib import suppress
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
-
-from typing_extensions import Literal
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.cloudwatchlogs

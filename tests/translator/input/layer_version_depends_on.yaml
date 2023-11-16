@@ -1,0 +1,26 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  Layer1:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri:
+        Bucket: test
+        Key: test.zip
+
+  Layer2:
+    Type: AWS::Serverless::LayerVersion
+    DependsOn: Layer1
+    Properties:
+      ContentUri:
+        Bucket: test
+        Key: test.zip
+
+  Layer3:
+    Type: AWS::Serverless::LayerVersion
+    DependsOn:
+    - Layer1
+    - Layer2
+    Properties:
+      ContentUri:
+        Bucket: test
+        Key: test.zip

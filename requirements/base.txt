@@ -1,6 +1,6 @@
 boto3>=1.19.5,==1.*
 jsonschema<5,>=3.2  # TODO: evaluate risk of removing jsonschema 3.x support
-typing_extensions>=4.4,<5 # 3.7 doesn't have Literal
+typing_extensions>=4.4 # 3.8 doesn't have Required, TypeGuard and ParamSpec
 
 # resource validation & schema generation
 pydantic>=1.8,<3

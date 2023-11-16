@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Union
-
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, Union
 
 from samtranslator.internal.schema_source.aws_serverless_connector import EmbeddedConnector
 from samtranslator.internal.schema_source.common import (
@@ -628,7 +626,7 @@ class Properties(BaseModel):
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     Tags: Optional[Tags] = prop("Tags")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = prop("PropagateTags")
     Timeout: Optional[Timeout] = prop("Timeout")
     Tracing: Optional[Tracing] = prop("Tracing")
     VersionDescription: Optional[PassThroughProp] = prop("VersionDescription")
@@ -659,7 +657,7 @@ class Globals(BaseModel):
         ["AWS::Lambda::Function", "Properties", "Environment"],
     )
     Tags: Optional[Tags] = prop("Tags")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = prop("PropagateTags")
     Tracing: Optional[Tracing] = prop("Tracing")
     KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
     Layers: Optional[Layers] = prop("Layers")
