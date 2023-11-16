@@ -28,6 +28,15 @@ class TestFunctionWithMsk(BaseTest):
         parameters.append(self.generate_parameter("MskClusterName2", cluster_name))
         self._common_validations_for_MSK("combination/function_with_msk_using_managed_policy", parameters)
 
+    def test_function_with_msk_trigger_and_s3_onfailure_events_destinations(self):
+        companion_stack_outputs = self.companion_stack_outputs
+        parameters = self.get_parameters(companion_stack_outputs)
+        cluster_name = "MskCluster3-" + generate_suffix()
+        parameters.append(self.generate_parameter("MskClusterName3", cluster_name))
+        self._common_validations_for_MSK(
+            "combination/function_with_msk_trigger_and_s3_onfailure_events_destinations", parameters
+        )
+
     def _common_validations_for_MSK(self, file_name, parameters):
         self.create_and_verify_stack(file_name, parameters)
 

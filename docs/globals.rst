@@ -74,6 +74,7 @@ Currently, the following resources and properties are being supported:
       Architectures:
       EphemeralStorage:
       RuntimeManagementConfig:
+      LoggingConfig:
 
     Api:
       # Properties of AWS::Serverless::Api

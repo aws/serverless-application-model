@@ -52,6 +52,7 @@ class Globals:
             "EphemeralStorage",
             "FunctionUrlConfig",
             "RuntimeManagementConfig",
+            "LoggingConfig",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
