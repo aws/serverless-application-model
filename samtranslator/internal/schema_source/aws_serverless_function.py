@@ -414,6 +414,7 @@ class MSKEventProperties(BaseModel):
     Stream: PassThroughProp = mskeventproperties("Stream")
     Topics: PassThroughProp = mskeventproperties("Topics")
     SourceAccessConfigurations: Optional[PassThroughProp] = mskeventproperties("SourceAccessConfigurations")
+    DestinationConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class MSKEvent(BaseModel):

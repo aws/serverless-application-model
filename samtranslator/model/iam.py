@@ -127,6 +127,19 @@ class IAMRolePolicies:
         }
 
     @classmethod
+    def s3_send_event_payload_role_policy(cls, s3_arn: Any, logical_id: str) -> Dict[str, Any]:
+        s3_arn_with_wild_card = {"Fn::Join": ["/", [s3_arn, "*"]]}
+        return {
+            "PolicyName": logical_id + "S3Policy",
+            "PolicyDocument": {
+                "Statement": [
+                    {"Action": "s3:PutObject", "Effect": "Allow", "Resource": s3_arn_with_wild_card},
+                    {"Action": "s3:ListBucket", "Effect": "Allow", "Resource": s3_arn},
+                ]
+            },
+        }
+
+    @classmethod
     def event_bus_put_events_role_policy(cls, event_bus_arn: Any, logical_id: str) -> Dict[str, Any]:
         return {
             "PolicyName": logical_id + "EventBridgePolicy",
