@@ -5338,6 +5338,9 @@
           "markdownDescription": "The list of `LayerVersion` ARNs that this function should use\\. The order specified here is the order in which they will be imported when running the Lambda function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Layers`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Layers"
         },
+        "LoggingConfig": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "MemorySize": {
           "allOf": [
             {
@@ -5859,6 +5862,9 @@
           ],
           "markdownDescription": "The list of `LayerVersion` ARNs that this function should use\\. The order specified here is the order in which they will be imported when running the Lambda function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Layers`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Layers"
+        },
+        "LoggingConfig": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "MemorySize": {
           "allOf": [
