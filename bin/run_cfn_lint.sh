@@ -11,5 +11,5 @@ fi
 
 "${VENV}/bin/python" -m pip install cfn-lint==0.75.0 --upgrade --quiet
 # update cfn schema
-"${VENV}/bin/cfn-lint" cfn-lint -u
+"${VENV}/bin/cfn-lint" -u
 "${VENV}/bin/cfn-lint" --format parseable
