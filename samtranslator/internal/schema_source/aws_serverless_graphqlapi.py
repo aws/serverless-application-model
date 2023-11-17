@@ -162,6 +162,8 @@ class Properties(BaseModel):
     ApiKeys: Optional[Dict[str, ApiKey]]
     DomainName: Optional[DomainName]
     Cache: Optional[Cache]
+    Visibility: Optional[PassThroughProp]
+    OwnerContact: Optional[PassThroughProp]
 
 
 class Resource(BaseModel):
