@@ -113,6 +113,8 @@ class GraphQLApi(Resource):
         "OpenIDConnectConfig": GeneratedProperty(),
         "UserPoolConfig": GeneratedProperty(),
         "AdditionalAuthenticationProviders": GeneratedProperty(),
+        "Visibility": GeneratedProperty(),
+        "OwnerContact": GeneratedProperty(),
     }
 
     Name: str
@@ -124,6 +126,8 @@ class GraphQLApi(Resource):
     Tags: Optional[List[Dict[str, Any]]]
     XrayEnabled: Optional[bool]
     LogConfig: Optional[LogConfigType]
+    Visibility: Optional[str]
+    OwnerContact: Optional[str]
 
     runtime_attrs = {"api_id": lambda self: fnGetAtt(self.logical_id, "ApiId")}
 

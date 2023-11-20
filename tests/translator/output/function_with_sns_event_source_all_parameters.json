@@ -62,7 +62,7 @@
         "FilterPolicyScope": "MessageAttributes",
         "Protocol": "lambda",
         "Region": "region",
-        "TopicArn": "topicArn"
+        "TopicArn": "topicArn-letsAddMoreSymbols"
       },
       "Type": "AWS::SNS::Subscription"
     },
@@ -73,7 +73,7 @@
           "Ref": "MyAwesomeFunction"
         },
         "Principal": "sns.amazonaws.com",
-        "SourceArn": "topicArn"
+        "SourceArn": "topicArn-letsAddMoreSymbols"
       },
       "Type": "AWS::Lambda::Permission"
     },
