@@ -99,3 +99,4 @@ class ResourceAttributes(BaseModel):
     Metadata: Optional[PassThroughProp]
     UpdateReplacePolicy: Optional[PassThroughProp]
     Condition: Optional[PassThroughProp]
+    IgnoreGlobals: Optional[Union[str, List[str]]]

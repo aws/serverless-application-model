@@ -1,4 +1,7 @@
+from typing import Any, Dict
+
 from samtranslator.metrics.method_decorator import cw_timer
+from samtranslator.model.exceptions import InvalidResourceAttributeTypeException
 from samtranslator.plugins.globals.globals import Globals, InvalidGlobalsSectionException
 from samtranslator.public.exceptions import InvalidDocumentException
 from samtranslator.public.plugins import BasePlugin
@@ -13,7 +16,7 @@ class GlobalsPlugin(BasePlugin):
     """
 
     @cw_timer(prefix="Plugin-Globals")
-    def on_before_transform_template(self, template_dict):  # type: ignore[no-untyped-def]
+    def on_before_transform_template(self, template_dict: Dict[str, Any]) -> None:
         """
         Hook method that runs before a template gets transformed. In this method, we parse and process Globals section
         from the template (if present).
@@ -28,11 +31,16 @@ class GlobalsPlugin(BasePlugin):
         # For each resource in template, try and merge with Globals if necessary
         template = SamTemplate(template_dict)
         for logicalId, resource in template.iterate():
-            resource.properties = global_section.merge(resource.type, resource.properties)  # type: ignore[no-untyped-call]
+            try:
+                resource.properties = global_section.merge(
+                    str(resource.type), resource.properties, logicalId, resource.ignore_globals
+                )
+            except InvalidResourceAttributeTypeException as ex:
+                raise InvalidDocumentException([ex]) from ex
             template.set(logicalId, resource)
 
         # Remove the Globals section from template if necessary
-        Globals.del_section(template_dict)  # type: ignore[no-untyped-call]
+        Globals.del_section(template_dict)
 
         # If there was a global openApiVersion flag, check and convert swagger
         # to the right version

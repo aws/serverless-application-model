@@ -1,0 +1,33 @@
+Globals:
+  Function:
+    Runtime: python3.8
+    Handler: index.lambda_handler
+    MemorySize: 128
+
+Resources:
+  ZipFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+
+  ImageFunction:
+    Type: AWS::Serverless::Function
+    IgnoreGlobals: '*'
+    Properties:
+      PackageType: Image
+      ImageUri: s3://bucket/key
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./src/image
+
+  ImageFunction2:
+    Type: AWS::Serverless::Function
+    IgnoreGlobals:
+    - Runtime
+    - Handler
+    Properties:
+      PackageType: Image
+      ImageUri: s3://bucket/key
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./src/image
