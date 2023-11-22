@@ -1,20 +1,4 @@
 Resources:
-  InvalidAuthorizationScopes:
-    Type: AWS::Serverless::Function
-    Properties:
-      Runtime: python3
-      Handler: index.handler
-      CodeUri: s3://bucket/key
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Auth:
-              AuthorizationScopes:
-              - https://foobar.acme.net/full-api
-            Method: POST
-            Path: /hello/world
-
   NoAuthApi:
     Type: AWS::Serverless::Api
     Properties:
