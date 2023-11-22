@@ -628,7 +628,7 @@ class Properties(BaseModel):
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     Tags: Optional[Tags] = prop("Tags")
-    PropagateTags: Optional[bool] = prop("PropagateTags")
+    PropagateTags: Optional[bool]  # TODO: add docs
     Timeout: Optional[Timeout] = prop("Timeout")
     Tracing: Optional[Tracing] = prop("Tracing")
     VersionDescription: Optional[PassThroughProp] = prop("VersionDescription")
@@ -659,7 +659,7 @@ class Globals(BaseModel):
         ["AWS::Lambda::Function", "Properties", "Environment"],
     )
     Tags: Optional[Tags] = prop("Tags")
-    PropagateTags: Optional[bool] = prop("PropagateTags")
+    PropagateTags: Optional[bool]  # TODO: add docs
     Tracing: Optional[Tracing] = prop("Tracing")
     KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
     Layers: Optional[Layers] = prop("Layers")
