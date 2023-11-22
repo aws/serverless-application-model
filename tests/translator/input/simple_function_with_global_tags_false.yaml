@@ -1,0 +1,28 @@
+Globals:
+  Function:
+    Tags:
+      TagKey1: TagValue1
+      TagKey2: ''
+      TagKey3: false
+      TagKey4: true
+      TagKey5: 0
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs18.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+Metadata:
+  SamTransformTest: true
