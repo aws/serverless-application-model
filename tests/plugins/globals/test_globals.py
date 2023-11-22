@@ -2,7 +2,6 @@ from unittest import TestCase
 from unittest.mock import Mock, patch
 
 from parameterized import parameterized
-from samtranslator.model.exceptions import InvalidResourceAttributeTypeException
 from samtranslator.plugins.globals.globals import GlobalProperties, Globals, InvalidGlobalsSectionException
 
 
@@ -336,29 +335,6 @@ class TestGlobalsObject(TestCase):
         result = globals.merge("some random type", local_properties)
 
         self.assertEqual(expected, result)
-
-    def test_get_template_globals_star_ignore_globals(self):
-        type = "prefix_type1"
-        globals = Globals(self.template)
-
-        result = globals.get_template_globals("MyFunction", type, "*")
-
-        self.assertEqual(result.global_properties, GlobalProperties({}).global_properties)
-
-    def test_get_template_globals_list_ignore_globals(self):
-        type = "prefix_type1"
-        globals = Globals(self.template)
-
-        result = globals.get_template_globals("MyFunction", type, ["prop1"])
-
-        self.assertEqual(result.global_properties, GlobalProperties({"prop2": "value2"}).global_properties)
-
-    def test_get_template_globals_error(self):
-        type = "prefix_type1"
-        globals = Globals(self.template)
-
-        with self.assertRaises(InvalidResourceAttributeTypeException):
-            globals.get_template_globals("MyFunction", type, ["prop3"])
 
     def test_merge_end_to_end_on_known_type1(self):
         type = "prefix_type1"

@@ -1065,20 +1065,6 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
-        "IgnoreGlobals": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
-          "title": "Ignoreglobals"
-        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -2379,6 +2365,9 @@
           ],
           "markdownDescription": "A string that configures how events will be read from Kafka topics\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AmazonManagedKafkaConfiguration`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "ConsumerGroupId"
+        },
+        "DestinationConfig": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "FilterCriteria": {
           "allOf": [
@@ -4348,20 +4337,6 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
-        "IgnoreGlobals": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
-          "title": "Ignoreglobals"
-        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -4744,20 +4719,6 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
-        "IgnoreGlobals": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
-          "title": "Ignoreglobals"
-        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -4841,20 +4802,6 @@
         },
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
-        },
-        "IgnoreGlobals": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
-          "title": "Ignoreglobals"
         },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
@@ -5391,6 +5338,9 @@
           "markdownDescription": "The list of `LayerVersion` ARNs that this function should use\\. The order specified here is the order in which they will be imported when running the Lambda function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Layers`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Layers"
         },
+        "LoggingConfig": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "MemorySize": {
           "allOf": [
             {
@@ -5420,8 +5370,7 @@
           "title": "PermissionsBoundary"
         },
         "PropagateTags": {
-          "markdownDescription": "Indicate whether or not to pass tags from the `Tags` property to your [AWS::Serverless::Function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources-function.html) generated resources\\. Specify `True` to propagate tags in your generated resources\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: `False`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "PropagateTags",
+          "title": "Propagatetags",
           "type": "boolean"
         },
         "ProvisionedConcurrencyConfig": {
@@ -5914,6 +5863,9 @@
           "markdownDescription": "The list of `LayerVersion` ARNs that this function should use\\. The order specified here is the order in which they will be imported when running the Lambda function\\.  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Layers`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Layers"
         },
+        "LoggingConfig": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "MemorySize": {
           "allOf": [
             {
@@ -5977,8 +5929,7 @@
           "title": "Policies"
         },
         "PropagateTags": {
-          "markdownDescription": "Indicate whether or not to pass tags from the `Tags` property to your [AWS::Serverless::Function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources-function.html) generated resources\\. Specify `True` to propagate tags in your generated resources\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: `False`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
-          "title": "PropagateTags",
+          "title": "Propagatetags",
           "type": "boolean"
         },
         "ProvisionedConcurrencyConfig": {
@@ -6148,20 +6099,6 @@
         },
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
-        },
-        "IgnoreGlobals": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
-          "title": "Ignoreglobals"
         },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
@@ -7082,20 +7019,6 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
-        "IgnoreGlobals": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
-          "title": "Ignoreglobals"
-        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -7304,20 +7227,6 @@
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
         },
-        "IgnoreGlobals": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
-          "title": "Ignoreglobals"
-        },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -7467,20 +7376,6 @@
         },
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
-        },
-        "IgnoreGlobals": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
-          "title": "Ignoreglobals"
         },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"
@@ -8028,20 +7923,6 @@
         },
         "DependsOn": {
           "$ref": "#/definitions/PassThroughProp"
-        },
-        "IgnoreGlobals": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ],
-          "title": "Ignoreglobals"
         },
         "Metadata": {
           "$ref": "#/definitions/PassThroughProp"

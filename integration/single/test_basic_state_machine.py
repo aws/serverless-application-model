@@ -34,10 +34,6 @@ class TestBasicLayerVersion(BaseTest):
         self._verify_tag_presence(tags, "TagOne", "ValueOne")
         self._verify_tag_presence(tags, "TagTwo", "ValueTwo")
 
-    @skipIf(
-        current_region_does_not_support([STATE_MACHINE_INLINE_DEFINITION]),
-        "StateMachine with inline definition is not supported in this testing region",
-    )
     def test_state_machine_with_role_path(self):
         """
         Creates a State machine with a Role Path
