@@ -24,7 +24,7 @@ Resources:
           - Action: [kafka:DescribeCluster, kafka:GetBootstrapBrokers, ec2:CreateNetworkInterface,
               ec2:DescribeNetworkInterfaces, ec2:DescribeVpcs, ec2:DeleteNetworkInterface,
               ec2:DescribeSubnets, ec2:DescribeSecurityGroups, logs:CreateLogGroup,
-              logs:CreateLogStream, logs:PutLogEvents]
+              logs:CreateLogStream, logs:PutLogEvents, s3:ListBucket]
             Effect: Allow
             Resource: '*'
       ManagedPolicyArns: [arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole]
