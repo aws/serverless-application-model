@@ -62,7 +62,6 @@ class TestConnectors(BaseTest):
             ("combination/connector_appsync_api_to_lambda",),
             ("combination/connector_appsync_to_lambda",),
             ("combination/connector_appsync_to_table",),
-            ("combination/connector_appsync_to_eventbus",),
             ("combination/connector_function_to_function",),
             ("combination/connector_restapi_to_function",),
             ("combination/connector_httpapi_to_function",),

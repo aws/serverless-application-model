@@ -1116,11 +1116,8 @@ class Api(PushEventSource):
                         )
 
         auth_scopes = event_auth.get("AuthorizationScopes")
-
         if auth_scopes:
             sam_expect(auth_scopes, event_id, "Auth.AuthorizationScopes", is_sam_event=True).to_be_a_list()
-            if not method_authorizer:
-                raise InvalidEventException(event_id, "AuthorizationScopes works only when Authorizer is set")
 
         apikey_required_setting = event_auth.get("ApiKeyRequired")
         apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
