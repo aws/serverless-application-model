@@ -1,0 +1,18 @@
+Parameters:
+  TagValueParam:
+    Type: String
+    Default: value
+
+Resources:
+  MinimalTableWithTags:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      Tags:
+        TagKey1: TagValue1
+        TagKey2: ''
+        TagKey3:
+          Ref: TagValueParam
+        TagKey4: '123'
+        TagKey5: true
+        TagKey6: false
+        TagKey7: 0

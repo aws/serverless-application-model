@@ -59,7 +59,7 @@ Resources:
       - ResourceName: Function
       CodeUri: s3://src/Function
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       MemorySize: 3008
       Timeout: 30
       Tracing: Active

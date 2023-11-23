@@ -14,7 +14,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
             return {
@@ -32,7 +32,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
             return {
@@ -50,7 +50,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
             return {
@@ -68,7 +68,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
             return {
@@ -86,7 +86,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
             return {
@@ -104,7 +104,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
             return {
@@ -122,7 +122,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
             return {
@@ -140,7 +140,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
             return {
@@ -158,7 +158,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       MemorySize: 128
       InlineCode: |
         exports.handler = async (event, context, callback) => {

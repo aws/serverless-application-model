@@ -6649,6 +6649,9 @@
         "Name": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "OwnerContact": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Resolvers": {
           "additionalProperties": {
             "additionalProperties": {
@@ -6668,6 +6671,9 @@
         "Tags": {
           "title": "Tags",
           "type": "object"
+        },
+        "Visibility": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "XrayEnabled": {
           "title": "Xrayenabled",
