@@ -84,7 +84,7 @@ Resources:
         Ref: MQBrokerName2
       DeploymentMode: SINGLE_INSTANCE
       EngineType: ACTIVEMQ
-      EngineVersion: 5.15.12
+      EngineVersion: 5.17.6
       HostInstanceType: mq.t3.micro
       Logs:
         Audit: true
