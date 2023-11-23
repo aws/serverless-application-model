@@ -790,6 +790,23 @@
             }
           }
         }
+      },
+      "AWS::Events::EventBus": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["events:PutEvents"],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
       }
     },
     "AWS::AppSync::GraphQLApi": {

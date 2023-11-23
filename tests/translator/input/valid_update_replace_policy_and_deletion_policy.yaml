@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform:
+- AWS::LanguageExtensions
+- AWS::Serverless-2016-10-31
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    UpdateReplacePolicy: Delete
+    Properties:
+      Handler: LambdaASP.NETCoreWebAPI2::LambdaASP.NETCoreWebAPI2.LambdaEntryPoint::FunctionHandlerAsync
+      Runtime: dotnet6
+      CodeUri: s3://bucket/key
+      Events:
+        None:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /method
+  MyFunction2:
+    Type: AWS::Serverless::Function
+    UpdateReplacePolicy: Delete
+    Properties:
+      Handler: LambdaASP.NETCoreWebAPI2::LambdaASP.NETCoreWebAPI2.LambdaEntryPoint::FunctionHandlerAsync
+      Runtime: dotnet6
+      CodeUri: s3://bucket/key
+      Events:
+        Hi:
+          Type: Api
+          Properties:
+            Method: post
+            Path: /method
+  MyFunction3:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    Properties:
+      Handler: LambdaASP.NETCoreWebAPI2::LambdaASP.NETCoreWebAPI2.LambdaEntryPoint::FunctionHandlerAsync
+      Runtime: dotnet6
+      CodeUri: s3://bucket/key
+      Events:
+        All:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /method2
+  MyFunction4:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Handler: LambdaASP.NETCoreWebAPI2::LambdaASP.NETCoreWebAPI2.LambdaEntryPoint::FunctionHandlerAsync
+      Runtime: dotnet6
+      CodeUri: s3://bucket/key
+      Events:
+        Bye:
+          Type: Api
+          Properties:
+            Method: post
+            Path: /method2

@@ -1,6 +1,7 @@
-from typing import Any, Dict, List
+import copy
+from typing import Any, Dict, List, Optional, Union
 
-from samtranslator.model.exceptions import ExceptionWithMessage
+from samtranslator.model.exceptions import ExceptionWithMessage, InvalidResourceAttributeTypeException
 from samtranslator.public.intrinsics import is_intrinsics
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -100,7 +101,7 @@ class Globals:
         SamResourceType.Function.value: ["RuntimeManagementConfig"],
     }
 
-    def __init__(self, template) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, template: Dict[str, Any]) -> None:
         """
         Constructs an instance of this object
 
@@ -112,12 +113,57 @@ class Globals:
         # Sort the names for stability in list ordering
         self.supported_resource_section_names.sort()
 
-        self.template_globals = {}
+        self.template_globals: Dict[str, GlobalProperties] = {}
 
         if self._KEYWORD in template:
             self.template_globals = self._parse(template[self._KEYWORD])  # type: ignore[no-untyped-call]
 
-    def merge(self, resource_type, resource_properties):  # type: ignore[no-untyped-def]
+    def get_template_globals(
+        self, logical_id: str, resource_type: str, ignore_globals: Optional[Union[str, List[str]]]
+    ) -> "GlobalProperties":
+        """
+        Get template globals but remove globals based on IgnoreGlobals attribute.
+
+        :param string logical_id: LogicalId of the resource
+        :param string resource_type: Type of the resource (Ex: AWS::Serverless::Function)
+        :param dict ignore_globals: IgnoreGlobals resource attribute. It can be either 1) "*" string value
+            or list of string value, each value should be a valid property in Globals section
+        :return dict: processed template globals
+        """
+        if not ignore_globals:
+            return self.template_globals[resource_type]
+
+        if isinstance(ignore_globals, str) and ignore_globals == "*":
+            return GlobalProperties({})
+
+        if isinstance(ignore_globals, list):
+            global_props: GlobalProperties = copy.deepcopy(self.template_globals[resource_type])
+            for key in ignore_globals:
+                if key not in global_props.global_properties:
+                    raise InvalidResourceAttributeTypeException(
+                        logical_id,
+                        "IgnoreGlobals",
+                        None,
+                        f"Resource {logical_id} has invalid resource attribute 'IgnoreGlobals' on item '{key}'.",
+                    )
+                del global_props.global_properties[key]
+            return global_props
+
+        # We raise exception for any non "*" or non-list input
+        raise InvalidResourceAttributeTypeException(
+            logical_id,
+            "IgnoreGlobals",
+            None,
+            f"Resource {logical_id} has invalid resource attribute 'IgnoreGlobals'.",
+        )
+
+    def merge(
+        self,
+        resource_type: str,
+        resource_properties: Dict[str, Any],
+        logical_id: str = "",
+        ignore_globals: Optional[Union[str, List[str]]] = None,
+    ) -> Any:
         """
         Adds global properties to the resource, if necessary. This method is a no-op if there are no global properties
         for this resource type
@@ -131,12 +177,12 @@ class Globals:
             # Nothing to do. Return the template unmodified
             return resource_properties
 
-        global_props = self.template_globals[resource_type]
+        global_props = self.get_template_globals(logical_id, str(resource_type), ignore_globals)
 
-        return global_props.merge(resource_properties)
+        return global_props.merge(resource_properties)  # type: ignore[no-untyped-call]
 
     @classmethod
-    def del_section(cls, template):  # type: ignore[no-untyped-def]
+    def del_section(cls, template: Dict[str, Any]) -> None:
         """
         Helper method to delete the Globals section altogether from the template
 
