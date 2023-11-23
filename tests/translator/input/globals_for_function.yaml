@@ -30,6 +30,10 @@ Globals:
       Size: 1024
     RuntimeManagementConfig:
       UpdateRuntimeOn: Auto
+    LoggingConfig:
+      LogGroup: myJsonStructuredLogs
+
+
 
 Resources:
   MinimalFunction:
