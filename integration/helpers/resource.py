@@ -206,8 +206,7 @@ def _resource_using_s3_events(resource: Dict[str, Any]) -> bool:
 def _get_all_event_sources(template_dict: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
     resources = template_dict.get("Resources", {}).values()
     for resource in resources:
-        for event in resource.get("Properties", {}).get("Events", {}).values():
-            yield event
+        yield from resource.get("Properties", {}).get("Events", {}).values()
 
 
 def _event_using_sns_filter_policy_scope(event: Dict[str, Any]) -> bool:
