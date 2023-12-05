@@ -1,9 +1,7 @@
 ﻿""" SAM macro definitions """
 import copy
 from contextlib import suppress
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
-
-from typing_extensions import Literal
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.cloudwatchlogs
@@ -2217,6 +2215,8 @@ class SamGraphQLApi(SamResourceMacro):
         "ApiKeys": Property(False, IS_DICT),
         "DomainName": Property(False, IS_DICT),
         "Cache": Property(False, IS_DICT),
+        "Visibility": PassThroughProperty(False),
+        "OwnerContact": PassThroughProperty(False),
     }
 
     Auth: List[Dict[str, Any]]
@@ -2232,6 +2232,8 @@ class SamGraphQLApi(SamResourceMacro):
     ApiKeys: Optional[Dict[str, Dict[str, Any]]]
     DomainName: Optional[Dict[str, Any]]
     Cache: Optional[Dict[str, Any]]
+    Visibility: Optional[PassThrough]
+    OwnerContact: Optional[PassThrough]
 
     # stop validation so we can use class variables for tracking state
     validate_setattr = False
@@ -2302,6 +2304,13 @@ class SamGraphQLApi(SamResourceMacro):
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         api.Name = passthrough_value(model.Name) or self.logical_id
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-graphqlapi.html#cfn-appsync-graphqlapi-visibility
+        # WARNING: If Visibility has not been defined, explicitly setting it to GLOBAL in a template/stack update will result in an API replacement and new DNS values.
+        # we don't want to force client's API re-creation
+        if model.Visibility:
+            api.Visibility = passthrough_value(model.Visibility)
+        if model.OwnerContact:
+            api.OwnerContact = passthrough_value(model.OwnerContact)
         api.XrayEnabled = model.XrayEnabled
 
         lambda_auth_arns = self._parse_and_set_auth_properties(api, model.Auth)

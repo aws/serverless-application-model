@@ -1,0 +1,13 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Mutation {
+          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
+        }
+      Visibility: PRIVATE
+      OwnerContact: blah-blah
+      Auth:
+        Type: AWS_IAM

@@ -36,7 +36,7 @@ class TestFunctionWithCweDlqGenerated(BaseTest):
 
         # checking policy action
         actions = dlq_policy_statement["Action"]
-        action_list = actions if type(actions) == list else [actions]
+        action_list = actions if isinstance(actions, list) == list else [actions]
         self.assertEqual(len(action_list), 1, "Only one action must be in dead-letter queue policy")
         self.assertEqual(
             action_list[0], "sqs:SendMessage", "Action referenced in dead-letter queue policy must be 'sqs:SendMessage'"

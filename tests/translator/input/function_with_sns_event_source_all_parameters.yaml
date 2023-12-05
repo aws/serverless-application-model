@@ -9,7 +9,7 @@ Resources:
         NotificationTopic:
           Type: SNS
           Properties:
-            Topic: topicArn
+            Topic: topicArn-letsAddMoreSymbols
             Region: region
             FilterPolicy:
               store:

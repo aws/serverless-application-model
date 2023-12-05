@@ -4,9 +4,7 @@ Helper classes to publish metrics
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
-
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, Optional, TypedDict, Union
 
 from samtranslator.internal.deprecation_control import deprecated
 

@@ -85,7 +85,7 @@ For a more thorough introduction, see the [this tutorial](https://docs.aws.amazo
 
 ### Setting up development environment
 
-You'll need to have Python 3.7+ installed.
+You'll need to have Python 3.8+ installed.
 
 Create a [virtual environment](https://docs.python.org/3/library/venv.html):
 

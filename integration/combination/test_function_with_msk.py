@@ -7,6 +7,10 @@ from integration.helpers.base_test import BaseTest, nonblocking
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
 
 
+# Mark this test suite as nonblocking tests since MSK Cluster creation can take
+# up to 30 minutes according to https://docs.aws.amazon.com/msk/latest/developerguide/troubleshooting.html#troubleshooting-cluster-stuck
+# This would cause the test to fail due to MSK Cluster did not stablize.
+# We should investigate any other cause of failures.
 @skipIf(current_region_does_not_support([MSK]), "MSK is not supported in this testing region")
 @nonblocking
 class TestFunctionWithMsk(BaseTest):
