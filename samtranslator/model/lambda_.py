@@ -34,6 +34,7 @@ class LambdaFunction(Resource):
         "SnapStart": GeneratedProperty(),
         "EphemeralStorage": GeneratedProperty(),
         "RuntimeManagementConfig": GeneratedProperty(),
+        "LoggingConfig": GeneratedProperty(),
     }
 
     Code: Dict[str, Any]
@@ -60,6 +61,7 @@ class LambdaFunction(Resource):
     SnapStart: Optional[Dict[str, Any]]
     EphemeralStorage: Optional[Dict[str, Any]]
     RuntimeManagementConfig: Optional[Dict[str, Any]]
+    LoggingConfig: Optional[Dict[str, Any]]
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
