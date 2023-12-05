@@ -164,7 +164,7 @@
             "Arn"
           ]
         },
-        "Runtime": "nodejs14.x"
+        "Runtime": "nodejs18.x"
       },
       "Type": "AWS::Lambda::Function"
     },
@@ -202,7 +202,7 @@
             "Arn"
           ]
         },
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs18.x",
         "Tags": [
           {
             "Key": "lambda:createdBy",

@@ -857,7 +857,7 @@ class TestTemplateValidation(TestCase):
                             "Properties": {
                                 "Handler": "foo",
                                 "InlineCode": "bar",
-                                "Runtime": "nodejs14.x",
+                                "Runtime": "nodejs18.x",
                                 "Policies": policies,
                             },
                         },

@@ -26,7 +26,7 @@ Resources:
   MyFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Handler: index.handler
       InlineCode: |
         exports.handler = async (event) => {
@@ -56,7 +56,7 @@ Resources:
           }
       Handler: index.handler
       Role: !GetAtt MyFunctionRole.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Tags:
         - Key: lambda:createdBy
           Value: SAM
