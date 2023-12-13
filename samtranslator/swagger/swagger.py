@@ -65,7 +65,7 @@ class SwaggerEditor(BaseEditor):
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
-                        "Invalid Swagger document. May be caused by having the OpenApi definition defined outside of the template."
+                        "Invalid Swagger document or the Swagger document is not explicitly defined in `DefinitionBody`."
                     )
                 ]
             )
