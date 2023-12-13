@@ -62,7 +62,13 @@ class SwaggerEditor(BaseEditor):
         """
 
         if not doc or not SwaggerEditor.is_valid(doc):
-            raise InvalidDocumentException([InvalidTemplateException("Invalid Swagger document")])
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        "Invalid Swagger document. May be caused by having the OpenApi definition defined outside of the template."
+                    )
+                ]
+            )
 
         self._doc = _deepcopy(doc)
         self.paths = self._doc["paths"]
