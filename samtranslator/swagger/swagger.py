@@ -65,7 +65,7 @@ class SwaggerEditor(BaseEditor):
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
-                        "Invalid Swagger document or the Swagger document is not explicitly defined in `DefinitionBody`."
+                        "Invalid Swagger document or the Swagger document is not explicitly defined in 'DefinitionBody'."
                     )
                 ]
             )
