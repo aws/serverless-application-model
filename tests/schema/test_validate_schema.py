@@ -234,7 +234,7 @@ class TestValidateUnifiedSchema(TestCase):
                             "Properties": {
                                 "InlineCode": "foo",
                                 "Handler": "bar",
-                                "Runtime": "node16.x",
+                                "Runtime": "node18.x",
                                 "Events": 1337,
                             },
                         },

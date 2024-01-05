@@ -22,7 +22,7 @@ class TestStateMachineWithPolicyTemplates(BaseTest):
         self.assertEqual(len(sqs_poller_policy), 1, "Only one statement must be in SQS Poller policy")
 
         sqs_policy_statement = sqs_poller_policy[0]
-        self.assertTrue(type(sqs_policy_statement["Resource"]) != list)
+        self.assertFalse(isinstance(sqs_policy_statement["Resource"], list))
 
         queue_url = self.get_physical_id_by_type("AWS::SQS::Queue")
         parts = queue_url.split("/")
@@ -40,7 +40,7 @@ class TestStateMachineWithPolicyTemplates(BaseTest):
         self.assertEqual(len(lambda_invoke_policy), 1, "One policies statements should be present")
 
         lambda_policy_statement = lambda_invoke_policy[0]
-        self.assertTrue(type(lambda_policy_statement["Resource"]) != list)
+        self.assertFalse(isinstance(lambda_policy_statement["Resource"], list))
 
         function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
         #  NOTE: The resource ARN has "*" suffix to allow for any Lambda function version as well

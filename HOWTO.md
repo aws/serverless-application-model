@@ -21,7 +21,7 @@ Check out the [latest specification](versions/2016-10-31.md) for details on how 
 You could also use the [aws-sam-cli](https://github.com/awslabs/aws-sam-cli) to get started 
 
 ```shell
-$ sam init --runtime python3.7
+$ sam init --runtime python3.8
 ```
 ## Packing Artifacts
 Before you can deploy a SAM template, you should first upload your Lambda 
