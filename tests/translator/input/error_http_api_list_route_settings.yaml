@@ -1,0 +1,9 @@
+Resources:
+  ChatApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: !Ref 'ChatApiName'
+      RouteSettings:
+      - RouteKey: !Sub 'ANY /${ChatApiName}'
+        ThrottlingBurstLimit: 100
+        ThrottlingRateLimit: 100
