@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout the PR
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
@@ -29,7 +29,7 @@ jobs:
           cp bin/public_interface.py "${{ runner.temp }}"/public_interface.py
 
       - name: Checkout the base
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: "${{ github.base_ref }}"
 
