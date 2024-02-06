@@ -233,7 +233,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
             if role.Policies and destination_config_policy not in role.Policies:
                 policy_document = destination_config_policy.get("PolicyDocument")
                 # do not add the policy if the same policy document is already present
-                if policy_document not in [d["PolicyDocument"] for d in role.Policies]:
+                if policy_document not in [d.get("PolicyDocument", {}) for d in role.Policies]:
                     role.Policies.append(destination_config_policy)
 
     def _validate_filter_criteria(self) -> None:
