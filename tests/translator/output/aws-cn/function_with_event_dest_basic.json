@@ -130,21 +130,21 @@
             "Fn::If": [
               "SomeCondition",
               {
-                "PolicyName": "MyTestFunctionRolePolicy0",
                 "PolicyDocument": {
-                  "Version": "2012-10-17",
                   "Statement": [
                     {
-                      "Effect": "Deny",
                       "Action": [
                         "logs:CreateLogGroup",
                         "logs:CreateLogStream",
                         "logs:PutLogEvents"
                       ],
+                      "Effect": "Deny",
                       "Resource": "arn:aws:logs:*:*:*"
                     }
-                  ]
-                }
+                  ],
+                  "Version": "2012-10-17"
+                },
+                "PolicyName": "MyTestFunctionRolePolicy0"
               },
               {
                 "Ref": "AWS::NoValue"
