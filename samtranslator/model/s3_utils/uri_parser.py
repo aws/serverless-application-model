@@ -95,7 +95,7 @@ def construct_s3_location_object(
                 f"Unsupported dynamic reference detected in '{property_name}'. Please "
                 "consider using alternative 'FunctionCode' object format.",
             )
-        
+
         # location_uri is NOT a dictionary. Parse it as a string
         _s3_pointer = parse_s3_uri(location_uri)
 
