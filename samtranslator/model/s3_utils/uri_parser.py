@@ -84,7 +84,7 @@ def construct_s3_location_object(
 
         s3_pointer = location_uri
 
-    else:
+    elif isinstance(location_uri, str):
         # location_uri is NOT a dictionary. Parse it as a string
         _s3_pointer = parse_s3_uri(location_uri)
 
@@ -96,6 +96,8 @@ def construct_s3_location_object(
                 "parameter.",
             )
         s3_pointer = _s3_pointer
+    else:
+        raise InvalidResourceException(logical_id, f"'{property_name}' must be of type dict or string.")
 
     code = {"S3Bucket": s3_pointer["Bucket"], "S3Key": s3_pointer["Key"]}
     if "Version" in s3_pointer:

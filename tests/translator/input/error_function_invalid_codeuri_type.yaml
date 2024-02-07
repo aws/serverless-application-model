@@ -1,0 +1,7 @@
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: []
+      Runtime: python2.7
+      Handler: hello.handler
