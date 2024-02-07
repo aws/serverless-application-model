@@ -1,0 +1,10 @@
+Resources:
+  LambdaApiDefinition:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: MyStageName
+      DisableExecuteApiEndpoint: true
+      DefinitionBody:
+        Fn::If:
+        - FalseCondition
+        - swaggerdefinition.api.json

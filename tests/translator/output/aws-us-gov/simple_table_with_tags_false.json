@@ -1,0 +1,60 @@
+{
+  "Parameters": {
+    "TagValueParam": {
+      "Default": "value",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "MinimalTableWithTags": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
+          {
+            "Key": "TagKey2",
+            "Value": ""
+          },
+          {
+            "Key": "TagKey3",
+            "Value": {
+              "Ref": "TagValueParam"
+            }
+          },
+          {
+            "Key": "TagKey4",
+            "Value": "123"
+          },
+          {
+            "Key": "TagKey5",
+            "Value": true
+          },
+          {
+            "Key": "TagKey6",
+            "Value": false
+          },
+          {
+            "Key": "TagKey7",
+            "Value": 0
+          }
+        ]
+      },
+      "Type": "AWS::DynamoDB::Table"
+    }
+  }
+}

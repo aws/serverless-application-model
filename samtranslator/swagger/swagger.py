@@ -62,7 +62,13 @@ class SwaggerEditor(BaseEditor):
         """
 
         if not doc or not SwaggerEditor.is_valid(doc):
-            raise InvalidDocumentException([InvalidTemplateException("Invalid Swagger document")])
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        "Invalid Swagger document or the Swagger document is not explicitly defined in 'DefinitionBody'."
+                    )
+                ]
+            )
 
         self._doc = _deepcopy(doc)
         self.paths = self._doc["paths"]

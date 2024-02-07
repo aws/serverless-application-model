@@ -1,9 +1,7 @@
 import json
 from functools import partial
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TypeVar, Union
-
-from typing_extensions import Literal
+from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
 from samtranslator.compat import pydantic
 from samtranslator.model.types import PassThrough
@@ -99,3 +97,4 @@ class ResourceAttributes(BaseModel):
     Metadata: Optional[PassThroughProp]
     UpdateReplacePolicy: Optional[PassThroughProp]
     Condition: Optional[PassThroughProp]
+    IgnoreGlobals: Optional[Union[str, List[str]]]

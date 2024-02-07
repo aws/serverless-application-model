@@ -7,7 +7,7 @@ Resources:
           console.log("Hello world!")
         };
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
 
   StateMachineIdWith30Characters:
     Type: AWS::Serverless::StateMachine

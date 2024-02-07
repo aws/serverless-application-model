@@ -518,6 +518,10 @@ class OpenApiEditor(BaseEditor):
 
         if self.security_schemes:
             self._doc.setdefault("components", Py27Dict())
+            if not self._doc["components"]:
+                # explicitly set to dict to account for scenario where
+                # 'components' is explicitly set to None
+                self._doc["components"] = Py27Dict()
             self._doc["components"]["securitySchemes"] = self.security_schemes
 
         if self.info:

@@ -1,0 +1,102 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Resources": {
+    "MyLambdaFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n  return {\n    statusCode: 200,\n    body: 'Success'\n  }\n}\n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "MyLambdaFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs18.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
+          {
+            "Key": "TagKey2",
+            "Value": ""
+          },
+          {
+            "Key": "TagKey3",
+            "Value": false
+          },
+          {
+            "Key": "TagKey4",
+            "Value": true
+          },
+          {
+            "Key": "TagKey5",
+            "Value": 0
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyLambdaFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaRole",
+          "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
+          {
+            "Key": "TagKey2",
+            "Value": ""
+          },
+          {
+            "Key": "TagKey3",
+            "Value": false
+          },
+          {
+            "Key": "TagKey4",
+            "Value": true
+          },
+          {
+            "Key": "TagKey5",
+            "Value": 0
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

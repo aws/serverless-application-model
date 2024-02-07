@@ -15,8 +15,8 @@ select = [
     "UP", # pyupgrade
 ]
 
-# Mininal python version we support is 3.7
-target-version = "py37"
+# Mininal python version we support is 3.8
+target-version = "py38"
 
 [per-file-ignores]
 

@@ -45,7 +45,7 @@ class TestStateMachineWithSchedule(BaseTest):
 
         start_execution_policy_statement = start_execution_policy[0]
 
-        self.assertTrue(type(start_execution_policy_statement["Action"]) != list)
+        self.assertFalse(isinstance(start_execution_policy_statement["Action"], list))
         policy_action = start_execution_policy_statement["Action"]
         self.assertEqual(
             policy_action,
@@ -53,7 +53,7 @@ class TestStateMachineWithSchedule(BaseTest):
             "Action referenced in event role policy must be 'states:StartExecution'",
         )
 
-        self.assertTrue(type(start_execution_policy_statement["Resource"]) != list)
+        self.assertFalse(isinstance(start_execution_policy_statement["Resource"], list))
         referenced_state_machine_arn = start_execution_policy_statement["Resource"]
         self.assertEqual(
             referenced_state_machine_arn,

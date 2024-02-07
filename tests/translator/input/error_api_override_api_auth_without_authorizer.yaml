@@ -1,0 +1,67 @@
+Resources:
+  MyApiWithLambdaRequestAuth:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          version: '1.0'
+          title: !Ref AWS::StackName
+        schemes:
+        - https
+        paths:
+          /lambda-request:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations
+                passthroughBehavior: when_no_match
+              responses: {}
+      Auth:
+        Authorizers:
+          MyLambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            Identity:
+              Headers:
+              - Authorization1
+        DefaultAuthorizer: MyLambdaRequestAuth
+
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          return {
+          statusCode: 200,
+          body: JSON.stringify(event),
+          headers: {}
+          }
+        }
+      Handler: index.handler
+      Runtime: nodejs8.10
+
+  MyFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          return {
+          statusCode: 200,
+          body: JSON.stringify(event),
+          headers: {}
+          }
+        }
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        LambdaRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaRequestAuth
+            Auth:
+              OverrideApiAuth: true
+            Method: get
+            Path: /lambda-request

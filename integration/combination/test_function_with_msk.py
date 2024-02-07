@@ -7,6 +7,10 @@ from integration.helpers.base_test import BaseTest, nonblocking
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
 
 
+# Mark this test suite as nonblocking tests since MSK Cluster creation can take
+# up to 30 minutes according to https://docs.aws.amazon.com/msk/latest/developerguide/troubleshooting.html#troubleshooting-cluster-stuck
+# This would cause the test to fail due to MSK Cluster did not stablize.
+# We should investigate any other cause of failures.
 @skipIf(current_region_does_not_support([MSK]), "MSK is not supported in this testing region")
 @nonblocking
 class TestFunctionWithMsk(BaseTest):
@@ -27,6 +31,15 @@ class TestFunctionWithMsk(BaseTest):
         cluster_name = "MskCluster2-" + generate_suffix()
         parameters.append(self.generate_parameter("MskClusterName2", cluster_name))
         self._common_validations_for_MSK("combination/function_with_msk_using_managed_policy", parameters)
+
+    def test_function_with_msk_trigger_and_s3_onfailure_events_destinations(self):
+        companion_stack_outputs = self.companion_stack_outputs
+        parameters = self.get_parameters(companion_stack_outputs)
+        cluster_name = "MskCluster3-" + generate_suffix()
+        parameters.append(self.generate_parameter("MskClusterName3", cluster_name))
+        self._common_validations_for_MSK(
+            "combination/function_with_msk_trigger_and_s3_onfailure_events_destinations", parameters
+        )
 
     def _common_validations_for_MSK(self, file_name, parameters):
         self.create_and_verify_stack(file_name, parameters)

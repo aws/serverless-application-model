@@ -1,0 +1,412 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Handler": "LambdaASP.NETCoreWebAPI2::LambdaASP.NETCoreWebAPI2.LambdaEntryPoint::FunctionHandlerAsync",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "dotnet6",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Delete"
+    },
+    "MyFunction2": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Handler": "LambdaASP.NETCoreWebAPI2::LambdaASP.NETCoreWebAPI2.LambdaEntryPoint::FunctionHandlerAsync",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunction2Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "dotnet6",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Delete"
+    },
+    "MyFunction2HiPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction2"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/method",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Delete"
+    },
+    "MyFunction2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Delete"
+    },
+    "MyFunction3": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Handler": "LambdaASP.NETCoreWebAPI2::LambdaASP.NETCoreWebAPI2.LambdaEntryPoint::FunctionHandlerAsync",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunction3Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "dotnet6",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunction3AllPermissionProd": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction3"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/method2",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyFunction3Role": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyFunction4": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Handler": "LambdaASP.NETCoreWebAPI2::LambdaASP.NETCoreWebAPI2.LambdaEntryPoint::FunctionHandlerAsync",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunction4Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "dotnet6",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "MyFunction4ByePermissionProd": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction4"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/method2",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "MyFunction4Role": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "MyFunctionNonePermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/method",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Delete"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Delete"
+    },
+    "ServerlessRestApi": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/method": {
+              "get": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }
+              },
+              "post": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction2.Arn}/invocations"
+                  }
+                }
+              }
+            },
+            "/method2": {
+              "get": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction3.Arn}/invocations"
+                  }
+                }
+              },
+              "post": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction4.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "ServerlessRestApiDeploymentf177d7dd48": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "RestApi deployment id: f177d7dd480597bbebe027d565e98d1b4e36e615",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "ServerlessRestApiProdStage": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeploymentf177d7dd48"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage",
+      "UpdateReplacePolicy": "Retain"
+    }
+  }
+}

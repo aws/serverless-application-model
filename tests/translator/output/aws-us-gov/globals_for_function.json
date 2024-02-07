@@ -28,6 +28,9 @@
             "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer2:2"
           }
         ],
+        "LoggingConfig": {
+          "LogGroup": "myJsonStructuredLogs"
+        },
         "MemorySize": 512,
         "ReservedConcurrentExecutions": 100,
         "Role": {
@@ -162,6 +165,9 @@
             "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1"
           }
         ],
+        "LoggingConfig": {
+          "LogGroup": "myJsonStructuredLogs"
+        },
         "MemorySize": 1024,
         "ReservedConcurrentExecutions": 50,
         "Role": {

@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Union
-
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, Union
 
 from samtranslator.internal.schema_source.aws_serverless_connector import EmbeddedConnector
 from samtranslator.internal.schema_source.common import (
@@ -414,6 +412,7 @@ class MSKEventProperties(BaseModel):
     Stream: PassThroughProp = mskeventproperties("Stream")
     Topics: PassThroughProp = mskeventproperties("Topics")
     SourceAccessConfigurations: Optional[PassThroughProp] = mskeventproperties("SourceAccessConfigurations")
+    DestinationConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class MSKEvent(BaseModel):
@@ -506,6 +505,7 @@ Architectures = Optional[PassThroughProp]
 EphemeralStorage = Optional[PassThroughProp]
 SnapStart = Optional[PassThroughProp]  # TODO: check the type
 RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
+LoggingConfig = Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Properties(BaseModel):
@@ -626,11 +626,12 @@ class Properties(BaseModel):
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     Tags: Optional[Tags] = prop("Tags")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = prop("PropagateTags")
     Timeout: Optional[Timeout] = prop("Timeout")
     Tracing: Optional[Tracing] = prop("Tracing")
     VersionDescription: Optional[PassThroughProp] = prop("VersionDescription")
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
+    LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Globals(BaseModel):
@@ -656,7 +657,7 @@ class Globals(BaseModel):
         ["AWS::Lambda::Function", "Properties", "Environment"],
     )
     Tags: Optional[Tags] = prop("Tags")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = prop("PropagateTags")
     Tracing: Optional[Tracing] = prop("Tracing")
     KmsKeyArn: Optional[KmsKeyArn] = prop("KmsKeyArn")
     Layers: Optional[Layers] = prop("Layers")
@@ -688,6 +689,7 @@ class Globals(BaseModel):
     )
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
+    LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):

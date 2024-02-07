@@ -1,0 +1,142 @@
+{
+  "Description": "SNS Fifo",
+  "Resources": {
+    "HelloWorldFunction": {
+      "Metadata": {
+        "DockerContext": "./hello-world",
+        "DockerTag": "nodejs12.x-v1",
+        "Dockerfile": "Dockerfile"
+      },
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n  return {\n    statusCode: 200,\n    body: 'Success'\n  }\n}\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "HelloWorldFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "HelloWorldFunctionFifoTrigger": {
+      "Properties": {
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "HelloWorldFunctionFifoTriggerQueue",
+            "Arn"
+          ]
+        },
+        "Protocol": "sqs",
+        "TopicArn": {
+          "Ref": "MyFifoTopic"
+        }
+      },
+      "Type": "AWS::SNS::Subscription"
+    },
+    "HelloWorldFunctionFifoTriggerEventSourceMapping": {
+      "Properties": {
+        "BatchSize": 10,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "HelloWorldFunctionFifoTriggerQueue",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "HelloWorldFunction"
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "HelloWorldFunctionFifoTriggerQueue": {
+      "Properties": {
+        "FifoQueue": true
+      },
+      "Type": "AWS::SQS::Queue"
+    },
+    "HelloWorldFunctionFifoTriggerQueuePolicy": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sqs:SendMessage",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "MyFifoTopic"
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Principal": "*",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "HelloWorldFunctionFifoTriggerQueue",
+                  "Arn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Queues": [
+          {
+            "Ref": "HelloWorldFunctionFifoTriggerQueue"
+          }
+        ]
+      },
+      "Type": "AWS::SQS::QueuePolicy"
+    },
+    "HelloWorldFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyFifoTopic": {
+      "Properties": {
+        "ContentBasedDeduplication": true,
+        "FifoTopic": true,
+        "TopicName": "myFifoTopic.fifo"
+      },
+      "Type": "AWS::SNS::Topic"
+    }
+  }
+}

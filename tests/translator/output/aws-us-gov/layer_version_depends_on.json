@@ -1,0 +1,42 @@
+{
+  "Resources": {
+    "Layer1d45b36fd2d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "test",
+          "S3Key": "test.zip"
+        },
+        "LayerName": "Layer1"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    },
+    "Layer25093239808": {
+      "DeletionPolicy": "Retain",
+      "DependsOn": "Layer1d45b36fd2d",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "test",
+          "S3Key": "test.zip"
+        },
+        "LayerName": "Layer2"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    },
+    "Layer34d7f81220c": {
+      "DeletionPolicy": "Retain",
+      "DependsOn": [
+        "Layer1d45b36fd2d",
+        "Layer25093239808"
+      ],
+      "Properties": {
+        "Content": {
+          "S3Bucket": "test",
+          "S3Key": "test.zip"
+        },
+        "LayerName": "Layer3"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    }
+  }
+}

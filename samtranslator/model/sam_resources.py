@@ -1,9 +1,7 @@
 ﻿""" SAM macro definitions """
 import copy
 from contextlib import suppress
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
-
-from typing_extensions import Literal
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.cloudwatchlogs
@@ -179,6 +177,7 @@ class SamFunction(SamResourceMacro):
         "SnapStart": PropertyType(False, IS_DICT),
         "FunctionUrlConfig": PropertyType(False, IS_DICT),
         "RuntimeManagementConfig": PassThroughProperty(False),
+        "LoggingConfig": PassThroughProperty(False),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -220,6 +219,7 @@ class SamFunction(SamResourceMacro):
     Architectures: Optional[List[Any]]
     SnapStart: Optional[Dict[str, Any]]
     FunctionUrlConfig: Optional[Dict[str, Any]]
+    LoggingConfig: Optional[Dict[str, Any]]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -351,6 +351,7 @@ class SamFunction(SamResourceMacro):
                 kwargs["event_resources"],
                 intrinsics_resolver,
                 lambda_alias=lambda_alias,
+                original_template=kwargs.get("original_template"),
             )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message) from e
@@ -602,6 +603,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.CodeSigningConfigArn = self.CodeSigningConfigArn
 
         lambda_function.RuntimeManagementConfig = self.RuntimeManagementConfig  # type: ignore[attr-defined]
+        lambda_function.LoggingConfig = self.LoggingConfig
         self._validate_package_type(lambda_function)
         return lambda_function
 
@@ -775,13 +777,14 @@ class SamFunction(SamResourceMacro):
             return logical_id
         return event_dict.get("Properties", {}).get("Path", logical_id)
 
-    def _generate_event_resources(
+    def _generate_event_resources(  # noqa: PLR0913
         self,
         lambda_function: LambdaFunction,
         execution_role: Optional[IAMRole],
         event_resources: Any,
         intrinsics_resolver: IntrinsicsResolver,
         lambda_alias: Optional[LambdaAlias] = None,
+        original_template: Optional[Dict[str, Any]] = None,
     ) -> List[Any]:
         """Generates and returns the resources associated with this function's events.
 
@@ -811,6 +814,7 @@ class SamFunction(SamResourceMacro):
                     "function": lambda_alias or lambda_function,
                     "role": execution_role,
                     "intrinsics_resolver": intrinsics_resolver,
+                    "original_template": original_template,
                 }
 
                 for name, resource in event_resources[logical_id].items():
@@ -2211,6 +2215,8 @@ class SamGraphQLApi(SamResourceMacro):
         "ApiKeys": Property(False, IS_DICT),
         "DomainName": Property(False, IS_DICT),
         "Cache": Property(False, IS_DICT),
+        "Visibility": PassThroughProperty(False),
+        "OwnerContact": PassThroughProperty(False),
     }
 
     Auth: List[Dict[str, Any]]
@@ -2226,6 +2232,8 @@ class SamGraphQLApi(SamResourceMacro):
     ApiKeys: Optional[Dict[str, Dict[str, Any]]]
     DomainName: Optional[Dict[str, Any]]
     Cache: Optional[Dict[str, Any]]
+    Visibility: Optional[PassThrough]
+    OwnerContact: Optional[PassThrough]
 
     # stop validation so we can use class variables for tracking state
     validate_setattr = False
@@ -2296,6 +2304,13 @@ class SamGraphQLApi(SamResourceMacro):
         api = GraphQLApi(logical_id=self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         api.Name = passthrough_value(model.Name) or self.logical_id
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-graphqlapi.html#cfn-appsync-graphqlapi-visibility
+        # WARNING: If Visibility has not been defined, explicitly setting it to GLOBAL in a template/stack update will result in an API replacement and new DNS values.
+        # we don't want to force client's API re-creation
+        if model.Visibility:
+            api.Visibility = passthrough_value(model.Visibility)
+        if model.OwnerContact:
+            api.OwnerContact = passthrough_value(model.OwnerContact)
         api.XrayEnabled = model.XrayEnabled
 
         lambda_auth_arns = self._parse_and_set_auth_properties(api, model.Auth)

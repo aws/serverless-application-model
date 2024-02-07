@@ -125,6 +125,31 @@
               ]
             },
             "PolicyName": "MyTestFunctionEventInvokeConfigOnFailureSNSPolicy"
+          },
+          {
+            "Fn::If": [
+              "SomeCondition",
+              {
+                "PolicyDocument": {
+                  "Statement": [
+                    {
+                      "Action": [
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:PutLogEvents"
+                      ],
+                      "Effect": "Deny",
+                      "Resource": "arn:aws:logs:*:*:*"
+                    }
+                  ],
+                  "Version": "2012-10-17"
+                },
+                "PolicyName": "MyTestFunctionRolePolicy0"
+              },
+              {
+                "Ref": "AWS::NoValue"
+              }
+            ]
           }
         ],
         "Tags": [

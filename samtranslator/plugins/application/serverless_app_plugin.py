@@ -1,6 +1,7 @@
 import copy
 import json
 import logging
+import re
 from time import sleep
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -150,6 +151,14 @@ class ServerlessAppPlugin(BasePlugin):
                         raise InvalidResourceException(
                             logical_id, "Serverless Application Repository is not available in this region."
                         )
+                    # SSM Pattern found here https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/dynamic-references.html
+                    ssm_pattern = r"{{resolve:ssm:[a-zA-Z0-9_.\-/]+(:\d+)?}}"
+                    if re.search(ssm_pattern, app_id):
+                        raise InvalidResourceException(
+                            logical_id,
+                            "Serverless Application Repostiory does not support dynamic reference in 'ApplicationId' property.",
+                        )
+
                     self._make_service_call_with_retry(service_call, app_id, semver, key, logical_id)  # type: ignore[no-untyped-call]
                 except InvalidResourceException as e:
                     # Catch all InvalidResourceExceptions, raise those in the before_resource_transform target.
