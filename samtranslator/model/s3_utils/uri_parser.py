@@ -85,7 +85,7 @@ def construct_s3_location_object(
 
         s3_pointer = location_uri
 
-    else:
+    elif isinstance(location_uri, str):
         # SSM Pattern found here https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/dynamic-references.html
         ssm_pattern = r"{{resolve:(ssm|ssm-secure|secretsmanager):[a-zA-Z0-9_.\-/]+(:\d+)?}}"
         match = search(ssm_pattern, location_uri)
@@ -107,6 +107,8 @@ def construct_s3_location_object(
                 "parameter.",
             )
         s3_pointer = _s3_pointer
+    else:
+        raise InvalidResourceException(logical_id, f"'{property_name}' must be of type dict or string.")
 
     code = {"S3Bucket": s3_pointer["Bucket"], "S3Key": s3_pointer["Key"]}
     if "Version" in s3_pointer:
