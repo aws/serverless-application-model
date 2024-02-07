@@ -86,6 +86,16 @@ def construct_s3_location_object(
         s3_pointer = location_uri
 
     elif isinstance(location_uri, str):
+        # SSM Pattern found here https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/dynamic-references.html
+        ssm_pattern = r"{{resolve:(ssm|ssm-secure|secretsmanager):[a-zA-Z0-9_.\-/]+(:\d+)?}}"
+        match = search(ssm_pattern, location_uri)
+        if match and match.group(0) and "/" in match.group(0):
+            raise InvalidResourceException(
+                logical_id,
+                f"Unsupported dynamic reference detected in '{property_name}'. Please "
+                "consider using alternative 'FunctionCode' object format.",
+            )
+        
         # location_uri is NOT a dictionary. Parse it as a string
         _s3_pointer = parse_s3_uri(location_uri)
 
