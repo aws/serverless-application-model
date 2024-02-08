@@ -122,7 +122,7 @@ def parse_date(date_string):
         # will use current local time as the base for subtraction, but falsely assume it is a UTC time. Therefore
         # the time that dateparser returns will be a `datetime` object that did not have any timezone information.
         # So be explicit to set the time to UTC.
-        "RELATIVE_BASE": datetime.datetime.utcnow()
+        "RELATIVE_BASE": datetime.datetime.now(datetime.timezone.utc)
     }
 
     return dateparser.parse(date_string, settings=parser_settings)
