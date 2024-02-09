@@ -29,7 +29,7 @@ import logging
 import sys
 import time
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 
 import botocore
 
@@ -140,7 +140,7 @@ class Deployer:
             "ChangeSetType": changeset_type,
             "Parameters": parameter_values,
             "Capabilities": capabilities,
-            "Description": f"Created by SAM CLI at {datetime.utcnow().isoformat()} UTC",
+            "Description": f"Created by SAM CLI at {datetime.now(timezone.utc).isoformat()} UTC",
             "Tags": tags,
         }
 
