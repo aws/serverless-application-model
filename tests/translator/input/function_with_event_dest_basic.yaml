@@ -38,3 +38,15 @@ Resources:
       Handler: index.handler
       Runtime: nodejs12.x
       MemorySize: 1024
+      Policies:
+      - Fn::If:
+        - SomeCondition
+        - Version: '2012-10-17'
+          Statement:
+          - Effect: Deny
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+        - Ref: AWS::NoValue
