@@ -124,6 +124,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin[Type[OpenApiEditor]]):
 
         # Handle Resource-level conditions if necessary
         api_route_settings = resource.properties.get("RouteSettings", {})
+        sam_expect(api_route_settings, api_id, "RouteSettings").to_be_a_map()
         event_route_settings = event_properties.get("RouteSettings", {})
         if condition:
             event_route_settings = make_conditional(condition, event_properties.get("RouteSettings", {}))
