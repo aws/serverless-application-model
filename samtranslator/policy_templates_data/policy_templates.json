@@ -2329,6 +2329,36 @@
       "Description": "Gives access permissions to create and list applications in the AWS Serverless Application Repository service",
       "Parameters": {}
     },
+    "StepFunctionsCallbackPolicy": {
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "states:SendTaskFailure",
+              "states:SendTaskHeartbeat",
+              "states:SendTaskSuccess"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  "stateMachineName": {
+                    "Ref": "StateMachineName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Description": "Gives permission to implement callback tasks in Step Functions",
+      "Parameters": {
+        "StateMachineName": {
+          "Description": "The name of the state machine to execute."
+        }
+      }
+    },
     "StepFunctionsExecutionPolicy": {
       "Definition": {
         "Statement": [
