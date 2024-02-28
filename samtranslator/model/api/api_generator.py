@@ -1125,11 +1125,10 @@ class ApiGenerator:
         if definition_body.get("swagger") is not None:
             return definition_body
 
-        if definition_body.get("openapi") is not None and self.open_api_version is None:
-            self.open_api_version = definition_body.get("openapi")
+        normalized_open_api_version = definition_body.get("openapi", self.open_api_version)
 
-        if self.open_api_version and SwaggerEditor.safe_compare_regex_with_string(
-            SwaggerEditor._OPENAPI_VERSION_3_REGEX, self.open_api_version
+        if normalized_open_api_version and SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor._OPENAPI_VERSION_3_REGEX, normalized_open_api_version
         ):
             if definition_body.get("securityDefinitions"):
                 components = definition_body.get("components", Py27Dict())
