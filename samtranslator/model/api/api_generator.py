@@ -41,6 +41,8 @@ from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)
 
+FEATURE_FLAG_NORMALIZED_OPENAPI_VERSION = "normalized_open_api_version"
+
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple(
     "CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge", "AllowCredentials"]
@@ -1127,7 +1129,7 @@ class ApiGenerator:
         if definition_body.get("swagger") is not None:
             return definition_body
 
-        if self.feature_toggle and self.feature_toggle.is_enabled("normalized_open_api_version"):
+        if self.feature_toggle and self.feature_toggle.is_enabled(FEATURE_FLAG_NORMALIZED_OPENAPI_VERSION):
             normalized_open_api_version = definition_body.get("openapi", self.open_api_version)
         elif definition_body.get("openapi") is not None and self.open_api_version is None:
             normalized_open_api_version = definition_body.get("openapi")
