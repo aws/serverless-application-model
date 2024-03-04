@@ -46,22 +46,5 @@
         "enabled": false
       }
     }
-  },
-  "normalized_open_api_version": {
-    "beta": {
-      "default": {
-        "enabled": false
-      }
-    },
-    "gamma": {
-      "default": {
-        "enabled": false
-      }
-    },
-    "prod": {
-      "default": {
-        "enabled": false
-      }
-    }
   }
 }
