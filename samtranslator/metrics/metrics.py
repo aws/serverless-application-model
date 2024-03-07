@@ -1,9 +1,10 @@
 """
 Helper classes to publish metrics
 """
+
 import logging
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, TypedDict, Union
 
 from samtranslator.internal.deprecation_control import deprecated
@@ -114,7 +115,7 @@ class MetricDatum:
         self.value = value
         self.unit = unit
         self.dimensions = dimensions if dimensions else []
-        self.timestamp = timestamp if timestamp else datetime.utcnow()
+        self.timestamp = timestamp if timestamp else datetime.now(timezone.utc)
 
     def get_metric_data(self) -> Dict[str, Any]:
         return {
