@@ -251,6 +251,7 @@ class ApiGenerator:
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
         self.open_api_version = open_api_version
+        self.remove_extra_stage = open_api_version
         self.models = models
         self.domain = domain
         self.fail_on_warnings = fail_on_warnings
@@ -399,7 +400,7 @@ class ApiGenerator:
             self.logical_id + "Deployment", attributes=self.passthrough_resource_attributes
         )
         deployment.RestApiId = rest_api.get_runtime_attr("rest_api_id")
-        if not self.open_api_version:
+        if not self.remove_extra_stage:
             deployment.StageName = "Stage"
 
         return deployment
@@ -437,7 +438,7 @@ class ApiGenerator:
         if swagger is not None:
             deployment.make_auto_deployable(
                 stage,
-                self.open_api_version,
+                self.remove_extra_stage,
                 swagger,
                 self.domain,
                 redeploy_restapi_parameters,
@@ -1124,10 +1125,11 @@ class ApiGenerator:
         if definition_body.get("swagger") is not None:
             return definition_body
 
-        normalized_open_api_version = definition_body.get("openapi", self.open_api_version)
+        if definition_body.get("openapi") is not None and self.open_api_version is None:
+            self.open_api_version = definition_body.get("openapi")
 
-        if normalized_open_api_version and SwaggerEditor.safe_compare_regex_with_string(
-            SwaggerEditor._OPENAPI_VERSION_3_REGEX, normalized_open_api_version
+        if self.open_api_version and SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor._OPENAPI_VERSION_3_REGEX, self.open_api_version
         ):
             if definition_body.get("securityDefinitions"):
                 components = definition_body.get("components", Py27Dict())
