@@ -26,6 +26,7 @@ class TestRegionConfiguration(TestCase):
             ["aws-us-gov"],
             ["aws-iso"],
             ["aws-iso-b"],
+            ["aws-iso-e"],
         ]
     )
     def test_when_apigw_edge_configuration_is_not_supported(self, partition):
