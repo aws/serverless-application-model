@@ -25,6 +25,8 @@ def _region_to_partition(region: str) -> str:
         return "aws-iso-b"
     if region_string.startswith("us-gov"):
         return "aws-us-gov"
+    if "iso" in region_string:
+        return "{AWS::Partition}"
 
     return "aws"
 

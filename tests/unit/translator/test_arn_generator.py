@@ -14,6 +14,7 @@ class TestArnGenerator(TestCase):
             ["us-gov-west-1", "aws-us-gov"],
             ["us-iso-east-1", "aws-iso"],
             ["us-isob-east-1", "aws-iso-b"],
+            ["eu-isoe-west-1", "{AWS::Partition}"],
         ]
     )
     def test_get_partition_name(self, region, expected_partition):
@@ -27,6 +28,7 @@ class TestArnGenerator(TestCase):
             ["us-gov-west-1", "aws-us-gov"],
             ["us-iso-east-1", "aws-iso"],
             ["us-isob-east-1", "aws-iso-b"],
+            ["eu-isoe-west-1", "{AWS::Partition}"],
         ]
     )
     def test_get_partition_name_when_region_not_provided(self, region, expected_partition):
