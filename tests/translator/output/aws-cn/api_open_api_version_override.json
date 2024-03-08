@@ -60,19 +60,12 @@
               }
             },
             "securitySchemes": {
-              "CognitoAuthorizer": {
+              "aws.auth.sigv4": {
+                "description": "AWS Signature Version 4 authentication",
                 "in": "header",
                 "name": "Authorization",
                 "type": "apiKey",
-                "x-amazon-apigateway-authorizer": {
-                  "providerARNs": [
-                    {
-                      "Fn::GetAtt": "MyCognitoUserPool.Arn"
-                    }
-                  ],
-                  "type": "cognito_user_pools"
-                },
-                "x-amazon-apigateway-authtype": "cognito_user_pools"
+                "x-amazon-apigateway-authtype": "awsSigv4"
               }
             }
           },
@@ -151,6 +144,22 @@
               "aws.auth.sigv4": []
             }
           ],
+          "securityDefinitions": {
+            "CognitoAuthorizer": {
+              "in": "header",
+              "name": "Authorization",
+              "type": "apiKey",
+              "x-amazon-apigateway-authorizer": {
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": "MyCognitoUserPool.Arn"
+                  }
+                ],
+                "type": "cognito_user_pools"
+              },
+              "x-amazon-apigateway-authtype": "cognito_user_pools"
+            }
+          },
           "x-amazon-apigateway-gateway-responses": {
             "DEFAULT_5XX": {
               "responseParameters": {
@@ -173,9 +182,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "ApiGatewayCognitoService15108F0BDeployment2a9725c838": {
+    "ApiGatewayCognitoService15108F0BDeployment46d69ebe56": {
       "Properties": {
-        "Description": "RestApi deployment id: 2a9725c838d10c88c6c75fec8e5fe7557ff62cea",
+        "Description": "RestApi deployment id: 46d69ebe56e878706dbfbf454b9cbdf8c15a5343",
         "RestApiId": {
           "Ref": "ApiGatewayCognitoService15108F0B"
         }
@@ -185,7 +194,7 @@
     "ApiGatewayCognitoService15108F0BprodStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiGatewayCognitoService15108F0BDeployment2a9725c838"
+          "Ref": "ApiGatewayCognitoService15108F0BDeployment46d69ebe56"
         },
         "RestApiId": {
           "Ref": "ApiGatewayCognitoService15108F0B"
