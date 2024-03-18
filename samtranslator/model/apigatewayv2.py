@@ -347,7 +347,7 @@ class ApiGatewayV2Authorizer:
 
     @staticmethod
     def _get_jwt_configuration(
-        props: Optional[Dict[str, Union[str, List[str]]]], logical_id: str
+        props: Optional[Dict[str, Union[str, List[str]]]], api_logical_id: str
     ) -> Optional[JwtConfiguration]:
         """Make sure that JWT configuration dict keys are lower case.
 
@@ -364,7 +364,7 @@ class ApiGatewayV2Authorizer:
         Parameters
         ----------
         props: jwt configuration dict with the keys either lower case or capitalized
-        logical_id: logical id of the Serverless Api resource with the jwt configuration
+        api_logical_id: logical id of the Serverless Api resource with the jwt configuration
 
         Returns
         -------
@@ -372,5 +372,5 @@ class ApiGatewayV2Authorizer:
         """
         if not props:
             return None
-        sam_expect(props, logical_id, "JwtConfiguration").to_be_a_map()
+        sam_expect(props, api_logical_id, "JwtConfiguration").to_be_a_map()
         return {k.lower(): v for k, v in props.items()}
