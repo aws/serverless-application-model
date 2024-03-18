@@ -363,8 +363,8 @@ class ApiGatewayV2Authorizer:
 
         Parameters
         ----------
-        props
-            jwt configuration dict with the keys either lower case or capitalized
+        props: jwt configuration dict with the keys either lower case or capitalized
+        logical_id: logical id of the Serverless Api resource with the jwt configuration
 
         Returns
         -------
