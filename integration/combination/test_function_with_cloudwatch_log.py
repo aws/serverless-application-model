@@ -1,10 +1,9 @@
 import logging
 from unittest.case import skipIf
 
+from integration.config.service_names import LOGS
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import LOGS
-
 
 LOG = logging.getLogger(__name__)
 

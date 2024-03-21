@@ -1,6 +1,6 @@
 from unittest.case import skipIf
 
-from integration.config.service_names import IOT, SCHEDULE_EVENT, LOGS
+from integration.config.service_names import IOT, LOGS, SCHEDULE_EVENT
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
 
