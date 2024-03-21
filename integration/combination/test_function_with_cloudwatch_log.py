@@ -6,7 +6,7 @@ from integration.helpers.resource import current_region_does_not_support
 
 
 @skipIf(
-    current_region_does_not_support([LOGS]), "A Logs resource part of this test is not supported in this testing region"
+    current_region_does_not_support([LOGS]), "A Logs resource that is a part of this test is not supported in this testing region"
 )
 class TestFunctionWithCloudWatchLog(BaseTest):
     def test_function_with_cloudwatch_log(self):
