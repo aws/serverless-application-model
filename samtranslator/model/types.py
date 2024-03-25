@@ -8,6 +8,7 @@ Validators should cover any validation logic that is *not* done by CloudFormatio
 the Permissions property is an ARN or list of ARNs. In this situation, we validate that the Permissions property is
 either a string or a list of strings, but do not validate whether the string(s) are valid IAM policy ARNs.
 """
+
 from typing import Any, Callable, Type, Union
 
 import samtranslator.model.exceptions
