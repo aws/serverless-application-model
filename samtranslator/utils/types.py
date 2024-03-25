@@ -1,4 +1,5 @@
 """Type related utils."""
+
 from typing import Any, Dict, TypeVar, Union
 
 T = TypeVar("T")

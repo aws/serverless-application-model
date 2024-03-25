@@ -342,7 +342,7 @@ class TestOpenApiEditor_is_valid(TestCase):
         [
             param(OpenApiEditor.gen_skeleton()),
             # Dict can contain any other unrecognized properties
-            param({"openapi": "3.1.1", "paths": {}, "foo": "bar", "baz": "bar"})
+            param({"openapi": "3.1.1", "paths": {}, "foo": "bar", "baz": "bar"}),
             # TODO check and update the regex accordingly
             # Fails for this: param({"openapi": "3.1.10", "paths": {}, "foo": "bar", "baz": "bar"})
         ]

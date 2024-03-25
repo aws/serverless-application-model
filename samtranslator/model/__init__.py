@@ -1,4 +1,5 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
+
 import inspect
 import re
 from abc import ABC, ABCMeta, abstractmethod
