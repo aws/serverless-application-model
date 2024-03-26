@@ -208,9 +208,9 @@ class Deployer:
                     {
                         "LogicalResourceId": resource_props.get("LogicalResourceId"),
                         "ResourceType": resource_props.get("ResourceType"),
-                        "Replacement": "N/A"
-                        if resource_props.get("Replacement") is None
-                        else resource_props.get("Replacement"),
+                        "Replacement": (
+                            "N/A" if resource_props.get("Replacement") is None else resource_props.get("Replacement")
+                        ),
                     }
                 )
 

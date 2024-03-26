@@ -2,6 +2,7 @@
 Utilities for table pretty printing
 This was ported over from the sam-cli repo
 """
+
 import shutil
 import textwrap
 from functools import wraps

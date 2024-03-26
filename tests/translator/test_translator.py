@@ -165,13 +165,13 @@ class AbstractTestTranslator(TestCase):
                 "AWSLambdaRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaRole",
             }
             if partition == "aws":
-                mock_policy_loader.load.return_value[
-                    "AWSXrayWriteOnlyAccess"
-                ] = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+                mock_policy_loader.load.return_value["AWSXrayWriteOnlyAccess"] = (
+                    "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+                )
             else:
-                mock_policy_loader.load.return_value[
-                    "AWSXRayDaemonWriteAccess"
-                ] = f"arn:{partition}:iam::aws:policy/AWSXRayDaemonWriteAccess"
+                mock_policy_loader.load.return_value["AWSXRayDaemonWriteAccess"] = (
+                    f"arn:{partition}:iam::aws:policy/AWSXRayDaemonWriteAccess"
+                )
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 

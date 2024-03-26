@@ -1,4 +1,5 @@
 """Base class for OpenApiEditor and SwaggerEditor."""
+
 import re
 from typing import Any, Dict, Iterator, List, Optional, Union
 

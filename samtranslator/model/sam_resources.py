@@ -1,4 +1,5 @@
 ﻿""" SAM macro definitions """
+
 import copy
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, cast
