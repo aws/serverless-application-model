@@ -1,4 +1,5 @@
 """A plug-able validator to help raise exception when some value is unexpected."""
+
 from typing import Any, Dict, Generic, Optional, TypeVar, cast
 
 from samtranslator.model.exceptions import (

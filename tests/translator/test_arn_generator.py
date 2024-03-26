@@ -10,7 +10,15 @@ class TestArnGenerator(TestCase):
         ArnGenerator.BOTO_SESSION_REGION_NAME = None
 
     @parameterized.expand(
-        [("us-east-1", "aws"), ("cn-east-1", "aws-cn"), ("us-gov-west-1", "aws-us-gov"), ("US-EAST-1", "aws")]
+        [
+            ("us-east-1", "aws"),
+            ("cn-east-1", "aws-cn"),
+            ("us-gov-west-1", "aws-us-gov"),
+            ("us-isob-east-1", "aws-iso-b"),
+            ("eu-isoe-west-1", "aws-iso-e"),
+            ("US-EAST-1", "aws"),
+            ("us-isof-east-1", "${AWS::Partition}"),
+        ]
     )
     def test_get_partition_name(self, region, expected):
         actual = ArnGenerator.get_partition_name(region)

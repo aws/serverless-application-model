@@ -101,13 +101,15 @@ def _print(signature: Dict[str, inspect.Signature], variables: Set[str]) -> None
     result: Dict[str, Any] = {"routines": {}, "variables": sorted(variables)}
     for key, value in signature.items():
         result["routines"][key] = [
-            {
-                "name": parameter.name,
-                "kind": parameter.kind.name,
-                "default": parameter.default,
-            }
-            if parameter.default != inspect.Parameter.empty
-            else {"name": parameter.name, "kind": parameter.kind.name}
+            (
+                {
+                    "name": parameter.name,
+                    "kind": parameter.kind.name,
+                    "default": parameter.default,
+                }
+                if parameter.default != inspect.Parameter.empty
+                else {"name": parameter.name, "kind": parameter.kind.name}
+            )
             for parameter in value.parameters.values()
         ]
     print(json.dumps(result, indent=2, sort_keys=True))
