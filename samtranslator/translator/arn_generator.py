@@ -17,22 +17,21 @@ def _get_region_from_session() -> str:
 def _region_to_partition(region: str) -> str:
     # setting default partition to aws, this will be overwritten by checking the region below
     region_string = region.lower()
-    if region_string.startswith("cn-"):
-        partition = "aws-cn"
-    elif region_string.startswith("us-iso-"):
-        partition = "aws-iso"
-    elif region_string.startswith("us-isob"):
-        partition = "aws-iso-b"
-    elif region_string.startswith("us-gov"):
-        partition = "aws-us-gov"
-    elif region_string.startswith("eu-isoe"):
-        partition = "aws-iso-e"
-    elif "iso" in region_string:
-        partition = "{AWS::Partition}"
-    else:
-        partition = "aws"
+    region_to_partition_map = {
+        "cn-": "aws-cn",
+        "us-iso-": "aws-iso",
+        "us-isob": "aws-iso-b",
+        "us-gov": "aws-us-gov",
+        "eu-isoe": "aws-iso-e",
+    }
+    for key, value in region_to_partition_map.items():
+        if region_string.startswith(key):
+            return value
 
-    return partition
+    if "iso" in region_string:
+        return "${AWS::Partition}"
+
+    return "aws"
 
 
 class ArnGenerator:
