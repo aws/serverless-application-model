@@ -17,16 +17,20 @@ def _get_region_from_session() -> str:
 def _region_to_partition(region: str) -> str:
     # setting default partition to aws, this will be overwritten by checking the region below
     region_string = region.lower()
-    if region_string.startswith("cn-"):
-        return "aws-cn"
-    if region_string.startswith("us-iso-"):
-        return "aws-iso"
-    if region_string.startswith("us-isob"):
-        return "aws-iso-b"
-    if region_string.startswith("us-gov"):
-        return "aws-us-gov"
-    if region_string.startswith("eu-isoe"):
-        return "aws-iso-e"
+    region_to_partition_map = {
+        "cn-": "aws-cn",
+        "us-iso-": "aws-iso",
+        "us-isob": "aws-iso-b",
+        "us-gov": "aws-us-gov",
+        "eu-isoe": "aws-iso-e",
+    }
+    for key, value in region_to_partition_map.items():
+        if region_string.startswith(key):
+            return value
+
+    # Using the ${AWS::Partition} placeholder so that we don't have to add new regions to the static list above
+    if "iso" in region_string:
+        return "${AWS::Partition}"
 
     return "aws"
 
