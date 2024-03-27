@@ -1703,6 +1703,29 @@
               ]
             },
             "PolicyName": "KitchenSinkFunctionRolePolicy62"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "states:SendTaskFailure",
+                    "states:SendTaskHeartbeat",
+                    "states:SendTaskSuccess"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                      {
+                        "stateMachineName": "name"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "KitchenSinkFunctionRolePolicy63"
           }
         ],
         "Tags": [
