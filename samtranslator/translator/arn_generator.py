@@ -29,10 +29,6 @@ def _region_to_partition(region: str) -> str:
         if region_string.startswith(key):
             return value
 
-    # Using the ${AWS::Partition} placeholder so that we don't have to add new regions to the static list above
-    if "iso" in region_string:
-        return "${AWS::Partition}"
-
     return "aws"
 
 
