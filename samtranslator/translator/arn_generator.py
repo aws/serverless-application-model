@@ -25,6 +25,8 @@ def _region_to_partition(region: str) -> str:
         return "aws-iso-b"
     if region_string.startswith("us-gov"):
         return "aws-us-gov"
+    if region_string.startswith("eu-isoe"):
+        return "aws-iso-e"
 
     return "aws"
 
