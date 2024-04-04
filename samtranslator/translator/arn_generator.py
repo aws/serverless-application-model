@@ -23,14 +23,11 @@ def _region_to_partition(region: str) -> str:
         "us-isob": "aws-iso-b",
         "us-gov": "aws-us-gov",
         "eu-isoe": "aws-iso-e",
+        "us-isof": "aws-iso-f",
     }
     for key, value in region_to_partition_map.items():
         if region_string.startswith(key):
             return value
-
-    # Using the ${AWS::Partition} placeholder so that we don't have to add new regions to the static list above
-    if "iso" in region_string:
-        return "${AWS::Partition}"
 
     return "aws"
 

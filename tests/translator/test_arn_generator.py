@@ -17,7 +17,7 @@ class TestArnGenerator(TestCase):
             ("us-isob-east-1", "aws-iso-b"),
             ("eu-isoe-west-1", "aws-iso-e"),
             ("US-EAST-1", "aws"),
-            ("us-isof-east-1", "${AWS::Partition}"),
+            ("us-isof-east-1", "aws-iso-f"),
         ]
     )
     def test_get_partition_name(self, region, expected):
