@@ -1,13 +1,13 @@
 from unittest.case import skipIf
 
-from integration.config.service_names import IOT, SCHEDULE_EVENT
+from integration.config.service_names import IOT, LOGS, SCHEDULE_EVENT
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
 
 
 @skipIf(
-    current_region_does_not_support([IOT, SCHEDULE_EVENT]),
-    "IoT, ScheduleEvent is not supported in this testing region",
+    current_region_does_not_support([IOT, SCHEDULE_EVENT, LOGS]),
+    "IoT, ScheduleEvent or a Logs resource is not supported in this testing region",
 )
 class TestFunctionWithAllEventTypes(BaseTest):
     def test_function_with_all_event_types(self):

@@ -1,4 +1,5 @@
 """Formatter base class for JSONFormatter and YamlFormatter."""
+
 import argparse
 import os
 import sys
