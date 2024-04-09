@@ -19,6 +19,8 @@ Resources:
 
   MyTopic:
     Type: AWS::SNS::Topic
+    Properties:
+      KmsMasterKeyId: alias/aws/sns
 
   MyConnector:
     Type: AWS::Serverless::Connector
