@@ -36,7 +36,7 @@ INPUT_FOLDER = os.path.join(BASE_PATH, "input")
 SUCCESS_FILES_NAMES_FOR_TESTING = [
     os.path.splitext(f)[0]
     for f in os.listdir(INPUT_FOLDER)
-    if not (f.startswith(("error_", "translate_", "feature_toggle_"))) 
+    if not (f.startswith(("error_", "translate_", "feature_toggle_")))
 ]
 ERROR_FILES_NAMES_FOR_TESTING = [os.path.splitext(f)[0] for f in os.listdir(INPUT_FOLDER) if f.startswith("error_")]
 FEATURE_TOGGLE_TESTING = [os.path.splitext(f)[0] for f in os.listdir(INPUT_FOLDER) if f.startswith("feature_toggle_")]
