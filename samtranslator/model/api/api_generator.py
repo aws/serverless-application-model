@@ -255,6 +255,7 @@ class ApiGenerator:
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
         self.open_api_version = open_api_version
+        self.remove_extra_stage = open_api_version
         self.models = models
         self.domain = domain
         self.fail_on_warnings = fail_on_warnings
@@ -404,7 +405,7 @@ class ApiGenerator:
             self.logical_id + "Deployment", attributes=self.passthrough_resource_attributes
         )
         deployment.RestApiId = rest_api.get_runtime_attr("rest_api_id")
-        if not self.open_api_version:
+        if not self.remove_extra_stage:
             deployment.StageName = "Stage"
 
         return deployment
@@ -442,7 +443,7 @@ class ApiGenerator:
         if swagger is not None:
             deployment.make_auto_deployable(
                 stage,
-                self.open_api_version,
+                self.remove_extra_stage,
                 swagger,
                 self.domain,
                 redeploy_restapi_parameters,

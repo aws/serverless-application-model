@@ -1,6 +1,7 @@
 """
 Method decorator for execution latency collection
 """
+
 import functools
 import logging
 from datetime import datetime
@@ -84,13 +85,13 @@ def _send_cw_metric(prefix, name, execution_time_ms, func, args):  # type: ignor
 @overload
 def cw_timer(
     *, name: Optional[str] = None, prefix: Optional[str] = None
-) -> Callable[[Callable[_PT, _RT]], Callable[_PT, _RT]]:
-    ...
+) -> Callable[[Callable[_PT, _RT]], Callable[_PT, _RT]]: ...
 
 
 @overload
-def cw_timer(_func: Callable[_PT, _RT], name: Optional[str] = None, prefix: Optional[str] = None) -> Callable[_PT, _RT]:
-    ...
+def cw_timer(
+    _func: Callable[_PT, _RT], name: Optional[str] = None, prefix: Optional[str] = None
+) -> Callable[_PT, _RT]: ...
 
 
 def cw_timer(
