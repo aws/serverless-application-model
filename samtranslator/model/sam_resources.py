@@ -1294,6 +1294,7 @@ class SamApi(SamResourceMacro):
         shared_api_usage_plan = kwargs.get("shared_api_usage_plan")
         template_conditions = kwargs.get("conditions")
         route53_record_set_groups = kwargs.get("route53_record_set_groups", {})
+        feature_toggle = kwargs.get("feature_toggle")
 
         api_generator = ApiGenerator(
             self.logical_id,
@@ -1330,6 +1331,7 @@ class SamApi(SamResourceMacro):
             mode=self.Mode,
             api_key_source_type=self.ApiKeySourceType,
             always_deploy=self.AlwaysDeploy,
+            feature_toggle=feature_toggle,
         )
 
         generated_resources = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
