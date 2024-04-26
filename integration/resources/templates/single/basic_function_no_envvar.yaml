@@ -6,5 +6,8 @@ Resources:
       Runtime: nodejs18.x
       CodeUri: ${codeuri}
       MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
 Metadata:
   SamTransformTest: true
