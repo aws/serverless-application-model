@@ -129,7 +129,9 @@ class ApiGatewayV2Authorizer:
         self.api_logical_id = api_logical_id
         self.name = name
         self.authorization_scopes = authorization_scopes
-        self.jwt_configuration: Optional[JwtConfiguration] = self._get_jwt_configuration(jwt_configuration)
+        self.jwt_configuration: Optional[JwtConfiguration] = self._get_jwt_configuration(
+            jwt_configuration, api_logical_id
+        )
         self.id_source = id_source
         self.function_arn = function_arn
         self.function_invoke_role = function_invoke_role
@@ -344,7 +346,9 @@ class ApiGatewayV2Authorizer:
         return identity_source
 
     @staticmethod
-    def _get_jwt_configuration(props: Optional[Dict[str, Union[str, List[str]]]]) -> Optional[JwtConfiguration]:
+    def _get_jwt_configuration(
+        props: Optional[Dict[str, Union[str, List[str]]]], api_logical_id: str
+    ) -> Optional[JwtConfiguration]:
         """Make sure that JWT configuration dict keys are lower case.
 
         ApiGatewayV2Authorizer doesn't create `AWS::ApiGatewayV2::Authorizer` but generates
@@ -359,8 +363,8 @@ class ApiGatewayV2Authorizer:
 
         Parameters
         ----------
-        props
-            jwt configuration dict with the keys either lower case or capitalized
+        props: jwt configuration dict with the keys either lower case or capitalized
+        api_logical_id: logical id of the Serverless Api resource with the jwt configuration
 
         Returns
         -------
@@ -368,4 +372,5 @@ class ApiGatewayV2Authorizer:
         """
         if not props:
             return None
+        sam_expect(props, api_logical_id, "JwtConfiguration").to_be_a_map()
         return {k.lower(): v for k, v in props.items()}

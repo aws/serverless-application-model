@@ -9,6 +9,7 @@ https://peps.python.org/pep-0565/#additional-use-case-for-futurewarning
 If external packages import deprecated interfaces,
 it is their responsibility to detect and remove them.
 """
+
 import warnings
 from functools import wraps
 from typing import Callable, Optional, TypeVar
