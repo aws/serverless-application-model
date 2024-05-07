@@ -3,6 +3,7 @@ from collections import namedtuple
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
+from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Resource
 from samtranslator.model.apigateway import (
@@ -39,6 +40,8 @@ from samtranslator.utils.utils import InvalidValueType, dict_deep_get
 from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)
+
+FEATURE_FLAG_NORMALIZED_OPENAPI_VERSION = "normalized_open_api_version"
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple(
@@ -205,6 +208,7 @@ class ApiGenerator:
         mode: Optional[Intrinsicable[str]] = None,
         api_key_source_type: Optional[Intrinsicable[str]] = None,
         always_deploy: Optional[bool] = False,
+        feature_toggle: Optional[FeatureToggle] = None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -261,6 +265,7 @@ class ApiGenerator:
         self.mode = mode
         self.api_key_source_type = api_key_source_type
         self.always_deploy = always_deploy
+        self.feature_toggle = feature_toggle
 
     def _construct_rest_api(self) -> ApiGatewayRestApi:
         """Constructs and returns the ApiGateway RestApi.
@@ -1125,11 +1130,15 @@ class ApiGenerator:
         if definition_body.get("swagger") is not None:
             return definition_body
 
-        if definition_body.get("openapi") is not None and self.open_api_version is None:
-            self.open_api_version = definition_body.get("openapi")
+        if self.feature_toggle and self.feature_toggle.is_enabled(FEATURE_FLAG_NORMALIZED_OPENAPI_VERSION):
+            normalized_open_api_version = definition_body.get("openapi", self.open_api_version)
+        elif definition_body.get("openapi") is not None and self.open_api_version is None:
+            normalized_open_api_version = definition_body.get("openapi")
+        else:
+            normalized_open_api_version = self.open_api_version
 
-        if self.open_api_version and SwaggerEditor.safe_compare_regex_with_string(
-            SwaggerEditor._OPENAPI_VERSION_3_REGEX, self.open_api_version
+        if normalized_open_api_version and SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor._OPENAPI_VERSION_3_REGEX, normalized_open_api_version
         ):
             if definition_body.get("securityDefinitions"):
                 components = definition_body.get("components", Py27Dict())

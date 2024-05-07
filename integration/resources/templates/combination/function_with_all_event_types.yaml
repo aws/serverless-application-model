@@ -132,6 +132,9 @@ Resources:
     Condition: MyCondition
     Properties:
       ShardCount: 1
+      StreamEncryption:
+        EncryptionType: KMS
+        KeyId: alias/aws/kinesis
 
   MyDynamoDB:
     UpdateReplacePolicy: Delete
