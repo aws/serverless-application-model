@@ -1,0 +1,273 @@
+{
+  "Resources": {
+    "ApiGatewayCognitoExecutionRole4F7CB5C8": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "apigateway.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "lambda:Invoke*",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "LambdaFunction7804BD21",
+                      "Arn"
+                    ]
+                  }
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "apigInvokeLambda"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ApiGatewayCognitoService15108F0B": {
+      "Properties": {
+        "Body": {
+          "components": {
+            "schemas": {
+              "CreateReviewRequestContent": {
+                "properties": {
+                  "reviewId": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "CreateReviewResponseContent": {
+                "properties": {
+                  "reviewId": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "securitySchemes": {
+              "CognitoAuthorizer": {
+                "in": "header",
+                "name": "Authorization",
+                "type": "apiKey",
+                "x-amazon-apigateway-authorizer": {
+                  "providerARNs": [
+                    {
+                      "Fn::GetAtt": "MyCognitoUserPool.Arn"
+                    }
+                  ],
+                  "type": "cognito_user_pools"
+                },
+                "x-amazon-apigateway-authtype": "cognito_user_pools"
+              }
+            }
+          },
+          "info": {
+            "title": "RxtHofApprovalServiceLambdaCognito",
+            "version": "2018-05-10"
+          },
+          "openapi": "3.0.2",
+          "paths": {
+            "/reviews": {
+              "post": {
+                "operationId": "CreateReview",
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/CreateReviewRequestContent"
+                      }
+                    }
+                  },
+                  "required": true
+                },
+                "responses": {
+                  "200": {
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/CreateReviewResponseContent"
+                        }
+                      }
+                    },
+                    "description": "CreateReview 200 response",
+                    "headers": {
+                      "Access-Control-Allow-Origin": {
+                        "schema": {
+                          "type": "string"
+                        }
+                      },
+                      "Access-Control-Expose-Headers": {
+                        "schema": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "security": [
+                  {
+                    "CognitoAuthorizer": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
+                    "Fn::Sub": "${ApiGatewayCognitoExecutionRole4F7CB5C8.Arn}"
+                  },
+                  "httpMethod": "POST",
+                  "responses": {
+                    "default": {
+                      "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                        "method.response.header.Access-Control-Expose-Headers": "'Content-Length,Content-Type,X-Amzn-Errortype,X-Amzn-Requestid'"
+                      },
+                      "statusCode": "200"
+                    }
+                  },
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction7804BD21.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "aws.auth.sigv4": []
+            }
+          ],
+          "x-amazon-apigateway-gateway-responses": {
+            "DEFAULT_5XX": {
+              "responseParameters": {
+                "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{\"message\":$context.error.messageString}"
+              }
+            }
+          }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ApiGatewayCognitoService15108F0BDeployment2a9725c838": {
+      "Properties": {
+        "Description": "RestApi deployment id: 2a9725c838d10c88c6c75fec8e5fe7557ff62cea",
+        "RestApiId": {
+          "Ref": "ApiGatewayCognitoService15108F0B"
+        }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ApiGatewayCognitoService15108F0BprodStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ApiGatewayCognitoService15108F0BDeployment2a9725c838"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayCognitoService15108F0B"
+        },
+        "StageName": "prod",
+        "TracingEnabled": true
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "LambdaFunction7804BD21": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event, context, callback) => {\n  const auth = event.queryStringParameters.authorization\n  const policyDocument = {\n    Version: '2012-10-17',\n    Statement: [{\n      Action: 'execute-api:Invoke',\n      Effect: auth && auth.toLowerCase() === 'allow' ? 'Allow' : 'Deny',\n      Resource: event.methodArn\n    }]\n  }\n  \n  return {\n    principalId: 'user',\n    context: {},\n    policyDocument\n  }\n}\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaFunctionServiceRoleD6E423C9",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x"
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "LambdaFunctionServiceRoleD6E423C9": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "LambdaFunctionServiceRoleDefaultPolicyF01A7EDC": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sns:Publish",
+              "Effect": "Allow",
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "LambdaFunctionServiceRoleDefaultPolicyF01A7EDC",
+        "Roles": [
+          {
+            "Ref": "LambdaFunctionServiceRoleD6E423C9"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Policy"
+    },
+    "MyCognitoUserPool": {
+      "Properties": {
+        "UserPoolName": "MyCognitoUserPool"
+      },
+      "Type": "AWS::Cognito::UserPool"
+    }
+  }
+}
