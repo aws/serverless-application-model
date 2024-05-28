@@ -429,7 +429,7 @@ class S3(PushEventSource):
         dependency, so CloudFormation will automatically wait once it reaches that function, the same
         as if you were using a DependsOn.
         """
-        properties = bucket.get("Properties", None)
+        properties = bucket.get("Properties")
         if properties is None:
             properties = {}
             bucket["Properties"] = properties
@@ -576,14 +576,14 @@ class SNS(PushEventSource):
         sqs_subscription: Dict[str, Any] = sam_expect(
             self.SqsSubscription, self.relative_id, "SqsSubscription", is_sam_event=True
         ).to_be_a_map()
-        queue_arn = sqs_subscription.get("QueueArn", None)
-        queue_url = sqs_subscription.get("QueueUrl", None)
+        queue_arn = sqs_subscription.get("QueueArn")
+        queue_url = sqs_subscription.get("QueueUrl")
         if not queue_arn or not queue_url:
             raise InvalidEventException(self.relative_id, "No QueueARN or QueueURL provided.")
 
-        queue_policy_logical_id = sqs_subscription.get("QueuePolicyLogicalId", None)
-        batch_size = sqs_subscription.get("BatchSize", None)
-        enabled = sqs_subscription.get("Enabled", None)
+        queue_policy_logical_id = sqs_subscription.get("QueuePolicyLogicalId")
+        batch_size = sqs_subscription.get("BatchSize")
+        enabled = sqs_subscription.get("Enabled")
 
         queue_policy = self._inject_sqs_queue_policy(  # type: ignore[no-untyped-call]
             self.Topic, queue_arn, queue_url, function, queue_policy_logical_id

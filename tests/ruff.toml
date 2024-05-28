@@ -1,8 +1,11 @@
 # black formatter takes care of the line length
 line-length = 999
 
+# Mininal python version we support is 3.8
+target-version = "py38"
+
 # The code quality of tests can be a bit lower compared to samtranslator
-select = [
+lint.select = [
     "E",  # Pyflakes
     "F",  # Pyflakes
     "PL", # pylint
@@ -15,10 +18,7 @@ select = [
     "UP", # pyupgrade
 ]
 
-# Mininal python version we support is 3.8
-target-version = "py38"
-
-[per-file-ignores]
+[lint.per-file-ignores]
 
 # The code quality of tests can be a bit lower:
 "**/*.py" = [
