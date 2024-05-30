@@ -170,7 +170,7 @@ class TestHttpApiGenerator(TestCase):
             }
             self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
             http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
-            self.assertNotIn("components", http_api.Body, "EnableIamAuthorizer value: %s" % val)
+            self.assertNotIn("components", http_api.Body, f"EnableIamAuthorizer value: {val}")
 
     def test_auth_novalue_default_does_not_raise(self):
         self.kwargs["auth"] = self.authorizers
