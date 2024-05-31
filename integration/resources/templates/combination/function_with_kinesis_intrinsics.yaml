@@ -80,5 +80,8 @@ Resources:
     Type: AWS::Kinesis::Stream
     Properties:
       ShardCount: 1
+      StreamEncryption:
+        EncryptionType: KMS
+        KeyId: alias/aws/kinesis
 Metadata:
   SamTransformTest: true

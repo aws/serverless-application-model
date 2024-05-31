@@ -34,9 +34,12 @@ DO_NOT_SORT = ["Layers"]
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = os.path.join(BASE_PATH, "input")
 SUCCESS_FILES_NAMES_FOR_TESTING = [
-    os.path.splitext(f)[0] for f in os.listdir(INPUT_FOLDER) if not (f.startswith(("error_", "translate_")))
+    os.path.splitext(f)[0]
+    for f in os.listdir(INPUT_FOLDER)
+    if not (f.startswith(("error_", "translate_", "feature_toggle_")))
 ]
 ERROR_FILES_NAMES_FOR_TESTING = [os.path.splitext(f)[0] for f in os.listdir(INPUT_FOLDER) if f.startswith("error_")]
+FEATURE_TOGGLE_TESTING = [os.path.splitext(f)[0] for f in os.listdir(INPUT_FOLDER) if f.startswith("feature_toggle_")]
 OUTPUT_FOLDER = os.path.join(BASE_PATH, "output")
 
 
@@ -154,7 +157,7 @@ class AbstractTestTranslator(TestCase):
         expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
         return json.load(open(expected_filepath))
 
-    def _compare_transform(self, manifest, expected, partition, region):
+    def _compare_transform(self, manifest, expected, partition, region, enable_feature_toggle=False):
         with patch("boto3.session.Session.region_name", region):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
@@ -165,15 +168,20 @@ class AbstractTestTranslator(TestCase):
                 "AWSLambdaRole": f"arn:{partition}:iam::aws:policy/service-role/AWSLambdaRole",
             }
             if partition == "aws":
-                mock_policy_loader.load.return_value[
-                    "AWSXrayWriteOnlyAccess"
-                ] = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+                mock_policy_loader.load.return_value["AWSXrayWriteOnlyAccess"] = (
+                    "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+                )
             else:
-                mock_policy_loader.load.return_value[
-                    "AWSXRayDaemonWriteAccess"
-                ] = f"arn:{partition}:iam::aws:policy/AWSXRayDaemonWriteAccess"
+                mock_policy_loader.load.return_value["AWSXRayDaemonWriteAccess"] = (
+                    f"arn:{partition}:iam::aws:policy/AWSXRayDaemonWriteAccess"
+                )
 
-            output_fragment = transform(manifest, parameter_values, mock_policy_loader)
+            if enable_feature_toggle:
+                mock_feature_toggle = MagicMock()
+                mock_feature_toggle.is_enabled.return_value = True
+                output_fragment = transform(manifest, parameter_values, mock_policy_loader, mock_feature_toggle)
+            else:
+                output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
         print(json.dumps(output_fragment, indent=2))
 
@@ -276,6 +284,31 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         expected = self._read_expected_output(testcase, partition)
 
         self._compare_transform(manifest, expected, partition, region)
+
+    @parameterized.expand(
+        itertools.product(
+            FEATURE_TOGGLE_TESTING,
+            [
+                ("aws", "ap-southeast-1"),
+                ("aws-cn", "cn-north-1"),
+                ("aws-us-gov", "us-gov-west-1"),
+            ],  # Run all the above tests against each of the list of partitions to test against
+        )
+    )
+    @patch(
+        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
+        mock_sar_service_call,
+    )
+    @patch("samtranslator.translator.arn_generator._get_region_from_session")
+    def test_transform_feature_toggle(self, testcase, partition_with_region, mock_get_region_from_session):
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+        mock_get_region_from_session.return_value = region
+
+        manifest = self._read_input(testcase)
+        expected = self._read_expected_output(testcase, partition)
+
+        self._compare_transform(manifest, expected, partition, region, True)
 
     @parameterized.expand(
         itertools.product(

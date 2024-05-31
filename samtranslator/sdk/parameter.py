@@ -55,7 +55,7 @@ class SamParameterValues:
         :return dict: Merged parameter values
         """
 
-        parameter_definition = sam_template.get("Parameters", None)
+        parameter_definition = sam_template.get("Parameters")
         if not parameter_definition or not isinstance(parameter_definition, dict):
             return self.parameter_values
 

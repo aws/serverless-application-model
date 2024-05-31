@@ -1,4 +1,5 @@
 ﻿""" SAM macro definitions """
+
 import copy
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, cast
@@ -252,7 +253,7 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(self.logical_id, e.message) from e
 
     @cw_timer
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0912, PLR0915
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0915
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
@@ -1293,6 +1294,7 @@ class SamApi(SamResourceMacro):
         shared_api_usage_plan = kwargs.get("shared_api_usage_plan")
         template_conditions = kwargs.get("conditions")
         route53_record_set_groups = kwargs.get("route53_record_set_groups", {})
+        feature_toggle = kwargs.get("feature_toggle")
 
         api_generator = ApiGenerator(
             self.logical_id,
@@ -1329,6 +1331,7 @@ class SamApi(SamResourceMacro):
             mode=self.Mode,
             api_key_source_type=self.ApiKeySourceType,
             always_deploy=self.AlwaysDeploy,
+            feature_toggle=feature_toggle,
         )
 
         generated_resources = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
@@ -1911,7 +1914,7 @@ class SamConnector(SamResourceMacro):
 
         raise InvalidResourceException(self.logical_id, "'Destination' is an empty list")
 
-    def generate_resources(  # noqa: PLR0912
+    def generate_resources(
         self,
         source: ConnectorResourceReference,
         destination: ConnectorResourceReference,

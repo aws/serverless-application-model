@@ -12,5 +12,7 @@ Resources:
 
   MyTopic:
     Type: AWS::SNS::Topic
+    Properties:
+      KmsMasterKeyId: alias/aws/sns
 Metadata:
   SamTransformTest: true

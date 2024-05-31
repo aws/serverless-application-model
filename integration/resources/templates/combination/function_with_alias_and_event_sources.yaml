@@ -91,6 +91,9 @@ Resources:
     Type: AWS::Kinesis::Stream
     Properties:
       ShardCount: 1
+      StreamEncryption:
+        EncryptionType: KMS
+        KeyId: alias/aws/kinesis
 
   # What an irony the I can't use AWS::Serverless::SimpleTable here because it doesn't support streams specification
   MyTable:

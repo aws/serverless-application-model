@@ -506,14 +506,14 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         for i, key in enumerate(self):
             string += ", " if i > 0 else ""
             if isinstance(key, ("".__class__, bytes)):
-                string += "%s: " % key.__repr__()
+                string += f"{key.__repr__()}: "
             else:
-                string += "%s: " % key
+                string += f"{key}: "
 
             if isinstance(self[key], ("".__class__, bytes)):
-                string += "%s" % self[key].__repr__()
+                string += str(self[key].__repr__())
             else:
-                string += "%s" % self[key]
+                string += str(self[key])
 
         string += "}"
         return string

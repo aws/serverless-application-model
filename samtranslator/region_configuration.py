@@ -17,13 +17,10 @@ class RegionConfiguration:
 
         :return: True, if API Gateway does not support Edge configuration
         """
-
-        return ArnGenerator.get_partition_name() not in [
-            "aws-us-gov",
-            "aws-iso",
-            "aws-iso-b",
-            "aws-cn",
-        ]
+        partition = ArnGenerator.get_partition_name()
+        if partition.startswith("aws-iso") or partition in ["aws-us-gov", "aws-cn"]:
+            return False
+        return True
 
     @classmethod
     def is_service_supported(cls, service, region=None):  # type: ignore[no-untyped-def]
