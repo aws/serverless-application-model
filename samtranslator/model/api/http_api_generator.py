@@ -633,8 +633,7 @@ class HttpApiGenerator:
             if "OpenIdConnectUrl" in authorizer:
                 raise InvalidResourceException(
                     self.logical_id,
-                    "'OpenIdConnectUrl' is no longer a supported property for authorizer '%s'. Please refer to the AWS SAM documentation."
-                    % (authorizer_name),
+                    f"'OpenIdConnectUrl' is no longer a supported property for authorizer '{authorizer_name}'. Please refer to the AWS SAM documentation.",
                 )
             authorizers[authorizer_name] = ApiGatewayV2Authorizer(  # type: ignore[no-untyped-call]
                 api_logical_id=self.logical_id,

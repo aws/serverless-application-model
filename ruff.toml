@@ -1,7 +1,10 @@
 # black formatter takes care of the line length
 line-length = 999
 
-select = [
+# Mininal python version we support is 3.8
+target-version = "py38"
+
+lint.select = [
     "E",  # pycodestyle
     "W",  # pycodestyle
     "F",  # Pyflakes
@@ -27,7 +30,7 @@ select = [
     "T20", # flake8-print
 ]
 
-ignore = [
+lint.ignore = [
     "UP006", # https://github.com/charliermarsh/ruff/pull/4427
     "UP007", # https://github.com/charliermarsh/ruff/pull/4427
     # Mutable class attributes should be annotated with `typing.ClassVar`
@@ -37,10 +40,7 @@ ignore = [
     "G004",
 ]
 
-# Mininal python version we support is 3.8
-target-version = "py38"
-
-[per-file-ignores]
+[lint.per-file-ignores]
 # python scripts in bin/ needs some python path configurations before import
 "bin/*.py" = [
     # E402: module-import-not-at-top-of-file
@@ -53,5 +53,5 @@ target-version = "py38"
     "T201",
 ]
 
-[pylint]
+[lint.pylint]
 max-args = 6  # We have many functions reaching 6 args
