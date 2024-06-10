@@ -350,6 +350,10 @@ class Resource(ABC):
             with suppress(KeyError):
                 error_properties = ".".join(str(x) for x in e.errors()[0]["loc"])
             raise InvalidResourceException(self.logical_id, f"Property '{error_properties}' is invalid.") from e
+        except AttributeError as e:
+            raise InvalidResourceException(
+                self.logical_id, "Module 'pydantic.v1' has no attribute 'error_wrappers'"
+            ) from e
 
     def validate_properties(self) -> None:
         """Validates that the required properties for this Resource have been populated, and that all properties have
