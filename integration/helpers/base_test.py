@@ -650,9 +650,9 @@ class BaseTest(TestCase):
             )
         return response
 
-    def do_post_request_with_logging(self, url: str, body_obj, headers=None):
+    def do_post_request_with_logging(self, url: str, body_obj, requestHeaders=None):
         """Perform a POST request with dict body body_obj."""
-        response = requests.post(url, json=body_obj, headers=headers) if headers else requests.post(url, json=body_obj)
+        response = requests.post(url, json=body_obj, headers=requestHeaders) if requestHeaders else requests.post(url, json=body_obj)
         amazon_headers = RequestUtils(response).get_amazon_headers()
         if self.internal:
             REQUEST_LOGGER.info(
