@@ -4,6 +4,8 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
+      EndpointConfiguration:
+        Type: REGIONAL
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
