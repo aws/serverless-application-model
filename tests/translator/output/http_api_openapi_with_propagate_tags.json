@@ -1,0 +1,112 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "MyHttpApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": "My API",
+            "version": "1.0.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {
+            "/": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          },
+          "tags": [
+            {
+              "name": "Project",
+              "x-amazon-apigateway-tag-value": "MyProject"
+            },
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "MyHttpApiApiGatewayDefaultStage": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyHttpApi"
+        },
+        "AutoDeploy": true,
+        "StageName": "$default",
+        "Tags": {
+          "Project": "MyProject",
+          "httpapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    },
+    "MyLambdaFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "my-bucket",
+          "S3Key": "my-code.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyLambdaFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.10",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyLambdaFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

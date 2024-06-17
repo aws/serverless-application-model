@@ -34,7 +34,7 @@ class ApiGatewayV2HttpApi(Resource):
         :param tags: Tags to be assigned to the resource
 
         """
-        if tags is not None and "Tags" in self.property_types:
+        if tags is not None and "Tags" in self.property_types and "Body" not in self.property_types:
             self.Tags = tags
 
 
