@@ -567,9 +567,9 @@ class BaseTest(TestCase):
             )
         return response
 
-    def verify_post_request(self, url: str, body_obj, expected_status_code: int):
+    def verify_post_request(self, url: str, body_obj, expected_status_code: int, headers=None):
         """Return response to POST request and verify matches expected status code."""
-        response = self.do_post_request(url, body_obj)
+        response = self.do_post_request_with_logging(url, body_obj, headers)
         if response.status_code != expected_status_code:
             raise StatusCodeError(
                 f"Request to {url} failed with status: {response.status_code}, expected status: {expected_status_code}"
@@ -650,12 +650,13 @@ class BaseTest(TestCase):
             )
         return response
 
-    def do_post_request(self, url: str, body_obj):
+    def do_post_request_with_logging(self, url: str, body_obj, headers=None):
         """Perform a POST request with dict body body_obj."""
-        response = requests.post(url, json=body_obj)
+        response = requests.post(url, json=body_obj, headers=headers) if headers else requests.post(url, json=body_obj)
+        amazon_headers = RequestUtils(response).get_amazon_headers()
         if self.internal:
             REQUEST_LOGGER.info(
                 "POST request made to " + url,
-                extra={"test": self.testcase, "status": response.status_code},
+                extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
             )
         return response
