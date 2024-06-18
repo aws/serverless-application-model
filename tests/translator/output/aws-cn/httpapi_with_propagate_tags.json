@@ -48,12 +48,7 @@
             ]
           }
         },
-        "FailOnWarnings": true,
-        "Tags": {
-          "TagKey1": "Value1",
-          "TagKey2": "Value2",
-          "httpapi:createdBy": "SAM"
-        }
+        "FailOnWarnings": true
       },
       "Type": "AWS::ApiGatewayV2::Api"
     },
