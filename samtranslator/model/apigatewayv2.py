@@ -25,7 +25,6 @@ class ApiGatewayV2HttpApi(Resource):
     }
 
     runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}
-    Tags: Optional[PassThrough]
 
     def assign_tags(self, tags: Dict[str, Any]) -> None:
         """Overriding default 'assign_tags' function in Resource class
@@ -34,8 +33,8 @@ class ApiGatewayV2HttpApi(Resource):
         :param tags: Tags to be assigned to the resource
 
         """
-        if tags is not None and "Tags" in self.property_types and "Body" not in self.property_types:
-            self.Tags = tags
+        # Tags are already defined in Body so they do not need to be assigned here
+        return
 
 
 class ApiGatewayV2Stage(Resource):
