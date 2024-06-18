@@ -118,6 +118,10 @@ class TestBasicApi(BaseTest):
         """
         Pass single quotes in input JSON to a StateMachine
         See https://github.com/aws/serverless-application-model/issues/1895
+
+        This test is known to sometimes be flaky, but we want to avoid marking it as non-blocking as this is a basic api test.
+        Instead, we set the EndpointConfiguration to REGIONAL and added logging to the api request
+        If this test continues to fail it should be marked as non-blocking
         """
         self.create_and_verify_stack("single/state_machine_with_api")
 
