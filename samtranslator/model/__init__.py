@@ -345,15 +345,13 @@ class Resource(ABC):
         """
         try:
             return cls.parse_obj(self._generate_resource_dict()["Properties"])
-        except pydantic.error_wrappers.ValidationError as e:
+        # TODO there is an issue on pydantic's side where we get an "module 'pydantic.v1' has no attribute 'error_wrappers'"
+        # Once pydantic fixes their issue we should change the bottom line to catch pydantic.error_wrappers.ValidationError instead of all exceptions
+        except Exception as e:
             error_properties: str = ""
             with suppress(KeyError):
                 error_properties = ".".join(str(x) for x in e.errors()[0]["loc"])
             raise InvalidResourceException(self.logical_id, f"Property '{error_properties}' is invalid.") from e
-        except AttributeError as e:
-            raise InvalidResourceException(
-                self.logical_id, "Module 'pydantic.v1' has no attribute 'error_wrappers'"
-            ) from e
 
     def validate_properties(self) -> None:
         """Validates that the required properties for this Resource have been populated, and that all properties have
