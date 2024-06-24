@@ -3,7 +3,8 @@
 import inspect
 import re
 from abc import ABC, ABCMeta, abstractmethod
-from contextlib import suppress
+
+# from contextlib import suppress
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
 from samtranslator.compat import pydantic
