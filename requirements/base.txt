@@ -3,4 +3,5 @@ jsonschema<5,>=3.2  # TODO: evaluate risk of removing jsonschema 3.x support
 typing_extensions>=4.4 # 3.8 doesn't have Required, TypeGuard and ParamSpec
 
 # resource validation & schema generation
-pydantic>=1.8,<3
+# 1.10.15 and 1.10.17 included breaking change from pydantic, more info: https://github.com/aws/serverless-application-model/issues/3617
+pydantic>=1.8,<3,!=1.10.15,!=1.10.17
