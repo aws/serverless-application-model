@@ -1778,6 +1778,7 @@ class SamStateMachine(SamResourceMacro):
         "PermissionsBoundary": PropertyType(False, IS_STR),
         "AutoPublishAlias": PassThroughProperty(False),
         "DeploymentPreference": MutatedPassThroughProperty(False),
+        "UseAliasAsEventTarget": Property(False, IS_BOOL),
     }
 
     Definition: Optional[Dict[str, Any]]
@@ -1796,6 +1797,7 @@ class SamStateMachine(SamResourceMacro):
     PermissionsBoundary: Optional[Intrinsicable[str]]
     AutoPublishAlias: Optional[PassThrough]
     DeploymentPreference: Optional[PassThrough]
+    UseAliasAsEventTarget: Optional[bool]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.stepfunctions.events,
@@ -1834,6 +1836,7 @@ class SamStateMachine(SamResourceMacro):
             get_managed_policy_map=get_managed_policy_map,
             auto_publish_alias=self.AutoPublishAlias,
             deployment_preference=self.DeploymentPreference,
+            use_alias_as_event_target=self.UseAliasAsEventTarget,
         )
 
         generated_resources = state_machine_generator.to_cloudformation()
