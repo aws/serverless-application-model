@@ -68,8 +68,14 @@ def get_input_file_path() -> Path:
 
 
 def copy_input_file_to_transform_test_dir(input_file_path: Path, transform_test_input_path: Path) -> None:
-    shutil.copyfile(input_file_path, transform_test_input_path)
-    print(f"Transform Test input file generated {transform_test_input_path}")
+    try:
+        shutil.copyfile(input_file_path, transform_test_input_path)
+        print(f"Transform Test input file generated {transform_test_input_path}")
+    except shutil.SameFileError:
+        print(f"Source and destination are the same file: {input_file_path}")
+    except Exception as e:
+        raise e
+
 
 
 def verify_input_template(input_file_path: Path) -> None:
@@ -99,7 +105,9 @@ def main() -> None:
     verify_input_template(input_file_path)
 
     transform_test_input_path = TRANSFORM_TEST_DIR / "input" / (file_basename + ".yaml")
-    copy_input_file_to_transform_test_dir(input_file_path, transform_test_input_path)
+    # check if the template is not already in the transform test input dir
+    if input_file_path != transform_test_input_path:
+        copy_input_file_to_transform_test_dir(input_file_path, transform_test_input_path)
 
     generate_transform_test_output_files(transform_test_input_path, file_basename)
 
