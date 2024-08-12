@@ -1,0 +1,45 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      Definition:
+        StartAt: HelloWorld
+        States:
+          HelloWorld:
+            Type: Pass
+            Result: 1
+            End: true
+      Role: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/doesNotExist"
+      AutoPublishAlias: test
+      UseAliasAsEventTarget: true
+      Events:
+        CWEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail:
+                state:
+                - terminated
+        EBEvent:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source: [aws.tag]
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /path
+            Method: get
+        CWSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Name: TestSchedule
+            Description: test schedule
+            Enabled: false
+        ScheduleEvent:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(1 minute)

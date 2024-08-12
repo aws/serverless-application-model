@@ -8020,6 +8020,10 @@
           ],
           "markdownDescription": "The type of the state machine\\.  \n*Valid values*: `STANDARD` or `EXPRESS`  \n*Type*: String  \n*Required*: No  \n*Default*: `STANDARD`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StateMachineType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-statemachinetype) property of an `AWS::StepFunctions::StateMachine` resource\\.",
           "title": "Type"
+        },
+        "UseAliasAsEventTarget": {
+          "title": "Usealiasaseventtarget",
+          "type": "boolean"
         }
       },
       "title": "Properties",
