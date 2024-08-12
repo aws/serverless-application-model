@@ -77,7 +77,6 @@ def copy_input_file_to_transform_test_dir(input_file_path: Path, transform_test_
         raise e
 
 
-
 def verify_input_template(input_file_path: Path) -> None:
     if "arn:aws:" in input_file_path.read_text(encoding="utf-8"):
         print(
