@@ -16,7 +16,7 @@ Resources:
     Properties:
       CodeUri: s3://bucket/key
       Handler: code/handler
-      Runtime: python3.8
+      Runtime: python3.11
       Events:
         AllEvent:
           Type: Api
