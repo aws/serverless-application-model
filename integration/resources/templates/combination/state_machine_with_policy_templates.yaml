@@ -24,7 +24,7 @@ Resources:
     Properties:
       CodeUri: ${codeuri}
       Handler: hello.handler
-      Runtime: python3.8
+      Runtime: python3.11
 
   MyQueue:
     Type: AWS::SQS::Queue
