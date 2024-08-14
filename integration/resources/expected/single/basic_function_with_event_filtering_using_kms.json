@@ -1,0 +1,22 @@
+[
+  {
+    "LogicalResourceId": "BasicFunctionWithEventFilteringUsingKmsKeyArn",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "BasicFunctionWithEventFilteringUsingKmsKeyArnRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyKey",
+    "ResourceType": "AWS::KMS::Key"
+  },
+  {
+    "LogicalResourceId": "MySqsQueue",
+    "ResourceType": "AWS::SQS::Queue"
+  },
+  {
+    "LogicalResourceId": "BasicFunctionWithEventFilteringUsingKmsKeyArnMySqsEvent",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  }
+]

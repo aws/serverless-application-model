@@ -564,11 +564,6 @@
               "x-amazon-apigateway-tag-value": "SAM"
             }
           ]
-        },
-        "Tags": {
-          "Key1": "Value1",
-          "Key2": "Value2",
-          "httpapi:createdBy": "SAM"
         }
       },
       "Type": "AWS::ApiGatewayV2::Api"

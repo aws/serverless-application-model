@@ -184,3 +184,6 @@ Resources:
       - SESBulkTemplatedCrudPolicy_v2:
           IdentityName: name
           TemplateName: template_name
+
+      - StepFunctionsCallbackPolicy:
+          StateMachineName: name

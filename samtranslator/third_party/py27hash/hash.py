@@ -53,7 +53,7 @@ class Hash:
         if isinstance(value, int):
             return hash(value)
 
-        raise TypeError("unhashable type: '%s'" % (type(value).__name__))
+        raise TypeError(f"unhashable type: '{type(value).__name__}'")
 
     @staticmethod
     def thash(value):  # type: ignore[no-untyped-def]

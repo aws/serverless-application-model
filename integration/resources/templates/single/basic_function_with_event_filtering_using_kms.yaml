@@ -1,0 +1,45 @@
+Resources:
+  BasicFunctionWithEventFilteringUsingKmsKeyArn:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs18.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+      Events:
+        MySqsEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MySqsQueue.Arn
+            FilterCriteria:
+              Filters:
+              - Pattern: '{ "body" : { "RequestCode" : [ "BBBB" ] } }'
+            KmsKeyArn: !GetAtt MyKey.Arn
+
+  MyKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: A sample key
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: key-default-1
+        Statement:
+        - Sid: Allow administration of the key
+          Effect: Allow
+          Principal:
+            AWS: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:root
+          Action:
+          - kms:*
+          Resource: '*'
+        - Sid: Allow encryption/decryption access to Lambda Service Principal
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: kms:Decrypt
+          Resource: '*'
+
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+
+Metadata:
+  SamTransformTest: true
