@@ -7,6 +7,8 @@ from samtranslator.utils.utils import (
     dict_deep_get,
     dict_deep_set,
     insert_unique,
+    namespace_prefix,
+    safe_dict,
 )
 
 
@@ -76,3 +78,101 @@ class TestUtils(TestCase):
 
         d = {"a": None, "b": None, "c": None}
         self.assertEqual(remove_none_values(d), {})
+
+    def test_namespace_prefix(self):
+        self.assertEqual(namespace_prefix("a", "b"), "a::b")
+
+        self.assertEqual(namespace_prefix("a", ""), "a")
+        self.assertEqual(namespace_prefix("a", None), "a")
+        self.assertEqual(namespace_prefix("", "b"), "b")
+        self.assertEqual(namespace_prefix(None, "b"), "b")
+
+        self.assertEqual(namespace_prefix("", ""), "")
+        self.assertEqual(namespace_prefix("", None), "")
+        self.assertEqual(namespace_prefix(None, ""), "")
+        self.assertEqual(namespace_prefix(None, None), "")
+
+    def test_safe_dict_no_change(self):
+        d = {"resource_id_1": {"Type": "custom_type"}, "resource_id_2": {"Type": "other_type"}}
+        self.assertEqual(safe_dict(d), d)
+
+    def test_safe_dict_with_missing_loop_entry(self):
+        d = {"Fn::ForEach::unique_loop_id": ["LoopKey", {"Type": "custom_type"}]}
+        self.assertEqual(safe_dict(d), d)
+
+    def test_safe_dict_with_extra_loop_entry(self):
+        d = {"Fn::ForEach::unique_loop_id": ["LoopKey", ["LoopKey1", "LoopKey2"], {"custom_type_${LoopKey}": {"Type": "custom_type", "Properties": {"property": "value"}}}, "extra_loop_entry"]}
+        self.assertEqual(safe_dict(d), d)
+
+    def test_safe_dict_with_loop_single_resource(self):
+        loop_id = "unique_loop_id"
+        d = {f"Fn::ForEach::{loop_id}": ["LoopKey", ["LoopKey1", "LoopKey2"], {"custom_type_${LoopKey}": {"Type": "custom_type", "Properties": {"property": "value"}}}]}
+        self.assertEqual(safe_dict(d), {f"{loop_id}::{k}": v for k,v in d[f"Fn::ForEach::{loop_id}"][2].items()})
+
+    def test_safe_dict_with_loop_multiple_resources(self):
+        loop_id = "unique_loop_id"
+        d = {
+            f"Fn::ForEach::{loop_id}": ["LoopKey", ["LoopKey1", "LoopKey2"], {
+                "custom_type_${LoopKey}": {"Type": "custom_type", "Properties": {"property": "value"}},
+                "other_type_${LoopKey}": {"Type": "other_type", "Properties": {"property": "value"}}
+            }]
+        }
+
+        self.assertEqual(safe_dict(d), {f"{loop_id}::{k}": v for k,v in d[f"Fn::ForEach::{loop_id}"][2].items()})
+
+    def test_safe_dict_with_loop_and_regular_resources(self):
+        loop_id = "unique_loop_id"
+        d = {
+            "resource_id_1": {"Type": "custom_type"},
+            f"Fn::ForEach::{loop_id}": ["LoopKey", ["LoopKey1", "LoopKey2"], {
+                "custom_type_${LoopKey}": {"Type": "custom_type", "Properties": {"property": "value"}},
+                "other_type_${LoopKey}": {"Type": "other_type", "Properties": {"property": "value"}}
+            }],
+            "resource_id_2": {"Type": "other_type"}
+        }
+
+        regular_resources_expected_dict = {k: d[k] for k in ["resource_id_1", "resource_id_2"]}
+        loop_expected_dir = {f"{loop_id}::{k}": v for k,v in d[f"Fn::ForEach::{loop_id}"][2].items()}
+        self.assertEqual(safe_dict(d), (regular_resources_expected_dict | loop_expected_dir))
+
+    def test_safe_dict_with_multiple_loops(self):
+        first_loop_id = "first_loop_id"
+        second_loop_id = "second_loop_id"
+        d = {
+            f"Fn::ForEach::{first_loop_id}": ["LoopKey", ["LoopKey10", "LoopKey11"], {
+                "custom_type_${LoopKey}": {"Type": "custom_type", "Properties": {"property": "value"}},
+                "other_type_${LoopKey}": {"Type": "other_type", "Properties": {"property": "value"}}
+            }],
+            f"Fn::ForEach::{second_loop_id}": ["LoopKey", ["LoopKey20", "LoopKey21"], {
+                "custom_type_${LoopKey}": {"Type": "custom_type", "Properties": {"property": "value"}},
+                "other_type_${LoopKey}": {"Type": "other_type", "Properties": {"property": "value"}}
+            }]
+        }
+
+        safe_d = safe_dict(d)
+        self.assertEqual(len(safe_d), 4)
+
+        first_expected_dict = {f"{first_loop_id}::{k}": v for k,v in d[f"Fn::ForEach::{first_loop_id}"][2].items()}
+        second_expected_dict = {f"{second_loop_id}::{k}": v for k,v in d[f"Fn::ForEach::{second_loop_id}"][2].items()}
+        self.assertEqual(safe_d, (first_expected_dict | second_expected_dict))
+
+    def test_safe_dict_with_embedded_loops(self):
+        outer_loop_id = "outer_loop_id"
+        inner_loop_id = "inner_loop_id"
+        d = {
+            f"Fn::ForEach::{outer_loop_id}": ["LoopKey", ["LoopKey10", "LoopKey11"], {
+                "custom_type_${LoopKey}": {"Type": "custom_type", "Properties": {"property": "value"}},
+                "other_type_${LoopKey}": {"Type": "other_type", "Properties": {"property": "value"}},
+                f"Fn::ForEach::{inner_loop_id}": ["LoopKey", ["LoopKey20", "LoopKey21"], {
+                    "custom_type_${LoopKey}": {"Type": "custom_type", "Properties": {"property": "value"}},
+                    "other_type_${LoopKey}": {"Type": "other_type", "Properties": {"property": "value"}}
+                }]
+            }],
+        }
+
+        safe_d = safe_dict(d)
+        self.assertEqual(len(safe_d), 4)
+
+        outer_loop_expected_dict = {"{}::{}".format(outer_loop_id, k): v for k,v in d[f"Fn::ForEach::{outer_loop_id}"][2].items() if not k.startswith("Fn::ForEach::")}
+        inner_loop_expected_dict = {"{}::{}::{}".format(outer_loop_id, inner_loop_id, k.removeprefix('Fn::ForEach::')): v for k,v in d[f"Fn::ForEach::{outer_loop_id}"][2][f"Fn::ForEach::{inner_loop_id}"][2].items()}
+        self.assertEqual(safe_d, (outer_loop_expected_dict | inner_loop_expected_dict))

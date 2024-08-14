@@ -58,6 +58,7 @@ SKIPPED_TESTS = [
     # TODO: Support globals (e.g. somehow make all fields of a model optional only for Globals)
     "api_with_custom_base_path",
     "function_with_tracing",  # TODO: intentionally skip this tests to cover incorrect scenarios
+    "intrinsic_for_each_resource", # intrinsic forEach loop is not supported
 ]
 
 

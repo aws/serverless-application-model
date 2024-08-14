@@ -15,6 +15,8 @@ class TestSamTemplate(TestCase):
                 "Api": {"Type": "AWS::Serverless::Api"},
                 "Layer": {"Type": "AWS::Serverless::LayerVersion"},
                 "NonSam": {"Type": "AWS::Lambda::Function"},
+                "Fn::ForEach::LambdaFunctions": [ "FunctionName", ["1", "2"], { "${FunctioName}": {"Type": "AWS::Lambda::Function", "a": "b"}}],
+                "Fn::ForEach::ServerlessFunctions": ["FunctionName", ["3", "4"], {"${FunctionName}": {"Type": "AWS::Serverless::Function", "a": "b"}}],
             },
         }
 
@@ -26,6 +28,7 @@ class TestSamTemplate(TestCase):
             ("Function2", {"Type": "AWS::Serverless::Function", "a": "b", "Properties": {}}),
             ("Api", {"Type": "AWS::Serverless::Api", "Properties": {}}),
             ("Layer", {"Type": "AWS::Serverless::LayerVersion", "Properties": {}}),
+            ("ServerlessFunctions::${FunctionName}", {"Type": "AWS::Serverless::Function", "a": "b", "Properties": {}}),
         ]
 
         actual = [(id, resource.to_dict()) for id, resource in template.iterate()]
@@ -38,6 +41,7 @@ class TestSamTemplate(TestCase):
         expected = [
             ("Function1", {"Type": "AWS::Serverless::Function", "DependsOn": "SomeOtherResource", "Properties": {}}),
             ("Function2", {"Type": "AWS::Serverless::Function", "a": "b", "Properties": {}}),
+            ("ServerlessFunctions::${FunctionName}", {"Type": "AWS::Serverless::Function", "a": "b", "Properties": {}}),
         ]
 
         actual = [(id, resource.to_dict()) for id, resource in template.iterate({type})]

@@ -9,6 +9,7 @@ from samtranslator.model.exceptions import (
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.plugins.sam_plugins import SamPlugins
 from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.utils.utils import safe_dict
 from samtranslator.validator.value_validator import sam_expect
 
 LOG = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ class Parser:
         ):
             raise InvalidDocumentException([InvalidTemplateException("'Resources' section is required")])
 
-        if not all(isinstance(sam_resource, dict) for sam_resource in sam_template["Resources"].values()):
+        if not all(isinstance(sam_resource, dict) for sam_resource in safe_dict(sam_template["Resources"]).values()):
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(

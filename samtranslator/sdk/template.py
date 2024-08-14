@@ -5,6 +5,7 @@ Classes representing SAM template and resources.
 from typing import Any, Dict, Iterator, Optional, Set, Tuple, Union
 
 from samtranslator.sdk.resource import SamResource
+from samtranslator.utils.utils import safe_dict
 
 
 class SamTemplate:
@@ -30,7 +31,7 @@ class SamTemplate:
         """
         if resource_types is None:
             resource_types = set()
-        for logicalId, resource_dict in self.resources.items():
+        for logicalId, resource_dict in safe_dict(self.resources).items():
             resource = SamResource(resource_dict)
             needs_filter = resource.valid()
             if resource_types:

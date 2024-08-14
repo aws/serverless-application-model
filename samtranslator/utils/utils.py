@@ -71,3 +71,39 @@ def dict_deep_set(d: Any, path: str, value: Any) -> None:
     if not isinstance(d, dict):
         raise InvalidValueType(relative_path)
     d[_path_nodes[0]] = value
+
+def namespace_prefix(prefix: str, string: str):
+    """
+    Joins `prefix` and `string` separated by `"::"` if neither is empty.
+
+    Returns the non empty one if only one is empty
+    Returns `""` if both are empty
+    """
+    return "::".join(filter(None, [prefix, string]))
+
+def safe_dict(input_dict, namespace = None):
+    """
+    Manipulates entries to support usage of `Fn::ForEach` intrinsic function in
+    resources dicts.
+
+    Recursively searches for array entries with keys starting with
+    `Fn::ForEach::` and replaces them with the provided resource fragments.
+
+    To support embedded usage of `Fn::ForEach` intrinsic function, resource
+    fragment keys are prefixed with provided unique loop name
+    """
+    output_dict = {}
+    for_each_function = "Fn::ForEach::"
+
+    for k, v in input_dict.items():
+        recurse = False
+        if isinstance(k, str) and k.startswith(for_each_function):
+            if isinstance(v, list) and len(v) == 3:
+                recurse = True
+
+        if recurse:
+            output_dict = output_dict | safe_dict(v[2], namespace_prefix(namespace, k.removeprefix(for_each_function)))
+        else:
+            output_dict[namespace_prefix(namespace, str(k))] = v
+
+    return output_dict

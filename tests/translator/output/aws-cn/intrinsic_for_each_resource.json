@@ -1,0 +1,141 @@
+{
+  "Mappings": {
+    "TemplateLinksPolicies": {
+      "Template1Link1": {
+        "template": "Template1",
+        "principal": {
+          "type": "User",
+          "id": "user1"
+        },
+        "resource": {
+          "type": "Resource",
+          "id": "resource1"
+        }
+      },
+      "Template1Link2": {
+        "template": "Template2",
+        "principal": {
+          "type": "User",
+          "id": "user2"
+        },
+        "resource": {
+          "type": "Resource",
+          "id": "resource2"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "Environment": {
+      "Type": "String"
+    },
+    "Project": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "PolicyStore": {
+      "Type": "AWS::VerifiedPermissions::PolicyStore",
+      "Properties": {
+        "Description": {
+          "Fn::Sub": "AVP Policy store for ${Project}-${Environment}"
+        },
+        "Schema": {
+          "CedarJson": {
+            "Fn::ToJsonString": {
+              "Fn::Transform": {
+                "Name": "AWS::Include",
+                "Parameters": {
+                  "Location": "policy-store-schema.json"
+                }
+              }
+            }
+          }
+        },
+        "ValidationSettings": {
+          "Mode": "STRICT"
+        }
+      }
+    },
+    "Template1": {
+      "Type": "AWS::VerifiedPermissions::PolicyTemplate",
+      "Properties": {
+        "PolicyStoreId": {
+          "Ref": "PolicyStore"
+        },
+        "Description": "AVP Template.",
+        "Statement": "permit(\n    principal in ?principal,\n    action == Action::\"action\",\n    resource == ?resource\n  );\n"
+      }
+    },
+    "Fn::ForEach::TemplateLinked": [
+      "TemplateKey",
+      {
+        "Fn::FindInMap": [
+          "TemplateLinksPolicies"
+        ]
+      },
+      {
+        "${TemplateKey}": {
+          "Type": "AWS::VerifiedPermissions::Policy",
+          "Properties": {
+            "PolicyStoreId": {
+              "Ref": "PolicyStore"
+            },
+            "Definition": {
+              "TemplateLinked": {
+                "PolicyTemplateId": {
+                  "Fn::GetAtt": [
+                    {
+                      "Fn::FindInMap": [
+                        "TemplateLinksPolicies",
+                        "${TemplateKey}",
+                        "template"
+                      ]
+                    },
+                    "PolicyTemplateId"
+                  ]
+                },
+                "Principal": {
+                  "EntityType": {
+                    "Fn::FindInMap": [
+                      "TemplateLinksPolicies",
+                      "${TemplateKey}",
+                      "principal",
+                      "type"
+                    ]
+                  },
+                  "EntityId": {
+                    "Fn::FindInMap": [
+                      "TemplateLinksPolicies",
+                      "${TemplateKey}",
+                      "principal",
+                      "id"
+                    ]
+                  }
+                },
+                "Resource": {
+                  "EntityType": {
+                    "Fn::FindInMap": [
+                      "TemplateLinksPolicies",
+                      "${TemplateKey}",
+                      "resource",
+                      "type"
+                    ]
+                  },
+                  "EntityId": {
+                    "Fn::FindInMap": [
+                      "TemplateLinksPolicies",
+                      "${TemplateKey}",
+                      "resource",
+                      "id"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
