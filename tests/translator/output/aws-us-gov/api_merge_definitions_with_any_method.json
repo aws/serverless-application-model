@@ -54,7 +54,7 @@
             "Arn"
           ]
         },
-        "Runtime": "python3.8",
+        "Runtime": "python3.11",
         "Tags": [
           {
             "Key": "lambda:createdBy",

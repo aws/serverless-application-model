@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from unittest.case import skipIf
 
 from tenacity import after_log, retry_if_exception_type, stop_after_attempt, wait_exponential, wait_random
@@ -129,7 +130,13 @@ class TestBasicApi(BaseTest):
         api_endpoint = stack_output.get("ApiEndpoint")
 
         input_json = {"f'oo": {"hello": "'wor'l'd'''"}}
+
+        # This will be the wait time before triggering the APIGW request
+        time.sleep(10)
+
         response = self.verify_post_request(api_endpoint, input_json, 200)
+
+        LOG.log(msg=f"retry times {self.verify_get_request_response.retry.statistics}", level=logging.WARNING)
 
         execution_arn = response.json()["executionArn"]
         execution = self.client_provider.sfn_client.describe_execution(executionArn=execution_arn)
