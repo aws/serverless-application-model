@@ -274,6 +274,28 @@ class TestBasicFunction(BaseTest):
             "Expecting tracing config mode to be set to PassThrough.",
         )
 
+    # TODO: add the integration test back after the feature launch on 06/05
+    # @skipIf(current_region_does_not_support([KMS]), "KMS is not supported in this testing region")
+    # def test_basic_function_with_event_filtering_using_kms(self):
+    #     """
+    #     Creates a basic lambda function with KMS key arn
+    #     """
+    #     self.create_and_verify_stack("single/basic_function_with_event_filtering_using_kms")
+
+    #     lambda_function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
+    #     event_source_mappings = self.client_provider.lambda_client.list_event_source_mappings(
+    #         FunctionName=lambda_function_name
+    #     )
+
+    #     event_source_mapping = event_source_mappings["EventSourceMappings"][0]
+    #     function_uuid = event_source_mapping["UUID"]
+
+    #     event_source_mapping_config = self.client_provider.lambda_client.get_event_source_mapping(UUID=function_uuid)
+
+    #     kms_key_arn = event_source_mapping_config["KMSKeyArn"]
+
+    #     self.assertIsNotNone(kms_key_arn, "Expecting KmsKeyArn to be set.")
+
     def _assert_invoke(self, lambda_client, function_name, qualifier=None, expected_status_code=200):
         """
         Assert if a Lambda invocation returns the expected status code
