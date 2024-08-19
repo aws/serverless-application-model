@@ -174,6 +174,7 @@ class Properties(BaseModel):
     Type: Optional[PassThroughProp] = properties("Type")
     AutoPublishAlias: Optional[PassThroughProp]
     DeploymentPreference: Optional[PassThroughProp]
+    UseAliasAsEventTarget: Optional[bool]
 
 
 class Resource(ResourceAttributes):

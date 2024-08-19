@@ -21,7 +21,7 @@
             "Arn"
           ]
         },
-        "Runtime": "python3.8",
+        "Runtime": "python3.11",
         "RuntimeManagementConfig": {
           "RuntimeVersionArn": {
             "Ref": "RuntimeVersionParam"
@@ -82,7 +82,7 @@
             "Arn"
           ]
         },
-        "Runtime": "python3.8",
+        "Runtime": "python3.11",
         "RuntimeManagementConfig": {
           "UpdateRuntimeOn": {
             "Ref": "RuntimeUpdateParam"
@@ -140,7 +140,7 @@
             "Arn"
           ]
         },
-        "Runtime": "python3.8",
+        "Runtime": "python3.11",
         "RuntimeManagementConfig": {
           "UpdateRuntimeOn": "Auto"
         },
@@ -166,7 +166,7 @@
             "Arn"
           ]
         },
-        "Runtime": "python3.8",
+        "Runtime": "python3.11",
         "RuntimeManagementConfig": {
           "UpdateRuntimeOn": "Auto"
         },
@@ -276,10 +276,10 @@
             "Arn"
           ]
         },
-        "Runtime": "python3.8",
+        "Runtime": "python3.11",
         "RuntimeManagementConfig": {
           "RuntimeVersionArn": {
-            "Fn::Sub": "arn:aws:lambda:${AWS::Region}::runtime:python3.8::0af1966588ced06e3143ae720245c9b7aeaae213c6921c12c742a166679cc505"
+            "Fn::Sub": "arn:aws:lambda:${AWS::Region}::runtime:python3.11::0af1966588ced06e3143ae720245c9b7aeaae213c6921c12c742a166679cc505"
           },
           "UpdateRuntimeOn": "Manual"
         },

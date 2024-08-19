@@ -148,6 +148,37 @@ class StepFunctionsStateMachine(TestCase):
         with self.assertRaises(InvalidEventException):
             StateMachineGenerator(**self.kwargs).to_cloudformation()
 
+    def test_state_machine_with_alias_as_event_source_target(self):
+        self.kwargs["definition_uri"] = "s3://mybucket/myASLfile"
+        self.kwargs["role"] = "my-test-role-arn"
+        self.kwargs["use_alias_as_event_target"] = True
+        self.kwargs["auto_publish_alias"] = "live"
+        event_resolver = Mock()
+        event_resolver.resolve_resource_type = Mock(return_value=CloudWatchEvent)
+        self.kwargs["event_resolver"] = event_resolver
+        self.kwargs["events"] = {
+            "CWEEvent": {"Type": "CloudWatchEvent", "Properties": {"Pattern": {"detail": {"state": ["terminated"]}}}}
+        }
+        self.kwargs["event_resources"] = {"CWEEvent": {}}
+        state_machine_generator = StateMachineGenerator(**self.kwargs)
+        state_machine_generator._generate_managed_traffic_shifting_resources()
+        generated_event_resources = state_machine_generator._generate_event_resources()
+        self.assertEqual(generated_event_resources[0].Targets[0]["Arn"], {"Ref": "StateMachineIdAliaslive"})
+
+    def test_state_machine_with_alias_as_event_source_target_requires_alias(self):
+        self.kwargs["definition_uri"] = "s3://mybucket/myASLfile"
+        self.kwargs["role"] = "my-test-role-arn"
+        self.kwargs["use_alias_as_event_target"] = True
+        self.kwargs["deployment_preference"] = {"Type": "ALL_AT_ONCE"}
+        # Missing property
+        # self.kwargs["auto_publish_alias"] = "live"
+        with self.assertRaises(InvalidResourceException) as error:
+            StateMachineGenerator(**self.kwargs).to_cloudformation()
+        self.assertEqual(
+            error.exception.message,
+            "Resource with id [StateMachineId] is invalid. 'UseAliasAsEventTarget' requires 'AutoPublishAlias' property to be specified.",
+        )
+
     def test_state_machine_with_managed_traffic_shifting_properties(self):
         self.kwargs["definition_uri"] = "s3://mybucket/myASLfile"
         self.kwargs["role"] = "my-test-role-arn"

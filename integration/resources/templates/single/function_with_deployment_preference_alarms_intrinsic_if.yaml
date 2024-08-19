@@ -9,7 +9,7 @@ Resources:
     Properties:
       CodeUri: ${codeuri}
       Handler: hello.handler
-      Runtime: python3.8
+      Runtime: python3.11
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery3Minutes
