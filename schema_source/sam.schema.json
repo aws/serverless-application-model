@@ -974,6 +974,9 @@
           "markdownDescription": "A list of the response types currently applied to the event source mapping\\. For more information, see [Reporting batch item failures](https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html#services-ddb-batchfailurereporting) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `ReportBatchItemFailures`  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionResponseTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-functionresponsetypes) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "FunctionResponseTypes"
         },
+        "KmsKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "MaximumBatchingWindowInSeconds": {
           "allOf": [
             {
@@ -1736,6 +1739,9 @@
           "markdownDescription": "A list of the response types currently applied to the event source mapping\\. For more information, see [Reporting batch item failures](https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html#services-kinesis-batchfailurereporting) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `ReportBatchItemFailures`  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionResponseTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-functionresponsetypes) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "FunctionResponseTypes"
         },
+        "KmsKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "MaximumBatchingWindowInSeconds": {
           "allOf": [
             {
@@ -2299,6 +2305,9 @@
           "markdownDescription": "A object that defines the criteria that determines whether Lambda should process an event\\. For more information, see [AWS Lambda event filtering](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [FilterCriteria](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FilterCriteria`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "FilterCriteria"
         },
+        "KmsKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "MaximumBatchingWindowInSeconds": {
           "allOf": [
             {
@@ -2391,6 +2400,9 @@
           ],
           "markdownDescription": "A object that defines the criteria that determines whether Lambda should process an event\\. For more information, see [AWS Lambda event filtering](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [FilterCriteria](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FilterCriteria`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "FilterCriteria"
+        },
+        "KmsKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "MaximumBatchingWindowInSeconds": {
           "allOf": [
@@ -2949,6 +2961,9 @@
           "markdownDescription": "A list of the response types currently applied to the event source mapping\\. For more information, see [ Reporting batch item failures](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-batchfailurereporting) in the *AWS Lambda Developer Guide*\\.   \n *Valid values*: `ReportBatchItemFailures`   \n *Type*: List   \n *Required*: No   \n *AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionResponseTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-functionresponsetypes) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "FunctionResponseTypes"
         },
+        "KmsKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "MaximumBatchingWindowInSeconds": {
           "allOf": [
             {
@@ -3164,6 +3179,9 @@
           "markdownDescription": "The list of bootstrap servers for your Kafka brokers\\. Include the port, for example `broker.example.com:xxxx`  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "KafkaBootstrapServers",
           "type": "array"
+        },
+        "KmsKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "SourceAccessConfigurations": {
           "allOf": [

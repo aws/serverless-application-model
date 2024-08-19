@@ -85,6 +85,7 @@ ignore_templates:
   - tests/translator/output/**/function_with_event_dest_conditional.json
   - tests/translator/output/**/function_with_event_schedule_state.json
   - tests/translator/output/**/function_with_file_system_config.json
+  - tests/translator/output/**/function_with_event_filtering.json  # TODO: remove once Event's KmsKeyArn is available
   - tests/translator/output/**/function_with_function_url_config_conditions.json
   - tests/translator/output/**/function_with_globals_role_path.json
   - tests/translator/output/**/function_with_intrinsic_architecture.json

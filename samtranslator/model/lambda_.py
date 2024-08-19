@@ -118,6 +118,7 @@ class LambdaEventSourceMapping(Resource):
         "FunctionResponseTypes": GeneratedProperty(),
         "SelfManagedEventSource": GeneratedProperty(),
         "FilterCriteria": GeneratedProperty(),
+        "KmsKeyArn": GeneratedProperty(),
         "AmazonManagedKafkaEventSourceConfig": GeneratedProperty(),
         "SelfManagedKafkaEventSourceConfig": GeneratedProperty(),
         "ScalingConfig": GeneratedProperty(),

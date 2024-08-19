@@ -52,6 +52,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         "FunctionResponseTypes": PropertyType(False, IS_LIST),
         "KafkaBootstrapServers": PropertyType(False, IS_LIST),
         "FilterCriteria": PropertyType(False, IS_DICT),
+        "KmsKeyArn": PassThroughProperty(False),
         "ConsumerGroupId": PropertyType(False, IS_STR),
         "ScalingConfig": PropertyType(False, IS_DICT),
     }
@@ -74,6 +75,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     FunctionResponseTypes: Optional[List[Any]]
     KafkaBootstrapServers: Optional[List[Any]]
     FilterCriteria: Optional[Dict[str, Any]]
+    KmsKeyArn: Optional[Intrinsicable[str]]
     ConsumerGroupId: Optional[Intrinsicable[str]]
     ScalingConfig: Optional[Dict[str, Any]]
 
@@ -141,6 +143,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds
         lambda_eventsourcemapping.FunctionResponseTypes = self.FunctionResponseTypes
         lambda_eventsourcemapping.FilterCriteria = self.FilterCriteria
+        lambda_eventsourcemapping.KmsKeyArn = self.KmsKeyArn
         lambda_eventsourcemapping.ScalingConfig = self.ScalingConfig
         self._validate_filter_criteria()
 

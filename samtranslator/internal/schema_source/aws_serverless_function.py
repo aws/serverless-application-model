@@ -169,6 +169,7 @@ class KinesisEventProperties(BaseModel):
     Enabled: Optional[PassThroughProp] = kinesiseventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = kinesiseventproperties("FilterCriteria")
     FunctionResponseTypes: Optional[PassThroughProp] = kinesiseventproperties("FunctionResponseTypes")
+    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = kinesiseventproperties("MaximumBatchingWindowInSeconds")
     MaximumRecordAgeInSeconds: Optional[PassThroughProp] = kinesiseventproperties("MaximumRecordAgeInSeconds")
     MaximumRetryAttempts: Optional[PassThroughProp] = kinesiseventproperties("MaximumRetryAttempts")
@@ -191,6 +192,7 @@ class DynamoDBEventProperties(BaseModel):
     Enabled: Optional[PassThroughProp] = dynamodbeventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = dynamodbeventproperties("FilterCriteria")
     FunctionResponseTypes: Optional[PassThroughProp] = dynamodbeventproperties("FunctionResponseTypes")
+    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = dynamodbeventproperties(
         "MaximumBatchingWindowInSeconds"
     )
@@ -235,6 +237,7 @@ class SQSEventProperties(BaseModel):
     Enabled: Optional[PassThroughProp] = sqseventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = sqseventproperties("FilterCriteria")
     FunctionResponseTypes: Optional[PassThroughProp] = sqseventproperties("FunctionResponseTypes")
+    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = sqseventproperties("MaximumBatchingWindowInSeconds")
     Queue: PassThroughProp = sqseventproperties("Queue")
     ScalingConfig: Optional[PassThroughProp]  # Update docs when live
@@ -406,6 +409,7 @@ class HttpApiEvent(BaseModel):
 class MSKEventProperties(BaseModel):
     ConsumerGroupId: Optional[PassThroughProp] = mskeventproperties("ConsumerGroupId")
     FilterCriteria: Optional[PassThroughProp] = mskeventproperties("FilterCriteria")
+    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumBatchingWindowInSeconds")
     StartingPosition: Optional[PassThroughProp] = mskeventproperties("StartingPosition")
     StartingPositionTimestamp: Optional[PassThroughProp] = mskeventproperties("StartingPositionTimestamp")
@@ -426,6 +430,7 @@ class MQEventProperties(BaseModel):
     DynamicPolicyName: Optional[bool] = mqeventproperties("DynamicPolicyName")
     Enabled: Optional[PassThroughProp] = mqeventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = mqeventproperties("FilterCriteria")
+    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mqeventproperties("MaximumBatchingWindowInSeconds")
     Queues: PassThroughProp = mqeventproperties("Queues")
     SecretsManagerKmsKeyId: Optional[str] = mqeventproperties("SecretsManagerKmsKeyId")
@@ -445,6 +450,7 @@ class SelfManagedKafkaEventProperties(BaseModel):
     KafkaBootstrapServers: Optional[List[SamIntrinsicable[str]]] = selfmanagedkafkaeventproperties(
         "KafkaBootstrapServers"
     )
+    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
     SourceAccessConfigurations: PassThroughProp = selfmanagedkafkaeventproperties("SourceAccessConfigurations")
     StartingPosition: Optional[PassThroughProp]  # TODO: add documentation
     StartingPositionTimestamp: Optional[PassThroughProp]  # TODO: add documentation
