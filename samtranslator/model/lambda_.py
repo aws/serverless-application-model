@@ -35,6 +35,7 @@ class LambdaFunction(Resource):
         "EphemeralStorage": GeneratedProperty(),
         "RuntimeManagementConfig": GeneratedProperty(),
         "LoggingConfig": GeneratedProperty(),
+        "RecursiveLoop": GeneratedProperty(),
     }
 
     Code: Dict[str, Any]
@@ -62,6 +63,7 @@ class LambdaFunction(Resource):
     EphemeralStorage: Optional[Dict[str, Any]]
     RuntimeManagementConfig: Optional[Dict[str, Any]]
     LoggingConfig: Optional[Dict[str, Any]]
+    RecursiveLoop: Optional[str]
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 

@@ -1,0 +1,21 @@
+Parameters:
+  RecursiveLoopParam:
+    Type: String
+    Default: ALLOW
+
+Resources:
+  RecursiveLoopFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      RecursiveLoop: TERMINATE
+
+  RecursiveLoopParameterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      RecursiveLoop: !Ref RecursiveLoopParam

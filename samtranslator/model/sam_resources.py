@@ -179,6 +179,7 @@ class SamFunction(SamResourceMacro):
         "FunctionUrlConfig": PropertyType(False, IS_DICT),
         "RuntimeManagementConfig": PassThroughProperty(False),
         "LoggingConfig": PassThroughProperty(False),
+        "RecursiveLoop": PassThroughProperty(False),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -221,6 +222,7 @@ class SamFunction(SamResourceMacro):
     SnapStart: Optional[Dict[str, Any]]
     FunctionUrlConfig: Optional[Dict[str, Any]]
     LoggingConfig: Optional[Dict[str, Any]]
+    RecursiveLoop: Optional[str]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -605,6 +607,7 @@ class SamFunction(SamResourceMacro):
 
         lambda_function.RuntimeManagementConfig = self.RuntimeManagementConfig  # type: ignore[attr-defined]
         lambda_function.LoggingConfig = self.LoggingConfig
+        lambda_function.RecursiveLoop = self.RecursiveLoop
         self._validate_package_type(lambda_function)
         return lambda_function
 

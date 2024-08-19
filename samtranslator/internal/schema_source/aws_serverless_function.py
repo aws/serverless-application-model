@@ -512,6 +512,7 @@ EphemeralStorage = Optional[PassThroughProp]
 SnapStart = Optional[PassThroughProp]  # TODO: check the type
 RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
 LoggingConfig = Optional[PassThroughProp]  # TODO: add documentation
+RecursiveLoop = Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
@@ -638,6 +639,7 @@ class Properties(BaseModel):
     VersionDescription: Optional[PassThroughProp] = prop("VersionDescription")
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
+    RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Globals(BaseModel):
@@ -696,6 +698,7 @@ class Globals(BaseModel):
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
+    RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):
