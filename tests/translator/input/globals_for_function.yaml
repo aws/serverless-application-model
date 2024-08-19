@@ -32,6 +32,7 @@ Globals:
       UpdateRuntimeOn: Auto
     LoggingConfig:
       LogGroup: myJsonStructuredLogs
+    RecursiveLoop: ALLOW
 
 
 
@@ -65,3 +66,4 @@ Resources:
       ReservedConcurrentExecutions: 100
       RuntimeManagementConfig:
         UpdateRuntimeOn: FunctionChange
+      RecursiveLoop: TERMINATE

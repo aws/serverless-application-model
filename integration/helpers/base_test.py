@@ -567,6 +567,13 @@ class BaseTest(TestCase):
             )
         return response
 
+    @retry(
+        stop=stop_after_attempt(5),
+        wait=wait_exponential(multiplier=1, min=16, max=64) + wait_random(0, 1),
+        retry=retry_if_exception_type(StatusCodeError),
+        after=after_log(LOG, logging.WARNING),
+        reraise=True,
+    )
     def verify_post_request(self, url: str, body_obj, expected_status_code: int, headers=None):
         """Return response to POST request and verify matches expected status code."""
         response = self.do_post_request_with_logging(url, body_obj, headers)
