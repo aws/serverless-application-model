@@ -32,6 +32,7 @@
           "LogGroup": "myJsonStructuredLogs"
         },
         "MemorySize": 512,
+        "RecursiveLoop": "TERMINATE",
         "ReservedConcurrentExecutions": 100,
         "Role": {
           "Fn::GetAtt": [
@@ -52,12 +53,12 @@
             "Value": "SAM"
           },
           {
-            "Key": "newtag1",
-            "Value": "newvalue1"
-          },
-          {
             "Key": "tag1",
             "Value": "value1"
+          },
+          {
+            "Key": "newtag1",
+            "Value": "newvalue1"
           }
         ],
         "Timeout": 100,
@@ -121,12 +122,12 @@
             "Value": "SAM"
           },
           {
-            "Key": "newtag1",
-            "Value": "newvalue1"
-          },
-          {
             "Key": "tag1",
             "Value": "value1"
+          },
+          {
+            "Key": "newtag1",
+            "Value": "newvalue1"
           }
         ]
       },
@@ -169,6 +170,7 @@
           "LogGroup": "myJsonStructuredLogs"
         },
         "MemorySize": 1024,
+        "RecursiveLoop": "ALLOW",
         "ReservedConcurrentExecutions": 50,
         "Role": {
           "Fn::GetAtt": [

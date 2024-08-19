@@ -5439,6 +5439,9 @@
           "markdownDescription": "The provisioned concurrency configuration of a function's alias\\.  \n`ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.\n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedConcurrencyConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig) property of an `AWS::Lambda::Alias` resource\\.",
           "title": "ProvisionedConcurrencyConfig"
         },
+        "RecursiveLoop": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "ReservedConcurrentExecutions": {
           "allOf": [
             {
@@ -6008,6 +6011,9 @@
             }
           ],
           "title": "ProvisionedConcurrencyConfig"
+        },
+        "RecursiveLoop": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "ReservedConcurrentExecutions": {
           "allOf": [
