@@ -134,7 +134,6 @@ ignore_templates:
   - tests/translator/output/**/function_with_tracing.json # Obsolete DependsOn on resource
   - tests/translator/output/**/api_with_propagate_tags.json # TODO: Intentional error transform tests. Will be updated.
   - tests/translator/output/**/function_with_intrinsics_resource_attribute.json # CFN now supports intrinsics in DeletionPolicy
-  - tests/translator/output/**/embedded_connectors_hardcoded_props.json # Only checking if the embedded connectors work
   - tests/translator/output/**/function_with_snapstart.json # Snapstart intentionally not attached to a lambda version which causes lint issues
   - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
 ignore_checks:
