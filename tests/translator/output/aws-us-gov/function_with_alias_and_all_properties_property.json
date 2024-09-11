@@ -46,7 +46,7 @@
         "PackageType": "Zip",
         "ReservedConcurrentExecutions": 100,
         "Role": {
-          "Fn::Sub": "arn:${AWS::Partition}:iam::role"
+          "Fn::Sub": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/role1"
         },
         "Runtime": "python2.7",
         "Tags": [
@@ -74,7 +74,7 @@
         },
         "FunctionVersion": {
           "Fn::GetAtt": [
-            "HashChangeFunctionVersion17ca83d2bf",
+            "HashChangeFunctionVersiona1a9d4d1e4",
             "Version"
           ]
         },
@@ -82,7 +82,7 @@
       },
       "Type": "AWS::Lambda::Alias"
     },
-    "HashChangeFunctionVersion17ca83d2bf": {
+    "HashChangeFunctionVersiona1a9d4d1e4": {
       "DeletionPolicy": "Retain",
       "Properties": {
         "Description": "sam-testing",
@@ -127,7 +127,7 @@
         "PackageType": "Zip",
         "ReservedConcurrentExecutions": 100,
         "Role": {
-          "Fn::Sub": "arn:${AWS::Partition}:iam::role"
+          "Fn::Sub": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/role1"
         },
         "Runtime": "python2.7",
         "Tags": [

@@ -104,12 +104,12 @@
               ],
               "Effect": "Allow",
               "Resource": [
-                "table-arn",
+                "arn:aws:dynamodb:us-west-2:987654321098:table/dec86919-7219-4e8d-8871-7f1609df2c7f",
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/index/*",
                     {
-                      "DestinationArn": "table-arn"
+                      "DestinationArn": "arn:aws:dynamodb:us-west-2:987654321098:table/dec86919-7219-4e8d-8871-7f1609df2c7f"
                     }
                   ]
                 }
@@ -127,12 +127,12 @@
               ],
               "Effect": "Allow",
               "Resource": [
-                "table-arn",
+                "arn:aws:dynamodb:us-west-2:987654321098:table/dec86919-7219-4e8d-8871-7f1609df2c7f",
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/index/*",
                     {
-                      "DestinationArn": "table-arn"
+                      "DestinationArn": "arn:aws:dynamodb:us-west-2:987654321098:table/dec86919-7219-4e8d-8871-7f1609df2c7f"
                     }
                   ]
                 }
@@ -248,12 +248,12 @@
               ],
               "Effect": "Allow",
               "Resource": [
-                "big-arn",
+                "arn:aws:dynamodb:us-west-2:987654321098:table/dec86919-7219-4e8d-8871-7f1609df2c7f",
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/index/*",
                     {
-                      "DestinationArn": "big-arn"
+                      "DestinationArn": "arn:aws:dynamodb:us-west-2:987654321098:table/dec86919-7219-4e8d-8871-7f1609df2c7f"
                     }
                   ]
                 }
@@ -271,12 +271,12 @@
               ],
               "Effect": "Allow",
               "Resource": [
-                "big-arn",
+                "arn:aws:dynamodb:us-west-2:987654321098:table/dec86919-7219-4e8d-8871-7f1609df2c7f",
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/index/*",
                     {
-                      "DestinationArn": "big-arn"
+                      "DestinationArn": "arn:aws:dynamodb:us-west-2:987654321098:table/dec86919-7219-4e8d-8871-7f1609df2c7f"
                     }
                   ]
                 }
