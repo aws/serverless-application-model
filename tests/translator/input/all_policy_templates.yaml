@@ -170,7 +170,7 @@ Resources:
           EventBusName: name
 
       - AcmGetCertificatePolicy:
-          CertificateArn: arn
+          CertificateArn: arn:aws:acm:us-west-2:987654321098:certificate/dec86919-7219-4e8d-8871-7f1609df2c7f
 
       - Route53ChangeResourceRecordSetsPolicy:
           HostedZoneId: test

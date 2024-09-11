@@ -62,7 +62,7 @@
         "FilterPolicyScope": "MessageAttributes",
         "Protocol": "lambda",
         "Region": "region",
-        "TopicArn": "topicArn-letsAddMoreSymbols"
+        "TopicArn": "arn:aws:sns:us-west-2:987654321098:key/dec86919-7219-4e8d-8871-7f1609df2c7f"
       },
       "Type": "AWS::SNS::Subscription"
     },
@@ -73,7 +73,7 @@
           "Ref": "MyAwesomeFunction"
         },
         "Principal": "sns.amazonaws.com",
-        "SourceArn": "topicArn-letsAddMoreSymbols"
+        "SourceArn": "arn:aws:sns:us-west-2:987654321098:key/dec86919-7219-4e8d-8871-7f1609df2c7f"
       },
       "Type": "AWS::Lambda::Permission"
     },

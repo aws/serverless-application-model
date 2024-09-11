@@ -134,8 +134,12 @@ ignore_templates:
   - tests/translator/output/**/function_with_tracing.json # Obsolete DependsOn on resource
   - tests/translator/output/**/api_with_propagate_tags.json # TODO: Intentional error transform tests. Will be updated.
   - tests/translator/output/**/function_with_intrinsics_resource_attribute.json # CFN now supports intrinsics in DeletionPolicy
+  - tests/translator/output/**/function_with_snapstart.json # Snapstart intentionally not attached to a lambda version which causes lint issues
+  - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
+  - E2533 # Another deprecated runtime; not relevant for transform tests
   - W2531 # EOL runtime; not relevant for transform tests
   - E3001 # Invalid or unsupported Type; common in transform tests since they focus on SAM resources
   - W2001 # Parameter not used
+  - E3006 # Resource type check; we have some Foo Bar resources
