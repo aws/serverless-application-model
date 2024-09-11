@@ -9,7 +9,7 @@ Resources:
         NotificationTopic:
           Type: SNS
           Properties:
-            Topic: topicArn-letsAddMoreSymbols
+            Topic: arn:aws:sns:us-west-2:987654321098:key/dec86919-7219-4e8d-8871-7f1609df2c7f
             Region: region
             FilterPolicy:
               store:
