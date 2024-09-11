@@ -19,7 +19,7 @@
             "Arn"
           ]
         },
-        "Runtime": "java11",
+        "Runtime": "python3.9",
         "SnapStart": {
           "ApplyOn": "PublishedVersions"
         },
@@ -75,7 +75,7 @@
             "Arn"
           ]
         },
-        "Runtime": "java11",
+        "Runtime": "python3.9",
         "SnapStart": {
           "ApplyOn": "PublishedVersions"
         },
@@ -155,7 +155,7 @@
             "Arn"
           ]
         },
-        "Runtime": "java11",
+        "Runtime": "python3.9",
         "SnapStart": {
           "ApplyOn": {
             "Ref": "SnapStartParam"
@@ -169,21 +169,6 @@
         ]
       },
       "Type": "AWS::Lambda::Function"
-    },
-    "SnapStartParameterFunctionAliaslive": {
-      "Properties": {
-        "FunctionName": {
-          "Ref": "SnapStartParameterFunction"
-        },
-        "FunctionVersion": {
-          "Fn::GetAtt": [
-            "SnapStartParameterFunctionVersione3921e07ea",
-            "Version"
-          ]
-        },
-        "Name": "live"
-      },
-      "Type": "AWS::Lambda::Alias"
     },
     "SnapStartParameterFunctionRole": {
       "Properties": {
@@ -214,15 +199,6 @@
         ]
       },
       "Type": "AWS::IAM::Role"
-    },
-    "SnapStartParameterFunctionVersione3921e07ea": {
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "SnapStartParameterFunction"
-        }
-      },
-      "Type": "AWS::Lambda::Version"
     }
   }
 }
