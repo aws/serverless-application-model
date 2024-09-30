@@ -1253,7 +1253,10 @@
       "Definition": {
         "Statement": [
           {
-            "Action": "kms:Encrypt",
+            "Action": [
+              "kms:Encrypt",
+              "kms:GenerateDataKey"
+            ],
             "Effect": "Allow",
             "Resource": {
               "Fn::Sub": [
