@@ -1255,7 +1255,7 @@
           {
             "Action": [
               "kms:Encrypt",
-              "kms:GenerateDataKey"
+              "kms:GenerateDataKey*"
             ],
             "Effect": "Allow",
             "Resource": {
