@@ -187,8 +187,9 @@ class HttpApiGenerator:
 
         elif isinstance(self.cors_configuration, dict):
             # Make sure keys in the dict are recognized
-            if not all(key in CorsProperties._fields for key in self.cors_configuration):
-                raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")
+            for key in self.cors_configuration:
+                if key not in CorsProperties._fields:
+                    raise InvalidResourceException(self.logical_id, f"Invalid key '{key}' for 'Cors' property.")
 
             properties = CorsProperties(**self.cors_configuration)
 
