@@ -1255,7 +1255,10 @@
           {
             "Action": [
               "kms:Encrypt",
-              "kms:GenerateDataKey*"
+              "kms:GenerateDataKey",
+              "kms:GenerateDataKeyWithoutPlaintext",
+              "kms:GenerateDataKeyPair",
+              "kms:GenerateDataKeyPairWithoutPlaintext"
             ],
             "Effect": "Allow",
             "Resource": {
