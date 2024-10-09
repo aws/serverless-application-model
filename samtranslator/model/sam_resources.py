@@ -943,19 +943,20 @@ class SamFunction(SamResourceMacro):
             # However, we need the Lambda function to automatically create a new version
             # and use the new layer. By setting the `PublishLambdaVersion` property to true,
             # a new Lambda function version will be created when the layer version is updated.
-            for layer in function.Layers:
-                layer_logical_id = get_logical_id_from_intrinsic(layer)
-                if not layer_logical_id:
-                    continue
+            if function.Layers:
+                for layer in function.Layers:
+                    layer_logical_id = get_logical_id_from_intrinsic(layer)
+                    if not layer_logical_id:
+                        continue
 
-                layer_resource = resource_resolver.get_resource_by_logical_id(layer_logical_id)
-                if not layer_resource:
-                    continue
+                    layer_resource = resource_resolver.get_resource_by_logical_id(layer_logical_id)
+                    if not layer_resource:
+                        continue
 
-                layer_properties = layer_resource.get("Properties", {})
-                publish_lambda_version = layer_properties.get("PublishLambdaVersion", False)
-                if publish_lambda_version:
-                    properties.update({layer_logical_id: layer_properties})
+                    layer_properties = layer_resource.get("Properties", {})
+                    publish_lambda_version = layer_properties.get("PublishLambdaVersion", False)
+                    if publish_lambda_version:
+                        properties.update({layer_logical_id: layer_properties})
 
             logical_dict = properties
         else:
