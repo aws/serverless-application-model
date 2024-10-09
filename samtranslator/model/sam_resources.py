@@ -60,7 +60,6 @@ from samtranslator.model.apigateway import (
 from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
 from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
-from samtranslator.model.intrinsics import get_logical_id_from_intrinsic
 from samtranslator.model.connector.connector import (
     UNSUPPORTED_CONNECTOR_PROFILE_TYPE,
     ConnectorResourceError,
@@ -82,6 +81,7 @@ from samtranslator.model.iam import IAMManagedPolicy, IAMRole, IAMRolePolicies
 from samtranslator.model.intrinsics import (
     fnGetAtt,
     fnSub,
+    get_logical_id_from_intrinsic,
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
