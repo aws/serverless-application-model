@@ -60,6 +60,7 @@ from samtranslator.model.apigateway import (
 from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
 from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
+from samtranslator.model.intrinsics import get_logical_id_from_intrinsic
 from samtranslator.model.connector.connector import (
     UNSUPPORTED_CONNECTOR_PROFILE_TYPE,
     ConnectorResourceError,
@@ -265,6 +266,7 @@ class SamFunction(SamResourceMacro):
         """
         resources: List[Any] = []
         intrinsics_resolver: IntrinsicsResolver = kwargs["intrinsics_resolver"]
+        resource_resolver: ResourceResolver = kwargs["resource_resolver"]
         mappings_resolver: Optional[IntrinsicsResolver] = kwargs.get("mappings_resolver")
         conditions = kwargs.get("conditions", {})
         feature_toggle = kwargs.get("feature_toggle")
@@ -303,7 +305,10 @@ class SamFunction(SamResourceMacro):
                 else:
                     lambda_function.Description = {"Fn::Join": [" ", [description, code_sha256]]}
             lambda_version = self._construct_version(
-                lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
+                lambda_function,
+                intrinsics_resolver=intrinsics_resolver,
+                resource_resolver=resource_resolver,
+                code_sha256=code_sha256,
             )
             lambda_alias = self._construct_alias(alias_name, lambda_function, lambda_version)
             resources.append(lambda_version)
@@ -883,7 +888,11 @@ class SamFunction(SamResourceMacro):
         return dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
 
     def _construct_version(
-        self, function: LambdaFunction, intrinsics_resolver: IntrinsicsResolver, code_sha256: Optional[str] = None
+        self,
+        function: LambdaFunction,
+        intrinsics_resolver: IntrinsicsResolver,
+        resource_resolver: ResourceResolver,
+        code_sha256: Optional[str] = None,
     ) -> LambdaVersion:
         """Constructs a Lambda Version resource that will be auto-published when CodeUri of the function changes.
         Old versions will not be deleted without a direct reference from the CloudFormation template.
@@ -929,6 +938,25 @@ class SamFunction(SamResourceMacro):
         # property that when set to true would change the lambda version whenever a property in the lambda function changes
         if self.AutoPublishAliasAllProperties:
             properties = function._generate_resource_dict().get("Properties", {})
+
+            # When a Lambda LayerVersion resource is updated, a new Lambda layer is created.
+            # However, we need the Lambda function to automatically create a new version
+            # and use the new layer. By setting the `PublishLambdaVersion` property to true,
+            # a new Lambda function version will be created when the layer version is updated.
+            for layer in function.Layers:
+                layer_logical_id = get_logical_id_from_intrinsic(layer)
+                if not layer_logical_id:
+                    continue
+
+                layer_resource = resource_resolver.get_resource_by_logical_id(layer_logical_id)
+                if not layer_resource:
+                    continue
+
+                layer_properties = layer_resource.get("Properties", {})
+                publish_lambda_version = layer_properties.get("PublishLambdaVersion", False)
+                if publish_lambda_version:
+                    properties.update({layer_logical_id: layer_properties})
+
             logical_dict = properties
         else:
             with suppress(AttributeError, UnboundLocalError):
@@ -1596,6 +1624,7 @@ class SamLayerVersion(SamResourceMacro):
     property_types = {
         "LayerName": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "Description": PropertyType(False, IS_STR),
+        "PublishLambdaVersion": PropertyType(False, IS_BOOL),
         "ContentUri": PropertyType(True, one_of(IS_STR, IS_DICT)),
         "CompatibleArchitectures": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
         "CompatibleRuntimes": PropertyType(False, list_of(one_of(IS_STR, IS_DICT))),
@@ -1605,6 +1634,7 @@ class SamLayerVersion(SamResourceMacro):
 
     LayerName: Optional[Intrinsicable[str]]
     Description: Optional[Intrinsicable[str]]
+    PublishLambdaVersion: Optional[bool]
     ContentUri: Dict[str, Any]
     CompatibleArchitectures: Optional[List[Any]]
     CompatibleRuntimes: Optional[List[Any]]
