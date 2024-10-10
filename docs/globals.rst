@@ -75,6 +75,7 @@ Currently, the following resources and properties are being supported:
       EphemeralStorage:
       RuntimeManagementConfig:
       LoggingConfig:
+      FileSystemConfigs:
 
     Api:
       # Properties of AWS::Serverless::Api
@@ -112,6 +113,10 @@ Currently, the following resources and properties are being supported:
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable
       SSESpecification:
+
+    LayerVersion:
+      # Properties of AWS::Serverless::LayerVersion
+      PublishLambdaVersion:
 
 Implicit APIs
 ~~~~~~~~~~~~~
