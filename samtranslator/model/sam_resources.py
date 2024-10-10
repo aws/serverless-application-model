@@ -887,7 +887,7 @@ class SamFunction(SamResourceMacro):
         dispatch_function: Callable[..., Dict[str, Any]] = artifact_dispatch[filtered_key]
         return dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
 
-    def _construct_version(
+    def _construct_version(  # noqa: PLR0912
         self,
         function: LambdaFunction,
         intrinsics_resolver: IntrinsicsResolver,
