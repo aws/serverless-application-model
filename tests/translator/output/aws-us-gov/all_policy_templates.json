@@ -1421,7 +1421,13 @@
             "PolicyDocument": {
               "Statement": [
                 {
-                  "Action": "kms:Encrypt",
+                  "Action": [
+                    "kms:Encrypt",
+                    "kms:GenerateDataKey",
+                    "kms:GenerateDataKeyWithoutPlaintext",
+                    "kms:GenerateDataKeyPair",
+                    "kms:GenerateDataKeyPairWithoutPlaintext"
+                  ],
                   "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [
