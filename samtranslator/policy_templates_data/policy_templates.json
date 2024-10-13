@@ -1253,6 +1253,32 @@
       "Definition": {
         "Statement": [
           {
+            "Action": "kms:Encrypt",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                {
+                  "keyId": {
+                    "Ref": "KeyId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Description": "Gives permission to encrypt with KMS Key",
+      "Parameters": {
+        "KeyId": {
+          "Description": "ID of the KMS Key"
+        }
+      }
+    },
+    "KMSEncryptPolicy_v2": {
+      "Definition": {
+        "Statement": [
+          {
             "Action": [
               "kms:Encrypt",
               "kms:GenerateDataKey",
