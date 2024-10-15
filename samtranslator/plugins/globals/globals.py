@@ -96,6 +96,7 @@ class Globals:
         ],
         SamResourceType.SimpleTable.value: ["SSESpecification"],
         SamResourceType.StateMachine.value: ["PropagateTags"],
+        SamResourceType.LambdaLayerVersion.value: ["PublishLambdaVersion"],
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {
