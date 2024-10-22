@@ -4,9 +4,10 @@ Resources:
     Type: AWS::Serverless::GraphQLApi
     Properties:
       SchemaInline: |
-        type Mutation {
-          addTodo(id: ID!, name: String, description: String, priority: Int): Todo
-        }
+        type Book {
+            bookName: String
+        } 
+        type Query { getBook(bookName: String): Book }
       Visibility: PRIVATE
       OwnerContact: blah-blah
       IntrospectionConfig: DISABLED

@@ -61,7 +61,7 @@
             "ApiId"
           ]
         },
-        "Definition": "type Mutation {\n  addTodo(id: ID!, name: String, description: String, priority: Int): Todo\n}\n"
+        "Definition": "type Book {\n    bookName: String\n} \ntype Query { getBook(bookName: String): Book }\n"
       },
       "Type": "AWS::AppSync::GraphQLSchema"
     }
