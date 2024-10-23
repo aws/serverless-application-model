@@ -12,7 +12,7 @@
         "DataSourceName": "some-cool-datasource",
         "Name": "MyFunction",
         "Runtime": {
-          "Name": "some-runtime",
+          "Name": "APPSYNC_JS",
           "RuntimeVersion": "1.2.3"
         }
       },
