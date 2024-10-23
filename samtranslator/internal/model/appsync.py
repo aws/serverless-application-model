@@ -115,6 +115,9 @@ class GraphQLApi(Resource):
         "AdditionalAuthenticationProviders": GeneratedProperty(),
         "Visibility": GeneratedProperty(),
         "OwnerContact": GeneratedProperty(),
+        "IntrospectionConfig": GeneratedProperty(),
+        "QueryDepthLimit": GeneratedProperty(),
+        "ResolverCountLimit": GeneratedProperty(),
     }
 
     Name: str
@@ -128,6 +131,9 @@ class GraphQLApi(Resource):
     LogConfig: Optional[LogConfigType]
     Visibility: Optional[str]
     OwnerContact: Optional[str]
+    IntrospectionConfig: Optional[str]
+    QueryDepthLimit: Optional[int]
+    ResolverCountLimit: Optional[int]
 
     runtime_attrs = {"api_id": lambda self: fnGetAtt(self.logical_id, "ApiId")}
 

@@ -1,0 +1,17 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Book {
+            bookName: String
+        } 
+        type Query { getBook(bookName: String): Book }
+      Visibility: PRIVATE
+      OwnerContact: blah-blah
+      IntrospectionConfig: DISABLED
+      QueryDepthLimit: 10
+      ResolverCountLimit: 100
+      Auth:
+        Type: AWS_IAM
