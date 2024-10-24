@@ -1,0 +1,20 @@
+Resources:
+  MinimalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.10
+      AutoPublishAlias: live
+      AutoPublishAliasAllProperties: true
+      VersionDescription: sam-testing
+      Layers:
+      - !Ref TestEnvLayer
+
+  TestEnvLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: test-env-dependencies
+      Description: Dependencies for test env implementation
+      ContentUri: s3://bucket/key
+      PublishLambdaVersion: false

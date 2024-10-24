@@ -47,6 +47,7 @@ class Properties(BaseModel):
         "CompatibleRuntimes",
         ["AWS::Lambda::LayerVersion", "Properties", "CompatibleRuntimes"],
     )
+    PublishLambdaVersion: Optional[bool]  # TODO: add docs
     ContentUri: Union[str, ContentUri] = properties("ContentUri")
     Description: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,
@@ -65,3 +66,7 @@ class Properties(BaseModel):
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::LayerVersion"]
     Properties: Properties
+
+
+class Globals(BaseModel):
+    PublishLambdaVersion: Optional[bool]  # TODO: add docs

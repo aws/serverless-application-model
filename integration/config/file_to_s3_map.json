@@ -23,6 +23,10 @@
     "type": "s3",
     "uri": ""
   },
+  "layer2.zip": {
+    "type": "s3",
+    "uri": ""
+  },
   "swagger1.json": {
     "type": "s3",
     "uri": ""
