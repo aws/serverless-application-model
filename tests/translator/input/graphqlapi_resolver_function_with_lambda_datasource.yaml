@@ -50,7 +50,7 @@ Resources:
       Functions:
         MyFunction:
           Runtime:
-            Name: some-runtime
+            Name: APPSYNC_JS
             Version: 1.2.3
           InlineCode: this is my epic code
           DataSource: MyDataSource

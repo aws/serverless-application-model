@@ -173,7 +173,7 @@
         "MaxBatchSize": 10,
         "Name": "MyFunction",
         "Runtime": {
-          "Name": "some-runtime",
+          "Name": "APPSYNC_JS",
           "RuntimeVersion": "1.2.3"
         }
       },
