@@ -1,0 +1,94 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Book {
+            bookName: String
+            id: ID
+        } 
+        type Query { getBook(bookName: String): Book }
+      OwnerContact: blah-blah
+      Auth:
+        Type: API_KEY
+      ApiKeys:
+        MyApiKey: {}
+      Functions:
+        processQuery:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: NONE
+          InlineCode: |
+            import { util } from '@aws-appsync/utils';
+
+            export function request(ctx) {
+              const id = util.autoId();
+              return { payload: { ...ctx.args, id } };
+            }
+
+            export function response(ctx) {
+              return ctx.result;
+            }
+      Resolvers:
+        Query:
+          getBook:
+            Pipeline:
+            - processQuery
+
+  IntrospectionDisableSuperCoolAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaInline: |
+        type Book {
+            bookName: String
+            id: ID
+        } 
+        type Query { getBook(bookName: String): Book }
+      OwnerContact: blah-blah
+      IntrospectionConfig: DISABLED
+      QueryDepthLimit: 10
+      ResolverCountLimit: 100
+      Auth:
+        Type: API_KEY
+      ApiKeys:
+        MyApiKey: {}
+      Functions:
+        processQuery:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: NONE
+          InlineCode: |
+            import { util } from '@aws-appsync/utils';
+
+            export function request(ctx) {
+              const id = util.autoId();
+              return { payload: { ...ctx.args, id } };
+            }
+
+            export function response(ctx) {
+              return ctx.result;
+            }
+      Resolvers:
+        Query:
+          getBook:
+            Pipeline:
+            - processQuery
+Outputs:
+  SuperCoolAPI:
+    Description: AppSync API
+    Value: !GetAtt SuperCoolAPI.GraphQLUrl
+  MyApiKey:
+    Description: API Id
+    Value: !GetAtt SuperCoolAPIMyApiKey.ApiKey
+  IntrospectionDisableSuperCoolAPI:
+    Description: AppSync API
+    Value: !GetAtt IntrospectionDisableSuperCoolAPI.GraphQLUrl
+  IntrospectionDisableSuperCoolAPIMyApiKey:
+    Description: API Id
+    Value: !GetAtt IntrospectionDisableSuperCoolAPIMyApiKey.ApiKey
+
+Metadata:
+  SamTransformTest: true
