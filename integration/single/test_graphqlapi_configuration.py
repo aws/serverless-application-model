@@ -60,17 +60,19 @@ class TestGraphQLApiConfiguration(BaseTest):
         response = execute_and_verify_appsync_query(url, api_key, query)
         self.assertEqual(response["data"]["getBook"]["bookName"], book_name)
 
-        introspection_disable_query_response = execute_and_verify_appsync_query(introspection_disable_api_url, introspection_disable_api_key, query)
+        introspection_disable_query_response = execute_and_verify_appsync_query(
+            introspection_disable_api_url, introspection_disable_api_key, query
+        )
         self.assertEqual(introspection_disable_query_response["data"]["getBook"]["bookName"], book_name)
 
-        query_introsepction = f"""
-            query myQuery {{
-              __schema {{ 
-                types {{
+        query_introsepction = """
+            query myQuery {
+              __schema { 
+                types {
                   name
-                }}
-               }}
-            }}
+                }
+               }
+            }
         """
 
         introspection_query_response = execute_and_verify_appsync_query(url, api_key, query_introsepction)
@@ -78,4 +80,6 @@ class TestGraphQLApiConfiguration(BaseTest):
 
         # sending introspection query and expecting error as introspection is DISABLED for this API using template file
         with self.assertRaises(Exception):
-            execute_and_verify_appsync_query(introspection_disable_api_url, introspection_disable_api_key, query_introsepction)
+            execute_and_verify_appsync_query(
+                introspection_disable_api_url, introspection_disable_api_key, query_introsepction
+            )
