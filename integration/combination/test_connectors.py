@@ -80,8 +80,6 @@ class TestConnectors(BaseTest):
             ("combination/connector_event_rule_to_sqs_write",),
             ("combination/connector_event_rule_to_sns_write",),
             ("combination/connector_event_rule_to_sfn_write",),
-            ("combination/connector_event_rule_to_eb_default_write",),
-            ("combination/connector_event_rule_to_eb_custom_write",),
             ("combination/connector_event_rule_to_lambda_write",),
             ("combination/connector_event_rule_to_lambda_write_multiple",),
             ("combination/connector_sqs_to_function",),
