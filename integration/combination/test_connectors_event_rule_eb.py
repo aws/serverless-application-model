@@ -1,4 +1,3 @@
-from time import sleep
 from unittest import SkipTest
 from unittest.case import skipIf
 
@@ -15,6 +14,7 @@ retry_once = retry(
     # unittest raises SkipTest for skipping tests
     retry=retry_if_exception(lambda e: not isinstance(e, SkipTest)),
 )
+
 
 @skipIf(
     current_region_does_not_support([EVENT_RULE_WITH_EVENT_BUS]),
