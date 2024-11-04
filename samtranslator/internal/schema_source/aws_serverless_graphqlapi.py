@@ -164,6 +164,9 @@ class Properties(BaseModel):
     Cache: Optional[Cache]
     Visibility: Optional[PassThroughProp]
     OwnerContact: Optional[PassThroughProp]
+    IntrospectionConfig: Optional[PassThroughProp]
+    QueryDepthLimit: Optional[PassThroughProp]
+    ResolverCountLimit: Optional[PassThroughProp]
 
 
 class Resource(BaseModel):

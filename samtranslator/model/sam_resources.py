@@ -2257,6 +2257,9 @@ class SamGraphQLApi(SamResourceMacro):
         "Cache": Property(False, IS_DICT),
         "Visibility": PassThroughProperty(False),
         "OwnerContact": PassThroughProperty(False),
+        "IntrospectionConfig": PassThroughProperty(False),
+        "QueryDepthLimit": PassThroughProperty(False),
+        "ResolverCountLimit": PassThroughProperty(False),
     }
 
     Auth: List[Dict[str, Any]]
@@ -2274,6 +2277,9 @@ class SamGraphQLApi(SamResourceMacro):
     Cache: Optional[Dict[str, Any]]
     Visibility: Optional[PassThrough]
     OwnerContact: Optional[PassThrough]
+    IntrospectionConfig: Optional[PassThrough]
+    QueryDepthLimit: Optional[PassThrough]
+    ResolverCountLimit: Optional[PassThrough]
 
     # stop validation so we can use class variables for tracking state
     validate_setattr = False
@@ -2352,6 +2358,13 @@ class SamGraphQLApi(SamResourceMacro):
         if model.OwnerContact:
             api.OwnerContact = passthrough_value(model.OwnerContact)
         api.XrayEnabled = model.XrayEnabled
+
+        if model.IntrospectionConfig:
+            api.IntrospectionConfig = passthrough_value(model.IntrospectionConfig)
+        if model.QueryDepthLimit:
+            api.QueryDepthLimit = passthrough_value(model.QueryDepthLimit)
+        if model.ResolverCountLimit:
+            api.ResolverCountLimit = passthrough_value(model.ResolverCountLimit)
 
         lambda_auth_arns = self._parse_and_set_auth_properties(api, model.Auth)
         auth_connectors = [

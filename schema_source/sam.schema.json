@@ -6662,6 +6662,9 @@
           "title": "Functions",
           "type": "object"
         },
+        "IntrospectionConfig": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Logging": {
           "anyOf": [
             {
@@ -6677,6 +6680,12 @@
           "$ref": "#/definitions/PassThroughProp"
         },
         "OwnerContact": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "QueryDepthLimit": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ResolverCountLimit": {
           "$ref": "#/definitions/PassThroughProp"
         },
         "Resolvers": {
