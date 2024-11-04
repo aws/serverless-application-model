@@ -30,7 +30,7 @@
         "UserPoolConfig": {
           "AppIdClientRegex": "myregex",
           "AwsRegion": "na-east-1",
-          "DefaultAction": "something",
+          "DefaultAction": "ALLOW",
           "UserPoolId": "myid"
         },
         "XrayEnabled": true
