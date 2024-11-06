@@ -3413,6 +3413,9 @@
         "HttpApi": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_httpapi__Globals"
         },
+        "LayerVersion": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_layerversion__Globals"
+        },
         "SimpleTable": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_simpletable__Globals"
         },
@@ -7221,6 +7224,17 @@
       "title": "Route53",
       "type": "object"
     },
+    "samtranslator__internal__schema_source__aws_serverless_layerversion__Globals": {
+      "additionalProperties": false,
+      "properties": {
+        "PublishLambdaVersion": {
+          "title": "Publishlambdaversion",
+          "type": "boolean"
+        }
+      },
+      "title": "Globals",
+      "type": "object"
+    },
     "samtranslator__internal__schema_source__aws_serverless_layerversion__Properties": {
       "additionalProperties": false,
       "properties": {
@@ -7320,6 +7334,10 @@
             }
           ],
           "title": "LicenseInfo"
+        },
+        "PublishLambdaVersion": {
+          "title": "Publishlambdaversion",
+          "type": "boolean"
         },
         "RetentionPolicy": {
           "anyOf": [
