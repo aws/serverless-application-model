@@ -24,6 +24,7 @@ class TestArchitecture(TestCase):
         "intrinsics_resolver": IntrinsicsResolver({}),
         "event_resources": [],
         "managed_policy_map": {"foo": "bar"},
+        "resource_resolver": ResourceResolver({}),
     }
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -60,6 +61,7 @@ class TestCodeUriandImageUri(TestCase):
         "intrinsics_resolver": IntrinsicsResolver({}),
         "event_resources": [],
         "managed_policy_map": {"foo": "bar"},
+        "resource_resolver": ResourceResolver({}),
     }
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -143,6 +145,7 @@ class TestAssumeRolePolicyDocument(TestCase):
         "intrinsics_resolver": IntrinsicsResolver({}),
         "event_resources": [],
         "managed_policy_map": {"foo": "bar"},
+        "resource_resolver": ResourceResolver({}),
     }
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -193,6 +196,7 @@ class TestVersionDescription(TestCase):
         "intrinsics_resolver": IntrinsicsResolver({}),
         "event_resources": [],
         "managed_policy_map": {"foo": "bar"},
+        "resource_resolver": ResourceResolver({}),
     }
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -441,6 +445,7 @@ class TestFunctionUrlConfig(TestCase):
         "intrinsics_resolver": IntrinsicsResolver({}),
         "event_resources": [],
         "managed_policy_map": {"foo": "bar"},
+        "resource_resolver": ResourceResolver({}),
     }
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")

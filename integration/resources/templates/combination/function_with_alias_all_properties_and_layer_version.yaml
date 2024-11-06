@@ -1,0 +1,21 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ${codeuri}
+      Handler: index.handler
+      Runtime: nodejs20.x
+      AutoPublishAlias: Live
+      AutoPublishAliasAllProperties: true
+      Layers:
+      - !Ref MyLayer
+
+  MyLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: ${contenturi}
+      RetentionPolicy: Delete
+      PublishLambdaVersion: true
+      Description: test
+Metadata:
+  SamTransformTest: true

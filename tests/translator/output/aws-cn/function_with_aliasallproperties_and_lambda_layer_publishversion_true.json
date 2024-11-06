@@ -1,0 +1,99 @@
+{
+  "Resources": {
+    "MinimalFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Layers": [
+          {
+            "Ref": "TestEnvLayer856c65a2ec"
+          }
+        ],
+        "Role": {
+          "Fn::GetAtt": [
+            "MinimalFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.10",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MinimalFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MinimalFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "MinimalFunctionVersion046dad86da",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "MinimalFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MinimalFunctionVersion046dad86da": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "MinimalFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "TestEnvLayer856c65a2ec": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Description": "Dependencies for test env implementation",
+        "LayerName": "test-env-dependencies"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    }
+  }
+}
