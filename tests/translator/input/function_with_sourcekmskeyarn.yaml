@@ -1,0 +1,21 @@
+Parameters:
+  SourceKMSKeyArnParam:
+    Type: String
+    Default: arn:aws:kms:us-west-2:123456789012:key/dec86919-7219-4e8d-8871-7f1609df2c7f
+
+Resources:
+  SourceKMSKeyArnFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      SourceKMSKeyArn: arn:aws:kms:us-west-2:987654321098:key/dec86919-7219-4e8d-8871-7f1609df2c7f
+
+  SourceKMSKeyArnParameterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      SourceKMSKeyArn: !Ref SourceKMSKeyArnParam

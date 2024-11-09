@@ -180,6 +180,7 @@ class SamFunction(SamResourceMacro):
         "RuntimeManagementConfig": PassThroughProperty(False),
         "LoggingConfig": PassThroughProperty(False),
         "RecursiveLoop": PassThroughProperty(False),
+        "SourceKMSKeyArn": PassThroughProperty(False),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -223,6 +224,7 @@ class SamFunction(SamResourceMacro):
     FunctionUrlConfig: Optional[Dict[str, Any]]
     LoggingConfig: Optional[Dict[str, Any]]
     RecursiveLoop: Optional[str]
+    SourceKMSKeyArn: Optional[str]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -880,7 +882,10 @@ class SamFunction(SamResourceMacro):
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
         dispatch_function: Callable[..., Dict[str, Any]] = artifact_dispatch[filtered_key]
-        return dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
+        code_dict = dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
+        if self.SourceKMSKeyArn and packagetype == ZIP:
+            code_dict["SourceKMSKeyArn"] = self.SourceKMSKeyArn
+        return code_dict
 
     def _construct_version(
         self, function: LambdaFunction, intrinsics_resolver: IntrinsicsResolver, code_sha256: Optional[str] = None
