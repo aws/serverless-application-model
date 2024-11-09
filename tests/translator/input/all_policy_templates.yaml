@@ -187,3 +187,6 @@ Resources:
 
       - StepFunctionsCallbackPolicy:
           StateMachineName: name
+
+      - KMSEncryptPolicy_v2:
+          KeyId: keyId
