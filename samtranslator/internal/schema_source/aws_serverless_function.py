@@ -513,6 +513,7 @@ SnapStart = Optional[PassThroughProp]  # TODO: check the type
 RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
 LoggingConfig = Optional[PassThroughProp]  # TODO: add documentation
 RecursiveLoop = Optional[PassThroughProp]
+SourceKMSKeyArn = Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
@@ -640,6 +641,7 @@ class Properties(BaseModel):
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
+    SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Globals(BaseModel):
@@ -699,6 +701,7 @@ class Globals(BaseModel):
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
+    SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):

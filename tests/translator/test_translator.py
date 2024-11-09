@@ -781,7 +781,7 @@ class TestTemplateValidation(TestCase):
             "MyFunction": {
                 "Type": "AWS::Serverless::Function",
                 "Properties": {
-                    "Runtime": "python3.8",
+                    "Runtime": "python3.11",
                     "Handler": "foo",
                     "InlineCode": "bar",
                     "Policies": [

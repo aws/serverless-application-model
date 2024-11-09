@@ -17,4 +17,4 @@ Resources:
       DataSources:
         Lambda:
           MyDataSource:
-            FunctionArn: blah
+            FunctionArn: arn:aws:lambda:us-west-2:987654321098:function:dec86919-7219-4e8d-8871-7f1609df2c7f

@@ -183,7 +183,9 @@
           ]
         },
         "ManagedPolicyArns": [
-          "arn:{AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          }
         ]
       },
       "Type": "AWS::IAM::Role"

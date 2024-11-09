@@ -9,7 +9,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: python3.8
+      Runtime: python3.11
       AutoPublishAlias: live
       InlineCode: |
         import json
@@ -31,6 +31,6 @@ Resources:
 
 Outputs:
   ApiEndpoint:
-    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/MyNewStageName"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/MyNewStageName"
 Metadata:
   SamTransformTest: true

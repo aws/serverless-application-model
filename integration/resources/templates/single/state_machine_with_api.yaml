@@ -14,12 +14,12 @@ Resources:
             print(event)
             return "do nothing"
       Handler: index.handler
-      Runtime: python3.8
+      Runtime: python3.11
   Post:
     Type: AWS::Serverless::StateMachine
     Properties:
       Policies:
-      - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/AWSLambda_FullAccess
       Definition:
         StartAt: One
         States:

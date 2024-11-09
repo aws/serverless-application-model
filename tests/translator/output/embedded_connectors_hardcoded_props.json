@@ -1,6 +1,9 @@
 {
   "Resources": {
     "MyApiV1": {
+      "Properties": {
+        "Name": "MyApiV1"
+      },
       "Type": "AWS::ApiGateway::RestApi"
     },
     "MyApiV1ApiV1ToLambdaWriteLambdaPermission": {
@@ -40,6 +43,9 @@
       "Type": "AWS::Lambda::Permission"
     },
     "MyApiV2": {
+      "Properties": {
+        "Name": "MyApiV2"
+      },
       "Type": "AWS::ApiGatewayV2::Api"
     },
     "MyApiV2ApiV2ToLambdaWriteLambdaPermission": {
@@ -79,6 +85,14 @@
       "Type": "AWS::Lambda::Permission"
     },
     "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = function(event, context, callback) {\n  return callback(null, 'success');\n}\n"
+        },
+        "Handler": "index.handler",
+        "Role": "arn:aws:iam::111122223333:role/lambda-role",
+        "Runtime": "nodejs20.x"
+      },
       "Type": "AWS::Lambda::Function"
     },
     "MyQueue": {
@@ -88,6 +102,9 @@
       "Type": "AWS::SQS::Queue"
     },
     "MyRule": {
+      "Properties": {
+        "ScheduleExpression": "rate(5 minutes)"
+      },
       "Type": "AWS::Events::Rule"
     },
     "MyRuleRuleToTopicTopicPolicy": {

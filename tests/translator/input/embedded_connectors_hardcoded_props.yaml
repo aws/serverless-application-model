@@ -2,6 +2,15 @@ Transform: AWS::Serverless-2016-10-31
 Resources:
   MyFunction:
     Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: arn:aws:iam::111122223333:role/lambda-role
+      Runtime: nodejs20.x
+      Code:
+        ZipFile: |
+          exports.handler = function(event, context, callback) {
+            return callback(null, 'success');
+          }
 
   MyRule:
     Type: AWS::Events::Rule
@@ -13,6 +22,8 @@ Resources:
             Arn: !Ref MyTopic
           Permissions:
           - Write
+    Properties:
+      ScheduleExpression: rate(5 minutes)
 
   MyQueue:
     Type: AWS::SQS::Queue
@@ -42,6 +53,8 @@ Resources:
             Id: MyFunction
           Permissions:
           - Write
+    Properties:
+      Name: MyApiV1
 
   MyApiV2:
     Type: AWS::ApiGatewayV2::Api
@@ -54,6 +67,8 @@ Resources:
             Id: MyFunction
           Permissions:
           - Write
+    Properties:
+      Name: MyApiV2
 
   MySNSTopic:
     Type: AWS::SNS::Topic

@@ -11,7 +11,7 @@ Resources:
           Principal:
             Service: lambda.amazonaws.com
       ManagedPolicyArns:
-      - arn:{AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   SamFunction:
     Type: AWS::Serverless::Function

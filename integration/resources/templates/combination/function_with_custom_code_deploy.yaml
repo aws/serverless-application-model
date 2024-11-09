@@ -10,7 +10,7 @@ Resources:
     Properties:
       CodeUri: ${codeuri}
       Handler: index.handler
-      Runtime: python3.8
+      Runtime: python3.11
 
       AutoPublishAlias: Live
 

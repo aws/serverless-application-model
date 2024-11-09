@@ -18,7 +18,7 @@ Resources:
         DynamoDb:
           MyDataSource:
             TableName: some-table
-            TableArn: big-arn
+            TableArn: arn:aws:dynamodb:us-west-2:987654321098:table/dec86919-7219-4e8d-8871-7f1609df2c7f
           AnotherDataSource:
             TableName: cool-table
-            TableArn: table-arn
+            TableArn: arn:aws:dynamodb:us-west-2:987654321098:table/dec86919-7219-4e8d-8871-7f1609df2c7f

@@ -42,7 +42,7 @@ Resources:
       - x86_64
       EphemeralStorage:
         Size: 1024
-      Role: !Sub arn:${AWS::Partition}:iam::role
+      Role: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/role1
       KmsKeyArn: !Sub arn:${AWS::Partition}:key:key
       FileSystemConfigs:
       - Arn: !GetAtt AccessPoint.Arn
@@ -72,7 +72,7 @@ Resources:
       - x86_64
       EphemeralStorage:
         Size: 1024
-      Role: !Sub arn:${AWS::Partition}:iam::role
+      Role: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/role1
       KmsKeyArn: !Sub arn:${AWS::Partition}:key:key
       FileSystemConfigs:
       - Arn: !GetAtt AccessPoint.Arn

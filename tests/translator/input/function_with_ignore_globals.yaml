@@ -1,6 +1,6 @@
 Globals:
   Function:
-    Runtime: python3.8
+    Runtime: python3.11
     Handler: index.lambda_handler
     MemorySize: 128
 

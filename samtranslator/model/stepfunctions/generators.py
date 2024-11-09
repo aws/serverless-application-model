@@ -54,6 +54,7 @@ class StateMachineGenerator:
         get_managed_policy_map=None,
         auto_publish_alias=None,
         deployment_preference=None,
+        use_alias_as_event_target=None,
     ):
         """
         Constructs an State Machine Generator class that generates a State Machine resource
@@ -81,6 +82,7 @@ class StateMachineGenerator:
         :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
         :param auto_publish_alias: Name of the state machine alias to automatically create and update
         :deployment_preference: Settings to enable gradual state machine deployments
+        :param use_alias_as_event_target: Whether to use the state machine alias as the event target
         """
         self.logical_id = logical_id
         self.depends_on = depends_on
@@ -110,6 +112,7 @@ class StateMachineGenerator:
         self.get_managed_policy_map = get_managed_policy_map
         self.auto_publish_alias = auto_publish_alias
         self.deployment_preference = deployment_preference
+        self.use_alias_as_event_target = use_alias_as_event_target
 
     @cw_timer(prefix="Generator", name="StateMachine")
     def to_cloudformation(self):  # type: ignore[no-untyped-def]
@@ -300,6 +303,8 @@ class StateMachineGenerator:
         deployment_preference["StateMachineVersionArn"] = state_machine_version_arn
         state_machine_alias.DeploymentPreference = deployment_preference
 
+        self.state_machine_alias = state_machine_alias
+
         return state_machine_alias
 
     def _generate_managed_traffic_shifting_resources(
@@ -310,6 +315,10 @@ class StateMachineGenerator:
         :returns: a list containing the state machine's version and alias resources
         :rtype: list
         """
+        if not self.auto_publish_alias and self.use_alias_as_event_target:
+            raise InvalidResourceException(
+                self.logical_id, "'UseAliasAsEventTarget' requires 'AutoPublishAlias' property to be specified."
+            )
         if not self.auto_publish_alias and not self.deployment_preference:
             return []
         if not self.auto_publish_alias and self.deployment_preference:
@@ -341,7 +350,12 @@ class StateMachineGenerator:
                         kwargs[name] = resource
                 except (TypeError, AttributeError) as e:
                     raise InvalidEventException(logical_id, str(e)) from e
-                resources += eventsource.to_cloudformation(resource=self.state_machine, **kwargs)
+                target_resource = (
+                    (self.state_machine_alias or self.state_machine)
+                    if self.use_alias_as_event_target
+                    else self.state_machine
+                )
+                resources += eventsource.to_cloudformation(resource=target_resource, **kwargs)
 
         return resources
 

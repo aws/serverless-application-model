@@ -5525,6 +5525,9 @@
           "markdownDescription": "Create a snapshot of any new Lambda function version\\. A snapshot is a cached state of your initialized function, including all of its dependencies\\. The function is initialized just once and the cached state is reused for all future invocations, improving application performance by reducing the number of times your function must be initialized\\. To learn more, see [Improving startup performance with Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [SnapStart](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SnapStart`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html) property of an `AWS::Lambda::Function` resource\\.",
           "title": "SnapStart"
         },
+        "SourceKMSKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Tags": {
           "markdownDescription": "A map \\(string to string\\) that specifies the tags added to this function\\. For details about valid keys and values for tags, see [Tag Key and Value Requirements](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html#configuration-tags-restrictions) in the *AWS Lambda Developer Guide*\\.  \nWhen the stack is created, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tags) property of an `AWS::Lambda::Function` resource\\. The `Tags` property in AWS SAM consists of key\\-value pairs \\(whereas in AWS CloudFormation this property consists of a list of `Tag` objects\\)\\. Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.",
           "title": "Tags",
@@ -6109,6 +6112,9 @@
           ],
           "markdownDescription": "Create a snapshot of any new Lambda function version\\. A snapshot is a cached state of your initialized function, including all of its dependencies\\. The function is initialized just once and the cached state is reused for all future invocations, improving application performance by reducing the number of times your function must be initialized\\. To learn more, see [Improving startup performance with Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [SnapStart](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SnapStart`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html) property of an `AWS::Lambda::Function` resource\\.",
           "title": "SnapStart"
+        },
+        "SourceKMSKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Tags": {
           "markdownDescription": "A map \\(string to string\\) that specifies the tags added to this function\\. For details about valid keys and values for tags, see [Tag Key and Value Requirements](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html#configuration-tags-restrictions) in the *AWS Lambda Developer Guide*\\.  \nWhen the stack is created, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.  \n*Type*: Map  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tags) property of an `AWS::Lambda::Function` resource\\. The `Tags` property in AWS SAM consists of key\\-value pairs \\(whereas in AWS CloudFormation this property consists of a list of `Tag` objects\\)\\. Also, AWS SAM automatically adds a `lambda:createdBy:SAM` tag to this Lambda function, and to the default roles that are generated for this function\\.",
@@ -8044,6 +8050,10 @@
           ],
           "markdownDescription": "The type of the state machine\\.  \n*Valid values*: `STANDARD` or `EXPRESS`  \n*Type*: String  \n*Required*: No  \n*Default*: `STANDARD`  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StateMachineType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#cfn-stepfunctions-statemachine-statemachinetype) property of an `AWS::StepFunctions::StateMachine` resource\\.",
           "title": "Type"
+        },
+        "UseAliasAsEventTarget": {
+          "title": "Usealiasaseventtarget",
+          "type": "boolean"
         }
       },
       "title": "Properties",

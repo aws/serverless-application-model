@@ -39,7 +39,7 @@
         },
         "Name": "AnotherFunction",
         "Runtime": {
-          "Name": "some-runtime",
+          "Name": "APPSYNC_JS",
           "RuntimeVersion": "1.2.3"
         }
       },
@@ -88,7 +88,7 @@
         },
         "Name": "GoodFunction",
         "Runtime": {
-          "Name": "some-runtime",
+          "Name": "APPSYNC_JS",
           "RuntimeVersion": "1.2.3"
         }
       },
@@ -111,7 +111,7 @@
         },
         "Name": "MyFunction",
         "Runtime": {
-          "Name": "some-runtime",
+          "Name": "APPSYNC_JS",
           "RuntimeVersion": "1.2.3"
         }
       },
@@ -159,7 +159,7 @@
         },
         "Name": "SimilarFunction",
         "Runtime": {
-          "Name": "some-runtime",
+          "Name": "APPSYNC_JS",
           "RuntimeVersion": "1.2.3"
         }
       },

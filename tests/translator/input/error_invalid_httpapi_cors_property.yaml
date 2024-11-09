@@ -1,0 +1,22 @@
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: stagename
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 200
+      RouteSettings:
+        GET /path:
+          ThrottlingBurstLimit: 500 # overridden in HttpApi Event
+      StageVariables:
+        StageVar: Value
+      FailOnWarnings: true
+      CorsConfiguration:
+        AllowOrigin:
+        - https://example.com
+        AllowHeaders:
+        - x-apigateway-header
+        AllowMethods:
+        - GET
+        MaxAge: 600
+        AllowCredentials: true

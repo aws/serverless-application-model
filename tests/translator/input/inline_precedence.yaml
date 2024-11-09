@@ -7,4 +7,4 @@ Resources:
             pass"
       CodeUri: .
       Handler: index.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.11

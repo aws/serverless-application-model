@@ -750,8 +750,9 @@ class ApiGenerator:
             properties = CorsProperties(AllowOrigin=self.cors)  # type: ignore[call-arg]
         elif isinstance(self.cors, dict):
             # Make sure keys in the dict are recognized
-            if not all(key in CorsProperties._fields for key in self.cors):
-                raise InvalidResourceException(self.logical_id, INVALID_ERROR)
+            for key in self.cors:
+                if key not in CorsProperties._fields:
+                    raise InvalidResourceException(self.logical_id, f"Invalid key '{key}' for 'Cors' property.")
 
             properties = CorsProperties(**self.cors)
 
