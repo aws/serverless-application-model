@@ -34,4 +34,4 @@ class RequestUtils:
             # Need to check for response is None here since the __bool__ method checks 200 <= status < 400
             return {}
 
-        return dict((k.lower(), v) for k, v in self.response.headers.items())
+        return {k.lower(): v for k, v in self.response.headers.items()}

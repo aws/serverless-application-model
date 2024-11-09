@@ -37,149 +37,149 @@ properties = get_prop(PROPERTIES_STEM)
 
 
 class ResourcePolicy(BaseModel):
-    AwsAccountBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountBlacklist")
-    AwsAccountWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountWhitelist")
-    CustomStatements: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("CustomStatements")
-    IntrinsicVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcBlacklist")
-    IntrinsicVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcWhitelist")
-    IntrinsicVpceBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceBlacklist")
-    IntrinsicVpceWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceWhitelist")
-    IpRangeBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeBlacklist")
-    IpRangeWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeWhitelist")
-    SourceVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcBlacklist")
-    SourceVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcWhitelist")
+    AwsAccountBlacklist: list[str | DictStrAny] | None = resourcepolicy("AwsAccountBlacklist")
+    AwsAccountWhitelist: list[str | DictStrAny] | None = resourcepolicy("AwsAccountWhitelist")
+    CustomStatements: list[str | DictStrAny] | None = resourcepolicy("CustomStatements")
+    IntrinsicVpcBlacklist: list[str | DictStrAny] | None = resourcepolicy("IntrinsicVpcBlacklist")
+    IntrinsicVpcWhitelist: list[str | DictStrAny] | None = resourcepolicy("IntrinsicVpcWhitelist")
+    IntrinsicVpceBlacklist: list[str | DictStrAny] | None = resourcepolicy("IntrinsicVpceBlacklist")
+    IntrinsicVpceWhitelist: list[str | DictStrAny] | None = resourcepolicy("IntrinsicVpceWhitelist")
+    IpRangeBlacklist: list[str | DictStrAny] | None = resourcepolicy("IpRangeBlacklist")
+    IpRangeWhitelist: list[str | DictStrAny] | None = resourcepolicy("IpRangeWhitelist")
+    SourceVpcBlacklist: list[str | DictStrAny] | None = resourcepolicy("SourceVpcBlacklist")
+    SourceVpcWhitelist: list[str | DictStrAny] | None = resourcepolicy("SourceVpcWhitelist")
 
 
 class CognitoAuthorizerIdentity(BaseModel):
-    Header: Optional[str] = cognitoauthorizeridentity("Header")
-    ReauthorizeEvery: Optional[SamIntrinsicable[int]] = cognitoauthorizeridentity("ReauthorizeEvery")
-    ValidationExpression: Optional[str] = cognitoauthorizeridentity("ValidationExpression")
+    Header: str | None = cognitoauthorizeridentity("Header")
+    ReauthorizeEvery: SamIntrinsicable[int] | None = cognitoauthorizeridentity("ReauthorizeEvery")
+    ValidationExpression: str | None = cognitoauthorizeridentity("ValidationExpression")
 
 
 class CognitoAuthorizer(BaseModel):
-    AuthorizationScopes: Optional[List[str]] = cognitoauthorizer("AuthorizationScopes")
-    Identity: Optional[CognitoAuthorizerIdentity] = cognitoauthorizer("Identity")
+    AuthorizationScopes: list[str] | None = cognitoauthorizer("AuthorizationScopes")
+    Identity: CognitoAuthorizerIdentity | None = cognitoauthorizer("Identity")
     UserPoolArn: SamIntrinsicable[str] = cognitoauthorizer("UserPoolArn")
 
 
 class LambdaTokenAuthorizerIdentity(BaseModel):
-    ReauthorizeEvery: Optional[SamIntrinsicable[int]] = lambdatokenauthorizeridentity("ReauthorizeEvery")
-    ValidationExpression: Optional[str] = lambdatokenauthorizeridentity("ValidationExpression")
-    Header: Optional[str] = lambdatokenauthorizeridentity("Header")
+    ReauthorizeEvery: SamIntrinsicable[int] | None = lambdatokenauthorizeridentity("ReauthorizeEvery")
+    ValidationExpression: str | None = lambdatokenauthorizeridentity("ValidationExpression")
+    Header: str | None = lambdatokenauthorizeridentity("Header")
 
 
 class LambdaRequestAuthorizerIdentity(BaseModel):
-    Context: Optional[List[str]] = lambdarequestauthorizeridentity("Context")
-    Headers: Optional[List[str]] = lambdarequestauthorizeridentity("Headers")
-    QueryStrings: Optional[List[str]] = lambdarequestauthorizeridentity("QueryStrings")
-    ReauthorizeEvery: Optional[SamIntrinsicable[int]] = lambdarequestauthorizeridentity("ReauthorizeEvery")
-    StageVariables: Optional[List[str]] = lambdarequestauthorizeridentity("StageVariables")
+    Context: list[str] | None = lambdarequestauthorizeridentity("Context")
+    Headers: list[str] | None = lambdarequestauthorizeridentity("Headers")
+    QueryStrings: list[str] | None = lambdarequestauthorizeridentity("QueryStrings")
+    ReauthorizeEvery: SamIntrinsicable[int] | None = lambdarequestauthorizeridentity("ReauthorizeEvery")
+    StageVariables: list[str] | None = lambdarequestauthorizeridentity("StageVariables")
 
 
 class LambdaTokenAuthorizer(BaseModel):
-    AuthorizationScopes: Optional[List[str]] = lambdatokenauthorizer("AuthorizationScopes")
+    AuthorizationScopes: list[str] | None = lambdatokenauthorizer("AuthorizationScopes")
     FunctionArn: SamIntrinsicable[str] = lambdatokenauthorizer("FunctionArn")
-    FunctionInvokeRole: Optional[str] = lambdatokenauthorizer("FunctionInvokeRole")
-    FunctionPayloadType: Optional[Literal["TOKEN"]] = lambdatokenauthorizer("FunctionPayloadType")
-    Identity: Optional[LambdaTokenAuthorizerIdentity] = lambdatokenauthorizer("Identity")
-    DisableFunctionDefaultPermissions: Optional[bool] = lambdatokenauthorizer("DisableFunctionDefaultPermissions")
+    FunctionInvokeRole: str | None = lambdatokenauthorizer("FunctionInvokeRole")
+    FunctionPayloadType: Literal["TOKEN"] | None = lambdatokenauthorizer("FunctionPayloadType")
+    Identity: LambdaTokenAuthorizerIdentity | None = lambdatokenauthorizer("Identity")
+    DisableFunctionDefaultPermissions: bool | None = lambdatokenauthorizer("DisableFunctionDefaultPermissions")
 
 
 class LambdaRequestAuthorizer(BaseModel):
-    AuthorizationScopes: Optional[List[str]] = lambdarequestauthorizer("AuthorizationScopes")
+    AuthorizationScopes: list[str] | None = lambdarequestauthorizer("AuthorizationScopes")
     FunctionArn: SamIntrinsicable[str] = lambdarequestauthorizer("FunctionArn")
-    FunctionInvokeRole: Optional[str] = lambdarequestauthorizer("FunctionInvokeRole")
-    FunctionPayloadType: Optional[Literal["REQUEST"]] = lambdarequestauthorizer("FunctionPayloadType")
-    Identity: Optional[LambdaRequestAuthorizerIdentity] = lambdarequestauthorizer("Identity")
-    DisableFunctionDefaultPermissions: Optional[bool] = lambdarequestauthorizer("DisableFunctionDefaultPermissions")
+    FunctionInvokeRole: str | None = lambdarequestauthorizer("FunctionInvokeRole")
+    FunctionPayloadType: Literal["REQUEST"] | None = lambdarequestauthorizer("FunctionPayloadType")
+    Identity: LambdaRequestAuthorizerIdentity | None = lambdarequestauthorizer("Identity")
+    DisableFunctionDefaultPermissions: bool | None = lambdarequestauthorizer("DisableFunctionDefaultPermissions")
 
 
 class UsagePlan(BaseModel):
     CreateUsagePlan: SamIntrinsicable[Literal["PER_API", "SHARED", "NONE"]] = usageplan("CreateUsagePlan")
-    Description: Optional[PassThroughProp] = usageplan("Description")
-    Quota: Optional[PassThroughProp] = usageplan("Quota")
-    Tags: Optional[PassThroughProp] = usageplan("Tags")
-    Throttle: Optional[PassThroughProp] = usageplan("Throttle")
-    UsagePlanName: Optional[PassThroughProp] = usageplan("UsagePlanName")
+    Description: PassThroughProp | None = usageplan("Description")
+    Quota: PassThroughProp | None = usageplan("Quota")
+    Tags: PassThroughProp | None = usageplan("Tags")
+    Throttle: PassThroughProp | None = usageplan("Throttle")
+    UsagePlanName: PassThroughProp | None = usageplan("UsagePlanName")
 
 
 class Auth(BaseModel):
-    AddDefaultAuthorizerToCorsPreflight: Optional[bool] = auth("AddDefaultAuthorizerToCorsPreflight")
-    AddApiKeyRequiredToCorsPreflight: Optional[bool]  # TODO Add Docs
-    ApiKeyRequired: Optional[bool] = auth("ApiKeyRequired")
-    Authorizers: Optional[
-        Dict[
+    AddDefaultAuthorizerToCorsPreflight: bool | None = auth("AddDefaultAuthorizerToCorsPreflight")
+    AddApiKeyRequiredToCorsPreflight: bool | None  # TODO Add Docs
+    ApiKeyRequired: bool | None = auth("ApiKeyRequired")
+    Authorizers: None | (
+        dict[
             str,
-            Union[
-                CognitoAuthorizer,
-                LambdaTokenAuthorizer,
-                LambdaRequestAuthorizer,
-            ],
+            (
+                CognitoAuthorizer |
+                LambdaTokenAuthorizer |
+                LambdaRequestAuthorizer
+            ),
         ]
-    ] = auth("Authorizers")
-    DefaultAuthorizer: Optional[str] = auth("DefaultAuthorizer")
-    InvokeRole: Optional[str] = auth("InvokeRole")
-    ResourcePolicy: Optional[ResourcePolicy] = auth("ResourcePolicy")
-    UsagePlan: Optional[UsagePlan] = auth("UsagePlan")
+    ) = auth("Authorizers")
+    DefaultAuthorizer: str | None = auth("DefaultAuthorizer")
+    InvokeRole: str | None = auth("InvokeRole")
+    ResourcePolicy: ResourcePolicy | None = auth("ResourcePolicy")
+    UsagePlan: UsagePlan | None = auth("UsagePlan")
 
 
 class Cors(BaseModel):
-    AllowCredentials: Optional[bool] = cors("AllowCredentials")
-    AllowHeaders: Optional[str] = cors("AllowHeaders")
-    AllowMethods: Optional[str] = cors("AllowMethods")
+    AllowCredentials: bool | None = cors("AllowCredentials")
+    AllowHeaders: str | None = cors("AllowHeaders")
+    AllowMethods: str | None = cors("AllowMethods")
     AllowOrigin: str = cors("AllowOrigin")
-    MaxAge: Optional[str] = cors("MaxAge")
+    MaxAge: str | None = cors("MaxAge")
 
 
 class Route53(BaseModel):
-    DistributionDomainName: Optional[PassThroughProp] = passthrough_prop(
+    DistributionDomainName: PassThroughProp | None = passthrough_prop(
         ROUTE53_STEM,
         "DistributionDomainName",
         ["AWS::Route53::RecordSetGroup.AliasTarget", "DNSName"],
     )
-    EvaluateTargetHealth: Optional[PassThroughProp] = passthrough_prop(
+    EvaluateTargetHealth: PassThroughProp | None = passthrough_prop(
         ROUTE53_STEM,
         "EvaluateTargetHealth",
         ["AWS::Route53::RecordSetGroup.AliasTarget", "EvaluateTargetHealth"],
     )
-    HostedZoneId: Optional[PassThroughProp] = passthrough_prop(
+    HostedZoneId: PassThroughProp | None = passthrough_prop(
         ROUTE53_STEM,
         "HostedZoneId",
         ["AWS::Route53::RecordSetGroup.RecordSet", "HostedZoneId"],
     )
-    HostedZoneName: Optional[PassThroughProp] = passthrough_prop(
+    HostedZoneName: PassThroughProp | None = passthrough_prop(
         ROUTE53_STEM,
         "HostedZoneName",
         ["AWS::Route53::RecordSetGroup.RecordSet", "HostedZoneName"],
     )
-    IpV6: Optional[bool] = route53("IpV6")
-    SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
-    Region: Optional[PassThroughProp]  # TODO: add docs
-    SeparateRecordSetGroup: Optional[bool]  # TODO: add docs
+    IpV6: bool | None = route53("IpV6")
+    SetIdentifier: PassThroughProp | None  # TODO: add docs
+    Region: PassThroughProp | None  # TODO: add docs
+    SeparateRecordSetGroup: bool | None  # TODO: add docs
 
 
 class Domain(BaseModel):
-    BasePath: Optional[PassThroughProp] = domain("BasePath")
-    NormalizeBasePath: Optional[bool] = domain("NormalizeBasePath")
+    BasePath: PassThroughProp | None = domain("BasePath")
+    NormalizeBasePath: bool | None = domain("NormalizeBasePath")
     CertificateArn: PassThroughProp = domain("CertificateArn")
     DomainName: PassThroughProp = passthrough_prop(
         DOMAIN_STEM,
         "DomainName",
         ["AWS::ApiGateway::DomainName", "Properties", "DomainName"],
     )
-    EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE"]]] = domain("EndpointConfiguration")
-    MutualTlsAuthentication: Optional[PassThroughProp] = passthrough_prop(
+    EndpointConfiguration: SamIntrinsicable[Literal["REGIONAL", "EDGE"]] | None = domain("EndpointConfiguration")
+    MutualTlsAuthentication: PassThroughProp | None = passthrough_prop(
         DOMAIN_STEM,
         "MutualTlsAuthentication",
         ["AWS::ApiGateway::DomainName", "Properties", "MutualTlsAuthentication"],
     )
-    OwnershipVerificationCertificateArn: Optional[PassThroughProp] = passthrough_prop(
+    OwnershipVerificationCertificateArn: PassThroughProp | None = passthrough_prop(
         DOMAIN_STEM,
         "OwnershipVerificationCertificateArn",
         ["AWS::ApiGateway::DomainName", "Properties", "OwnershipVerificationCertificateArn"],
     )
-    Route53: Optional[Route53] = domain("Route53")
-    SecurityPolicy: Optional[PassThroughProp] = passthrough_prop(
+    Route53: Route53 | None = domain("Route53")
+    SecurityPolicy: PassThroughProp | None = passthrough_prop(
         DOMAIN_STEM,
         "SecurityPolicy",
         ["AWS::ApiGateway::DomainName", "Properties", "SecurityPolicy"],
@@ -197,7 +197,7 @@ class DefinitionUri(BaseModel):
         "Key",
         ["AWS::ApiGateway::RestApi.S3Location", "Key"],
     )
-    Version: Optional[PassThroughProp] = passthrough_prop(
+    Version: PassThroughProp | None = passthrough_prop(
         DEFINITION_URI_STEM,
         "Version",
         ["AWS::ApiGateway::RestApi.S3Location", "Version"],
@@ -205,12 +205,12 @@ class DefinitionUri(BaseModel):
 
 
 class EndpointConfiguration(BaseModel):
-    Type: Optional[PassThroughProp] = passthrough_prop(
+    Type: PassThroughProp | None = passthrough_prop(
         ENDPOINT_CONFIGURATION_STEM,
         "Type",
         ["AWS::ApiGateway::RestApi.EndpointConfiguration", "Types"],
     )
-    VPCEndpointIds: Optional[PassThroughProp] = passthrough_prop(
+    VPCEndpointIds: PassThroughProp | None = passthrough_prop(
         ENDPOINT_CONFIGURATION_STEM,
         "VPCEndpointIds",
         ["AWS::ApiGateway::RestApi.EndpointConfiguration", "VpcEndpointIds"],
@@ -237,145 +237,145 @@ AlwaysDeploy = Optional[bool]
 
 
 class Properties(BaseModel):
-    AccessLogSetting: Optional[AccessLogSetting] = passthrough_prop(
+    AccessLogSetting: AccessLogSetting | None = passthrough_prop(
         PROPERTIES_STEM,
         "AccessLogSetting",
         ["AWS::ApiGateway::Stage", "Properties", "AccessLogSetting"],
     )
-    ApiKeySourceType: Optional[PassThroughProp] = passthrough_prop(
+    ApiKeySourceType: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "ApiKeySourceType",
         ["AWS::ApiGateway::RestApi", "Properties", "ApiKeySourceType"],
     )
-    Auth: Optional[Auth] = properties("Auth")
-    BinaryMediaTypes: Optional[BinaryMediaTypes] = properties("BinaryMediaTypes")
-    CacheClusterEnabled: Optional[CacheClusterEnabled] = passthrough_prop(
+    Auth: Auth | None = properties("Auth")
+    BinaryMediaTypes: BinaryMediaTypes | None = properties("BinaryMediaTypes")
+    CacheClusterEnabled: CacheClusterEnabled | None = passthrough_prop(
         PROPERTIES_STEM,
         "CacheClusterEnabled",
         ["AWS::ApiGateway::Stage", "Properties", "CacheClusterEnabled"],
     )
-    CacheClusterSize: Optional[CacheClusterSize] = passthrough_prop(
+    CacheClusterSize: CacheClusterSize | None = passthrough_prop(
         PROPERTIES_STEM,
         "CacheClusterSize",
         ["AWS::ApiGateway::Stage", "Properties", "CacheClusterSize"],
     )
-    CanarySetting: Optional[CanarySetting] = passthrough_prop(
+    CanarySetting: CanarySetting | None = passthrough_prop(
         PROPERTIES_STEM,
         "CanarySetting",
         ["AWS::ApiGateway::Stage", "Properties", "CanarySetting"],
     )
-    Cors: Optional[CorsType] = properties("Cors")
-    DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
-    DefinitionUri: Optional[DefinitionUriType] = properties("DefinitionUri")
-    MergeDefinitions: Optional[MergeDefinitions] = properties("MergeDefinitions")
-    Description: Optional[PassThroughProp] = passthrough_prop(
+    Cors: CorsType | None = properties("Cors")
+    DefinitionBody: DictStrAny | None = properties("DefinitionBody")
+    DefinitionUri: DefinitionUriType | None = properties("DefinitionUri")
+    MergeDefinitions: MergeDefinitions | None = properties("MergeDefinitions")
+    Description: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "Description",
         ["AWS::ApiGateway::Stage", "Properties", "Description"],
     )
-    DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
-    Domain: Optional[Domain] = properties("Domain")
-    EndpointConfiguration: Optional[EndpointConfigurationType] = properties("EndpointConfiguration")
-    FailOnWarnings: Optional[PassThroughProp] = passthrough_prop(
+    DisableExecuteApiEndpoint: PassThroughProp | None = properties("DisableExecuteApiEndpoint")
+    Domain: Domain | None = properties("Domain")
+    EndpointConfiguration: EndpointConfigurationType | None = properties("EndpointConfiguration")
+    FailOnWarnings: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "FailOnWarnings",
         ["AWS::ApiGateway::RestApi", "Properties", "FailOnWarnings"],
     )
-    GatewayResponses: Optional[GatewayResponses] = properties("GatewayResponses")
-    MethodSettings: Optional[MethodSettings] = passthrough_prop(
+    GatewayResponses: GatewayResponses | None = properties("GatewayResponses")
+    MethodSettings: MethodSettings | None = passthrough_prop(
         PROPERTIES_STEM,
         "MethodSettings",
         ["AWS::ApiGateway::Stage", "Properties", "MethodSettings"],
     )
-    MinimumCompressionSize: Optional[MinimumCompressionSize] = passthrough_prop(
+    MinimumCompressionSize: MinimumCompressionSize | None = passthrough_prop(
         PROPERTIES_STEM,
         "MinimumCompressionSize",
         ["AWS::ApiGateway::RestApi", "Properties", "MinimumCompressionSize"],
     )
-    Mode: Optional[PassThroughProp] = passthrough_prop(
+    Mode: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "Mode",
         ["AWS::ApiGateway::RestApi", "Properties", "Mode"],
     )
-    Models: Optional[DictStrAny] = properties("Models")
-    Name: Optional[Name] = passthrough_prop(
+    Models: DictStrAny | None = properties("Models")
+    Name: Name | None = passthrough_prop(
         PROPERTIES_STEM,
         "Name",
         ["AWS::ApiGateway::RestApi", "Properties", "Name"],
     )
-    OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
+    OpenApiVersion: OpenApiVersion | None = properties("OpenApiVersion")
     StageName: SamIntrinsicable[str] = properties("StageName")
-    Tags: Optional[DictStrAny] = properties("Tags")
-    PropagateTags: Optional[bool]  # TODO: add docs
-    TracingEnabled: Optional[TracingEnabled] = passthrough_prop(
+    Tags: DictStrAny | None = properties("Tags")
+    PropagateTags: bool | None  # TODO: add docs
+    TracingEnabled: TracingEnabled | None = passthrough_prop(
         PROPERTIES_STEM,
         "TracingEnabled",
         ["AWS::ApiGateway::Stage", "Properties", "TracingEnabled"],
     )
-    Variables: Optional[Variables] = passthrough_prop(
+    Variables: Variables | None = passthrough_prop(
         PROPERTIES_STEM,
         "Variables",
         ["AWS::ApiGateway::Stage", "Properties", "Variables"],
     )
-    AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
+    AlwaysDeploy: AlwaysDeploy | None = properties("AlwaysDeploy")
 
 
 class Globals(BaseModel):
-    Auth: Optional[Auth] = properties("Auth")
-    Name: Optional[Name] = passthrough_prop(
+    Auth: Auth | None = properties("Auth")
+    Name: Name | None = passthrough_prop(
         PROPERTIES_STEM,
         "Name",
         ["AWS::ApiGateway::RestApi", "Properties", "Name"],
     )
-    DefinitionUri: Optional[PassThroughProp] = properties("DefinitionUri")
-    CacheClusterEnabled: Optional[CacheClusterEnabled] = passthrough_prop(
+    DefinitionUri: PassThroughProp | None = properties("DefinitionUri")
+    CacheClusterEnabled: CacheClusterEnabled | None = passthrough_prop(
         PROPERTIES_STEM,
         "CacheClusterEnabled",
         ["AWS::ApiGateway::Stage", "Properties", "CacheClusterEnabled"],
     )
-    CacheClusterSize: Optional[CacheClusterSize] = passthrough_prop(
+    CacheClusterSize: CacheClusterSize | None = passthrough_prop(
         PROPERTIES_STEM,
         "CacheClusterSize",
         ["AWS::ApiGateway::Stage", "Properties", "CacheClusterSize"],
     )
-    MergeDefinitions: Optional[MergeDefinitions] = properties("MergeDefinitions")
-    Variables: Optional[Variables] = passthrough_prop(
+    MergeDefinitions: MergeDefinitions | None = properties("MergeDefinitions")
+    Variables: Variables | None = passthrough_prop(
         PROPERTIES_STEM,
         "Variables",
         ["AWS::ApiGateway::Stage", "Properties", "Variables"],
     )
-    EndpointConfiguration: Optional[PassThroughProp] = properties("EndpointConfiguration")
-    MethodSettings: Optional[MethodSettings] = properties("MethodSettings")
-    BinaryMediaTypes: Optional[BinaryMediaTypes] = properties("BinaryMediaTypes")
-    MinimumCompressionSize: Optional[MinimumCompressionSize] = passthrough_prop(
+    EndpointConfiguration: PassThroughProp | None = properties("EndpointConfiguration")
+    MethodSettings: MethodSettings | None = properties("MethodSettings")
+    BinaryMediaTypes: BinaryMediaTypes | None = properties("BinaryMediaTypes")
+    MinimumCompressionSize: MinimumCompressionSize | None = passthrough_prop(
         PROPERTIES_STEM,
         "MinimumCompressionSize",
         ["AWS::ApiGateway::RestApi", "Properties", "MinimumCompressionSize"],
     )
-    Cors: Optional[CorsType] = properties("Cors")
-    GatewayResponses: Optional[GatewayResponses] = properties("GatewayResponses")
-    AccessLogSetting: Optional[AccessLogSetting] = passthrough_prop(
+    Cors: CorsType | None = properties("Cors")
+    GatewayResponses: GatewayResponses | None = properties("GatewayResponses")
+    AccessLogSetting: AccessLogSetting | None = passthrough_prop(
         PROPERTIES_STEM,
         "AccessLogSetting",
         ["AWS::ApiGateway::Stage", "Properties", "AccessLogSetting"],
     )
-    CanarySetting: Optional[CanarySetting] = passthrough_prop(
+    CanarySetting: CanarySetting | None = passthrough_prop(
         PROPERTIES_STEM,
         "CanarySetting",
         ["AWS::ApiGateway::Stage", "Properties", "CanarySetting"],
     )
-    TracingEnabled: Optional[TracingEnabled] = passthrough_prop(
+    TracingEnabled: TracingEnabled | None = passthrough_prop(
         PROPERTIES_STEM,
         "TracingEnabled",
         ["AWS::ApiGateway::Stage", "Properties", "TracingEnabled"],
     )
-    OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
-    Domain: Optional[Domain] = properties("Domain")
-    AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    OpenApiVersion: OpenApiVersion | None = properties("OpenApiVersion")
+    Domain: Domain | None = properties("Domain")
+    AlwaysDeploy: AlwaysDeploy | None = properties("AlwaysDeploy")
+    PropagateTags: bool | None  # TODO: add docs
 
 
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::Api"]
     Properties: Properties
-    Connectors: Optional[Dict[str, EmbeddedConnector]]
+    Connectors: dict[str, EmbeddedConnector] | None

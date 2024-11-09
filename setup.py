@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # setup.py
 #
@@ -32,7 +31,7 @@ def read(*filenames, **kwargs):
     sep = kwargs.get("sep", os.linesep)
     buf = []
     for filename in filenames:
-        with io.open(filename, encoding=encoding) as f:
+        with open(filename, encoding=encoding) as f:
             buf.append(f.read())
     return sep.join(buf)
 

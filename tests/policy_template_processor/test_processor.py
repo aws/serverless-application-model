@@ -50,7 +50,7 @@ class TestPolicyTemplateProcessor(TestCase):
         processor = PolicyTemplatesProcessor(policy_templates_dict)
 
         self.assertEqual(2, len(processor.policy_templates))
-        self.assertEqual(set(["key1", "key2"]), set(processor.policy_templates.keys()))
+        self.assertEqual({"key1", "key2"}, set(processor.policy_templates.keys()))
 
         # Template.from_dict must be called only once for each template entry
         self.assertEqual(2, template_from_dict_mock.call_count)
