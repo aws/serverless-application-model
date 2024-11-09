@@ -33,6 +33,7 @@ Globals:
     LoggingConfig:
       LogGroup: myJsonStructuredLogs
     RecursiveLoop: ALLOW
+    SourceKMSKeyArn: arn:aws:kms:us-west-2:123456789012:key/dec86919-7219-4e8d-8871-7f1609df2c7f
 
 
 
@@ -67,3 +68,4 @@ Resources:
       RuntimeManagementConfig:
         UpdateRuntimeOn: FunctionChange
       RecursiveLoop: TERMINATE
+      SourceKMSKeyArn: arn:aws:kms:us-west-2:987654321098:key/dec86919-7219-4e8d-8871-7f1609df2c7f
