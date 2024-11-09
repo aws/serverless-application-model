@@ -16,7 +16,7 @@ Resources:
           AppIdClientRegex: myregex
           AwsRegion: na-east-1
           # This default action will exist post transform since this is our default authentication.
-          DefaultAction: something
+          DefaultAction: ALLOW
           UserPoolId: myid
       Tags:
         key1: value1
