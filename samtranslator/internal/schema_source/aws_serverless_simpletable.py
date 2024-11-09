@@ -35,28 +35,28 @@ SSESpecification = Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
-    PointInTimeRecoverySpecification: Optional[PassThroughProp]  # TODO: add docs
-    PrimaryKey: Optional[PrimaryKey] = properties("PrimaryKey")
-    ProvisionedThroughput: Optional[PassThroughProp] = passthrough_prop(
+    PointInTimeRecoverySpecification: PassThroughProp | None  # TODO: add docs
+    PrimaryKey: PrimaryKey | None = properties("PrimaryKey")
+    ProvisionedThroughput: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "ProvisionedThroughput",
         ["AWS::DynamoDB::Table", "Properties", "ProvisionedThroughput"],
     )
-    SSESpecification: Optional[SSESpecification] = passthrough_prop(
+    SSESpecification: SSESpecification | None = passthrough_prop(
         PROPERTIES_STEM,
         "SSESpecification",
         ["AWS::DynamoDB::Table", "Properties", "SSESpecification"],
     )
-    TableName: Optional[PassThroughProp] = passthrough_prop(
+    TableName: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "TableName",
         ["AWS::DynamoDB::Table", "Properties", "TableName"],
     )
-    Tags: Optional[Dict[str, Any]] = properties("Tags")
+    Tags: dict[str, Any] | None = properties("Tags")
 
 
 class Globals(BaseModel):
-    SSESpecification: Optional[SSESpecification] = passthrough_prop(
+    SSESpecification: SSESpecification | None = passthrough_prop(
         PROPERTIES_STEM,
         "SSESpecification",
         ["AWS::DynamoDB::Table", "Properties", "SSESpecification"],
@@ -65,5 +65,5 @@ class Globals(BaseModel):
 
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::SimpleTable"]
-    Properties: Optional[Properties]
-    Connectors: Optional[Dict[str, EmbeddedConnector]]
+    Properties: Properties | None
+    Connectors: dict[str, EmbeddedConnector] | None

@@ -23,19 +23,19 @@ class Location(BaseModel):
 
 
 class Properties(BaseModel):
-    Location: Union[str, Location] = properties("Location")
-    NotificationARNs: Optional[PassThroughProp] = passthrough_prop(
+    Location: str | Location = properties("Location")
+    NotificationARNs: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "NotificationARNs",
         ["AWS::CloudFormation::Stack", "Properties", "NotificationARNs"],
     )
-    Parameters: Optional[PassThroughProp] = passthrough_prop(
+    Parameters: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "Parameters",
         ["AWS::CloudFormation::Stack", "Properties", "Parameters"],
     )
-    Tags: Optional[Dict[str, Any]] = properties("Tags")
-    TimeoutInMinutes: Optional[PassThroughProp] = passthrough_prop(
+    Tags: dict[str, Any] | None = properties("Tags")
+    TimeoutInMinutes: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "TimeoutInMinutes",
         ["AWS::CloudFormation::Stack", "Properties", "TimeoutInMinutes"],

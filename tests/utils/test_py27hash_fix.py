@@ -497,7 +497,7 @@ class TestConvertToPy27Dict(TestCase):
             self.assertIsInstance(item, Py27Dict)
 
     def test_with_other_type(self):
-        original = [("a", "b"), set(["a", "b"]), 123, 123.123]
+        original = [("a", "b"), {"a", "b"}, 123, 123.123]
         converted = _convert_to_py27_type(original)
         self.assertIsInstance(converted[0], tuple)
         self.assertIsInstance(converted[1], set)

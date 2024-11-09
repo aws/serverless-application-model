@@ -29,7 +29,7 @@ class ContentUri(BaseModel):
         "Key",
         ["AWS::Lambda::LayerVersion.Content", "S3Key"],
     )
-    Version: Optional[PassThroughProp] = passthrough_prop(
+    Version: PassThroughProp | None = passthrough_prop(
         CONTENT_URI_STEM,
         "Version",
         ["AWS::Lambda::LayerVersion.Content", "S3ObjectVersion"],
@@ -37,30 +37,30 @@ class ContentUri(BaseModel):
 
 
 class Properties(BaseModel):
-    CompatibleArchitectures: Optional[PassThroughProp] = passthrough_prop(
+    CompatibleArchitectures: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "CompatibleArchitectures",
         ["AWS::Lambda::LayerVersion", "Properties", "CompatibleArchitectures"],
     )
-    CompatibleRuntimes: Optional[PassThroughProp] = passthrough_prop(
+    CompatibleRuntimes: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "CompatibleRuntimes",
         ["AWS::Lambda::LayerVersion", "Properties", "CompatibleRuntimes"],
     )
-    PublishLambdaVersion: Optional[bool]  # TODO: add docs
-    ContentUri: Union[str, ContentUri] = properties("ContentUri")
-    Description: Optional[PassThroughProp] = passthrough_prop(
+    PublishLambdaVersion: bool | None  # TODO: add docs
+    ContentUri: str | ContentUri = properties("ContentUri")
+    Description: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "Description",
         ["AWS::Lambda::LayerVersion", "Properties", "Description"],
     )
-    LayerName: Optional[PassThroughProp] = properties("LayerName")
-    LicenseInfo: Optional[PassThroughProp] = passthrough_prop(
+    LayerName: PassThroughProp | None = properties("LayerName")
+    LicenseInfo: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "LicenseInfo",
         ["AWS::Lambda::LayerVersion", "Properties", "LicenseInfo"],
     )
-    RetentionPolicy: Optional[SamIntrinsicable[str]] = properties("RetentionPolicy")
+    RetentionPolicy: SamIntrinsicable[str] | None = properties("RetentionPolicy")
 
 
 class Resource(ResourceAttributes):
@@ -69,4 +69,4 @@ class Resource(ResourceAttributes):
 
 
 class Globals(BaseModel):
-    PublishLambdaVersion: Optional[bool]  # TODO: add docs
+    PublishLambdaVersion: bool | None  # TODO: add docs

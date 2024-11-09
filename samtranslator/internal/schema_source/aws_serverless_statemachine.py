@@ -28,9 +28,9 @@ eventtarget = get_prop("sam-property-statemachine-statemachinetarget")
 
 
 class DeadLetterConfig(BaseModel):
-    Arn: Optional[PassThroughProp] = deadletterconfig("Arn")
-    QueueLogicalId: Optional[str] = deadletterconfig("QueueLogicalId")
-    Type: Optional[Literal["SQS"]] = deadletterconfig("Type")
+    Arn: PassThroughProp | None = deadletterconfig("Arn")
+    QueueLogicalId: str | None = deadletterconfig("QueueLogicalId")
+    Type: Literal["SQS"] | None = deadletterconfig("Type")
 
 
 class ScheduleTarget(BaseModel):
@@ -38,16 +38,16 @@ class ScheduleTarget(BaseModel):
 
 
 class ScheduleEventProperties(BaseModel):
-    DeadLetterConfig: Optional[DeadLetterConfig] = scheduleeventproperties("DeadLetterConfig")
-    Description: Optional[PassThroughProp] = scheduleeventproperties("Description")
-    Enabled: Optional[bool] = scheduleeventproperties("Enabled")
-    Input: Optional[PassThroughProp] = scheduleeventproperties("Input")
-    Name: Optional[PassThroughProp] = scheduleeventproperties("Name")
-    RetryPolicy: Optional[PassThroughProp] = scheduleeventproperties("RetryPolicy")
-    Schedule: Optional[PassThroughProp] = scheduleeventproperties("Schedule")
-    State: Optional[PassThroughProp] = scheduleeventproperties("State")
-    Target: Optional[ScheduleTarget] = scheduleeventproperties("Target")
-    RoleArn: Optional[PassThroughProp]  # TODO: add doc
+    DeadLetterConfig: DeadLetterConfig | None = scheduleeventproperties("DeadLetterConfig")
+    Description: PassThroughProp | None = scheduleeventproperties("Description")
+    Enabled: bool | None = scheduleeventproperties("Enabled")
+    Input: PassThroughProp | None = scheduleeventproperties("Input")
+    Name: PassThroughProp | None = scheduleeventproperties("Name")
+    RetryPolicy: PassThroughProp | None = scheduleeventproperties("RetryPolicy")
+    Schedule: PassThroughProp | None = scheduleeventproperties("Schedule")
+    State: PassThroughProp | None = scheduleeventproperties("State")
+    Target: ScheduleTarget | None = scheduleeventproperties("Target")
+    RoleArn: PassThroughProp | None  # TODO: add doc
 
 
 class ScheduleEvent(BaseModel):
@@ -56,22 +56,22 @@ class ScheduleEvent(BaseModel):
 
 
 class ScheduleV2EventProperties(BaseModel):
-    DeadLetterConfig: Optional[DeadLetterConfig] = scheduleeventv2properties("DeadLetterConfig")
-    Description: Optional[PassThroughProp] = scheduleeventv2properties("Description")
-    EndDate: Optional[PassThroughProp] = scheduleeventv2properties("EndDate")
-    FlexibleTimeWindow: Optional[PassThroughProp] = scheduleeventv2properties("FlexibleTimeWindow")
-    GroupName: Optional[PassThroughProp] = scheduleeventv2properties("GroupName")
-    Input: Optional[PassThroughProp] = scheduleeventv2properties("Input")
-    KmsKeyArn: Optional[PassThroughProp] = scheduleeventv2properties("KmsKeyArn")
-    Name: Optional[PassThroughProp] = scheduleeventv2properties("Name")
-    PermissionsBoundary: Optional[PassThroughProp] = scheduleeventv2properties("PermissionsBoundary")
-    RetryPolicy: Optional[PassThroughProp] = scheduleeventv2properties("RetryPolicy")
-    RoleArn: Optional[PassThroughProp] = scheduleeventv2properties("RoleArn")
-    ScheduleExpression: Optional[PassThroughProp] = scheduleeventv2properties("ScheduleExpression")
-    ScheduleExpressionTimezone: Optional[PassThroughProp] = scheduleeventv2properties("ScheduleExpressionTimezone")
-    StartDate: Optional[PassThroughProp] = scheduleeventv2properties("StartDate")
-    State: Optional[PassThroughProp] = scheduleeventv2properties("State")
-    OmitName: Optional[bool]  # TODO: add doc
+    DeadLetterConfig: DeadLetterConfig | None = scheduleeventv2properties("DeadLetterConfig")
+    Description: PassThroughProp | None = scheduleeventv2properties("Description")
+    EndDate: PassThroughProp | None = scheduleeventv2properties("EndDate")
+    FlexibleTimeWindow: PassThroughProp | None = scheduleeventv2properties("FlexibleTimeWindow")
+    GroupName: PassThroughProp | None = scheduleeventv2properties("GroupName")
+    Input: PassThroughProp | None = scheduleeventv2properties("Input")
+    KmsKeyArn: PassThroughProp | None = scheduleeventv2properties("KmsKeyArn")
+    Name: PassThroughProp | None = scheduleeventv2properties("Name")
+    PermissionsBoundary: PassThroughProp | None = scheduleeventv2properties("PermissionsBoundary")
+    RetryPolicy: PassThroughProp | None = scheduleeventv2properties("RetryPolicy")
+    RoleArn: PassThroughProp | None = scheduleeventv2properties("RoleArn")
+    ScheduleExpression: PassThroughProp | None = scheduleeventv2properties("ScheduleExpression")
+    ScheduleExpressionTimezone: PassThroughProp | None = scheduleeventv2properties("ScheduleExpressionTimezone")
+    StartDate: PassThroughProp | None = scheduleeventv2properties("StartDate")
+    State: PassThroughProp | None = scheduleeventv2properties("State")
+    OmitName: bool | None  # TODO: add doc
 
 
 class ScheduleV2Event(BaseModel):
@@ -80,24 +80,24 @@ class ScheduleV2Event(BaseModel):
 
 
 class ResourcePolicy(BaseModel):
-    AwsAccountBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountBlacklist")
-    AwsAccountWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("AwsAccountWhitelist")
-    CustomStatements: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("CustomStatements")
-    IntrinsicVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcBlacklist")
-    IntrinsicVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpcWhitelist")
-    IntrinsicVpceBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceBlacklist")
-    IntrinsicVpceWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IntrinsicVpceWhitelist")
-    IpRangeBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeBlacklist")
-    IpRangeWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("IpRangeWhitelist")
-    SourceVpcBlacklist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcBlacklist")
-    SourceVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcWhitelist")
+    AwsAccountBlacklist: list[str | DictStrAny] | None = resourcepolicy("AwsAccountBlacklist")
+    AwsAccountWhitelist: list[str | DictStrAny] | None = resourcepolicy("AwsAccountWhitelist")
+    CustomStatements: list[str | DictStrAny] | None = resourcepolicy("CustomStatements")
+    IntrinsicVpcBlacklist: list[str | DictStrAny] | None = resourcepolicy("IntrinsicVpcBlacklist")
+    IntrinsicVpcWhitelist: list[str | DictStrAny] | None = resourcepolicy("IntrinsicVpcWhitelist")
+    IntrinsicVpceBlacklist: list[str | DictStrAny] | None = resourcepolicy("IntrinsicVpceBlacklist")
+    IntrinsicVpceWhitelist: list[str | DictStrAny] | None = resourcepolicy("IntrinsicVpceWhitelist")
+    IpRangeBlacklist: list[str | DictStrAny] | None = resourcepolicy("IpRangeBlacklist")
+    IpRangeWhitelist: list[str | DictStrAny] | None = resourcepolicy("IpRangeWhitelist")
+    SourceVpcBlacklist: list[str | DictStrAny] | None = resourcepolicy("SourceVpcBlacklist")
+    SourceVpcWhitelist: list[str | DictStrAny] | None = resourcepolicy("SourceVpcWhitelist")
 
 
 class CloudWatchEventProperties(BaseModel):
-    EventBusName: Optional[PassThroughProp] = cloudwatcheventproperties("EventBusName")
-    Input: Optional[PassThroughProp] = cloudwatcheventproperties("Input")
-    InputPath: Optional[PassThroughProp] = cloudwatcheventproperties("InputPath")
-    Pattern: Optional[PassThroughProp] = cloudwatcheventproperties("Pattern")
+    EventBusName: PassThroughProp | None = cloudwatcheventproperties("EventBusName")
+    Input: PassThroughProp | None = cloudwatcheventproperties("Input")
+    InputPath: PassThroughProp | None = cloudwatcheventproperties("InputPath")
+    Pattern: PassThroughProp | None = cloudwatcheventproperties("Pattern")
 
 
 class CloudWatchEvent(BaseModel):
@@ -110,15 +110,15 @@ class EventBridgeRuleTarget(BaseModel):
 
 
 class EventBridgeRuleEventProperties(BaseModel):
-    DeadLetterConfig: Optional[DeadLetterConfig] = eventbridgeruleeventproperties("DeadLetterConfig")
-    EventBusName: Optional[PassThroughProp] = eventbridgeruleeventproperties("EventBusName")
-    Input: Optional[PassThroughProp] = eventbridgeruleeventproperties("Input")
-    InputPath: Optional[PassThroughProp] = eventbridgeruleeventproperties("InputPath")
-    Pattern: Optional[PassThroughProp] = eventbridgeruleeventproperties("Pattern")
-    RetryPolicy: Optional[PassThroughProp] = eventbridgeruleeventproperties("RetryPolicy")
-    Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
-    RuleName: Optional[PassThroughProp] = eventbridgeruleeventproperties("RuleName")
-    InputTransformer: Optional[PassThroughProp]  # TODO: add docs
+    DeadLetterConfig: DeadLetterConfig | None = eventbridgeruleeventproperties("DeadLetterConfig")
+    EventBusName: PassThroughProp | None = eventbridgeruleeventproperties("EventBusName")
+    Input: PassThroughProp | None = eventbridgeruleeventproperties("Input")
+    InputPath: PassThroughProp | None = eventbridgeruleeventproperties("InputPath")
+    Pattern: PassThroughProp | None = eventbridgeruleeventproperties("Pattern")
+    RetryPolicy: PassThroughProp | None = eventbridgeruleeventproperties("RetryPolicy")
+    Target: EventBridgeRuleTarget | None = eventbridgeruleeventproperties("Target")
+    RuleName: PassThroughProp | None = eventbridgeruleeventproperties("RuleName")
+    InputTransformer: PassThroughProp | None  # TODO: add docs
 
 
 class EventBridgeRuleEvent(BaseModel):
@@ -127,18 +127,18 @@ class EventBridgeRuleEvent(BaseModel):
 
 
 class Auth(BaseModel):
-    ApiKeyRequired: Optional[bool] = apiauth("ApiKeyRequired")
-    AuthorizationScopes: Optional[List[str]] = apiauth("AuthorizationScopes")
-    Authorizer: Optional[str] = apiauth("Authorizer")
-    ResourcePolicy: Optional[ResourcePolicy] = apiauth("ResourcePolicy")
+    ApiKeyRequired: bool | None = apiauth("ApiKeyRequired")
+    AuthorizationScopes: list[str] | None = apiauth("AuthorizationScopes")
+    Authorizer: str | None = apiauth("Authorizer")
+    ResourcePolicy: ResourcePolicy | None = apiauth("ResourcePolicy")
 
 
 class ApiEventProperties(BaseModel):
-    Auth: Optional[Auth] = apieventproperties("Auth")
+    Auth: Auth | None = apieventproperties("Auth")
     Method: str = apieventproperties("Method")
     Path: str = apieventproperties("Path")
-    RestApiId: Optional[SamIntrinsicable[str]] = apieventproperties("RestApiId")
-    UnescapeMappingTemplate: Optional[bool] = apieventproperties("UnescapeMappingTemplate")
+    RestApiId: SamIntrinsicable[str] | None = apieventproperties("RestApiId")
+    UnescapeMappingTemplate: bool | None = apieventproperties("UnescapeMappingTemplate")
 
 
 class ApiEvent(BaseModel):
@@ -147,41 +147,41 @@ class ApiEvent(BaseModel):
 
 
 class Properties(BaseModel):
-    Definition: Optional[DictStrAny] = properties("Definition")
-    DefinitionSubstitutions: Optional[DictStrAny] = properties("DefinitionSubstitutions")
-    DefinitionUri: Optional[Union[str, PassThroughProp]] = properties("DefinitionUri")
-    Events: Optional[
-        Dict[
+    Definition: DictStrAny | None = properties("Definition")
+    DefinitionSubstitutions: DictStrAny | None = properties("DefinitionSubstitutions")
+    DefinitionUri: str | PassThroughProp | None = properties("DefinitionUri")
+    Events: None | (
+        dict[
             str,
-            Union[
-                ScheduleEvent,
-                ScheduleV2Event,
-                CloudWatchEvent,
-                EventBridgeRuleEvent,
-                ApiEvent,
-            ],
+            (
+                ScheduleEvent |
+                ScheduleV2Event |
+                CloudWatchEvent |
+                EventBridgeRuleEvent |
+                ApiEvent
+            ),
         ]
-    ] = properties("Events")
-    Logging: Optional[PassThroughProp] = properties("Logging")
-    Name: Optional[PassThroughProp] = properties("Name")
-    PermissionsBoundary: Optional[PassThroughProp] = properties("PermissionsBoundary")
-    Policies: Optional[Union[str, DictStrAny, List[Union[str, DictStrAny]]]] = properties("Policies")
-    Role: Optional[PassThroughProp] = properties("Role")
-    RolePath: Optional[PassThroughProp] = properties("RolePath")
-    Tags: Optional[DictStrAny] = properties("Tags")
-    PropagateTags: Optional[bool]  # TODO: add docs
-    Tracing: Optional[PassThroughProp] = properties("Tracing")
-    Type: Optional[PassThroughProp] = properties("Type")
-    AutoPublishAlias: Optional[PassThroughProp]
-    DeploymentPreference: Optional[PassThroughProp]
-    UseAliasAsEventTarget: Optional[bool]
+    ) = properties("Events")
+    Logging: PassThroughProp | None = properties("Logging")
+    Name: PassThroughProp | None = properties("Name")
+    PermissionsBoundary: PassThroughProp | None = properties("PermissionsBoundary")
+    Policies: str | DictStrAny | list[str | DictStrAny] | None = properties("Policies")
+    Role: PassThroughProp | None = properties("Role")
+    RolePath: PassThroughProp | None = properties("RolePath")
+    Tags: DictStrAny | None = properties("Tags")
+    PropagateTags: bool | None  # TODO: add docs
+    Tracing: PassThroughProp | None = properties("Tracing")
+    Type: PassThroughProp | None = properties("Type")
+    AutoPublishAlias: PassThroughProp | None
+    DeploymentPreference: PassThroughProp | None
+    UseAliasAsEventTarget: bool | None
 
 
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::StateMachine"]
     Properties: Properties
-    Connectors: Optional[Dict[str, EmbeddedConnector]]
+    Connectors: dict[str, EmbeddedConnector] | None
 
 
 class Globals(BaseModel):
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: bool | None  # TODO: add docs

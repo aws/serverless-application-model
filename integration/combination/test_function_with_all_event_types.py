@@ -66,7 +66,7 @@ class TestFunctionWithAllEventTypes(BaseTest):
         # assert LambdaEventSourceMappings
         event_source_mappings = lambda_client.list_event_source_mappings()["EventSourceMappings"]
         event_source_mapping_configurations = [x for x in event_source_mappings if x["FunctionArn"] == alias_arn]
-        event_source_mapping_arns = set([x["EventSourceArn"] for x in event_source_mapping_configurations])
+        event_source_mapping_arns = {x["EventSourceArn"] for x in event_source_mapping_configurations}
 
         kinesis_client = self.client_provider.kinesis_client
         kinesis_stream_name = self.get_physical_id_by_type("AWS::Kinesis::Stream")

@@ -23,12 +23,12 @@ from samtranslator.internal.schema_source.common import BaseModel, LenientBaseMo
 
 
 class Globals(BaseModel):
-    Function: Optional[aws_serverless_function.Globals]
-    Api: Optional[aws_serverless_api.Globals]
-    HttpApi: Optional[aws_serverless_httpapi.Globals]
-    SimpleTable: Optional[aws_serverless_simpletable.Globals]
-    StateMachine: Optional[aws_serverless_statemachine.Globals]
-    LayerVersion: Optional[aws_serverless_layerversion.Globals]
+    Function: aws_serverless_function.Globals | None
+    Api: aws_serverless_api.Globals | None
+    HttpApi: aws_serverless_httpapi.Globals | None
+    SimpleTable: aws_serverless_simpletable.Globals | None
+    StateMachine: aws_serverless_statemachine.Globals | None
+    LayerVersion: aws_serverless_layerversion.Globals | None
 
 
 Resources = Union[
@@ -45,25 +45,25 @@ Resources = Union[
 
 
 class _ModelWithoutResources(LenientBaseModel):
-    Globals: Optional[Globals]
+    Globals: Globals | None
 
 
 class SamModel(_ModelWithoutResources):
-    Resources: Dict[
+    Resources: dict[
         str,
-        Union[
-            Resources,
+        (
+            Resources |
             # Ignore resources that are not AWS::Serverless::*
-            any_cfn_resource.Resource,
-        ],
+            any_cfn_resource.Resource
+        ),
     ]
 
 
 class Model(_ModelWithoutResources):
-    Resources: Dict[str, Resources]
+    Resources: dict[str, Resources]
 
 
-def get_schema(model: Type[pydantic.BaseModel]) -> Dict[str, Any]:
+def get_schema(model: type[pydantic.BaseModel]) -> dict[str, Any]:
     obj = model.schema()
 
     # http://json-schema.org/understanding-json-schema/reference/schema.html#schema
@@ -83,7 +83,7 @@ def json_dumps(obj: Any) -> str:
     return json.dumps(obj, indent=2, sort_keys=True) + "\n"
 
 
-def _replace_in_dict(d: Dict[str, Any], keyword: str, replace: Callable[[Dict[str, Any]], Any]) -> Dict[str, Any]:
+def _replace_in_dict(d: dict[str, Any], keyword: str, replace: Callable[[dict[str, Any]], Any]) -> dict[str, Any]:
     """
     Replace any dict containing keyword.
 
@@ -97,7 +97,7 @@ def _replace_in_dict(d: Dict[str, Any], keyword: str, replace: Callable[[Dict[st
     return d
 
 
-def _deep_get(d: Dict[str, Any], path: List[str]) -> Dict[str, Any]:
+def _deep_get(d: dict[str, Any], path: list[str]) -> dict[str, Any]:
     """
     Returns value at path defined by the keys in `path`.
     """
@@ -106,7 +106,7 @@ def _deep_get(d: Dict[str, Any], path: List[str]) -> Dict[str, Any]:
     return d
 
 
-def _add_embedded_connectors(schema: Dict[str, Any]) -> None:
+def _add_embedded_connectors(schema: dict[str, Any]) -> None:
     """
     Add embedded Connectors resource attribute to supported CloudFormation resources.
     """
@@ -123,7 +123,7 @@ def _add_embedded_connectors(schema: Dict[str, Any]) -> None:
         schema["definitions"][resource]["properties"]["Connectors"] = embedded_connector
 
 
-def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any]) -> None:
+def extend_with_cfn_schema(sam_schema: dict[str, Any], cfn_schema: dict[str, Any]) -> None:
     """
     Add CloudFormation resources and template syntax to SAM schema.
     """
@@ -152,7 +152,7 @@ def extend_with_cfn_schema(sam_schema: Dict[str, Any], cfn_schema: Dict[str, Any
     _add_embedded_connectors(sam_schema)
 
     # Inject CloudFormation documentation to SAM pass-through properties
-    def replace_passthrough(d: Dict[str, Any]) -> Dict[str, Any]:
+    def replace_passthrough(d: dict[str, Any]) -> dict[str, Any]:
         passthrough = d["__samPassThrough"]
         schema = deepcopy(_deep_get(cfn_schema, passthrough["schemaPath"]))
         schema["markdownDescription"] = passthrough["markdownDescriptionOverride"]
