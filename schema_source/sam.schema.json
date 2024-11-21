@@ -2413,6 +2413,9 @@
           "markdownDescription": "The maximum amount of time to gather records before invoking the function, in seconds\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumBatchingWindowInSeconds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumbatchingwindowinseconds) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "MaximumBatchingWindowInSeconds"
         },
+        "ProvisionedPollerConfig": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "SourceAccessConfigurations": {
           "allOf": [
             {
@@ -3181,6 +3184,9 @@
           "type": "array"
         },
         "KmsKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "ProvisionedPollerConfig": {
           "$ref": "#/definitions/PassThroughProp"
         },
         "SourceAccessConfigurations": {
