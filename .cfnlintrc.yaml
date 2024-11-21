@@ -131,12 +131,15 @@ ignore_templates:
   - tests/translator/output/**/function_with_mq.json  # Property "EventSourceArn" can Fn::GetAtt to a resource of types [AWS::DynamoDB::GlobalTable, AWS::DynamoDB::Table, AWS::Kinesis::Stream, AWS::Kinesis::StreamConsumer, AWS::SQS::Queue]
   - tests/translator/output/**/function_with_mq_using_autogen_role.json  # Property "EventSourceArn" can Fn::GetAtt to a resource of types [AWS::DynamoDB::GlobalTable, AWS::DynamoDB::Table, AWS::Kinesis::Stream, AWS::Kinesis::StreamConsumer, AWS::SQS::Queue]
   - tests/translator/output/**/function_with_recursive_loop.json  # Invalid Property Resources/RecursiveLoopParameterFunction/Properties/RecursiveLoop
+  - tests/translator/output/**/function_with_sourcekmskeyarn.json  # Invalid Property Resources/SourceKMSKeyArnParameterFunction/Properties/SourceKMSKeyArn
   - tests/translator/output/**/function_with_tracing.json # Obsolete DependsOn on resource
   - tests/translator/output/**/api_with_propagate_tags.json # TODO: Intentional error transform tests. Will be updated.
   - tests/translator/output/**/function_with_intrinsics_resource_attribute.json # CFN now supports intrinsics in DeletionPolicy
   - tests/translator/output/**/function_with_snapstart.json # Snapstart intentionally not attached to a lambda version which causes lint issues
   - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
   - tests/translator/output/**/function_with_provisioned_poller_config.json
+  - tests/translator/output/**/function_with_metrics_config.json
+
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
   - E2533 # Another deprecated runtime; not relevant for transform tests

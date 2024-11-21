@@ -1,0 +1,77 @@
+Parameters:
+  S3BucketArn1:
+    Type: String
+    Default: arn:aws:s3::123456789012:my_bucket-1
+  S3BucketArn2:
+    Type: String
+    Default: arn:aws:s3::123456789012:my_bucket-2
+Globals:
+  Function:
+    AutoPublishAlias: live
+    EventInvokeConfig:
+      MaximumEventAgeInSeconds: 70
+      MaximumRetryAttempts: 1
+      DestinationConfig:
+        OnSuccess:
+          Type: S3Bucket
+          Destination: !Ref S3BucketArn1
+        OnFailure:
+          Type: S3Bucket
+          Destination: !Ref S3BucketArn2
+
+Resources:
+  MyTestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = function(event, context, callback) {
+            var event_received_at = new Date().toISOString();
+            console.log('Event received at: ' + event_received_at);
+            console.log('Received event:', JSON.stringify(event, null, 2));
+
+            if (event.Success) {
+                console.log("Success");
+                context.callbackWaitsForEmptyEventLoop = false;
+                callback(null);
+            } else {
+                console.log("Failure");
+                context.callbackWaitsForEmptyEventLoop = false;
+                callback(new Error("Failure from event, Success = false, I am failing!"), 'Destination Function Error Thrown');
+            }
+        };      
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 1024
+
+  MyTestFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 70
+        MaximumRetryAttempts: 1
+        DestinationConfig:
+          OnSuccess:
+            Type: S3Bucket
+            Destination: arn:aws:s3::123456789012:my_bucket-3
+          OnFailure:
+            Type: S3Bucket
+            Destination: arn:aws:s3::123456789012:my_bucket-4
+      InlineCode: |
+        exports.handler = function(event, context, callback) {
+            var event_received_at = new Date().toISOString();
+            console.log('Event received at: ' + event_received_at);
+            console.log('Received event:', JSON.stringify(event, null, 2));
+
+            if (event.Success) {
+                console.log("Success");
+                context.callbackWaitsForEmptyEventLoop = false;
+                callback(null);
+            } else {
+                console.log("Failure");
+                context.callbackWaitsForEmptyEventLoop = false;
+                callback(new Error("Failure from event, Success = false, I am failing!"), 'Destination Function Error Thrown');
+            }
+        };      
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 1024

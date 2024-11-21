@@ -123,6 +123,7 @@ class LambdaEventSourceMapping(Resource):
         "SelfManagedKafkaEventSourceConfig": GeneratedProperty(),
         "ScalingConfig": GeneratedProperty(),
         "ProvisionedPollerConfig": GeneratedProperty(),
+        "MetricsConfig": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}

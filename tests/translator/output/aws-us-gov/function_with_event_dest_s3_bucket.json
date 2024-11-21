@@ -1,0 +1,316 @@
+{
+  "Parameters": {
+    "S3BucketArn1": {
+      "Default": "arn:aws:s3::123456789012:my_bucket-1",
+      "Type": "String"
+    },
+    "S3BucketArn2": {
+      "Default": "arn:aws:s3::123456789012:my_bucket-2",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "MyTestFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = function(event, context, callback) {\n    var event_received_at = new Date().toISOString();\n    console.log('Event received at: ' + event_received_at);\n    console.log('Received event:', JSON.stringify(event, null, 2));\n\n    if (event.Success) {\n        console.log(\"Success\");\n        context.callbackWaitsForEmptyEventLoop = false;\n        callback(null);\n    } else {\n        console.log(\"Failure\");\n        context.callbackWaitsForEmptyEventLoop = false;\n        callback(new Error(\"Failure from event, Success = false, I am failing!\"), 'Destination Function Error Thrown');\n    }\n};      \n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "MyTestFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyTestFunction2": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = function(event, context, callback) {\n    var event_received_at = new Date().toISOString();\n    console.log('Event received at: ' + event_received_at);\n    console.log('Received event:', JSON.stringify(event, null, 2));\n\n    if (event.Success) {\n        console.log(\"Success\");\n        context.callbackWaitsForEmptyEventLoop = false;\n        callback(null);\n    } else {\n        console.log(\"Failure\");\n        context.callbackWaitsForEmptyEventLoop = false;\n        callback(new Error(\"Failure from event, Success = false, I am failing!\"), 'Destination Function Error Thrown');\n    }\n};      \n"
+        },
+        "Handler": "index.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "MyTestFunction2Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyTestFunction2Aliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyTestFunction2"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "MyTestFunction2Versiondaf9da458d",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "MyTestFunction2EventInvokeConfig": {
+      "DependsOn": [
+        "MyTestFunction2Aliaslive"
+      ],
+      "Properties": {
+        "DestinationConfig": {
+          "OnFailure": {
+            "Destination": "arn:aws:s3::123456789012:my_bucket-4"
+          },
+          "OnSuccess": {
+            "Destination": "arn:aws:s3::123456789012:my_bucket-3"
+          }
+        },
+        "FunctionName": {
+          "Ref": "MyTestFunction2"
+        },
+        "MaximumEventAgeInSeconds": 70,
+        "MaximumRetryAttempts": 1,
+        "Qualifier": "live"
+      },
+      "Type": "AWS::Lambda::EventInvokeConfig"
+    },
+    "MyTestFunction2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "s3:PutObject",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Join": [
+                      "/",
+                      [
+                        "arn:aws:s3::123456789012:my_bucket-3",
+                        "*"
+                      ]
+                    ]
+                  }
+                },
+                {
+                  "Action": "s3:ListBucket",
+                  "Effect": "Allow",
+                  "Resource": "arn:aws:s3::123456789012:my_bucket-3"
+                }
+              ]
+            },
+            "PolicyName": "MyTestFunction2EventInvokeConfigOnSuccessS3Policy"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "s3:PutObject",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Join": [
+                      "/",
+                      [
+                        "arn:aws:s3::123456789012:my_bucket-4",
+                        "*"
+                      ]
+                    ]
+                  }
+                },
+                {
+                  "Action": "s3:ListBucket",
+                  "Effect": "Allow",
+                  "Resource": "arn:aws:s3::123456789012:my_bucket-4"
+                }
+              ]
+            },
+            "PolicyName": "MyTestFunction2EventInvokeConfigOnFailureS3Policy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyTestFunction2Versiondaf9da458d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyTestFunction2"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "MyTestFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyTestFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "MyTestFunctionVersiondaf9da458d",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "MyTestFunctionEventInvokeConfig": {
+      "DependsOn": [
+        "MyTestFunctionAliaslive"
+      ],
+      "Properties": {
+        "DestinationConfig": {
+          "OnFailure": {
+            "Destination": "arn:aws:s3::123456789012:my_bucket-2"
+          },
+          "OnSuccess": {
+            "Destination": "arn:aws:s3::123456789012:my_bucket-1"
+          }
+        },
+        "FunctionName": {
+          "Ref": "MyTestFunction"
+        },
+        "MaximumEventAgeInSeconds": 70,
+        "MaximumRetryAttempts": 1,
+        "Qualifier": "live"
+      },
+      "Type": "AWS::Lambda::EventInvokeConfig"
+    },
+    "MyTestFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "s3:PutObject",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Join": [
+                      "/",
+                      [
+                        "arn:aws:s3::123456789012:my_bucket-1",
+                        "*"
+                      ]
+                    ]
+                  }
+                },
+                {
+                  "Action": "s3:ListBucket",
+                  "Effect": "Allow",
+                  "Resource": "arn:aws:s3::123456789012:my_bucket-1"
+                }
+              ]
+            },
+            "PolicyName": "MyTestFunctionEventInvokeConfigOnSuccessS3Policy"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "s3:PutObject",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Join": [
+                      "/",
+                      [
+                        "arn:aws:s3::123456789012:my_bucket-2",
+                        "*"
+                      ]
+                    ]
+                  }
+                },
+                {
+                  "Action": "s3:ListBucket",
+                  "Effect": "Allow",
+                  "Resource": "arn:aws:s3::123456789012:my_bucket-2"
+                }
+              ]
+            },
+            "PolicyName": "MyTestFunctionEventInvokeConfigOnFailureS3Policy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyTestFunctionVersiondaf9da458d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyTestFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    }
+  }
+}

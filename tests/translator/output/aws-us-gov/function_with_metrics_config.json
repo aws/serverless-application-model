@@ -1,0 +1,164 @@
+{
+  "Resources": {
+    "DynamoDBTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ]
+      },
+      "Type": "AWS::DynamoDB::Table"
+    },
+    "FilteredEventsFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "metricsConfig.zip"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FilteredEventsFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FilteredEventsFunctionDynamoDBStreamEvent": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "DynamoDBTable",
+            "StreamArn"
+          ]
+        },
+        "FilterCriteria": {
+          "Filters": []
+        },
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        },
+        "MetricsConfig": {
+          "Metrics": []
+        },
+        "StartingPosition": "TRIM_HORIZON"
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "FilteredEventsFunctionKinesisStream": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "KinesisStream",
+            "Arn"
+          ]
+        },
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{\"name\": \"value\"}"
+            },
+            {
+              "Pattern": "{\"name2\": \"value2\"}"
+            }
+          ]
+        },
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        },
+        "MetricsConfig": {
+          "Metrics": [
+            "EventCount"
+          ]
+        },
+        "StartingPosition": "LATEST"
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "FilteredEventsFunctionMySqsQueue": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MySqsQueue",
+            "Arn"
+          ]
+        },
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{\"name\": \"value\"}"
+            }
+          ]
+        },
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        },
+        "MetricsConfig": {
+          "Metrics": [
+            "EventCount"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "FilteredEventsFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "KinesisStream": {
+      "Properties": {
+        "ShardCount": 1
+      },
+      "Type": "AWS::Kinesis::Stream"
+    },
+    "MySqsQueue": {
+      "Type": "AWS::SQS::Queue"
+    }
+  }
+}

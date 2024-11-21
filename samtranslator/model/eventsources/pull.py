@@ -56,6 +56,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         "ConsumerGroupId": PropertyType(False, IS_STR),
         "ScalingConfig": PropertyType(False, IS_DICT),
         "ProvisionedPollerConfig": PropertyType(False, IS_DICT),
+        "MetricsConfig": PropertyType(False, IS_DICT),
     }
 
     BatchSize: Optional[Intrinsicable[int]]
@@ -80,6 +81,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
     ConsumerGroupId: Optional[Intrinsicable[str]]
     ScalingConfig: Optional[Dict[str, Any]]
     ProvisionedPollerConfig: Optional[Dict[str, Any]]
+    MetricsConfig: Optional[Dict[str, Any]]
 
     @abstractmethod
     def get_policy_arn(self) -> Optional[str]:
@@ -148,6 +150,7 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
         lambda_eventsourcemapping.KmsKeyArn = self.KmsKeyArn
         lambda_eventsourcemapping.ScalingConfig = self.ScalingConfig
         lambda_eventsourcemapping.ProvisionedPollerConfig = self.ProvisionedPollerConfig
+        lambda_eventsourcemapping.MetricsConfig = self.MetricsConfig
         self._validate_filter_criteria()
 
         if self.KafkaBootstrapServers:

@@ -7,7 +7,8 @@
         ],
         "Code": {
           "S3Bucket": "sam-demo-bucket",
-          "S3Key": "hello.zip"
+          "S3Key": "hello.zip",
+          "SourceKMSKeyArn": "arn:aws:kms:us-west-2:987654321098:key/dec86919-7219-4e8d-8871-7f1609df2c7f"
         },
         "Environment": {
           "Variables": {
@@ -84,7 +85,7 @@
         },
         "FunctionVersion": {
           "Fn::GetAtt": [
-            "FunctionWithOverridesVersion096ed3b52b",
+            "FunctionWithOverridesVersionb52716e99f",
             "Version"
           ]
         },
@@ -133,7 +134,7 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "FunctionWithOverridesVersion096ed3b52b": {
+    "FunctionWithOverridesVersionb52716e99f": {
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
@@ -149,7 +150,8 @@
         ],
         "Code": {
           "S3Bucket": "global-bucket",
-          "S3Key": "global.zip"
+          "S3Key": "global.zip",
+          "SourceKMSKeyArn": "arn:aws:kms:us-west-2:123456789012:key/dec86919-7219-4e8d-8871-7f1609df2c7f"
         },
         "Environment": {
           "Variables": {
@@ -217,7 +219,7 @@
         },
         "FunctionVersion": {
           "Fn::GetAtt": [
-            "MinimalFunctionVersione7c6f56e4d",
+            "MinimalFunctionVersion5244f38b49",
             "Version"
           ]
         },
@@ -262,7 +264,7 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "MinimalFunctionVersione7c6f56e4d": {
+    "MinimalFunctionVersion5244f38b49": {
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
