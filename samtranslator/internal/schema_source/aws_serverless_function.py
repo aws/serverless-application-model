@@ -105,12 +105,12 @@ class DeadLetterQueue(BaseModel):
 
 class EventInvokeOnFailure(BaseModel):
     Destination: Optional[SamIntrinsicable[str]] = eventinvokeonfailure("Destination")
-    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]] = eventinvokeonfailure("Type")
+    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge", "S3Bucket"]] = eventinvokeonfailure("Type")
 
 
 class EventInvokeOnSuccess(BaseModel):
     Destination: Optional[SamIntrinsicable[str]] = eventinvokeonsuccess("Destination")
-    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge"]] = eventinvokeonsuccess("Type")
+    Type: Optional[Literal["SQS", "SNS", "Lambda", "EventBridge", "S3Bucket"]] = eventinvokeonsuccess("Type")
 
 
 class EventInvokeDestinationConfig(BaseModel):
@@ -516,6 +516,7 @@ SnapStart = Optional[PassThroughProp]  # TODO: check the type
 RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
 LoggingConfig = Optional[PassThroughProp]  # TODO: add documentation
 RecursiveLoop = Optional[PassThroughProp]
+SourceKMSKeyArn = Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
@@ -643,6 +644,7 @@ class Properties(BaseModel):
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
+    SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Globals(BaseModel):
@@ -702,6 +704,7 @@ class Globals(BaseModel):
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
+    SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):

@@ -1,4 +1,4 @@
-﻿""" SAM macro definitions """
+""" SAM macro definitions """
 
 import copy
 from contextlib import suppress
@@ -181,6 +181,7 @@ class SamFunction(SamResourceMacro):
         "RuntimeManagementConfig": PassThroughProperty(False),
         "LoggingConfig": PassThroughProperty(False),
         "RecursiveLoop": PassThroughProperty(False),
+        "SourceKMSKeyArn": PassThroughProperty(False),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -224,6 +225,7 @@ class SamFunction(SamResourceMacro):
     FunctionUrlConfig: Optional[Dict[str, Any]]
     LoggingConfig: Optional[Dict[str, Any]]
     RecursiveLoop: Optional[str]
+    SourceKMSKeyArn: Optional[str]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -439,7 +441,7 @@ class SamFunction(SamResourceMacro):
         ARN property, so to handle conditional ifs we have to inject if conditions in the auto created
         SQS/SNS resources as well as in the policy documents.
         """
-        accepted_types_list = ["SQS", "SNS", "EventBridge", "Lambda"]
+        accepted_types_list = ["SQS", "SNS", "EventBridge", "Lambda", "S3Bucket"]
         auto_inject_list = ["SQS", "SNS"]
         resource: Optional[Union[SNSTopic, SQSQueue]] = None
         policy = {}
@@ -630,6 +632,8 @@ class SamFunction(SamResourceMacro):
                 return IAMRolePolicies.event_bus_put_events_role_policy(dest_arn, logical_id)
             if _type == "Lambda":
                 return IAMRolePolicies.lambda_invoke_function_role_policy(dest_arn, logical_id)
+            if _type == "S3Bucket":
+                return IAMRolePolicies.s3_send_event_payload_role_policy(dest_arn, logical_id)
         return {}
 
     def _construct_role(
@@ -885,7 +889,10 @@ class SamFunction(SamResourceMacro):
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
         dispatch_function: Callable[..., Dict[str, Any]] = artifact_dispatch[filtered_key]
-        return dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
+        code_dict = dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
+        if self.SourceKMSKeyArn and packagetype == ZIP:
+            code_dict["SourceKMSKeyArn"] = self.SourceKMSKeyArn
+        return code_dict
 
     def _construct_version(  # noqa: PLR0912
         self,
