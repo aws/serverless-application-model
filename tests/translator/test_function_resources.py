@@ -15,6 +15,8 @@ class TestVersionsAndAliases(TestCase):
         self.intrinsics_resolver_mock.resolve = Mock()
         self.mappings_resolver_mock = Mock()
         self.mappings_resolver_mock.resolve = Mock()
+        self.resource_resolver_mock = Mock()
+        self.resource_resolver_mock.resolve = Mock()
 
         self.code_uri = "s3://bucket/key?versionId=version"
         self.func_dict = {
@@ -44,6 +46,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["managed_policy_map"] = {"a": "b"}
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {
             "S3Bucket": "bucket",
             "S3Key": "key",
@@ -76,6 +79,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["managed_policy_map"] = {"a": "b"}
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {
             "S3Bucket": "bucket",
             "S3Key": "key",
@@ -131,6 +135,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
         kwargs["deployment_preference_collection"] = deployment_preference_collection
         get_resolved_alias_name_mock.return_value = alias_name
@@ -176,6 +181,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {
             "S3Bucket": "bucket",
             "S3Key": "key",
@@ -212,6 +218,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         preference_collection = self._make_deployment_preference_collection()
         preference_collection.get.return_value = DeploymentPreference.from_dict(
             sam_func.logical_id, deploy_preference_dict
@@ -248,6 +255,7 @@ class TestVersionsAndAliases(TestCase):
             kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
             kwargs["mappings_resolver"] = self.mappings_resolver_mock
             kwargs["deployment_preference_collection"] = self._make_deployment_preference_collection()
+            kwargs["resource_resolver"] = self.resource_resolver_mock
             sam_func.to_cloudformation(**kwargs)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -271,6 +279,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
 
         preference_collection = self._make_deployment_preference_collection()
         preference_collection.get.return_value = DeploymentPreference.from_dict(
@@ -311,6 +320,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
         kwargs["deployment_preference_collection"] = deployment_preference_collection
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = True
@@ -355,6 +365,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
         kwargs["deployment_preference_collection"] = deployment_preference_collection
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"MyEnabledFlag": True}
@@ -389,6 +400,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
         kwargs["deployment_preference_collection"] = deployment_preference_collection
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"MyEnabledFlag": True}
@@ -424,6 +436,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
         kwargs["deployment_preference_collection"] = deployment_preference_collection
         get_resolved_alias_name_mock.return_value = alias_name
@@ -472,6 +485,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
         kwargs["deployment_preference_collection"] = deployment_preference_collection
         get_resolved_alias_name_mock.return_value = alias_name
@@ -531,6 +545,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        kwargs["resource_resolver"] = self.resource_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
         kwargs["deployment_preference_collection"] = deployment_preference_collection
         get_resolved_alias_name_mock.return_value = alias_name
@@ -560,7 +575,9 @@ class TestVersionsAndAliases(TestCase):
         generator_mock.gen.return_value = id_val
 
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
-        version = self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
+        version = self.sam_func._construct_version(
+            self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock
+        )
 
         self.assertEqual(version.logical_id, id_val)
         self.assertEqual(version.Description, None)
@@ -582,7 +599,9 @@ class TestVersionsAndAliases(TestCase):
 
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
         self.sam_func.AutoPublishCodeSha256 = hash_code
-        version = self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock, hash_code)
+        version = self.sam_func._construct_version(
+            self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock, hash_code
+        )
 
         self.assertEqual(version.logical_id, id_val)
         self.assertEqual(version.Description, None)
@@ -603,7 +622,9 @@ class TestVersionsAndAliases(TestCase):
 
         del self.lambda_func.Code["S3ObjectVersion"]
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
-        version = self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
+        version = self.sam_func._construct_version(
+            self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock
+        )
 
         self.assertEqual(version.logical_id, id_val)
 
@@ -616,7 +637,9 @@ class TestVersionsAndAliases(TestCase):
         # Empty code dictionary
         self.lambda_func.Code = {}
         with self.assertRaises(ValueError):
-            self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
+            self.sam_func._construct_version(
+                self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock
+            )
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_version_creation_intrinsic_function_in_code_s3key(self, LogicalIdGeneratorMock):
@@ -628,7 +651,9 @@ class TestVersionsAndAliases(TestCase):
         self.lambda_func.Code = {"S3Bucket": "bucket", "S3Key": {"Ref": "keyparameter"}, "S3ObjectVersion": "version"}
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
 
-        version = self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
+        version = self.sam_func._construct_version(
+            self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock
+        )
         self.assertEqual(version.logical_id, id_val)
 
         expected_prefix = self.sam_func.logical_id + "Version"
@@ -644,7 +669,9 @@ class TestVersionsAndAliases(TestCase):
         self.lambda_func.Code = {"S3Bucket": {"Ref": "bucketparameter"}, "S3Key": "key", "S3ObjectVersion": "version"}
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
 
-        version = self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
+        version = self.sam_func._construct_version(
+            self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock
+        )
         self.assertEqual(version.logical_id, id_val)
 
         expected_prefix = self.sam_func.logical_id + "Version"
@@ -660,7 +687,9 @@ class TestVersionsAndAliases(TestCase):
         self.lambda_func.Code = {"S3Bucket": "bucket", "S3Key": "key", "S3ObjectVersion": {"Ref": "versionparameter"}}
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
 
-        version = self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
+        version = self.sam_func._construct_version(
+            self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock
+        )
         self.assertEqual(version.logical_id, id_val)
 
         expected_prefix = self.sam_func.logical_id + "Version"
@@ -676,7 +705,7 @@ class TestVersionsAndAliases(TestCase):
 
         # Test that logicalId changes with changes to CodeSha
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
-        self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
+        self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock)
 
         LogicalIdGeneratorMock.assert_called_once_with(prefix, self.lambda_func.Code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(self.lambda_func.Code)
@@ -685,7 +714,7 @@ class TestVersionsAndAliases(TestCase):
         self.lambda_func.Code["S3ObjectVersion"] = "new object version"
         new_code = self.lambda_func.Code.copy()
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = new_code
-        self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
+        self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock)
         LogicalIdGeneratorMock.assert_called_with(prefix, new_code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(new_code)
 
@@ -699,7 +728,7 @@ class TestVersionsAndAliases(TestCase):
         self.lambda_func.Code = {"S3Bucket": "bucket", "S3Key": {"Ref": "someparam"}}
 
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
-        self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
+        self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock)
 
         LogicalIdGeneratorMock.assert_called_once_with(prefix, self.lambda_func.Code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(self.lambda_func.Code)
@@ -707,7 +736,7 @@ class TestVersionsAndAliases(TestCase):
         # Now, just let the intrinsics resolver return a different value. Let's make sure the new value gets wired up properly
         new_code = {"S3Bucket": "bucket", "S3Key": "some new value"}
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = new_code
-        self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
+        self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock)
         LogicalIdGeneratorMock.assert_called_with(prefix, new_code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(self.lambda_func.Code)
 
@@ -723,11 +752,14 @@ class TestVersionsAndAliases(TestCase):
 
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = lambda_func.Code
 
-        version1 = self.sam_func._construct_version(lambda_func, self.intrinsics_resolver_mock)
-        version_snapstart = self.sam_func._construct_version(lambda_func_snapstart, self.intrinsics_resolver_mock)
+        version1 = self.sam_func._construct_version(
+            lambda_func, self.intrinsics_resolver_mock, self.resource_resolver_mock
+        )
+        version_snapstart = self.sam_func._construct_version(
+            lambda_func_snapstart, self.intrinsics_resolver_mock, self.resource_resolver_mock
+        )
         version_snapstart_none = self.sam_func._construct_version(
-            lambda_func_snapstart_none,
-            self.intrinsics_resolver_mock,
+            lambda_func_snapstart_none, self.intrinsics_resolver_mock, self.resource_resolver_mock
         )
         # SnapStart config changes the hash, except when ApplyOn is "None"
         self.assertNotEqual(version1.logical_id, version_snapstart.logical_id)

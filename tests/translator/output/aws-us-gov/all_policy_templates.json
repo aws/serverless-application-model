@@ -1726,6 +1726,31 @@
               ]
             },
             "PolicyName": "KitchenSinkFunctionRolePolicy63"
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "kms:Encrypt",
+                    "kms:GenerateDataKey",
+                    "kms:GenerateDataKeyWithoutPlaintext",
+                    "kms:GenerateDataKeyPair",
+                    "kms:GenerateDataKeyPairWithoutPlaintext"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                      {
+                        "keyId": "keyId"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "KitchenSinkFunctionRolePolicy64"
           }
         ],
         "Tags": [
