@@ -137,7 +137,9 @@ ignore_templates:
   - tests/translator/output/**/function_with_intrinsics_resource_attribute.json # CFN now supports intrinsics in DeletionPolicy
   - tests/translator/output/**/function_with_snapstart.json # Snapstart intentionally not attached to a lambda version which causes lint issues
   - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
+  - tests/translator/output/**/function_with_provisioned_poller_config.json
   - tests/translator/output/**/function_with_metrics_config.json
+
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
   - E2533 # Another deprecated runtime; not relevant for transform tests

@@ -122,6 +122,7 @@ class LambdaEventSourceMapping(Resource):
         "AmazonManagedKafkaEventSourceConfig": GeneratedProperty(),
         "SelfManagedKafkaEventSourceConfig": GeneratedProperty(),
         "ScalingConfig": GeneratedProperty(),
+        "ProvisionedPollerConfig": GeneratedProperty(),
         "MetricsConfig": GeneratedProperty(),
     }
 

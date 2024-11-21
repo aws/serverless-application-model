@@ -1,0 +1,151 @@
+{
+  "Resources": {
+    "KafkaEventsFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "metricsConfig.zip"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "KafkaEventsFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "KafkaEventsFunctionMyKafkaCluster": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "KafkaEventsFunction"
+        },
+        "ProvisionedPollerConfig": {
+          "MaximumPollers": 100,
+          "MinimumPollers": 2
+        },
+        "SelfManagedEventSource": {
+          "Endpoints": {
+            "KafkaBootstrapServers": [
+              "abc.xyz.com:9092",
+              "123.45.67.89:9096"
+            ]
+          }
+        },
+        "SelfManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": "consumergroup1"
+        },
+        "SourceAccessConfigurations": [
+          {
+            "Type": "SASL_SCRAM_512_AUTH",
+            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
+          },
+          {
+            "Type": "VPC_SUBNET",
+            "URI": "subnet:subnet-12345"
+          },
+          {
+            "Type": "VPC_SECURITY_GROUP",
+            "URI": "security_group:sg-67890"
+          }
+        ],
+        "StartingPosition": "AT_TIMESTAMP",
+        "StartingPositionTimestamp": 1672560000,
+        "Topics": [
+          "Topic1"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "KafkaEventsFunctionMyMskEvent": {
+      "Properties": {
+        "AmazonManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": "consumergroup1"
+        },
+        "EventSourceArn": {
+          "Fn::Sub": "arn:aws:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2"
+        },
+        "FunctionName": {
+          "Ref": "KafkaEventsFunction"
+        },
+        "ProvisionedPollerConfig": {
+          "MaximumPollers": 10,
+          "MinimumPollers": 5
+        },
+        "StartingPosition": "LATEST",
+        "Topics": [
+          "MyDummyTestTopic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "KafkaEventsFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "secretsmanager:GetSecretValue"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
+                },
+                {
+                  "Action": [
+                    "ec2:CreateNetworkInterface",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DescribeVpcs",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeSecurityGroups"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "SelfManagedKafkaExecutionRolePolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
