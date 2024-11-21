@@ -3,10 +3,10 @@
     "Invalid Serverless Application Specification document. ",
     "Number of errors found: 3. ",
     "Resource with id [MyTestFunction] is invalid. ",
-    "'Type: blah' must be one of ['SQS', 'SNS', 'EventBridge', 'Lambda'] Resource with id [MyTestFunctionInvalidDestinationConfigOnSuccessType] is invalid. ",
+    "'Type: blah' must be one of ['SQS', 'SNS', 'EventBridge', 'Lambda', 'S3Bucket'] Resource with id [MyTestFunctionInvalidDestinationConfigOnSuccessType] is invalid. ",
     "Property 'EventInvokeConfig.DestinationConfig.OnSuccess' should be a map. ",
     "Resource with id [MyTestFunctionInvalidDestinationConfigType] is invalid. ",
     "Property 'EventInvokeConfig.DestinationConfig' should be a map."
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 3. Resource with id [MyTestFunction] is invalid. 'Type: blah' must be one of ['SQS', 'SNS', 'EventBridge', 'Lambda'] Resource with id [MyTestFunctionInvalidDestinationConfigOnSuccessType] is invalid. Property 'EventInvokeConfig.DestinationConfig.OnSuccess' should be a map. Resource with id [MyTestFunctionInvalidDestinationConfigType] is invalid. Property 'EventInvokeConfig.DestinationConfig' should be a map."
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 3. Resource with id [MyTestFunction] is invalid. 'Type: blah' must be one of ['SQS', 'SNS', 'EventBridge', 'Lambda', 'S3Bucket'] Resource with id [MyTestFunctionInvalidDestinationConfigOnSuccessType] is invalid. Property 'EventInvokeConfig.DestinationConfig.OnSuccess' should be a map. Resource with id [MyTestFunctionInvalidDestinationConfigType] is invalid. Property 'EventInvokeConfig.DestinationConfig' should be a map."
 }

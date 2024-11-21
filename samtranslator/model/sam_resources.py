@@ -1,4 +1,4 @@
-﻿""" SAM macro definitions """
+""" SAM macro definitions """
 
 import copy
 from contextlib import suppress
@@ -441,7 +441,7 @@ class SamFunction(SamResourceMacro):
         ARN property, so to handle conditional ifs we have to inject if conditions in the auto created
         SQS/SNS resources as well as in the policy documents.
         """
-        accepted_types_list = ["SQS", "SNS", "EventBridge", "Lambda"]
+        accepted_types_list = ["SQS", "SNS", "EventBridge", "Lambda", "S3Bucket"]
         auto_inject_list = ["SQS", "SNS"]
         resource: Optional[Union[SNSTopic, SQSQueue]] = None
         policy = {}
@@ -632,6 +632,8 @@ class SamFunction(SamResourceMacro):
                 return IAMRolePolicies.event_bus_put_events_role_policy(dest_arn, logical_id)
             if _type == "Lambda":
                 return IAMRolePolicies.lambda_invoke_function_role_policy(dest_arn, logical_id)
+            if _type == "S3Bucket":
+                return IAMRolePolicies.s3_send_event_payload_role_policy(dest_arn, logical_id)
         return {}
 
     def _construct_role(
