@@ -178,6 +178,7 @@ class KinesisEventProperties(BaseModel):
     StartingPositionTimestamp: Optional[PassThroughProp] = kinesiseventproperties("StartingPositionTimestamp")
     Stream: PassThroughProp = kinesiseventproperties("Stream")
     TumblingWindowInSeconds: Optional[PassThroughProp] = kinesiseventproperties("TumblingWindowInSeconds")
+    MetricsConfig: Optional[PassThroughProp]
 
 
 class KinesisEvent(BaseModel):
@@ -203,6 +204,7 @@ class DynamoDBEventProperties(BaseModel):
     StartingPositionTimestamp: Optional[PassThroughProp] = dynamodbeventproperties("StartingPositionTimestamp")
     Stream: PassThroughProp = dynamodbeventproperties("Stream")
     TumblingWindowInSeconds: Optional[PassThroughProp] = dynamodbeventproperties("TumblingWindowInSeconds")
+    MetricsConfig: Optional[PassThroughProp]
 
 
 class DynamoDBEvent(BaseModel):
@@ -241,6 +243,7 @@ class SQSEventProperties(BaseModel):
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = sqseventproperties("MaximumBatchingWindowInSeconds")
     Queue: PassThroughProp = sqseventproperties("Queue")
     ScalingConfig: Optional[PassThroughProp]  # Update docs when live
+    MetricsConfig: Optional[PassThroughProp]
 
 
 class SQSEvent(BaseModel):

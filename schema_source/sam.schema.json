@@ -1004,6 +1004,9 @@
           "markdownDescription": "The maximum number of times to retry when the function returns an error\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumRetryAttempts`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumretryattempts) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "MaximumRetryAttempts"
         },
+        "MetricsConfig": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "ParallelizationFactor": {
           "allOf": [
             {
@@ -1768,6 +1771,9 @@
           ],
           "markdownDescription": "The maximum number of times to retry when the function returns an error\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumRetryAttempts`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumretryattempts) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "MaximumRetryAttempts"
+        },
+        "MetricsConfig": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "ParallelizationFactor": {
           "allOf": [
@@ -2972,6 +2978,9 @@
           ],
           "markdownDescription": "The maximum amount of time, in seconds, to gather records before invoking the function\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumBatchingWindowInSeconds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumbatchingwindowinseconds) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "MaximumBatchingWindowInSeconds"
+        },
+        "MetricsConfig": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Queue": {
           "allOf": [
