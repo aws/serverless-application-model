@@ -77,7 +77,6 @@ class LambdaRequestAuthorizerIdentity(BaseModel):
 
 
 class LambdaTokenAuthorizer(BaseModel):
-    AuthorizationScopes: Optional[List[str]] = lambdatokenauthorizer("AuthorizationScopes")
     FunctionArn: SamIntrinsicable[str] = lambdatokenauthorizer("FunctionArn")
     FunctionInvokeRole: Optional[str] = lambdatokenauthorizer("FunctionInvokeRole")
     FunctionPayloadType: Optional[Literal["TOKEN"]] = lambdatokenauthorizer("FunctionPayloadType")
@@ -86,7 +85,6 @@ class LambdaTokenAuthorizer(BaseModel):
 
 
 class LambdaRequestAuthorizer(BaseModel):
-    AuthorizationScopes: Optional[List[str]] = lambdarequestauthorizer("AuthorizationScopes")
     FunctionArn: SamIntrinsicable[str] = lambdarequestauthorizer("FunctionArn")
     FunctionInvokeRole: Optional[str] = lambdarequestauthorizer("FunctionInvokeRole")
     FunctionPayloadType: Optional[Literal["REQUEST"]] = lambdarequestauthorizer("FunctionPayloadType")

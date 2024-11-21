@@ -4,7 +4,7 @@ Resources:
     Properties:
       CodeUri: ${codeuri}
       Handler: index.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs18.x
       AutoPublishAlias: Live
       AutoPublishAliasAllProperties: true
       Layers:
