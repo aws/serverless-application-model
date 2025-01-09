@@ -3,8 +3,10 @@
   "Conditions": {
     "FalseCondition": {
       "Fn::Equals": [
-        true,
-        false
+        {
+          "Ref": "AWS::AccountId"
+        },
+        "myAccountId"
       ]
     }
   },
