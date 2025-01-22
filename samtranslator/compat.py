@@ -1,6 +1,6 @@
 try:
     from pydantic import v1 as pydantic
-    # Starting Pydantic v1.10.17, pydantic import v1 will success, 
+    # Starting Pydantic v1.10.17, pydantic import v1 will success,
     # adding the following line to make Pydantic v1 should fall back to v1 import correctly.
     pydantic.error_wrappers
 except ImportError:
@@ -10,5 +10,5 @@ except ImportError:
 except AttributeError:
     # Pydantic v1.10.17+
     import pydantic  # type: ignore
-    
+
 __all__ = ["pydantic"]
