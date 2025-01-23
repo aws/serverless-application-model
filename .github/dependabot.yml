@@ -10,4 +10,5 @@ updates:
       include: scope
     reviewers:
       - aws/sae-enterprise
+      - aws/aws-lambda-tooling
     open-pull-requests-limit: 10
