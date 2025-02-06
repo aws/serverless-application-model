@@ -133,6 +133,8 @@ from .s3_utils.uri_parser import construct_image_code_object, construct_s3_locat
 from .tags.resource_tagging import get_tag_list
 
 _CONDITION_CHAR_LIMIT = 255
+FUNCTION_URL_PUBLIC_PERMISSION_ACTION = "lambda:InvokeFunctionUrl"
+FUNCTION_INVOKE_PERMISSION_ACTION = "lambda:InvokeFunction"
 
 
 class SamFunction(SamResourceMacro):
@@ -320,9 +322,10 @@ class SamFunction(SamResourceMacro):
         if self.FunctionUrlConfig:
             lambda_url = self._construct_function_url(lambda_function, lambda_alias, self.FunctionUrlConfig)
             resources.append(lambda_url)
-            url_permission = self._construct_url_permission(lambda_function, lambda_alias, self.FunctionUrlConfig)
-            if url_permission:
-                resources.append(url_permission)
+            url_permissions = self._construct_url_permissions(lambda_function, lambda_alias, self.FunctionUrlConfig)
+            if url_permissions:
+                for permission in url_permissions:
+                    resources.append(permission)
 
         self._validate_deployment_preference_and_add_update_policy(
             kwargs.get("deployment_preference_collection"),
@@ -332,7 +335,6 @@ class SamFunction(SamResourceMacro):
             self.get_passthrough_resource_attributes(),
             feature_toggle,
         )
-
         event_invoke_policies: List[Dict[str, Any]] = []
         if self.EventInvokeConfig:
             function_name = lambda_function.logical_id
@@ -1213,11 +1215,11 @@ class SamFunction(SamResourceMacro):
                     "{} must be of type {}.".format(prop_name, str(prop_type).split("'")[1]),
                 )
 
-    def _construct_url_permission(
+    def _construct_url_permissions(
         self, lambda_function: LambdaFunction, lambda_alias: Optional[LambdaAlias], function_url_config: Dict[str, Any]
-    ) -> Optional[LambdaPermission]:
+    ) -> Optional[Tuple[LambdaPermission, LambdaPermission]]:
         """
-        Construct the lambda permission associated with the function url resource in a case
+        Construct the lambda permissions associated with the function url resource in a case
         for public access when AuthType is NONE
 
         Parameters
@@ -1225,28 +1227,83 @@ class SamFunction(SamResourceMacro):
         lambda_function : LambdaUrl
             Lambda Function resource
 
-        llambda_alias : LambdaAlias
+        lambda_alias : LambdaAlias
             Lambda Alias resource
 
         Returns
         -------
-        LambdaPermission
-            The lambda permission appended to a function url resource with public access
+        Optional[Tuple[LambdaPermission, LambdaPermission]]
+            The lambda permission appended to a function url resource with public access and the
+            Permission to invoke the function in general.
         """
         auth_type = function_url_config.get("AuthType")
 
         if auth_type not in ["NONE"] or is_intrinsic(function_url_config):
             return None
 
-        logical_id = f"{lambda_function.logical_id}UrlPublicPermissions"
+        url_public_permission_logical_id = f"{lambda_function.logical_id}UrlPublicPermissions"
+        lambda_url_public_permission = self.get_lambda_url_permissions(
+            url_public_permission_logical_id,
+            lambda_function,
+            lambda_alias,
+            FUNCTION_URL_PUBLIC_PERMISSION_ACTION,
+            auth_type,
+        )
+
+        url_invoke_permission_logical_id = f"{lambda_function.logical_id}URLInvokeAllowPublicAccess"
+        lambda_invoke_permission = self.get_lambda_url_permissions(
+            url_invoke_permission_logical_id,
+            lambda_function,
+            lambda_alias,
+            FUNCTION_INVOKE_PERMISSION_ACTION,
+            auth_type,
+        )
+
+        return (lambda_url_public_permission, lambda_invoke_permission)
+
+    def get_lambda_url_permissions(
+        self,
+        logical_id: str,
+        lambda_function: LambdaFunction,
+        lambda_alias: Optional[LambdaAlias],
+        action: str,
+        auth_type: str,
+    ) -> LambdaPermission:
+        """
+        get_lambda_url_permissions
+
+        Parameters
+        ----------
+        logical_id : str
+            Unique id of the function
+        lambda_function : LambdaFuntion
+            Lambda Function resource
+        lambda_alias : Optional[LambdaAlias]
+            Lambda Alias resource
+        action : str
+            The action or actions that will be allowed or denied
+        auth_type : str
+            Function URL AuthType
+
+        Returns
+        -------
+        LambdaPermission
+            The lambda permission appended to a function url resource with public access
+        """
         lambda_permission_attributes = self.get_passthrough_resource_attributes()
+
         lambda_permission = LambdaPermission(logical_id=logical_id, attributes=lambda_permission_attributes)
-        lambda_permission.Action = "lambda:InvokeFunctionUrl"
+        lambda_permission.Action = action
+        lambda_permission.Principal = "*"
         lambda_permission.FunctionName = (
             lambda_alias.get_runtime_attr("arn") if lambda_alias else lambda_function.get_runtime_attr("name")
         )
-        lambda_permission.Principal = "*"
-        lambda_permission.FunctionUrlAuthType = auth_type
+        if action == FUNCTION_URL_PUBLIC_PERMISSION_ACTION:
+            lambda_permission.FunctionUrlAuthType = auth_type
+
+        if action == FUNCTION_INVOKE_PERMISSION_ACTION:
+            lambda_permission.InvokedViaFunctionUrl = True
+
         return lambda_permission
 
 
