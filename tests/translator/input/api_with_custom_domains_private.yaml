@@ -1,0 +1,69 @@
+Parameters:
+  DomainName:
+    Type: String
+    Default: private.example.com
+    Description: Custom domain name for the API
+
+  CertificateArn:
+    Type: String
+    Default: arn:aws:acm:us-west-2:123456789:certificate/abcd-000-1234-0000-000000abcd
+    Description: ARN of the ACM certificate for the domain
+
+  VpcEndpointId:
+    Type: String
+    Default: vpce-abcd1234efg
+    Description: VPC Endpoint ID for private API access
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      EndpointConfiguration:
+        Type: PRIVATE
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+          - Effect: Allow
+            Principal: '*'
+            Action: execute-api:Invoke
+            Resource: execute-api:/*
+          - Effect: Deny
+            Principal: '*'
+            Action: execute-api:Invoke
+            Resource: execute-api:/*
+            Condition:
+              StringNotEquals:
+                aws:SourceVpce: !Ref VpcEndpointId
+
+  ApiDomainName:
+    Type: AWS::ApiGateway::DomainNameV2
+    Properties:
+      DomainName: !Ref DomainName
+      EndpointConfiguration:
+        Types:
+        - PRIVATE
+      SecurityPolicy: TLS_1_2
+      RegionalCertificateArn: !Ref CertificateArn
+
+  ApiMapping:
+    Type: AWS::ApiGateway::BasePathMappingV2
+    Properties:
+      DomainName: !Ref ApiDomainName
+      RestApiId: !Ref MyApi
+      Stage: prod
+
+  DomainNameVpcEndpointAssociation:
+    Type: AWS::ApiGateway::VpcEndpointAssociation
+    Properties:
+      DomainName: !Ref DomainName
+      VpcEndpointId: !Ref VpcEndpointId
+
+Outputs:
+  ApiDomainName:
+    Description: Custom Domain Name for the API
+    Value: !Ref DomainName
+
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/prod/

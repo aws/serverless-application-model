@@ -230,11 +230,38 @@ class ApiGatewayDomainName(Resource):
     OwnershipVerificationCertificateArn: Optional[PassThrough]
 
 
+class ApiGatewayDomainNameV2(Resource):
+    resource_type = "AWS::ApiGateway::DomainNameV2"
+    property_types = {
+        "DomainName": GeneratedProperty(),
+        "EndpointConfiguration": GeneratedProperty(),
+        "SecurityPolicy": GeneratedProperty(),
+        "CertificateArn": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+    }
+
+    DomainName: PassThrough
+    EndpointConfiguration: Optional[PassThrough]
+    SecurityPolicy: Optional[PassThrough]
+    CertificateArn: Optional[PassThrough]
+    Tags: Optional[PassThrough]
+
+
 class ApiGatewayBasePathMapping(Resource):
     resource_type = "AWS::ApiGateway::BasePathMapping"
     property_types = {
         "BasePath": GeneratedProperty(),
         "DomainName": GeneratedProperty(),
+        "RestApiId": GeneratedProperty(),
+        "Stage": GeneratedProperty(),
+    }
+
+
+class ApiGatewayBasePathMappingV2(Resource):
+    resource_type = "AWS::ApiGateway::BasePathMappingV2"
+    property_types = {
+        "BasePath": GeneratedProperty(),
+        "DomainNameArn": GeneratedProperty(),
         "RestApiId": GeneratedProperty(),
         "Stage": GeneratedProperty(),
     }
