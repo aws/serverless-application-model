@@ -13,8 +13,8 @@ Description: >
 Conditions:
   FalseCondition:
     Fn::Equals:
-    - true
-    - false
+    - !Ref AWS::AccountId
+    - myAccountId
 
 Resources:
   # Rest Api with DefinitionBody under If intrinsic, SwaggerEditor not used
