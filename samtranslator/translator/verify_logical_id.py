@@ -15,6 +15,8 @@ do_not_verify = {
     "AWS::Cognito::UserPool": "AWS::Cognito::UserPool",
     "AWS::ApiGateway::DomainName": "AWS::ApiGateway::DomainName",
     "AWS::ApiGateway::BasePathMapping": "AWS::ApiGateway::BasePathMapping",
+    "AWS::ApiGateway::DomainNameV2": "AWS::ApiGateway::DomainNameV2",
+    "AWS::ApiGateway::BasePathMappingV2": "AWS::ApiGateway::BasePathMappingV2",
     "AWS::StepFunctions::StateMachine": "AWS::Serverless::StateMachine",
     "AWS::AppSync::GraphQLApi": "AWS::Serverless::GraphQLApi",
 }
