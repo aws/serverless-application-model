@@ -3,7 +3,7 @@ from unittest.case import skipIf
 
 from botocore.exceptions import ClientError
 
-from integration.config.service_names import REST_API
+from integration.config.service_names import LAYERS, REST_API
 from integration.helpers.base_test import LOG, BaseTest
 from integration.helpers.common_api import get_function_versions
 from integration.helpers.resource import current_region_does_not_support
@@ -160,6 +160,7 @@ class TestFunctionWithAlias(BaseTest):
         function_policy = json.loads(function_policy_str)
         self.assertEqual(len(function_policy["Statement"]), len(permission_resources))
 
+    @skipIf(current_region_does_not_support([LAYERS]), "Layers is not supported in this testing region")
     def test_function_with_alias_and_layer_version(self):
         self.create_and_verify_stack("combination/function_with_alias_all_properties_and_layer_version")
         alias_name = "Live"
