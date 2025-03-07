@@ -526,11 +526,7 @@ class ApiGenerator:
             if mutual_tls_auth.get("TruststoreVersion", None):
                 domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
 
-        if self.domain.get("SecurityPolicy", None):
-            domain.SecurityPolicy = self.domain["SecurityPolicy"]
-
-        if self.domain.get("OwnershipVerificationCertificateArn", None):
-            domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
+        self._set_optional_domain_properties(domain)
 
         basepaths: Optional[List[str]]
         basepath_value = self.domain.get("BasePath")
@@ -548,12 +544,7 @@ class ApiGenerator:
         basepath_resource_list: List[ApiGatewayBasePathMapping] = []
 
         if basepaths is None:
-            basepath_mapping = ApiGatewayBasePathMapping(
-                self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
-            )
-            basepath_mapping.DomainName = ref(api_domain_name)
-            basepath_mapping.RestApiId = ref(rest_api.logical_id)
-            basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
+            basepath_mapping = self._create_basepath_mapping(api_domain_name, rest_api, None, None)
             basepath_resource_list.extend([basepath_mapping])
         else:
             sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
@@ -561,14 +552,11 @@ class ApiGenerator:
                 # Remove possible leading and trailing '/' because a base path may only
                 # contain letters, numbers, and one of "$-_.+!*'()"
                 path = "".join(e for e in basepath if e.isalnum())
+                mapping_basepath = path if normalize_basepath else basepath
                 logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
-                basepath_mapping = ApiGatewayBasePathMapping(
-                    logical_id, attributes=self.passthrough_resource_attributes
+                basepath_mapping = self._create_basepath_mapping(
+                    api_domain_name, rest_api, logical_id, mapping_basepath
                 )
-                basepath_mapping.DomainName = ref(api_domain_name)
-                basepath_mapping.RestApiId = ref(rest_api.logical_id)
-                basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
-                basepath_mapping.BasePath = path if normalize_basepath else basepath
                 basepath_resource_list.extend([basepath_mapping])
 
         # Create the Route53 RecordSetGroup resource
@@ -600,12 +588,7 @@ class ApiGenerator:
                 )
 
             if not record_set_group:
-                record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
-                if "HostedZoneId" in route53:
-                    record_set_group.HostedZoneId = route53.get("HostedZoneId")
-                if "HostedZoneName" in route53:
-                    record_set_group.HostedZoneName = route53.get("HostedZoneName")
-                record_set_group.RecordSets = []
+                record_set_group = self._get_record_set_group(logical_id, route53)
                 route53_record_set_groups[logical_id] = record_set_group
 
             record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, api_domain_name, route53)
@@ -616,7 +599,7 @@ class ApiGenerator:
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
     ) -> ApiDomainResponseV2:
         """
-        Constructs and returns the ApiGateway Domain and BasepathMapping
+        Constructs and returns the ApiGateway Domain V2 and BasepathMapping V2
         """
         if self.domain is None:
             return ApiDomainResponseV2(None, None, None)
@@ -659,7 +642,7 @@ class ApiGenerator:
 
         basepath_resource_list: List[ApiGatewayBasePathMappingV2] = []
         if basepaths is None:
-            basepath_mapping = self._create_basepath_mapping(domain_name_arn, rest_api)
+            basepath_mapping = self._create_basepath_mapping_v2(domain_name_arn, rest_api)
             basepath_resource_list.extend([basepath_mapping])
         else:
             sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
@@ -728,9 +711,10 @@ class ApiGenerator:
             return
         if self.domain.get("SecurityPolicy", None):
             domain.SecurityPolicy = self.domain["SecurityPolicy"]
-
         if self.domain.get("Policy", None):
             domain.Policy = self.domain["Policy"]
+        if self.domain.get("OwnershipVerificationCertificateArn", None):
+            domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
 
     def _get_record_set_group(self, logical_id: str, route53: Dict[str, Any]) -> Route53RecordSetGroup:
         record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
@@ -806,6 +790,29 @@ class ApiGenerator:
         return alias_target
 
     def _create_basepath_mapping(
+        self,
+        api_domain_name: PassThrough,
+        rest_api: ApiGatewayRestApi,
+        logical_id: Optional[str],
+        basepath: Optional[str],
+    ) -> ApiGatewayBasePathMapping:
+
+        basepath_mapping: ApiGatewayBasePathMapping
+        basepath_mapping = (
+            ApiGatewayBasePathMapping(logical_id, attributes=self.passthrough_resource_attributes)
+            if logical_id
+            else ApiGatewayBasePathMapping(
+                self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
+            )
+        )
+        basepath_mapping.DomainName = ref(api_domain_name)
+        basepath_mapping.RestApiId = ref(rest_api.logical_id)
+        basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
+        if basepath:
+            basepath_mapping.BasePath = basepath
+        return basepath_mapping
+
+    def _create_basepath_mapping_v2(
         self, domain_name_arn: PassThrough, rest_api: ApiGatewayRestApi
     ) -> ApiGatewayBasePathMappingV2:
         basepath_mapping = ApiGatewayBasePathMappingV2(
