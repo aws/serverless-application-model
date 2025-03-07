@@ -650,33 +650,16 @@ class ApiGenerator:
 
         domain.EndpointConfiguration = {"Types": [endpoint]}
 
-        if self.domain.get("SecurityPolicy", None):
-            domain.SecurityPolicy = self.domain["SecurityPolicy"]
+        self._set_optional_domain_properties(domain)
 
-        if self.domain.get("Policy", None):
-            domain.Policy = self.domain["Policy"]
-
-        basepaths: Optional[List[str]]
-        basepath_value = self.domain.get("BasePath")
-        # Create BasepathMappings
-        if self.domain.get("BasePath") and isinstance(basepath_value, str):
-            basepaths = [basepath_value]
-        elif self.domain.get("BasePath") and isinstance(basepath_value, list):
-            basepaths = cast(Optional[List[Any]], basepath_value)
-        else:
-            basepaths = None
+        basepaths: Optional[List[str]] = self._get_basepaths()
 
         # Boolean to allow/disallow symbols in BasePath property
         normalize_basepath = self.domain.get("NormalizeBasePath", True)
 
         basepath_resource_list: List[ApiGatewayBasePathMappingV2] = []
         if basepaths is None:
-            basepath_mapping = ApiGatewayBasePathMappingV2(
-                self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
-            )
-            basepath_mapping.DomainNameArn = ref(domain_name_arn)
-            basepath_mapping.RestApiId = ref(rest_api.logical_id)
-            basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
+            basepath_mapping = self._create_basepath_mapping(domain_name_arn, rest_api)
             basepath_resource_list.extend([basepath_mapping])
         else:
             sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
@@ -723,17 +706,40 @@ class ApiGenerator:
                 )
 
             if not record_set_group:
-                record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
-                if "HostedZoneId" in route53:
-                    record_set_group.HostedZoneId = route53.get("HostedZoneId")
-                if "HostedZoneName" in route53:
-                    record_set_group.HostedZoneName = route53.get("HostedZoneName")
-                record_set_group.RecordSets = []
+                record_set_group = self._get_record_set_group(logical_id, route53)
                 route53_record_set_groups[logical_id] = record_set_group
 
             record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, domain_name, route53)
 
         return ApiDomainResponseV2(domain, basepath_resource_list, record_set_group)
+
+    def _get_basepaths(self) -> Optional[List[str]]:
+        if self.domain is None:
+            return None
+        basepath_value = self.domain.get("BasePath")
+        if self.domain.get("BasePath") and isinstance(basepath_value, str):
+            return [basepath_value]
+        if self.domain.get("BasePath") and isinstance(basepath_value, list):
+            return cast(Optional[List[Any]], basepath_value)
+        return None
+
+    def _set_optional_domain_properties(self, domain: Union[ApiGatewayDomainName, ApiGatewayDomainNameV2]) -> None:
+        if self.domain is None:
+            return
+        if self.domain.get("SecurityPolicy", None):
+            domain.SecurityPolicy = self.domain["SecurityPolicy"]
+
+        if self.domain.get("Policy", None):
+            domain.Policy = self.domain["Policy"]
+
+    def _get_record_set_group(self, logical_id: str, route53: Dict[str, Any]) -> Route53RecordSetGroup:
+        record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
+        if "HostedZoneId" in route53:
+            record_set_group.HostedZoneId = route53.get("HostedZoneId")
+        if "HostedZoneName" in route53:
+            record_set_group.HostedZoneName = route53.get("HostedZoneName")
+        record_set_group.RecordSets = []
+        return record_set_group
 
     def _construct_single_record_set_group(
         self, domain: Dict[str, Any], api_domain_name: str, route53: Any
@@ -799,6 +805,17 @@ class ApiGenerator:
             alias_target["DNSName"] = route53.get("DistributionDomainName")
         return alias_target
 
+    def _create_basepath_mapping(
+        self, domain_name_arn: PassThrough, rest_api: ApiGatewayRestApi
+    ) -> ApiGatewayBasePathMappingV2:
+        basepath_mapping = ApiGatewayBasePathMappingV2(
+            self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
+        )
+        basepath_mapping.DomainNameArn = ref(domain_name_arn)
+        basepath_mapping.RestApiId = ref(rest_api.logical_id)
+        basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
+        return basepath_mapping
+
     @cw_timer(prefix="Generator", name="Api")
     def to_cloudformation(
         self, redeploy_restapi_parameters: Optional[Any], route53_record_set_groups: Dict[str, Route53RecordSetGroup]
@@ -808,8 +825,11 @@ class ApiGenerator:
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
         :rtype: tuple
         """
+        api_domain_response: Union[ApiDomainResponseV2, ApiDomainResponse]
+        domain: Union[Resource, None]
+        basepath_mapping: Union[List[ApiGatewayBasePathMapping], List[ApiGatewayBasePathMappingV2], None]
         rest_api = self._construct_rest_api()
-        if self.endpoint_configuration == "PRIVATE":
+        if self.endpoint_configuration and self.endpoint_configuration.get("Type") == "PRIVATE":
             api_domain_response = self._construct_api_domain_v2(rest_api, route53_record_set_groups)
             domain = api_domain_response.domain
             basepath_mapping = api_domain_response.apigw_basepath_mapping_list
@@ -840,7 +860,9 @@ class ApiGenerator:
                 List[Resource],
                 Tuple[Resource],
                 List[LambdaPermission],
+                List[Resource],
                 List[ApiGatewayBasePathMapping],
+                List[ApiGatewayBasePathMappingV2],
             ],
         ] = []
 

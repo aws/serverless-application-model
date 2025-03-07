@@ -33,6 +33,9 @@
   "Resources": {
     "ApiDomainName": {
       "Properties": {
+        "CertificateArn": {
+          "Ref": "CertificateArn"
+        },
         "DomainName": {
           "Ref": "DomainName"
         },
@@ -41,16 +44,13 @@
             "PRIVATE"
           ]
         },
-        "RegionalCertificateArn": {
-          "Ref": "CertificateArn"
-        },
         "SecurityPolicy": "TLS_1_2"
       },
       "Type": "AWS::ApiGateway::DomainNameV2"
     },
     "ApiMapping": {
       "Properties": {
-        "DomainName": {
+        "DomainNameArn": {
           "Ref": "ApiDomainName"
         },
         "RestApiId": {
