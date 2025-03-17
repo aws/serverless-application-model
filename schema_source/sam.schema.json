@@ -3618,7 +3618,8 @@
             {
               "enum": [
                 "REGIONAL",
-                "EDGE"
+                "EDGE",
+                "PRIVATE"
               ],
               "type": "string"
             }

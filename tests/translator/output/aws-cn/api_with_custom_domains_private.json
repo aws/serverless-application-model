@@ -31,45 +31,17 @@
     }
   },
   "Resources": {
-    "ApiDomainName": {
+    "ApiGatewayDomainNameV27c603ed871": {
       "Properties": {
-        "CertificateArn": {
-          "Ref": "CertificateArn"
-        },
-        "DomainName": {
-          "Ref": "DomainName"
-        },
+        "CertificateArn": "arn:aws:acm:us-west-2:123456789:certificate/abcd-000-1234-0000-000000abcd",
+        "DomainName": "private.example.com",
         "EndpointConfiguration": {
           "Types": [
             "PRIVATE"
           ]
-        },
-        "SecurityPolicy": "TLS_1_2"
-      },
-      "Type": "AWS::ApiGateway::DomainNameV2"
-    },
-    "ApiMapping": {
-      "Properties": {
-        "DomainNameArn": {
-          "Ref": "ApiDomainName"
-        },
-        "RestApiId": {
-          "Ref": "MyApi"
-        },
-        "Stage": "prod"
-      },
-      "Type": "AWS::ApiGateway::BasePathMappingV2"
-    },
-    "DomainNameVpcEndpointAssociation": {
-      "Properties": {
-        "DomainName": {
-          "Ref": "DomainName"
-        },
-        "VpcEndpointId": {
-          "Ref": "VpcEndpointId"
         }
       },
-      "Type": "AWS::ApiGateway::VpcEndpointAssociation"
+      "Type": "AWS::ApiGateway::DomainNameV2"
     },
     "MyApi": {
       "Properties": {
@@ -107,18 +79,32 @@
         },
         "EndpointConfiguration": {
           "Types": [
-            "PRIVATE"
+            "REGIONAL"
           ]
         },
         "Parameters": {
-          "endpointConfigurationTypes": "PRIVATE"
+          "endpointConfigurationTypes": "REGIONAL"
         }
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiDeployment2ced3f20ee": {
+    "MyApiBasePathMapping": {
       "Properties": {
-        "Description": "RestApi deployment id: 2ced3f20eef8a8f634f7677e1f11e4eb1a4b6b47",
+        "DomainNameArn": {
+          "Ref": "ApiGatewayDomainNameV27c603ed871"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiprodStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMappingV2"
+    },
+    "MyApiDeployment2a2c7964a1": {
+      "Properties": {
+        "Description": "RestApi deployment id: 2a2c7964a1e48b03d060fa6af26d333717eb4f0f",
         "RestApiId": {
           "Ref": "MyApi"
         },
@@ -129,7 +115,7 @@
     "MyApiprodStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment2ced3f20ee"
+          "Ref": "MyApiDeployment2a2c7964a1"
         },
         "RestApiId": {
           "Ref": "MyApi"

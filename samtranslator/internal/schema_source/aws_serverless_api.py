@@ -165,7 +165,9 @@ class Domain(BaseModel):
         "DomainName",
         ["AWS::ApiGateway::DomainName", "Properties", "DomainName"],
     )
-    EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE"]]] = domain("EndpointConfiguration")
+    EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE", "PRIVATE"]]] = domain(
+        "EndpointConfiguration"
+    )
     MutualTlsAuthentication: Optional[PassThroughProp] = passthrough_prop(
         DOMAIN_STEM,
         "MutualTlsAuthentication",
@@ -181,24 +183,6 @@ class Domain(BaseModel):
         DOMAIN_STEM,
         "SecurityPolicy",
         ["AWS::ApiGateway::DomainName", "Properties", "SecurityPolicy"],
-    )
-
-
-class DomainV2(BaseModel):
-    BasePath: Optional[PassThroughProp] = domain("BasePath")
-    NormalizeBasePath: Optional[bool] = domain("NormalizeBasePath")
-    CertificateArn: PassThroughProp = domain("CertificateArn")
-    DomainName: PassThroughProp = passthrough_prop(
-        DOMAIN_STEM,
-        "DomainName",
-        ["AWS::ApiGateway::DomainNameV2", "Properties", "DomainName"],
-    )
-    EndpointConfiguration: Optional[SamIntrinsicable[Literal["PRIVATE"]]] = domain("EndpointConfiguration")
-    Route53: Optional[Route53] = domain("Route53")
-    SecurityPolicy: Optional[PassThroughProp] = passthrough_prop(
-        DOMAIN_STEM,
-        "SecurityPolicy",
-        ["AWS::ApiGateway::DomainNameV2", "Properties", "SecurityPolicy"],
     )
 
 

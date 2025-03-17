@@ -608,15 +608,12 @@ class ApiGenerator:
         domain_name: PassThrough = sam_expect(
             self.domain.get("DomainName"), self.logical_id, "Domain.DomainName"
         ).to_not_be_none()
-        domain_name_arn: PassThrough = sam_expect(
-            self.domain.get("DomainNameArn"), self.logical_id, "Domain.DomainNameArn"
-        )
         certificate_arn: PassThrough = sam_expect(
             self.domain.get("CertificateArn"), self.logical_id, "Domain.CertificateArn"
         ).to_not_be_none()
 
         api_domain_name = "{}{}".format("ApiGatewayDomainNameV2", LogicalIdGenerator("", domain_name).gen())
-        self.domain["ApiDomainName"] = api_domain_name
+        domain_name_arn = ref(api_domain_name)
         domain = ApiGatewayDomainNameV2(api_domain_name, attributes=self.passthrough_resource_attributes)
 
         domain.DomainName = domain_name
@@ -654,7 +651,7 @@ class ApiGenerator:
                 basepath_mapping = ApiGatewayBasePathMappingV2(
                     logical_id, attributes=self.passthrough_resource_attributes
                 )
-                basepath_mapping.DomainNameArn = ref(domain_name_arn)
+                basepath_mapping.DomainNameArn = domain_name_arn
                 basepath_mapping.RestApiId = ref(rest_api.logical_id)
                 basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
                 basepath_mapping.BasePath = path if normalize_basepath else basepath
@@ -818,7 +815,7 @@ class ApiGenerator:
         basepath_mapping = ApiGatewayBasePathMappingV2(
             self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
         )
-        basepath_mapping.DomainNameArn = ref(domain_name_arn)
+        basepath_mapping.DomainNameArn = domain_name_arn
         basepath_mapping.RestApiId = ref(rest_api.logical_id)
         basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
         return basepath_mapping
@@ -836,7 +833,7 @@ class ApiGenerator:
         domain: Union[Resource, None]
         basepath_mapping: Union[List[ApiGatewayBasePathMapping], List[ApiGatewayBasePathMappingV2], None]
         rest_api = self._construct_rest_api()
-        if self.endpoint_configuration and self.endpoint_configuration.get("Type") == "PRIVATE":
+        if isinstance(self.domain, dict) and self.domain.get("EndpointConfiguration") == "PRIVATE":
             api_domain_response = self._construct_api_domain_v2(rest_api, route53_record_set_groups)
             domain = api_domain_response.domain
             basepath_mapping = api_domain_response.apigw_basepath_mapping_list

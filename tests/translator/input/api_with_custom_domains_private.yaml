@@ -19,8 +19,10 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
-      EndpointConfiguration:
-        Type: PRIVATE
+      Domain:
+        DomainName: !Ref DomainName
+        CertificateArn: !Ref CertificateArn
+        EndpointConfiguration: PRIVATE
       Auth:
         ResourcePolicy:
           CustomStatements:
@@ -35,29 +37,6 @@ Resources:
             Condition:
               StringNotEquals:
                 aws:SourceVpce: !Ref VpcEndpointId
-
-  ApiDomainName:
-    Type: AWS::ApiGateway::DomainNameV2
-    Properties:
-      DomainName: !Ref DomainName
-      EndpointConfiguration:
-        Types:
-        - PRIVATE
-      SecurityPolicy: TLS_1_2
-      CertificateArn: !Ref CertificateArn
-
-  ApiMapping:
-    Type: AWS::ApiGateway::BasePathMappingV2
-    Properties:
-      DomainNameArn: !Ref ApiDomainName
-      RestApiId: !Ref MyApi
-      Stage: prod
-
-  DomainNameVpcEndpointAssociation:
-    Type: AWS::ApiGateway::VpcEndpointAssociation
-    Properties:
-      DomainName: !Ref DomainName
-      VpcEndpointId: !Ref VpcEndpointId
 
 Outputs:
   ApiDomainName:
