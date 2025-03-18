@@ -159,6 +159,7 @@ class Route53(BaseModel):
 class Domain(BaseModel):
     BasePath: Optional[PassThroughProp] = domain("BasePath")
     NormalizeBasePath: Optional[bool] = domain("NormalizeBasePath")
+    Policy: Optional[PassThroughProp]
     CertificateArn: PassThroughProp = domain("CertificateArn")
     DomainName: PassThroughProp = passthrough_prop(
         DOMAIN_STEM,

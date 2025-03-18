@@ -3670,6 +3670,9 @@
           ],
           "title": "OwnershipVerificationCertificateArn"
         },
+        "Policy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Route53": {
           "allOf": [
             {

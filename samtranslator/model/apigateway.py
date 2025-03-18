@@ -238,6 +238,7 @@ class ApiGatewayDomainNameV2(Resource):
         "SecurityPolicy": GeneratedProperty(),
         "CertificateArn": GeneratedProperty(),
         "Tags": GeneratedProperty(),
+        "Policy": GeneratedProperty(),
     }
 
     DomainName: PassThrough
@@ -245,6 +246,7 @@ class ApiGatewayDomainNameV2(Resource):
     SecurityPolicy: Optional[PassThrough]
     CertificateArn: Optional[PassThrough]
     Tags: Optional[PassThrough]
+    Policy: Optional[PassThrough]
 
 
 class ApiGatewayBasePathMapping(Resource):

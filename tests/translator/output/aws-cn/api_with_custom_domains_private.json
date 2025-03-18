@@ -39,6 +39,28 @@
           "Types": [
             "PRIVATE"
           ]
+        },
+        "Policy": {
+          "Statement": [
+            {
+              "Action": "execute-api:Invoke",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Resource": "execute-api:/*"
+            },
+            {
+              "Action": "execute-api:Invoke",
+              "Condition": {
+                "StringNotEquals": {
+                  "aws:SourceVpce": "vpce-abcd1234efg"
+                }
+              },
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": "execute-api:/*"
+            }
+          ],
+          "Version": "2012-10-17"
         }
       },
       "Type": "AWS::ApiGateway::DomainNameV2"
@@ -102,9 +124,9 @@
       },
       "Type": "AWS::ApiGateway::BasePathMappingV2"
     },
-    "MyApiDeployment2a2c7964a1": {
+    "MyApiDeployment305713bc0b": {
       "Properties": {
-        "Description": "RestApi deployment id: 2a2c7964a1e48b03d060fa6af26d333717eb4f0f",
+        "Description": "RestApi deployment id: 305713bc0b043df7d6fdb169ecf2f9d9844519da",
         "RestApiId": {
           "Ref": "MyApi"
         },
@@ -115,7 +137,7 @@
     "MyApiprodStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment2a2c7964a1"
+          "Ref": "MyApiDeployment305713bc0b"
         },
         "RestApiId": {
           "Ref": "MyApi"
