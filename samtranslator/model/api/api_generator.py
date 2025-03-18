@@ -833,14 +833,14 @@ class ApiGenerator:
         domain: Union[Resource, None]
         basepath_mapping: Union[List[ApiGatewayBasePathMapping], List[ApiGatewayBasePathMappingV2], None]
         rest_api = self._construct_rest_api()
-        if isinstance(self.domain, dict) and self.domain.get("EndpointConfiguration") == "PRIVATE":
-            api_domain_response = self._construct_api_domain_v2(rest_api, route53_record_set_groups)
-            domain = api_domain_response.domain
-            basepath_mapping = api_domain_response.apigw_basepath_mapping_list
-        else:
-            api_domain_response = self._construct_api_domain(rest_api, route53_record_set_groups)
-            domain = api_domain_response.domain
-            basepath_mapping = api_domain_response.apigw_basepath_mapping_list
+        api_domain_response = (
+            self._construct_api_domain_v2(rest_api, route53_record_set_groups)
+            if isinstance(self.domain, dict) and self.domain.get("EndpointConfiguration") == "PRIVATE"
+            else self._construct_api_domain(rest_api, route53_record_set_groups)
+        )
+
+        domain = api_domain_response.domain
+        basepath_mapping = api_domain_response.apigw_basepath_mapping_list
 
         route53_recordsetGroup = api_domain_response.recordset_group
 
@@ -864,7 +864,6 @@ class ApiGenerator:
                 List[Resource],
                 Tuple[Resource],
                 List[LambdaPermission],
-                List[Resource],
                 List[ApiGatewayBasePathMapping],
                 List[ApiGatewayBasePathMappingV2],
             ],

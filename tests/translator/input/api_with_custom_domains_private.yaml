@@ -6,7 +6,7 @@ Parameters:
 
   CertificateArn:
     Type: String
-    Default: arn:aws:acm:us-west-2:123456789:certificate/abcd-000-1234-0000-000000abcd
+    Default: another-api-arn
     Description: ARN of the ACM certificate for the domain
 
   VpcEndpointId:
