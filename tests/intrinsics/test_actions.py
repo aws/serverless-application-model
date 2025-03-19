@@ -111,6 +111,11 @@ class TestRefCanResolveParameterRefs(TestCase):
         ref = RefAction()
         self.assertEqual(expected, ref.resolve_parameter_refs(input, parameters))
 
+    def test_resolve_ref_value(self):
+        self.ref = RefAction()
+        input_aws_no_value = {"Ref": "AWS::NoValue"}
+        self.assertEqual(None, self.ref.resolve_ref_value(input_aws_no_value))
+
     def test_must_ignore_invalid_value(self):
         parameters = {"key": "value"}
         input = {"Ref": ["invalid value"]}

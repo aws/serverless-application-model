@@ -344,15 +344,16 @@ class SamFunction(SamResourceMacro):
         managed_policy_map = kwargs.get("managed_policy_map", {})
         get_managed_policy_map = kwargs.get("get_managed_policy_map")
 
-        execution_role = None
-        if lambda_function.Role is None:
-            execution_role = self._construct_role(
-                managed_policy_map,
-                event_invoke_policies,
-                intrinsics_resolver,
-                get_managed_policy_map,
-            )
-            lambda_function.Role = execution_role.get_runtime_attr("arn")
+        policy_configs = {
+            "managed_policy_map": managed_policy_map,
+            "event_invoke_policies": event_invoke_policies,
+            "get_managed_policy_map": get_managed_policy_map,
+        }
+
+        execution_role = self._handle_role_configuration(
+            lambda_function, conditions, intrinsics_resolver, policy_configs
+        )
+        if execution_role:
             resources.append(execution_role)
 
         try:
@@ -370,6 +371,93 @@ class SamFunction(SamResourceMacro):
         self.propagate_tags(resources, self.Tags, self.PropagateTags)
 
         return resources
+
+    def _handle_role_configuration(
+        self,
+        lambda_function: LambdaFunction,
+        conditions: Dict[str, Any],
+        intrinsics_resolver: IntrinsicsResolver,
+        policy_configs: Dict[str, Any],
+    ) -> Optional[IAMRole]:
+        """Handle the configuration of the Lambda function's execution role.
+
+        :param lambda_function: The lambda function resource
+        :param conditions: Conditions from the template
+        :param intrinsics_resolver: Resolver for intrinsic functions
+        :param policy_configs: Dictionary containing policy-related configurations including:
+            - managed_policy_map
+            - event_invoke_policies
+            - get_managed_policy_map
+        :returns: IAMRole if a new role needs to be created, None otherwise
+        :rtype: Optional[IAMRole]
+        """
+        should_create_role = lambda_function.Role is None or not self._resolve_property_value(
+            lambda_function.Role, conditions, intrinsics_resolver
+        )
+
+        if should_create_role:
+            execution_role = self._construct_role(
+                policy_configs["managed_policy_map"],
+                policy_configs["event_invoke_policies"],
+                intrinsics_resolver,
+                policy_configs["get_managed_policy_map"],
+            )
+            lambda_function.Role = execution_role.get_runtime_attr("arn")
+            return execution_role
+
+        # Role exists and is resolved
+        lambda_function.Role = self._resolve_property_value(lambda_function.Role, conditions, intrinsics_resolver)
+        return None
+
+    def _resolve_property_value(
+        self, property_value: Any, conditions: Dict[str, Any], intrinsics_resolver: IntrinsicsResolver
+    ) -> Any:
+        """Recursively resolve property value that could contain nested supported intrinsic functions.
+
+        :param property_value: The property value to resolve, can be None, a primitive value, or a dict
+            containing intrinsic functions
+        :param conditions: Dictionary of condition names and their evaluated boolean values
+        :param intrinsics_resolver: Resolver instance that handles intrinsic function resolution
+        :returns: Resolved property value after evaluating all nested intrinsic functions
+        :rtype: Any
+        """
+        if property_value is None:
+            return None
+
+        if not isinstance(property_value, dict):
+            return property_value
+
+        if is_intrinsic_if(property_value):
+            return self._resolve_if_condition(property_value, conditions, intrinsics_resolver)
+
+        if is_intrinsic(property_value) and "Ref" in property_value:
+            return self._resolve_ref_value(property_value, intrinsics_resolver)
+
+        return property_value
+
+    def _resolve_if_condition(
+        self, if_value: Dict[str, Any], conditions: Dict[str, Any], intrinsics_resolver: IntrinsicsResolver
+    ) -> Any:
+        """Handle Fn::If resolution separately to reduce branch count."""
+        condition_name = if_value["Fn::If"][0]
+        true_value = if_value["Fn::If"][1]
+        false_value = if_value["Fn::If"][2]
+
+        if intrinsics_resolver.evaluate_condition(condition_name, conditions):
+            return self._resolve_property_value(true_value, conditions, intrinsics_resolver)
+        return self._resolve_property_value(false_value, conditions, intrinsics_resolver)
+
+    def _resolve_ref_value(self, property_value: Dict[str, Any], intrinsics_resolver: IntrinsicsResolver) -> Any:
+        """Handle Ref resolution.
+
+        :param ref_value: Dictionary containing Ref
+        :param intrinsics_resolver: Resolver instance that handles intrinsic function resolution
+        :returns: Resolved value after evaluating the Ref
+        :rtype: Any
+        """
+        if property_value["Ref"] in intrinsics_resolver.parameters:
+            return intrinsics_resolver.resolve_parameter_refs(property_value)
+        return intrinsics_resolver.resolve_ref_value(property_value)
 
     def _construct_event_invoke_config(  # noqa: PLR0913
         self,
