@@ -12,7 +12,7 @@ Resources:
             Schedule: rate(1 minute)
             Description: test schedule
             Enabled: false
-            RoleArn: arn:0000000000:iam::role/yoyo
+            RoleArn: arn:aws:iam::123456123456:role/testRole
         CWScheduleCreateRole:
           Type: Schedule
           Properties:
