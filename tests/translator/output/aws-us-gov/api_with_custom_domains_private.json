@@ -3,7 +3,7 @@
     "ApiDomainName": {
       "Description": "Custom Domain Name for the API",
       "Value": {
-        "Ref": "DomainName"
+        "Ref": "ApiGatewayDomainNameV27c603ed871"
       }
     },
     "ApiEndpoint": {

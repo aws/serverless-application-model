@@ -55,7 +55,7 @@ Resources:
 Outputs:
   ApiDomainName:
     Description: Custom Domain Name for the API
-    Value: !Ref DomainName
+    Value: !Ref MyApi.DomainNameV2
 
   ApiEndpoint:
     Description: API Gateway endpoint URL
