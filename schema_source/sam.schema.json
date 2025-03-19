@@ -3618,7 +3618,8 @@
             {
               "enum": [
                 "REGIONAL",
-                "EDGE"
+                "EDGE",
+                "PRIVATE"
               ],
               "type": "string"
             }
@@ -3668,6 +3669,9 @@
             }
           ],
           "title": "OwnershipVerificationCertificateArn"
+        },
+        "Policy": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Route53": {
           "allOf": [

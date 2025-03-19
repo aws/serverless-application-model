@@ -139,6 +139,7 @@ ignore_templates:
   - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
   - tests/translator/output/**/function_with_provisioned_poller_config.json
   - tests/translator/output/**/function_with_metrics_config.json
+  - tests/translator/output/**/api_with_custom_domains_private.json
 
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests

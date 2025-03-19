@@ -159,13 +159,16 @@ class Route53(BaseModel):
 class Domain(BaseModel):
     BasePath: Optional[PassThroughProp] = domain("BasePath")
     NormalizeBasePath: Optional[bool] = domain("NormalizeBasePath")
+    Policy: Optional[PassThroughProp]
     CertificateArn: PassThroughProp = domain("CertificateArn")
     DomainName: PassThroughProp = passthrough_prop(
         DOMAIN_STEM,
         "DomainName",
         ["AWS::ApiGateway::DomainName", "Properties", "DomainName"],
     )
-    EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE"]]] = domain("EndpointConfiguration")
+    EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE", "PRIVATE"]]] = domain(
+        "EndpointConfiguration"
+    )
     MutualTlsAuthentication: Optional[PassThroughProp] = passthrough_prop(
         DOMAIN_STEM,
         "MutualTlsAuthentication",
