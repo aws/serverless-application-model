@@ -345,7 +345,7 @@ class Resource(ABC):
         """
         try:
             return cls.parse_obj(self._generate_resource_dict()["Properties"])
-        except pydantic.error_wrappers.ValidationError as e:
+        except pydantic.error_wrappers.ValidationError as e:  # type: ignore
             error_properties: str = ""
             with suppress(KeyError):
                 error_properties = ".".join(str(x) for x in e.errors()[0]["loc"])
