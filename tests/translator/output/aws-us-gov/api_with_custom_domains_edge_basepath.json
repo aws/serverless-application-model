@@ -48,19 +48,42 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
                 }
               }
             }
           }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiDeployment4bf2b92ed2": {
+    "MyApiBasePathMapping": {
       "Properties": {
-        "Description": "RestApi deployment id: 4bf2b92ed23f25233fae6efddc221e057d99c292",
+        "BasePath": "",
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName9005ff2ee8"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "MyApiDeploymentf9a7aee6d1": {
+      "Properties": {
+        "Description": "RestApi deployment id: f9a7aee6d12f55ef7501475df6f08c671b0e5218",
         "RestApiId": {
           "Ref": "MyApi"
         }
@@ -70,7 +93,7 @@
     "MyApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment4bf2b92ed2"
+          "Ref": "MyApiDeploymentf9a7aee6d1"
         },
         "RestApiId": {
           "Ref": "MyApi"
@@ -125,7 +148,7 @@
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/get",
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/get",
             {
               "__ApiId__": {
                 "Ref": "MyApi"
@@ -156,7 +179,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Tags": [
           {

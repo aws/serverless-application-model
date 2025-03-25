@@ -805,7 +805,8 @@ class ApiGenerator:
         basepath_mapping.DomainName = ref(api_domain_name)
         basepath_mapping.RestApiId = ref(rest_api.logical_id)
         basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
-        basepath_mapping.BasePath = basepath
+        if basepath is not None:
+            basepath_mapping.BasePath = basepath
         return basepath_mapping
 
     def _create_basepath_mapping_v2(

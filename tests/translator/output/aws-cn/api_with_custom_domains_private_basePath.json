@@ -98,12 +98,21 @@
             ],
             "Version": "2012-10-17"
           }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
     "MyApiBasePathMapping": {
       "Properties": {
+        "BasePath": "",
         "DomainNameArn": {
           "Ref": "ApiGatewayDomainNameV27c603ed871"
         },
@@ -116,9 +125,9 @@
       },
       "Type": "AWS::ApiGateway::BasePathMappingV2"
     },
-    "MyApiDeployment7c3b13a843": {
+    "MyApiDeploymente37f6c9943": {
       "Properties": {
-        "Description": "RestApi deployment id: 7c3b13a843cdd653d1310c6fd7881e8fe8e49da8",
+        "Description": "RestApi deployment id: e37f6c9943b5e1213efecf302864c9e775fcf695",
         "RestApiId": {
           "Ref": "MyApi"
         },
@@ -126,10 +135,25 @@
       },
       "Type": "AWS::ApiGateway::Deployment"
     },
+    "MyApipostBasePathMapping": {
+      "Properties": {
+        "BasePath": "post",
+        "DomainNameArn": {
+          "Ref": "ApiGatewayDomainNameV27c603ed871"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiprodStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMappingV2"
+    },
     "MyApiprodStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment7c3b13a843"
+          "Ref": "MyApiDeploymente37f6c9943"
         },
         "RestApiId": {
           "Ref": "MyApi"

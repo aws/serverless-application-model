@@ -65,7 +65,7 @@
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/get",
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/get",
             {
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
@@ -86,7 +86,7 @@
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/post",
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/post",
             {
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
@@ -117,7 +117,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Tags": [
           {
@@ -175,7 +175,7 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
                 }
               }
@@ -187,42 +187,28 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
                 }
               }
             }
           },
           "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "ServerlessRestApiDeployment4697061386": {
+    "ServerlessRestApiBasePathMapping": {
       "Properties": {
-        "Description": "RestApi deployment id: 4697061386a7e696fb8f30105a102cad3712f1a6",
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "StageName": "Stage"
-      },
-      "Type": "AWS::ApiGateway::Deployment"
-    },
-    "ServerlessRestApiProdStage": {
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment4697061386"
-        },
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "StageName": "Prod"
-      },
-      "Type": "AWS::ApiGateway::Stage"
-    },
-    "ServerlessRestApigetBasePathMapping": {
-      "Properties": {
-        "BasePath": "get",
+        "BasePath": "",
         "DomainName": {
           "Ref": "ApiGatewayDomainName1a01391c0c"
         },
@@ -234,6 +220,28 @@
         }
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "ServerlessRestApiDeployment62123287c5": {
+      "Properties": {
+        "Description": "RestApi deployment id: 62123287c568397bf0c56295abac199a5de47607",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ServerlessRestApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment62123287c5"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
     },
     "ServerlessRestApipostBasePathMapping": {
       "Properties": {

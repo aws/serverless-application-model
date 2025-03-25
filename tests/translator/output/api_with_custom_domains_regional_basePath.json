@@ -198,31 +198,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "ServerlessRestApiDeployment4697061386": {
+    "ServerlessRestApiBasePathMapping": {
       "Properties": {
-        "Description": "RestApi deployment id: 4697061386a7e696fb8f30105a102cad3712f1a6",
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "StageName": "Stage"
-      },
-      "Type": "AWS::ApiGateway::Deployment"
-    },
-    "ServerlessRestApiProdStage": {
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment4697061386"
-        },
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "StageName": "Prod"
-      },
-      "Type": "AWS::ApiGateway::Stage"
-    },
-    "ServerlessRestApigetBasePathMapping": {
-      "Properties": {
-        "BasePath": "get",
+        "BasePath": "",
         "DomainName": {
           "Ref": "ApiGatewayDomainName1a01391c0c"
         },
@@ -234,6 +212,28 @@
         }
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "ServerlessRestApiDeploymentdfd08ecd45": {
+      "Properties": {
+        "Description": "RestApi deployment id: dfd08ecd455af89776b262d0c48a317e3252014d",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ServerlessRestApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeploymentdfd08ecd45"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
     },
     "ServerlessRestApipostBasePathMapping": {
       "Properties": {

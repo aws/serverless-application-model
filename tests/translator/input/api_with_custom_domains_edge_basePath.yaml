@@ -41,6 +41,7 @@ Resources:
           Ref: MyEdgeDomainCert
         EndpointConfiguration: EDGE
         BasePath:
+        - /
         - /get
         Route53:
           HostedZoneId:
