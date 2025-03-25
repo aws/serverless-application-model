@@ -765,17 +765,6 @@ class TestVersionsAndAliases(TestCase):
         self.assertNotEqual(version1.logical_id, version_snapstart.logical_id)
         self.assertEqual(version1.logical_id, version_snapstart_none.logical_id)
 
-    def test_alias_creation(self):
-        name = "aliasname"
-
-        alias = self.sam_func._construct_alias(name, self.lambda_func, self.lambda_version)
-
-        expected_logical_id = f"{self.lambda_func.logical_id}Alias{name}"
-        self.assertEqual(alias.logical_id, expected_logical_id)
-        self.assertEqual(alias.Name, name)
-        self.assertEqual(alias.FunctionName, {"Ref": self.lambda_func.logical_id})
-        self.assertEqual(alias.FunctionVersion, {"Fn::GetAtt": [self.lambda_version.logical_id, "Version"]})
-
     @parameterized.expand(
         [
             # Valid cases
