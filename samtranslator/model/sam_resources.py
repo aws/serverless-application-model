@@ -1029,7 +1029,7 @@ class SamFunction(SamResourceMacro):
 
     def _validate_deployment_preference_and_add_update_policy(  # noqa: PLR0913
         self,
-        deployment_preference_collection: DeploymentPreferenceCollection,
+        deployment_preference_collection: Optional[DeploymentPreferenceCollection],
         lambda_alias: Optional[LambdaAlias],
         intrinsics_resolver: IntrinsicsResolver,
         mappings_resolver: IntrinsicsResolver,
