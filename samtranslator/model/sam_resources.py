@@ -1015,7 +1015,7 @@ class SamFunction(SamResourceMacro):
 
         # Strip hyphens and underscores from the alias name for the logical ID
         # This ensures the logical ID contains only alphanumeric characters
-        alias_alphanumeric_name = re.sub(r"[-_]", "", name)
+        alias_alphanumeric_name = name.replace("-", "D").replace("_", "U")
 
         logical_id = f"{function.logical_id}Alias{alias_alphanumeric_name}"
         alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())

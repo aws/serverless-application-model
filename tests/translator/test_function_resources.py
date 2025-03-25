@@ -768,16 +768,26 @@ class TestVersionsAndAliases(TestCase):
     @parameterized.expand(
         [
             # Valid cases
-            # Expect logical id should be {fn name}{'Alias'}{alphanumerica alias name without `-`` or `_`}
+            # Expect logical id should be {fn name}{'Alias'}{alphanumerica alias name without `-` or `_`}
             ("aliasname", "fooAliasaliasname"),
-            ("alias-name", "fooAliasaliasname"),
-            ("alias_name", "fooAliasaliasname"),
+            ("alias-name", "fooAliasaliasDname"),
+            ("alias_name", "fooAliasaliasUname"),
             ("alias123", "fooAliasalias123"),
             ("123alias", "fooAlias123alias"),
             ("UPPERCASE", "fooAliasUPPERCASE"),
-            ("mixed-Case_123", "fooAliasmixedCase123"),
+            ("mixed-Case_123", "fooAliasmixedDCaseU123"),
             ("a", "fooAliasa"),  # Single character
-            ("1a", "fooAlias1a"),  # Starts with number but contains letter
+            ("1a", "fooAlias1a"),  # Starts with number
+            # Check the placement of dash and underscore
+            ("1-1_1", "fooAlias1D1U1"),
+            ("1_1-1", "fooAlias1U1D1"),
+            ("11-1", "fooAlias11D1"),
+            ("1-11", "fooAlias1D11"),
+            ("11_1", "fooAlias11U1"),
+            ("1_11", "fooAlias1U11"),
+            ("1-1-1", "fooAlias1D1D1"),
+            ("-1-1-1-", "fooAliasD1D1D1D"),
+            ("_1_1-1-", "fooAliasU1U1D1D"),
         ]
     )
     def test_alias_creation(self, alias_name, expected_logical_id):
