@@ -776,19 +776,21 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(alias.FunctionName, {"Ref": self.lambda_func.logical_id})
         self.assertEqual(alias.FunctionVersion, {"Fn::GetAtt": [self.lambda_version.logical_id, "Version"]})
 
-    @parameterized.expand([
-        # Valid cases
-        # Expect logical id should be {fn name}{'Alias'}{alphanumerica alias name without `-`` or `_`}
-        ("aliasname", "fooAliasaliasname"),
-        ("alias-name", "fooAliasaliasname"),
-        ("alias_name", "fooAliasaliasname"),
-        ("alias123", "fooAliasalias123"),
-        ("123alias", "fooAlias123alias"),
-        ("UPPERCASE", "fooAliasUPPERCASE"),
-        ("mixed-Case_123", "fooAliasmixedCase123"),
-        ("a", "fooAliasa"),  # Single character
-        ("1a", 'fooAlias1a'), # Starts with number but contains letter
-    ])
+    @parameterized.expand(
+        [
+            # Valid cases
+            # Expect logical id should be {fn name}{'Alias'}{alphanumerica alias name without `-`` or `_`}
+            ("aliasname", "fooAliasaliasname"),
+            ("alias-name", "fooAliasaliasname"),
+            ("alias_name", "fooAliasaliasname"),
+            ("alias123", "fooAliasalias123"),
+            ("123alias", "fooAlias123alias"),
+            ("UPPERCASE", "fooAliasUPPERCASE"),
+            ("mixed-Case_123", "fooAliasmixedCase123"),
+            ("a", "fooAliasa"),  # Single character
+            ("1a", "fooAlias1a"),  # Starts with number but contains letter
+        ]
+    )
     def test_alias_creation(self, alias_name, expected_logical_id):
         alias = self.sam_func._construct_alias(alias_name, self.lambda_func, self.lambda_version)
 
@@ -797,25 +799,35 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(alias.FunctionName, {"Ref": self.lambda_func.logical_id})
         self.assertEqual(alias.FunctionVersion, {"Fn::GetAtt": [self.lambda_version.logical_id, "Version"]})
 
-
-    @parameterized.expand([
-        # Invalid cases
-        ("", "Resource with id [foo] is invalid. Alias name is required to create an alias"),
-        (None, "Resource with id [foo] is invalid. Alias name is required to create an alias"),
-        ("123", "Resource with id [foo] is invalid. Alias name ('123') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)"),
-        ("name with space", "Resource with id [foo] is invalid. Alias name ('name with space') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)"),
-        ("alias@name", "Resource with id [foo] is invalid. Alias name ('alias@name') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)"),
-        ("alias/name", "Resource with id [foo] is invalid. Alias name ('alias/name') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)"),
-    ])
+    @parameterized.expand(
+        [
+            # Invalid cases
+            ("", "Resource with id [foo] is invalid. Alias name is required to create an alias"),
+            (None, "Resource with id [foo] is invalid. Alias name is required to create an alias"),
+            (
+                "123",
+                "Resource with id [foo] is invalid. Alias name ('123') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)",
+            ),
+            (
+                "name with space",
+                "Resource with id [foo] is invalid. Alias name ('name with space') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)",
+            ),
+            (
+                "alias@name",
+                "Resource with id [foo] is invalid. Alias name ('alias@name') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)",
+            ),
+            (
+                "alias/name",
+                "Resource with id [foo] is invalid. Alias name ('alias/name') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)",
+            ),
+        ]
+    )
     def test_alias_creation_error(self, alias_name, expected_error_massage):
         with self.assertRaises(InvalidResourceException) as context:
             self.sam_func._construct_alias(alias_name, self.lambda_func, self.lambda_version)
-        
+
         error = context.exception
-        self.assertEqual(
-            str(error.message),
-            expected_error_massage
-        )
+        self.assertEqual(str(error.message), expected_error_massage)
 
     def test_get_resolved_alias_name_must_work(self):
         property_name = "something"
