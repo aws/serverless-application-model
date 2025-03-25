@@ -23,6 +23,9 @@ Resources:
         DomainName: !Ref DomainName
         CertificateArn: !Ref CertificateArn
         EndpointConfiguration: PRIVATE
+        BasePath:
+        - /
+        - /post
         Policy:
           Version: '2012-10-17'
           Statement:

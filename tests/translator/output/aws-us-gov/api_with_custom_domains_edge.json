@@ -66,9 +66,24 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiDeploymentf93ee70a03": {
+    "MyApiBasePathMapping": {
       "Properties": {
-        "Description": "RestApi deployment id: f93ee70a03a9487cc3ec71325ea28c65ed2a38a0",
+        "BasePath": "",
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName9005ff2ee8"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "MyApiDeploymentf9a7aee6d1": {
+      "Properties": {
+        "Description": "RestApi deployment id: f9a7aee6d12f55ef7501475df6f08c671b0e5218",
         "RestApiId": {
           "Ref": "MyApi"
         }
@@ -78,7 +93,7 @@
     "MyApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentf93ee70a03"
+          "Ref": "MyApiDeploymentf9a7aee6d1"
         },
         "RestApiId": {
           "Ref": "MyApi"

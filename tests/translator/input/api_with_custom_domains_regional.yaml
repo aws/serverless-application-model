@@ -19,7 +19,7 @@ Globals:
         TruststoreVersion: 0
       SecurityPolicy: TLS_1_2
       BasePath:
-      - /get
+      - /
       - /post
       Route53:
         HostedZoneId:
