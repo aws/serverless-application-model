@@ -139,6 +139,7 @@ ignore_templates:
   - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
   - tests/translator/output/**/function_with_provisioned_poller_config.json
   - tests/translator/output/**/function_with_metrics_config.json
+  - tests/translator/output/**/api_with_custom_domains_private.json
 
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
@@ -147,3 +148,4 @@ ignore_checks:
   - E3001 # Invalid or unsupported Type; common in transform tests since they focus on SAM resources
   - W2001 # Parameter not used
   - E3006 # Resource type check; we have some Foo Bar resources
+  - W3037 # Ignore cfn-lint check for non existing IAM permissions

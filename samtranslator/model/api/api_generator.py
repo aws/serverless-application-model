@@ -10,8 +10,10 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
     ApiGatewayAuthorizer,
     ApiGatewayBasePathMapping,
+    ApiGatewayBasePathMappingV2,
     ApiGatewayDeployment,
     ApiGatewayDomainName,
+    ApiGatewayDomainNameV2,
     ApiGatewayResponse,
     ApiGatewayRestApi,
     ApiGatewayStage,
@@ -76,6 +78,13 @@ GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusC
 class ApiDomainResponse:
     domain: Optional[ApiGatewayDomainName]
     apigw_basepath_mapping_list: Optional[List[ApiGatewayBasePathMapping]]
+    recordset_group: Any
+
+
+@dataclass
+class ApiDomainResponseV2:
+    domain: Optional[ApiGatewayDomainNameV2]
+    apigw_basepath_mapping_list: Optional[List[ApiGatewayBasePathMappingV2]]
     recordset_group: Any
 
 
@@ -517,11 +526,7 @@ class ApiGenerator:
             if mutual_tls_auth.get("TruststoreVersion", None):
                 domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
 
-        if self.domain.get("SecurityPolicy", None):
-            domain.SecurityPolicy = self.domain["SecurityPolicy"]
-
-        if self.domain.get("OwnershipVerificationCertificateArn", None):
-            domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
+        self._set_optional_domain_properties(domain)
 
         basepaths: Optional[List[str]]
         basepath_value = self.domain.get("BasePath")
@@ -539,12 +544,7 @@ class ApiGenerator:
         basepath_resource_list: List[ApiGatewayBasePathMapping] = []
 
         if basepaths is None:
-            basepath_mapping = ApiGatewayBasePathMapping(
-                self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
-            )
-            basepath_mapping.DomainName = ref(api_domain_name)
-            basepath_mapping.RestApiId = ref(rest_api.logical_id)
-            basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
+            basepath_mapping = self._create_basepath_mapping(api_domain_name, rest_api, None, None)
             basepath_resource_list.extend([basepath_mapping])
         else:
             sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
@@ -552,14 +552,11 @@ class ApiGenerator:
                 # Remove possible leading and trailing '/' because a base path may only
                 # contain letters, numbers, and one of "$-_.+!*'()"
                 path = "".join(e for e in basepath if e.isalnum())
+                mapping_basepath = path if normalize_basepath else basepath
                 logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
-                basepath_mapping = ApiGatewayBasePathMapping(
-                    logical_id, attributes=self.passthrough_resource_attributes
+                basepath_mapping = self._create_basepath_mapping(
+                    api_domain_name, rest_api, logical_id, mapping_basepath
                 )
-                basepath_mapping.DomainName = ref(api_domain_name)
-                basepath_mapping.RestApiId = ref(rest_api.logical_id)
-                basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
-                basepath_mapping.BasePath = path if normalize_basepath else basepath
                 basepath_resource_list.extend([basepath_mapping])
 
         # Create the Route53 RecordSetGroup resource
@@ -591,17 +588,139 @@ class ApiGenerator:
                 )
 
             if not record_set_group:
-                record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
-                if "HostedZoneId" in route53:
-                    record_set_group.HostedZoneId = route53.get("HostedZoneId")
-                if "HostedZoneName" in route53:
-                    record_set_group.HostedZoneName = route53.get("HostedZoneName")
-                record_set_group.RecordSets = []
+                record_set_group = self._get_record_set_group(logical_id, route53)
                 route53_record_set_groups[logical_id] = record_set_group
 
             record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, api_domain_name, route53)
 
         return ApiDomainResponse(domain, basepath_resource_list, record_set_group)
+
+    def _construct_api_domain_v2(
+        self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
+    ) -> ApiDomainResponseV2:
+        """
+        Constructs and returns the ApiGateway Domain V2 and BasepathMapping V2
+        """
+        if self.domain is None:
+            return ApiDomainResponseV2(None, None, None)
+
+        sam_expect(self.domain, self.logical_id, "Domain").to_be_a_map()
+        domain_name: PassThrough = sam_expect(
+            self.domain.get("DomainName"), self.logical_id, "Domain.DomainName"
+        ).to_not_be_none()
+        certificate_arn: PassThrough = sam_expect(
+            self.domain.get("CertificateArn"), self.logical_id, "Domain.CertificateArn"
+        ).to_not_be_none()
+
+        api_domain_name = "{}{}".format("ApiGatewayDomainNameV2", LogicalIdGenerator("", domain_name).gen())
+        domain_name_arn = ref(api_domain_name)
+        domain = ApiGatewayDomainNameV2(api_domain_name, attributes=self.passthrough_resource_attributes)
+
+        domain.DomainName = domain_name
+        endpoint = self.domain.get("EndpointConfiguration")
+
+        if endpoint not in ["EDGE", "REGIONAL", "PRIVATE"]:
+            raise InvalidResourceException(
+                self.logical_id,
+                "EndpointConfiguration for Custom Domains must be"
+                " one of {}.".format(["EDGE", "REGIONAL", "PRIVATE"]),
+            )
+
+        domain.CertificateArn = certificate_arn
+
+        domain.EndpointConfiguration = {"Types": [endpoint]}
+
+        self._set_optional_domain_properties(domain)
+
+        basepaths: Optional[List[str]] = self._get_basepaths()
+
+        # Boolean to allow/disallow symbols in BasePath property
+        normalize_basepath = self.domain.get("NormalizeBasePath", True)
+
+        basepath_resource_list: List[ApiGatewayBasePathMappingV2] = []
+        if basepaths is None:
+            basepath_mapping = self._create_basepath_mapping_v2(domain_name_arn, rest_api)
+            basepath_resource_list.extend([basepath_mapping])
+        else:
+            sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
+            for basepath in basepaths:
+                # Remove possible leading and trailing '/' because a base path may only
+                # contain letters, numbers, and one of "$-_.+!*'()"
+                path = "".join(e for e in basepath if e.isalnum())
+                logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
+                basepath_mapping = ApiGatewayBasePathMappingV2(
+                    logical_id, attributes=self.passthrough_resource_attributes
+                )
+                basepath_mapping.DomainNameArn = domain_name_arn
+                basepath_mapping.RestApiId = ref(rest_api.logical_id)
+                basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
+                basepath_mapping.BasePath = path if normalize_basepath else basepath
+                basepath_resource_list.extend([basepath_mapping])
+
+        # Create the Route53 RecordSetGroup resource
+        record_set_group = None
+        route53 = self.domain.get("Route53")
+        if route53 is not None:
+            sam_expect(route53, self.logical_id, "Domain.Route53").to_be_a_map()
+            if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
+                )
+
+            logical_id_suffix = LogicalIdGenerator(
+                "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
+            ).gen()
+            logical_id = "RecordSetGroup" + logical_id_suffix
+
+            record_set_group = route53_record_set_groups.get(logical_id)
+
+            if route53.get("SeparateRecordSetGroup"):
+                sam_expect(
+                    route53.get("SeparateRecordSetGroup"), self.logical_id, "Domain.Route53.SeparateRecordSetGroup"
+                ).to_be_a_bool()
+                return ApiDomainResponseV2(
+                    domain,
+                    basepath_resource_list,
+                    self._construct_single_record_set_group(self.domain, domain_name, route53),
+                )
+
+            if not record_set_group:
+                record_set_group = self._get_record_set_group(logical_id, route53)
+                route53_record_set_groups[logical_id] = record_set_group
+
+            record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, domain_name, route53)
+
+        return ApiDomainResponseV2(domain, basepath_resource_list, record_set_group)
+
+    def _get_basepaths(self) -> Optional[List[str]]:
+        if self.domain is None:
+            return None
+        basepath_value = self.domain.get("BasePath")
+        if self.domain.get("BasePath") and isinstance(basepath_value, str):
+            return [basepath_value]
+        if self.domain.get("BasePath") and isinstance(basepath_value, list):
+            return cast(Optional[List[Any]], basepath_value)
+        return None
+
+    def _set_optional_domain_properties(self, domain: Union[ApiGatewayDomainName, ApiGatewayDomainNameV2]) -> None:
+        if self.domain is None:
+            return
+        if self.domain.get("SecurityPolicy", None):
+            domain.SecurityPolicy = self.domain["SecurityPolicy"]
+        if self.domain.get("Policy", None):
+            domain.Policy = self.domain["Policy"]
+        if self.domain.get("OwnershipVerificationCertificateArn", None):
+            domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
+
+    def _get_record_set_group(self, logical_id: str, route53: Dict[str, Any]) -> Route53RecordSetGroup:
+        record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
+        if "HostedZoneId" in route53:
+            record_set_group.HostedZoneId = route53.get("HostedZoneId")
+        if "HostedZoneName" in route53:
+            record_set_group.HostedZoneName = route53.get("HostedZoneName")
+        record_set_group.RecordSets = []
+        return record_set_group
 
     def _construct_single_record_set_group(
         self, domain: Dict[str, Any], api_domain_name: str, route53: Any
@@ -667,6 +786,40 @@ class ApiGenerator:
             alias_target["DNSName"] = route53.get("DistributionDomainName")
         return alias_target
 
+    def _create_basepath_mapping(
+        self,
+        api_domain_name: PassThrough,
+        rest_api: ApiGatewayRestApi,
+        logical_id: Optional[str],
+        basepath: Optional[str],
+    ) -> ApiGatewayBasePathMapping:
+
+        basepath_mapping: ApiGatewayBasePathMapping
+        basepath_mapping = (
+            ApiGatewayBasePathMapping(logical_id, attributes=self.passthrough_resource_attributes)
+            if logical_id
+            else ApiGatewayBasePathMapping(
+                self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
+            )
+        )
+        basepath_mapping.DomainName = ref(api_domain_name)
+        basepath_mapping.RestApiId = ref(rest_api.logical_id)
+        basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
+        if basepath is not None:
+            basepath_mapping.BasePath = basepath
+        return basepath_mapping
+
+    def _create_basepath_mapping_v2(
+        self, domain_name_arn: PassThrough, rest_api: ApiGatewayRestApi
+    ) -> ApiGatewayBasePathMappingV2:
+        basepath_mapping = ApiGatewayBasePathMappingV2(
+            self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
+        )
+        basepath_mapping.DomainNameArn = domain_name_arn
+        basepath_mapping.RestApiId = ref(rest_api.logical_id)
+        basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
+        return basepath_mapping
+
     @cw_timer(prefix="Generator", name="Api")
     def to_cloudformation(
         self, redeploy_restapi_parameters: Optional[Any], route53_record_set_groups: Dict[str, Route53RecordSetGroup]
@@ -676,10 +829,19 @@ class ApiGenerator:
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
         :rtype: tuple
         """
+        api_domain_response: Union[ApiDomainResponseV2, ApiDomainResponse]
+        domain: Union[Resource, None]
+        basepath_mapping: Union[List[ApiGatewayBasePathMapping], List[ApiGatewayBasePathMappingV2], None]
         rest_api = self._construct_rest_api()
-        api_domain_response = self._construct_api_domain(rest_api, route53_record_set_groups)
+        api_domain_response = (
+            self._construct_api_domain_v2(rest_api, route53_record_set_groups)
+            if isinstance(self.domain, dict) and self.domain.get("EndpointConfiguration") == "PRIVATE"
+            else self._construct_api_domain(rest_api, route53_record_set_groups)
+        )
+
         domain = api_domain_response.domain
         basepath_mapping = api_domain_response.apigw_basepath_mapping_list
+
         route53_recordsetGroup = api_domain_response.recordset_group
 
         deployment = self._construct_deployment(rest_api)
@@ -703,6 +865,7 @@ class ApiGenerator:
                 Tuple[Resource],
                 List[LambdaPermission],
                 List[ApiGatewayBasePathMapping],
+                List[ApiGatewayBasePathMappingV2],
             ],
         ] = []
 
