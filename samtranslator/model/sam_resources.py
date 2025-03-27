@@ -1010,7 +1010,7 @@ class SamFunction(SamResourceMacro):
         if not re.match(ALIAS_REGEX, name):
             raise InvalidResourceException(
                 self.logical_id,
-                f"Alias name ('{name}') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)",
+                f"AutoPublishAlias name ('{name}') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
             )
 
         # Strip hyphens and underscores from the alias name for the logical ID

@@ -805,19 +805,19 @@ class TestVersionsAndAliases(TestCase):
             (None, "Resource with id [foo] is invalid. Alias name is required to create an alias"),
             (
                 "123",
-                "Resource with id [foo] is invalid. Alias name ('123') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)",
+                "Resource with id [foo] is invalid. AutoPublishAlias name ('123') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
             ),
             (
                 "name with space",
-                "Resource with id [foo] is invalid. Alias name ('name with space') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)",
+                "Resource with id [foo] is invalid. AutoPublishAlias name ('name with space') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
             ),
             (
                 "alias@name",
-                "Resource with id [foo] is invalid. Alias name ('alias@name') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)",
+                "Resource with id [foo] is invalid. AutoPublishAlias name ('alias@name') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
             ),
             (
                 "alias/name",
-                "Resource with id [foo] is invalid. Alias name ('alias/name') does not match pattern (?!^[0-9]+$)([a-zA-Z0-9-_]+)",
+                "Resource with id [foo] is invalid. AutoPublishAlias name ('alias/name') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
             ),
         ]
     )
