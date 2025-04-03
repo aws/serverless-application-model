@@ -147,3 +147,4 @@ ignore_checks:
   - E3001 # Invalid or unsupported Type; common in transform tests since they focus on SAM resources
   - W2001 # Parameter not used
   - E3006 # Resource type check; we have some Foo Bar resources
+  - W3037 # Ignore cfn-lint check for non existing IAM permissions

@@ -1,0 +1,166 @@
+{
+  "Outputs": {
+    "ApiDomainName": {
+      "Description": "Custom Domain Name for the API",
+      "Value": {
+        "Ref": "ApiGatewayDomainNameV27c603ed871"
+      }
+    },
+    "ApiEndpoint": {
+      "Description": "API Gateway endpoint URL",
+      "Value": {
+        "Fn::Sub": "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+      }
+    }
+  },
+  "Parameters": {
+    "CertificateArn": {
+      "Default": "another-api-arn",
+      "Description": "ARN of the ACM certificate for the domain",
+      "Type": "String"
+    },
+    "DomainName": {
+      "Default": "private.example.com",
+      "Description": "Custom domain name for the API",
+      "Type": "String"
+    },
+    "VpcEndpointId": {
+      "Default": "vpce-abcd1234efg",
+      "Description": "VPC Endpoint ID for private API access",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "ApiGatewayDomainNameV27c603ed871": {
+      "Properties": {
+        "CertificateArn": "another-api-arn",
+        "DomainName": "private.example.com",
+        "EndpointConfiguration": {
+          "Types": [
+            "PRIVATE"
+          ]
+        },
+        "Policy": {
+          "Statement": [
+            {
+              "Action": "execute-api:Invoke",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Resource": "execute-api:/*"
+            },
+            {
+              "Action": "execute-api:Invoke",
+              "Condition": {
+                "StringNotEquals": {
+                  "aws:SourceVpce": "vpce-abcd1234efg"
+                }
+              },
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": "execute-api:/*"
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::ApiGateway::DomainNameV2"
+    },
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {},
+          "swagger": "2.0",
+          "x-amazon-apigateway-policy": {
+            "Statement": [
+              {
+                "Action": "execute-api:Invoke",
+                "Effect": "Allow",
+                "Principal": "*",
+                "Resource": "execute-api:/*"
+              },
+              {
+                "Action": "execute-api:Invoke",
+                "Condition": {
+                  "StringNotEquals": {
+                    "aws:SourceVpce": "vpce-abcd1234efg"
+                  }
+                },
+                "Effect": "Deny",
+                "Principal": "*",
+                "Resource": "execute-api:/*"
+              }
+            ],
+            "Version": "2012-10-17"
+          }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiBasePathMapping": {
+      "Properties": {
+        "BasePath": "",
+        "DomainNameArn": {
+          "Ref": "ApiGatewayDomainNameV27c603ed871"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiprodStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMappingV2"
+    },
+    "MyApiDeploymente37f6c9943": {
+      "Properties": {
+        "Description": "RestApi deployment id: e37f6c9943b5e1213efecf302864c9e775fcf695",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApipostBasePathMapping": {
+      "Properties": {
+        "BasePath": "post",
+        "DomainNameArn": {
+          "Ref": "ApiGatewayDomainNameV27c603ed871"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiprodStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMappingV2"
+    },
+    "MyApiprodStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeploymente37f6c9943"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    }
+  }
+}
