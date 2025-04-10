@@ -220,7 +220,7 @@ class ApiGenerator:
         api_key_source_type: Optional[Intrinsicable[str]] = None,
         always_deploy: Optional[bool] = False,
         feature_toggle: Optional[FeatureToggle] = None,
-        policy: Optional[Dict[str, Any] | Intrinsicable[str]] = None,
+        policy: Optional[Union[Dict[str, Any], Intrinsicable[str]]] = None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
