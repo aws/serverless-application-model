@@ -1,0 +1,170 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Sample SAM Template for a simple serverless application",
+  "Parameters": {
+    "CertificateArn": {
+      "Default": "arn:aws:acm:us-east-1:123456789012:certificate/4ba8fce1-abcd-4717-9c34-11bfd24372ba",
+      "Type": "String"
+    },
+    "DomainName": {
+      "Default": "sam.apigateway.com",
+      "Type": "String"
+    },
+    "HostedZoneId": {
+      "Default": "Z012334",
+      "Type": "String"
+    },
+    "VpcEndpointId": {
+      "Default": "vpce-123123123123123",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "ApiGatewayDomainNameV2f6d6317296": {
+      "Properties": {
+        "CertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/4ba8fce1-abcd-4717-9c34-11bfd24372ba",
+        "DomainName": "sam.apigateway.com",
+        "EndpointConfiguration": {
+          "Types": [
+            "PRIVATE"
+          ]
+        },
+        "Policy": {
+          "Statement": [
+            {
+              "Action": "execute-api:Invoke",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Resource": "execute-api:/*"
+            },
+            {
+              "Action": "execute-api:Invoke",
+              "Condition": {
+                "StringNotEquals": {
+                  "aws:SourceVpce": "vpce-123123123123123"
+                }
+              },
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": "execute-api:/*"
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::ApiGateway::DomainNameV2"
+    },
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {}
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "PRIVATE"
+          ],
+          "VpcEndpointIds": [
+            {
+              "Ref": "VpcEndpointId"
+            }
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "PRIVATE"
+        },
+        "Policy": {
+          "Statement": [
+            {
+              "Action": "execute-api:Invoke",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Resource": "execute-api:/*"
+            },
+            {
+              "Action": "execute-api:Invoke",
+              "Condition": {
+                "StringNotEquals": {
+                  "aws:SourceVpce": {
+                    "Ref": "VpcEndpointId"
+                  }
+                }
+              },
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": "execute-api:/*"
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiDeployment3693c4e775": {
+      "Properties": {
+        "Description": "RestApi deployment id: 3693c4e775ecebd2f6db26dea5689d6f8ace2ed6",
+        "RestApiId": {
+          "Ref": "MyApi"
+        }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment3693c4e775"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyApigetBasePathMapping": {
+      "Properties": {
+        "BasePath": "get",
+        "DomainNameArn": {
+          "Ref": "ApiGatewayDomainNameV2f6d6317296"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMappingV2"
+    },
+    "RecordSetGroup486a9be065": {
+      "Properties": {
+        "HostedZoneId": "HostedZoneId",
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "DNSName": "VPCEndpointDomainName",
+              "HostedZoneId": "VPCEndpointHostedZoneId"
+            },
+            "Name": "sam.apigateway.com",
+            "Type": "A"
+          },
+          {
+            "AliasTarget": {
+              "DNSName": "VPCEndpointDomainName",
+              "HostedZoneId": "VPCEndpointHostedZoneId"
+            },
+            "Name": "sam.apigateway.com",
+            "Type": "AAAA"
+          }
+        ]
+      },
+      "Type": "AWS::Route53::RecordSetGroup"
+    }
+  }
+}
