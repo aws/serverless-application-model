@@ -54,7 +54,7 @@
       },
       "Type": "AWS::ApiGateway::DomainNameV2"
     },
-    "DomainNameAccessAssociation136aec2782": {
+    "DomainNameAccessAssociation73b399e17c": {
       "Properties": {
         "AccessAssociationSource": "vpce-123123123123123",
         "AccessAssociationSourceType": "VPCE",

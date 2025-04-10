@@ -669,7 +669,7 @@ class ApiGenerator:
         domain_access_association_resource = None
         if domain_access_association is not None:
             domain_access_association_resource = self._generate_domain_access_association(
-                domain_access_association, domain_name_arn
+                domain_access_association, domain_name_arn, api_domain_name
             )
 
         # Create the Route53 RecordSetGroup resource
@@ -1542,13 +1542,16 @@ class ApiGenerator:
             rest_api.Parameters = {"endpointConfigurationTypes": value}
 
     def _generate_domain_access_association(
-        self, domain_access_association: Dict[str, Any], domain_name_arn: Dict[str, str]
+        self,
+        domain_access_association: Dict[str, Any],
+        domain_name_arn: Dict[str, str],
+        domain_logical_id: str,
     ) -> ApiGatewayDomainNameAccessAssociation:
         """
         Generate domain access association resource
         """
         vpcEndpointId = domain_access_association.get("VpcEndpointId")
-        logical_id = LogicalIdGenerator("DomainNameAccessAssociation", [vpcEndpointId]).gen()
+        logical_id = LogicalIdGenerator("DomainNameAccessAssociation", [vpcEndpointId, domain_logical_id]).gen()
 
         domain_access_association_resource = ApiGatewayDomainNameAccessAssociation(
             logical_id, attributes=self.passthrough_resource_attributes
