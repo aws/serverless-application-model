@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sample SAM Template for a simple serverless application
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: sam.apigateway.com
+  CertificateArn:
+    Type: String
+    Default: arn:aws:acm:us-east-1:123456789012:certificate/4ba8fce1-abcd-4717-9c34-11bfd24372ba
+  HostedZoneId:
+    Type: String
+    Default: Z012334
+  VpcEndpointId:
+    Type: String
+    Default: vpce-123123123123123
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Policy:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal: '*'
+          Action: execute-api:Invoke
+          Resource: execute-api:/*
+        - Effect: Deny
+          Principal: '*'
+          Action: execute-api:Invoke
+          Resource: execute-api:/*
+          Condition:
+            StringNotEquals:
+              aws:SourceVpce: !Ref VpcEndpointId
+      OpenApiVersion: 3.0.1
+      StageName: Prod
+      EndpointConfiguration:
+        Type: PRIVATE
+        VPCEndpointIds:
+        - !Ref VpcEndpointId
+
+      Domain:
+        DomainName: !Ref DomainName
+        CertificateArn: !Ref CertificateArn
+        EndpointConfiguration: PRIVATE
+        BasePath:
+        - /get
+        Route53:
+          HostedZoneId: HostedZoneId
+          VpcEndpointDomainName: VPCEndpointDomainName
+          VpcEndpointHostedZoneId: VPCEndpointHostedZoneId
+          IpV6: true
