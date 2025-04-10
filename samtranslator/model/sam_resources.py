@@ -1,4 +1,4 @@
-""" SAM macro definitions """
+﻿""" SAM macro definitions """
 
 import copy
 from contextlib import suppress
@@ -1275,6 +1275,7 @@ class SamApi(SamResourceMacro):
         "DisableExecuteApiEndpoint": PropertyType(False, IS_BOOL),
         "ApiKeySourceType": PropertyType(False, IS_STR),
         "AlwaysDeploy": Property(False, IS_BOOL),
+        "Policy": PropertyType(False, one_of(IS_STR, IS_DICT)),
     }
 
     Name: Optional[Intrinsicable[str]]
@@ -1306,6 +1307,7 @@ class SamApi(SamResourceMacro):
     DisableExecuteApiEndpoint: Optional[Intrinsicable[bool]]
     ApiKeySourceType: Optional[Intrinsicable[str]]
     AlwaysDeploy: Optional[bool]
+    Policy: Optional[Dict[str, Any] | Intrinsicable[str]]
 
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
@@ -1373,6 +1375,7 @@ class SamApi(SamResourceMacro):
             api_key_source_type=self.ApiKeySourceType,
             always_deploy=self.AlwaysDeploy,
             feature_toggle=feature_toggle,
+            policy=self.Policy,
         )
 
         generated_resources = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
