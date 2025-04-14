@@ -13,6 +13,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayBasePathMappingV2,
     ApiGatewayDeployment,
     ApiGatewayDomainName,
+    ApiGatewayDomainNameAccessAssociation,
     ApiGatewayDomainNameV2,
     ApiGatewayResponse,
     ApiGatewayRestApi,
@@ -86,6 +87,7 @@ class ApiDomainResponseV2:
     domain: Optional[ApiGatewayDomainNameV2]
     apigw_basepath_mapping_list: Optional[List[ApiGatewayBasePathMappingV2]]
     recordset_group: Any
+    domain_access_association: Any
 
 
 class SharedApiUsagePlan:
@@ -218,6 +220,7 @@ class ApiGenerator:
         api_key_source_type: Optional[Intrinsicable[str]] = None,
         always_deploy: Optional[bool] = False,
         feature_toggle: Optional[FeatureToggle] = None,
+        policy: Optional[Union[Dict[str, Any], Intrinsicable[str]]] = None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -275,6 +278,7 @@ class ApiGenerator:
         self.api_key_source_type = api_key_source_type
         self.always_deploy = always_deploy
         self.feature_toggle = feature_toggle
+        self.policy = policy
 
     def _construct_rest_api(self) -> ApiGatewayRestApi:
         """Constructs and returns the ApiGateway RestApi.
@@ -327,6 +331,9 @@ class ApiGenerator:
 
         if self.api_key_source_type:
             rest_api.ApiKeySourceType = self.api_key_source_type
+
+        if self.policy:
+            rest_api.Policy = self.policy
 
         return rest_api
 
@@ -602,7 +609,7 @@ class ApiGenerator:
         Constructs and returns the ApiGateway Domain V2 and BasepathMapping V2
         """
         if self.domain is None:
-            return ApiDomainResponseV2(None, None, None)
+            return ApiDomainResponseV2(None, None, None, None)
 
         sam_expect(self.domain, self.logical_id, "Domain").to_be_a_map()
         domain_name: PassThrough = sam_expect(
@@ -657,6 +664,14 @@ class ApiGenerator:
                 basepath_mapping.BasePath = path if normalize_basepath else basepath
                 basepath_resource_list.extend([basepath_mapping])
 
+        # Create the DomainNameAccessAssociation
+        domain_access_association = self.domain.get("AccessAssociation")
+        domain_access_association_resource = None
+        if domain_access_association is not None:
+            domain_access_association_resource = self._generate_domain_access_association(
+                domain_access_association, domain_name_arn, api_domain_name
+            )
+
         # Create the Route53 RecordSetGroup resource
         record_set_group = None
         route53 = self.domain.get("Route53")
@@ -683,6 +698,7 @@ class ApiGenerator:
                     domain,
                     basepath_resource_list,
                     self._construct_single_record_set_group(self.domain, domain_name, route53),
+                    domain_access_association_resource,
                 )
 
             if not record_set_group:
@@ -691,7 +707,7 @@ class ApiGenerator:
 
             record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, domain_name, route53)
 
-        return ApiDomainResponseV2(domain, basepath_resource_list, record_set_group)
+        return ApiDomainResponseV2(domain, basepath_resource_list, record_set_group, domain_access_association_resource)
 
     def _get_basepaths(self) -> Optional[List[str]]:
         if self.domain is None:
@@ -779,11 +795,14 @@ class ApiGenerator:
         if domain.get("EndpointConfiguration") == "REGIONAL":
             alias_target["HostedZoneId"] = fnGetAtt(api_domain_name, "RegionalHostedZoneId")
             alias_target["DNSName"] = fnGetAtt(api_domain_name, "RegionalDomainName")
-        else:
+        elif domain.get("EndpointConfiguration") == "EDGE":
             if route53.get("DistributionDomainName") is None:
                 route53["DistributionDomainName"] = fnGetAtt(api_domain_name, "DistributionDomainName")
             alias_target["HostedZoneId"] = "Z2FDTNDATAQYW2"
             alias_target["DNSName"] = route53.get("DistributionDomainName")
+        else:
+            alias_target["HostedZoneId"] = route53.get("VpcEndpointHostedZoneId")
+            alias_target["DNSName"] = route53.get("VpcEndpointDomainName")
         return alias_target
 
     def _create_basepath_mapping(
@@ -833,11 +852,16 @@ class ApiGenerator:
         domain: Union[Resource, None]
         basepath_mapping: Union[List[ApiGatewayBasePathMapping], List[ApiGatewayBasePathMappingV2], None]
         rest_api = self._construct_rest_api()
+        is_private_domain = isinstance(self.domain, dict) and self.domain.get("EndpointConfiguration") == "PRIVATE"
         api_domain_response = (
             self._construct_api_domain_v2(rest_api, route53_record_set_groups)
-            if isinstance(self.domain, dict) and self.domain.get("EndpointConfiguration") == "PRIVATE"
+            if is_private_domain
             else self._construct_api_domain(rest_api, route53_record_set_groups)
         )
+
+        domain_access_association = None
+        if is_private_domain:
+            domain_access_association = cast(ApiDomainResponseV2, api_domain_response).domain_access_association
 
         domain = api_domain_response.domain
         basepath_mapping = api_domain_response.apigw_basepath_mapping_list
@@ -881,6 +905,9 @@ class ApiGenerator:
                 usage_plan,
             ]
         )
+
+        if domain_access_association is not None:
+            generated_resources.append(domain_access_association)
 
         # Make a list of single resources
         generated_resources_list: List[Resource] = []
@@ -1513,3 +1540,24 @@ class ApiGenerator:
         else:
             rest_api.EndpointConfiguration = {"Types": [value]}
             rest_api.Parameters = {"endpointConfigurationTypes": value}
+
+    def _generate_domain_access_association(
+        self,
+        domain_access_association: Dict[str, Any],
+        domain_name_arn: Dict[str, str],
+        domain_logical_id: str,
+    ) -> ApiGatewayDomainNameAccessAssociation:
+        """
+        Generate domain access association resource
+        """
+        vpcEndpointId = domain_access_association.get("VpcEndpointId")
+        logical_id = LogicalIdGenerator("DomainNameAccessAssociation", [vpcEndpointId, domain_logical_id]).gen()
+
+        domain_access_association_resource = ApiGatewayDomainNameAccessAssociation(
+            logical_id, attributes=self.passthrough_resource_attributes
+        )
+        domain_access_association_resource.DomainNameArn = domain_name_arn
+        domain_access_association_resource.AccessAssociationSourceType = "VPCE"
+        domain_access_association_resource.AccessAssociationSource = vpcEndpointId
+
+        return domain_access_association_resource
