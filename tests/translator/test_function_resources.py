@@ -765,20 +765,68 @@ class TestVersionsAndAliases(TestCase):
         self.assertNotEqual(version1.logical_id, version_snapstart.logical_id)
         self.assertEqual(version1.logical_id, version_snapstart_none.logical_id)
 
-    def test_alias_creation(self):
-        name = "aliasname"
+    @parameterized.expand(
+        [
+            # Valid cases
+            # Expect logical id should be {fn name}{'Alias'}{alphanumerica alias name without `-` or `_`}
+            ("aliasname", "fooAliasaliasname"),
+            ("alias-name", "fooAliasaliasDname"),
+            ("alias_name", "fooAliasaliasUname"),
+            ("alias123", "fooAliasalias123"),
+            ("123alias", "fooAlias123alias"),
+            ("UPPERCASE", "fooAliasUPPERCASE"),
+            ("mixed-Case_123", "fooAliasmixedDCaseU123"),
+            ("a", "fooAliasa"),  # Single character
+            ("1a", "fooAlias1a"),  # Starts with number
+            # Check the placement of dash and underscore
+            ("1-1_1", "fooAlias1D1U1"),
+            ("1_1-1", "fooAlias1U1D1"),
+            ("11-1", "fooAlias11D1"),
+            ("1-11", "fooAlias1D11"),
+            ("11_1", "fooAlias11U1"),
+            ("1_11", "fooAlias1U11"),
+            ("1-1-1", "fooAlias1D1D1"),
+            ("-1-1-1-", "fooAliasD1D1D1D"),
+            ("_1_1-1-", "fooAliasU1U1D1D"),
+        ]
+    )
+    def test_alias_creation(self, alias_name, expected_logical_id):
+        alias = self.sam_func._construct_alias(alias_name, self.lambda_func, self.lambda_version)
 
-        alias = self.sam_func._construct_alias(name, self.lambda_func, self.lambda_version)
-
-        expected_logical_id = f"{self.lambda_func.logical_id}Alias{name}"
         self.assertEqual(alias.logical_id, expected_logical_id)
-        self.assertEqual(alias.Name, name)
+        self.assertEqual(alias.Name, alias_name)
         self.assertEqual(alias.FunctionName, {"Ref": self.lambda_func.logical_id})
         self.assertEqual(alias.FunctionVersion, {"Fn::GetAtt": [self.lambda_version.logical_id, "Version"]})
 
-    def test_alias_creation_error(self):
-        with self.assertRaises(InvalidResourceException):
-            self.sam_func._construct_alias(None, self.lambda_func, self.lambda_version)
+    @parameterized.expand(
+        [
+            # Invalid cases
+            ("", "Resource with id [foo] is invalid. Alias name is required to create an alias"),
+            (None, "Resource with id [foo] is invalid. Alias name is required to create an alias"),
+            (
+                "123",
+                "Resource with id [foo] is invalid. AutoPublishAlias name ('123') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
+            ),
+            (
+                "name with space",
+                "Resource with id [foo] is invalid. AutoPublishAlias name ('name with space') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
+            ),
+            (
+                "alias@name",
+                "Resource with id [foo] is invalid. AutoPublishAlias name ('alias@name') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
+            ),
+            (
+                "alias/name",
+                "Resource with id [foo] is invalid. AutoPublishAlias name ('alias/name') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
+            ),
+        ]
+    )
+    def test_alias_creation_error(self, alias_name, expected_error_massage):
+        with self.assertRaises(InvalidResourceException) as context:
+            self.sam_func._construct_alias(alias_name, self.lambda_func, self.lambda_version)
+
+        error = context.exception
+        self.assertEqual(str(error.message), expected_error_massage)
 
     def test_get_resolved_alias_name_must_work(self):
         property_name = "something"
