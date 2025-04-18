@@ -1,0 +1,54 @@
+Resources:
+  FunctionAliasNameCamelCase:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      AutoPublishAlias: camelCaseName
+      VersionDescription: sam-testing
+
+  FunctionAliasNameUpperCase:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      AutoPublishAlias: UPPERCASE
+      VersionDescription: sam-testing
+
+  FunctionAliasNameLowerCase:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      AutoPublishAlias: lowercase
+      VersionDescription: sam-testing
+
+  FunctionAliasNameUnderscore:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      AutoPublishAlias: _underscore_name_
+      VersionDescription: sam-testing
+
+  FunctionAliasNameDash:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      AutoPublishAlias: underscore-name
+      VersionDescription: sam-testing
+
+  FunctionAliasNameMix:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      AutoPublishAlias: underScoreNAME_with-dash-01234
+      VersionDescription: sam-testing
