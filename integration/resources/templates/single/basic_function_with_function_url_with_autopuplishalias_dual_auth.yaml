@@ -22,7 +22,7 @@ Resources:
           MaxAge: 10
 Outputs:
   FunctionUrl:
-    Description: "URL of the Lambda function alias"
+    Description: URL of the Lambda function alias
     Value: !GetAtt MyLambdaFunctionUrl.FunctionUrl
 Metadata:
   SamTransformTest: true

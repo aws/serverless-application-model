@@ -21,7 +21,7 @@ Resources:
           MaxAge: 10
 Outputs:
   FunctionUrl:
-    Description: "URL of the Lambda function"
+    Description: URL of the Lambda function
     Value: !GetAtt MyLambdaFunctionUrl.FunctionUrl
 Metadata:
   SamTransformTest: true
