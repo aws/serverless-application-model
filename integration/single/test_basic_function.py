@@ -183,7 +183,7 @@ class TestBasicFunction(BaseTest):
 
         # Get the template to check for InvokedViaFunctionUrl property
         cfn_client = self.client_provider.cfn_client
-        template = cfn_client.get_template(StackName=self.stack_name)
+        template = cfn_client.get_template(StackName=self.stack_name, TemplateStage="Processed")
         template_body = template["TemplateBody"]
 
         # Check if the InvokePermission has InvokedViaFunctionUrl: True
