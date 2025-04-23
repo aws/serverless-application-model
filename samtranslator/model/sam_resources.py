@@ -321,7 +321,7 @@ class SamFunction(SamResourceMacro):
             lambda_url = self._construct_function_url(lambda_function, lambda_alias, self.FunctionUrlConfig)
             resources.append(lambda_url)
             url_permission = self._construct_url_permission(lambda_function, lambda_alias, self.FunctionUrlConfig)
-            invoke_dual_auth_permission = self._construct_invoke_dual_auth_permission(
+            invoke_dual_auth_permission = self._construct_invoke_permission(
                 lambda_function, lambda_alias, self.FunctionUrlConfig
             )
             if url_permission and invoke_dual_auth_permission:
@@ -1231,6 +1231,10 @@ class SamFunction(SamResourceMacro):
         lambda_alias : LambdaAlias
             Lambda Alias resource
 
+
+        function_url_config: Dict
+            Function url config used to create FURL
+
         Returns
         -------
         LambdaPermission
@@ -1252,7 +1256,7 @@ class SamFunction(SamResourceMacro):
         lambda_permission.FunctionUrlAuthType = auth_type
         return lambda_permission
 
-    def _construct_invoke_dual_auth_permission(
+    def _construct_invoke_permission(
         self, lambda_function: LambdaFunction, lambda_alias: Optional[LambdaAlias], function_url_config: Dict[str, Any]
     ) -> Optional[LambdaPermission]:
         """
@@ -1266,6 +1270,9 @@ class SamFunction(SamResourceMacro):
 
         lambda_alias : LambdaAlias
             Lambda Alias resource
+
+        function_url_config: Dict
+            Function url config used to create FURL
 
         Returns
         -------
