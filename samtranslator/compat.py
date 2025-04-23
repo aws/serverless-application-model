@@ -7,9 +7,9 @@ try:
 except ImportError:
     # Unfortunately mypy cannot handle this try/expect pattern, and "type: ignore"
     # is the simplest work-around. See: https://github.com/python/mypy/issues/1153
-    import pydantic   # type: ignore
+    import pydantic  # type: ignore
 except AttributeError:
     # Pydantic v1.10.17+
-    import pydantic   # type: ignore
+    import pydantic  # type: ignore
 
 __all__ = ["pydantic"]
