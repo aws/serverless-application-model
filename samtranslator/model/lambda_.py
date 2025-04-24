@@ -139,6 +139,7 @@ class LambdaPermission(Resource):
         "SourceArn": GeneratedProperty(),
         "EventSourceToken": GeneratedProperty(),
         "FunctionUrlAuthType": GeneratedProperty(),
+        "InvokedViaFunctionUrl": GeneratedProperty(),
     }
 
 
