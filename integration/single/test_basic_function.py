@@ -130,6 +130,73 @@ class TestBasicFunction(BaseTest):
         self.assertEqual(function_url_config["Cors"], cors_config)
         self._assert_invoke(lambda_client, function_name, qualifier, 200)
 
+    @parameterized.expand(
+        [
+            ("single/basic_function_with_function_url_dual_auth", None),
+            ("single/basic_function_with_function_url_with_autopuplishalias_dual_auth", "live"),
+        ]
+    )
+    @skipIf(current_region_does_not_support([LAMBDA_URL]), "Lambda Url is not supported in this testing region")
+    def test_basic_function_with_url_dual_auth(self, file_name, qualifier):
+        """
+        Creates a basic lambda function with Function Url with authtype: None
+        Verifies that 2 AWS::Lambda::Permission resources are created:
+        - lambda:InvokeFunctionUrl
+        - lambda:InvokeFunction with InvokedViaFunctionUrl: True
+        """
+        self.create_and_verify_stack(file_name)
+
+        # Get Lambda permissions
+        lambda_permissions = self.get_stack_resources("AWS::Lambda::Permission")
+
+        # Verify we have exactly 2 permissions
+        self.assertEqual(len(lambda_permissions), 2, "Expected exactly 2 Lambda permissions")
+
+        # Check for the expected permission logical IDs
+        invoke_function_url_permission = None
+        invoke_permission = None
+
+        for permission in lambda_permissions:
+            logical_id = permission["LogicalResourceId"]
+            if "MyLambdaFunctionUrlPublicPermissions" in logical_id:
+                invoke_function_url_permission = permission
+            elif "MyLambdaFunctionURLInvokeAllowPublicAccess" in logical_id:
+                invoke_permission = permission
+
+        # Verify both permissions exist
+        self.assertIsNotNone(invoke_function_url_permission, "Expected MyLambdaFunctionUrlPublicPermissions to exist")
+        self.assertIsNotNone(invoke_permission, "Expected MyLambdaFunctionURLInvokeAllowPublicAccess to exist")
+
+        # Get the function name and URL
+        function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
+        lambda_client = self.client_provider.lambda_client
+
+        # Get the function URL configuration to verify auth type
+        function_url_config = (
+            lambda_client.get_function_url_config(FunctionName=function_name, Qualifier=qualifier)
+            if qualifier
+            else lambda_client.get_function_url_config(FunctionName=function_name)
+        )
+
+        # Verify the auth type is NONE
+        self.assertEqual(function_url_config["AuthType"], "NONE", "Expected AuthType to be NONE")
+
+        # Get the template to check for InvokedViaFunctionUrl property
+        cfn_client = self.client_provider.cfn_client
+        template = cfn_client.get_template(StackName=self.stack_name, TemplateStage="Processed")
+        template_body = template["TemplateBody"]
+
+        # Check if the InvokePermission has InvokedViaFunctionUrl: True
+        # This is a bit hacky but we don't have direct access to the resource properties
+        # We're checking if the string representation of the template contains this property
+        template_str = str(template_body)
+        self.assertIn("InvokedViaFunctionUrl", template_str, "Expected InvokedViaFunctionUrl property in the template")
+
+        # Get the function URL from stack outputs
+        function_url = self.get_stack_output("FunctionUrl")["OutputValue"]
+        # Invoke the function URL and verify the response
+        self._verify_get_request(function_url, self.FUNCTION_OUTPUT)
+
     @skipIf(current_region_does_not_support([CODE_DEPLOY]), "CodeDeploy is not supported in this testing region")
     def test_function_with_deployment_preference_alarms_intrinsic_if(self):
         self.create_and_verify_stack("single/function_with_deployment_preference_alarms_intrinsic_if")

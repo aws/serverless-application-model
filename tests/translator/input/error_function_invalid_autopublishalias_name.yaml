@@ -1,0 +1,9 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      # Using an invalid alias name with special characters that can't be properly transformed
+      AutoPublishAlias: invalid*alias@name

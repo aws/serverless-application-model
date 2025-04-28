@@ -1,6 +1,7 @@
-""" SAM macro definitions """
+﻿""" SAM macro definitions """
 
 import copy
+import re
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, cast
 
@@ -238,7 +239,6 @@ class SamFunction(SamResourceMacro):
 
     # DeadLetterQueue
     dead_letter_queue_policy_actions = {"SQS": "sqs:SendMessage", "SNS": "sns:Publish"}
-    #
 
     # Conditions
     conditions: Dict[str, Any] = {}  # TODO: Replace `Any` with something more specific
@@ -321,18 +321,21 @@ class SamFunction(SamResourceMacro):
             lambda_url = self._construct_function_url(lambda_function, lambda_alias, self.FunctionUrlConfig)
             resources.append(lambda_url)
             url_permission = self._construct_url_permission(lambda_function, lambda_alias, self.FunctionUrlConfig)
-            if url_permission:
+            invoke_dual_auth_permission = self._construct_invoke_permission(
+                lambda_function, lambda_alias, self.FunctionUrlConfig
+            )
+            if url_permission and invoke_dual_auth_permission:
                 resources.append(url_permission)
+                resources.append(invoke_dual_auth_permission)
 
         self._validate_deployment_preference_and_add_update_policy(
-            kwargs.get("deployment_preference_collection", None),
+            kwargs.get("deployment_preference_collection"),
             lambda_alias,
             intrinsics_resolver,
             cast(IntrinsicsResolver, mappings_resolver),  # TODO: better handle mappings_resolver's Optional
             self.get_passthrough_resource_attributes(),
             feature_toggle,
         )
-
         event_invoke_policies: List[Dict[str, Any]] = []
         if self.EventInvokeConfig:
             function_name = lambda_function.logical_id
@@ -1002,7 +1005,22 @@ class SamFunction(SamResourceMacro):
         if not name:
             raise InvalidResourceException(self.logical_id, "Alias name is required to create an alias")
 
-        logical_id = f"{function.logical_id}Alias{name}"
+        # Validate alias name against the required pattern: (?!^[0-9]+$)([a-zA-Z0-9-_]+)
+        # This ensures the alias name:
+        # 1. Contains only alphanumeric characters, hyphens, and underscores
+        # 2. Is not purely numeric
+        ALIAS_REGEX = r"(?!^[0-9]+$)([a-zA-Z0-9\-_]+)$"
+        if not re.match(ALIAS_REGEX, name):
+            raise InvalidResourceException(
+                self.logical_id,
+                f"AutoPublishAlias name ('{name}') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
+            )
+
+        # Strip hyphens and underscores from the alias name for the logical ID
+        # This ensures the logical ID contains only alphanumeric characters
+        alias_alphanumeric_name = name.replace("-", "D").replace("_", "U")
+
+        logical_id = f"{function.logical_id}Alias{alias_alphanumeric_name}"
         alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())
         alias.Name = name
         alias.FunctionName = function.get_runtime_attr("name")
@@ -1014,7 +1032,7 @@ class SamFunction(SamResourceMacro):
 
     def _validate_deployment_preference_and_add_update_policy(  # noqa: PLR0913
         self,
-        deployment_preference_collection: DeploymentPreferenceCollection,
+        deployment_preference_collection: Optional[DeploymentPreferenceCollection],
         lambda_alias: Optional[LambdaAlias],
         intrinsics_resolver: IntrinsicsResolver,
         mappings_resolver: IntrinsicsResolver,
@@ -1210,8 +1228,12 @@ class SamFunction(SamResourceMacro):
         lambda_function : LambdaUrl
             Lambda Function resource
 
-        llambda_alias : LambdaAlias
+        lambda_alias : LambdaAlias
             Lambda Alias resource
+
+
+        function_url_config: Dict
+            Function url config used to create FURL
 
         Returns
         -------
@@ -1233,6 +1255,47 @@ class SamFunction(SamResourceMacro):
         lambda_permission.Principal = "*"
         lambda_permission.FunctionUrlAuthType = auth_type
         return lambda_permission
+
+    def _construct_invoke_permission(
+        self, lambda_function: LambdaFunction, lambda_alias: Optional[LambdaAlias], function_url_config: Dict[str, Any]
+    ) -> Optional[LambdaPermission]:
+        """
+        Construct the lambda permission associated with the function invoke resource in a case
+        for public access when AuthType is NONE
+
+        Parameters
+        ----------
+        lambda_function : LambdaUrl
+            Lambda Function resource
+
+        lambda_alias : LambdaAlias
+            Lambda Alias resource
+
+        function_url_config: Dict
+            Function url config used to create FURL
+
+        Returns
+        -------
+        LambdaPermission
+            The lambda permission appended to a function that allow function invoke only from Function URL
+        """
+        # create lambda:InvokeFunction with InvokedViaFunctionUrl=True
+        auth_type = function_url_config.get("AuthType")
+
+        if auth_type not in ["NONE"] or is_intrinsic(function_url_config):
+            return None
+
+        logical_id = f"{lambda_function.logical_id}URLInvokeAllowPublicAccess"
+        lambda_permission_attributes = self.get_passthrough_resource_attributes()
+        lambda_invoke_permission = LambdaPermission(logical_id=logical_id, attributes=lambda_permission_attributes)
+        lambda_invoke_permission.Action = "lambda:InvokeFunction"
+        lambda_invoke_permission.Principal = "*"
+        lambda_invoke_permission.FunctionName = (
+            lambda_alias.get_runtime_attr("arn") if lambda_alias else lambda_function.get_runtime_attr("name")
+        )
+        lambda_invoke_permission.InvokedViaFunctionUrl = True
+
+        return lambda_invoke_permission
 
 
 class SamApi(SamResourceMacro):
@@ -1275,6 +1338,7 @@ class SamApi(SamResourceMacro):
         "DisableExecuteApiEndpoint": PropertyType(False, IS_BOOL),
         "ApiKeySourceType": PropertyType(False, IS_STR),
         "AlwaysDeploy": Property(False, IS_BOOL),
+        "Policy": PropertyType(False, one_of(IS_STR, IS_DICT)),
     }
 
     Name: Optional[Intrinsicable[str]]
@@ -1306,6 +1370,7 @@ class SamApi(SamResourceMacro):
     DisableExecuteApiEndpoint: Optional[Intrinsicable[bool]]
     ApiKeySourceType: Optional[Intrinsicable[str]]
     AlwaysDeploy: Optional[bool]
+    Policy: Optional[Union[Dict[str, Any], Intrinsicable[str]]]
 
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
@@ -1373,6 +1438,7 @@ class SamApi(SamResourceMacro):
             api_key_source_type=self.ApiKeySourceType,
             always_deploy=self.AlwaysDeploy,
             feature_toggle=feature_toggle,
+            policy=self.Policy,
         )
 
         generated_resources = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
