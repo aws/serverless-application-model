@@ -1,6 +1,9 @@
 templates:
   - tests/translator/output/**/*.json
 ignore_templates:
+  - tests/translator/output/**/function_with_function_url_config.json
+  - tests/translator/output/**/function_with_function_url_config_and_autopublishalias.json
+  - tests/translator/output/**/function_with_function_url_config_without_cors_config.json
   - tests/translator/output/**/error_*.json # Fail by design
   - tests/translator/output/**/api_http_paths_with_if_condition.json
   - tests/translator/output/**/api_http_paths_with_if_condition_no_value_else_case.json
@@ -139,7 +142,6 @@ ignore_templates:
   - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
   - tests/translator/output/**/function_with_provisioned_poller_config.json
   - tests/translator/output/**/function_with_metrics_config.json
-  - tests/translator/output/**/api_with_custom_domains_private.json
 
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests

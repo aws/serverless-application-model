@@ -154,6 +154,12 @@ class Route53(BaseModel):
     SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
     Region: Optional[PassThroughProp]  # TODO: add docs
     SeparateRecordSetGroup: Optional[bool]  # TODO: add docs
+    VpcEndpointDomainName: Optional[PassThroughProp]  # TODO: add docs
+    VpcEndpointHostedZoneId: Optional[PassThroughProp]  # TODO: add docs
+
+
+class AccessAssociation(BaseModel):
+    VpcEndpointId: PassThroughProp  # TODO: add docs
 
 
 class Domain(BaseModel):
@@ -185,6 +191,7 @@ class Domain(BaseModel):
         "SecurityPolicy",
         ["AWS::ApiGateway::DomainName", "Properties", "SecurityPolicy"],
     )
+    AccessAssociation: Optional[AccessAssociation]
 
 
 class DefinitionUri(BaseModel):
@@ -307,6 +314,7 @@ class Properties(BaseModel):
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
     StageName: SamIntrinsicable[str] = properties("StageName")
     Tags: Optional[DictStrAny] = properties("Tags")
+    Policy: Optional[PassThroughProp]  # TODO: add docs
     PropagateTags: Optional[bool]  # TODO: add docs
     TracingEnabled: Optional[TracingEnabled] = passthrough_prop(
         PROPERTIES_STEM,

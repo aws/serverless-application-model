@@ -1,0 +1,30 @@
+[
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionVersion",
+    "ResourceType": "AWS::Lambda::Version"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionAliaslive",
+    "ResourceType": "AWS::Lambda::Alias"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionUrlPublicPermissions",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionURLInvokeAllowPublicAccess",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionUrl",
+    "ResourceType": "AWS::Lambda::Url"
+  }
+]
