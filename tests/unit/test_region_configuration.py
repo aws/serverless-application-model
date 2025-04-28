@@ -20,7 +20,7 @@ class TestRegionConfiguration(TestCase):
 
             self.assertTrue(RegionConfiguration.is_apigw_edge_configuration_supported())
 
-    @parameterized.expand([["aws-cn"], ["aws-us-gov"], ["aws-iso"], ["aws-iso-b"], ["aws-iso-e"], ["aws-iso-f"]])
+    @parameterized.expand([["aws-cn"], ["aws-us-gov"], ["aws-iso"], ["aws-iso-b"], ["aws-iso-e"], ["aws-iso-f"], ["aws-eusc"]])
     def test_when_apigw_edge_configuration_is_not_supported(self, partition):
         with patch(
             "samtranslator.translator.arn_generator.ArnGenerator.get_partition_name"
