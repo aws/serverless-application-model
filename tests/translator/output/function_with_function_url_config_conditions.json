@@ -68,18 +68,6 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "MyFunctionURLInvokeAllowPublicAccess": {
-      "Condition": "MyCondition",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "MyFunction"
-        },
-        "InvokedViaFunctionUrl": true,
-        "Principal": "*"
-      },
-      "Type": "AWS::Lambda::Permission"
-    },
     "MyFunctionUrl": {
       "Condition": "MyCondition",
       "Properties": {

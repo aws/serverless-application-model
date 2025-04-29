@@ -583,29 +583,11 @@ class TestFunctionUrlConfig(TestCase):
 
         cfnResources = function.to_cloudformation(**self.kwargs)
         generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaPermission)]
-        self.assertEqual(generatedUrlList.__len__(), 2)
-        for permission in generatedUrlList:
-            self.assertEqual(permission.FunctionName, {"Ref": "foo"})
-            self.assertEqual(permission.Principal, "*")
-            self.assertTrue(permission.Action in ["lambda:InvokeFunctionUrl", "lambda:InvokeFunction"])
-            if permission.Action == "lambda:InvokeFunctionUrl":
-                self.assertEqual(permission.FunctionUrlAuthType, "NONE")
-            if permission.Action == "lambda:InvokeFunction":
-                self.assertEqual(permission.InvokedViaFunctionUrl, True)
-
-    @patch("boto3.session.Session.region_name", "ap-southeast-1")
-    def test_with_aws_iam_function_url_config_with_lambda_permission(self):
-        function = SamFunction("foo")
-        function.CodeUri = "s3://foobar/foo.zip"
-        function.Runtime = "foo"
-        function.Handler = "bar"
-        # When create FURL with AWS_IAM
-        function.FunctionUrlConfig = {"AuthType": "AWS_IAM"}
-
-        cfnResources = function.to_cloudformation(**self.kwargs)
-        generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaPermission)]
-        # Then no permisssion should be auto created
-        self.assertEqual(generatedUrlList.__len__(), 0)
+        self.assertEqual(generatedUrlList.__len__(), 1)
+        self.assertEqual(generatedUrlList[0].Action, "lambda:InvokeFunctionUrl")
+        self.assertEqual(generatedUrlList[0].FunctionName, {"Ref": "foo"})
+        self.assertEqual(generatedUrlList[0].Principal, "*")
+        self.assertEqual(generatedUrlList[0].FunctionUrlAuthType, "NONE")
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_with_invalid_function_url_config_with_authorization_type_value_as_None(self):
