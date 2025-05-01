@@ -73,17 +73,6 @@
       },
       "Type": "AWS::IAM::Role"
     },
-    "MyFunctionURLInvokeAllowPublicAccess": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "MyFunctionAliaslive"
-        },
-        "InvokedViaFunctionUrl": true,
-        "Principal": "*"
-      },
-      "Type": "AWS::Lambda::Permission"
-    },
     "MyFunctionUrl": {
       "Properties": {
         "AuthType": "NONE",
