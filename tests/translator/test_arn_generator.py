@@ -18,6 +18,7 @@ class TestArnGenerator(TestCase):
             ("eu-isoe-west-1", "aws-iso-e"),
             ("US-EAST-1", "aws"),
             ("us-isof-east-1", "aws-iso-f"),
+            ("eusc-de-east-1", "aws-eusc"),
         ]
     )
     def test_get_partition_name(self, region, expected):
