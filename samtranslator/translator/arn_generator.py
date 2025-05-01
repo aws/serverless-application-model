@@ -24,6 +24,7 @@ def _region_to_partition(region: str) -> str:
         "us-gov": "aws-us-gov",
         "eu-isoe": "aws-iso-e",
         "us-isof": "aws-iso-f",
+        "eusc-": "aws-eusc",
     }
     for key, value in region_to_partition_map.items():
         if region_string.startswith(key):

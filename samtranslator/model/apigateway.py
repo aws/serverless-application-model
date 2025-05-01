@@ -29,6 +29,7 @@ class ApiGatewayRestApi(Resource):
         "Mode": GeneratedProperty(),
         "ApiKeySourceType": GeneratedProperty(),
         "Tags": GeneratedProperty(),
+        "Policy": GeneratedProperty(),
     }
 
     Body: Optional[Dict[str, Any]]
@@ -44,6 +45,7 @@ class ApiGatewayRestApi(Resource):
     Mode: Optional[PassThrough]
     ApiKeySourceType: Optional[PassThrough]
     Tags: Optional[PassThrough]
+    Policy: Optional[PassThrough]
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
 
@@ -305,6 +307,16 @@ class ApiGatewayApiKey(Resource):
     }
 
     runtime_attrs = {"api_key_id": lambda self: ref(self.logical_id)}
+
+
+class ApiGatewayDomainNameAccessAssociation(Resource):
+    resource_type = "AWS::ApiGateway::DomainNameAccessAssociation"
+    property_types = {
+        "AccessAssociationSource": GeneratedProperty(),
+        "AccessAssociationSourceType": GeneratedProperty(),
+        "DomainNameArn": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+    }
 
 
 class ApiGatewayAuthorizer:
