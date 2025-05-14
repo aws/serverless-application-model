@@ -169,6 +169,34 @@ class RefAction(Action):
 
         return {self.intrinsic_name: resolved_value}
 
+    def resolve_ref_value(self, input_dict: Optional[Any]) -> Optional[Any]:
+        """
+        Handles the AWS::NoValue special case for Ref intrinsic function.
+        All other Ref values are returned as-is for resolution by CloudFormation at runtime.
+
+        :param input_dict: Dictionary containing a Ref intrinsic function.
+            Must be in the format: {"Ref": value} where value is a string.
+            Examples:
+                {"Ref": "AWS::NoValue"}     -> Returns None
+                {"Ref": "MyParameter"}     -> Returns {"Ref": "MyParameter"} unchanged
+                {"Ref": {"Some": "Dict"}}  -> Returns input unchanged (invalid)
+                None                       -> Returns None
+
+        :return: Optional[Any]
+        """
+        if input_dict is None or not self.can_handle(input_dict):
+            return input_dict
+
+        dict_value = input_dict[self.intrinsic_name]
+
+        if not isinstance(dict_value, str):
+            return input_dict
+
+        if dict_value == "AWS::NoValue":
+            return None
+
+        return input_dict
+
 
 class SubAction(Action):
     intrinsic_name = "Fn::Sub"

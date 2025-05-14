@@ -249,3 +249,126 @@ class IntrinsicsResolver:
         """
         # All intrinsic functions are dictionaries with just one key
         return isinstance(_input, dict) and len(_input) == 1 and next(iter(_input.keys())) in self.supported_intrinsics
+
+    def evaluate_condition(self, condition: Any, conditions: Dict[str, bool]) -> bool:
+        """
+        Evaluates a condition using the appropriate Action class.
+
+        :param condition: The condition to evaluate
+        :param conditions: Dictionary of condition names and their values
+        :return: The evaluated boolean result
+        """
+        # Handle direct boolean values
+        if isinstance(condition, bool):
+            return condition
+
+        # Handle string values
+        if isinstance(condition, str):
+            if condition.lower() == "true":
+                return True
+            if condition.lower() == "false":
+                return False
+            if condition in conditions:
+                condition_value = conditions[condition]
+                return self.evaluate_condition(condition_value, conditions)
+            raise InvalidDocumentException(
+                [InvalidTemplateException(f"Condition '{condition}' not found in conditions")]
+            )
+
+        # Handle dictionary-based conditions (intrinsic functions)
+        if isinstance(condition, dict):
+            if len(condition) != 1:
+                raise InvalidDocumentException([InvalidTemplateException(f"Invalid condition structure {condition}")])
+
+            function_type = next(iter(condition.keys()))
+            value = condition[function_type]
+
+            return self._evaluate_function_type(function_type, value, conditions)
+
+        raise InvalidDocumentException([InvalidTemplateException(f"Invalid condition value {condition}")])
+
+    def _evaluate_function_type(self, function_type: str, value: Any, conditions: Dict[str, bool]) -> bool:
+        """Helper method to evaluate different function types."""
+        if function_type == "Fn::Equals":
+            return self._evaluate_equals(value)
+        if function_type == "Fn::And":
+            if not isinstance(value, list):
+                raise InvalidDocumentException(
+                    [InvalidTemplateException(f"Invalid Fn::And value {value}. Fn::And requires a list of conditions")]
+                )
+            return all(self.evaluate_condition(cond, conditions) for cond in value)
+        if function_type == "Fn::Or":
+            if not isinstance(value, list):
+                raise InvalidDocumentException(
+                    [InvalidTemplateException(f"Invalid Fn::Or value {value}. Fn::Or requires a list of conditions")]
+                )
+            return any(self.evaluate_condition(cond, conditions) for cond in value)
+        if function_type == "Fn::Not":
+            if not isinstance(value, list) or len(value) != 1:
+                raise InvalidDocumentException(
+                    [
+                        InvalidTemplateException(
+                            f"Invalid Fn::Not value {value}. Fn::Not requires a list with exactly 1 value"
+                        )
+                    ]
+                )
+            return not self.evaluate_condition(value[0], conditions)
+
+        raise InvalidDocumentException([InvalidTemplateException(f"Invalid condition function {function_type}")])
+
+    def _evaluate_equals(self, equals_values: List[Any]) -> bool:
+        """
+        Evaluates Fn::Equals condition by resolving and comparing its operands.
+
+        :param equals_values: List containing the two values to compare
+        :return: Boolean result of the comparison
+        """
+        _NUM_ARGUMENTS = 2
+        if not isinstance(equals_values, list) or len(equals_values) != _NUM_ARGUMENTS:
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        f"Invalid Fn::Equals value {equals_values}. Fn::Equals requires a list with exactly 2 values"
+                    )
+                ]
+            )
+
+        left_value, right_value = equals_values
+
+        # Resolve left and right values based on theirs types
+        resolved_left = self._resolve_equals_operand(left_value)
+        resolved_right = self._resolve_equals_operand(right_value)
+
+        return bool(resolved_left == resolved_right)
+
+    def _resolve_equals_operand(self, value: Any) -> Any:
+        """
+        Resolves an operand in an Fn::Equals condition based on its type.
+        Specifically handles Ref.
+
+        :param value: The value to resolve
+        :return: The resolved value after processing Ref function
+        """
+        if isinstance(value, dict) and "Ref" in value:
+            return self.supported_intrinsics["Ref"].resolve_parameter_refs(value, self.parameters)
+
+        # For string literals (like "" or AWS::NoValue) or other direct values, return as is
+        return value
+
+    def resolve_ref_value(self, _input: Any) -> Any:
+        """
+        Resolve Ref intrinsic function in the given input object.
+
+        :param _input: Input object to resolve. Expected to be a dictionary with "Ref" key
+            if it contains a reference, e.g., {"Ref": "MyResource"}
+
+        :return: The resolved value if input is a Ref intrinsic function.
+                Returns original input if Input is an intrinsic function other than "Ref"
+        """
+        if not self._is_intrinsic_dict(_input):
+            return _input
+
+        function_type = next(iter(_input.keys()))
+        if function_type != "Ref":
+            return _input
+        return self.supported_intrinsics[function_type].resolve_ref_value(_input)
