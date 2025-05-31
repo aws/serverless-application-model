@@ -1,0 +1,11 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolTier: PLUS
+      UserPoolName: MyUserPool
+      EmailAuthenticationMessage: Your verification code is {####}
+      EmailAuthenticationSubject: Your verification code
+      WebAuthnRelyingPartyID: id
+      WebAuthnUserVerification: required
