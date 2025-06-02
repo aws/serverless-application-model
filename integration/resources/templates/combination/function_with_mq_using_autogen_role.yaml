@@ -84,13 +84,13 @@ Resources:
         Ref: MQBrokerName2
       DeploymentMode: SINGLE_INSTANCE
       EngineType: ACTIVEMQ
-      EngineVersion: 5.17.6
+      EngineVersion: 5.18
       HostInstanceType: mq.t3.micro
       Logs:
         Audit: true
         General: true
       PubliclyAccessible: true
-      AutoMinorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
       SecurityGroups:
       - Ref: MQSecurityGroup
       SubnetIds:
