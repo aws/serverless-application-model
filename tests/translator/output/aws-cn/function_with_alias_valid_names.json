@@ -1,0 +1,472 @@
+{
+  "Resources": {
+    "FunctionAliasNameCamelCase": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameCamelCaseRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.9",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionAliasNameCamelCaseAliascamelCaseName": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FunctionAliasNameCamelCase"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameCamelCaseVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "camelCaseName"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "FunctionAliasNameCamelCaseRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "FunctionAliasNameCamelCaseVersion640128d35d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "FunctionAliasNameCamelCase"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "FunctionAliasNameDash": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameDashRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.9",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionAliasNameDashAliasunderscoreDname": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FunctionAliasNameDash"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameDashVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "underscore-name"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "FunctionAliasNameDashRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "FunctionAliasNameDashVersion640128d35d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "FunctionAliasNameDash"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "FunctionAliasNameLowerCase": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameLowerCaseRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.9",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionAliasNameLowerCaseAliaslowercase": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FunctionAliasNameLowerCase"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameLowerCaseVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "lowercase"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "FunctionAliasNameLowerCaseRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "FunctionAliasNameLowerCaseVersion640128d35d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "FunctionAliasNameLowerCase"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "FunctionAliasNameMix": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameMixRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.9",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionAliasNameMixAliasunderScoreNAMEUwithDdashD01234": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FunctionAliasNameMix"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameMixVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "underScoreNAME_with-dash-01234"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "FunctionAliasNameMixRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "FunctionAliasNameMixVersion640128d35d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "FunctionAliasNameMix"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "FunctionAliasNameUnderscore": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameUnderscoreRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.9",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionAliasNameUnderscoreAliasUunderscoreUnameU": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FunctionAliasNameUnderscore"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameUnderscoreVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "_underscore_name_"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "FunctionAliasNameUnderscoreRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "FunctionAliasNameUnderscoreVersion640128d35d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "FunctionAliasNameUnderscore"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "FunctionAliasNameUpperCase": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameUpperCaseRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.9",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionAliasNameUpperCaseAliasUPPERCASE": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FunctionAliasNameUpperCase"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "FunctionAliasNameUpperCaseVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "UPPERCASE"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "FunctionAliasNameUpperCaseRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "FunctionAliasNameUpperCaseVersion640128d35d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "FunctionAliasNameUpperCase"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    }
+  }
+}

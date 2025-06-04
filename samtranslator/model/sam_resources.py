@@ -1,6 +1,7 @@
 ﻿""" SAM macro definitions """
 
 import copy
+import re
 from contextlib import suppress
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, cast
 
@@ -238,7 +239,6 @@ class SamFunction(SamResourceMacro):
 
     # DeadLetterQueue
     dead_letter_queue_policy_actions = {"SQS": "sqs:SendMessage", "SNS": "sns:Publish"}
-    #
 
     # Conditions
     conditions: Dict[str, Any] = {}  # TODO: Replace `Any` with something more specific
@@ -325,7 +325,7 @@ class SamFunction(SamResourceMacro):
                 resources.append(url_permission)
 
         self._validate_deployment_preference_and_add_update_policy(
-            kwargs.get("deployment_preference_collection", None),
+            kwargs.get("deployment_preference_collection"),
             lambda_alias,
             intrinsics_resolver,
             cast(IntrinsicsResolver, mappings_resolver),  # TODO: better handle mappings_resolver's Optional
@@ -1002,7 +1002,22 @@ class SamFunction(SamResourceMacro):
         if not name:
             raise InvalidResourceException(self.logical_id, "Alias name is required to create an alias")
 
-        logical_id = f"{function.logical_id}Alias{name}"
+        # Validate alias name against the required pattern: (?!^[0-9]+$)([a-zA-Z0-9-_]+)
+        # This ensures the alias name:
+        # 1. Contains only alphanumeric characters, hyphens, and underscores
+        # 2. Is not purely numeric
+        ALIAS_REGEX = r"(?!^[0-9]+$)([a-zA-Z0-9\-_]+)$"
+        if not re.match(ALIAS_REGEX, name):
+            raise InvalidResourceException(
+                self.logical_id,
+                f"AutoPublishAlias name ('{name}') must contain only alphanumeric characters, hyphens, or underscores matching (?!^[0-9]+$)([a-zA-Z0-9-_]+) pattern.",
+            )
+
+        # Strip hyphens and underscores from the alias name for the logical ID
+        # This ensures the logical ID contains only alphanumeric characters
+        alias_alphanumeric_name = name.replace("-", "D").replace("_", "U")
+
+        logical_id = f"{function.logical_id}Alias{alias_alphanumeric_name}"
         alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())
         alias.Name = name
         alias.FunctionName = function.get_runtime_attr("name")
@@ -1014,7 +1029,7 @@ class SamFunction(SamResourceMacro):
 
     def _validate_deployment_preference_and_add_update_policy(  # noqa: PLR0913
         self,
-        deployment_preference_collection: DeploymentPreferenceCollection,
+        deployment_preference_collection: Optional[DeploymentPreferenceCollection],
         lambda_alias: Optional[LambdaAlias],
         intrinsics_resolver: IntrinsicsResolver,
         mappings_resolver: IntrinsicsResolver,
