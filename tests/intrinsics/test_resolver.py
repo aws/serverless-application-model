@@ -119,6 +119,55 @@ class TestParameterReferenceResolution(TestCase):
         self.assertEqual(resolver.resolve_parameter_refs(input), expected)
         resolver._try_resolve_parameter_refs.assert_not_called()
 
+    def test_evaluate_condition_scenarios(self):
+        resolver = IntrinsicsResolver({})
+        conditions = {"Condition1": True, "Condition2": False, "NestedCondition": "Condition1"}
+
+        # Test direct boolean values
+        self.assertTrue(resolver.evaluate_condition(True, conditions))
+        self.assertFalse(resolver.evaluate_condition(False, conditions))
+
+        # Test string literals
+        self.assertTrue(resolver.evaluate_condition("true", conditions))
+        self.assertFalse(resolver.evaluate_condition("false", conditions))
+
+        # Test condition lookups
+        self.assertTrue(resolver.evaluate_condition("Condition1", conditions))
+        self.assertFalse(resolver.evaluate_condition("Condition2", conditions))
+        self.assertTrue(resolver.evaluate_condition("NestedCondition", conditions))
+
+    def test_evaluate_condition_intrinsic_functions(self):
+        resolver = IntrinsicsResolver({})
+        conditions = {"Condition1": True, "Condition2": False}
+
+        # Test Fn::Equals
+        self.assertTrue(resolver.evaluate_condition({"Fn::Equals": ["value1", "value1"]}, conditions))
+
+        # Test Fn::And
+        self.assertFalse(resolver.evaluate_condition({"Fn::And": ["Condition1", "Condition2"]}, conditions))
+
+        # Test Fn::Or
+        self.assertTrue(resolver.evaluate_condition({"Fn::Or": ["Condition1", "Condition2"]}, conditions))
+
+        # Test Fn::Not
+        self.assertFalse(resolver.evaluate_condition({"Fn::Not": ["Condition1"]}, conditions))
+
+    def test_evaluate_condition_error_cases(self):
+        resolver = IntrinsicsResolver({})
+        conditions = {}
+
+        # Test invalid condition name
+        with self.assertRaises(InvalidDocumentException):
+            resolver.evaluate_condition("NonExistentCondition", conditions)
+
+        # Test invalid function
+        with self.assertRaises(InvalidDocumentException):
+            resolver.evaluate_condition({"InvalidFunction": []}, conditions)
+
+        # Test invalid condition structure
+        with self.assertRaises(InvalidDocumentException):
+            resolver.evaluate_condition({"key1": "value1", "key2": "value2"}, conditions)
+
 
 class TestResourceReferenceResolution(TestCase):
     def setUp(self):
@@ -161,6 +210,19 @@ class TestResourceReferenceResolution(TestCase):
 
         self.assertEqual(resolver.resolve_sam_resource_refs(input, {}), expected)
         resolver._try_resolve_sam_resource_refs.assert_not_called()
+
+    def test_resolve_ref_value(self):
+        # Test with non-intrinsic input
+        non_intrinsic = {"key": "value"}
+        self.assertEqual(non_intrinsic, self.resolver.resolve_ref_value(non_intrinsic))
+
+        # Test with non-Ref intrinsic
+        non_ref = {"Fn::Sub": "value"}
+        self.assertEqual(non_ref, self.resolver.resolve_ref_value(non_ref))
+
+        # Test with AWS::NoValue
+        ref_input = {"Ref": "AWS::NoValue"}
+        self.assertEqual(None, self.resolver.resolve_ref_value(ref_input))
 
 
 class TestSupportedIntrinsics(TestCase):
