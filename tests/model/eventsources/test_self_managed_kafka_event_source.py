@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from parameterized import parameterized
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.eventsources.pull import SelfManagedKafka
 from samtranslator.model.exceptions import InvalidEventException
 
@@ -321,3 +322,154 @@ class SelfManagedKafkaEventSource(TestCase):
         with self.assertRaises(InvalidEventException) as error:
             self.kafka_event_source.get_policy_statements()
         self.assertEqual(error_message, str(error.exception))
+
+    def test_validate_schema_registry_config_missing_required_fields(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "SASL_SCRAM_256_AUTH", "URI": "SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.SchemaRegistryConfig = {
+            "SchemaRegistryURI": "arn:aws:glue:us-west-2:123456789012:registry/example"
+        }
+        with self.assertRaises(InvalidEventException) as context:
+            self.kafka_event_source.get_policy_statements(IntrinsicsResolver({}))
+        self.assertTrue("Missing required field EventRecordFormat in SchemaRegistryConfig" in str(context.exception))
+
+    def test_validate_schema_registry_config_invalid_format(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "SASL_SCRAM_256_AUTH", "URI": "SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.SchemaRegistryConfig = {
+            "SchemaRegistryURI": "arn:aws:glue:us-west-2:123456789012:registry/example",
+            "EventRecordFormat": "INVALID",
+            "SchemaValidationConfigs": [],
+        }
+        with self.assertRaises(InvalidEventException) as context:
+            self.kafka_event_source.get_policy_statements(IntrinsicsResolver({}))
+        self.assertTrue(
+            "EventRecordFormat in SchemaRegistryConfig must be either 'JSON' or 'SOURCE'" in str(context.exception)
+        )
+
+    def test_validate_schema_registry_config_invalid_validation_configs(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "SASL_SCRAM_256_AUTH", "URI": "SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.SchemaRegistryConfig = {
+            "SchemaRegistryURI": "arn:aws:glue:us-west-2:123456789012:registry/example",
+            "EventRecordFormat": "JSON",
+            "SchemaValidationConfigs": "not-a-list",
+        }
+        with self.assertRaises(InvalidEventException) as context:
+            self.kafka_event_source.get_policy_statements(IntrinsicsResolver({}))
+        self.assertTrue("SchemaValidationConfigs must be a list" in str(context.exception))
+
+    def test_get_policy_statements_with_schema_registry(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "BASIC_AUTH", "URI": "SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.SchemaRegistryConfig = {
+            "SchemaRegistryURI": "arn:aws:glue:us-west-2:123456789012:registry/example",
+            "EventRecordFormat": "JSON",
+            "SchemaValidationConfigs": [{"Attribute": "KEY"}],
+            "AccessConfigs": [{"Type": "BASIC_AUTH", "URI": "BASIC_AUTH_URI"}],
+        }
+
+        policy_statements = self.kafka_event_source.get_policy_statements(IntrinsicsResolver({}))
+        expected_statements = [
+            {"Action": ["secretsmanager:GetSecretValue"], "Effect": "Allow", "Resource": "SECRET_URI"},
+            {
+                "Action": [
+                    "ec2:CreateNetworkInterface",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DescribeVpcs",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeSecurityGroups",
+                ],
+                "Effect": "Allow",
+                "Resource": "*",
+            },
+            {"Action": ["secretsmanager:GetSecretValue"], "Effect": "Allow", "Resource": "BASIC_AUTH_URI"},
+            {
+                "Action": ["glue:GetRegistry"],
+                "Effect": "Allow",
+                "Resource": "arn:aws:glue:us-west-2:123456789012:registry/example",
+            },
+            {
+                "Action": ["glue:GetSchemaVersion"],
+                "Effect": "Allow",
+                "Resource": [
+                    {"Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:schema/example/*"}
+                ],
+            },
+        ]
+        self.assertEqual(len(policy_statements), 1)
+        self.assertEqual(len(policy_statements[0]["PolicyDocument"]["Statement"]), len(expected_statements))
+        for statement in expected_statements:
+            self.assertIn(statement, policy_statements[0]["PolicyDocument"]["Statement"])
+
+    def test_get_policy_statements_with_non_glue_schema_registry(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "BASIC_AUTH", "URI": "SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.SchemaRegistryConfig = {
+            "SchemaRegistryURI": "https://example.com/testRegistry",
+            "EventRecordFormat": "JSON",
+            "SchemaValidationConfigs": [{"Attribute": "KEY"}],
+            "AccessConfigs": [
+                {"Type": "SERVER_ROOT_CA_CERTIFICATE", "URI": "CA_SECRET_URI"},
+            ],
+        }
+
+        policy_statements = self.kafka_event_source.get_policy_statements(IntrinsicsResolver({}))
+        expected_statements = [
+            {
+                "Action": [
+                    "secretsmanager:GetSecretValue",
+                ],
+                "Effect": "Allow",
+                "Resource": "SECRET_URI",
+            },
+            {
+                "Action": [
+                    "ec2:CreateNetworkInterface",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DescribeVpcs",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeSecurityGroups",
+                ],
+                "Effect": "Allow",
+                "Resource": "*",
+            },
+            {
+                "Action": [
+                    "secretsmanager:GetSecretValue",
+                ],
+                "Effect": "Allow",
+                "Resource": "CA_SECRET_URI",
+            },
+        ]
+
+        self.assertEqual(len(policy_statements[0]["PolicyDocument"]["Statement"]), len(expected_statements))
+        for statement in expected_statements:
+            self.assertIn(statement, policy_statements[0]["PolicyDocument"]["Statement"])
