@@ -20,7 +20,7 @@ Resources:
             VolumeSize: 1
       ClusterName:
         Ref: MskClusterName2
-      KafkaVersion: 2.4.1.1
+      KafkaVersion: 3.8.x
       NumberOfBrokerNodes: 2
 
   MyMskStreamProcessor:

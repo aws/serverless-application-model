@@ -1,0 +1,471 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {},
+  "Resources": {
+    "MyMskStreamProcessorWithConfluentSchemaAndBasicAuth": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "kafka.zip"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyMskStreamProcessorWithConfluentSchemaAndBasicAuthRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyMskStreamProcessorWithConfluentSchemaAndBasicAuthMyMskEvent": {
+      "Properties": {
+        "AmazonManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": "consumergroup1",
+          "SchemaRegistryConfig": {
+            "AccessConfigs": [
+              {
+                "Type": "BASIC_AUTH",
+                "URI": {
+                  "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:123456789012:secret:my-path"
+                }
+              }
+            ],
+            "EventRecordFormat": "JSON",
+            "SchemaRegistryURI": "https://example.com/registry",
+            "SchemaValidationConfigs": [
+              {
+                "Attribute": "KEY"
+              },
+              {
+                "Attribute": "VALUE"
+              }
+            ]
+          }
+        },
+        "EventSourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2"
+        },
+        "FunctionName": {
+          "Ref": "MyMskStreamProcessorWithConfluentSchemaAndBasicAuth"
+        },
+        "StartingPosition": "LATEST",
+        "Topics": [
+          "MyDummyTestTopic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyMskStreamProcessorWithConfluentSchemaAndBasicAuthRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "secretsmanager:GetSecretValue"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:123456789012:secret:my-path"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "MSKExecutionRolePolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyMskStreamProcessorWithGlueSchemaAndBasicAuth": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "kafka.zip"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyMskStreamProcessorWithGlueSchemaAndBasicAuthRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyMskStreamProcessorWithGlueSchemaAndBasicAuthMyMskEvent": {
+      "Properties": {
+        "AmazonManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": "consumergroup1",
+          "SchemaRegistryConfig": {
+            "AccessConfigs": [
+              {
+                "Type": "BASIC_AUTH",
+                "URI": {
+                  "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:123456789012:secret:my-path"
+                }
+              }
+            ],
+            "EventRecordFormat": "JSON",
+            "SchemaRegistryURI": {
+              "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:012345678901:registry/registry1"
+            },
+            "SchemaValidationConfigs": [
+              {
+                "Attribute": "KEY"
+              },
+              {
+                "Attribute": "VALUE"
+              }
+            ]
+          }
+        },
+        "EventSourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2"
+        },
+        "FunctionName": {
+          "Ref": "MyMskStreamProcessorWithGlueSchemaAndBasicAuth"
+        },
+        "StartingPosition": "LATEST",
+        "Topics": [
+          "MyDummyTestTopic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyMskStreamProcessorWithGlueSchemaAndBasicAuthRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "secretsmanager:GetSecretValue"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:123456789012:secret:my-path"
+                  }
+                },
+                {
+                  "Action": [
+                    "glue:GetRegistry"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:012345678901:registry/registry1"
+                  }
+                },
+                {
+                  "Action": [
+                    "glue:GetSchemaVersion"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:schema/registry1/*"
+                    }
+                  ]
+                }
+              ]
+            },
+            "PolicyName": "MSKExecutionRolePolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyMskStreamProcessorWithGlueSchemaAndIamAuth": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "kafka.zip"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyMskStreamProcessorWithGlueSchemaAndIamAuthRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyMskStreamProcessorWithGlueSchemaAndIamAuthMyMskEvent": {
+      "Properties": {
+        "AmazonManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": "consumergroup1",
+          "SchemaRegistryConfig": {
+            "EventRecordFormat": "JSON",
+            "SchemaRegistryURI": {
+              "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:012345678901:registry/registry1"
+            },
+            "SchemaValidationConfigs": [
+              {
+                "Attribute": "KEY"
+              }
+            ]
+          }
+        },
+        "EventSourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2"
+        },
+        "FunctionName": {
+          "Ref": "MyMskStreamProcessorWithGlueSchemaAndIamAuth"
+        },
+        "StartingPosition": "LATEST",
+        "Topics": [
+          "MyDummyTestTopic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyMskStreamProcessorWithGlueSchemaAndIamAuthRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "glue:GetRegistry"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:012345678901:registry/registry1"
+                  }
+                },
+                {
+                  "Action": [
+                    "glue:GetSchemaVersion"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:schema/registry1/*"
+                    }
+                  ]
+                }
+              ]
+            },
+            "PolicyName": "MSKExecutionRolePolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyMskStreamProcessorWithOnlySchemaRegistry": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "kafka.zip"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyMskStreamProcessorWithOnlySchemaRegistryRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyMskStreamProcessorWithOnlySchemaRegistryMyMskEvent": {
+      "Properties": {
+        "AmazonManagedKafkaEventSourceConfig": {
+          "SchemaRegistryConfig": {
+            "EventRecordFormat": "JSON",
+            "SchemaRegistryURI": {
+              "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:012345678901:registry/registry1"
+            },
+            "SchemaValidationConfigs": [
+              {
+                "Attribute": "KEY"
+              }
+            ]
+          }
+        },
+        "EventSourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2"
+        },
+        "FunctionName": {
+          "Ref": "MyMskStreamProcessorWithOnlySchemaRegistry"
+        },
+        "StartingPosition": "LATEST",
+        "Topics": [
+          "MyDummyTestTopic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyMskStreamProcessorWithOnlySchemaRegistryRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "glue:GetRegistry"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:012345678901:registry/registry1"
+                  }
+                },
+                {
+                  "Action": [
+                    "glue:GetSchemaVersion"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:schema/registry1/*"
+                    }
+                  ]
+                }
+              ]
+            },
+            "PolicyName": "MSKExecutionRolePolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
