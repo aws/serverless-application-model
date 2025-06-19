@@ -1,0 +1,86 @@
+Parameters:
+  PreCreatedSubnetOne:
+    Type: String
+  PreCreatedSubnetTwo:
+    Type: String
+  MskClusterName4:
+    Type: String
+
+Resources:
+  MyLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: [sts:AssumeRole]
+          Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+      Policies:
+      - PolicyName: IntegrationTestExecution
+        PolicyDocument:
+          Statement:
+          - Action: [kafka:DescribeCluster, kafka:GetBootstrapBrokers, ec2:CreateNetworkInterface,
+              ec2:DescribeNetworkInterfaces, ec2:DescribeVpcs, ec2:DeleteNetworkInterface,
+              ec2:DescribeSubnets, ec2:DescribeSecurityGroups, logs:CreateLogGroup,
+              logs:CreateLogStream, logs:PutLogEvents, s3:ListBucket, kafka:DescribeClusterV2]
+            Effect: Allow
+            Resource: '*'
+      ManagedPolicyArns:
+      - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+      - {Value: SAM, Key: lambda:createdBy}
+
+  MyMskCluster:
+    Type: AWS::MSK::Cluster
+    Properties:
+      BrokerNodeGroupInfo:
+        ClientSubnets:
+        - Ref: PreCreatedSubnetOne
+        - Ref: PreCreatedSubnetTwo
+        InstanceType: kafka.t3.small
+        StorageInfo:
+          EBSStorageInfo:
+            VolumeSize: 1
+      ClusterName:
+        Ref: MskClusterName4
+      KafkaVersion: 3.8.x
+      NumberOfBrokerNodes: 2
+
+  MyMskStreamProcessor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs18.x
+      Handler: index.handler
+      CodeUri: ${codeuri}
+      Role:
+        Fn::GetAtt: [MyLambdaExecutionRole, Arn]
+      Events:
+        MyMskEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream:
+              Ref: MyMskCluster
+            Topics:
+            - SchemaRegistryTestTopic
+            ProvisionedPollerConfig:
+              MinimumPollers: 1
+            SchemaRegistryConfig:
+              AccessConfigs:
+              - Type: BASIC_AUTH
+                URI: !Sub arn:${AWS::Partition}:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c
+              SchemaValidationConfigs:
+              - Attribute: KEY
+              EventRecordFormat: JSON
+              SchemaRegistryURI: https://confluent.us-east-2.aws.confluent.cloud:9092
+
+
+
+  PreCreatedS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+
+Metadata:
+  SamTransformTest: true

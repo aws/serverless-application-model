@@ -139,6 +139,8 @@ ignore_templates:
   - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
   - tests/translator/output/**/function_with_provisioned_poller_config.json
   - tests/translator/output/**/function_with_metrics_config.json
+  - tests/translator/output/**/function_with_self_managed_kafka_and_schema_registry.json # cfnlint is not updated to recognize the SchemaRegistryConfig property
+  - tests/translator/output/**/function_with_msk_with_schema_registry_config.json # cfnlint is not updated to recognize the SchemaRegistryConfig property
 
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests
