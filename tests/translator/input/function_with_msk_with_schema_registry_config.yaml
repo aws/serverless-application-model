@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters: {}
+
+Resources:
+  MyMskStreamProcessorWithGlueSchemaAndIamAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs12.x
+      Handler: index.handler
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Events:
+        MyMskEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Sub arn:${AWS::Partition}:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            Topics:
+            - MyDummyTestTopic
+            ConsumerGroupId: consumergroup1
+            SchemaRegistryConfig:
+              SchemaRegistryURI: !Sub arn:${AWS::Partition}:glue:${AWS::Region}:012345678901:registry/registry1
+              EventRecordFormat: JSON
+              SchemaValidationConfigs:
+              - Attribute: KEY
+
+  MyMskStreamProcessorWithGlueSchemaAndBasicAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs12.x
+      Handler: index.handler
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Events:
+        MyMskEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Sub arn:${AWS::Partition}:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            Topics:
+            - MyDummyTestTopic
+            ConsumerGroupId: consumergroup1
+            SchemaRegistryConfig:
+              SchemaRegistryURI: !Sub arn:${AWS::Partition}:glue:${AWS::Region}:012345678901:registry/registry1
+              EventRecordFormat: JSON
+              AccessConfigs:
+              - Type: BASIC_AUTH
+                URI: !Sub arn:${AWS::Partition}:secretsmanager:${AWS::Region}:123456789012:secret:my-path
+              SchemaValidationConfigs:
+              - Attribute: KEY
+              - Attribute: VALUE
+
+  MyMskStreamProcessorWithConfluentSchemaAndBasicAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs12.x
+      Handler: index.handler
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Events:
+        MyMskEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Sub arn:${AWS::Partition}:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            Topics:
+            - MyDummyTestTopic
+            ConsumerGroupId: consumergroup1
+            SchemaRegistryConfig:
+              SchemaRegistryURI: https://example.com/registry
+              EventRecordFormat: JSON
+              AccessConfigs:
+              - Type: BASIC_AUTH
+                URI: !Sub arn:${AWS::Partition}:secretsmanager:${AWS::Region}:123456789012:secret:my-path
+              SchemaValidationConfigs:
+              - Attribute: KEY
+              - Attribute: VALUE
+
+  MyMskStreamProcessorWithOnlySchemaRegistry:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs12.x
+      Handler: index.handler
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Events:
+        MyMskEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: !Sub arn:${AWS::Partition}:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            Topics:
+            - MyDummyTestTopic
+            SchemaRegistryConfig:
+              SchemaRegistryURI: !Sub arn:${AWS::Partition}:glue:${AWS::Region}:012345678901:registry/registry1
+              EventRecordFormat: JSON
+              SchemaValidationConfigs:
+              - Attribute: KEY
