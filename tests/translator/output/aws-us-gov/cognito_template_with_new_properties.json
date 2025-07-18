@@ -1,0 +1,15 @@
+{
+  "Resources": {
+    "MyUserPool": {
+      "Properties": {
+        "EmailAuthenticationMessage": "Your verification code is {####}",
+        "EmailAuthenticationSubject": "Your verification code",
+        "UserPoolName": "MyUserPool",
+        "UserPoolTier": "PLUS",
+        "WebAuthnRelyingPartyID": "id",
+        "WebAuthnUserVerification": "required"
+      },
+      "Type": "AWS::Cognito::UserPool"
+    }
+  }
+}
