@@ -11,6 +11,8 @@ class CognitoUserPool(Resource):
         "AutoVerifiedAttributes": GeneratedProperty(),
         "DeletionProtection": GeneratedProperty(),
         "DeviceConfiguration": GeneratedProperty(),
+        "EmailAuthenticationMessage": GeneratedProperty(),
+        "EmailAuthenticationSubject": GeneratedProperty(),
         "EmailConfiguration": GeneratedProperty(),
         "EmailVerificationMessage": GeneratedProperty(),
         "EmailVerificationSubject": GeneratedProperty(),
@@ -28,7 +30,10 @@ class CognitoUserPool(Resource):
         "UserPoolAddOns": GeneratedProperty(),
         "UserPoolName": GeneratedProperty(),
         "UserPoolTags": GeneratedProperty(),
+        "UserPoolTier": GeneratedProperty(),
         "VerificationMessageTemplate": GeneratedProperty(),
+        "WebAuthnRelyingPartyID": GeneratedProperty(),
+        "WebAuthnUserVerification": GeneratedProperty(),
     }
 
     runtime_attrs = {

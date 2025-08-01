@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters: {}
+Resources:
+  MSKFunctionWithoutSchemaValidationConfigs:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Handler: index.kafka_handler
+      Runtime: python3.9
+      Events:
+        MyKafkaCluster:
+          Type: MSK
+          Properties:
+            Stream: !Sub arn:aws:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            StartingPosition: LATEST
+            SourceAccessConfigurations:
+            - Type: SASL_SCRAM_512_AUTH
+              URI: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c
+            Topics:
+            - abcd
+            SchemaRegistryConfig:
+              SchemaRegistryURI: https://example.com/registry
+              EventRecordFormat: JSON
+  MSKFunctionWithoutEventRecordFormat:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Handler: index.kafka_handler
+      Runtime: python3.9
+      Events:
+        MyKafkaCluster:
+          Type: MSK
+          Properties:
+            Stream: !Sub arn:aws:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            StartingPosition: LATEST
+            SourceAccessConfigurations:
+            - Type: SASL_SCRAM_512_AUTH
+              URI: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c
+            Topics:
+            - abcd
+            SchemaRegistryConfig:
+              SchemaRegistryURI: https://example.com/registry
+              SchemaValidationConfigs:
+              - Attribute: KEY
+              - Attribute: VALUE
+  MSKFunctionWithoutSchemaRegistryURI:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Handler: index.kafka_handler
+      Runtime: python3.9
+      Events:
+        MyKafkaCluster:
+          Type: MSK
+          Properties:
+            Stream: !Sub arn:aws:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            StartingPosition: LATEST
+            SourceAccessConfigurations:
+            - Type: SASL_SCRAM_512_AUTH
+              URI: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c
+            Topics:
+            - abcd
+            SchemaRegistryConfig:
+              SchemaValidationConfigs:
+              - Attribute: KEY
+              - Attribute: VALUE
+              EventRecordFormat: JSON
