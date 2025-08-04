@@ -41,6 +41,15 @@ class TestFunctionWithMsk(BaseTest):
             "combination/function_with_msk_trigger_and_s3_onfailure_events_destinations", parameters
         )
 
+    def test_function_with_msk_trigger_and_confluent_schema_registry(self):
+        companion_stack_outputs = self.companion_stack_outputs
+        parameters = self.get_parameters(companion_stack_outputs)
+        cluster_name = "MskCluster4-" + generate_suffix()
+        parameters.append(self.generate_parameter("MskClusterName4", cluster_name))
+        self._common_validations_for_MSK(
+            "combination/function_with_msk_trigger_and_confluent_schema_registry", parameters
+        )
+
     def _common_validations_for_MSK(self, file_name, parameters):
         self.create_and_verify_stack(file_name, parameters)
 
