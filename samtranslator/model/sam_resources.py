@@ -254,13 +254,13 @@ class SamFunction(SamResourceMacro):
     }
 
     # Validation rules
-    __validation_rules__ = [
-        # TODO: To enable these rules, we need to update translator test input/output files to property configure template
-        #       to avoid fail-fast. eg: test with DeploymentPreference without AutoPublishAlias would fail fast before reaching testing state
-        # (ValidationRule.MUTUALLY_EXCLUSIVE, ["ImageUri", "InlineCode", "CodeUri"]),
-        # (ValidationRule.CONDITIONAL_REQUIREMENT, ["DeploymentPreference", "AutoPublishAlias"]),
-        # (ValidationRule.CONDITIONAL_REQUIREMENT, ["ProvisionedConcurrencyConfig", "AutoPublishAlias"]),
-    ]
+    # TODO: To enable these rules, we need to update translator test input/output files to property configure template
+    #       to avoid fail-fast. eg: test with DeploymentPreference without AutoPublishAlias would fail fast before reaching testing state
+    # __validation_rules__ = [
+    #     (ValidationRule.MUTUALLY_EXCLUSIVE, ["ImageUri", "InlineCode", "CodeUri"]),
+    #     (ValidationRule.CONDITIONAL_REQUIREMENT, ["DeploymentPreference", "AutoPublishAlias"]),
+    #     (ValidationRule.CONDITIONAL_REQUIREMENT, ["ProvisionedConcurrencyConfig", "AutoPublishAlias"]),
+    # ]
 
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
