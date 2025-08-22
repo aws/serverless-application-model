@@ -1,4 +1,4 @@
-﻿""" SAM macro definitions """
+﻿"""SAM macro definitions"""
 
 import copy
 import re
@@ -139,6 +139,7 @@ class SamFunction(SamResourceMacro):
     """SAM function macro."""
 
     resource_type = "AWS::Serverless::Function"
+
     property_types = {
         "FunctionName": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "Handler": PassThroughProperty(False),
@@ -252,6 +253,15 @@ class SamFunction(SamResourceMacro):
         "DestinationQueue": SQSQueue.resource_type,
     }
 
+    # Validation rules
+    __validation_rules__ = [
+        # TODO: To enable these rules, we need to update translator test input/output files to property configure template
+        #       to avoid fail-fast. eg: test with DeploymentPreference without AutoPublishAlias would fail fast before reaching testing state
+        # (ValidationRule.MUTUALLY_EXCLUSIVE, ["ImageUri", "InlineCode", "CodeUri"]),
+        # (ValidationRule.CONDITIONAL_REQUIREMENT, ["DeploymentPreference", "AutoPublishAlias"]),
+        # (ValidationRule.CONDITIONAL_REQUIREMENT, ["ProvisionedConcurrencyConfig", "AutoPublishAlias"]),
+    ]
+
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
             return {"event_resources": self._event_resources_to_link(resources)}
@@ -273,6 +283,11 @@ class SamFunction(SamResourceMacro):
         mappings_resolver: Optional[IntrinsicsResolver] = kwargs.get("mappings_resolver")
         conditions = kwargs.get("conditions", {})
         feature_toggle = kwargs.get("feature_toggle")
+
+        # TODO: Skip pass schema_class=aws_serverless_function.Properties to skip schema validation for now.
+        # - adding this now would required update error message in error error_function_*_test.py
+        # - add this when we can verify that changing error message would not break customers
+        # self.validate_before_transform(schema_class=None, collect_all_errors=False)
 
         if self.DeadLetterQueue:
             self._validate_dlq(self.DeadLetterQueue)
@@ -1809,6 +1824,7 @@ class SamLayerVersion(SamResourceMacro):
         # Intrinsics are not validated
         if is_intrinsic(architectures):
             return
+
         for arq in architectures:
             # We validate the values only if we they're not intrinsics
             if not is_intrinsic(arq) and arq not in [ARM64, X86_64]:
