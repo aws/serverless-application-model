@@ -630,13 +630,13 @@ class TestSamResourceMacroValidation(TestCase):
         resource.ConditionalVar3 = None
         resource.validate_before_transform(self.TestProperties)
 
-        # Test 3: When NestedSetting1.NestedVar1="test", NestedSetting2.NestedVar2 should NOT be present
+        # Test 3: When NestedSetting1.NestedVar1="test", NestedSetting2.NestedVar2=22 should NOT be present
         resource.NestedSetting1 = {"NestedVar1": "test"}
-        resource.NestedSetting2 = {"NestedVar2": "value2"}
+        resource.NestedSetting2 = {"NestedVar2": 22}
         with self.assertRaises(InvalidResourceException) as error_3:
             resource.validate_before_transform(self.TestProperties)
         self.assertIn(
-            "'NestedSetting1.NestedVar1=test' cannot be used with 'NestedSetting2.NestedVar2'",
+            "'NestedSetting1.NestedVar1=test' cannot be used with 'NestedSetting2.NestedVar2=22'",
             error_3.exception.message,
         )
 
