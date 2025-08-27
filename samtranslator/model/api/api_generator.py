@@ -535,13 +535,13 @@ class ApiGenerator:
 
         self._set_optional_domain_properties(domain)
 
-        basepaths: Optional[List[str]]
+        basepaths: Optional[List[Any]]
         basepath_value = self.domain.get("BasePath")
         # Create BasepathMappings
-        if self.domain.get("BasePath") and isinstance(basepath_value, str):
+        if isinstance(basepath_value, str) or is_intrinsic(basepath_value):
             basepaths = [basepath_value]
-        elif self.domain.get("BasePath") and isinstance(basepath_value, list):
-            basepaths = cast(Optional[List[Any]], basepath_value)
+        elif isinstance(basepath_value, list):
+            basepaths = basepath_value
         else:
             basepaths = None
 
@@ -554,13 +554,18 @@ class ApiGenerator:
             basepath_mapping = self._create_basepath_mapping(api_domain_name, rest_api, None, None)
             basepath_resource_list.extend([basepath_mapping])
         else:
-            sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
             for basepath in basepaths:
-                # Remove possible leading and trailing '/' because a base path may only
-                # contain letters, numbers, and one of "$-_.+!*'()"
-                path = "".join(e for e in basepath if e.isalnum())
-                mapping_basepath = path if normalize_basepath else basepath
-                logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
+                if is_intrinsic(basepath):
+                    mapping_basepath = basepath
+                    logical_id = self.logical_id + "BasePathMapping"
+                else:
+                    sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
+                    # Remove possible leading and trailing '/' because a base path may only
+                    # contain letters, numbers, and one of "$-_.+!*'()"
+                    path = "".join(e for e in basepath if e.isalnum())
+                    mapping_basepath = path if normalize_basepath else basepath
+                    logical_id = "{}{}{}".format(self.logical_id, path, "BasePathMapping")
+
                 basepath_mapping = self._create_basepath_mapping(
                     api_domain_name, rest_api, logical_id, mapping_basepath
                 )
@@ -810,7 +815,7 @@ class ApiGenerator:
         api_domain_name: PassThrough,
         rest_api: ApiGatewayRestApi,
         logical_id: Optional[str],
-        basepath: Optional[str],
+        basepath: Optional[Any],
     ) -> ApiGatewayBasePathMapping:
 
         basepath_mapping: ApiGatewayBasePathMapping
