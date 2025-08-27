@@ -373,6 +373,16 @@ class Deployer:
             self.describe_changeset(result["Id"], stack_name)
             return result
         except deploy_exceptions.ChangeEmptyError:
+            try:
+                # Delete the most recent change set that failed to create because it was empty
+                changeset = sorted(
+                    self._client.list_change_sets(StackName=stack_name).get("Summaries"),
+                    key=lambda c: c["CreationTime"],
+                )[-1]
+                if changeset.get("Status") == "FAILED" and changeset.get("ExecutionStatus") == "UNAVAILABLE":
+                    self._client.delete_change_set(ChangeSetName=changeset["ChangeSetId"], StackName=stack_name)
+            except Exception as ex:
+                LOG.warning("Failed to clean up empty changeset", exc_info=ex)
             return {}
         except botocore.exceptions.ClientError as ex:
             raise deploy_exceptions.DeployFailedError(stack_name=stack_name, msg=str(ex))
