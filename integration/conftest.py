@@ -63,12 +63,12 @@ def clean_all_integ_buckets():
 @pytest.fixture()
 def setup_companion_stack_once(tmpdir_factory, get_prefix):
     tests_integ_dir = Path(__file__).resolve().parents[1]
-    template_foler = Path(tests_integ_dir, "integration", "setup")
-    companion_stack_tempalte_path = Path(template_foler, COMPANION_STACK_TEMPLATE)
+    template_folder = Path(tests_integ_dir, "integration", "setup")
+    companion_stack_template_path = Path(template_folder, COMPANION_STACK_TEMPLATE)
     cfn_client = ClientProvider().cfn_client
     output_dir = tmpdir_factory.mktemp("data")
     stack_name = get_prefix + COMPANION_STACK_NAME
-    companion_stack = Stack(stack_name, companion_stack_tempalte_path, cfn_client, output_dir)
+    companion_stack = Stack(stack_name, companion_stack_template_path, cfn_client, output_dir)
     companion_stack.create_or_update(_stack_exists(stack_name))
 
 
