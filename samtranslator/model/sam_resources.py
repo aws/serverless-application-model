@@ -253,14 +253,20 @@ class SamFunction(SamResourceMacro):
         "DestinationQueue": SQSQueue.resource_type,
     }
 
-    # Validation rules
+    # def get_property_validation_rules(self) -> Optional[PropertyRules]:
+    #     """Override to provide PropertyRules validation for SAM Function."""
     # TODO: To enable these rules, we need to update translator test input/output files to property configure template
     #       to avoid fail-fast. eg: test with DeploymentPreference without AutoPublishAlias would fail fast before reaching testing state
-    # __validation_rules__ = [
-    #     (ValidationRule.MUTUALLY_EXCLUSIVE, ["ImageUri", "InlineCode", "CodeUri"]),
-    #     (ValidationRule.CONDITIONAL_REQUIREMENT, ["DeploymentPreference", "AutoPublishAlias"]),
-    #     (ValidationRule.CONDITIONAL_REQUIREMENT, ["ProvisionedConcurrencyConfig", "AutoPublishAlias"]),
-    # ]
+    # from samtranslator.internal.schema_source.aws_serverless_function import Properties as FunctionProperties
+    # return (PropertyRules(FunctionProperties)
+    #     .addMutuallyExclusive("ImageUri", "InlineCode", "CodeUri")
+    #     .addConditionalInclusive("DeploymentPreference", ["AutoPublishAlias"])
+    #     .addConditionalInclusive("ProvisionedConcurrencyConfig", ["AutoPublishAlias"])
+    #     .addConditionalInclusive("PackageType=Zip", ["Runtime", "Handler"])
+    #     .addConditionalInclusive("PackageType=Image", ["ImageUri"])
+    #     .addConditionalExclusive("PackageType=Zip", ["ImageUri", "ImageConfig"])
+    #     .addConditionalExclusive("PackageType=Image", ["Runtime", "Handler", "Layers"]))
+    # return None
 
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
@@ -287,7 +293,7 @@ class SamFunction(SamResourceMacro):
         # TODO: Skip pass schema_class=aws_serverless_function.Properties to skip schema validation for now.
         # - adding this now would required update error message in error error_function_*_test.py
         # - add this when we can verify that changing error message would not break customers
-        # self.validate_before_transform(schema_class=None, collect_all_errors=False)
+        # self.validate_before_transform(schema_class=aws_serverless_function.Properties)
 
         if self.DeadLetterQueue:
             self._validate_dlq(self.DeadLetterQueue)

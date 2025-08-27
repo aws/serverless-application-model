@@ -4,7 +4,6 @@ import inspect
 import re
 from abc import ABC, ABCMeta, abstractmethod
 from contextlib import suppress
-from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
 from samtranslator.compat import pydantic
@@ -16,6 +15,7 @@ from samtranslator.model.exceptions import (
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, Validator, any_type, is_type
 from samtranslator.plugins import LifeCycleEvents
+from samtranslator.validator.property_rule import PropertyRules
 
 RT = TypeVar("RT", bound=pydantic.BaseModel)  # return type
 
@@ -395,8 +395,11 @@ class Resource(ABC):
                 # Multiple types - consolidate with union
                 type_text = " or ".join(unique_types)
                 result.append(f"Property '{path}' value must be {type_text}.")
+            elif len(unique_types) == 1:
+                # Single type - use type mapping
+                result.append(f"Property '{path}' value must be {unique_types[0]}.")
             else:
-                # Single or no types - format normally
+                # No types - format normally
                 result.append(self._format_single_error(data["error"]))
 
         return result
@@ -542,16 +545,6 @@ class ResourceMacro(Resource, metaclass=ABCMeta):
         """
 
 
-class ValidationRule(Enum):
-    MUTUALLY_EXCLUSIVE = "mutually_exclusive"
-    MUTUALLY_INCLUSIVE = "mutually_inclusive"
-    CONDITIONAL_REQUIREMENT = "conditional_requirement"
-
-
-# Simple tuple-based rules: (rule_type, [property_names])
-PropertyRule = Tuple[ValidationRule, List[str]]
-
-
 class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
     """ResourceMacro that specifically refers to SAM (AWS::Serverless::*) resources."""
 
@@ -578,6 +571,10 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
 
     # Aggregate list of all reserved tags
     _RESERVED_TAGS = [_SAM_KEY, _SAR_APP_KEY, _SAR_SEMVER_KEY]
+
+    def get_property_validation_rules(self) -> Optional[PropertyRules]:
+        """Override this method in child classes to provide PropertyRules validation."""
+        return None
 
     def get_resource_references(self, generated_cfn_resources, supported_resource_refs):  # type: ignore[no-untyped-def]
         """
@@ -687,70 +684,20 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
                 "input.",
             )
 
-    def validate_before_transform(self, schema_class: Optional[Type[RT]], collect_all_errors: bool = False) -> None:
-        if not hasattr(self, "__validation_rules__"):
+    def validate_before_transform(self, schema_class: Type[RT]) -> None:
+        rules = self.get_property_validation_rules()
+        if rules is None:
             return
 
-        rules = self.__validation_rules__
-        validated_model = (
-            self.validate_properties_and_return_model(schema_class, collect_all_errors) if schema_class else None
-        )
+        # Validate properties and get model, then pass to rules
+        try:
+            validated_model = self.validate_properties_and_return_model(schema_class)
+        except Exception:
+            validated_model = None
 
-        error_messages = []
-
-        for rule_type, properties in rules:
-            present = [prop for prop in properties if self._get_property_value(prop, validated_model) is not None]
-            if rule_type == ValidationRule.MUTUALLY_EXCLUSIVE:
-                # Check if more than one property exists
-                if len(present) > 1:
-                    prop_names = [f"'{p}'" for p in present]
-                    error_messages.append(f"Cannot specify {self._combine_string(prop_names)} together.")
-
-            elif rule_type == ValidationRule.MUTUALLY_INCLUSIVE:
-                # If any property in the group is present, then all properties in the group must be present
-                # Check if some but not all properties from the group are present
-                missing_some_properties = 0 < len(present) < len(properties)
-                if missing_some_properties:
-                    error_messages.append(f"Properties must be used together: {self._combine_string(properties)}.")
-
-            elif (
-                rule_type == ValidationRule.CONDITIONAL_REQUIREMENT
-                and self._get_property_value(properties[0], validated_model) is not None
-                and self._get_property_value(properties[1], validated_model) is None
-            ):
-                # First property requires second property
-                error_messages.append(f"'{properties[0]}' requires '{properties[1]}'.")
-
-        # If there are any validation errors, raise a single exception with all error messages
+        error_messages = rules.validate_all(validated_model)
         if error_messages:
             raise InvalidResourceException(self.logical_id, "\n".join(error_messages))
-
-    def _combine_string(self, words: List[str]) -> str:
-        return ", ".join(words[:-1]) + (" and " + words[-1] if len(words) > 1 else words[0] if words else "")
-
-    def _get_property_value(self, prop: str, validated_model: Any = None) -> Any:
-        """Original property value getter. Supports nested properties with dot notation."""
-        if "." not in prop:
-            # Simple property - use existing logic for direct attributes
-            return getattr(self, prop, None)
-
-        # Nested property - use validated model
-        if validated_model is None:
-            return None
-
-        try:
-            # Navigate through nested properties using dot notation
-            value = validated_model
-            for part in prop.split("."):
-                if hasattr(value, part):
-                    value = getattr(value, part)
-                    if value is None:
-                        return None
-                else:
-                    return None
-            return value
-        except Exception:
-            return None
 
 
 class ResourceTypeResolver:

@@ -3,12 +3,14 @@ from unittest import TestCase
 from unittest.mock import Mock
 
 import pytest
+from parameterized import parameterized
 from samtranslator.internal.schema_source.common import BaseModel
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
-from samtranslator.model import PropertyType, Resource, ResourceTypeResolver, SamResourceMacro, ValidationRule
+from samtranslator.model import PropertyType, Resource, ResourceTypeResolver, SamResourceMacro
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.types import IS_BOOL, IS_DICT, IS_INT, IS_STR
 from samtranslator.plugins import LifeCycleEvents
+from samtranslator.validator.property_rule import PropertyRules
 
 
 def valid_if_true(value, should_raise=True):
@@ -398,32 +400,18 @@ class TestSamPluginsInResource(TestCase):
         )
 
 
-class TestSamResourceMacro(TestCase):
-    """
-    Test validation functionality in SamResourceMacro
+# Restructured test classes for better organization
+class SamResourceMacroTestBase:
+    """Shared test fixtures for SamResourceMacro tests"""
 
-    IMPORTANT: These tests document the CURRENT BEHAVIOR of the validation system,
-    which has known bugs. The validation logic incorrectly treats property conditions
-    that evaluate to False as "present" for validation purposes.
-
-    Known Issues:
-    1. Property conditions like "Type=CUSTOM" that evaluate to False are still
-       considered "present" because False != None
-    2. Boolean comparisons fail because True != "True" (string comparison)
-    3. Integer comparisons fail because 42 != "42" (string comparison)
-    4. Validation rules trigger even when their conditions don't match
-    """
-
-    def setUp(self):
+    @classmethod
+    def setup_test_fixtures(cls):
         """Set up common test fixtures"""
-        self.ValidationRule = ValidationRule
 
-        # Test setting properties using BaseModel from samtranslator.internal.schema_source.common
         class TestSettingProperties(BaseModel):
             NestedVar1: Optional[str] = None
             NestedVar2: Optional[str] = None
 
-        # Comprehensive schema class for testing using BaseModel from samtranslator.internal.schema_source.common
         class TestProperties(BaseModel):
             ConditionalVar1: Optional[int] = None
             ConditionalVar2: Optional[int] = None
@@ -438,10 +426,6 @@ class TestSamResourceMacro(TestCase):
             NestedSetting2: Optional[TestSettingProperties] = None
             NestedSetting3: Optional[TestSettingProperties] = None
 
-        self.TestProperties = TestProperties
-        self.TestSettingProperties = TestSettingProperties
-
-        # Reusable test resource class extending SamResourceMacro
         class TestResource(SamResourceMacro):
             resource_type = "Test::Resource"
             property_types = {
@@ -462,327 +446,422 @@ class TestSamResourceMacro(TestCase):
             def to_cloudformation(self, **kwargs):
                 return []
 
-        self.TestResource = TestResource
+        return TestProperties, TestSettingProperties, TestResource
 
-    class TestValidateBeforeTransform(TestCase):
-        """Test cases for validate_before_transform() method"""
 
-        def setUp(self):
-            """Set up test fixtures for validate_before_transform tests"""
-            # Import from parent class
-            parent = TestSamResourceMacro()
-            parent.setUp()
-            self.ValidationRule = parent.ValidationRule
-            self.TestProperties = parent.TestProperties
-            self.TestSettingProperties = parent.TestSettingProperties
-            self.TestResource = parent.TestResource
+class TestSamResourceMacroValidation(TestCase):
+    """Test validate_before_transform functionality with restructured approach"""
 
-        def test_validate_before_transform_all_rules_pass(self):
-            """Test successful validation when all rules are satisfied"""
-
-            class Resource(self.TestResource):
-                __validation_rules__ = [
-                    (self.ValidationRule.CONDITIONAL_REQUIREMENT, ["ConditionalVar1", "ConditionalVar2"]),
-                    (self.ValidationRule.CONDITIONAL_REQUIREMENT, ["ConditionalVar2", "ConditionalVar3"]),
-                    (
-                        self.ValidationRule.CONDITIONAL_REQUIREMENT,
-                        ["NestedSetting1.NestedVar1", "NestedSetting2.NestedVar2"],
-                    ),
-                    (self.ValidationRule.MUTUALLY_EXCLUSIVE, ["ExclusiveVar1", "ExclusiveVar2"]),
-                    (self.ValidationRule.MUTUALLY_EXCLUSIVE, ["ExclusiveVar2", "ExclusiveVar3"]),
-                    (
-                        self.ValidationRule.MUTUALLY_EXCLUSIVE,
-                        ["NestedSetting1.NestedVar1", "NestedSetting2.NestedVar1"],
-                    ),
-                    (self.ValidationRule.MUTUALLY_EXCLUSIVE, ["NestedSetting1.NestedVar2", "ExclusiveVar3"]),
-                    (self.ValidationRule.MUTUALLY_INCLUSIVE, ["InclusiveVar1", "ExclusiveVar1"]),
-                    (
-                        self.ValidationRule.MUTUALLY_INCLUSIVE,
-                        ["NestedSetting1.NestedVar1", "NestedSetting2.NestedVar2"],
-                    ),
-                    (
-                        self.ValidationRule.MUTUALLY_INCLUSIVE,
-                        ["NestedSetting2.NestedVar2", "NestedSetting3.NestedVar2"],
-                    ),
-                ]
-
-            resource = Resource("TestId")
-
-            # Happy case: All rules satisfied
-            resource.ConditionalVar1 = 1
-            resource.ConditionalVar2 = 2
-            resource.ConditionalVar3 = 3
-            resource.ExclusiveVar1 = "ONLY_EXCLUSIVE_VAL"  # cannot have ExclusiveVar2, ExclusiveVar3
-            resource.InclusiveVar1 = True
-            resource.InclusiveVar2 = False
-            resource.NestedSetting2 = {"NestedVar2": "NestedVar2"}
-            resource.NestedSetting1 = {"NestedVar1": "NestedVar1"}
-            resource.NestedSetting3 = {"NestedVar2": "NestedVar2"}
-
-            # Should not raise any exception
-            resource.validate_before_transform(self.TestProperties, collect_all_errors=True)
-
-        def test_conditional_requirement_rule(self):
-            """Test CONDITIONAL_REQUIREMENT validation rule"""
-
-            class Resource(self.TestResource):
-                __validation_rules__ = [
-                    (self.ValidationRule.CONDITIONAL_REQUIREMENT, ["ConditionalVar1", "ConditionalVar2"]),
-                    (self.ValidationRule.CONDITIONAL_REQUIREMENT, ["ConditionalVar1", "ConditionalVar3"]),
-                    (
-                        self.ValidationRule.CONDITIONAL_REQUIREMENT,
-                        ["NestedSetting1.NestedVar1", "NestedSetting2.NestedVar2"],
-                    ),
-                ]
-
-            resource = Resource("TestId")
-
-            # Test 1: Should show 3 errors
-            resource.ConditionalVar1 = 1
-            resource.NestedSetting1 = {"NestedVar1": "NestedVar1"}
-            with self.assertRaises(InvalidResourceException) as error_1:
-                resource.validate_before_transform(self.TestProperties, collect_all_errors=True)
-            self.assertEqual(
-                "Resource with id [TestId] is invalid. 'ConditionalVar1' requires 'ConditionalVar2'.\n'ConditionalVar1' requires 'ConditionalVar3'.\n'NestedSetting1.NestedVar1' requires 'NestedSetting2.NestedVar2'.",
-                error_1.exception.message,
-            )
-
-            # Test 2: should show 2 error
-            resource.ConditionalVar2 = 2
-            with self.assertRaises(InvalidResourceException) as error_2:
-                resource.validate_before_transform(self.TestProperties, collect_all_errors=True)
-            self.assertEqual(
-                "Resource with id [TestId] is invalid. 'ConditionalVar1' requires 'ConditionalVar3'.\n'NestedSetting1.NestedVar1' requires 'NestedSetting2.NestedVar2'.",
-                error_2.exception.message,
-            )
-
-            # Test 3: should show 1 error
-            resource.ConditionalVar3 = 3
-            with self.assertRaises(InvalidResourceException) as error_3:
-                resource.validate_before_transform(self.TestProperties, collect_all_errors=True)
-            self.assertEqual(
-                "Resource with id [TestId] is invalid. 'NestedSetting1.NestedVar1' requires 'NestedSetting2.NestedVar2'.",
-                error_3.exception.message,
-            )
-
-        def test_mutually_inclusive_rule(self):
-            """Test MUTUALLY_INCLUSIVE validation rule"""
-
-            class Resource(self.TestResource):
-                __validation_rules__ = [
-                    # When InclusiveVar1 is specified, InclusiveVar2 and InclusiveVar3 should be present
-                    (self.ValidationRule.MUTUALLY_INCLUSIVE, ["InclusiveVar1", "InclusiveVar2"]),
-                    (self.ValidationRule.MUTUALLY_INCLUSIVE, ["InclusiveVar1", "InclusiveVar3"]),
-                    # When NestedSetting1.NestedVar1 is specified, NestedSetting2.NestedVar2 should be present
-                    (
-                        self.ValidationRule.MUTUALLY_INCLUSIVE,
-                        ["NestedSetting1.NestedVar1", "NestedSetting2.NestedVar2"],
-                    ),
-                ]
-
-            resource = Resource("TestId")
-
-            # Test 1: When InclusiveVar1 is present, both InclusiveVar2 and InclusiveVar3 must also be present
-            resource.InclusiveVar1 = True
-            with self.assertRaises(InvalidResourceException) as error_1:
-                resource.validate_before_transform(self.TestProperties, collect_all_errors=True)
-            expected_errors = [
-                "Properties must be used together: InclusiveVar1 and InclusiveVar2.",
-                "Properties must be used together: InclusiveVar1 and InclusiveVar3.",
-            ]
-            for expected_error in expected_errors:
-                self.assertIn(expected_error, error_1.exception.message)
-
-            # Test 2: When InclusiveVar2 is provided, only one error should remain
-            resource.InclusiveVar2 = True
-            with self.assertRaises(InvalidResourceException) as error_2:
-                resource.validate_before_transform(self.TestProperties, collect_all_errors=True)
-            self.assertIn(
-                "Properties must be used together: InclusiveVar1 and InclusiveVar3.", error_2.exception.message
-            )
-
-            # Test 3: When all inclusive vars are provided, no error for inclusive vars
-            resource.InclusiveVar3 = True
-            # Should not raise exception for inclusive vars
-            resource.validate_before_transform(self.TestProperties)
-
-            # Test 4: When NestedSetting1.NestedVar1 is specified, NestedSetting2.NestedVar2 should be present
-            resource.NestedSetting1 = {"NestedVar1": "AUTO"}
-            with self.assertRaises(InvalidResourceException) as error_4:
-                resource.validate_before_transform(self.TestProperties)
-            self.assertEqual(
-                "Resource with id [TestId] is invalid. Properties must be used together: NestedSetting1.NestedVar1 and NestedSetting2.NestedVar2.",
-                error_4.exception.message,
-            )
-
-            # Test 5: When both nested properties are provided, no error
-            resource.NestedSetting2 = {"NestedVar2": "REQUIRED"}
-            # Should not raise exception
-            resource.validate_before_transform(self.TestProperties)
-
-        def test_mutually_exclusive_rule(self):
-            """Test MUTUALLY_EXCLUSIVE validation rule"""
-
-            class Resource(self.TestResource):
-                __validation_rules__ = [
-                    (self.ValidationRule.MUTUALLY_EXCLUSIVE, ["ExclusiveVar1", "ExclusiveVar2"]),
-                    (self.ValidationRule.MUTUALLY_EXCLUSIVE, ["ExclusiveVar2", "ExclusiveVar3"]),
-                    (
-                        self.ValidationRule.MUTUALLY_EXCLUSIVE,
-                        ["NestedSetting1.NestedVar1", "NestedSetting2.NestedVar1"],
-                    ),
-                    (self.ValidationRule.MUTUALLY_EXCLUSIVE, ["NestedSetting1.NestedVar2", "ExclusiveVar3"]),
-                ]
-
-            resource = Resource("TestId")
-
-            # Test 1: Cannot have both ExclusiveVar1 and ExclusiveVar2
-            resource.ExclusiveVar1 = "value1"
-            resource.ExclusiveVar2 = "value2"
-            with self.assertRaises(InvalidResourceException) as error_1:
-                resource.validate_before_transform(self.TestProperties)
-            self.assertEqual(
-                "Resource with id [TestId] is invalid. Cannot specify 'ExclusiveVar1' and 'ExclusiveVar2' together.",
-                error_1.exception.message,
-            )
-
-            # Test 2: Can have ExclusiveVar1 alone
-            resource.ExclusiveVar2 = None  # Remove ExclusiveVar2
-            # Should not raise exception
-            resource.validate_before_transform(self.TestProperties)
-
-            # Test 3: Cannot have both ExclusiveVar2 and ExclusiveVar3
-            resource.ExclusiveVar1 = None  # Remove ExclusiveVar1
-            resource.ExclusiveVar2 = "value2"
-            resource.ExclusiveVar3 = "value3"
-            with self.assertRaises(InvalidResourceException) as error_3:
-                resource.validate_before_transform(self.TestProperties)
-            self.assertEqual(
-                "Resource with id [TestId] is invalid. Cannot specify 'ExclusiveVar2' and 'ExclusiveVar3' together.",
-                error_3.exception.message,
-            )
-
-            # Test 4: Multiple exclusive violations - should show all errors
-            resource.ExclusiveVar1 = "value1"  # This conflicts with ExclusiveVar2
-            resource.ExclusiveVar2 = "value2"  # This conflicts with both ExclusiveVar1 and ExclusiveVar3
-            resource.ExclusiveVar3 = "value3"  # This conflicts with ExclusiveVar2
-            with self.assertRaises(InvalidResourceException) as error_4:
-                resource.validate_before_transform(self.TestProperties, collect_all_errors=True)
-            expected_errors = [
-                "Cannot specify 'ExclusiveVar1' and 'ExclusiveVar2' together.",
-                "Cannot specify 'ExclusiveVar2' and 'ExclusiveVar3' together.",
-            ]
-            for expected_error in expected_errors:
-                self.assertIn(expected_error, error_4.exception.message)
-
-            # Test 5: Cannot have both NestedSetting1.NestedVar1 and NestedSetting2.NestedVar1
-            resource.ExclusiveVar1 = None  # Clear previous conflicts
-            resource.ExclusiveVar2 = None
-            resource.ExclusiveVar3 = None
-            resource.NestedSetting1 = {"NestedVar1": "nested_value1"}
-            resource.NestedSetting2 = {"NestedVar1": "nested_value2"}
-            with self.assertRaises(InvalidResourceException) as error_5:
-                resource.validate_before_transform(self.TestProperties)
-            self.assertEqual(
-                "Resource with id [TestId] is invalid. Cannot specify 'NestedSetting1.NestedVar1' and 'NestedSetting2.NestedVar1' together.",
-                error_5.exception.message,
-            )
-
-            # Test 6: Cannot have both NestedSetting1.NestedVar2 and ExclusiveVar3
-            resource.NestedSetting2 = None  # Remove previous conflict
-            resource.NestedSetting1 = {"NestedVar2": "nested_value2"}
-            resource.ExclusiveVar3 = "value3"
-            with self.assertRaises(InvalidResourceException) as error_6:
-                resource.validate_before_transform(self.TestProperties)
-            self.assertEqual(
-                "Resource with id [TestId] is invalid. Cannot specify 'NestedSetting1.NestedVar2' and 'ExclusiveVar3' together.",
-                error_6.exception.message,
-            )
-
-            # Test 7: Can have nested properties that don't conflict
-            resource.ExclusiveVar3 = None  # Remove conflict
-            resource.NestedSetting1 = {"NestedVar1": "nested_value1"}  # This doesn't conflict with NestedVar2
-            resource.NestedSetting2 = {"NestedVar2": "nested_value2"}  # This doesn't conflict with NestedVar1
-            # Should not raise exception
-            resource.validate_before_transform(self.TestProperties)
-
-    class TestFormatAllErrors(TestCase):
-        """Test cases for _format_all_errors() method"""
-
-        def setUp(self):
-            """Set up test fixtures for _format_all_errors tests"""
-            # Import from parent class
-            parent = TestSamResourceMacro()
-            parent.setUp()
-            self.ValidationRule = parent.ValidationRule
-            self.TestProperties = parent.TestProperties
-            self.TestSettingProperties = parent.TestSettingProperties
-            self.TestResource = parent.TestResource
-
-        @pytest.mark.parametrize(
-            "mock_errors,expected_count,expected_messages",
-            [
-                # Single type error
-                (
-                    [{"loc": ("ConditionalVar1",), "msg": "not a valid int", "type": "type_error.integer"}],
-                    1,
-                    ["Property 'ConditionalVar1' value must be integer."],
-                ),
-                # Union type consolidation
-                (
-                    [
-                        {"loc": ("ExclusiveVar1",), "msg": "not a valid str", "type": "type_error.str"},
-                        {"loc": ("ExclusiveVar1",), "msg": "not a valid int", "type": "type_error.integer"},
-                    ],
-                    1,
-                    ["Property 'ExclusiveVar1' value must be string or integer."],
-                ),
-                # Missing property error
-                (
-                    [{"loc": ("RequiredProperty",), "msg": "field required", "type": "value_error.missing"}],
-                    1,
-                    ["Property 'RequiredProperty' is required."],
-                ),
-                # Invalid property error
-                (
-                    [{"loc": ("InvalidProperty",), "msg": "extra fields not permitted", "type": "value_error.extra"}],
-                    1,
-                    ["Property 'InvalidProperty' is an invalid property."],
-                ),
-                # Nested property error
-                (
-                    [{"loc": ("NestedSetting1", "NestedVar1"), "msg": "not a valid str", "type": "type_error.str"}],
-                    1,
-                    ["Property 'NestedSetting1.NestedVar1' value must be string."],
-                ),
-                # Multiple properties with errors
-                (
-                    [
-                        {"loc": ("ConditionalVar1",), "msg": "not a valid int", "type": "type_error.integer"},
-                        {"loc": ("ExclusiveVar1",), "msg": "field required", "type": "value_error.missing"},
-                        {"loc": ("NestedSetting1", "NestedVar1"), "msg": "not a valid str", "type": "type_error.str"},
-                    ],
-                    3,
-                    [
-                        "Property 'ConditionalVar1' value must be integer.",
-                        "Property 'ExclusiveVar1' is required.",
-                        "Property 'NestedSetting1.NestedVar1' value must be string.",
-                    ],
-                ),
-                # Fallback error formatting
-                (
-                    [{"loc": ("SomeProperty",), "msg": "Some Custom Error Message", "type": "custom_error"}],
-                    1,
-                    ["Property 'SomeProperty' some custom error message."],
-                ),
-            ],
+    def setUp(self):
+        self.TestProperties, self.TestSettingProperties, self.TestResource = (
+            SamResourceMacroTestBase.setup_test_fixtures()
         )
-        def test_format_all_errors(self, mock_errors, expected_count, expected_messages):
-            """Test formatting various types of validation errors"""
-            resource = self.TestResource("TestId")
 
-            formatted_errors = resource._format_all_errors(mock_errors)
-            self.assertEqual(len(formatted_errors), expected_count)
+    def test_validate_before_transform_simple_rules_pass(self):
+        """Test successful validation with simple rules"""
 
-            for expected_message in expected_messages:
-                self.assertIn(expected_message, formatted_errors)
+        class Resource(self.TestResource):
+            def get_property_validation_rules(self):
+                return (
+                    PropertyRules()
+                    .addConditionalInclusive("ConditionalVar1", ["ConditionalVar2"])
+                    .addMutuallyExclusive("ExclusiveVar1", "ExclusiveVar2")
+                    .addMutuallyInclusive("InclusiveVar1", "InclusiveVar2")
+                )
+
+        resource = Resource("TestId")
+        resource.ConditionalVar1 = 1
+        resource.ConditionalVar2 = 2
+        resource.ExclusiveVar1 = "value1"
+        resource.InclusiveVar1 = True
+        resource.InclusiveVar2 = True
+
+        # Should not raise exception
+        resource.validate_before_transform(self.TestProperties)
+
+    def test_validate_before_transform_complex_rules_pass(self):
+        """Test successful validation when all rules are satisfied"""
+
+        class Resource(self.TestResource):
+            def get_property_validation_rules(self):
+                return (
+                    PropertyRules()
+                    .addConditionalInclusive("ConditionalVar1", ["ConditionalVar2"])
+                    .addConditionalInclusive("ConditionalVar2", ["ConditionalVar3"])
+                    .addConditionalInclusive("NestedSetting1.NestedVar1", ["NestedSetting2.NestedVar2"])
+                    .addMutuallyExclusive("ExclusiveVar1", "ExclusiveVar2")
+                    .addMutuallyExclusive("ExclusiveVar2", "ExclusiveVar3")
+                    .addMutuallyExclusive("NestedSetting1.NestedVar1", "NestedSetting2.NestedVar1")
+                    .addMutuallyExclusive("NestedSetting1.NestedVar2", "ExclusiveVar3")
+                    .addMutuallyInclusive("InclusiveVar1", "ExclusiveVar1")
+                    .addMutuallyInclusive("NestedSetting1.NestedVar1", "NestedSetting2.NestedVar2")
+                    .addMutuallyInclusive("NestedSetting2.NestedVar2", "NestedSetting3.NestedVar2")
+                )
+
+        resource = Resource("TestId")
+
+        # Happy case: All rules satisfied
+        resource.ConditionalVar1 = 1
+        resource.ConditionalVar2 = 2
+        resource.ConditionalVar3 = 3
+        resource.ExclusiveVar1 = "ONLY_EXCLUSIVE_VAL"
+        resource.InclusiveVar1 = True
+        resource.InclusiveVar2 = False
+        resource.NestedSetting2 = {"NestedVar2": "NestedVar2"}
+        resource.NestedSetting1 = {"NestedVar1": "NestedVar1"}
+        resource.NestedSetting3 = {"NestedVar2": "NestedVar2"}
+
+        # Should not raise any exception
+        resource.validate_before_transform(self.TestProperties)
+
+    def test_validate_before_transform_conditional_inclusive(self):
+        """Test CONDITIONAL_INCLUSIVE validation rule"""
+
+        class Resource(self.TestResource):
+            def get_property_validation_rules(self):
+                return (
+                    PropertyRules()
+                    .addConditionalInclusive("ConditionalVar1=1", ["ConditionalVar2", "ConditionalVar3"])
+                    .addConditionalInclusive(
+                        "NestedSetting1.NestedVar1=test", ["NestedSetting2.NestedVar2=22", "NestedSetting2.NestedVar1"]
+                    )
+                )
+
+        resource = Resource("TestId")
+
+        # Test 1: When ConditionalVar1=1, ConditionalVar2 and ConditionalVar3 should be present
+        resource.ConditionalVar1 = 1
+        resource.NestedSetting1 = {"NestedVar1": "test"}
+        with self.assertRaises(InvalidResourceException) as error_1:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertEqual(
+            "Resource with id [TestId] is invalid. 'ConditionalVar1=1' requires all of: 'ConditionalVar2', 'ConditionalVar3'.\n'NestedSetting1.NestedVar1=test' requires all of: 'NestedSetting2.NestedVar2=22', 'NestedSetting2.NestedVar1'.",
+            error_1.exception.message,
+        )
+
+        # Test 2: Add ConditionalVar2, should still fail for ConditionalVar3
+        resource.ConditionalVar2 = 2
+        with self.assertRaises(InvalidResourceException) as error_2:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertEqual(
+            "Resource with id [TestId] is invalid. 'ConditionalVar1=1' requires all of: 'ConditionalVar3'.\n'NestedSetting1.NestedVar1=test' requires all of: 'NestedSetting2.NestedVar2=22', 'NestedSetting2.NestedVar1'.",
+            error_2.exception.message,
+        )
+
+        # Test 3: Add ConditionalVar3, should still fail for NestedSetting2.NestedVar2
+        resource.ConditionalVar3 = 3
+        with self.assertRaises(InvalidResourceException) as error_3:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertEqual(
+            "Resource with id [TestId] is invalid. 'NestedSetting1.NestedVar1=test' requires all of: 'NestedSetting2.NestedVar2=22', 'NestedSetting2.NestedVar1'.",
+            error_3.exception.message,
+        )
+
+        # Test 4: Add NestedSetting2.NestedVar2=22, should still fail for NestedSetting2.NestedVar1=12
+        resource.NestedSetting2 = {"NestedVar2": 22}
+        with self.assertRaises(InvalidResourceException) as error_4:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertEqual(
+            "Resource with id [TestId] is invalid. 'NestedSetting1.NestedVar1=test' requires all of: 'NestedSetting2.NestedVar1'.",
+            error_4.exception.message,
+        )
+
+        # Test 5: Set NestedSetting2.NestedVar1, should pass
+        resource.NestedSetting2 = {"NestedVar2": 22, "NestedVar1": 12}
+        resource.validate_before_transform(self.TestProperties)
+
+        # Test 6: When ConditionalVar1 is None/unset, conditional rules should not apply
+        resource.ConditionalVar1 = None
+        resource.ConditionalVar2 = None
+        resource.ConditionalVar3 = None
+        resource.NestedSetting1 = None
+        resource.NestedSetting2 = None
+        resource.validate_before_transform(self.TestProperties)  # Should pass
+
+        # Test 7: When ConditionalVar1 != 1, rules should not apply (value-specific behavior)
+        resource.ConditionalVar1 = 2  # Different value than 1
+        resource.ConditionalVar2 = None  # Missing target properties
+        resource.ConditionalVar3 = None
+        resource.validate_before_transform(self.TestProperties)  # Should pass
+
+        # Test 8: When NestedSetting1.NestedVar1 != "test", nested rule should not apply
+        resource.ConditionalVar1 = 1
+        resource.ConditionalVar2 = 2
+        resource.ConditionalVar3 = 3
+        resource.NestedSetting1 = {"NestedVar1": "different"}  # Different value than "test"
+        resource.NestedSetting2 = None  # Missing target property
+        resource.validate_before_transform(self.TestProperties)  # Should pass
+
+        # Test 9: All conditions are met - should pass
+        resource.ConditionalVar1 = 1
+        resource.ConditionalVar2 = 2
+        resource.ConditionalVar3 = 3
+        resource.NestedSetting1 = {"NestedVar1": "test"}
+        resource.NestedSetting2 = {"NestedVar2": 22, "NestedVar1": 12}
+        resource.validate_before_transform(self.TestProperties)  # Should pass
+
+    def test_validate_before_transform_conditional_exclusive(self):
+        """Test CONDITIONAL_EXCLUSIVE validation rule"""
+
+        class Resource(self.TestResource):
+            def get_property_validation_rules(self):
+                return (
+                    PropertyRules()
+                    .addConditionalExclusive("ConditionalVar1=1", ["ConditionalVar2", "ConditionalVar3"])
+                    .addConditionalExclusive(
+                        "NestedSetting1.NestedVar1=test", ["NestedSetting2.NestedVar2=22", "NestedSetting2.NestedVar1"]
+                    )
+                )
+
+        resource = Resource("TestId")
+
+        # Test 1: When ConditionalVar1=1, ConditionalVar2 and ConditionalVar3 should NOT be present
+        resource.ConditionalVar1 = 1
+        resource.ConditionalVar2 = 2
+        resource.ConditionalVar3 = 3
+        with self.assertRaises(InvalidResourceException) as error_1:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertIn(
+            "'ConditionalVar1=1' cannot be used with 'ConditionalVar2', 'ConditionalVar3'", error_1.exception.message
+        )
+
+        # Test 2: Remove conflicting properties, should pass
+        resource.ConditionalVar2 = None
+        resource.ConditionalVar3 = None
+        resource.validate_before_transform(self.TestProperties)
+
+        # Test 3: When NestedSetting1.NestedVar1="test", NestedSetting2.NestedVar2 should NOT be present
+        resource.NestedSetting1 = {"NestedVar1": "test"}
+        resource.NestedSetting2 = {"NestedVar2": "value2"}
+        with self.assertRaises(InvalidResourceException) as error_3:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertIn(
+            "'NestedSetting1.NestedVar1=test' cannot be used with 'NestedSetting2.NestedVar2'",
+            error_3.exception.message,
+        )
+
+        # Test 4: Remove NestedSetting2.NestedVar2, should pass
+        resource.NestedSetting2 = None
+        resource.validate_before_transform(self.TestProperties)
+
+        # Test 5: When ConditionalVar1 is None/unset, conditional rules should not apply
+        resource.ConditionalVar1 = None
+        resource.ConditionalVar2 = 2
+        resource.ConditionalVar3 = 3
+        resource.NestedSetting1 = None
+        resource.NestedSetting2 = {"NestedVar2": "value2"}
+        resource.validate_before_transform(self.TestProperties)  # Should pass
+
+        # Test 6: When ConditionalVar1 != 1, rules should not apply (value-specific behavior)
+        resource.ConditionalVar1 = 2  # Different value than 1
+        resource.ConditionalVar2 = 2  # Conflicting properties present
+        resource.ConditionalVar3 = 3
+        resource.validate_before_transform(self.TestProperties)  # Should pass
+
+        # Test 7: When NestedSetting1.NestedVar1 != "test", nested rule should not apply
+        resource.ConditionalVar1 = 1
+        resource.ConditionalVar2 = None
+        resource.ConditionalVar3 = None
+        resource.NestedSetting1 = {"NestedVar1": "different"}  # Different value than "test"
+        resource.NestedSetting2 = {"NestedVar2": "value2"}  # Conflicting property present
+        resource.validate_before_transform(self.TestProperties)  # Should pass
+
+    def test_validate_before_transform_mutually_inclusive(self):
+        """Test MUTUALLY_INCLUSIVE validation rule"""
+
+        class Resource(self.TestResource):
+            def get_property_validation_rules(self):
+                return (
+                    PropertyRules()
+                    .addMutuallyInclusive("InclusiveVar1", "InclusiveVar2")
+                    .addMutuallyInclusive("InclusiveVar1", "InclusiveVar3")
+                    .addMutuallyInclusive("NestedSetting1.NestedVar1", "NestedSetting2.NestedVar2")
+                )
+
+        resource = Resource("TestId")
+
+        # Test 1: When InclusiveVar1 is specified, InclusiveVar2 and InclusiveVar3 should be present
+        resource.InclusiveVar1 = True
+        with self.assertRaises(InvalidResourceException) as error_1:
+            resource.validate_before_transform(self.TestProperties)
+        expected_errors = [
+            "When using 'InclusiveVar1', you must also specify 'InclusiveVar2'",
+            "When using 'InclusiveVar1', you must also specify 'InclusiveVar3'",
+        ]
+        for expected_error in expected_errors:
+            self.assertIn(expected_error, error_1.exception.message)
+
+        # Test 2: Add InclusiveVar2, should still fail for InclusiveVar3
+        resource.InclusiveVar2 = True
+        with self.assertRaises(InvalidResourceException) as error_2:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertIn("When using 'InclusiveVar1', you must also specify 'InclusiveVar3'", error_2.exception.message)
+
+        # Test 3: Add InclusiveVar3, should pass for inclusive vars
+        resource.InclusiveVar3 = True
+        resource.validate_before_transform(self.TestProperties)
+
+        # Test 4: When NestedSetting1.NestedVar1 is specified, NestedSetting2.NestedVar2 should be present
+        resource.NestedSetting1 = {"NestedVar1": "AUTO"}
+        with self.assertRaises(InvalidResourceException) as error_4:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertIn(
+            "When using 'NestedSetting1.NestedVar1', you must also specify 'NestedSetting2.NestedVar2'",
+            error_4.exception.message,
+        )
+
+        # Test 5: Add NestedSetting2.NestedVar2, should pass
+        resource.NestedSetting2 = {"NestedVar2": "REQUIRED"}
+        resource.validate_before_transform(self.TestProperties)
+
+    def test_validate_before_transform_mutually_exclusive(self):
+        """Test MUTUALLY_EXCLUSIVE validation rule"""
+
+        class Resource(self.TestResource):
+            def get_property_validation_rules(self):
+                return (
+                    PropertyRules()
+                    .addMutuallyExclusive("ExclusiveVar1", "ExclusiveVar2")
+                    .addMutuallyExclusive("ExclusiveVar2", "ExclusiveVar3")
+                    .addMutuallyExclusive("NestedSetting1.NestedVar1", "NestedSetting2.NestedVar1")
+                    .addMutuallyExclusive("NestedSetting1.NestedVar2", "ExclusiveVar3")
+                )
+
+        resource = Resource("TestId")
+
+        # Test 1: Cannot have both ExclusiveVar1 and ExclusiveVar2
+        resource.ExclusiveVar1 = "value1"
+        resource.ExclusiveVar2 = "value2"
+        with self.assertRaises(InvalidResourceException) as error_1:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertEqual(
+            "Resource with id [TestId] is invalid. Cannot specify 'ExclusiveVar1' and 'ExclusiveVar2' together.",
+            error_1.exception.message,
+        )
+
+        # Test 2: Remove ExclusiveVar1, should pass
+        resource.ExclusiveVar1 = None
+        resource.ExclusiveVar2 = "value2"
+        resource.validate_before_transform(self.TestProperties)
+
+        # Test 3: Cannot have both ExclusiveVar2 and ExclusiveVar3
+        resource.ExclusiveVar2 = "value2"
+        resource.ExclusiveVar3 = "value3"
+        with self.assertRaises(InvalidResourceException) as error_3:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertEqual(
+            "Resource with id [TestId] is invalid. Cannot specify 'ExclusiveVar2' and 'ExclusiveVar3' together.",
+            error_3.exception.message,
+        )
+
+        # Test 4: Test multiple conflicts
+        resource.ExclusiveVar1 = "value1"
+        resource.ExclusiveVar2 = "value2"
+        resource.ExclusiveVar3 = "value3"
+        with self.assertRaises(InvalidResourceException) as error_4:
+            resource.validate_before_transform(self.TestProperties)
+        expected_errors = [
+            "Cannot specify 'ExclusiveVar1' and 'ExclusiveVar2' together",
+            "Cannot specify 'ExclusiveVar2' and 'ExclusiveVar3' together",
+        ]
+        for expected_error in expected_errors:
+            self.assertIn(expected_error, error_4.exception.message)
+
+        # Test 5: Test nested property exclusions
+        resource.ExclusiveVar1 = None
+        resource.ExclusiveVar2 = None
+        resource.ExclusiveVar3 = None
+        resource.NestedSetting1 = {"NestedVar1": "nested_value1"}
+        resource.NestedSetting2 = {"NestedVar1": "nested_value2"}
+        with self.assertRaises(InvalidResourceException) as error_5:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertEqual(
+            "Resource with id [TestId] is invalid. Cannot specify 'NestedSetting1.NestedVar1' and 'NestedSetting2.NestedVar1' together.",
+            error_5.exception.message,
+        )
+
+        # Test 6: Test nested vs top-level exclusion
+        resource.NestedSetting2 = {"NestedVar1": None}
+        resource.NestedSetting1 = {"NestedVar2": "nested_value1"}
+        resource.ExclusiveVar3 = "value3"
+        with self.assertRaises(InvalidResourceException) as error_6:
+            resource.validate_before_transform(self.TestProperties)
+        self.assertEqual(
+            "Resource with id [TestId] is invalid. Cannot specify 'NestedSetting1.NestedVar2' and 'ExclusiveVar3' together.",
+            error_6.exception.message,
+        )
+
+        # Test 7: Clean state should pass
+        resource.ExclusiveVar1 = None
+        resource.ExclusiveVar2 = None
+        resource.ExclusiveVar3 = None
+        resource.NestedSetting1 = {"NestedVar1": "nested_value1"}
+        resource.NestedSetting2 = {"NestedVar2": "nested_value2"}
+        resource.validate_before_transform(self.TestProperties)
+
+    @parameterized.expand(
+        [
+            # Single type error
+            (
+                [{"loc": ("ConditionalVar1",), "msg": "not a valid int", "type": "type_error.integer"}],
+                1,
+                ["Property 'ConditionalVar1' value must be integer."],
+            ),
+            # Union type consolidation
+            (
+                [
+                    {"loc": ("ExclusiveVar1",), "msg": "not a valid str", "type": "type_error.str"},
+                    {"loc": ("ExclusiveVar1",), "msg": "not a valid int", "type": "type_error.integer"},
+                ],
+                1,
+                ["Property 'ExclusiveVar1' value must be string or integer."],
+            ),
+            # Missing property error
+            (
+                [{"loc": ("RequiredProperty",), "msg": "field required", "type": "value_error.missing"}],
+                1,
+                ["Property 'RequiredProperty' is required."],
+            ),
+            # Invalid property error
+            (
+                [{"loc": ("InvalidProperty",), "msg": "extra fields not permitted", "type": "value_error.extra"}],
+                1,
+                ["Property 'InvalidProperty' is an invalid property."],
+            ),
+            # Nested property error
+            (
+                [{"loc": ("NestedSetting1", "NestedVar1"), "msg": "not a valid str", "type": "type_error.str"}],
+                1,
+                ["Property 'NestedSetting1.NestedVar1' value must be string."],
+            ),
+            # Multiple properties with errors
+            (
+                [
+                    {"loc": ("ConditionalVar1",), "msg": "not a valid int", "type": "type_error.integer"},
+                    {"loc": ("ExclusiveVar1",), "msg": "field required", "type": "value_error.missing"},
+                    {"loc": ("NestedSetting1", "NestedVar1"), "msg": "not a valid str", "type": "type_error.str"},
+                ],
+                3,
+                [
+                    "Property 'ConditionalVar1' value must be integer.",
+                    "Property 'ExclusiveVar1' is required.",
+                    "Property 'NestedSetting1.NestedVar1' value must be string.",
+                ],
+            ),
+            # Fallback error formatting
+            (
+                [{"loc": ("SomeProperty",), "msg": "Some Custom Error Message", "type": "custom_error"}],
+                1,
+                ["Property 'SomeProperty' some custom error message."],
+            ),
+        ],
+    )
+    def test_format_all_errors(self, mock_errors, expected_count, expected_messages):
+        """Test formatting various types of validation errors"""
+        resource = self.TestResource("TestId")
+
+        formatted_errors = resource._format_all_errors(mock_errors)
+        self.assertEqual(len(formatted_errors), expected_count)
+
+        for expected_message in expected_messages:
+            self.assertIn(expected_message, formatted_errors)
