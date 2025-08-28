@@ -99,10 +99,28 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiDeployment19c8cf5c63": {
+    "MyApiBasePathMapping": {
       "Condition": "C1",
       "Properties": {
-        "Description": "RestApi deployment id: 19c8cf5c63090f12c5a96f6f57162495bed446c7",
+        "BasePath": {
+          "Fn::Sub": "ap-southeast-1-api"
+        },
+        "DomainName": {
+          "Ref": "ApiGatewayDomainNamec0ed6fae34"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "MyApiDeployment651fe13005": {
+      "Condition": "C1",
+      "Properties": {
+        "Description": "RestApi deployment id: 651fe13005fac4c7c7f2fe93b77c7ef2c6c3e746",
         "RestApiId": {
           "Ref": "MyApi"
         }
@@ -113,7 +131,7 @@
       "Condition": "C1",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment19c8cf5c63"
+          "Ref": "MyApiDeployment651fe13005"
         },
         "RestApiId": {
           "Ref": "MyApi"
@@ -121,38 +139,6 @@
         "StageName": "Prod"
       },
       "Type": "AWS::ApiGateway::Stage"
-    },
-    "MyApifetchBasePathMapping": {
-      "Condition": "C1",
-      "Properties": {
-        "BasePath": "fetch",
-        "DomainName": {
-          "Ref": "ApiGatewayDomainNamec0ed6fae34"
-        },
-        "RestApiId": {
-          "Ref": "MyApi"
-        },
-        "Stage": {
-          "Ref": "MyApiProdStage"
-        }
-      },
-      "Type": "AWS::ApiGateway::BasePathMapping"
-    },
-    "MyApigetBasePathMapping": {
-      "Condition": "C1",
-      "Properties": {
-        "BasePath": "get",
-        "DomainName": {
-          "Ref": "ApiGatewayDomainNamec0ed6fae34"
-        },
-        "RestApiId": {
-          "Ref": "MyApi"
-        },
-        "Stage": {
-          "Ref": "MyApiProdStage"
-        }
-      },
-      "Type": "AWS::ApiGateway::BasePathMapping"
     },
     "MyFunction": {
       "Condition": "C1",
