@@ -58,7 +58,7 @@ Resources:
         DomainName: !Sub 'example-${AWS::Region}.com'
         CertificateArn: !Ref MyDomainCert
         EndpointConfiguration: !Ref EndpointConf
-        BasePath: [/get, /fetch]
+        BasePath: !Sub '${AWS::Region}-api'
         MutualTlsAuthentication:
           TruststoreUri: !Ref MyMTLSUri
           TruststoreVersion: !Ref MyMTLSVersion

@@ -107,10 +107,28 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiDeployment32e59613e2": {
+    "MyApiBasePathMapping": {
       "Condition": "C1",
       "Properties": {
-        "Description": "RestApi deployment id: 32e59613e2e02a1f1d264849167ea359f10342f0",
+        "BasePath": {
+          "Fn::Sub": "us-gov-west-1-api"
+        },
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName9c93aac102"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "MyApiDeployment9d140ab9b8": {
+      "Condition": "C1",
+      "Properties": {
+        "Description": "RestApi deployment id: 9d140ab9b8b8ee141d5cd2d4a90a374c37a10db7",
         "RestApiId": {
           "Ref": "MyApi"
         }
@@ -121,7 +139,7 @@
       "Condition": "C1",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment32e59613e2"
+          "Ref": "MyApiDeployment9d140ab9b8"
         },
         "RestApiId": {
           "Ref": "MyApi"
@@ -129,38 +147,6 @@
         "StageName": "Prod"
       },
       "Type": "AWS::ApiGateway::Stage"
-    },
-    "MyApifetchBasePathMapping": {
-      "Condition": "C1",
-      "Properties": {
-        "BasePath": "fetch",
-        "DomainName": {
-          "Ref": "ApiGatewayDomainName9c93aac102"
-        },
-        "RestApiId": {
-          "Ref": "MyApi"
-        },
-        "Stage": {
-          "Ref": "MyApiProdStage"
-        }
-      },
-      "Type": "AWS::ApiGateway::BasePathMapping"
-    },
-    "MyApigetBasePathMapping": {
-      "Condition": "C1",
-      "Properties": {
-        "BasePath": "get",
-        "DomainName": {
-          "Ref": "ApiGatewayDomainName9c93aac102"
-        },
-        "RestApiId": {
-          "Ref": "MyApi"
-        },
-        "Stage": {
-          "Ref": "MyApiProdStage"
-        }
-      },
-      "Type": "AWS::ApiGateway::BasePathMapping"
     },
     "MyFunction": {
       "Condition": "C1",
