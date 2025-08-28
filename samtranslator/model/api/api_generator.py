@@ -554,12 +554,13 @@ class ApiGenerator:
             basepath_mapping = self._create_basepath_mapping(api_domain_name, rest_api, None, None)
             basepath_resource_list.extend([basepath_mapping])
         else:
+            if not is_intrinsic(basepaths[0]):
+                sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
             for basepath in basepaths:
                 if is_intrinsic(basepath):
                     mapping_basepath = basepath
                     logical_id = self.logical_id + "BasePathMapping"
                 else:
-                    sam_expect(basepaths, self.logical_id, "Domain.BasePath").to_be_a_list_of(ExpectedType.STRING)
                     # Remove possible leading and trailing '/' because a base path may only
                     # contain letters, numbers, and one of "$-_.+!*'()"
                     path = "".join(e for e in basepath if e.isalnum())
