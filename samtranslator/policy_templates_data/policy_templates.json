@@ -122,13 +122,23 @@
           {
             "Action": [
               "athena:ListWorkGroups",
-              "athena:GetExecutionEngine",
+              "athena:GetWorkGroup",
               "athena:GetExecutionEngines",
-              "athena:GetNamespace",
-              "athena:GetCatalogs",
-              "athena:GetNamespaces",
-              "athena:GetTables",
-              "athena:GetTable"
+              "athena:GetDatabase",
+              "athena:ListDataCatalogs",
+              "athena:ListDatabases",
+              "athena:ListTableMetadata",
+              "athena:GetTableMetadata"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+          },
+          {
+            "Action": [
+              "glue:GetDatabases",
+              "glue:GetDatabase",
+              "glue:GetTables",
+              "glue:GetTable"
             ],
             "Effect": "Allow",
             "Resource": "*"
