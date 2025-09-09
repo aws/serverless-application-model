@@ -1,18 +1,30 @@
+import logging
 from unittest import SkipTest
 from unittest.case import skipIf
 
 from parameterized import parameterized
-from tenacity import retry, retry_if_exception, stop_after_attempt
+from tenacity import (
+    after_log,
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+    wait_random,
+)
 
 from integration.config.service_names import EVENT_RULE_WITH_EVENT_BUS
 from integration.conftest import clean_bucket
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
 
-retry_once = retry(
-    stop=stop_after_attempt(2),
-    # unittest raises SkipTest for skipping tests
+LOG = logging.getLogger(__name__)
+
+retry_with_backoff = retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=4, max=16) + wait_random(0, 1),
     retry=retry_if_exception(lambda e: not isinstance(e, SkipTest)),
+    after=after_log(LOG, logging.WARNING),
+    reraise=True,
 )
 
 
@@ -35,19 +47,20 @@ class TestConnectorsWithEventRuleToEB(BaseTest):
             ("combination/connector_event_rule_to_eb_custom_write",),
         ]
     )
-    @retry_once
     def test_connector_event_rule_eb_by_invoking_a_function(self, template_file_path):
         self.skip_using_service_detector(template_file_path)
         self.create_and_verify_stack(template_file_path)
 
         lambda_function_name = self.get_physical_id_by_logical_id("TriggerFunction")
-        lambda_client = self.client_provider.lambda_client
+        self.verify_lambda_invocation(lambda_function_name)
 
-        request_params = {
-            "FunctionName": lambda_function_name,
-            "InvocationType": "RequestResponse",
-            "Payload": "{}",
-        }
-        response = lambda_client.invoke(**request_params)
+    @retry_with_backoff
+    def verify_lambda_invocation(self, lambda_function_name):
+        """Verify Lambda function invocation with retry logic."""
+        response = self.client_provider.lambda_client.invoke(
+            FunctionName=lambda_function_name,
+            InvocationType="RequestResponse",
+            Payload="{}"
+        )
         self.assertEqual(response.get("StatusCode"), 200)
         self.assertEqual(response.get("FunctionError"), None)
