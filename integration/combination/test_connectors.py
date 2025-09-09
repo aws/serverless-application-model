@@ -53,9 +53,7 @@ class TestConnectorsWithEventBus(BaseTest):
     def verify_lambda_invocation(self, lambda_function_name):
         """Verify Lambda function invocation with retry logic."""
         response = self.client_provider.lambda_client.invoke(
-            FunctionName=lambda_function_name,
-            InvocationType="RequestResponse",
-            Payload="{}"
+            FunctionName=lambda_function_name, InvocationType="RequestResponse", Payload="{}"
         )
         self.assertEqual(response.get("StatusCode"), 200)
         self.assertEqual(response.get("FunctionError"), None)
@@ -74,9 +72,7 @@ class TestConnectors(BaseTest):
     def verify_lambda_invocation(self, lambda_function_name):
         """Verify Lambda function invocation with retry logic."""
         response = self.client_provider.lambda_client.invoke(
-            FunctionName=lambda_function_name,
-            InvocationType="RequestResponse",
-            Payload="{}"
+            FunctionName=lambda_function_name, InvocationType="RequestResponse", Payload="{}"
         )
         self.assertEqual(response.get("StatusCode"), 200)
         self.assertEqual(response.get("FunctionError"), None)
