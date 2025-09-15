@@ -258,10 +258,10 @@
           "Description": "Name of the Athena Workgroup"
         },
         "DatabaseName": {
-          "Description": "Name of the Athena Workgroup"
+          "Description": "Name of the Glue Database"
         },
         "TableName": {
-          "Description": "Name of the Athena Workgroup"
+          "Description": "Name of the Glue Table"
         }
       }
     },
