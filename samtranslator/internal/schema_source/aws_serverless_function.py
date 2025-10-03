@@ -411,6 +411,7 @@ class HttpApiEvent(BaseModel):
 
 class MSKEventProperties(BaseModel):
     ConsumerGroupId: Optional[PassThroughProp] = mskeventproperties("ConsumerGroupId")
+    Enabled: Optional[PassThroughProp]  # TODO: it doesn't show up in docs yet
     FilterCriteria: Optional[PassThroughProp] = mskeventproperties("FilterCriteria")
     KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumBatchingWindowInSeconds")

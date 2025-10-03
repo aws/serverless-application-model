@@ -27,6 +27,12 @@ Resources:
               logs:CreateLogStream, logs:PutLogEvents, s3:ListBucket]
             Effect: Allow
             Resource: '*'
+          - Action: s3:PutObject
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+              - PreCreatedS3Bucket
+              - Arn
       ManagedPolicyArns:
       - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Tags:
@@ -60,6 +66,7 @@ Resources:
         MyMskEvent:
           Type: MSK
           Properties:
+            Enabled: false
             StartingPosition: LATEST
             Stream:
               Ref: MyMskCluster
