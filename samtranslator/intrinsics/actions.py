@@ -7,7 +7,7 @@ from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemp
 
 def _get_parameter_value(parameters: Dict[str, Any], param_name: str, default: Any = None) -> Any:
     """
-    Get parameter value from parameters dict, but return None if it's a CloudFormation internal placeholder.
+    Get parameter value from parameters dict, but return default (None) if it's a CloudFormation internal placeholder.
 
     CloudFormation internal placeholders are passed during changeset creation with --include-nested-stacks
     when there are cross-references between nested stacks that don't exist yet.
@@ -127,10 +127,7 @@ class RefAction(Action):
             return input_dict
 
         # Use the wrapper function to get parameter value
-        # It returns None if the parameter is a CloudFormation internal placeholder
-
-        # If param_value is None, either the parameter doesn't exist or it's a placeholder
-        # Return the original input unchanged
+        # It returns the original input unchanged if the parameter is a CloudFormation internal placeholder
         return _get_parameter_value(parameters, param_name, input_dict)
 
     def resolve_resource_refs(
@@ -220,7 +217,7 @@ class SubAction(Action):
             :return: Either the value it resolves to. If not the original reference
             """
             # Use the wrapper function to get parameter value
-            # It returns None if the parameter is a CloudFormation internal placeholder
+            # It returns the original input unchanged if the parameter is a CloudFormation internal placeholder
             return _get_parameter_value(parameters, prop_name, full_ref)
 
         return self._handle_sub_action(input_dict, do_replacement)
