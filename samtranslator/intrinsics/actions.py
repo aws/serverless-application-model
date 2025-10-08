@@ -7,7 +7,9 @@ from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemp
 
 def _get_parameter_value(parameters: Dict[str, Any], param_name: str, default: Any = None) -> Any:
     """
-    Get parameter value from parameters dict, but return default (None) if it's a CloudFormation internal placeholder.
+    Get parameter value from parameters dict, but return default (None) if 
+    - it's a CloudFormation internal placeholder.
+    - param_name is not in the parameters.
 
     CloudFormation internal placeholders are passed during changeset creation with --include-nested-stacks
     when there are cross-references between nested stacks that don't exist yet.
