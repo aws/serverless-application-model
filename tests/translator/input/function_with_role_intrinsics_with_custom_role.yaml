@@ -1,0 +1,18 @@
+Parameters:
+  roleArn: arn:aws:iam::123456789012:role/MyCustomRole
+
+Conditions:
+  RoleExists: !Not [!Equals ['', !Ref roleArn]]
+
+Resources:
+  MinimalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Role: !If
+      - RoleExists
+      - !Ref roleArn
+      - !Ref "AWS::NoValue"

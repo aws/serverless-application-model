@@ -1,0 +1,41 @@
+{
+  "Conditions": {
+    "RoleExists": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            "",
+            {
+              "Ref": "roleArn"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "Parameters": {
+    "roleArn": "arn:aws:iam::123456789012:role/MyCustomRole"
+  },
+  "Resources": {
+    "MinimalFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Ref": "roleArn"
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    }
+  }
+}

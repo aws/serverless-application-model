@@ -720,3 +720,94 @@ def test_function_datasource_set_with_none():
     api = SamGraphQLApi("MyApi")
     none_datasource = api._construct_none_datasource("foo")
     assert none_datasource
+
+
+class TestSamFunctionRoleResolver(TestCase):
+    """
+    Tests for resolving role property values in SamFunction
+    """
+
+    def setUp(self):
+        self.function = SamFunction("foo")
+        self.function.CodeUri = "s3://foobar/foo.zip"
+        self.function.Runtime = "foo"
+        self.function.Handler = "bar"
+        self.template = {"Conditions": {}}
+
+        self.kwargs = {
+            "intrinsics_resolver": IntrinsicsResolver({}),
+            "event_resources": [],
+            "managed_policy_map": {},
+            "resource_resolver": ResourceResolver({}),
+            "conditions": self.template.get("Conditions", {}),
+        }
+
+    def test_role_none_creates_execution_role(self):
+        self.function.Role = None
+        cfn_resources = self.function.to_cloudformation(**self.kwargs)
+        generated_roles = [x for x in cfn_resources if isinstance(x, IAMRole)]
+
+        self.assertEqual(len(generated_roles), 1)  # Should create execution role
+
+    def test_role_with_parameter_ref(self):
+        self.function.Role = {"Ref": "roleArn"}
+
+        kwargs = dict(self.kwargs)
+        kwargs["intrinsics_resolver"] = IntrinsicsResolver({"roleArn": "arn:aws:iam::123456789012:role/existing-role"})
+
+        cfn_resources = self.function.to_cloudformation(**kwargs)
+        lambda_function = next(r for r in cfn_resources if isinstance(r, LambdaFunction))
+        generated_roles = [x for x in cfn_resources if isinstance(x, IAMRole)]
+
+        self.assertEqual(len(generated_roles), 0)
+        self.assertEqual(lambda_function.Role, "arn:aws:iam::123456789012:role/existing-role")
+
+    def test_role_if_condition_valid_role_no_creation(self):
+        self.function.Role = {
+            "Fn::If": ["Condition", "arn:aws:iam::123456789012:role/existing-role", {"Ref": "AWS::NoValue"}]
+        }
+
+        template = {"Conditions": {"Condition": True}}
+
+        kwargs = dict(self.kwargs)
+        kwargs["conditions"] = template.get("Conditions", {})
+
+        cfn_resources = self.function.to_cloudformation(**kwargs)
+        generated_roles = [x for x in cfn_resources if isinstance(x, IAMRole)]
+        lambda_function = next(r for r in cfn_resources if r.resource_type == "AWS::Lambda::Function")
+
+        self.assertEqual(len(generated_roles), 0)  # Should not create execution role
+        self.assertEqual(lambda_function.Role, "arn:aws:iam::123456789012:role/existing-role")
+
+    def test_role_if_condition_no_value_creates_execution_role(self):
+        self.function.Role = {
+            "Fn::If": ["Condition", "arn:aws:iam::123456789012:role/existing-role", {"Ref": "AWS::NoValue"}]
+        }
+
+        template = {"Conditions": {"Condition": False}}
+
+        kwargs = dict(self.kwargs)
+        kwargs["conditions"] = template.get("Conditions", {})
+
+        cfn_resources = self.function.to_cloudformation(**kwargs)
+        generated_roles = [x for x in cfn_resources if isinstance(x, IAMRole)]
+
+        self.assertEqual(len(generated_roles), 1)  # Should create execution role
+
+    def test_role_with_nested_intrinsics(self):
+        self.function.Role = {
+            "Fn::If": [
+                "Condition",
+                {"Ref": "roleArn"},
+                {"Fn::If": ["SecondCondition", "arn:aws:iam::123456789012:role/second-role", {"Ref": "AWS::NoValue"}]},
+            ]
+        }
+
+        template = {"Conditions": {"Condition": False, "SecondCondition": True}}
+
+        kwargs = dict(self.kwargs)
+        kwargs["conditions"] = template.get("Conditions", {})
+
+        cfn_resources = self.function.to_cloudformation(**kwargs)
+        lambda_function = next(r for r in cfn_resources if isinstance(r, LambdaFunction))
+        self.assertEqual(lambda_function.Role, "arn:aws:iam::123456789012:role/second-role")
