@@ -119,6 +119,133 @@ class TestParameterReferenceResolution(TestCase):
         self.assertEqual(resolver.resolve_parameter_refs(input), expected)
         resolver._try_resolve_parameter_refs.assert_not_called()
 
+    def test_cloudformation_internal_placeholder_not_resolved(self):
+        """Test that CloudFormation internal placeholders are not resolved"""
+        parameter_values = {
+            "UserPoolArn": "{{IntrinsicFunction:debugging-cloudformation-issues4/Cognito.Outputs.UserPoolArn/Fn::GetAtt}}",
+            "NormalParam": "normal-value",
+        }
+        resolver = IntrinsicsResolver(parameter_values)
+
+        # CloudFormation placeholder should not be resolved
+        input1 = {"Ref": "UserPoolArn"}
+        expected1 = {"Ref": "UserPoolArn"}
+        output1 = resolver.resolve_parameter_refs(input1)
+        self.assertEqual(output1, expected1)
+
+        # Normal parameter should still be resolved
+        input2 = {"Ref": "NormalParam"}
+        expected2 = "normal-value"
+        output2 = resolver.resolve_parameter_refs(input2)
+        self.assertEqual(output2, expected2)
+
+    def test_cloudformation_placeholders_in_nested_structure(self):
+        """Test CloudFormation placeholders in nested structures"""
+        parameter_values = {
+            "Placeholder1": "{{IntrinsicFunction:stack/Output1/Fn::GetAtt}}",
+            "Placeholder2": "{{IntrinsicFunction:stack/Output2/Fn::GetAtt}}",
+            "NormalParam": "value",
+        }
+        resolver = IntrinsicsResolver(parameter_values)
+
+        input = {
+            "Resources": {
+                "Resource1": {
+                    "Properties": {
+                        "Prop1": {"Ref": "Placeholder1"},
+                        "Prop2": {"Ref": "NormalParam"},
+                        "Prop3": {"Ref": "Placeholder2"},
+                    }
+                }
+            }
+        }
+
+        expected = {
+            "Resources": {
+                "Resource1": {
+                    "Properties": {
+                        "Prop1": {"Ref": "Placeholder1"},  # Not resolved
+                        "Prop2": "value",  # Resolved
+                        "Prop3": {"Ref": "Placeholder2"},  # Not resolved
+                    }
+                }
+            }
+        }
+
+        output = resolver.resolve_parameter_refs(input)
+        self.assertEqual(output, expected)
+
+    def test_cloudformation_placeholders_in_lists(self):
+        """Test CloudFormation placeholders in list structures"""
+        parameter_values = {
+            "VpceId": "{{IntrinsicFunction:stack/VpcEndpoint.Outputs.Id/Fn::GetAtt}}",
+            "Region": "us-east-1",
+        }
+        resolver = IntrinsicsResolver(parameter_values)
+
+        input = [{"Ref": "VpceId"}, {"Ref": "Region"}, "static-value", {"Ref": "VpceId"}]
+
+        expected = [
+            {"Ref": "VpceId"},  # Not resolved
+            "us-east-1",  # Resolved
+            "static-value",
+            {"Ref": "VpceId"},  # Not resolved
+        ]
+
+        output = resolver.resolve_parameter_refs(input)
+        self.assertEqual(output, expected)
+
+    def test_cloudformation_placeholders_with_sub(self):
+        """Test that CloudFormation placeholders inside Fn::Sub are not substituted
+
+        Similar to Ref, Fn::Sub should not substitute CloudFormation internal placeholders.
+        This prevents the placeholders from being embedded in strings where they can't be
+        properly handled by CloudFormation.
+        """
+        parameter_values = {
+            "Placeholder": "{{IntrinsicFunction:stack/Output/Fn::GetAtt}}",
+            "NormalParam": "normal-value",
+        }
+        resolver = IntrinsicsResolver(parameter_values)
+
+        # Sub should not substitute CloudFormation placeholders, but should substitute normal params
+        input = {"Fn::Sub": "Value is ${Placeholder} and ${NormalParam}"}
+        expected = {"Fn::Sub": "Value is ${Placeholder} and normal-value"}
+
+        output = resolver.resolve_parameter_refs(input)
+        self.assertEqual(output, expected)
+
+    def test_various_cloudformation_placeholder_formats(self):
+        """Test various CloudFormation placeholder formats"""
+        parameter_values = {
+            "Valid1": "{{IntrinsicFunction:stack/Resource.Outputs.Value/Fn::GetAtt}}",
+            "Valid2": "{{IntrinsicFunction:name-with-dashes/Out/Fn::GetAtt}}",
+            "Valid3": "{{IntrinsicFunction:stack123/Resource.Out/Fn::GetAtt}}",
+            "NotPlaceholder1": "{{SomethingElse}}",
+            "NotPlaceholder2": "{{intrinsicfunction:lowercase}}",
+            "NotPlaceholder3": "normal-string",
+        }
+        resolver = IntrinsicsResolver(parameter_values)
+
+        # Valid placeholders should not be resolved
+        for param in ["Valid1", "Valid2", "Valid3"]:
+            input = {"Ref": param}
+            expected = {"Ref": param}
+            output = resolver.resolve_parameter_refs(input)
+            self.assertEqual(output, expected, f"Failed for {param}")
+
+        # Non-placeholders should be resolved
+        test_cases = [
+            ("NotPlaceholder1", "{{SomethingElse}}"),
+            ("NotPlaceholder2", "{{intrinsicfunction:lowercase}}"),
+            ("NotPlaceholder3", "normal-string"),
+        ]
+
+        for param, expected_value in test_cases:
+            input = {"Ref": param}
+            output = resolver.resolve_parameter_refs(input)
+            self.assertEqual(output, expected_value, f"Failed for {param}")
+
 
 class TestResourceReferenceResolution(TestCase):
     def setUp(self):
