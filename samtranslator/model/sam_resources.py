@@ -321,8 +321,12 @@ class SamFunction(SamResourceMacro):
             lambda_url = self._construct_function_url(lambda_function, lambda_alias, self.FunctionUrlConfig)
             resources.append(lambda_url)
             url_permission = self._construct_url_permission(lambda_function, lambda_alias, self.FunctionUrlConfig)
-            if url_permission:
+            invoke_dual_auth_permission = self._construct_invoke_permission(
+                lambda_function, lambda_alias, self.FunctionUrlConfig
+            )
+            if url_permission and invoke_dual_auth_permission:
                 resources.append(url_permission)
+                resources.append(invoke_dual_auth_permission)
 
         self._validate_deployment_preference_and_add_update_policy(
             kwargs.get("deployment_preference_collection"),
@@ -332,7 +336,6 @@ class SamFunction(SamResourceMacro):
             self.get_passthrough_resource_attributes(),
             feature_toggle,
         )
-
         event_invoke_policies: List[Dict[str, Any]] = []
         if self.EventInvokeConfig:
             function_name = lambda_function.logical_id
@@ -1225,8 +1228,12 @@ class SamFunction(SamResourceMacro):
         lambda_function : LambdaUrl
             Lambda Function resource
 
-        llambda_alias : LambdaAlias
+        lambda_alias : LambdaAlias
             Lambda Alias resource
+
+
+        function_url_config: Dict
+            Function url config used to create FURL
 
         Returns
         -------
@@ -1248,6 +1255,47 @@ class SamFunction(SamResourceMacro):
         lambda_permission.Principal = "*"
         lambda_permission.FunctionUrlAuthType = auth_type
         return lambda_permission
+
+    def _construct_invoke_permission(
+        self, lambda_function: LambdaFunction, lambda_alias: Optional[LambdaAlias], function_url_config: Dict[str, Any]
+    ) -> Optional[LambdaPermission]:
+        """
+        Construct the lambda permission associated with the function invoke resource in a case
+        for public access when AuthType is NONE
+
+        Parameters
+        ----------
+        lambda_function : LambdaUrl
+            Lambda Function resource
+
+        lambda_alias : LambdaAlias
+            Lambda Alias resource
+
+        function_url_config: Dict
+            Function url config used to create FURL
+
+        Returns
+        -------
+        LambdaPermission
+            The lambda permission appended to a function that allow function invoke only from Function URL
+        """
+        # create lambda:InvokeFunction with InvokedViaFunctionUrl=True
+        auth_type = function_url_config.get("AuthType")
+
+        if auth_type not in ["NONE"] or is_intrinsic(function_url_config):
+            return None
+
+        logical_id = f"{lambda_function.logical_id}URLInvokeAllowPublicAccess"
+        lambda_permission_attributes = self.get_passthrough_resource_attributes()
+        lambda_invoke_permission = LambdaPermission(logical_id=logical_id, attributes=lambda_permission_attributes)
+        lambda_invoke_permission.Action = "lambda:InvokeFunction"
+        lambda_invoke_permission.Principal = "*"
+        lambda_invoke_permission.FunctionName = (
+            lambda_alias.get_runtime_attr("arn") if lambda_alias else lambda_function.get_runtime_attr("name")
+        )
+        lambda_invoke_permission.InvokedViaFunctionUrl = True
+
+        return lambda_invoke_permission
 
 
 class SamApi(SamResourceMacro):
