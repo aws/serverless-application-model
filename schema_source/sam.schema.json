@@ -2397,6 +2397,9 @@
         "DestinationConfig": {
           "$ref": "#/definitions/PassThroughProp"
         },
+        "Enabled": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "FilterCriteria": {
           "allOf": [
             {
