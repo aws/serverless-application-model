@@ -20,7 +20,7 @@ from samtranslator.utils.utils import as_array, insert_unique
 class ConnectorResourceReference:
     """Reference to a connector resource with all its identifying properties."""
 
-    logical_id: str
+    logical_id: Optional[str]
     resource_type: str
     arn: Optional[str] = None
     role_name: Optional[str] = None
