@@ -1,4 +1,4 @@
-from collections import namedtuple
+from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional
 
 from typing_extensions import TypeGuard
@@ -16,20 +16,18 @@ from samtranslator.model.stepfunctions import StepFunctionsStateMachine
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.utils.utils import as_array, insert_unique
 
-# TODO: Switch to dataclass
-ConnectorResourceReference = namedtuple(
-    "ConnectorResourceReference",
-    [
-        "logical_id",
-        "resource_type",
-        "arn",
-        "role_name",
-        "queue_url",
-        "resource_id",
-        "name",
-        "qualifier",
-    ],
-)
+@dataclass(frozen=True)
+class ConnectorResourceReference:
+    """Reference to a connector resource with all its identifying properties."""
+
+    logical_id: str
+    resource_type: str
+    arn: Optional[str] = None
+    role_name: Optional[str] = None
+    queue_url: Optional[str] = None
+    resource_id: Optional[str] = None
+    name: Optional[str] = None
+    qualifier: Optional[str] = None
 
 _SAM_TO_CFN_RESOURCE_TYPE = {
     SamResourceType.Function.value: LambdaFunction.resource_type,
