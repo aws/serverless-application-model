@@ -33,6 +33,7 @@ Resources:
         MyMskEvent:
           Type: MSK
           Properties:
+            Enabled: false
             StartingPosition: LATEST
             Stream:
               Ref: MyMskCluster
