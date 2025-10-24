@@ -7,6 +7,17 @@ transparent and open process for evolving AWS SAM.
 
 Please read through this document before submitting any issues or pull requests to ensure we have all the necessary information to effectively respond to your bug report or contribution.
 
+## AI Usage
+
+While using generative AI is allowed when contributing to this project, please keep the following points in mind:
+
+* Review all code yourself before you submit it.
+* Understand all the code you have submitted in order to answer any questions the maintainers could have when reviewing your PR.
+* Avoid being overly verbose in code and testing - extra code can be hard to review.
+  * For example, avoid writing unit tests that duplicate existing ones, or test libraries that you're using.
+* Keep PR descriptions, comments, and follow ups concise.
+* Ensure AI-generated code meets the same quality standards as human-written code.
+
 ## Integrating AWS SAM into your tool
 
 We encourage you to modify SAM to integrate it with other frameworks and deployment providers from the community for building serverless applications. If you're building a new tool that will use AWS SAM, let us know how we can help!
