@@ -1,0 +1,162 @@
+{
+  "Resources": {
+    "ApiGatewayDomainName1bc412bb08": {
+      "Properties": {
+        "DomainName": "api.example.com",
+        "EndpointConfiguration": {
+          "IpAddressType": "dualstack",
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "RegionalCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/example"
+      },
+      "Type": "AWS::ApiGateway::DomainName"
+    },
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/test": {
+              "get": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiBasePathMapping": {
+      "Properties": {
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName1bc412bb08"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMapping"
+    },
+    "MyApiDeployment40b05f8308": {
+      "Properties": {
+        "Description": "RestApi deployment id: 40b05f8308a845bae46f8533064c760f37253eec",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment40b05f8308"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  return { statusCode: 200, body: 'Hello' };\n};\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs18.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyFunctionApiEventPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/test",
+            {
+              "__ApiId__": {
+                "Ref": "MyApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

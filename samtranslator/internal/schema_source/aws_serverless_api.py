@@ -175,6 +175,11 @@ class Domain(BaseModel):
     EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE", "PRIVATE"]]] = domain(
         "EndpointConfiguration"
     )
+    IpAddressType: Optional[PassThroughProp] = passthrough_prop(
+        DOMAIN_STEM,
+        "IpAddressType",
+        ["AWS::ApiGateway::DomainName.EndpointConfiguration", "IpAddressType"],
+    )
     MutualTlsAuthentication: Optional[PassThroughProp] = passthrough_prop(
         DOMAIN_STEM,
         "MutualTlsAuthentication",
@@ -222,6 +227,11 @@ class EndpointConfiguration(BaseModel):
         ENDPOINT_CONFIGURATION_STEM,
         "VPCEndpointIds",
         ["AWS::ApiGateway::RestApi.EndpointConfiguration", "VpcEndpointIds"],
+    )
+    IpAddressType: Optional[PassThroughProp] = passthrough_prop(
+        ENDPOINT_CONFIGURATION_STEM,
+        "IpAddressType",
+        ["AWS::ApiGateway::RestApi.EndpointConfiguration", "IpAddressType"],
     )
 
 
