@@ -347,16 +347,13 @@ class SamFunction(SamResourceMacro):
         managed_policy_map = kwargs.get("managed_policy_map", {})
         get_managed_policy_map = kwargs.get("get_managed_policy_map")
 
-        execution_role = None
-        if lambda_function.Role is None:
-            execution_role = self._construct_role(
-                managed_policy_map,
-                event_invoke_policies,
-                intrinsics_resolver,
-                get_managed_policy_map,
-            )
-            lambda_function.Role = execution_role.get_runtime_attr("arn")
-            resources.append(execution_role)
+        execution_role = self._construct_role(
+            managed_policy_map,
+            event_invoke_policies,
+            intrinsics_resolver,
+            get_managed_policy_map,
+        )
+        self._make_lambda_role(lambda_function, intrinsics_resolver, execution_role, resources)
 
         try:
             resources += self._generate_event_resources(
@@ -373,6 +370,42 @@ class SamFunction(SamResourceMacro):
         self.propagate_tags(resources, self.Tags, self.PropagateTags)
 
         return resources
+
+    def _make_lambda_role(
+        self,
+        lambda_function: LambdaFunction,
+        intrinsics_resolver: IntrinsicsResolver,
+        execution_role: IAMRole,
+        resources: List[Any],
+    ) -> None:
+        lambda_role = lambda_function.Role
+
+        if lambda_role is None:
+            resources.append(execution_role)
+            lambda_function.Role = execution_role.get_runtime_attr("arn")
+
+        if is_intrinsic_if(lambda_role):
+            resources.append(execution_role)
+
+            # We need to create and if else condition here
+            role_resolved_value = intrinsics_resolver.resolve_parameter_refs(self.Role)
+            role_list = role_resolved_value.get("Fn::If")
+
+            # both are none values then we need to create a role
+            if is_intrinsic_no_value(role_list[1]) and is_intrinsic_no_value(role_list[2]):
+                lambda_function.Role = execution_role.get_runtime_attr("arn")
+
+            # first value is none so we should create condition ? create : [2]
+            elif is_intrinsic_no_value(role_list[1]):
+                lambda_function.Role = make_conditional(
+                    role_list[0], execution_role.get_runtime_attr("arn"), role_list[2]
+                )
+
+            # second value is none so we should create condition ? [1] : create
+            elif is_intrinsic_no_value(role_list[2]):
+                lambda_function.Role = make_conditional(
+                    role_list[0], role_list[1], execution_role.get_runtime_attr("arn")
+                )
 
     def _construct_event_invoke_config(  # noqa: PLR0913
         self,
