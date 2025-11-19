@@ -5,6 +5,31 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 
 
+def _get_parameter_value(parameters: Dict[str, Any], param_name: str, default: Any = None) -> Any:
+    """
+    Get parameter value from parameters dict, but return default (None) if
+    - it's a CloudFormation internal placeholder.
+    - param_name is not in the parameters.
+
+    CloudFormation internal placeholders are passed during changeset creation with --include-nested-stacks
+    when there are cross-references between nested stacks that don't exist yet.
+    These placeholders should not be resolved by SAM.
+
+    :param parameters: Dictionary of parameter values
+    :param param_name: Name of the parameter to retrieve
+    :param default: Default value to return if parameter not found or is a placeholder
+    :return: Parameter value, or default if not found or is a CloudFormation placeholder
+    """
+    value = parameters.get(param_name, default)
+
+    # Check if the value is a CloudFormation internal placeholder
+    # E.g. {{IntrinsicFunction:api-xx/MyStack.Outputs.API/Fn::GetAtt}}
+    if isinstance(value, str) and value.startswith("{{IntrinsicFunction:"):
+        return default
+
+    return value
+
+
 class Action(ABC):
     """
     Base class for intrinsic function actions. Each intrinsic function must subclass this,
@@ -103,9 +128,9 @@ class RefAction(Action):
         if not isinstance(param_name, str):
             return input_dict
 
-        if param_name in parameters:
-            return parameters[param_name]
-        return input_dict
+        # Use the wrapper function to get parameter value
+        # It returns the original input unchanged if the parameter is a CloudFormation internal placeholder
+        return _get_parameter_value(parameters, param_name, input_dict)
 
     def resolve_resource_refs(
         self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
@@ -193,7 +218,9 @@ class SubAction(Action):
             :param prop_name: => logicalId.property
             :return: Either the value it resolves to. If not the original reference
             """
-            return parameters.get(prop_name, full_ref)
+            # Use the wrapper function to get parameter value
+            # It returns the original input unchanged if the parameter is a CloudFormation internal placeholder
+            return _get_parameter_value(parameters, prop_name, full_ref)
 
         return self._handle_sub_action(input_dict, do_replacement)
 
