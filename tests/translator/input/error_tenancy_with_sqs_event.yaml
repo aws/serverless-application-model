@@ -1,0 +1,21 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  MyQueue:
+    Type: AWS::SQS::Queue
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.11
+      Handler: index.handler
+      InlineCode: |
+        def handler(event, context):
+            return {}
+      TenancyConfig:
+        TenantIsolationMode: PER_TENANT
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MyQueue.Arn

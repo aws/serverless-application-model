@@ -56,6 +56,7 @@ class Globals:
             "LoggingConfig",
             "RecursiveLoop",
             "SourceKMSKeyArn",
+            "TenancyConfig",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
@@ -101,7 +102,12 @@ class Globals:
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {
-        SamResourceType.Function.value: ["RuntimeManagementConfig", "RecursiveLoop", "SourceKMSKeyArn"],
+        SamResourceType.Function.value: [
+            "RuntimeManagementConfig",
+            "RecursiveLoop",
+            "SourceKMSKeyArn",
+            "TenancyConfig",
+        ],
     }
 
     def __init__(self, template: Dict[str, Any]) -> None:
