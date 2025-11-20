@@ -522,6 +522,7 @@ RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
 LoggingConfig = Optional[PassThroughProp]  # TODO: add documentation
 RecursiveLoop = Optional[PassThroughProp]
 SourceKMSKeyArn = Optional[PassThroughProp]
+TenancyConfig = Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
@@ -650,6 +651,7 @@ class Properties(BaseModel):
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
     SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Globals(BaseModel):
@@ -710,6 +712,7 @@ class Globals(BaseModel):
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
     SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):
