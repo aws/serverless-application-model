@@ -184,6 +184,7 @@ class SamFunction(SamResourceMacro):
         "LoggingConfig": PassThroughProperty(False),
         "RecursiveLoop": PassThroughProperty(False),
         "SourceKMSKeyArn": PassThroughProperty(False),
+        "TenancyConfig": PassThroughProperty(False),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -228,6 +229,7 @@ class SamFunction(SamResourceMacro):
     LoggingConfig: Optional[Dict[str, Any]]
     RecursiveLoop: Optional[str]
     SourceKMSKeyArn: Optional[str]
+    TenancyConfig: Optional[Dict[str, Any]]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -276,6 +278,8 @@ class SamFunction(SamResourceMacro):
 
         if self.DeadLetterQueue:
             self._validate_dlq(self.DeadLetterQueue)
+
+        self._validate_tenancy_config_compatibility()
 
         lambda_function = self._construct_lambda_function(intrinsics_resolver)
         resources.append(lambda_function)
@@ -572,6 +576,37 @@ class SamFunction(SamResourceMacro):
 
         return resolved_alias_name
 
+    def _validate_tenancy_config_compatibility(self) -> None:
+        if not self.TenancyConfig:
+            return
+
+        if self.ProvisionedConcurrencyConfig:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Provisioned concurrency is not supported for functions enabled with tenancy configuration.",
+            )
+
+        if self.FunctionUrlConfig:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Function URL is not supported for functions enabled with tenancy configuration.",
+            )
+
+        if self.SnapStart:
+            raise InvalidResourceException(
+                self.logical_id,
+                "SnapStart is not supported for functions enabled with tenancy configuration.",
+            )
+
+        if self.Events:
+            for event in self.Events.values():
+                event_type = event.get("Type")
+                if event_type not in ["Api", "HttpApi"]:
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        f"Event source '{event_type}' is not supported for functions enabled with tenancy configuration. Only Api and HttpApi event sources are supported.",
+                    )
+
     def _construct_lambda_function(self, intrinsics_resolver: IntrinsicsResolver) -> LambdaFunction:
         """Constructs and returns the Lambda function.
 
@@ -618,6 +653,7 @@ class SamFunction(SamResourceMacro):
 
         lambda_function.RuntimeManagementConfig = self.RuntimeManagementConfig  # type: ignore[attr-defined]
         lambda_function.LoggingConfig = self.LoggingConfig
+        lambda_function.TenancyConfig = self.TenancyConfig
         lambda_function.RecursiveLoop = self.RecursiveLoop
         self._validate_package_type(lambda_function)
         return lambda_function
