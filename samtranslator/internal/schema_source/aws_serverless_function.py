@@ -423,6 +423,10 @@ class MSKEventProperties(BaseModel):
     DestinationConfig: Optional[PassThroughProp]  # TODO: add documentation
     ProvisionedPollerConfig: Optional[PassThroughProp]
     SchemaRegistryConfig: Optional[PassThroughProp]
+    BisectBatchOnFunctionError: Optional[PassThroughProp] = mskeventproperties("BisectBatchOnFunctionError")
+    FunctionResponseTypes: Optional[PassThroughProp] = mskeventproperties("FunctionResponseTypes")
+    MaximumRecordAgeInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumRecordAgeInSeconds")
+    MaximumRetryAttempts: Optional[PassThroughProp] = mskeventproperties("MaximumRetryAttempts")
 
 
 class MSKEvent(BaseModel):
@@ -463,6 +467,12 @@ class SelfManagedKafkaEventProperties(BaseModel):
     Topics: PassThroughProp = selfmanagedkafkaeventproperties("Topics")
     ProvisionedPollerConfig: Optional[PassThroughProp]
     SchemaRegistryConfig: Optional[PassThroughProp]
+    BisectBatchOnFunctionError: Optional[PassThroughProp] = selfmanagedkafkaeventproperties(
+        "BisectBatchOnFunctionError"
+    )
+    MaximumRecordAgeInSeconds: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("MaximumRecordAgeInSeconds")
+    MaximumRetryAttempts: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("MaximumRetryAttempts")
+    FunctionResponseTypes: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("FunctionResponseTypes")
 
 
 class SelfManagedKafkaEvent(BaseModel):
