@@ -471,7 +471,7 @@ class ApiGenerator:
 
         return stage
 
-    def _construct_api_domain(  # noqa: PLR0912, PLR0915
+    def _construct_api_domain(  # noqa: PLR0912, PLR0915 (too many branches/statements)
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
     ) -> ApiDomainResponse:
         """
@@ -511,6 +511,11 @@ class ApiGenerator:
             domain.CertificateArn = certificate_arn
 
         domain.EndpointConfiguration = {"Types": [endpoint]}
+
+        # Handle IpAddressType if present
+        ip_address_type = self.domain.get("IpAddressType")
+        if ip_address_type:
+            domain.EndpointConfiguration["IpAddressType"] = ip_address_type
 
         mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
         if mutual_tls_auth:
@@ -602,7 +607,7 @@ class ApiGenerator:
 
         return ApiDomainResponse(domain, basepath_resource_list, record_set_group)
 
-    def _construct_api_domain_v2(
+    def _construct_api_domain_v2(  # noqa: PLR0915
         self, rest_api: ApiGatewayRestApi, route53_record_set_groups: Any
     ) -> ApiDomainResponseV2:
         """
@@ -636,6 +641,11 @@ class ApiGenerator:
         domain.CertificateArn = certificate_arn
 
         domain.EndpointConfiguration = {"Types": [endpoint]}
+
+        # Handle IpAddressType if present
+        ip_address_type = self.domain.get("IpAddressType")
+        if ip_address_type:
+            domain.EndpointConfiguration["IpAddressType"] = ip_address_type
 
         self._set_optional_domain_properties(domain)
 
@@ -1537,6 +1547,10 @@ class ApiGenerator:
                 rest_api.EndpointConfiguration["VpcEndpointIds"] = value.get("VPCEndpointIds") or value.get(
                     "VpcEndpointIds"
                 )
+
+            # Handle IpAddressType if present
+            if "IpAddressType" in value:
+                rest_api.EndpointConfiguration["IpAddressType"] = value.get("IpAddressType")
         else:
             rest_api.EndpointConfiguration = {"Types": [value]}
             rest_api.Parameters = {"endpointConfigurationTypes": value}

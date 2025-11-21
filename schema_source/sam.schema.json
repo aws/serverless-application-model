@@ -1164,6 +1164,23 @@
     "EndpointConfiguration": {
       "additionalProperties": false,
       "properties": {
+        "IpAddressType": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The IP address type for the API Gateway endpoint\\.  \n*Valid values*: `ipv4` or `dualstack`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`IpAddressType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-endpointconfiguration.html#cfn-apigateway-restapi-endpointconfiguration-ipaddresstype) property of the `AWS::ApiGateway::RestApi` `EndpointConfiguration` data type\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi.EndpointConfiguration",
+              "properties",
+              "IpAddressType"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "IpAddressType"
+        },
         "Type": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The endpoint type of a REST API\\.  \n*Valid values*: `EDGE` or `REGIONAL` or `PRIVATE`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Types`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-endpointconfiguration.html#cfn-apigateway-restapi-endpointconfiguration-types) property of the `AWS::ApiGateway::RestApi` `EndpointConfiguration` data type\\.",
@@ -2385,6 +2402,15 @@
     "MSKEventProperties": {
       "additionalProperties": false,
       "properties": {
+        "BisectBatchOnFunctionError": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "If the function returns an error, split the batch in two and retry\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`BisectBatchOnFunctionError`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-bisectbatchonfunctionerror) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "BisectBatchOnFunctionError"
+        },
         "ConsumerGroupId": {
           "allOf": [
             {
@@ -2409,6 +2435,15 @@
           "markdownDescription": "A object that defines the criteria that determines whether Lambda should process an event\\. For more information, see [AWS Lambda event filtering](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [FilterCriteria](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FilterCriteria`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "FilterCriteria"
         },
+        "FunctionResponseTypes": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A list of the response types currently applied to the event source mapping\\. For more information, see [Reporting batch item failures](https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html#services-ddb-batchfailurereporting) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `ReportBatchItemFailures`  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionResponseTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-functionresponsetypes) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "FunctionResponseTypes"
+        },
         "KmsKeyArn": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -2420,6 +2455,24 @@
           ],
           "markdownDescription": "The maximum amount of time to gather records before invoking the function, in seconds\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumBatchingWindowInSeconds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumbatchingwindowinseconds) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "MaximumBatchingWindowInSeconds"
+        },
+        "MaximumRecordAgeInSeconds": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The maximum age of a record that Lambda sends to a function for processing\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumRecordAgeInSeconds`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumrecordageinseconds) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "MaximumRecordAgeInSeconds"
+        },
+        "MaximumRetryAttempts": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The maximum number of times to retry when the function returns an error\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumRetryAttempts`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumretryattempts) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "MaximumRetryAttempts"
         },
         "ProvisionedPollerConfig": {
           "$ref": "#/definitions/PassThroughProp"
@@ -3155,6 +3208,15 @@
           "markdownDescription": "The maximum number of records in each batch that Lambda pulls from your stream and sends to your function\\.  \n*Type*: Integer  \n*Required*: No  \n*Default*: 100  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`BatchSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-batchsize) property of an `AWS::Lambda::EventSourceMapping` resource\\.  \n*Minimum*: `1`  \n*Maximum*: `10000`",
           "title": "BatchSize"
         },
+        "BisectBatchOnFunctionError": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "If the function returns an error, split the batch in two and retry\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`BisectBatchOnFunctionError`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-bisectbatchonfunctionerror) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "BisectBatchOnFunctionError"
+        },
         "ConsumerGroupId": {
           "allOf": [
             {
@@ -3182,6 +3244,15 @@
           "markdownDescription": "A object that defines the criteria to determine whether Lambda should process an event\\. For more information, see [AWS Lambda event filtering](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html) in the *AWS Lambda Developer Guide*\\.  \n*Type*: [FilterCriteria](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FilterCriteria`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-filtercriteria.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "FilterCriteria"
         },
+        "FunctionResponseTypes": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A list of the response types currently applied to the event source mapping\\. For more information, see [Reporting batch item failures](https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html#services-ddb-batchfailurereporting) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: `ReportBatchItemFailures`  \n*Type*: List  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`FunctionResponseTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-functionresponsetypes) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "FunctionResponseTypes"
+        },
         "KafkaBootstrapServers": {
           "items": {
             "anyOf": [
@@ -3199,6 +3270,24 @@
         },
         "KmsKeyArn": {
           "$ref": "#/definitions/PassThroughProp"
+        },
+        "MaximumRecordAgeInSeconds": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The maximum age of a record that Lambda sends to a function for processing\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumRecordAgeInSeconds`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumrecordageinseconds) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "MaximumRecordAgeInSeconds"
+        },
+        "MaximumRetryAttempts": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The maximum number of times to retry when the function returns an error\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumRetryAttempts`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumretryattempts) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "MaximumRetryAttempts"
         },
         "ProvisionedPollerConfig": {
           "$ref": "#/definitions/PassThroughProp"
@@ -3651,6 +3740,23 @@
           ],
           "markdownDescription": "Defines the type of API Gateway endpoint to map to the custom domain\\. The value of this property determines how the `CertificateArn` property is mapped in AWS CloudFormation\\.  \n*Valid values*: `REGIONAL` or `EDGE`  \n*Type*: String  \n*Required*: No  \n*Default*: `REGIONAL`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "EndpointConfiguration"
+        },
+        "IpAddressType": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The IP address types that can invoke this DomainName. Use `ipv4` to allow only IPv4 addresses to invoke this DomainName, or use `dualstack` to allow both IPv4 and IPv6 addresses to invoke this DomainName. For the `PRIVATE` endpoint type, only `dualstack` is supported.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`IpAddressType`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-domainname-endpointconfiguration.html#cfn-apigateway-domainname-endpointconfiguration-ipaddresstype) property of an `AWS::ApiGateway::DomainName.EndpointConfiguration` resource.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::DomainName.EndpointConfiguration",
+              "properties",
+              "IpAddressType"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "IpAddressType"
         },
         "MutualTlsAuthentication": {
           "__samPassThrough": {

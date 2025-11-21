@@ -1,0 +1,23 @@
+Parameters:
+  IpAddressType:
+    Type: String
+    Default: dualstack
+  DomainName:
+    Type: String
+  CertificateArn:
+    Type: String
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: ${definitionuri}
+      Domain:
+        DomainName: !Ref DomainName
+        CertificateArn: !Ref CertificateArn
+        EndpointConfiguration: REGIONAL
+        IpAddressType: !Ref IpAddressType
+
+Metadata:
+  SamTransformTest: true
