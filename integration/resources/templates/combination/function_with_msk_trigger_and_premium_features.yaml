@@ -66,8 +66,17 @@ Resources:
               Ref: MyMskCluster
             Topics:
             - SchemaRegistryTestTopic
+            DestinationConfig:
+              OnFailure:
+                Type: Kafka
+                Destination: kafka://testTopic
             ProvisionedPollerConfig:
               MinimumPollers: 1
+            BisectBatchOnFunctionError: true
+            MaximumRecordAgeInSeconds: 3600
+            MaximumRetryAttempts: 3
+            FunctionResponseTypes:
+            - ReportBatchItemFailures
             SchemaRegistryConfig:
               AccessConfigs:
               - Type: BASIC_AUTH
