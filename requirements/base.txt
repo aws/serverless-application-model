@@ -4,4 +4,4 @@ typing_extensions>=4.4 # 3.8 doesn't have Required, TypeGuard and ParamSpec
 
 # resource validation & schema generation
 # 1.10.15 and 1.10.17 included breaking change from pydantic, more info: https://github.com/aws/serverless-application-model/issues/3617
-pydantic>=1.8,<3,!=1.10.15,!=1.10.17
+pydantic>=1.10.18,<3
