@@ -975,7 +975,20 @@ class ApiGenerator:
             )
 
         editor = SwaggerEditor(self.definition_body)
+        # Track normalized paths to avoid duplicate OPTIONS methods for paths that differ only by trailing slash
+        # API Gateway treats /path and /path/ as the same resource, so we normalize before adding CORS
+        normalized_paths_processed: Set[str] = set()
+        
         for path in editor.iter_on_path():
+            # Normalize path by removing trailing slash (except for root path "/")
+            normalized_path = path.rstrip("/") if path != "/" else path
+            
+            # Skip if we've already processed this normalized path to avoid duplicate OPTIONS methods
+            if normalized_path in normalized_paths_processed:
+                continue
+            
+            normalized_paths_processed.add(normalized_path)
+            
             try:
                 editor.add_cors(  # type: ignore[no-untyped-call]
                     path,
