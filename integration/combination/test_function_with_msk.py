@@ -41,14 +41,20 @@ class TestFunctionWithMsk(BaseTest):
             "combination/function_with_msk_trigger_and_s3_onfailure_events_destinations", parameters
         )
 
-    def test_function_with_msk_trigger_and_confluent_schema_registry(self):
+    def test_function_with_msk_trigger_and_premium_features(self):
         companion_stack_outputs = self.companion_stack_outputs
         parameters = self.get_parameters(companion_stack_outputs)
         cluster_name = "MskCluster4-" + generate_suffix()
         parameters.append(self.generate_parameter("MskClusterName4", cluster_name))
-        self._common_validations_for_MSK(
+        self._common_validations_for_MSK("combination/function_with_msk_trigger_and_premium_features", parameters)
+        event_source_mapping_result = self._common_validations_for_MSK(
             "combination/function_with_msk_trigger_and_confluent_schema_registry", parameters
         )
+        # Verify error handling properties are correctly set
+        self.assertTrue(event_source_mapping_result.get("BisectBatchOnFunctionError"))
+        self.assertEqual(event_source_mapping_result.get("MaximumRecordAgeInSeconds"), 3600)
+        self.assertEqual(event_source_mapping_result.get("MaximumRetryAttempts"), 3)
+        self.assertEqual(event_source_mapping_result.get("FunctionResponseTypes"), ["ReportBatchItemFailures"])
 
     def _common_validations_for_MSK(self, file_name, parameters):
         self.create_and_verify_stack(file_name, parameters)
@@ -74,6 +80,7 @@ class TestFunctionWithMsk(BaseTest):
 
         self.assertEqual(event_source_mapping_function_arn, lambda_function_arn)
         self.assertEqual(event_source_mapping_kafka_cluster_arn, msk_cluster_arn)
+        return event_source_mapping_result
 
     def get_parameters(self, dictionary):
         parameters = []
