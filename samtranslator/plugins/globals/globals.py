@@ -57,6 +57,10 @@ class Globals:
             "RecursiveLoop",
             "SourceKMSKeyArn",
             "TenancyConfig",
+            "CapacityProviderConfig",
+            "FunctionScalingConfig",
+            "PublishToLatestPublished",
+            "VersionDeletionPolicy",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
@@ -99,16 +103,27 @@ class Globals:
         SamResourceType.SimpleTable.value: ["SSESpecification"],
         SamResourceType.StateMachine.value: ["PropagateTags"],
         SamResourceType.LambdaLayerVersion.value: ["PublishLambdaVersion"],
+        SamResourceType.CapacityProvider.value: [
+            "VpcConfig",
+            "OperatorRole",
+            "Tags",
+            "InstanceRequirements",
+            "ScalingConfig",
+            "KMSKeyArn",
+            "PropagateTags",
+        ],
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {
         SamResourceType.Function.value: [
-            "RuntimeManagementConfig",
-            "RecursiveLoop",
-            "SourceKMSKeyArn",
             "TenancyConfig",
+            "CapacityProviderConfig",
+            "FunctionScalingConfig",
+            "PublishToLatestPublished",
+            "VersionDeletionPolicy",
         ],
     }
+    unreleased_resource_types: List[str] = [SamResourceType.CapacityProvider.value]
 
     def __init__(self, template: Dict[str, Any]) -> None:
         """
@@ -117,7 +132,9 @@ class Globals:
         :param dict template: SAM template to be parsed
         """
         self.supported_resource_section_names = [
-            x.replace(self._RESOURCE_PREFIX, "") for x in self.supported_properties
+            x.replace(self._RESOURCE_PREFIX, "")
+            for x in self.supported_properties
+            if x not in self.unreleased_resource_types
         ]
         # Sort the names for stability in list ordering
         self.supported_resource_section_names.sort()

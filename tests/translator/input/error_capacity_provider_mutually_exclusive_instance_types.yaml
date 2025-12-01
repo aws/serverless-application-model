@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test validation rules for capacity provider with mutually exclusive AllowedTypes
+  and ExcludedTypes
+
+Resources:
+  # This capacity provider has both AllowedTypes and ExcludedTypes
+  # which are mutually exclusive, so it should fail validation
+  CapacityProviderWithValidationError:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: TestCapacityProvider
+      VpcConfig:
+        SubnetIds:
+        - subnet-12345678
+        SecurityGroupIds:
+        - sg-12345678
+      InstanceRequirements:
+        AllowedTypes:
+        - c5.xlarge
+        - c5.2xlarge
+        ExcludedTypes:
+        - t2.micro
+        - t2.small

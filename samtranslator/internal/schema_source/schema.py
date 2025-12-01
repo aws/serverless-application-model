@@ -11,6 +11,7 @@ from samtranslator.internal.schema_source import (
     any_cfn_resource,
     aws_serverless_api,
     aws_serverless_application,
+    aws_serverless_capacity_provider,
     aws_serverless_connector,
     aws_serverless_function,
     aws_serverless_graphqlapi,
@@ -29,6 +30,7 @@ class Globals(BaseModel):
     SimpleTable: Optional[aws_serverless_simpletable.Globals]
     StateMachine: Optional[aws_serverless_statemachine.Globals]
     LayerVersion: Optional[aws_serverless_layerversion.Globals]
+    CapacityProvider: Optional[aws_serverless_capacity_provider.Globals]
 
 
 Resources = Union[
@@ -41,6 +43,7 @@ Resources = Union[
     aws_serverless_httpapi.Resource,
     aws_serverless_application.Resource,
     aws_serverless_graphqlapi.Resource,
+    aws_serverless_capacity_provider.Resource,
 ]
 
 

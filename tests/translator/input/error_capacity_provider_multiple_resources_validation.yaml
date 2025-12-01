@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  # Resource 1: Missing VpcConfig entirely
+  CapacityProvider1:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: TestCapacityProvider1
+      # VpcConfig is missing (required property)
+  # Resource 2: Missing SubnetIds in VpcConfig
+  CapacityProvider2:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: TestCapacityProvider2
+      VpcConfig:
+        # SubnetIds is missing (required nested property)
+        SecurityGroupIds:
+        - sg-12345678
+
+  # Resource 3: Wrong types for nested properties
+  CapacityProvider3:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: TestCapacityProvider3
+      VpcConfig:
+        SubnetIds: subnet-12345678 # Should be a list, not string
+        SecurityGroupIds: sg-12345678 # Should be a list, not string
+      ScalingConfig:
+        MaxVCpuCount: invalid # Should be a number, not string
+  # Resource 4: Invalid nested structure
+  CapacityProvider4:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: TestCapacityProvider4
+      VpcConfig:
+        SubnetIds:
+        - subnet-12345678
+        InvalidProperty: should not be here # Unknown property in VpcConfig
+      ScalingConfig:
+        AverageCPUUtilization: not_a_number # Should be a number
