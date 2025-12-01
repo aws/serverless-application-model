@@ -11,6 +11,7 @@ from samtranslator.model.lambda_ import LambdaFunction, LambdaLayerVersion, Lamb
 from samtranslator.model.packagetype import IMAGE, ZIP
 from samtranslator.model.sam_resources import (
     SamApi,
+    SamCapacityProvider,
     SamConnector,
     SamFunction,
     SamGraphQLApi,
@@ -738,3 +739,61 @@ def test_function_datasource_set_with_none():
     api = SamGraphQLApi("MyApi")
     none_datasource = api._construct_none_datasource("foo")
     assert none_datasource
+
+
+class TestSamCapacityProvider(TestCase):
+    """Tests for SamCapacityProvider"""
+
+    def setUp(self):
+        self.intrinsics_resolver = IntrinsicsResolver({})
+        self.kwargs = {
+            "intrinsics_resolver": self.intrinsics_resolver,
+            "resource_resolver": ResourceResolver({}),
+        }
+
+    def test_basic_capacity_provider_without_propagate_tags(self):
+        """Test that tags are correctly set on the capacity provider"""
+        capacity_provider = SamCapacityProvider("MyCapacityProvider")
+        capacity_provider.VpcConfig = {"SubnetIds": ["subnet-123", "subnet-456"], "SecurityGroupIds": ["sg-123"]}
+        capacity_provider.Tags = {"Environment": "Production", "Project": "ServerlessApp"}
+
+        resources = capacity_provider.to_cloudformation(**self.kwargs)
+
+        # Verify the capacity provider has the expected tags
+        lambda_capacity_providers = [
+            r for r in resources if hasattr(r, "resource_type") and r.resource_type == "AWS::Lambda::CapacityProvider"
+        ]
+        self.assertEqual(len(lambda_capacity_providers), 1)
+
+        # Check that the tags are present in the capacity provider
+        tags = lambda_capacity_providers[0].Tags
+        if not tags:
+            self.fail("CapacityProvider resource generated with missing tags.")
+        self.assertEqual(sorted([tag["Key"] for tag in tags]), ["Environment", "Project", "lambda:createdBy"])
+        self.assertEqual(sorted([tag["Value"] for tag in tags]), ["Production", "SAM", "ServerlessApp"])
+
+        # Verify that IAM resources don't have user tags by default
+        iam_resources = [
+            r for r in resources if hasattr(r, "resource_type") and r.resource_type.startswith("AWS::IAM::")
+        ]
+        for resource in iam_resources:
+            if hasattr(resource, "Tags") and resource.Tags:
+                tags = resource.Tags
+                self.assertEqual([tag["Key"] for tag in tags], ["lambda:createdBy"])
+                self.assertEqual([tag["Value"] for tag in tags], ["SAM"])
+
+    def test_capacity_provider_with_propagate_tags(self):
+        """Test that tags are propagated to all resources when PropagateTags is True"""
+        capacity_provider = SamCapacityProvider("MyCapacityProvider")
+        capacity_provider.VpcConfig = {"SubnetIds": ["subnet-123", "subnet-456"], "SecurityGroupIds": ["sg-123"]}
+        capacity_provider.Tags = {"Environment": "Production", "Project": "ServerlessApp"}
+        capacity_provider.PropagateTags = True
+
+        resources = capacity_provider.to_cloudformation(**self.kwargs)
+
+        # Check that tags are propagated to all resources
+        for resource in resources:
+            if hasattr(resource, "Tags") and resource.Tags:
+                tags = resource.Tags
+                self.assertEqual(sorted([tag["Key"] for tag in tags]), ["Environment", "Project", "lambda:createdBy"])
+                self.assertEqual(sorted([tag["Value"] for tag in tags]), ["Production", "SAM", "ServerlessApp"])
