@@ -1,0 +1,11 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test missing VpcConfig for CapacityProvider
+
+Resources:
+  CapacityProviderMissingVpcConfig:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: test-capacity-provider
+      Tags:
+        Environment: Test
