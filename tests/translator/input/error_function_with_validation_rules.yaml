@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test validation rules for function resources
+
+Resources:
+  # This function has both CapacityProviderConfig and ProvisionedConcurrencyConfig
+  # which are mutually exclusive, so it should fail validation
+  FunctionWithValidationError:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: index.handler
+      Runtime: python3.9
+      CapacityProviderConfig:
+        Arn: arn:aws:lambda:us-west-2:123456789012:capacity-provider/test-provider
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 10
