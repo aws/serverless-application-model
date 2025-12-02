@@ -20,6 +20,7 @@ DEPLOYMENT_PREFERENCE_STEM = "sam-property-function-deploymentpreference"
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
 apiauth = get_prop("sam-property-function-apifunctionauth")
 apieventproperties = get_prop("sam-property-function-api")
+capacityproviderconfig = get_prop("sam-property-function-capacityproviderconfig")
 cloudwatcheventproperties = get_prop("sam-property-function-cloudwatchevent")
 cloudwatchlogseventproperties = get_prop("sam-property-function-cloudwatchlogs")
 codeuri = get_prop("sam-property-function-functioncode")
@@ -535,6 +536,16 @@ SourceKMSKeyArn = Optional[PassThroughProp]
 TenancyConfig = Optional[PassThroughProp]
 
 
+class CapacityProviderConfig(BaseModel):
+    Arn: SamIntrinsicable[str] = capacityproviderconfig("Arn")
+    PerExecutionEnvironmentMaxConcurrency: Optional[SamIntrinsicable[int]] = capacityproviderconfig(
+        "PerExecutionEnvironmentMaxConcurrency"
+    )
+    ExecutionEnvironmentMemoryGiBPerVCpu: Optional[SamIntrinsicable[Union[int, float]]] = capacityproviderconfig(
+        "ExecutionEnvironmentMemoryGiBPerVCpu"
+    )
+
+
 class Properties(BaseModel):
     Architectures: Optional[Architectures] = passthrough_prop(
         PROPERTIES_STEM,
@@ -661,6 +672,12 @@ class Properties(BaseModel):
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
     SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    CapacityProviderConfig: Optional[CapacityProviderConfig] = prop("CapacityProviderConfig")  # TODO: add documentation
+    FunctionScalingConfig: Optional[PassThroughProp]  # TODO: add documentation
+    VersionDeletionPolicy: Optional[SamIntrinsicable[Union[str, bool]]] = prop(
+        "VersionDeletionPolicy"
+    )  # TODO: add documentation
+    PublishToLatestPublished: Optional[SamIntrinsicable[Union[str, bool]]]  # TODO: add documentation
     TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
     DurableConfig: Optional[PassThroughProp]  # TODO: add documentation
 
@@ -723,6 +740,12 @@ class Globals(BaseModel):
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
     SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    CapacityProviderConfig: Optional[CapacityProviderConfig] = prop("CapacityProviderConfig")  # TODO: add documentation
+    FunctionScalingConfig: Optional[PassThroughProp]  # TODO: add documentation
+    VersionDeletionPolicy: Optional[SamIntrinsicable[Union[str, bool]]] = prop(
+        "VersionDeletionPolicy"
+    )  # TODO: add documentation
+    PublishToLatestPublished: Optional[SamIntrinsicable[Union[str, bool]]]  # TODO: add documentation
     TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
     DurableConfig: Optional[PassThroughProp]  # TODO: add documentation
 

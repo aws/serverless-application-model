@@ -132,6 +132,12 @@ class InvalidResourcePropertyTypeException(InvalidResourceException):
 
         self.key_path = key_path
 
+    def __str__(self) -> str:
+        return self.message
+
+    def __repr__(self) -> str:
+        return self.message
+
     @staticmethod
     def _default_message(key_path: str, expected_type: Optional[ExpectedType]) -> str:
         if expected_type:

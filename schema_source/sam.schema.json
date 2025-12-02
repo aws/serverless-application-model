@@ -196,6 +196,55 @@
       "title": "Caching",
       "type": "object"
     },
+    "CapacityProviderConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Arn": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "markdownDescription": "The ARN of the capacity provider.\n*Type*: String\n*Required*: Yes\n*AWS CloudFormation compatibility*: This property is passed directly to the [`CapacityProviderArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-capacityproviderconfig.html#cfn-lambda-function-capacityproviderconfig-capacityproviderarn) property of the `AWS::Lambda::Function` `CapacityProviderConfig` data type.",
+          "title": "Arn"
+        },
+        "ExecutionEnvironmentMemoryGiBPerVCpu": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "markdownDescription": "The memory in GiB per vCPU for the execution environment.\n*Type*: Number\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`ExecutionEnvironmentMemoryGiBPerVCpu`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-capacityproviderconfig.html#cfn-lambda-function-capacityproviderconfig-executionenvironmentmemorygibpervcpu) property of the `AWS::Lambda::Function` `CapacityProviderConfig` data type.",
+          "title": "ExecutionEnvironmentMemoryGiBPerVCpu"
+        },
+        "PerExecutionEnvironmentMaxConcurrency": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "The maximum concurrency for the execution environment.\n*Type*: Integer\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`PerExecutionEnvironmentMaxConcurrency`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-capacityproviderconfig.html#cfn-lambda-function-capacityproviderconfig-perexecutionenvironmentmaxconcurrency) property of the `AWS::Lambda::Function` `CapacityProviderConfig` data type.",
+          "title": "PerExecutionEnvironmentMaxConcurrency"
+        }
+      },
+      "required": [
+        "Arn"
+      ],
+      "title": "CapacityProviderConfig",
+      "type": "object"
+    },
     "CloudWatchLogsEvent": {
       "additionalProperties": false,
       "properties": {
@@ -1633,6 +1682,58 @@
       "title": "HttpApiEventProperties",
       "type": "object"
     },
+    "InstanceRequirements": {
+      "additionalProperties": false,
+      "properties": {
+        "AllowedTypes": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          },
+          "markdownDescription": "The allowed instance types.\n*Type*: List of String\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`AllowedInstanceTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-instancerequirements.html#cfn-lambda-capacityprovider-instancerequirements-allowedinstancetypes) property of the `AWS::Lambda::CapacityProvider` `InstanceRequirements` data type.",
+          "title": "AllowedTypes",
+          "type": "array"
+        },
+        "Architectures": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          },
+          "markdownDescription": "The CPU architecture for the instances.\n*Type*: List of String\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architecture`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-instancerequirements.html#cfn-lambda-capacityprovider-instancerequirements-architecture) property of the `AWS::Lambda::CapacityProvider` `InstanceRequirements` data type.",
+          "title": "Architectures",
+          "type": "array"
+        },
+        "ExcludedTypes": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          },
+          "markdownDescription": "The excluded instance types.\n*Type*: List of String\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`ExcludedInstanceTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-instancerequirements.html#cfn-lambda-capacityprovider-instancerequirements-excludedinstancetypes) property of the `AWS::Lambda::CapacityProvider` `InstanceRequirements` data type.",
+          "title": "ExcludedTypes",
+          "type": "array"
+        }
+      },
+      "title": "InstanceRequirements",
+      "type": "object"
+    },
     "IoTRuleEvent": {
       "additionalProperties": false,
       "properties": {
@@ -3062,6 +3163,37 @@
       "title": "SQSEventProperties",
       "type": "object"
     },
+    "ScalingConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "AverageCPUUtilization": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "markdownDescription": "A target tracking scaling policy based on average CPU utilization. Lambda will automatically adjusts the capacity provider's compute resources to this a specified target value.\n*Type*: Number\n*Required*: No\n*AWS CloudFormation compatibility*: This property is transformed to a scaling policy with `PredefinedMetricType` of `LambdaCapacityProviderAverageCPUUtilization`.",
+          "title": "AverageCPUUtilization"
+        },
+        "MaxVCpuCount": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "markdownDescription": "The maximum number of compute instances that the capacity provider can scale up to.\n*Type*: Integer\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaxVCpuCount`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-capacityproviderscalingconfig.html#cfn-lambda-capacityprovider-capacityproviderscalingconfig-maxvcpucount) property of the `AWS::Lambda::CapacityProvider` `CapacityProviderScalingConfig` data type.",
+          "title": "MaxVCpuCount"
+        }
+      },
+      "title": "ScalingConfig",
+      "type": "object"
+    },
     "ScheduleEventProperties": {
       "additionalProperties": false,
       "properties": {
@@ -3513,11 +3645,54 @@
       "title": "UserPoolConfig",
       "type": "object"
     },
+    "VpcConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "SecurityGroupIds": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          },
+          "markdownDescription": "A list of VPC security group IDs.\n*Type*: List of String\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`SecurityGroupIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-vpcconfig.html#cfn-lambda-capacityprovider-vpcconfig-securitygroupids) property of the `AWS::Lambda::CapacityProvider` `VpcConfig` data type.",
+          "title": "SecurityGroupIds",
+          "type": "array"
+        },
+        "SubnetIds": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          },
+          "markdownDescription": "A list of VPC subnet IDs.\n*Type*: List of String\n*Required*: Yes\n*AWS CloudFormation compatibility*: This property is passed directly to the [`SubnetIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-vpcconfig.html#cfn-lambda-capacityprovider-vpcconfig-subnetids) property of the `AWS::Lambda::CapacityProvider` `VpcConfig` data type.",
+          "title": "SubnetIds",
+          "type": "array"
+        }
+      },
+      "required": [
+        "SubnetIds"
+      ],
+      "title": "VpcConfig",
+      "type": "object"
+    },
     "__main____Globals": {
       "additionalProperties": false,
       "properties": {
         "Api": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_api__Globals"
+        },
+        "CapacityProvider": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_capacity_provider__Globals"
         },
         "Function": {
           "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_function__Globals"
@@ -4951,6 +5126,174 @@
       "title": "Resource",
       "type": "object"
     },
+    "samtranslator__internal__schema_source__aws_serverless_capacity_provider__Globals": {
+      "additionalProperties": false,
+      "properties": {
+        "InstanceRequirements": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/InstanceRequirements"
+            }
+          ],
+          "markdownDescription": "Instance requirements for the capacity provider.\n*Type*: [InstanceRequirements](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-capacityprovider-instancerequirements.html)\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`InstanceRequirements`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-instancerequirements) property of an `AWS::Lambda::CapacityProvider` resource.",
+          "title": "InstanceRequirements"
+        },
+        "KMSKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "OperatorRole": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The ARN of the capacity provider operator role. If not provided, SAM auto-generates one with EC2 management permissions.\n*Type*: String\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`CapacityProviderOperatorRoleArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-permissionsconfig.html#cfn-lambda-capacityprovider-permissionsconfig-capacityprovideroperatorrolearn) property of the `AWS::Lambda::CapacityProvider` `PermissionsConfig` data type.",
+          "title": "OperatorRole"
+        },
+        "PropagateTags": {
+          "markdownDescription": "Indicate whether or not to pass tags from the `Tags` property to your [AWS::Serverless::Function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources-capacityprovider.html) generated resources\\. Specify `True` to propagate tags in your generated resources\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: `False`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "PropagateTags",
+          "type": "boolean"
+        },
+        "ScalingConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ScalingConfig"
+            }
+          ],
+          "markdownDescription": "Scaling configuration for the capacity provider.\n*Type*: [ScalingConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-capacityprovider-scalingconfig.html)\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`CapacityProviderScalingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-capacityproviderscalingconfig) property of an `AWS::Lambda::CapacityProvider` resource.",
+          "title": "ScalingConfig"
+        },
+        "Tags": {
+          "markdownDescription": "A map of key-value pairs to apply to the capacity provider.\n*Type*: Map\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-tags) property of an `AWS::Lambda::CapacityProvider` resource.",
+          "title": "Tags",
+          "type": "object"
+        },
+        "VpcConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/VpcConfig"
+            }
+          ],
+          "markdownDescription": "VPC configuration for the capacity provider.\n*Type*: [VpcConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-capacityprovider-vpcconfig.html)\n*Required*: Yes\n*AWS CloudFormation compatibility*: This property is passed directly to the [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-vpcconfig) property of an `AWS::Lambda::CapacityProvider` resource.",
+          "title": "VpcConfig"
+        }
+      },
+      "title": "Globals",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_capacity_provider__Properties": {
+      "additionalProperties": false,
+      "properties": {
+        "CapacityProviderName": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "InstanceRequirements": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/InstanceRequirements"
+            }
+          ],
+          "markdownDescription": "Instance requirements for the capacity provider.\n*Type*: [InstanceRequirements](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-capacityprovider-instancerequirements.html)\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`InstanceRequirements`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-instancerequirements) property of an `AWS::Lambda::CapacityProvider` resource.",
+          "title": "InstanceRequirements"
+        },
+        "KMSKeyArn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "OperatorRole": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The ARN of the capacity provider operator role. If not provided, SAM auto-generates one with EC2 management permissions.\n*Type*: String\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`CapacityProviderOperatorRoleArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-permissionsconfig.html#cfn-lambda-capacityprovider-permissionsconfig-capacityprovideroperatorrolearn) property of the `AWS::Lambda::CapacityProvider` `PermissionsConfig` data type.",
+          "title": "OperatorRole"
+        },
+        "PropagateTags": {
+          "markdownDescription": "Indicate whether or not to pass tags from the `Tags` property to your [AWS::Serverless::Function](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources-capacityprovider.html) generated resources\\. Specify `True` to propagate tags in your generated resources\\.  \n*Type*: Boolean  \n*Required*: No  \n*Default*: `False`  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
+          "title": "PropagateTags",
+          "type": "boolean"
+        },
+        "ScalingConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ScalingConfig"
+            }
+          ],
+          "markdownDescription": "Scaling configuration for the capacity provider.\n*Type*: [ScalingConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-capacityprovider-scalingconfig.html)\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`CapacityProviderScalingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-capacityproviderscalingconfig) property of an `AWS::Lambda::CapacityProvider` resource.",
+          "title": "ScalingConfig"
+        },
+        "Tags": {
+          "markdownDescription": "A map of key-value pairs to apply to the capacity provider.\n*Type*: Map\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`Tags`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-tags) property of an `AWS::Lambda::CapacityProvider` resource.",
+          "title": "Tags",
+          "type": "object"
+        },
+        "VpcConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/VpcConfig"
+            }
+          ],
+          "markdownDescription": "VPC configuration for the capacity provider.\n*Type*: [VpcConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-capacityprovider-vpcconfig.html)\n*Required*: Yes\n*AWS CloudFormation compatibility*: This property is passed directly to the [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-vpcconfig) property of an `AWS::Lambda::CapacityProvider` resource.",
+          "title": "VpcConfig"
+        }
+      },
+      "required": [
+        "VpcConfig"
+      ],
+      "title": "Properties",
+      "type": "object"
+    },
+    "samtranslator__internal__schema_source__aws_serverless_capacity_provider__Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DeletionPolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "DependsOn": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "IgnoreGlobals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Ignoreglobals"
+        },
+        "Metadata": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
+        "Properties": {
+          "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_capacity_provider__Properties"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::CapacityProvider"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "$ref": "#/definitions/PassThroughProp"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "title": "Resource",
+      "type": "object"
+    },
     "samtranslator__internal__schema_source__aws_serverless_connector__Properties": {
       "additionalProperties": false,
       "properties": {
@@ -5434,6 +5777,15 @@
           "markdownDescription": "The name of the Lambda alias\\. For more information about Lambda aliases, see [Lambda function aliases](https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html) in the *AWS Lambda Developer Guide*\\. For examples that use this property, see [Deploying serverless applications gradually with AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/automating-updates-to-serverless-apps.html)\\.  \nAWS SAM generates [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html) and [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html) resources when this property is set\\. For information about this scenario, see [AutoPublishAlias property is specified](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources-function.html#sam-specification-generated-resources-function-autopublishalias)\\. For general information about generated AWS CloudFormation resources, see [Generated AWS CloudFormation resources for AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources.html)\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "AutoPublishAlias"
         },
+        "CapacityProviderConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/CapacityProviderConfig"
+            }
+          ],
+          "markdownDescription": "Configuration for using a Lambda capacity provider with this function.\n*Type*: [CapacityProviderConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-capacityproviderconfig.html)\n*Required*",
+          "title": "CapacityProviderConfig"
+        },
         "CodeUri": {
           "anyOf": [
             {
@@ -5526,6 +5878,9 @@
           "markdownDescription": "The object that describes event invoke configuration on a Lambda function\\.  \n*Type*: [EventInvokeConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-eventinvokeconfiguration.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "EventInvokeConfig"
         },
+        "FunctionScalingConfig": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Handler": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The function within your code that is called to begin execution\\. This property is only required if the `PackageType` property is set to `Zip`\\.  \n*Type*: String  \n*Required*: Conditional  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Handler`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler) property of an `AWS::Lambda::Function` resource\\.",
@@ -5607,6 +5962,20 @@
           ],
           "markdownDescription": "The provisioned concurrency configuration of a function's alias\\.  \n`ProvisionedConcurrencyConfig` can be specified only if the `AutoPublishAlias` is set\\. Otherwise, an error results\\.\n*Type*: [ProvisionedConcurrencyConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedConcurrencyConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html#cfn-lambda-alias-provisionedconcurrencyconfig) property of an `AWS::Lambda::Alias` resource\\.",
           "title": "ProvisionedConcurrencyConfig"
+        },
+        "PublishToLatestPublished": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Publishtolatestpublished"
         },
         "RecursiveLoop": {
           "$ref": "#/definitions/PassThroughProp"
@@ -5713,6 +6082,21 @@
           "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\.  \n+ `Active` \u2013 Activates X\\-Ray tracing for the function\\.\n+ `Disabled` \u2013 Deactivates X\\-Ray for the function\\.\n+ `PassThrough` \u2013 Activates X\\-Ray tracing for the function\\. Sampling decision is delegated to the downstream services\\.\nIf specified as `Active` or `PassThrough` and the `Role` property is not set, AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.  \nFor more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: \\[`Active`\\|`Disabled`\\|`PassThrough`\\]  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Tracing"
         },
+        "VersionDeletionPolicy": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "markdownDescription": "Policy for deleting old versions of the function. This will set [DeletionPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-attribute-deletionpolicy.html) attribute for the version resource when use with AutoPublishAlias\n*Type*: String\n*Required*: No\n*Valid values*: `Retain` or `Delete`\n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent.",
+          "title": "VersionDeletionPolicy"
+        },
         "VpcConfig": {
           "allOf": [
             {
@@ -5781,6 +6165,15 @@
           ],
           "markdownDescription": "When used, this string works with the `CodeUri` value to determine if a new Lambda version needs to be published\\. This property is often used to resolve the following deployment issue: A deployment package is stored in an Amazon S3 location and is replaced by a new deployment package with updated Lambda function code but the `CodeUri` property remains unchanged \\(as opposed to the new deployment package being uploaded to a new Amazon S3 location and the `CodeUri` being changed to the new location\\)\\.  \nThis problem is marked by an AWS SAM template having the following characteristics:  \n+ The `DeploymentPreference` object is configured for gradual deployments \\(as described in [Deploying serverless applications gradually with AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/automating-updates-to-serverless-apps.html)\\)\n+ The `AutoPublishAlias` property is set and doesn't change between deployments\n+ The `CodeUri` property is set and doesn't change between deployments\\.\nIn this scenario, updating `AutoPublishCodeSha256` results in a new Lambda version being created successfully\\. However, new function code deployed to Amazon S3 will not be recognized\\. To recognize new function code, consider using versioning in your Amazon S3 bucket\\. Specify the `Version` property for your Lambda function and configure your bucket to always use the latest deployment package\\.  \nIn this scenario, to trigger the gradual deployment successfully, you must provide a unique value for `AutoPublishCodeSha256`\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent\\.",
           "title": "AutoPublishCodeSha256"
+        },
+        "CapacityProviderConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/CapacityProviderConfig"
+            }
+          ],
+          "markdownDescription": "Configuration for using a Lambda capacity provider with this function.\n*Type*: [CapacityProviderConfig](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-capacityproviderconfig.html)\n*Required*",
+          "title": "CapacityProviderConfig"
         },
         "CodeSigningConfigArn": {
           "__samPassThrough": {
@@ -6010,6 +6403,9 @@
           ],
           "title": "FunctionName"
         },
+        "FunctionScalingConfig": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "FunctionUrlConfig": {
           "allOf": [
             {
@@ -6190,6 +6586,20 @@
           ],
           "title": "ProvisionedConcurrencyConfig"
         },
+        "PublishToLatestPublished": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Publishtolatestpublished"
+        },
         "RecursiveLoop": {
           "$ref": "#/definitions/PassThroughProp"
         },
@@ -6306,6 +6716,21 @@
           ],
           "markdownDescription": "The string that specifies the function's X\\-Ray tracing mode\\.  \n+ `Active` \u2013 Activates X\\-Ray tracing for the function\\.\n+ `Disabled` \u2013 Deactivates X\\-Ray for the function\\.\n+ `PassThrough` \u2013 Activates X\\-Ray tracing for the function\\. Sampling decision is delegated to the downstream services\\.\nIf specified as `Active` or `PassThrough` and the `Role` property is not set, AWS SAM adds the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` policy to the Lambda execution role that it creates for you\\.  \nFor more information about X\\-Ray, see [Using AWS Lambda with AWS X\\-Ray](https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html) in the *AWS Lambda Developer Guide*\\.  \n*Valid values*: \\[`Active`\\|`Disabled`\\|`PassThrough`\\]  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is similar to the [`TracingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Tracing"
+        },
+        "VersionDeletionPolicy": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "markdownDescription": "Policy for deleting old versions of the function. This will set [DeletionPolicy](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-attribute-deletionpolicy.html) attribute for the version resource when use with AutoPublishAlias\n*Type*: String\n*Required*: No\n*Valid values*: `Retain` or `Delete`\n*AWS CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an AWS CloudFormation equivalent.",
+          "title": "VersionDeletionPolicy"
         },
         "VersionDescription": {
           "allOf": [
@@ -8708,6 +9133,9 @@
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_graphqlapi__Resource"
+          },
+          {
+            "$ref": "#/definitions/samtranslator__internal__schema_source__aws_serverless_capacity_provider__Resource"
           },
           {
             "$ref": "#/definitions/samtranslator__internal__schema_source__any_cfn_resource__Resource"
