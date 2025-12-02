@@ -116,7 +116,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy",
           "arn:aws-us-gov:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ],
@@ -254,7 +254,7 @@
           "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy",
           "arn:aws-us-gov:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ],
