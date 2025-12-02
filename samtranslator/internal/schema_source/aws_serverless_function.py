@@ -662,6 +662,7 @@ class Properties(BaseModel):
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
     SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
     TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
+    DurableConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Globals(BaseModel):
@@ -723,6 +724,7 @@ class Globals(BaseModel):
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
     SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
     TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
+    DurableConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):

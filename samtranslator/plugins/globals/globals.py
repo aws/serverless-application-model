@@ -57,6 +57,7 @@ class Globals:
             "RecursiveLoop",
             "SourceKMSKeyArn",
             "TenancyConfig",
+            "DurableConfig",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
@@ -107,6 +108,7 @@ class Globals:
             "RecursiveLoop",
             "SourceKMSKeyArn",
             "TenancyConfig",
+            "DurableConfig",
         ],
     }
 

@@ -5476,6 +5476,9 @@
           "markdownDescription": "A description of the function\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Description`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description) property of an `AWS::Lambda::Function` resource\\.",
           "title": "Description"
         },
+        "DurableConfig": {
+          "$ref": "#/definitions/PassThroughProp"
+        },
         "Environment": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "The configuration for the runtime environment\\.  \n*Type*: [Environment](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Environment`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html) property of an `AWS::Lambda::Function` resource\\.",
@@ -5852,6 +5855,9 @@
             }
           ],
           "title": "Description"
+        },
+        "DurableConfig": {
+          "$ref": "#/definitions/PassThroughProp"
         },
         "Environment": {
           "__samPassThrough": {

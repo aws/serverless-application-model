@@ -148,6 +148,7 @@ ignore_templates:
   - tests/translator/output/**/function_with_tenancy_and_api_event.json # cfnlint is not updated to recognize the TenancyConfig property
   - tests/translator/output/**/function_with_tenancy_and_httpapi_event.json # cfnlint is not updated to recognize the TenancyConfig property
   - tests/translator/output/**/function_with_tenancy_config_global.json # cfnlint is not updated to recognize the TenancyConfig property
+  - tests/translator/output/**/*durable_config*.json # TODO: Remove this once Durable Function is launched in CFN
 
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests

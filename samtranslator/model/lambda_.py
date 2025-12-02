@@ -37,6 +37,7 @@ class LambdaFunction(Resource):
         "LoggingConfig": GeneratedProperty(),
         "RecursiveLoop": GeneratedProperty(),
         "TenancyConfig": GeneratedProperty(),
+        "DurableConfig": GeneratedProperty(),
     }
 
     Code: Dict[str, Any]
@@ -66,6 +67,7 @@ class LambdaFunction(Resource):
     LoggingConfig: Optional[Dict[str, Any]]
     RecursiveLoop: Optional[str]
     TenancyConfig: Optional[Dict[str, Any]]
+    DurableConfig: Optional[Dict[str, Any]]
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
