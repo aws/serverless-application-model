@@ -198,6 +198,7 @@ class SamFunction(SamResourceMacro):
         "VersionDeletionPolicy": PropertyType(False, IS_STR_ENUM(["Delete", "Retain"])),
         "PublishToLatestPublished": PassThroughProperty(False),
         "TenancyConfig": PassThroughProperty(False),
+        "DurableConfig": PropertyType(False, IS_DICT),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -247,6 +248,7 @@ class SamFunction(SamResourceMacro):
     PublishToLatestPublished: Optional[PassThrough]
     VersionDeletionPolicy: Optional[Intrinsicable[str]]
     TenancyConfig: Optional[Dict[str, Any]]
+    DurableConfig: Optional[Dict[str, Any]]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -690,6 +692,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.LoggingConfig = self.LoggingConfig
         lambda_function.TenancyConfig = self.TenancyConfig
         lambda_function.RecursiveLoop = self.RecursiveLoop
+        lambda_function.DurableConfig = self.DurableConfig
 
         # Transform capacity provider configuration
         if self.CapacityProviderConfig:
