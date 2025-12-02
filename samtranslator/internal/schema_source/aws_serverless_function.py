@@ -679,6 +679,7 @@ class Properties(BaseModel):
     )  # TODO: add documentation
     PublishToLatestPublished: Optional[SamIntrinsicable[Union[str, bool]]]  # TODO: add documentation
     TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
+    DurableConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Globals(BaseModel):
@@ -746,6 +747,7 @@ class Globals(BaseModel):
     )  # TODO: add documentation
     PublishToLatestPublished: Optional[SamIntrinsicable[Union[str, bool]]]  # TODO: add documentation
     TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
+    DurableConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):

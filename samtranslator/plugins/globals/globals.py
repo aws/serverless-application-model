@@ -57,6 +57,7 @@ class Globals:
             "RecursiveLoop",
             "SourceKMSKeyArn",
             "TenancyConfig",
+            "DurableConfig",
             "CapacityProviderConfig",
             "FunctionScalingConfig",
             "PublishToLatestPublished",
@@ -117,6 +118,7 @@ class Globals:
     unreleased_properties: Dict[str, List[str]] = {
         SamResourceType.Function.value: [
             "TenancyConfig",
+            "DurableConfig",
             "CapacityProviderConfig",
             "FunctionScalingConfig",
             "PublishToLatestPublished",
