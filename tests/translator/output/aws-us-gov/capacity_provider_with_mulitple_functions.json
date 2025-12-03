@@ -1,0 +1,470 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Complete template with capacity provider and functions",
+  "Parameters": {
+    "MemoryGiBPerVCpu": {
+      "Default": 2.5,
+      "Description": "Memory GiB per vCPU for capacity provider",
+      "Type": "Number"
+    }
+  },
+  "Resources": {
+    "BasicLMIFunction": {
+      "Properties": {
+        "CapacityProviderConfig": {
+          "LambdaManagedInstancesCapacityProviderConfig": {
+            "CapacityProviderArn": {
+              "Fn::GetAtt": [
+                "MyCapacityProvider",
+                "Arn"
+              ]
+            },
+            "ExecutionEnvironmentMemoryGiBPerVCpu": {
+              "Ref": "MemoryGiBPerVCpu"
+            }
+          }
+        },
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "BasicLMIFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "BasicLMIFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "CodeDeployServiceRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "codedeploy.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "LMIFunctionWithAlias": {
+      "Properties": {
+        "CapacityProviderConfig": {
+          "LambdaManagedInstancesCapacityProviderConfig": {
+            "CapacityProviderArn": {
+              "Fn::GetAtt": [
+                "MyCapacityProvider",
+                "Arn"
+              ]
+            },
+            "ExecutionEnvironmentMemoryGiBPerVCpu": 4,
+            "PerExecutionEnvironmentMaxConcurrency": 50
+          }
+        },
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": "Lambda function with capacity provider and auto publish alias",
+        "FunctionScalingConfig": {
+          "MaxExecutionEnvironments": 20,
+          "MinExecutionEnvironments": 2
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "LMIFunctionWithAliasRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "LMIFunctionWithAliasAliasProduction": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LMIFunctionWithAlias"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "LMIFunctionWithAliasVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "Production"
+      },
+      "Type": "AWS::Lambda::Alias",
+      "UpdatePolicy": {
+        "CodeDeployLambdaAliasUpdate": {
+          "ApplicationName": {
+            "Ref": "ServerlessDeploymentApplication"
+          },
+          "DeploymentGroupName": {
+            "Ref": "LMIFunctionWithAliasDeploymentGroup"
+          }
+        }
+      }
+    },
+    "LMIFunctionWithAliasDeletePolicy": {
+      "Properties": {
+        "CapacityProviderConfig": {
+          "LambdaManagedInstancesCapacityProviderConfig": {
+            "CapacityProviderArn": {
+              "Fn::GetAtt": [
+                "MyCapacityProvider",
+                "Arn"
+              ]
+            },
+            "ExecutionEnvironmentMemoryGiBPerVCpu": 4,
+            "PerExecutionEnvironmentMaxConcurrency": 50
+          }
+        },
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": "Lambda function with capacity provider and auto publish alias",
+        "FunctionScalingConfig": {
+          "MaxExecutionEnvironments": 20,
+          "MinExecutionEnvironments": 2
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "LMIFunctionWithAliasDeletePolicyRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "LMIFunctionWithAliasDeletePolicyAliasProduction": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LMIFunctionWithAliasDeletePolicy"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "LMIFunctionWithAliasDeletePolicyVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "Production"
+      },
+      "Type": "AWS::Lambda::Alias",
+      "UpdatePolicy": {
+        "CodeDeployLambdaAliasUpdate": {
+          "ApplicationName": {
+            "Ref": "ServerlessDeploymentApplication"
+          },
+          "DeploymentGroupName": {
+            "Ref": "LMIFunctionWithAliasDeletePolicyDeploymentGroup"
+          }
+        }
+      }
+    },
+    "LMIFunctionWithAliasDeletePolicyDeploymentGroup": {
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "ServerlessDeploymentApplication"
+        },
+        "AutoRollbackConfiguration": {
+          "Enabled": true,
+          "Events": [
+            "DEPLOYMENT_FAILURE",
+            "DEPLOYMENT_STOP_ON_ALARM",
+            "DEPLOYMENT_STOP_ON_REQUEST"
+          ]
+        },
+        "DeploymentConfigName": {
+          "Fn::Sub": [
+            "CodeDeployDefault.Lambda${ConfigName}",
+            {
+              "ConfigName": "Linear10PercentEvery1Minute"
+            }
+          ]
+        },
+        "DeploymentStyle": {
+          "DeploymentOption": "WITH_TRAFFIC_CONTROL",
+          "DeploymentType": "BLUE_GREEN"
+        },
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "CodeDeployServiceRole",
+            "Arn"
+          ]
+        }
+      },
+      "Type": "AWS::CodeDeploy::DeploymentGroup"
+    },
+    "LMIFunctionWithAliasDeletePolicyRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "LMIFunctionWithAliasDeletePolicyVersion640128d35d": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LMIFunctionWithAliasDeletePolicy"
+        },
+        "FunctionScalingConfig": {
+          "MaxExecutionEnvironments": 20,
+          "MinExecutionEnvironments": 2
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "LMIFunctionWithAliasDeploymentGroup": {
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "ServerlessDeploymentApplication"
+        },
+        "AutoRollbackConfiguration": {
+          "Enabled": true,
+          "Events": [
+            "DEPLOYMENT_FAILURE",
+            "DEPLOYMENT_STOP_ON_ALARM",
+            "DEPLOYMENT_STOP_ON_REQUEST"
+          ]
+        },
+        "DeploymentConfigName": {
+          "Fn::Sub": [
+            "CodeDeployDefault.Lambda${ConfigName}",
+            {
+              "ConfigName": "Linear10PercentEvery1Minute"
+            }
+          ]
+        },
+        "DeploymentStyle": {
+          "DeploymentOption": "WITH_TRAFFIC_CONTROL",
+          "DeploymentType": "BLUE_GREEN"
+        },
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "CodeDeployServiceRole",
+            "Arn"
+          ]
+        }
+      },
+      "Type": "AWS::CodeDeploy::DeploymentGroup"
+    },
+    "LMIFunctionWithAliasRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "LMIFunctionWithAliasVersion640128d35d": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LMIFunctionWithAlias"
+        },
+        "FunctionScalingConfig": {
+          "MaxExecutionEnvironments": 20,
+          "MinExecutionEnvironments": 2
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "MyCapacityProvider": {
+      "Properties": {
+        "CapacityProviderName": "test-capacity-provider",
+        "CapacityProviderScalingConfig": {
+          "MaxVCpuCount": 10,
+          "ScalingMode": "Manual",
+          "ScalingPolicies": [
+            {
+              "PredefinedMetricType": "LambdaCapacityProviderAverageCPUUtilization",
+              "TargetValue": 75.0
+            }
+          ]
+        },
+        "InstanceRequirements": {
+          "AllowedInstanceTypes": [
+            "c5.xlarge",
+            "c5.2xlarge"
+          ],
+          "Architectures": [
+            "arm64"
+          ]
+        },
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "MyCapacityProviderOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678"
+          ],
+          "SubnetIds": [
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "MyCapacityProviderOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ServerlessDeploymentApplication": {
+      "Properties": {
+        "ComputePlatform": "Lambda"
+      },
+      "Type": "AWS::CodeDeploy::Application"
+    }
+  }
+}

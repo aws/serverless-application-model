@@ -1,4 +1,4 @@
-﻿""" SAM macro definitions """
+﻿"""SAM macro definitions"""
 
 import copy
 import re
@@ -34,8 +34,12 @@ from samtranslator.internal.model.appsync import (
     SyncConfigType,
     UserPoolConfigType,
 )
-from samtranslator.internal.schema_source import aws_serverless_graphqlapi
-from samtranslator.internal.schema_source.common import PermissionsType
+from samtranslator.internal.schema_source import (
+    aws_serverless_capacity_provider,
+    aws_serverless_function,
+    aws_serverless_graphqlapi,
+)
+from samtranslator.internal.schema_source.common import PermissionsType, SamIntrinsicable
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.internal.utils.utils import passthrough_value, remove_none_values
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
@@ -49,6 +53,7 @@ from samtranslator.model import (
     ResourceResolver,
     ResourceTypeResolver,
     SamResourceMacro,
+    ValidationRule,
 )
 from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
@@ -61,6 +66,8 @@ from samtranslator.model.apigateway import (
 )
 from samtranslator.model.apigatewayv2 import ApiGatewayV2DomainName, ApiGatewayV2Stage
 from samtranslator.model.architecture import ARM64, X86_64
+from samtranslator.model.capacity_provider.generators import CapacityProviderGenerator
+from samtranslator.model.cfn_attributes.deletion_policy import DeletionPolicy
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.connector.connector import (
     UNSUPPORTED_CONNECTOR_PROFILE_TYPE,
@@ -114,6 +121,7 @@ from samtranslator.model.types import (
     IS_INT,
     IS_LIST,
     IS_STR,
+    IS_STR_ENUM,
     PassThrough,
     any_type,
     dict_of,
@@ -139,6 +147,7 @@ class SamFunction(SamResourceMacro):
     """SAM function macro."""
 
     resource_type = "AWS::Serverless::Function"
+
     property_types = {
         "FunctionName": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "Handler": PassThroughProperty(False),
@@ -184,6 +193,12 @@ class SamFunction(SamResourceMacro):
         "LoggingConfig": PassThroughProperty(False),
         "RecursiveLoop": PassThroughProperty(False),
         "SourceKMSKeyArn": PassThroughProperty(False),
+        "CapacityProviderConfig": PropertyType(False, IS_DICT),
+        "FunctionScalingConfig": PropertyType(False, IS_DICT),
+        "VersionDeletionPolicy": PropertyType(False, IS_STR_ENUM(["Delete", "Retain"])),
+        "PublishToLatestPublished": PassThroughProperty(False),
+        "TenancyConfig": PassThroughProperty(False),
+        "DurableConfig": PropertyType(False, IS_DICT),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -228,6 +243,12 @@ class SamFunction(SamResourceMacro):
     LoggingConfig: Optional[Dict[str, Any]]
     RecursiveLoop: Optional[str]
     SourceKMSKeyArn: Optional[str]
+    CapacityProviderConfig: Optional[Dict[str, Any]]
+    FunctionScalingConfig: Optional[Dict[str, Any]]
+    PublishToLatestPublished: Optional[PassThrough]
+    VersionDeletionPolicy: Optional[Intrinsicable[str]]
+    TenancyConfig: Optional[Dict[str, Any]]
+    DurableConfig: Optional[Dict[str, Any]]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -252,6 +273,19 @@ class SamFunction(SamResourceMacro):
         "DestinationQueue": SQSQueue.resource_type,
     }
 
+    # Validation rules
+    __validation_rules__ = [
+        (ValidationRule.MUTUALLY_EXCLUSIVE, ["CapacityProviderConfig", "ProvisionedConcurrencyConfig"]),
+        (ValidationRule.MUTUALLY_EXCLUSIVE, ["CapacityProviderConfig", "VpcConfig"]),
+        (ValidationRule.CONDITIONAL_REQUIREMENT, ["FunctionScalingConfig", "CapacityProviderConfig"]),
+        (ValidationRule.CONDITIONAL_REQUIREMENT, ["VersionDeletionPolicy", "AutoPublishAlias"]),
+        # TODO: To enable these rules, we need to update translator test input/output files to property configure template
+        #       to avoid fail-fast. eg: test with DeploymentPreference without AutoPublishAlias would fail fast before reaching testing state
+        # (ValidationRule.MUTUALLY_EXCLUSIVE, ["ImageUri", "InlineCode", "CodeUri"]),
+        # (ValidationRule.CONDITIONAL_REQUIREMENT, ["DeploymentPreference", "AutoPublishAlias"]),
+        # (ValidationRule.CONDITIONAL_REQUIREMENT, ["ProvisionedConcurrencyConfig", "AutoPublishAlias"]),
+    ]
+
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         try:
             return {"event_resources": self._event_resources_to_link(resources)}
@@ -274,8 +308,15 @@ class SamFunction(SamResourceMacro):
         conditions = kwargs.get("conditions", {})
         feature_toggle = kwargs.get("feature_toggle")
 
+        # TODO: Skip pass schema_class=aws_serverless_function.Properties to skip schema validation for now.
+        # - adding this now would required update error message in error error_function_*_test.py
+        # - add this when we can verify that changing error message would not break customers
+        self.validate_before_transform(schema_class=None, collect_all_errors=False)
+
         if self.DeadLetterQueue:
             self._validate_dlq(self.DeadLetterQueue)
+
+        self._validate_tenancy_config_compatibility()
 
         lambda_function = self._construct_lambda_function(intrinsics_resolver)
         resources.append(lambda_function)
@@ -572,6 +613,37 @@ class SamFunction(SamResourceMacro):
 
         return resolved_alias_name
 
+    def _validate_tenancy_config_compatibility(self) -> None:
+        if not self.TenancyConfig:
+            return
+
+        if self.ProvisionedConcurrencyConfig:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Provisioned concurrency is not supported for functions enabled with tenancy configuration.",
+            )
+
+        if self.FunctionUrlConfig:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Function URL is not supported for functions enabled with tenancy configuration.",
+            )
+
+        if self.SnapStart:
+            raise InvalidResourceException(
+                self.logical_id,
+                "SnapStart is not supported for functions enabled with tenancy configuration.",
+            )
+
+        if self.Events:
+            for event in self.Events.values():
+                event_type = event.get("Type")
+                if event_type not in ["Api", "HttpApi"]:
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        f"Event source '{event_type}' is not supported for functions enabled with tenancy configuration. Only Api and HttpApi event sources are supported.",
+                    )
+
     def _construct_lambda_function(self, intrinsics_resolver: IntrinsicsResolver) -> LambdaFunction:
         """Constructs and returns the Lambda function.
 
@@ -618,9 +690,66 @@ class SamFunction(SamResourceMacro):
 
         lambda_function.RuntimeManagementConfig = self.RuntimeManagementConfig  # type: ignore[attr-defined]
         lambda_function.LoggingConfig = self.LoggingConfig
+        lambda_function.TenancyConfig = self.TenancyConfig
         lambda_function.RecursiveLoop = self.RecursiveLoop
+        lambda_function.DurableConfig = self.DurableConfig
+
+        # Transform capacity provider configuration
+        if self.CapacityProviderConfig:
+            lambda_function.CapacityProviderConfig = self._transform_capacity_provider_config()
+
+        # Pass through function scaling configuration
+        if self.FunctionScalingConfig:
+            lambda_function.FunctionScalingConfig = self.FunctionScalingConfig
+
+        # Pass through PublishToLatestPublished configuration
+        if self.PublishToLatestPublished is not None:
+            lambda_function.PublishToLatestPublished = self.PublishToLatestPublished
+
         self._validate_package_type(lambda_function)
         return lambda_function
+
+    def _transform_capacity_provider_config(self) -> Dict[str, Any]:
+        """
+        Transform SAM CapacityProviderConfig to CloudFormation format.
+
+        Transforms from:
+        CapacityProviderConfig:
+          Arn: <capacity-provider-arn>
+          PerExecutionEnvironmentMaxConcurrency: <integer>
+          ExecutionEnvironmentMemoryGiBPerVCpu: <number>
+
+        To:
+        CapacityProviderConfig:
+          LambdaManagedInstancesCapacityProviderConfig:
+            CapacityProviderArn: <capacity-provider-arn>
+            PerExecutionEnvironmentMaxConcurrency: <integer>
+            ExecutionEnvironmentMemoryGiBPerVCpu: <number>
+        """
+        if not self.CapacityProviderConfig:
+            return {}
+
+        # Validate CapacityProviderConfig using Pydantic model directly for comprehensive error collection
+        try:
+            validated_model = aws_serverless_function.CapacityProviderConfig.parse_obj(self.CapacityProviderConfig)
+        except Exception as e:
+            raise InvalidResourceException(self.logical_id, f"Invalid CapacityProviderConfig: {e!s}") from e
+
+        # Extract validated properties - cast to Any to handle SamIntrinsicable types
+        capacity_provider_arn: Optional[SamIntrinsicable[str]] = validated_model.Arn
+        max_concurrency: Optional[SamIntrinsicable[int]] = validated_model.PerExecutionEnvironmentMaxConcurrency
+        memory_to_vcpu_ratio: Optional[SamIntrinsicable[float]] = validated_model.ExecutionEnvironmentMemoryGiBPerVCpu
+
+        # Build the transformed structure
+        ec2_config: Dict[str, Any] = {"CapacityProviderArn": capacity_provider_arn}
+
+        if max_concurrency is not None:
+            ec2_config["PerExecutionEnvironmentMaxConcurrency"] = max_concurrency
+
+        if memory_to_vcpu_ratio is not None:
+            ec2_config["ExecutionEnvironmentMemoryGiBPerVCpu"] = memory_to_vcpu_ratio
+
+        return {"LambdaManagedInstancesCapacityProviderConfig": ec2_config}
 
     def _add_event_invoke_managed_policy(
         self, dest_config: Dict[str, Any], logical_id: str, dest_arn: Any
@@ -898,6 +1027,20 @@ class SamFunction(SamResourceMacro):
             code_dict["SourceKMSKeyArn"] = self.SourceKMSKeyArn
         return code_dict
 
+    def _get_default_version_deletion_policy(self) -> str:
+        """
+        Determine the default DeletionPolicy for Lambda version resources.
+
+        Returns:
+            str: "Delete" for functions with CapacityProviderConfig,
+                 "Retain" for classic Lambda functions
+        """
+        if self.CapacityProviderConfig is not None:
+            # LMI function - delete versions to avoid unnecessary costs
+            return DeletionPolicy.DELETE
+        # Classic Lambda function - retain versions (existing behavior)
+        return DeletionPolicy.RETAIN
+
     def _construct_version(  # noqa: PLR0912
         self,
         function: LambdaFunction,
@@ -984,11 +1127,19 @@ class SamFunction(SamResourceMacro):
 
         attributes = self.get_passthrough_resource_attributes()
         if "DeletionPolicy" not in attributes:
-            attributes["DeletionPolicy"] = "Retain"
+            if self.VersionDeletionPolicy is not None:
+                # User explicitly specified VersionDeletionPolicy
+                attributes["DeletionPolicy"] = self.VersionDeletionPolicy
+            else:
+                # Use smart default based on function type
+                attributes["DeletionPolicy"] = self._get_default_version_deletion_policy()
 
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr("name")
         lambda_version.Description = self.VersionDescription
+
+        if self.CapacityProviderConfig is not None and self.FunctionScalingConfig is not None:
+            lambda_version.FunctionScalingConfig = self.FunctionScalingConfig
 
         return lambda_version
 
@@ -1296,6 +1447,78 @@ class SamFunction(SamResourceMacro):
         lambda_invoke_permission.InvokedViaFunctionUrl = True
 
         return lambda_invoke_permission
+
+
+class SamCapacityProvider(SamResourceMacro):
+    """
+    SAM CapacityProvider resource transformer
+    """
+
+    resource_type = "AWS::Serverless::CapacityProvider"
+    resource_property_schema = aws_serverless_capacity_provider.Properties
+    property_types = {
+        "CapacityProviderName": Property(False, one_of(IS_STR, IS_DICT)),
+        "VpcConfig": Property(True, IS_DICT),
+        "OperatorRole": Property(False, one_of(IS_STR, IS_DICT)),
+        "Tags": Property(False, IS_DICT),
+        "PropagateTags": Property(False, IS_BOOL),
+        "InstanceRequirements": Property(False, IS_DICT),
+        "ScalingConfig": Property(False, IS_DICT),
+        "KMSKeyArn": Property(False, one_of(IS_STR, IS_DICT)),
+    }
+
+    CapacityProviderName: Optional[Intrinsicable[str]]
+    VpcConfig: Dict[str, Any]
+    OperatorRole: Optional[PassThrough]
+    Tags: Optional[Dict[str, Any]]
+    PropagateTags: Optional[bool]
+    InstanceRequirements: Optional[Dict[str, Any]]
+    ScalingConfig: Optional[Dict[str, Any]]
+    KMSKeyArn: Optional[Intrinsicable[str]]
+
+    # Validation rules
+    __validation_rules__ = [
+        (
+            ValidationRule.MUTUALLY_EXCLUSIVE,
+            ["InstanceRequirements.AllowedTypes", "InstanceRequirements.ExcludedTypes"],
+        ),
+    ]
+
+    def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
+        """
+        Transform the SAM CapacityProvider resource to CloudFormation
+        """
+        self.validate_before_transform(schema_class=self.resource_property_schema, collect_all_errors=True)
+
+        # Use enhanced validation method with comprehensive error collection
+        model = self.validate_properties_and_return_model(
+            aws_serverless_capacity_provider.Properties, collect_all_errors=True
+        )
+
+        capacity_provider_generator = CapacityProviderGenerator(
+            logical_id=self.logical_id,
+            capacity_provider_name=passthrough_value(model.CapacityProviderName),
+            vpc_config=model.VpcConfig.dict() if model.VpcConfig else None,
+            operator_role=passthrough_value(model.OperatorRole),
+            tags=model.Tags,
+            instance_requirements=(
+                model.InstanceRequirements.dict(exclude_none=True) if model.InstanceRequirements else None
+            ),
+            scaling_config=model.ScalingConfig.dict(exclude_none=True) if model.ScalingConfig else None,
+            kms_key_arn=passthrough_value(model.KMSKeyArn),
+            depends_on=self.depends_on,
+            resource_attributes=self.resource_attributes,
+            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+        )
+
+        resources = capacity_provider_generator.to_cloudformation()
+
+        # Propagate tags to generated resources if PropagateTags is set.
+        # Need to combine tags with sam tags; Existing propagate_tags() method replace
+        # Tags assigned
+        self.propagate_tags_combine(resources, model.Tags, self.PropagateTags)
+
+        return resources
 
 
 class SamApi(SamResourceMacro):
@@ -1717,9 +1940,7 @@ class SamLayerVersion(SamResourceMacro):
     LicenseInfo: Optional[Intrinsicable[str]]
     RetentionPolicy: Optional[Intrinsicable[str]]
 
-    RETAIN = "Retain"
-    DELETE = "Delete"
-    retention_policy_options = [RETAIN, DELETE]
+    retention_policy_options = [DeletionPolicy.RETAIN, DeletionPolicy.DELETE]
 
     @cw_timer
     def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def]
@@ -1763,7 +1984,7 @@ class SamLayerVersion(SamResourceMacro):
 
         attributes = self.get_passthrough_resource_attributes()
         if "DeletionPolicy" not in attributes:
-            attributes["DeletionPolicy"] = self.RETAIN
+            attributes["DeletionPolicy"] = DeletionPolicy.RETAIN
         if retention_policy_value is not None:
             attributes["DeletionPolicy"] = retention_policy_value
 
@@ -1819,7 +2040,7 @@ class SamLayerVersion(SamResourceMacro):
             raise InvalidResourceException(
                 self.logical_id,
                 "'RetentionPolicy' does not accept intrinsic functions, "
-                f"please use one of the following options: {[self.RETAIN, self.DELETE]}",
+                f"please use one of the following options: {[DeletionPolicy.RETAIN, DeletionPolicy.DELETE]}",
             )
 
         if self.RetentionPolicy is None:
@@ -1829,7 +2050,7 @@ class SamLayerVersion(SamResourceMacro):
             raise InvalidResourceException(
                 self.logical_id,
                 "Invalid 'RetentionPolicy' type, "
-                f"please use one of the following options: {[self.RETAIN, self.DELETE]}",
+                f"please use one of the following options: {[DeletionPolicy.RETAIN, DeletionPolicy.DELETE]}",
             )
 
         for option in self.retention_policy_options:
@@ -1837,7 +2058,7 @@ class SamLayerVersion(SamResourceMacro):
                 return option
         raise InvalidResourceException(
             self.logical_id,
-            f"'RetentionPolicy' must be one of the following options: {[self.RETAIN, self.DELETE]}.",
+            f"'RetentionPolicy' must be one of the following options: {[DeletionPolicy.RETAIN, DeletionPolicy.DELETE]}.",
         )
 
     def _validate_architectures(self, lambda_layer: LambdaLayerVersion) -> None:
@@ -1857,6 +2078,7 @@ class SamLayerVersion(SamResourceMacro):
         # Intrinsics are not validated
         if is_intrinsic(architectures):
             return
+
         for arq in architectures:
             # We validate the values only if we they're not intrinsics
             if not is_intrinsic(arq) and arq not in [ARM64, X86_64]:

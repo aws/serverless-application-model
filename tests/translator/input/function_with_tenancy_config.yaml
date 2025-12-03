@@ -1,0 +1,11 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  FunctionWithTenancyConfig:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.11
+      TenancyConfig:
+        TenantIsolationMode: PER_TENANT

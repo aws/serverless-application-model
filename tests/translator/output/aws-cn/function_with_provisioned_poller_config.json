@@ -23,7 +23,7 @@
       },
       "Type": "AWS::Lambda::Function"
     },
-    "KafkaEventsFunctionMyKafkaCluster": {
+    "KafkaEventsFunctionMyKafkaEvent": {
       "Properties": {
         "FunctionName": {
           "Ref": "KafkaEventsFunction"
@@ -65,10 +65,83 @@
       },
       "Type": "AWS::Lambda::EventSourceMapping"
     },
+    "KafkaEventsFunctionMyKafkaEventWithKafkaDestination": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "KafkaEventsFunction"
+        },
+        "ProvisionedPollerConfig": {
+          "MaximumPollers": 100,
+          "MinimumPollers": 2,
+          "PollerGroupName": "self-managed-kafka-poller-group"
+        },
+        "SelfManagedEventSource": {
+          "Endpoints": {
+            "KafkaBootstrapServers": [
+              "abc.xyz.com:9092",
+              "123.45.67.89:9096"
+            ]
+          }
+        },
+        "SelfManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": "consumergroup1"
+        },
+        "SourceAccessConfigurations": [
+          {
+            "Type": "SASL_SCRAM_512_AUTH",
+            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
+          },
+          {
+            "Type": "VPC_SUBNET",
+            "URI": "subnet:subnet-12345"
+          },
+          {
+            "Type": "VPC_SECURITY_GROUP",
+            "URI": "security_group:sg-67890"
+          }
+        ],
+        "StartingPosition": "AT_TIMESTAMP",
+        "StartingPositionTimestamp": 1672560000,
+        "Topics": [
+          "Topic1"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
     "KafkaEventsFunctionMyMskEvent": {
       "Properties": {
         "AmazonManagedKafkaEventSourceConfig": {
           "ConsumerGroupId": "consumergroup1"
+        },
+        "EventSourceArn": {
+          "Fn::Sub": "arn:aws:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2"
+        },
+        "FunctionName": {
+          "Ref": "KafkaEventsFunction"
+        },
+        "ProvisionedPollerConfig": {
+          "MaximumPollers": 10,
+          "MinimumPollers": 5,
+          "PollerGroupName": {
+            "Fn::Sub": "${AWS::StackName}-msk-poller-group"
+          }
+        },
+        "StartingPosition": "LATEST",
+        "Topics": [
+          "MyDummyTestTopic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "KafkaEventsFunctionMyMskEventWithKafkaDestination": {
+      "Properties": {
+        "AmazonManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": "consumergroup1"
+        },
+        "DestinationConfig": {
+          "OnFailure": {
+            "Destination": "kafka://topic2"
+          }
         },
         "EventSourceArn": {
           "Fn::Sub": "arn:aws:kafka:${AWS::Region}:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2"

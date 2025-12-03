@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test unsupported property in CapacityProvider Globals
+
+Globals:
+  CapacityProvider:
+    VpcConfig:
+      SubnetIds:
+      - subnet-12345678
+    CapacityProviderName: CapacityProviderName-is-not-supported
+
+Resources:
+  MinimalCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: test-capacity-provider
+
+  MinimalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.12

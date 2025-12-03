@@ -1,0 +1,27 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Domain:
+        DomainName: api.example.com
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/example
+        EndpointConfiguration: REGIONAL
+        IpAddressType: dualstack
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          return { statusCode: 200, body: 'Hello' };
+        };
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Method: GET
+            Path: /test

@@ -1,0 +1,136 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CapacityProvider with custom permissions configuration test",
+  "Resources": {
+    "CustomPermissionsCapacityProvider": {
+      "Properties": {
+        "CapacityProviderName": "custom-permissions-provider",
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "CustomPermissionsCapacityProviderOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678"
+          ],
+          "SubnetIds": [
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "CustomPermissionsCapacityProviderOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ec2:TerminateInstances",
+                    "ec2:RunInstances",
+                    "ec2:DescribeInstanceStatus",
+                    "ec2:DescribeInstances",
+                    "ec2:CreateTags"
+                  ],
+                  "Condition": {
+                    "StringEquals": {
+                      "ec2:ManagedResourceOperator": "scaler.lambda.amazonaws.com"
+                    }
+                  },
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:instance/*"
+                    },
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+                    },
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:volume/*"
+                    }
+                  ]
+                },
+                {
+                  "Action": [
+                    "ec2:DescribeAvailabilityZones",
+                    "ec2:DescribeCapacityReservations",
+                    "ec2:DescribeInstanceTypeOfferings",
+                    "ec2:DescribeInstanceTypes",
+                    "ec2:DescribeSecurityGroups",
+                    "ec2:DescribeSubnets"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                },
+                {
+                  "Action": [
+                    "ec2:RunInstances",
+                    "ec2:CreateNetworkInterface"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:subnet/*"
+                    },
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:security-group/*"
+                    }
+                  ]
+                },
+                {
+                  "Action": [
+                    "ec2:RunInstances"
+                  ],
+                  "Condition": {
+                    "Bool": {
+                      "ec2:Public": "true"
+                    }
+                  },
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:image/*"
+                    }
+                  ]
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "CapacityProviderOperatorRolePolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
