@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test wrong data types for CapacityProvider properties
+
+Resources:
+  CapacityProviderWrongTypes:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds: subnet-12345678 # Should be a list, not string
+        SecurityGroupIds: sg-12345678 # Should be a list, not string
+      Tags: invalid-tags # Should be a dict, not string
+      ScalingConfig:
+        MaxVCpuCount: not-a-number # Should be integer, not string
+        AverageCPUUtilization: invalid-percentage # Should be number, not string

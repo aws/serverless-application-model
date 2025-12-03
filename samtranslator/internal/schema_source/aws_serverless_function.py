@@ -20,6 +20,7 @@ DEPLOYMENT_PREFERENCE_STEM = "sam-property-function-deploymentpreference"
 alexaskilleventproperties = get_prop("sam-property-function-alexaskill")
 apiauth = get_prop("sam-property-function-apifunctionauth")
 apieventproperties = get_prop("sam-property-function-api")
+capacityproviderconfig = get_prop("sam-property-function-capacityproviderconfig")
 cloudwatcheventproperties = get_prop("sam-property-function-cloudwatchevent")
 cloudwatchlogseventproperties = get_prop("sam-property-function-cloudwatchlogs")
 codeuri = get_prop("sam-property-function-functioncode")
@@ -411,6 +412,7 @@ class HttpApiEvent(BaseModel):
 
 class MSKEventProperties(BaseModel):
     ConsumerGroupId: Optional[PassThroughProp] = mskeventproperties("ConsumerGroupId")
+    Enabled: Optional[PassThroughProp]  # TODO: it doesn't show up in docs yet
     FilterCriteria: Optional[PassThroughProp] = mskeventproperties("FilterCriteria")
     KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumBatchingWindowInSeconds")
@@ -422,6 +424,10 @@ class MSKEventProperties(BaseModel):
     DestinationConfig: Optional[PassThroughProp]  # TODO: add documentation
     ProvisionedPollerConfig: Optional[PassThroughProp]
     SchemaRegistryConfig: Optional[PassThroughProp]
+    BisectBatchOnFunctionError: Optional[PassThroughProp] = mskeventproperties("BisectBatchOnFunctionError")
+    FunctionResponseTypes: Optional[PassThroughProp] = mskeventproperties("FunctionResponseTypes")
+    MaximumRecordAgeInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumRecordAgeInSeconds")
+    MaximumRetryAttempts: Optional[PassThroughProp] = mskeventproperties("MaximumRetryAttempts")
 
 
 class MSKEvent(BaseModel):
@@ -462,6 +468,12 @@ class SelfManagedKafkaEventProperties(BaseModel):
     Topics: PassThroughProp = selfmanagedkafkaeventproperties("Topics")
     ProvisionedPollerConfig: Optional[PassThroughProp]
     SchemaRegistryConfig: Optional[PassThroughProp]
+    BisectBatchOnFunctionError: Optional[PassThroughProp] = selfmanagedkafkaeventproperties(
+        "BisectBatchOnFunctionError"
+    )
+    MaximumRecordAgeInSeconds: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("MaximumRecordAgeInSeconds")
+    MaximumRetryAttempts: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("MaximumRetryAttempts")
+    FunctionResponseTypes: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("FunctionResponseTypes")
 
 
 class SelfManagedKafkaEvent(BaseModel):
@@ -521,6 +533,17 @@ RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
 LoggingConfig = Optional[PassThroughProp]  # TODO: add documentation
 RecursiveLoop = Optional[PassThroughProp]
 SourceKMSKeyArn = Optional[PassThroughProp]
+TenancyConfig = Optional[PassThroughProp]
+
+
+class CapacityProviderConfig(BaseModel):
+    Arn: SamIntrinsicable[str] = capacityproviderconfig("Arn")
+    PerExecutionEnvironmentMaxConcurrency: Optional[SamIntrinsicable[int]] = capacityproviderconfig(
+        "PerExecutionEnvironmentMaxConcurrency"
+    )
+    ExecutionEnvironmentMemoryGiBPerVCpu: Optional[SamIntrinsicable[Union[int, float]]] = capacityproviderconfig(
+        "ExecutionEnvironmentMemoryGiBPerVCpu"
+    )
 
 
 class Properties(BaseModel):
@@ -649,6 +672,14 @@ class Properties(BaseModel):
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
     SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    CapacityProviderConfig: Optional[CapacityProviderConfig] = prop("CapacityProviderConfig")  # TODO: add documentation
+    FunctionScalingConfig: Optional[PassThroughProp]  # TODO: add documentation
+    VersionDeletionPolicy: Optional[SamIntrinsicable[Union[str, bool]]] = prop(
+        "VersionDeletionPolicy"
+    )  # TODO: add documentation
+    PublishToLatestPublished: Optional[SamIntrinsicable[Union[str, bool]]]  # TODO: add documentation
+    TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
+    DurableConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Globals(BaseModel):
@@ -709,6 +740,14 @@ class Globals(BaseModel):
     LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
     RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
     SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    CapacityProviderConfig: Optional[CapacityProviderConfig] = prop("CapacityProviderConfig")  # TODO: add documentation
+    FunctionScalingConfig: Optional[PassThroughProp]  # TODO: add documentation
+    VersionDeletionPolicy: Optional[SamIntrinsicable[Union[str, bool]]] = prop(
+        "VersionDeletionPolicy"
+    )  # TODO: add documentation
+    PublishToLatestPublished: Optional[SamIntrinsicable[Union[str, bool]]]  # TODO: add documentation
+    TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
+    DurableConfig: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):
