@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Complete template with capacity provider and functions
+
+Parameters:
+  MemoryGiBPerVCpu:
+    Type: Number
+    Default: 2.5
+    Description: Memory GiB per vCPU for capacity provider
+Resources:
+  # Define a capacity provider resource
+  MyCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: test-capacity-provider
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        SubnetIds:
+        - subnet-12345678
+      InstanceRequirements:
+        Architectures:
+        - arm64
+        AllowedTypes:
+        - c5.xlarge
+        - c5.2xlarge
+      ScalingConfig:
+        MaxVCpuCount: 10
+        AverageCPUUtilization: 75
+
+  # Function 1: Basic function with capacity provider reference
+  BasicLMIFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.12
+      CapacityProviderConfig:
+        Arn: !GetAtt MyCapacityProvider.Arn
+        ExecutionEnvironmentMemoryGiBPerVCpu: !Ref MemoryGiBPerVCpu
+
+  # Function 2: Function with capacity provider and auto publish alias
+  LMIFunctionWithAlias:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.12
+      Description: Lambda function with capacity provider and auto publish alias
+      AutoPublishAlias: Production
+      CapacityProviderConfig:
+        Arn: !GetAtt MyCapacityProvider.Arn
+        PerExecutionEnvironmentMaxConcurrency: 50
+        ExecutionEnvironmentMemoryGiBPerVCpu: 4
+      FunctionScalingConfig:
+        MinExecutionEnvironments: 2
+        MaxExecutionEnvironments: 20
+      DeploymentPreference:
+        Type: Linear10PercentEvery1Minute
+
+  # Function 2: Function with capacity provider and auto publish alias
+  LMIFunctionWithAliasDeletePolicy:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.12
+      Description: Lambda function with capacity provider and auto publish alias
+      AutoPublishAlias: Production
+      CapacityProviderConfig:
+        Arn: !GetAtt MyCapacityProvider.Arn
+        PerExecutionEnvironmentMaxConcurrency: 50
+        ExecutionEnvironmentMemoryGiBPerVCpu: 4
+      FunctionScalingConfig:
+        MinExecutionEnvironments: 2
+        MaxExecutionEnvironments: 20
+      DeploymentPreference:
+        Type: Linear10PercentEvery1Minute
+      VersionDeletionPolicy: Retain

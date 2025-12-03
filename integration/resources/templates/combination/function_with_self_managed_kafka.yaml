@@ -15,10 +15,18 @@ Resources:
             - 123.45.67.89:9096
             Topics:
             - Topic1
+            ProvisionedPollerConfig:
+              MinimumPollers: 1
+              PollerGroupName: test1
             SourceAccessConfigurations:
             - Type: BASIC_AUTH
               URI:
                 Ref: KafkaUserSecret
+            BisectBatchOnFunctionError: true
+            MaximumRecordAgeInSeconds: 3600
+            MaximumRetryAttempts: 3
+            FunctionResponseTypes:
+            - ReportBatchItemFailures
 
   KafkaUserSecret:
     Type: AWS::SecretsManager::Secret

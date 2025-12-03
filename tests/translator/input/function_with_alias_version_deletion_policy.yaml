@@ -1,0 +1,10 @@
+Resources:
+  MinimalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.13
+      AutoPublishAlias: live
+      VersionDescription: sam-testing
+      VersionDeletionPolicy: Delete
