@@ -789,7 +789,11 @@ class SamFunction(SamResourceMacro):
             else IAMRolePolicies.lambda_assume_role_policy()
         )
 
-        managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
+        managed_policy_arns = (
+            [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicDurableExecutionRolePolicy")]
+            if self.DurableConfig
+            else [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
+        )
 
         tracing = intrinsics_resolver.resolve_parameter_refs(self.Tracing)
 
