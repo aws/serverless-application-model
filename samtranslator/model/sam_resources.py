@@ -1508,7 +1508,7 @@ class SamCapacityProvider(SamResourceMacro):
             instance_requirements=(
                 model.InstanceRequirements.dict(exclude_none=True) if model.InstanceRequirements else None
             ),
-            scaling_config=model.ScalingConfig.dict() if model.ScalingConfig else None,
+            scaling_config=model.ScalingConfig.dict(exclude_none=True) if model.ScalingConfig else None,
             kms_key_arn=passthrough_value(model.KMSKeyArn),
             depends_on=self.depends_on,
             resource_attributes=self.resource_attributes,
