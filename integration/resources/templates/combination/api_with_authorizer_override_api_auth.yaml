@@ -51,14 +51,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       InlineCode: |
-        exports.handler = async (event, context, callback) => {
+        exports.handler = async (event, context) => {
           return {
             statusCode: 200,
             body: 'Success'
           }
         }
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs22.x
       Events:
         LambdaRequest:
           Type: Api
@@ -94,9 +94,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs22.x
       InlineCode: |
-        exports.handler = async (event, context, callback) => {
+        exports.handler = async (event, context) => {
           const auth = event.queryStringParameters.authorization
           const policyDocument = {
             Version: '2012-10-17',
