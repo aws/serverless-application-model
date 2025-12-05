@@ -1,0 +1,175 @@
+{
+  "Resources": {
+    "DurableFunctionWithGlobals": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "my-bucket",
+          "S3Key": "my-function.zip"
+        },
+        "DurableConfig": {
+          "ExecutionTimeout": 3600,
+          "RetentionPeriodInDays": 30
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "DurableFunctionWithGlobalsRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.11",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "DurableFunctionWithGlobalsRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "DurableFunctionWithOverride": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "my-bucket",
+          "S3Key": "my-function.zip"
+        },
+        "DurableConfig": {
+          "ExecutionTimeout": 7200,
+          "RetentionPeriodInDays": 7
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "DurableFunctionWithOverrideRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.11",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "DurableFunctionWithOverrideRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "RegularFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "my-bucket",
+          "S3Key": "my-function.zip"
+        },
+        "DurableConfig": {
+          "ExecutionTimeout": 3600,
+          "RetentionPeriodInDays": 30
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "RegularFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.11",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "RegularFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
