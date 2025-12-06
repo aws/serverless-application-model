@@ -63,8 +63,11 @@ class FeatureToggle:
         """
         To check if feature is available
 
+
         :param feature_name: name of feature
         """
+        # Check if feature is enabled for this stage, region, and account
+
         if feature_name not in self.feature_config:
             LOG.warning(f"Feature '{feature_name}' not available in Feature Toggle Config.")
             return False
