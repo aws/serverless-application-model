@@ -851,6 +851,8 @@ class TestSamFunctionRoleResolver(TestCase):
         lambda_function = next(r for r in cfn_resources if r.resource_type == "AWS::Lambda::Function")
 
         self.assertEqual(lambda_function.Role, role_get_att)
+
+
 class TestSamCapacityProvider(TestCase):
     """Tests for SamCapacityProvider"""
 
