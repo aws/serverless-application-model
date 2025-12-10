@@ -116,7 +116,7 @@ class Deployer:
         :return:
         """
 
-        if type == "UPDATE":
+        if changeset_type == "UPDATE":
             # UsePreviousValue not valid if parameter is new
             summary = self._client.get_template_summary(StackName=stack_name)
             existing_parameters = [parameter["ParameterKey"] for parameter in summary["Parameters"]]
