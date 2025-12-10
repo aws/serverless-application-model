@@ -396,7 +396,7 @@ class StateMachineGenerator:
         else:
             return dynamic_value_paths
 
-        for key, value in sorted(iterator, key=lambda item: item[0]):  # type: ignore[no-any-return]
+        for key, value in sorted(iterator, key=lambda item: item[0]):
             if is_intrinsic(value) or is_dynamic_reference(value):
                 dynamic_value_paths.append([*path, key])
             elif isinstance(value, (dict, list)):
