@@ -95,7 +95,7 @@ resource:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs24.x
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery10Minutes
@@ -165,7 +165,7 @@ resource:
             Action:
               - "lambda:InvokeFunction"
             Resource: !GetAtt MyLambdaFunction.Arn
-      Runtime: nodejs12.x
+      Runtime: nodejs24.x
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
         Enabled: False
@@ -198,7 +198,7 @@ Traffic Shifting Configurations
 In the above example ``Linear10PercentEvery10Minutes`` is one of several preselected traffic shifting configurations 
 available in CodeDeploy. You can pick the configuration that best suits your application. See docs_ for the complete list:
 
-.. _docs: https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst#traffic-shifting-configurations
+.. _docs: https://github.com/aws/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst#traffic-shifting-configurations
 
 - Canary10Percent30Minutes
 - Canary10Percent5Minutes
@@ -269,7 +269,7 @@ Hooks are extremely powerful because:
     Instead, use the Policies_ attribute to provide the CodeDeploy and Lambda permissions needed. The example also shows a Policy that provides access to the CodeDeploy resource that SAM automatically generates.
     Finally, use the ``FunctionName`` property to control the exact name of the Lambda function CloudFormation creates. Otherwise, CloudFormation will create your Lambda function with the Stack name and a unique ID added as part of the name.
 
-.. _Policies: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#resource-types
+.. _Policies: https://github.com/aws/serverless-application-model/blob/master/versions/2016-10-31.md#resource-types
 
 .. code:: yaml
 

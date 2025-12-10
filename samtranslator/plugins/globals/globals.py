@@ -317,15 +317,15 @@ class GlobalProperties:
       ```
       Global:
         Function:
-          Runtime: nodejs
+          Runtime: nodejs24.x
 
       Function:
-         Runtime: python
+         Runtime: python3.14
       ```
 
     After processing, Function resource will contain:
       ```
-      Runtime: python
+      Runtime: python3.14
       ```
 
     **Different data types**

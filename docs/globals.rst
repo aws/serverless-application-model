@@ -13,7 +13,7 @@ Example:
 
   Globals:
     Function:
-      Runtime: nodejs6.10
+      Runtime: nodejs24.x
       Timeout: 180
       Handler: index.handler
       Environment:
@@ -39,7 +39,7 @@ Example:
               Method: POST
 
 
-In the above example, both ``HelloWorldFunction`` and ``ThumbnailFunction`` will use nodejs6.10 runtime, 180 seconds 
+In the above example, both ``HelloWorldFunction`` and ``ThumbnailFunction`` will use nodejs24.x runtime, 180 seconds 
 timeout and index.handler Handler. ``HelloWorldFunction`` adds MESSAGE environment variable in addition to the 
 inherited TABLE_NAME. ``ThumbnailFunction`` inherits all the Globals properties and adds an API Event source.
 
@@ -168,19 +168,19 @@ Value specified in the resource will **replace** Global value
 
 Example:
 
-Runtime of ``MyFunction`` will be set to python3.6
+Runtime of ``MyFunction`` will be set to python3.14
 
 .. code:: yaml
 
   Globals:
     Function:
-      Runtime: nodejs4.3
+      Runtime: nodejs24.x
 
   Resources:
     MyFunction:
       Type: AWS::Serverless::Function
       Properties:
-        Runtime: python3.6
+        Runtime: python3.14
 
 Maps are merged
 ~~~~~~~~~~~~~~~
