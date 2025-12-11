@@ -394,7 +394,7 @@ class SamFunction(SamResourceMacro):
             intrinsics_resolver,
             get_managed_policy_map,
         )
-        self._make_lambda_role(lambda_function, intrinsics_resolver, execution_role, resources)
+        self._make_lambda_role(lambda_function, intrinsics_resolver, execution_role, resources, conditions)
 
         try:
             resources += self._generate_event_resources(
@@ -418,6 +418,7 @@ class SamFunction(SamResourceMacro):
         intrinsics_resolver: IntrinsicsResolver,
         execution_role: IAMRole,
         resources: List[Any],
+        conditions: Dict[str, Any],
     ) -> None:
         lambda_role = lambda_function.Role
 
@@ -432,8 +433,17 @@ class SamFunction(SamResourceMacro):
             role_resolved_value = intrinsics_resolver.resolve_parameter_refs(self.Role)
             role_list = role_resolved_value.get("Fn::If")
 
-            # both are none values then we need to create a role
-            if is_intrinsic_no_value(role_list[1]) and is_intrinsic_no_value(role_list[2]):
+            is_both_intrinsic_no_values = is_intrinsic_no_value(role_list[1]) and is_intrinsic_no_value(role_list[2])
+
+            # When either one of the condition is a non no value we need to conditionally
+            # create IAM role, This requires generating a condition that negates the condition check
+            # passed for IAM role creation and use that for the new role being created
+            if not is_both_intrinsic_no_values:
+                execution_role.set_resource_attribute("Condition", f"NOT{role_list[0]}")
+                conditions[f"NOT{role_list[0]}"] = make_not_conditional(role_list[0])
+
+            # both are none values, we need to create a role
+            if is_both_intrinsic_no_values:
                 lambda_function.Role = execution_role.get_runtime_attr("arn")
 
             # first value is none so we should create condition ? create : [2]

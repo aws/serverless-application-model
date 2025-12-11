@@ -1,5 +1,12 @@
 {
   "Conditions": {
+    "NOTRoleExists": {
+      "Fn::Not": [
+        {
+          "Condition": "RoleExists"
+        }
+      ]
+    },
     "RoleExists": {
       "Fn::Not": [
         {
@@ -52,6 +59,7 @@
       "Type": "AWS::Lambda::Function"
     },
     "MinimalFunctionRole": {
+      "Condition": "NOTRoleExists",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
