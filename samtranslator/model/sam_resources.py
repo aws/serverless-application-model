@@ -435,28 +435,27 @@ class SamFunction(SamResourceMacro):
 
             is_both_intrinsic_no_values = is_intrinsic_no_value(role_list[1]) and is_intrinsic_no_value(role_list[2])
 
-            # When either one of the condition is a non no value we need to conditionally
-            # create IAM role, This requires generating a condition that negates the condition check
-            # passed for IAM role creation and use that for the new role being created
-            if not is_both_intrinsic_no_values:
-                execution_role.set_resource_attribute("Condition", f"NOT{role_list[0]}")
-                conditions[f"NOT{role_list[0]}"] = make_not_conditional(role_list[0])
-
             # both are none values, we need to create a role
             if is_both_intrinsic_no_values:
                 lambda_function.Role = execution_role.get_runtime_attr("arn")
 
             # first value is none so we should create condition ? create : [2]
+            # create a condition for IAM role to only create on if case
             elif is_intrinsic_no_value(role_list[1]):
                 lambda_function.Role = make_conditional(
                     role_list[0], execution_role.get_runtime_attr("arn"), role_list[2]
                 )
+                execution_role.set_resource_attribute("Condition", f"{role_list[0]}")
 
             # second value is none so we should create condition ? [1] : create
+            # create a condition for IAM role to only create on else case
+            # with top level condition that negates the condition passed
             elif is_intrinsic_no_value(role_list[2]):
                 lambda_function.Role = make_conditional(
                     role_list[0], role_list[1], execution_role.get_runtime_attr("arn")
                 )
+                execution_role.set_resource_attribute("Condition", f"NOT{role_list[0]}")
+                conditions[f"NOT{role_list[0]}"] = make_not_conditional(role_list[0])
 
     def _construct_event_invoke_config(  # noqa: PLR0913
         self,
