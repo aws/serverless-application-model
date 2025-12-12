@@ -110,7 +110,7 @@ class Globals:
             "Tags",
             "InstanceRequirements",
             "ScalingConfig",
-            "KMSKeyArn",
+            "KmsKeyArn",
             "PropagateTags",
         ],
     }

@@ -88,12 +88,12 @@ class Properties(BaseModel):
     # TODO: Change back to passthrough_prop after CloudFormation schema is updated with AWS::Lambda::CapacityProvider
     # Optional KMS key ARN - passes through directly to CFN for encryption configuration
     # Uses PassThroughProp because it's a direct 1:1 mapping with no SAM transformation
-    # KMSKeyArn: Optional[PassThroughProp] = passthrough_prop(
+    # KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
     #     PROPERTIES_STEM,
-    #     "KMSKeyArn",
-    #     ["AWS::Lambda::CapacityProvider", "Properties", "KMSKeyArn"],
+    #     "KmsKeyArn",
+    #     ["AWS::Lambda::CapacityProvider", "Properties", "KmsKeyArn"],
     # )
-    KMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Globals(BaseModel):
@@ -120,7 +120,7 @@ class Globals(BaseModel):
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
     ScalingConfig: Optional[ScalingConfig] = properties("ScalingConfig")
 
-    KMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):
