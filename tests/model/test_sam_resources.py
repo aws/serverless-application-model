@@ -751,14 +751,12 @@ class TestSamFunctionRoleResolver(TestCase):
         self.function.CodeUri = "s3://foobar/foo.zip"
         self.function.Runtime = "foo"
         self.function.Handler = "bar"
-        self.template = {"Conditions": {}}
-
         self.kwargs = {
             "intrinsics_resolver": IntrinsicsResolver({}),
             "event_resources": [],
             "managed_policy_map": {},
             "resource_resolver": ResourceResolver({}),
-            "conditions": self.template.get("Conditions", {}),
+            "conditions": {"Conditions": {}},
         }
 
     def test_role_none_creates_execution_role(self):
@@ -785,9 +783,8 @@ class TestSamFunctionRoleResolver(TestCase):
         }
         self.function.Role = role_conditional
 
-        template = {"Conditions": {"Condition": True}}
         kwargs = dict(self.kwargs)
-        kwargs["conditions"] = template.get("Conditions", {})
+        kwargs["conditions"] = {"Condition": True}
 
         cfn_resources = self.function.to_cloudformation(**self.kwargs)
         generated_roles = [x for x in cfn_resources if isinstance(x, IAMRole)]
@@ -801,9 +798,8 @@ class TestSamFunctionRoleResolver(TestCase):
         role_conditional = {"Fn::If": ["Condition", {"Ref": "AWS::NoValue"}, {"Ref": "AWS::NoValue"}]}
         self.function.Role = role_conditional
 
-        template = {"Conditions": {"Condition": True}}
         kwargs = dict(self.kwargs)
-        kwargs["conditions"] = template.get("Conditions", {})
+        kwargs["conditions"] = {"Condition": True}
 
         cfn_resources = self.function.to_cloudformation(**self.kwargs)
         generated_roles = [x for x in cfn_resources if isinstance(x, IAMRole)]
@@ -814,9 +810,8 @@ class TestSamFunctionRoleResolver(TestCase):
         role_conditional = {"Fn::If": ["Condition", {"Ref": "AWS::NoValue"}, {"Ref": "iamRoleArn"}]}
         self.function.Role = role_conditional
 
-        template = {"Conditions": {"Condition": True}}
         kwargs = dict(self.kwargs)
-        kwargs["conditions"] = template.get("Conditions", {})
+        kwargs["conditions"] = {"Condition": True}
 
         cfn_resources = self.function.to_cloudformation(**self.kwargs)
         generated_roles = [x for x in cfn_resources if isinstance(x, IAMRole)]
@@ -831,9 +826,8 @@ class TestSamFunctionRoleResolver(TestCase):
         role_conditional = {"Fn::If": ["Condition", {"Ref": "iamRoleArn"}, {"Ref": "AWS::NoValue"}]}
         self.function.Role = role_conditional
 
-        template = {"Conditions": {"Condition": True}}
         kwargs = dict(self.kwargs)
-        kwargs["conditions"] = template.get("Conditions", {})
+        kwargs["conditions"] = {"Condition": True}
 
         cfn_resources = self.function.to_cloudformation(**self.kwargs)
         generated_roles = [x for x in cfn_resources if isinstance(x, IAMRole)]
