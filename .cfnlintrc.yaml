@@ -144,7 +144,7 @@ ignore_templates:
   - tests/translator/output/**/function_with_metrics_config.json
   - tests/translator/output/**/function_with_self_managed_kafka_and_schema_registry.json # cfnlint is not updated to recognize the SchemaRegistryConfig property
   - tests/translator/output/**/function_with_msk_with_schema_registry_config.json # cfnlint is not updated to recognize the SchemaRegistryConfig property
-  - tests/translator/output/**/*capacity_provider*.json # TODO: Remove this once CFN updates
+  - tests/translator/output/aws-*/*capacity_provider*.json # Ignore Capacity Provider test format in non-aws partitions
   - tests/translator/output/**/function_with_tenancy_config.json # cfnlint is not updated to recognize the TenancyConfig property
   - tests/translator/output/**/function_with_tenancy_and_api_event.json # cfnlint is not updated to recognize the TenancyConfig property
   - tests/translator/output/**/function_with_tenancy_and_httpapi_event.json # cfnlint is not updated to recognize the TenancyConfig property
