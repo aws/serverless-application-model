@@ -426,36 +426,37 @@ class SamFunction(SamResourceMacro):
             resources.append(execution_role)
             lambda_function.Role = execution_role.get_runtime_attr("arn")
 
-        if is_intrinsic_if(lambda_role):
-            resources.append(execution_role)
+        elif is_intrinsic_if(lambda_role):
 
             # We need to create and if else condition here
-            role_resolved_value = intrinsics_resolver.resolve_parameter_refs(self.Role)
-            role_list = role_resolved_value.get("Fn::If")
+            role_resolved_value = intrinsics_resolver.resolve_parameter_refs(lambda_role)
+            role_condition, role_if, role_else = role_resolved_value.get("Fn::If")
 
-            is_both_intrinsic_no_values = is_intrinsic_no_value(role_list[1]) and is_intrinsic_no_value(role_list[2])
+            is_both_intrinsic_no_values = is_intrinsic_no_value(role_if) and is_intrinsic_no_value(role_else)
 
-            # both are none values, we need to create a role
+            # Create a role only when no value is in either of the conditions
+            if is_intrinsic_no_value(role_if) or is_intrinsic_no_value(role_else):
+                resources.append(execution_role)
+
+            # both are none values, we always need to create a role
             if is_both_intrinsic_no_values:
                 lambda_function.Role = execution_role.get_runtime_attr("arn")
 
             # first value is none so we should create condition ? create : [2]
             # create a condition for IAM role to only create on if case
-            elif is_intrinsic_no_value(role_list[1]):
+            elif is_intrinsic_no_value(role_if):
                 lambda_function.Role = make_conditional(
-                    role_list[0], execution_role.get_runtime_attr("arn"), role_list[2]
+                    role_condition, execution_role.get_runtime_attr("arn"), role_else
                 )
-                execution_role.set_resource_attribute("Condition", f"{role_list[0]}")
+                execution_role.set_resource_attribute("Condition", f"{role_condition}")
 
             # second value is none so we should create condition ? [1] : create
             # create a condition for IAM role to only create on else case
             # with top level condition that negates the condition passed
-            elif is_intrinsic_no_value(role_list[2]):
-                lambda_function.Role = make_conditional(
-                    role_list[0], role_list[1], execution_role.get_runtime_attr("arn")
-                )
-                execution_role.set_resource_attribute("Condition", f"NOT{role_list[0]}")
-                conditions[f"NOT{role_list[0]}"] = make_not_conditional(role_list[0])
+            elif is_intrinsic_no_value(role_else):
+                lambda_function.Role = make_conditional(role_condition, role_if, execution_role.get_runtime_attr("arn"))
+                execution_role.set_resource_attribute("Condition", f"NOT{role_condition}")
+                conditions[f"NOT{role_condition}"] = make_not_conditional(role_condition)
 
     def _construct_event_invoke_config(  # noqa: PLR0913
         self,

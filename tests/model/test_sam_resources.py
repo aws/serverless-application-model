@@ -793,7 +793,8 @@ class TestSamFunctionRoleResolver(TestCase):
         generated_roles = [x for x in cfn_resources if isinstance(x, IAMRole)]
         lambda_function = next(r for r in cfn_resources if r.resource_type == "AWS::Lambda::Function")
 
-        self.assertEqual(len(generated_roles), 1)
+        # Should not create a role if a role is passed in for both cases
+        self.assertEqual(len(generated_roles), 0)
         self.assertEqual(lambda_function.Role, role_conditional)
 
     def test_role_fn_if_both_no_value_creates_execution_role(self):
