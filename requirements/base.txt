@@ -3,4 +3,6 @@ jsonschema<5,>=3.2  # TODO: evaluate risk of removing jsonschema 3.x support
 typing_extensions>=4.4 # 3.8 doesn't have Required, TypeGuard and ParamSpec
 
 # resource validation & schema generation
-pydantic~=2.12.5
+# we should remove support for Python 3.8 soon (and 3.9), but supporting it for now
+pydantic>=2.10.6; python_version>="3.8"
+pydantic~=2.12.5; python_version>="3.9"
