@@ -44,7 +44,7 @@ try:
         aws_serverless_function,
         aws_serverless_graphqlapi,
     )
-except Exception:
+except RuntimeError:  # Pydantic fails when initializing the model classes with a RuntimeError in 3.14
     aws_serverless_capacity_provider = cast(ModuleType, None)
     aws_serverless_function = cast(ModuleType, None)
     aws_serverless_graphqlapi = cast(ModuleType, None)
