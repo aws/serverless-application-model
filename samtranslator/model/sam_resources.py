@@ -293,7 +293,7 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(self.logical_id, e.message) from e
 
     @cw_timer
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0915
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0915, PLR0912
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
@@ -448,7 +448,7 @@ class SamFunction(SamResourceMacro):
         lambda_role = lambda_function.Role
         execution_role_arn = execution_role.get_runtime_attr("arn")
 
-        result = {
+        result: Dict[str, Any] = {
             "should_append_role": False,
             "lambda_role_value": None,
             "execution_role_condition": None,
@@ -459,9 +459,13 @@ class SamFunction(SamResourceMacro):
         role_resolved_value = intrinsics_resolver.resolve_parameter_refs(lambda_role)
         role_condition, role_if, role_else = role_resolved_value.get("Fn::If")
 
+        if is_intrinsic_no_value(role_if) and is_intrinsic_no_value(role_else):
+            result["lambda_role_value"] = execution_role_arn
+            result["should_append_role"] = True
+
         # first value is none so we should create condition ? create : [2]
         # create a condition for IAM role to only create on if case
-        if is_intrinsic_no_value(role_if):
+        elif is_intrinsic_no_value(role_if):
             result["lambda_role_value"] = make_conditional(role_condition, execution_role_arn, role_else)
             result["execution_role_condition"] = f"{role_condition}"
             result["should_append_role"] = True
