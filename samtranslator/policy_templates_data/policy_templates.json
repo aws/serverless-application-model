@@ -170,6 +170,101 @@
         }
       }
     },
+    "AthenaQueryPolicy_v2": {
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "athena:ListWorkGroups",
+              "athena:GetWorkGroup",
+              "athena:GetExecutionEngines",
+              "athena:GetDatabase",
+              "athena:ListDataCatalogs",
+              "athena:ListDatabases",
+              "athena:ListTableMetadata",
+              "athena:GetTableMetadata"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+          },
+          {
+            "Action": [
+              "glue:GetDatabases",
+              "glue:GetDatabase",
+              "glue:GetTables",
+              "glue:GetTable"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+              "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:catalog",
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:database/${databaseName}",
+                  {
+                    "databaseName": {
+                      "Ref": "DatabaseName"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:table/${databaseName}/${tableName}",
+                  {
+                    "databaseName": {
+                      "Ref": "DatabaseName"
+                    },
+                    "tableName": {
+                      "Ref": "TableName"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Action": [
+              "athena:StartQueryExecution",
+              "athena:GetQueryResults",
+              "athena:DeleteNamedQuery",
+              "athena:GetNamedQuery",
+              "athena:ListQueryExecutions",
+              "athena:StopQueryExecution",
+              "athena:GetQueryResultsStream",
+              "athena:ListNamedQueries",
+              "athena:CreateNamedQuery",
+              "athena:GetQueryExecution",
+              "athena:BatchGetNamedQuery",
+              "athena:BatchGetQueryExecution",
+              "athena:GetWorkGroup"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${workgroupName}",
+                {
+                  "workgroupName": {
+                    "Ref": "WorkGroupName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Description": "Gives permissions to execute Athena queries",
+      "Parameters": {
+        "WorkGroupName": {
+          "Description": "Name of the Athena Workgroup"
+        },
+        "DatabaseName": {
+          "Description": "Name of the Glue Database"
+        },
+        "TableName": {
+          "Description": "Name of the Glue Table"
+        }
+      }
+    },
     "CloudFormationDescribeStacksPolicy": {
       "Definition": {
         "Statement": [
