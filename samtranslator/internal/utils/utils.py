@@ -13,7 +13,7 @@ def passthrough_value(v: Optional[PassThroughProp]) -> PassThrough:
     """
     Cast PassThroughProp values to PassThrough.
 
-    PassThroughProp has a __root__ value which is of type PassThrough. But mypy
+    PassThroughProp has a .root value which is of type PassThrough. But mypy
     does not look deep enough to see this type, and does not recognize it as Any,
     so assignments to CFN resource types fail. So we cast to PassThrough here.
 

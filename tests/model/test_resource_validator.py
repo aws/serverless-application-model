@@ -61,21 +61,17 @@ class TestResourceValidator(TestCase):
 class TestResourceValidatorFailure(TestCase):
     def test_connector_with_empty_properties(self):
         invalid_connector = SamConnector("foo")
-        with self.assertRaises(
-            InvalidResourceException,
-        ):
+        with self.assertRaises(InvalidResourceException) as cm:
             invalid_connector.validate_properties_and_return_model(ConnectorProperties)
-            self.assertRegex(".+Given resource property '(Source|Destination|Permissions)'.+ is invalid.")
+        self.assertRegex(str(cm.exception), ".+Property '.+' is required.")
 
     def test_connector_without_source(self):
         invalid_connector = SamConnector("foo")
         invalid_connector.Destination = {"Id": "MyTable"}
         invalid_connector.Permissions = ["Read"]
-        with self.assertRaises(
-            InvalidResourceException,
-        ):
+        with self.assertRaises(InvalidResourceException) as cm:
             invalid_connector.validate_properties_and_return_model(ConnectorProperties)
-            self.assertRegex(".+Property 'Source'.+ is invalid.")
+        self.assertIn("Property 'Source' is required.", str(cm.exception))
 
     def test_connector_with_invalid_permission(self):
         invalid_connector = SamConnector("foo")

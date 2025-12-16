@@ -6,7 +6,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Type, Union
 
-from samtranslator.compat import pydantic
+import pydantic
+
 from samtranslator.internal.schema_source import (
     any_cfn_resource,
     aws_serverless_api,
@@ -24,13 +25,17 @@ from samtranslator.internal.schema_source.common import BaseModel, LenientBaseMo
 
 
 class Globals(BaseModel):
-    Function: Optional[aws_serverless_function.Globals]
-    Api: Optional[aws_serverless_api.Globals]
-    HttpApi: Optional[aws_serverless_httpapi.Globals]
-    SimpleTable: Optional[aws_serverless_simpletable.Globals]
-    StateMachine: Optional[aws_serverless_statemachine.Globals]
-    LayerVersion: Optional[aws_serverless_layerversion.Globals]
-    CapacityProvider: Optional[aws_serverless_capacity_provider.Globals]
+    Function: Optional[aws_serverless_function.Globals] = None
+    Api: Optional[aws_serverless_api.Globals] = None
+    HttpApi: Optional[aws_serverless_httpapi.Globals] = None
+    SimpleTable: Optional[aws_serverless_simpletable.Globals] = None
+    StateMachine: Optional[aws_serverless_statemachine.Globals] = None
+    LayerVersion: Optional[aws_serverless_layerversion.Globals] = None
+    CapacityProvider: Optional[aws_serverless_capacity_provider.Globals] = None
+
+
+# Type alias to avoid field name shadowing class name in Pydantic v2
+_Globals = Globals
 
 
 Resources = Union[
@@ -48,7 +53,7 @@ Resources = Union[
 
 
 class _ModelWithoutResources(LenientBaseModel):
-    Globals: Optional[Globals]
+    Globals: Optional[_Globals] = None
 
 
 class SamModel(_ModelWithoutResources):
@@ -66,20 +71,46 @@ class Model(_ModelWithoutResources):
     Resources: Dict[str, Resources]
 
 
+def _normalize_refs(obj: Any) -> Any:
+    """
+    Recursively update $ref paths from Pydantic v2 format (#/$defs/) to v1 format (#/definitions/).
+    """
+    if isinstance(obj, dict):
+        result = {}
+        for k, v in obj.items():
+            if k == "$ref" and isinstance(v, str) and v.startswith("#/$defs/"):
+                result[k] = v.replace("#/$defs/", "#/definitions/")
+            else:
+                result[k] = _normalize_refs(v)
+        return result
+    if isinstance(obj, list):
+        return [_normalize_refs(item) for item in obj]
+    return obj
+
+
 def get_schema(model: Type[pydantic.BaseModel]) -> Dict[str, Any]:
-    obj = model.schema()
+    obj = model.model_json_schema()
 
     # http://json-schema.org/understanding-json-schema/reference/schema.html#schema
     # https://github.com/pydantic/pydantic/issues/1478
+    # Using draft-07 because Pydantic v2 generates 'const' keyword which requires draft-06+
     # Validated in https://github.com/aws/serverless-application-model/blob/5c82f5d2ae95adabc9827398fba8ccfc3dbe101a/tests/schema/test_validate_schema.py#L91
-    obj["$schema"] = "http://json-schema.org/draft-04/schema#"
+    obj["$schema"] = "http://json-schema.org/draft-07/schema#"
+
+    # Pydantic v2 uses "$defs" instead of "definitions" - normalize to "definitions" for compatibility
+    if "$defs" in obj:
+        obj["definitions"] = obj.pop("$defs")
+
+    # Update all $ref paths from #/$defs/ to #/definitions/
+    obj = _normalize_refs(obj)
 
     # Pydantic automatically adds title to model (https://github.com/pydantic/pydantic/issues/1051),
     # and the YAML extension for VS Code then shows 'PassThroughProp' as title for pass-through
     # properties (instead of the title of the property itself)... so manually deleting it.
-    del obj["definitions"]["PassThroughProp"]["title"]
+    if "PassThroughProp" in obj.get("definitions", {}):
+        obj["definitions"]["PassThroughProp"].pop("title", None)
 
-    return obj
+    return dict(obj)
 
 
 def json_dumps(obj: Any) -> str:

@@ -6,7 +6,7 @@ from unittest import TestCase
 import pytest
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
-from jsonschema.validators import Draft4Validator
+from jsonschema.validators import Draft7Validator
 from parameterized import parameterized
 from samtranslator.yaml_helper import yaml_parse
 
@@ -127,7 +127,7 @@ class TestValidateUnifiedSchema(TestCase):
             validate(obj, schema=UNIFIED_SCHEMA)
 
     def test_structure(self):
-        assert UNIFIED_SCHEMA["$schema"] == "http://json-schema.org/draft-04/schema#"
+        assert UNIFIED_SCHEMA["$schema"] == "http://json-schema.org/draft-07/schema#"
         assert {
             "AWSTemplateFormatVersion",
             "Conditions",
@@ -190,7 +190,7 @@ class TestValidateUnifiedSchema(TestCase):
         ],
     )
     def test_sanity_valid(self, template):
-        Draft4Validator(UNIFIED_SCHEMA).validate(template)
+        Draft7Validator(UNIFIED_SCHEMA).validate(template)
         validate(template, schema=UNIFIED_SCHEMA)
 
     @parameterized.expand(

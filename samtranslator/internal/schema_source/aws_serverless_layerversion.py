@@ -36,6 +36,10 @@ class ContentUri(BaseModel):
     )
 
 
+# Type alias to avoid field name shadowing class name
+_ContentUri = ContentUri
+
+
 class Properties(BaseModel):
     CompatibleArchitectures: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,
@@ -47,8 +51,8 @@ class Properties(BaseModel):
         "CompatibleRuntimes",
         ["AWS::Lambda::LayerVersion", "Properties", "CompatibleRuntimes"],
     )
-    PublishLambdaVersion: Optional[bool]  # TODO: add docs
-    ContentUri: Union[str, ContentUri] = properties("ContentUri")
+    PublishLambdaVersion: Optional[bool] = None  # TODO: add docs
+    ContentUri: Union[str, _ContentUri] = properties("ContentUri")
     Description: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,
         "Description",
@@ -69,4 +73,4 @@ class Resource(ResourceAttributes):
 
 
 class Globals(BaseModel):
-    PublishLambdaVersion: Optional[bool]  # TODO: add docs
+    PublishLambdaVersion: Optional[bool] = None  # TODO: add docs

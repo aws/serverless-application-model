@@ -23,26 +23,32 @@ class PrimaryKey(BaseModel):
         PRIMARY_KEY_STEM,
         "Name",
         ["AWS::DynamoDB::Table.AttributeDefinition", "AttributeName"],
+        required=True,
     )
     Type: PassThroughProp = passthrough_prop(
         PRIMARY_KEY_STEM,
         "Type",
         ["AWS::DynamoDB::Table.AttributeDefinition", "AttributeType"],
+        required=True,
     )
 
 
-SSESpecification = Optional[PassThroughProp]
+# Type alias to avoid field name shadowing class name
+_PrimaryKey = PrimaryKey
+
+# Type alias with underscore prefix to avoid shadowing by field name
+_SSESpecification = Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
-    PointInTimeRecoverySpecification: Optional[PassThroughProp]  # TODO: add docs
-    PrimaryKey: Optional[PrimaryKey] = properties("PrimaryKey")
+    PointInTimeRecoverySpecification: Optional[PassThroughProp] = None  # TODO: add docs
+    PrimaryKey: Optional[_PrimaryKey] = properties("PrimaryKey")
     ProvisionedThroughput: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,
         "ProvisionedThroughput",
         ["AWS::DynamoDB::Table", "Properties", "ProvisionedThroughput"],
     )
-    SSESpecification: Optional[SSESpecification] = passthrough_prop(
+    SSESpecification: Optional[_SSESpecification] = passthrough_prop(
         PROPERTIES_STEM,
         "SSESpecification",
         ["AWS::DynamoDB::Table", "Properties", "SSESpecification"],
@@ -56,14 +62,18 @@ class Properties(BaseModel):
 
 
 class Globals(BaseModel):
-    SSESpecification: Optional[SSESpecification] = passthrough_prop(
+    SSESpecification: Optional[_SSESpecification] = passthrough_prop(
         PROPERTIES_STEM,
         "SSESpecification",
         ["AWS::DynamoDB::Table", "Properties", "SSESpecification"],
     )
 
 
+# Type alias to avoid field name shadowing class name in Pydantic V2
+_Properties = Properties
+
+
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::SimpleTable"]
-    Properties: Optional[Properties]
-    Connectors: Optional[Dict[str, EmbeddedConnector]]
+    Properties: Optional[_Properties] = None
+    Connectors: Optional[Dict[str, EmbeddedConnector]] = None

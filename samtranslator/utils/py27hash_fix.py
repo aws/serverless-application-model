@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 import copy
 import ctypes
@@ -561,7 +560,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         """
         return [(k, self[k]) for k in self]
 
-    def setdefault(self, key, default):  # type: ignore[no-untyped-def]
+    def setdefault(self, key: Any, default: Any = None) -> Any:
         """
         Retruns the value of a key if the key exists. Otherwise inserts key with the default value
 

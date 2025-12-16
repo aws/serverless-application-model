@@ -120,3 +120,4 @@ venv.bak/
 integration/config/file_to_s3_map_modified.json
 
 .tmp
+.kiro

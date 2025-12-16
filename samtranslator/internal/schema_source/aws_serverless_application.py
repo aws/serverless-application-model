@@ -22,8 +22,12 @@ class Location(BaseModel):
     SemanticVersion: SamIntrinsicable[str] = location("SemanticVersion")
 
 
+# Type alias to avoid field name shadowing class name
+_Location = Location
+
+
 class Properties(BaseModel):
-    Location: Union[str, Location] = properties("Location")
+    Location: Union[str, _Location] = properties("Location")
     NotificationARNs: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,
         "NotificationARNs",

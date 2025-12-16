@@ -2,8 +2,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-import jsonschema
-from jsonschema.exceptions import ValidationError
+from jsonschema import Draft7Validator
 
 from samtranslator import policy_templates_data
 from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
@@ -118,11 +117,14 @@ class PolicyTemplatesProcessor:
         if not schema:
             schema = PolicyTemplatesProcessor._read_schema()
 
-        try:
-            jsonschema.validate(policy_templates_dict, schema)
-        except ValidationError as ex:
-            # Stringifying the exception will give us useful error message
-            raise ValueError(str(ex)) from ex
+        # Use Draft7Validator directly to avoid check_schema() which has
+        # compatibility issues with Python 3.14. This also provides more
+        # specific error messages.
+        validator = Draft7Validator(schema)
+        errors = list(validator.iter_errors(policy_templates_dict))
+        if errors:
+            # Raise the first error with a useful message
+            raise ValueError(str(errors[0]))
 
         return True
 

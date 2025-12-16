@@ -33,12 +33,16 @@ class DeadLetterConfig(BaseModel):
     Type: Optional[Literal["SQS"]] = deadletterconfig("Type")
 
 
+# Type alias to avoid field name shadowing class name
+_DeadLetterConfig = DeadLetterConfig
+
+
 class ScheduleTarget(BaseModel):
     Id: PassThroughProp = scheduletarget("Id")
 
 
 class ScheduleEventProperties(BaseModel):
-    DeadLetterConfig: Optional[DeadLetterConfig] = scheduleeventproperties("DeadLetterConfig")
+    DeadLetterConfig: Optional[_DeadLetterConfig] = scheduleeventproperties("DeadLetterConfig")
     Description: Optional[PassThroughProp] = scheduleeventproperties("Description")
     Enabled: Optional[bool] = scheduleeventproperties("Enabled")
     Input: Optional[PassThroughProp] = scheduleeventproperties("Input")
@@ -47,7 +51,7 @@ class ScheduleEventProperties(BaseModel):
     Schedule: Optional[PassThroughProp] = scheduleeventproperties("Schedule")
     State: Optional[PassThroughProp] = scheduleeventproperties("State")
     Target: Optional[ScheduleTarget] = scheduleeventproperties("Target")
-    RoleArn: Optional[PassThroughProp]  # TODO: add doc
+    RoleArn: Optional[PassThroughProp] = None  # TODO: add doc
 
 
 class ScheduleEvent(BaseModel):
@@ -56,7 +60,7 @@ class ScheduleEvent(BaseModel):
 
 
 class ScheduleV2EventProperties(BaseModel):
-    DeadLetterConfig: Optional[DeadLetterConfig] = scheduleeventv2properties("DeadLetterConfig")
+    DeadLetterConfig: Optional[_DeadLetterConfig] = scheduleeventv2properties("DeadLetterConfig")
     Description: Optional[PassThroughProp] = scheduleeventv2properties("Description")
     EndDate: Optional[PassThroughProp] = scheduleeventv2properties("EndDate")
     FlexibleTimeWindow: Optional[PassThroughProp] = scheduleeventv2properties("FlexibleTimeWindow")
@@ -71,7 +75,7 @@ class ScheduleV2EventProperties(BaseModel):
     ScheduleExpressionTimezone: Optional[PassThroughProp] = scheduleeventv2properties("ScheduleExpressionTimezone")
     StartDate: Optional[PassThroughProp] = scheduleeventv2properties("StartDate")
     State: Optional[PassThroughProp] = scheduleeventv2properties("State")
-    OmitName: Optional[bool]  # TODO: add doc
+    OmitName: Optional[bool] = None  # TODO: add doc
 
 
 class ScheduleV2Event(BaseModel):
@@ -93,6 +97,10 @@ class ResourcePolicy(BaseModel):
     SourceVpcWhitelist: Optional[List[Union[str, DictStrAny]]] = resourcepolicy("SourceVpcWhitelist")
 
 
+# Type alias to avoid field name shadowing class name
+_ResourcePolicy = ResourcePolicy
+
+
 class CloudWatchEventProperties(BaseModel):
     EventBusName: Optional[PassThroughProp] = cloudwatcheventproperties("EventBusName")
     Input: Optional[PassThroughProp] = cloudwatcheventproperties("Input")
@@ -110,7 +118,7 @@ class EventBridgeRuleTarget(BaseModel):
 
 
 class EventBridgeRuleEventProperties(BaseModel):
-    DeadLetterConfig: Optional[DeadLetterConfig] = eventbridgeruleeventproperties("DeadLetterConfig")
+    DeadLetterConfig: Optional[_DeadLetterConfig] = eventbridgeruleeventproperties("DeadLetterConfig")
     EventBusName: Optional[PassThroughProp] = eventbridgeruleeventproperties("EventBusName")
     Input: Optional[PassThroughProp] = eventbridgeruleeventproperties("Input")
     InputPath: Optional[PassThroughProp] = eventbridgeruleeventproperties("InputPath")
@@ -118,7 +126,7 @@ class EventBridgeRuleEventProperties(BaseModel):
     RetryPolicy: Optional[PassThroughProp] = eventbridgeruleeventproperties("RetryPolicy")
     Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
     RuleName: Optional[PassThroughProp] = eventbridgeruleeventproperties("RuleName")
-    InputTransformer: Optional[PassThroughProp]  # TODO: add docs
+    InputTransformer: Optional[PassThroughProp] = None  # TODO: add docs
 
 
 class EventBridgeRuleEvent(BaseModel):
@@ -130,11 +138,15 @@ class Auth(BaseModel):
     ApiKeyRequired: Optional[bool] = apiauth("ApiKeyRequired")
     AuthorizationScopes: Optional[List[str]] = apiauth("AuthorizationScopes")
     Authorizer: Optional[str] = apiauth("Authorizer")
-    ResourcePolicy: Optional[ResourcePolicy] = apiauth("ResourcePolicy")
+    ResourcePolicy: Optional[_ResourcePolicy] = apiauth("ResourcePolicy")
+
+
+# Type alias to avoid field name shadowing class name
+_Auth = Auth
 
 
 class ApiEventProperties(BaseModel):
-    Auth: Optional[Auth] = apieventproperties("Auth")
+    Auth: Optional[_Auth] = apieventproperties("Auth")
     Method: str = apieventproperties("Method")
     Path: str = apieventproperties("Path")
     RestApiId: Optional[SamIntrinsicable[str]] = apieventproperties("RestApiId")
@@ -169,19 +181,19 @@ class Properties(BaseModel):
     Role: Optional[PassThroughProp] = properties("Role")
     RolePath: Optional[PassThroughProp] = properties("RolePath")
     Tags: Optional[DictStrAny] = properties("Tags")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = None  # TODO: add docs
     Tracing: Optional[PassThroughProp] = properties("Tracing")
     Type: Optional[PassThroughProp] = properties("Type")
-    AutoPublishAlias: Optional[PassThroughProp]
-    DeploymentPreference: Optional[PassThroughProp]
-    UseAliasAsEventTarget: Optional[bool]
+    AutoPublishAlias: Optional[PassThroughProp] = None
+    DeploymentPreference: Optional[PassThroughProp] = None
+    UseAliasAsEventTarget: Optional[bool] = None
 
 
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::StateMachine"]
     Properties: Properties
-    Connectors: Optional[Dict[str, EmbeddedConnector]]
+    Connectors: Optional[Dict[str, EmbeddedConnector]] = None
 
 
 class Globals(BaseModel):
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = None  # TODO: add docs

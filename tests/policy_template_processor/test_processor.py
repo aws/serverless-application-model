@@ -2,7 +2,7 @@ import json
 from unittest import TestCase
 from unittest.mock import Mock, mock_open, patch
 
-import jsonschema
+from jsonschema import Draft7Validator
 from jsonschema.exceptions import ValidationError
 from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
@@ -149,65 +149,58 @@ class TestPolicyTemplateProcessor(TestCase):
         with self.assertRaises(TypeError):
             processor.convert("key1", parameter_values)
 
-    @patch.object(jsonschema, "validate")
     @patch.object(PolicyTemplatesProcessor, "_read_schema")
-    def test_is_valid_templates_dict_must_use_default_schema(self, read_schema_mock, jsonschema_validate_mock):
+    def test_is_valid_templates_dict_must_use_default_schema(self, read_schema_mock):
         policy_templates_dict = {"key": "value"}
 
-        schema = "some schema"
+        schema = {"type": "object"}
         read_schema_mock.return_value = schema
-        jsonschema_validate_mock.return_value = True
 
-        result = PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict)
-        self.assertTrue(result)
+        with patch.object(Draft7Validator, "iter_errors", return_value=iter([])):
+            result = PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict)
+            self.assertTrue(result)
+            read_schema_mock.assert_called_once_with()
 
-        jsonschema_validate_mock.assert_called_once_with(policy_templates_dict, schema)
-        read_schema_mock.assert_called_once_with()
-
-    @patch.object(jsonschema, "validate")
     @patch.object(PolicyTemplatesProcessor, "_read_schema")
-    def test_is_valid_templates_dict_must_use_input_schema(self, read_schema_mock, jsonschema_validate_mock):
+    def test_is_valid_templates_dict_must_use_input_schema(self, read_schema_mock):
         policy_templates_dict = {"key": "value"}
 
-        schema = "some schema"
-        jsonschema_validate_mock.return_value = True
+        schema = {"type": "object"}
 
-        result = PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict, schema)
-        self.assertTrue(result)
+        with patch.object(Draft7Validator, "iter_errors", return_value=iter([])):
+            result = PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict, schema)
+            self.assertTrue(result)
+            read_schema_mock.assert_not_called()  # must not read schema if one is given
 
-        jsonschema_validate_mock.assert_called_once_with(policy_templates_dict, schema)
-        read_schema_mock.assert_not_called()  # must not read schema if one is given
-
-    @patch.object(jsonschema, "validate")
     @patch.object(PolicyTemplatesProcessor, "_read_schema")
-    def test_is_valid_templates_dict_must_raise_for_invalid_input(self, read_schema_mock, jsonschema_validate_mock):
+    def test_is_valid_templates_dict_must_raise_for_invalid_input(self, read_schema_mock):
         policy_templates_dict = {"key": "value"}
 
-        schema = "some schema"
+        schema = {"type": "object"}
         exception_msg = "exception"
 
         read_schema_mock.return_value = schema
-        jsonschema_validate_mock.side_effect = ValidationError(exception_msg)
+        error = ValidationError(exception_msg)
 
-        with self.assertRaises(ValueError) as cm:
-            PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict)
+        with patch.object(Draft7Validator, "iter_errors", return_value=iter([error])):
+            with self.assertRaises(ValueError) as cm:
+                PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict)
 
-        ex = cm.exception
-        self.assertEqual(str(ex), exception_msg)
+            ex = cm.exception
+            self.assertEqual(str(ex), exception_msg)
 
-    @patch.object(jsonschema, "validate")
     @patch.object(PolicyTemplatesProcessor, "_read_schema")
-    def test_is_valid_templates_dict_must_bubble_unhandled_exceptions(self, read_schema_mock, jsonschema_validate_mock):
+    def test_is_valid_templates_dict_must_bubble_unhandled_exceptions(self, read_schema_mock):
         policy_templates_dict = {"key": "value"}
 
-        schema = "some schema"
+        schema = {"type": "object"}
         exception_msg = "exception"
 
         read_schema_mock.return_value = schema
-        jsonschema_validate_mock.side_effect = TypeError(exception_msg)
 
-        with self.assertRaises(TypeError):
-            PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict)
+        with patch.object(Draft7Validator, "iter_errors", side_effect=TypeError(exception_msg)):
+            with self.assertRaises(TypeError):
+                PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict)
 
     @patch.object(json, "loads")
     def test_read_json_must_read_from_file(self, json_loads_mock):
