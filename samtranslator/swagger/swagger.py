@@ -1095,13 +1095,13 @@ class SwaggerEditor(BaseEditor):
                 if re.match(vpc_regex, endpoint):
                     vpc_list.append(endpoint)
             if vpc_list:
-                condition.setdefault("aws:SourceVpc", []).extend(vpc_list)  # type: ignore[no-untyped-call]
+                condition.setdefault("aws:SourceVpc", []).extend(vpc_list)
             if vpce_list:
-                condition.setdefault("aws:SourceVpce", []).extend(vpce_list)  # type: ignore[no-untyped-call]
+                condition.setdefault("aws:SourceVpce", []).extend(vpce_list)
         if intrinsic_vpc_endpoint_list is not None:
-            condition.setdefault("aws:SourceVpc", []).extend(intrinsic_vpc_endpoint_list)  # type: ignore[no-untyped-call]
+            condition.setdefault("aws:SourceVpc", []).extend(intrinsic_vpc_endpoint_list)
         if intrinsic_vpce_endpoint_list is not None:
-            condition.setdefault("aws:SourceVpce", []).extend(intrinsic_vpce_endpoint_list)  # type: ignore[no-untyped-call]
+            condition.setdefault("aws:SourceVpce", []).extend(intrinsic_vpce_endpoint_list)
 
         # Skip writing to transformed template if both vpc and vpce endpoint lists are empty
         if (not condition.get("aws:SourceVpc", [])) and (not condition.get("aws:SourceVpce", [])):

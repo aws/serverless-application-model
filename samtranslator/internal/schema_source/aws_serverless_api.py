@@ -101,9 +101,14 @@ class UsagePlan(BaseModel):
     UsagePlanName: Optional[PassThroughProp] = usageplan("UsagePlanName")
 
 
+# Type aliases to avoid field name shadowing class names
+_ResourcePolicy = ResourcePolicy
+_UsagePlan = UsagePlan
+
+
 class Auth(BaseModel):
     AddDefaultAuthorizerToCorsPreflight: Optional[bool] = auth("AddDefaultAuthorizerToCorsPreflight")
-    AddApiKeyRequiredToCorsPreflight: Optional[bool]  # TODO Add Docs
+    AddApiKeyRequiredToCorsPreflight: Optional[bool] = None  # TODO Add Docs
     ApiKeyRequired: Optional[bool] = auth("ApiKeyRequired")
     Authorizers: Optional[
         Dict[
@@ -117,8 +122,12 @@ class Auth(BaseModel):
     ] = auth("Authorizers")
     DefaultAuthorizer: Optional[str] = auth("DefaultAuthorizer")
     InvokeRole: Optional[str] = auth("InvokeRole")
-    ResourcePolicy: Optional[ResourcePolicy] = auth("ResourcePolicy")
-    UsagePlan: Optional[UsagePlan] = auth("UsagePlan")
+    ResourcePolicy: Optional[_ResourcePolicy] = auth("ResourcePolicy")
+    UsagePlan: Optional[_UsagePlan] = auth("UsagePlan")
+
+
+# Type alias to avoid field name shadowing class name
+_Auth = Auth
 
 
 class Cors(BaseModel):
@@ -151,21 +160,26 @@ class Route53(BaseModel):
         ["AWS::Route53::RecordSetGroup.RecordSet", "HostedZoneName"],
     )
     IpV6: Optional[bool] = route53("IpV6")
-    SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
-    Region: Optional[PassThroughProp]  # TODO: add docs
-    SeparateRecordSetGroup: Optional[bool]  # TODO: add docs
-    VpcEndpointDomainName: Optional[PassThroughProp]  # TODO: add docs
-    VpcEndpointHostedZoneId: Optional[PassThroughProp]  # TODO: add docs
+    SetIdentifier: Optional[PassThroughProp] = None  # TODO: add docs
+    Region: Optional[PassThroughProp] = None  # TODO: add docs
+    SeparateRecordSetGroup: Optional[bool] = None  # TODO: add docs
+    VpcEndpointDomainName: Optional[PassThroughProp] = None  # TODO: add docs
+    VpcEndpointHostedZoneId: Optional[PassThroughProp] = None  # TODO: add docs
 
 
 class AccessAssociation(BaseModel):
     VpcEndpointId: PassThroughProp  # TODO: add docs
 
 
+# Type aliases to avoid field name shadowing class names
+_Route53 = Route53
+_AccessAssociation = AccessAssociation
+
+
 class Domain(BaseModel):
     BasePath: Optional[PassThroughProp] = domain("BasePath")
     NormalizeBasePath: Optional[bool] = domain("NormalizeBasePath")
-    Policy: Optional[PassThroughProp]
+    Policy: Optional[PassThroughProp] = None
     CertificateArn: PassThroughProp = domain("CertificateArn")
     DomainName: PassThroughProp = passthrough_prop(
         DOMAIN_STEM,
@@ -190,13 +204,17 @@ class Domain(BaseModel):
         "OwnershipVerificationCertificateArn",
         ["AWS::ApiGateway::DomainName", "Properties", "OwnershipVerificationCertificateArn"],
     )
-    Route53: Optional[Route53] = domain("Route53")
+    Route53: Optional[_Route53] = domain("Route53")
     SecurityPolicy: Optional[PassThroughProp] = passthrough_prop(
         DOMAIN_STEM,
         "SecurityPolicy",
         ["AWS::ApiGateway::DomainName", "Properties", "SecurityPolicy"],
     )
-    AccessAssociation: Optional[AccessAssociation]
+    AccessAssociation: Optional[_AccessAssociation] = None
+
+
+# Type alias to avoid field name shadowing class name
+_Domain = Domain
 
 
 class DefinitionUri(BaseModel):
@@ -235,27 +253,28 @@ class EndpointConfiguration(BaseModel):
     )
 
 
-Name = Optional[PassThroughProp]
-DefinitionUriType = Optional[Union[str, DefinitionUri]]
-MergeDefinitions = Optional[bool]
-CacheClusterEnabled = Optional[PassThroughProp]
-CacheClusterSize = Optional[PassThroughProp]
-Variables = Optional[PassThroughProp]
-EndpointConfigurationType = Optional[SamIntrinsicable[EndpointConfiguration]]
-MethodSettings = Optional[PassThroughProp]
-BinaryMediaTypes = Optional[PassThroughProp]
-MinimumCompressionSize = Optional[PassThroughProp]
-CorsType = Optional[SamIntrinsicable[Union[str, Cors]]]
-GatewayResponses = Optional[DictStrAny]
-AccessLogSetting = Optional[PassThroughProp]
-CanarySetting = Optional[PassThroughProp]
-TracingEnabled = Optional[PassThroughProp]
-OpenApiVersion = Optional[Union[float, str]]  # TODO: float doesn't exist in documentation
-AlwaysDeploy = Optional[bool]
+# Type aliases with underscore prefix to avoid shadowing by field names
+_Name = Optional[PassThroughProp]
+_DefinitionUriType = Optional[Union[str, DefinitionUri]]
+_MergeDefinitions = Optional[bool]
+_CacheClusterEnabled = Optional[PassThroughProp]
+_CacheClusterSize = Optional[PassThroughProp]
+_Variables = Optional[PassThroughProp]
+_EndpointConfigurationType = Optional[SamIntrinsicable[EndpointConfiguration]]
+_MethodSettings = Optional[PassThroughProp]
+_BinaryMediaTypes = Optional[PassThroughProp]
+_MinimumCompressionSize = Optional[PassThroughProp]
+_CorsType = Optional[SamIntrinsicable[Union[str, Cors]]]
+_GatewayResponses = Optional[DictStrAny]
+_AccessLogSetting = Optional[PassThroughProp]
+_CanarySetting = Optional[PassThroughProp]
+_TracingEnabled = Optional[PassThroughProp]
+_OpenApiVersion = Optional[Union[float, str]]  # TODO: float doesn't exist in documentation
+_AlwaysDeploy = Optional[bool]
 
 
 class Properties(BaseModel):
-    AccessLogSetting: Optional[AccessLogSetting] = passthrough_prop(
+    AccessLogSetting: Optional[_AccessLogSetting] = passthrough_prop(
         PROPERTIES_STEM,
         "AccessLogSetting",
         ["AWS::ApiGateway::Stage", "Properties", "AccessLogSetting"],
@@ -265,47 +284,47 @@ class Properties(BaseModel):
         "ApiKeySourceType",
         ["AWS::ApiGateway::RestApi", "Properties", "ApiKeySourceType"],
     )
-    Auth: Optional[Auth] = properties("Auth")
-    BinaryMediaTypes: Optional[BinaryMediaTypes] = properties("BinaryMediaTypes")
-    CacheClusterEnabled: Optional[CacheClusterEnabled] = passthrough_prop(
+    Auth: Optional[_Auth] = properties("Auth")
+    BinaryMediaTypes: Optional[_BinaryMediaTypes] = properties("BinaryMediaTypes")
+    CacheClusterEnabled: Optional[_CacheClusterEnabled] = passthrough_prop(
         PROPERTIES_STEM,
         "CacheClusterEnabled",
         ["AWS::ApiGateway::Stage", "Properties", "CacheClusterEnabled"],
     )
-    CacheClusterSize: Optional[CacheClusterSize] = passthrough_prop(
+    CacheClusterSize: Optional[_CacheClusterSize] = passthrough_prop(
         PROPERTIES_STEM,
         "CacheClusterSize",
         ["AWS::ApiGateway::Stage", "Properties", "CacheClusterSize"],
     )
-    CanarySetting: Optional[CanarySetting] = passthrough_prop(
+    CanarySetting: Optional[_CanarySetting] = passthrough_prop(
         PROPERTIES_STEM,
         "CanarySetting",
         ["AWS::ApiGateway::Stage", "Properties", "CanarySetting"],
     )
-    Cors: Optional[CorsType] = properties("Cors")
+    Cors: Optional[_CorsType] = properties("Cors")
     DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
-    DefinitionUri: Optional[DefinitionUriType] = properties("DefinitionUri")
-    MergeDefinitions: Optional[MergeDefinitions] = properties("MergeDefinitions")
+    DefinitionUri: Optional[_DefinitionUriType] = properties("DefinitionUri")
+    MergeDefinitions: Optional[_MergeDefinitions] = properties("MergeDefinitions")
     Description: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,
         "Description",
         ["AWS::ApiGateway::Stage", "Properties", "Description"],
     )
     DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
-    Domain: Optional[Domain] = properties("Domain")
-    EndpointConfiguration: Optional[EndpointConfigurationType] = properties("EndpointConfiguration")
+    Domain: Optional[_Domain] = properties("Domain")
+    EndpointConfiguration: Optional[_EndpointConfigurationType] = properties("EndpointConfiguration")
     FailOnWarnings: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,
         "FailOnWarnings",
         ["AWS::ApiGateway::RestApi", "Properties", "FailOnWarnings"],
     )
-    GatewayResponses: Optional[GatewayResponses] = properties("GatewayResponses")
-    MethodSettings: Optional[MethodSettings] = passthrough_prop(
+    GatewayResponses: Optional[_GatewayResponses] = properties("GatewayResponses")
+    MethodSettings: Optional[_MethodSettings] = passthrough_prop(
         PROPERTIES_STEM,
         "MethodSettings",
         ["AWS::ApiGateway::Stage", "Properties", "MethodSettings"],
     )
-    MinimumCompressionSize: Optional[MinimumCompressionSize] = passthrough_prop(
+    MinimumCompressionSize: Optional[_MinimumCompressionSize] = passthrough_prop(
         PROPERTIES_STEM,
         "MinimumCompressionSize",
         ["AWS::ApiGateway::RestApi", "Properties", "MinimumCompressionSize"],
@@ -316,85 +335,85 @@ class Properties(BaseModel):
         ["AWS::ApiGateway::RestApi", "Properties", "Mode"],
     )
     Models: Optional[DictStrAny] = properties("Models")
-    Name: Optional[Name] = passthrough_prop(
+    Name: Optional[_Name] = passthrough_prop(
         PROPERTIES_STEM,
         "Name",
         ["AWS::ApiGateway::RestApi", "Properties", "Name"],
     )
-    OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
+    OpenApiVersion: Optional[_OpenApiVersion] = properties("OpenApiVersion")
     StageName: SamIntrinsicable[str] = properties("StageName")
     Tags: Optional[DictStrAny] = properties("Tags")
-    Policy: Optional[PassThroughProp]  # TODO: add docs
-    PropagateTags: Optional[bool]  # TODO: add docs
-    TracingEnabled: Optional[TracingEnabled] = passthrough_prop(
+    Policy: Optional[PassThroughProp] = None  # TODO: add docs
+    PropagateTags: Optional[bool] = None  # TODO: add docs
+    TracingEnabled: Optional[_TracingEnabled] = passthrough_prop(
         PROPERTIES_STEM,
         "TracingEnabled",
         ["AWS::ApiGateway::Stage", "Properties", "TracingEnabled"],
     )
-    Variables: Optional[Variables] = passthrough_prop(
+    Variables: Optional[_Variables] = passthrough_prop(
         PROPERTIES_STEM,
         "Variables",
         ["AWS::ApiGateway::Stage", "Properties", "Variables"],
     )
-    AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
+    AlwaysDeploy: Optional[_AlwaysDeploy] = properties("AlwaysDeploy")
 
 
 class Globals(BaseModel):
-    Auth: Optional[Auth] = properties("Auth")
-    Name: Optional[Name] = passthrough_prop(
+    Auth: Optional[_Auth] = properties("Auth")
+    Name: Optional[_Name] = passthrough_prop(
         PROPERTIES_STEM,
         "Name",
         ["AWS::ApiGateway::RestApi", "Properties", "Name"],
     )
     DefinitionUri: Optional[PassThroughProp] = properties("DefinitionUri")
-    CacheClusterEnabled: Optional[CacheClusterEnabled] = passthrough_prop(
+    CacheClusterEnabled: Optional[_CacheClusterEnabled] = passthrough_prop(
         PROPERTIES_STEM,
         "CacheClusterEnabled",
         ["AWS::ApiGateway::Stage", "Properties", "CacheClusterEnabled"],
     )
-    CacheClusterSize: Optional[CacheClusterSize] = passthrough_prop(
+    CacheClusterSize: Optional[_CacheClusterSize] = passthrough_prop(
         PROPERTIES_STEM,
         "CacheClusterSize",
         ["AWS::ApiGateway::Stage", "Properties", "CacheClusterSize"],
     )
-    MergeDefinitions: Optional[MergeDefinitions] = properties("MergeDefinitions")
-    Variables: Optional[Variables] = passthrough_prop(
+    MergeDefinitions: Optional[_MergeDefinitions] = properties("MergeDefinitions")
+    Variables: Optional[_Variables] = passthrough_prop(
         PROPERTIES_STEM,
         "Variables",
         ["AWS::ApiGateway::Stage", "Properties", "Variables"],
     )
     EndpointConfiguration: Optional[PassThroughProp] = properties("EndpointConfiguration")
-    MethodSettings: Optional[MethodSettings] = properties("MethodSettings")
-    BinaryMediaTypes: Optional[BinaryMediaTypes] = properties("BinaryMediaTypes")
-    MinimumCompressionSize: Optional[MinimumCompressionSize] = passthrough_prop(
+    MethodSettings: Optional[_MethodSettings] = properties("MethodSettings")
+    BinaryMediaTypes: Optional[_BinaryMediaTypes] = properties("BinaryMediaTypes")
+    MinimumCompressionSize: Optional[_MinimumCompressionSize] = passthrough_prop(
         PROPERTIES_STEM,
         "MinimumCompressionSize",
         ["AWS::ApiGateway::RestApi", "Properties", "MinimumCompressionSize"],
     )
-    Cors: Optional[CorsType] = properties("Cors")
-    GatewayResponses: Optional[GatewayResponses] = properties("GatewayResponses")
-    AccessLogSetting: Optional[AccessLogSetting] = passthrough_prop(
+    Cors: Optional[_CorsType] = properties("Cors")
+    GatewayResponses: Optional[_GatewayResponses] = properties("GatewayResponses")
+    AccessLogSetting: Optional[_AccessLogSetting] = passthrough_prop(
         PROPERTIES_STEM,
         "AccessLogSetting",
         ["AWS::ApiGateway::Stage", "Properties", "AccessLogSetting"],
     )
-    CanarySetting: Optional[CanarySetting] = passthrough_prop(
+    CanarySetting: Optional[_CanarySetting] = passthrough_prop(
         PROPERTIES_STEM,
         "CanarySetting",
         ["AWS::ApiGateway::Stage", "Properties", "CanarySetting"],
     )
-    TracingEnabled: Optional[TracingEnabled] = passthrough_prop(
+    TracingEnabled: Optional[_TracingEnabled] = passthrough_prop(
         PROPERTIES_STEM,
         "TracingEnabled",
         ["AWS::ApiGateway::Stage", "Properties", "TracingEnabled"],
     )
-    OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
-    Domain: Optional[Domain] = properties("Domain")
-    AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    OpenApiVersion: Optional[_OpenApiVersion] = properties("OpenApiVersion")
+    Domain: Optional[_Domain] = properties("Domain")
+    AlwaysDeploy: Optional[_AlwaysDeploy] = properties("AlwaysDeploy")
+    PropagateTags: Optional[bool] = None  # TODO: add docs
 
 
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::Api"]
     Properties: Properties
-    Connectors: Optional[Dict[str, EmbeddedConnector]]
+    Connectors: Optional[Dict[str, EmbeddedConnector]] = None

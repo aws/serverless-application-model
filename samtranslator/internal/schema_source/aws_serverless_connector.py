@@ -25,9 +25,10 @@ class ResourceReference(BaseModel):
 
 
 class Properties(BaseModel):
-    Source: ResourceReference = properties("Source")
-    Destination: Union[ResourceReference, List[ResourceReference]] = properties("Destination")
-    Permissions: List[Literal["Read", "Write"]] = properties("Permissions")
+    # Required fields - not using get_prop() to ensure they are truly required in Pydantic v2
+    Source: ResourceReference
+    Destination: Union[ResourceReference, List[ResourceReference]]
+    Permissions: List[Literal["Read", "Write"]]
 
 
 class Resource(ResourceAttributes):

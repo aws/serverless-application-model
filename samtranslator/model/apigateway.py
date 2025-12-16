@@ -522,7 +522,7 @@ class ApiGatewayAuthorizer:
         if not self.identity or not self.identity.get("Header"):
             return "Authorization"
 
-        return self.identity.get("Header")
+        return self.identity.get("Header")  # type: ignore[no-any-return]
 
     def _get_reauthorize_every(self) -> Optional[PassThrough]:
         if not self.identity:

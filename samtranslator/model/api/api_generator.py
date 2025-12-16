@@ -603,6 +603,8 @@ class ApiGenerator:
                 record_set_group = self._get_record_set_group(logical_id, route53)
                 route53_record_set_groups[logical_id] = record_set_group
 
+            if record_set_group.RecordSets is None:
+                record_set_group.RecordSets = []
             record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, api_domain_name, route53)
 
         return ApiDomainResponse(domain, basepath_resource_list, record_set_group)
@@ -715,6 +717,8 @@ class ApiGenerator:
                 record_set_group = self._get_record_set_group(logical_id, route53)
                 route53_record_set_groups[logical_id] = record_set_group
 
+            if record_set_group.RecordSets is None:
+                record_set_group.RecordSets = []
             record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain, domain_name, route53)
 
         return ApiDomainResponseV2(domain, basepath_resource_list, record_set_group, domain_access_association_resource)

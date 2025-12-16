@@ -371,32 +371,63 @@ class Resource(ABC):
             collect_all_errors: If True, collect all validation errors. If False (default), only first error.
         """
         try:
-            return cls.parse_obj(self._generate_resource_dict()["Properties"])
-        except pydantic.error_wrappers.ValidationError as e:
+            return cls.model_validate(self._generate_resource_dict()["Properties"])
+        except pydantic.ValidationError as e:
             if collect_all_errors:
                 # Comprehensive error collection with union type consolidation
                 error_messages = self._format_all_errors(e.errors())  # type: ignore[arg-type]
                 raise InvalidResourceException(self.logical_id, " ".join(error_messages)) from e
             error_properties: str = ""
+            error_message_suffix = "is invalid."
             with suppress(KeyError):
-                error_properties = ".".join(str(x) for x in e.errors()[0]["loc"])
-            raise InvalidResourceException(self.logical_id, f"Property '{error_properties}' is invalid.") from e
+                first_error = e.errors()[0]
+                # Filter out Pydantic v2 union type indicators from the path
+                error_properties = self._filter_error_path(first_error["loc"])
+                # Provide more specific error message for required fields
+                if first_error.get("type") == "missing":
+                    error_message_suffix = "is required."
+            raise InvalidResourceException(
+                self.logical_id, f"Property '{error_properties}' {error_message_suffix}"
+            ) from e
+
+    def _filter_error_path(self, loc: tuple[Any, ...]) -> str:
+        """Filter out Pydantic v2 union type indicators from error location path."""
+        loc_parts = [str(x) for x in loc]
+        filtered_parts: list[str] = []
+        for p in loc_parts:
+            # Skip lowercase type names (int, float, str, bool) and patterns like 'dict[...]'
+            if p.islower() or p.startswith(("dict[", "list[")):
+                continue
+            # Skip if this part is the same as the previous part (union type class name)
+            if filtered_parts and p == filtered_parts[-1]:
+                continue
+            filtered_parts.append(p)
+        return ".".join(filtered_parts) if filtered_parts else ".".join(loc_parts)
 
     def _format_all_errors(self, errors: List[Dict[str, Any]]) -> List[str]:
         """Format all validation errors, consolidating union type errors in single pass."""
+        # Pydantic v2 uses different error message format than v1
         type_mapping = {
+            # Pydantic v1 patterns
             "not a valid dict": "dictionary",
             "not a valid int": "integer",
             "not a valid float": "number",
             "not a valid list": "list",
             "not a valid str": "string",
+            # Pydantic v2 patterns
+            "Input should be a valid dictionary": "dictionary",
+            "Input should be a valid integer": "integer",
+            "Input should be a valid number": "number",
+            "Input should be a valid list": "list",
+            "Input should be a valid string": "string",
         }
 
-        # Group errors by path in a single pass
+        # Group errors by base path (without union type suffixes) in a single pass
         path_to_errors: Dict[str, Dict[str, Any]] = {}
 
         for error in errors:
-            property_path = ".".join(str(x) for x in error["loc"])
+            property_path = self._filter_error_path(error["loc"])
+
             raw_message = error.get("msg", "")
 
             # Extract type for union consolidation
@@ -429,13 +460,20 @@ class Resource(ABC):
 
     def _format_single_error(self, error: Dict[str, Any]) -> str:
         """Format a single Pydantic error into user-friendly message."""
-        property_path = ".".join(str(x) for x in error["loc"])
-        raw_message = error["msg"]
+        property_path = self._filter_error_path(error["loc"])
 
-        if error["type"] == "value_error.missing":
+        raw_message = error["msg"]
+        error_type = error.get("type", "")
+
+        # Handle required field errors (Pydantic v2 uses "missing", v1 used "value_error.missing")
+        if error_type in ("missing", "value_error.missing"):
             return f"Property '{property_path}' is required."
-        if "extra fields not permitted" in raw_message:
+        # Handle extra fields (Pydantic v2 uses "extra_forbidden", message is "Extra inputs are not permitted")
+        if "extra" in raw_message.lower() and "not permitted" in raw_message.lower():
             return f"Property '{property_path}' is an invalid property."
+        # Handle list validation errors
+        if "valid list" in raw_message.lower():
+            return f"Property '{property_path}' value is not a valid list."
         return f"Property '{property_path}' {raw_message.lower()}."
 
     def validate_properties(self) -> None:

@@ -731,7 +731,7 @@ class SamFunction(SamResourceMacro):
 
         # Validate CapacityProviderConfig using Pydantic model directly for comprehensive error collection
         try:
-            validated_model = aws_serverless_function.CapacityProviderConfig.parse_obj(self.CapacityProviderConfig)
+            validated_model = aws_serverless_function.CapacityProviderConfig.model_validate(self.CapacityProviderConfig)
         except Exception as e:
             raise InvalidResourceException(self.logical_id, f"Invalid CapacityProviderConfig: {e!s}") from e
 
@@ -1502,13 +1502,13 @@ class SamCapacityProvider(SamResourceMacro):
         capacity_provider_generator = CapacityProviderGenerator(
             logical_id=self.logical_id,
             capacity_provider_name=passthrough_value(model.CapacityProviderName),
-            vpc_config=model.VpcConfig.dict() if model.VpcConfig else None,
+            vpc_config=model.VpcConfig.model_dump() if model.VpcConfig else None,
             operator_role=passthrough_value(model.OperatorRole),
             tags=model.Tags,
             instance_requirements=(
-                model.InstanceRequirements.dict(exclude_none=True) if model.InstanceRequirements else None
+                model.InstanceRequirements.model_dump(exclude_none=True) if model.InstanceRequirements else None
             ),
-            scaling_config=model.ScalingConfig.dict(exclude_none=True) if model.ScalingConfig else None,
+            scaling_config=model.ScalingConfig.model_dump(exclude_none=True) if model.ScalingConfig else None,
             kms_key_arn=passthrough_value(model.KmsKeyArn),
             depends_on=self.depends_on,
             resource_attributes=self.resource_attributes,
@@ -2699,8 +2699,8 @@ class SamGraphQLApi(SamResourceMacro):
         lambda_auth_arns: List[Intrinsicable[str]] = []
 
         # Default authoriser
-        default_auth = aws_serverless_graphqlapi.Authorizer.parse_obj(
-            {k: v for k, v in auth.dict().items() if k != "Additional"}
+        default_auth = aws_serverless_graphqlapi.Authorizer.model_validate(
+            {k: v for k, v in auth.model_dump().items() if k != "Additional"}
         )
         name, auth_dict = self._validate_and_extract_authorizer_config(default_auth)
         api.AuthenticationType = auth.Type
@@ -2750,7 +2750,7 @@ class SamGraphQLApi(SamResourceMacro):
         # necessary the associated config as well.
         MAX_AUTH_PROPERTIES = 2
 
-        keys = remove_none_values(auth.dict()).keys()
+        keys = remove_none_values(auth.model_dump()).keys()
         if len(keys) > MAX_AUTH_PROPERTIES:
             key_path = "'Auth'" if not index else f"'Auth.Additional.{index}'"
             raise InvalidResourceException(
@@ -2763,7 +2763,7 @@ class SamGraphQLApi(SamResourceMacro):
                 "'LambdaAuthorizer' must be defined if type is 'AWS_LAMBDA'."
             )
             return "LambdaAuthorizerConfig", cast(
-                LambdaAuthorizerConfigType, remove_none_values(lambda_authorizer.dict())
+                LambdaAuthorizerConfigType, remove_none_values(lambda_authorizer.model_dump())
             )
 
         if auth.Type == "OPENID_CONNECT":
@@ -2771,7 +2771,7 @@ class SamGraphQLApi(SamResourceMacro):
             openid_connect = sam_expect(auth.OpenIDConnect, self.logical_id, key_path).to_not_be_none(
                 "'OpenIDConnect' must be defined if type is 'OPENID_CONNECT'."
             )
-            return "OpenIDConnectConfig", cast(OpenIDConnectConfigType, remove_none_values(openid_connect.dict()))
+            return "OpenIDConnectConfig", cast(OpenIDConnectConfigType, remove_none_values(openid_connect.model_dump()))
 
         # Last possible type is "AMAZON_COGNITO_USER_POOLS"
         if auth.Type == "AMAZON_COGNITO_USER_POOLS":
@@ -2783,7 +2783,7 @@ class SamGraphQLApi(SamResourceMacro):
                 # UserPoolConfig does not have the DefaultAction property UNLESS it is the primary authentication
                 # method (first index). If it is an additional authentication, we nullify this value.
                 user_pool.DefaultAction = None
-            return "UserPoolConfig", cast(UserPoolConfigType, remove_none_values(user_pool.dict()))
+            return "UserPoolConfig", cast(UserPoolConfigType, remove_none_values(user_pool.model_dump()))
 
         return None, None
 
@@ -3038,7 +3038,7 @@ class SamGraphQLApi(SamResourceMacro):
             ddb_config["Versioned"] = cast(PassThrough, ddb_datasource.Versioned)
 
         if ddb_datasource.DeltaSync:
-            deltasync_properties = ddb_datasource.DeltaSync.dict()
+            deltasync_properties = ddb_datasource.DeltaSync.model_dump()
             ddb_config["DeltaSyncConfig"] = cast(PassThrough, deltasync_properties)
 
         return ddb_config
@@ -3178,7 +3178,7 @@ class SamGraphQLApi(SamResourceMacro):
             # "Id" is a mutually exclusive property to every other property. If this function has it
             # defined, then we make sure it's the only property, and continue to next function.
             if function.Id:
-                keys = remove_none_values(function.dict()).keys()  # remove undefined properties, then get keys
+                keys = remove_none_values(function.model_dump()).keys()  # remove undefined properties, then get keys
                 if len(keys) != 1:
                     raise InvalidResourceException(
                         relative_id, "'Id' cannot be defined with other properties in Function."
@@ -3201,7 +3201,7 @@ class SamGraphQLApi(SamResourceMacro):
             func_config.Runtime = self._parse_runtime(function, relative_id)
 
             if function.Sync:
-                func_config.SyncConfig = cast(SyncConfigType, remove_none_values(function.Sync.dict()))
+                func_config.SyncConfig = cast(SyncConfigType, remove_none_values(function.Sync.model_dump()))
 
             self._function_id_map[relative_id] = func_config.get_runtime_attr("function_id")
             func_configs.append(func_config)
@@ -3365,7 +3365,7 @@ class SamGraphQLApi(SamResourceMacro):
                     )
 
                 if resolver.Caching:
-                    cfn_resolver.CachingConfig = cast(CachingConfigType, resolver.Caching.dict(exclude_none=True))
+                    cfn_resolver.CachingConfig = cast(CachingConfigType, resolver.Caching.model_dump(exclude_none=True))
 
                 if resolver.MaxBatchSize:
                     cfn_resolver.MaxBatchSize = passthrough_value(resolver.MaxBatchSize)

@@ -1,6 +1,9 @@
 templates:
   - tests/translator/output/**/*.json
 ignore_templates:
+  - tests/translator/output/**/function_with_function_url_config.json
+  - tests/translator/output/**/function_with_function_url_config_and_autopublishalias.json
+  - tests/translator/output/**/function_with_function_url_config_without_cors_config.json
   - tests/translator/output/**/error_*.json # Fail by design
   - tests/translator/output/**/api_http_paths_with_if_condition.json
   - tests/translator/output/**/api_http_paths_with_if_condition_no_value_else_case.json
@@ -14,15 +17,25 @@ ignore_templates:
   - tests/translator/output/**/api_rest_paths_with_if_condition_swagger_no_value_then_case.json
   - tests/translator/output/**/api_with_any_method_in_swagger.json
   - tests/translator/output/**/api_with_auth_and_conditions_all_max.json
+  - tests/translator/output/**/api_with_basic_custom_domain.json
+  - tests/translator/output/**/api_with_basic_custom_domain_http.json
   - tests/translator/output/**/api_with_basic_custom_domain_intrinsics.json
   - tests/translator/output/**/api_with_basic_custom_domain_intrinsics_http.json
+  - tests/translator/output/**/api_with_binary_media_types.json
+  - tests/translator/output/**/api_with_binary_media_types_definition_body.json
   - tests/translator/output/**/api_with_canary_setting.json
   - tests/translator/output/**/api_with_cors_and_conditions_no_definitionbody.json
   - tests/translator/output/**/api_with_custom_base_path.json
+  - tests/translator/output/**/api_with_custom_domain_route53.json
+  - tests/translator/output/**/api_with_custom_domain_route53_hosted_zone_name.json
+  - tests/translator/output/**/api_with_custom_domain_route53_hosted_zone_name_http.json
+  - tests/translator/output/**/api_with_custom_domain_route53_http.json
   - tests/translator/output/**/api_with_custom_domain_route53_multiple_intrinsic_hostedzoneid.json
+  - tests/translator/output/**/api_with_identity_intrinsic.json
   - tests/translator/output/**/api_with_if_conditional_with_resource_policy.json
   - tests/translator/output/**/api_with_resource_policy_global.json
   - tests/translator/output/**/api_with_security_definition_and_none_components.json
+  - tests/translator/output/**/api_with_source_vpc_whitelist.json
   - tests/translator/output/**/api_with_usageplans.json
   - tests/translator/output/**/api_with_usageplans_intrinsics.json
   - tests/translator/output/**/api_with_usageplans_shared_attributes_three.json
@@ -47,8 +60,11 @@ ignore_templates:
   - tests/translator/output/**/connector_sfn_to_function.json
   - tests/translator/output/**/connector_sns_to_function.json
   - tests/translator/output/**/connector_table_to_function.json
+  - tests/translator/output/**/documentdb_with_intrinsics.json  # TODO: remove once DocumentDDB is available
   - tests/translator/output/**/eventbridgerule_with_dlq.json
   - tests/translator/output/**/function_event_conditions.json
+  - tests/translator/output/**/function_with_alias_and_code_sha256.json
+  - tests/translator/output/**/function_with_alias_intrinsics.json
   - tests/translator/output/**/function_with_condition.json
   - tests/translator/output/**/function_with_conditional_managed_policy.json
   - tests/translator/output/**/function_with_conditional_managed_policy_and_ref_no_value.json
@@ -57,12 +73,16 @@ ignore_templates:
   - tests/translator/output/**/function_with_custom_codedeploy_deployment_preference.json
   - tests/translator/output/**/function_with_deployment_no_service_role_with_passthrough.json
   - tests/translator/output/**/function_with_deployment_no_service_role_without_passthrough.json
+  - tests/translator/output/**/function_with_deployment_preference.json
   - tests/translator/output/**/function_with_deployment_preference_condition_with_passthrough.json
   - tests/translator/output/**/function_with_deployment_preference_condition_without_passthrough.json
+  - tests/translator/output/**/function_with_deployment_preference_from_parameters.json
   - tests/translator/output/**/function_with_deployment_preference_multiple_combinations_conditions_with_passthrough.json
   - tests/translator/output/**/function_with_deployment_preference_multiple_combinations_conditions_without_passthrough.json
   - tests/translator/output/**/function_with_deployment_preference_passthrough_condition_with_supported_intrinsics.json
   - tests/translator/output/**/function_with_dlq.json
+  - tests/translator/output/**/function_with_documentdb_with_kms.json  # TODO: remove once DocumentDDB is available
+  - tests/translator/output/**/function_with_documentdb.json  # TODO: remove once DocumentDDB is available
   - tests/translator/output/**/function_with_event_dest.json
   - tests/translator/output/**/function_with_event_dest_basic.json
   - tests/translator/output/**/function_with_event_dest_conditional.json
@@ -72,12 +92,14 @@ ignore_templates:
   - tests/translator/output/**/function_with_function_url_config_conditions.json
   - tests/translator/output/**/function_with_globals_role_path.json
   - tests/translator/output/**/function_with_intrinsic_architecture.json
+  - tests/translator/output/**/function_with_kmskeyarn.json
   - tests/translator/output/**/function_with_resource_refs.json
   - tests/translator/output/**/function_with_role_and_role_path.json
   - tests/translator/output/**/function_with_role_path.json
   - tests/translator/output/**/http_api_custom_iam_auth.json
   - tests/translator/output/**/http_api_existing_openapi.json
   - tests/translator/output/**/http_api_existing_openapi_conditions.json
+  - tests/translator/output/**/http_api_explicit_stage.json
   - tests/translator/output/**/http_api_global_iam_auth_enabled.json
   - tests/translator/output/**/http_api_local_iam_auth_enabled.json
   - tests/translator/output/**/http_api_with_cors.json
@@ -87,27 +109,47 @@ ignore_templates:
   - tests/translator/output/**/implicit_http_api_with_many_conditions.json
   - tests/translator/output/**/intrinsic_functions.json
   - tests/translator/output/**/kinesis_intrinsics.json
+  - tests/translator/output/**/layers_all_properties.json
   - tests/translator/output/**/layers_with_intrinsics.json
   - tests/translator/output/**/s3_create_remove.json
   - tests/translator/output/**/s3_intrinsics.json
   - tests/translator/output/**/schema_validation_1.json
   - tests/translator/output/**/self_managed_kafka_with_intrinsics.json
+  - tests/translator/output/**/sqs_with_scaling_config.json  # Invalid Property Resources/SQSFunctionMySqsQueue/Properties/ScalingConfig
   - tests/translator/output/**/state_machine_with_condition.json
   - tests/translator/output/**/state_machine_with_condition_and_events.json
   - tests/translator/output/**/state_machine_with_eb_dlq_target_id.json
   - tests/translator/output/**/state_machine_with_event_schedule_state.json
   - tests/translator/output/**/state_machine_with_schedule.json
   - tests/translator/output/**/state_machine_with_schedule_dlq_retry_policy.json
+  - tests/translator/output/**/state_machine_with_auto_publish_alias.json
+  - tests/translator/output/**/state_machine_with_deployment_preference_all_at_once.json
+  - tests/translator/output/**/state_machine_with_deployment_preference_canary.json
+  - tests/translator/output/**/state_machine_with_deployment_preference_linear.json
+  - tests/translator/output/**/state_machine_with_deletion_policy.json
+  - tests/translator/output/**/state_machine_with_update_replace_policy.json
   - tests/translator/output/**/globals_for_function.json  # RuntimeManagementConfig
+  - tests/translator/output/**/function_with_runtime_config.json  # RuntimeManagementConfig
   - tests/translator/output/**/managed_policies_minimal.json  # Intentionally has non-existent managed policy name
+  - tests/translator/output/**/function_with_mq.json  # Property "EventSourceArn" can Fn::GetAtt to a resource of types [AWS::DynamoDB::GlobalTable, AWS::DynamoDB::Table, AWS::Kinesis::Stream, AWS::Kinesis::StreamConsumer, AWS::SQS::Queue]
+  - tests/translator/output/**/function_with_mq_using_autogen_role.json  # Property "EventSourceArn" can Fn::GetAtt to a resource of types [AWS::DynamoDB::GlobalTable, AWS::DynamoDB::Table, AWS::Kinesis::Stream, AWS::Kinesis::StreamConsumer, AWS::SQS::Queue]
   - tests/translator/output/**/function_with_recursive_loop.json  # Invalid Property Resources/RecursiveLoopParameterFunction/Properties/RecursiveLoop
+  - tests/translator/output/**/function_with_sourcekmskeyarn.json  # Invalid Property Resources/SourceKMSKeyArnParameterFunction/Properties/SourceKMSKeyArn
   - tests/translator/output/**/function_with_tracing.json # Obsolete DependsOn on resource
   - tests/translator/output/**/api_with_propagate_tags.json # TODO: Intentional error transform tests. Will be updated.
   - tests/translator/output/**/function_with_intrinsics_resource_attribute.json # CFN now supports intrinsics in DeletionPolicy
   - tests/translator/output/**/function_with_snapstart.json # Snapstart intentionally not attached to a lambda version which causes lint issues
   - tests/translator/output/**/managed_policies_everything.json # intentionally contains wrong arns
+  - tests/translator/output/**/function_with_provisioned_poller_config.json
   - tests/translator/output/**/function_with_metrics_config.json
+  - tests/translator/output/**/function_with_self_managed_kafka_and_schema_registry.json # cfnlint is not updated to recognize the SchemaRegistryConfig property
+  - tests/translator/output/**/function_with_msk_with_schema_registry_config.json # cfnlint is not updated to recognize the SchemaRegistryConfig property
   - tests/translator/output/aws-*/*capacity_provider*.json # Ignore Capacity Provider test format in non-aws partitions
+  - tests/translator/output/**/function_with_tenancy_config.json # cfnlint is not updated to recognize the TenancyConfig property
+  - tests/translator/output/**/function_with_tenancy_and_api_event.json # cfnlint is not updated to recognize the TenancyConfig property
+  - tests/translator/output/**/function_with_tenancy_and_httpapi_event.json # cfnlint is not updated to recognize the TenancyConfig property
+  - tests/translator/output/**/function_with_tenancy_config_global.json # cfnlint is not updated to recognize the TenancyConfig property
+  - tests/translator/output/**/*durable_config*.json # TODO: Remove this once Durable Function is launched in CFN
 
 ignore_checks:
   - E2531 # Deprecated runtime; not relevant for transform tests

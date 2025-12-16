@@ -45,7 +45,7 @@ class LambdaAuthorizer(BaseModel):
     EnableSimpleResponses: Optional[bool] = lambdaauthorizer("EnableSimpleResponses")
     FunctionArn: SamIntrinsicable[str] = lambdaauthorizer("FunctionArn")
     FunctionInvokeRole: Optional[SamIntrinsicable[str]] = lambdaauthorizer("FunctionInvokeRole")
-    EnableFunctionDefaultPermissions: Optional[bool]  # TODO: add docs
+    EnableFunctionDefaultPermissions: Optional[bool] = None  # TODO: add docs
     Identity: Optional[LambdaAuthorizerIdentity] = lambdaauthorizer("Identity")
 
 
@@ -64,6 +64,10 @@ class Auth(BaseModel):
     EnableIamAuthorizer: Optional[bool] = auth("EnableIamAuthorizer")
 
 
+# Type alias to avoid field name shadowing class name
+_Auth = Auth
+
+
 class CorsConfiguration(BaseModel):
     AllowCredentials: Optional[bool] = corsconfiguration("AllowCredentials")
     AllowHeaders: Optional[List[str]] = corsconfiguration("AllowHeaders")
@@ -79,14 +83,22 @@ class DefinitionUri(BaseModel):
     Version: Optional[str] = definitionuri("Version")
 
 
+# Type alias to avoid field name shadowing class name
+_DefinitionUri = DefinitionUri
+
+
 class Route53(BaseModel):
     DistributionDomainName: Optional[PassThroughProp] = route53("DistributionDomainName")
     EvaluateTargetHealth: Optional[PassThroughProp] = route53("EvaluateTargetHealth")
     HostedZoneId: Optional[PassThroughProp] = route53("HostedZoneId")
     HostedZoneName: Optional[PassThroughProp] = route53("HostedZoneName")
     IpV6: Optional[bool] = route53("IpV6")
-    SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
-    Region: Optional[PassThroughProp]  # TODO: add docs
+    SetIdentifier: Optional[PassThroughProp] = None  # TODO: add docs
+    Region: Optional[PassThroughProp] = None  # TODO: add docs
+
+
+# Type alias to avoid field name shadowing class name
+_Route53 = Route53
 
 
 class Domain(BaseModel):
@@ -96,53 +108,62 @@ class Domain(BaseModel):
     EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL"]]] = domain("EndpointConfiguration")
     MutualTlsAuthentication: Optional[PassThroughProp] = domain("MutualTlsAuthentication")
     OwnershipVerificationCertificateArn: Optional[PassThroughProp] = domain("OwnershipVerificationCertificateArn")
-    Route53: Optional[Route53] = domain("Route53")
+    Route53: Optional[_Route53] = domain("Route53")
     SecurityPolicy: Optional[PassThroughProp] = domain("SecurityPolicy")
 
 
-AccessLogSettings = Optional[PassThroughProp]
-StageVariables = Optional[PassThroughProp]
-Tags = Optional[DictStrAny]
-RouteSettings = Optional[PassThroughProp]
-FailOnWarnings = Optional[PassThroughProp]
-CorsConfigurationType = Optional[PassThroughProp]
-DefaultRouteSettings = Optional[PassThroughProp]
+# Type alias to avoid field name shadowing class name
+_Domain = Domain
+
+
+# Type aliases with underscore prefix to avoid shadowing by field names
+_AccessLogSettings = Optional[PassThroughProp]
+_StageVariables = Optional[PassThroughProp]
+_Tags = Optional[DictStrAny]
+_RouteSettings = Optional[PassThroughProp]
+_FailOnWarnings = Optional[PassThroughProp]
+_CorsConfigurationType = Optional[PassThroughProp]
+_DefaultRouteSettings = Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
-    AccessLogSettings: Optional[AccessLogSettings] = properties("AccessLogSettings")
-    Auth: Optional[Auth] = properties("Auth")
+    AccessLogSettings: Optional[_AccessLogSettings] = properties("AccessLogSettings")
+    Auth: Optional[_Auth] = properties("Auth")
     # TODO: Also string like in the docs?
-    CorsConfiguration: Optional[CorsConfigurationType] = properties("CorsConfiguration")
-    DefaultRouteSettings: Optional[DefaultRouteSettings] = properties("DefaultRouteSettings")
+    CorsConfiguration: Optional[_CorsConfigurationType] = properties("CorsConfiguration")
+    DefaultRouteSettings: Optional[_DefaultRouteSettings] = properties("DefaultRouteSettings")
     DefinitionBody: Optional[DictStrAny] = properties("DefinitionBody")
-    DefinitionUri: Optional[Union[str, DefinitionUri]] = properties("DefinitionUri")
+    DefinitionUri: Optional[Union[str, _DefinitionUri]] = properties("DefinitionUri")
     Description: Optional[str] = properties("Description")
     DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
-    Domain: Optional[Domain] = properties("Domain")
-    FailOnWarnings: Optional[FailOnWarnings] = properties("FailOnWarnings")
-    RouteSettings: Optional[RouteSettings] = properties("RouteSettings")
+    Domain: Optional[_Domain] = properties("Domain")
+    FailOnWarnings: Optional[_FailOnWarnings] = properties("FailOnWarnings")
+    RouteSettings: Optional[_RouteSettings] = properties("RouteSettings")
     StageName: Optional[PassThroughProp] = properties("StageName")
-    StageVariables: Optional[StageVariables] = properties("StageVariables")
-    Tags: Optional[Tags] = properties("Tags")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    StageVariables: Optional[_StageVariables] = properties("StageVariables")
+    Tags: Optional[_Tags] = properties("Tags")
+    PropagateTags: Optional[bool] = None  # TODO: add docs
     Name: Optional[PassThroughProp] = properties("Name")
 
 
 class Globals(BaseModel):
-    Auth: Optional[Auth] = properties("Auth")
-    AccessLogSettings: Optional[AccessLogSettings] = properties("AccessLogSettings")
-    StageVariables: Optional[StageVariables] = properties("StageVariables")
-    Tags: Optional[Tags] = properties("Tags")
-    RouteSettings: Optional[RouteSettings] = properties("RouteSettings")
-    FailOnWarnings: Optional[FailOnWarnings] = properties("FailOnWarnings")
-    Domain: Optional[Domain] = properties("Domain")
-    CorsConfiguration: Optional[CorsConfigurationType] = properties("CorsConfiguration")
-    DefaultRouteSettings: Optional[DefaultRouteSettings] = properties("DefaultRouteSettings")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    Auth: Optional[_Auth] = properties("Auth")
+    AccessLogSettings: Optional[_AccessLogSettings] = properties("AccessLogSettings")
+    StageVariables: Optional[_StageVariables] = properties("StageVariables")
+    Tags: Optional[_Tags] = properties("Tags")
+    RouteSettings: Optional[_RouteSettings] = properties("RouteSettings")
+    FailOnWarnings: Optional[_FailOnWarnings] = properties("FailOnWarnings")
+    Domain: Optional[_Domain] = properties("Domain")
+    CorsConfiguration: Optional[_CorsConfigurationType] = properties("CorsConfiguration")
+    DefaultRouteSettings: Optional[_DefaultRouteSettings] = properties("DefaultRouteSettings")
+    PropagateTags: Optional[bool] = None  # TODO: add docs
+
+
+# Type alias to avoid field name shadowing class name in Pydantic V2
+_Properties = Properties
 
 
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::HttpApi"]
-    Properties: Optional[Properties]
-    Connectors: Optional[Dict[str, EmbeddedConnector]]
+    Properties: Optional[_Properties] = None
+    Connectors: Optional[Dict[str, EmbeddedConnector]] = None

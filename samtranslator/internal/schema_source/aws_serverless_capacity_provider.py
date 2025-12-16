@@ -26,7 +26,8 @@ class VpcConfig(BaseModel):
     # Optional list of security group IDs - supports intrinsic functions for dynamic references
     SecurityGroupIds: Optional[List[SamIntrinsicable[str]]] = vpcconfig("SecurityGroupIds")
     # Required list of subnet IDs - supports intrinsic functions for dynamic VPC configuration
-    SubnetIds: List[SamIntrinsicable[str]] = vpcconfig("SubnetIds")
+    # Note: Using ... (Ellipsis) to make this field required in Pydantic v2
+    SubnetIds: List[SamIntrinsicable[str]]
 
 
 class InstanceRequirements(BaseModel):
@@ -51,6 +52,12 @@ class ScalingConfig(BaseModel):
     AverageCPUUtilization: Optional[SamIntrinsicable[float]] = scalingconfig("AverageCPUUtilization")
 
 
+# Type aliases to avoid field name shadowing class names
+_VpcConfig = VpcConfig
+_InstanceRequirements = InstanceRequirements
+_ScalingConfig = ScalingConfig
+
+
 class Properties(BaseModel):
     # TODO: Change back to passthrough_prop after CloudFormation schema is updated with AWS::Lambda::CapacityProvider
     # Optional capacity provider name - passes through directly to CFN AWS::Lambda::CapacityProvider
@@ -60,11 +67,11 @@ class Properties(BaseModel):
     #     "CapacityProviderName",
     #     ["AWS::Lambda::CapacityProvider", "Properties", "CapacityProviderName"],
     # )
-    CapacityProviderName: Optional[PassThroughProp]  # TODO: add documentation
+    CapacityProviderName: Optional[PassThroughProp] = None  # TODO: add documentation
 
     # Required VPC configuration - preserves CFN structure, required for EC2 instance networking
     # Uses custom VpcConfig class to validate required SubnetIds while maintaining passthrough behavior
-    VpcConfig: VpcConfig = properties("VpcConfig")
+    VpcConfig: _VpcConfig = properties("VpcConfig")
 
     # Optional operator role ARN - if not provided, SAM auto-generates one with EC2 management permissions
     OperatorRole: Optional[PassThroughProp] = properties("OperatorRole")
@@ -79,11 +86,11 @@ class Properties(BaseModel):
 
     # Optional instance requirements - maps to CFN InstanceRequirements with property name shortening
     # Uses custom InstanceRequirements class because SAM shortens names
-    InstanceRequirements: Optional[InstanceRequirements] = properties("InstanceRequirements")
+    InstanceRequirements: Optional[_InstanceRequirements] = properties("InstanceRequirements")
 
     # Optional scaling configuration - maps to CFN CapacityProviderScalingConfig
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
-    ScalingConfig: Optional[ScalingConfig] = properties("ScalingConfig")
+    ScalingConfig: Optional[_ScalingConfig] = properties("ScalingConfig")
 
     # TODO: Change back to passthrough_prop after CloudFormation schema is updated with AWS::Lambda::CapacityProvider
     # Optional KMS key ARN - passes through directly to CFN for encryption configuration
@@ -93,13 +100,13 @@ class Properties(BaseModel):
     #     "KmsKeyArn",
     #     ["AWS::Lambda::CapacityProvider", "Properties", "KmsKeyArn"],
     # )
-    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp] = None  # TODO: add documentation
 
 
 class Globals(BaseModel):
     # Global VPC configuration - can be inherited by capacity providers if not overridden
     # Uses custom VpcConfig class to validate required SubnetIds while maintaining passthrough behavior
-    VpcConfig: Optional[VpcConfig] = properties("VpcConfig")
+    VpcConfig: Optional[_VpcConfig] = properties("VpcConfig")
 
     # Global operator role ARN - can be inherited by capacity providers if not overridden
     OperatorRole: Optional[PassThroughProp] = properties("OperatorRole")
@@ -114,13 +121,13 @@ class Globals(BaseModel):
 
     # Global instance requirements - can be inherited by capacity providers if not overridden
     # Uses custom InstanceRequirements class because SAM shortens names
-    InstanceRequirements: Optional[InstanceRequirements] = properties("InstanceRequirements")
+    InstanceRequirements: Optional[_InstanceRequirements] = properties("InstanceRequirements")
 
     # Global scaling configuration - can be inherited by capacity providers if not overridden
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
-    ScalingConfig: Optional[ScalingConfig] = properties("ScalingConfig")
+    ScalingConfig: Optional[_ScalingConfig] = properties("ScalingConfig")
 
-    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp] = None  # TODO: add documentation
 
 
 class Resource(ResourceAttributes):

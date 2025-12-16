@@ -115,7 +115,9 @@ class Schedule(EventSource):
     RoleArn: Optional[PassThrough]
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
+    def to_cloudformation(  # type: ignore[override]
+        self, resource: StepFunctionsStateMachine, **kwargs: Any
+    ) -> List[Any]:
         """Returns the EventBridge Rule and IAM Role to which this Schedule event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
@@ -239,7 +241,9 @@ class CloudWatchEvent(EventSource):
     InputTransformer: Optional[PassThrough]
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
+    def to_cloudformation(  # type: ignore[override]
+        self, resource: StepFunctionsStateMachine, **kwargs: Any
+    ) -> List[Any]:
         """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this
         CloudWatch Events/EventBridge event source corresponds.
 
@@ -352,7 +356,9 @@ class Api(EventSource):
         return PushApi.resources_to_link_for_rest_api(resources, self.relative_id, self.RestApiId)
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
+    def to_cloudformation(  # type: ignore[override]
+        self, resource: StepFunctionsStateMachine, **kwargs: Any
+    ) -> List[Any]:
         """If the Api event source has a RestApi property, then simply return the IAM role resource
         allowing API Gateway to start the state machine execution. If no RestApi is provided, then
         additionally inject the path, method, and the x-amazon-apigateway-integration into the
