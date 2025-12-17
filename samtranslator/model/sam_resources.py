@@ -2,7 +2,9 @@
 
 import copy
 import re
+import sys
 from contextlib import suppress
+from types import ModuleType
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import samtranslator.model.eventsources
@@ -34,11 +36,19 @@ from samtranslator.internal.model.appsync import (
     SyncConfigType,
     UserPoolConfigType,
 )
-from samtranslator.internal.schema_source import (
-    aws_serverless_capacity_provider,
-    aws_serverless_function,
-    aws_serverless_graphqlapi,
-)
+
+# Pydantic 1 doesn't support Python 3.14 so these imports will fail until we migrate to v2
+try:
+    from samtranslator.internal.schema_source import (
+        aws_serverless_capacity_provider,
+        aws_serverless_function,
+        aws_serverless_graphqlapi,
+    )
+except RuntimeError:  # Pydantic fails when initializing the model classes with a RuntimeError in 3.14
+    aws_serverless_capacity_provider = cast(ModuleType, None)
+    aws_serverless_function = cast(ModuleType, None)
+    aws_serverless_graphqlapi = cast(ModuleType, None)
+
 from samtranslator.internal.schema_source.common import PermissionsType, SamIntrinsicable
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.internal.utils.utils import passthrough_value, remove_none_values
@@ -141,6 +151,14 @@ from .s3_utils.uri_parser import construct_image_code_object, construct_s3_locat
 from .tags.resource_tagging import get_tag_list
 
 _CONDITION_CHAR_LIMIT = 255
+
+
+# Utility function to throw an error when using functionality that doesn't work in Python 3.14 (need migration to Pydantic v2)
+def check_python_314_compatibility(module: Optional[ModuleType], functionality: str) -> None:
+    if sys.version_info >= (3, 14) and module is None:
+        raise RuntimeError(
+            f"{functionality} functionalities are temporarily not supported when running SAM in Python 3.14"
+        )
 
 
 class SamFunction(SamResourceMacro):
@@ -731,6 +749,7 @@ class SamFunction(SamResourceMacro):
 
         # Validate CapacityProviderConfig using Pydantic model directly for comprehensive error collection
         try:
+            check_python_314_compatibility(aws_serverless_function, "Capacity Provider")
             validated_model = aws_serverless_function.CapacityProviderConfig.parse_obj(self.CapacityProviderConfig)
         except Exception as e:
             raise InvalidResourceException(self.logical_id, f"Invalid CapacityProviderConfig: {e!s}") from e
@@ -1459,7 +1478,6 @@ class SamCapacityProvider(SamResourceMacro):
     """
 
     resource_type = "AWS::Serverless::CapacityProvider"
-    resource_property_schema = aws_serverless_capacity_provider.Properties
     property_types = {
         "CapacityProviderName": Property(False, one_of(IS_STR, IS_DICT)),
         "VpcConfig": Property(True, IS_DICT),
@@ -1492,7 +1510,11 @@ class SamCapacityProvider(SamResourceMacro):
         """
         Transform the SAM CapacityProvider resource to CloudFormation
         """
-        self.validate_before_transform(schema_class=self.resource_property_schema, collect_all_errors=True)
+        check_python_314_compatibility(aws_serverless_capacity_provider, "Capacity Provider")
+        self.validate_before_transform(
+            schema_class=aws_serverless_capacity_provider.Properties,
+            collect_all_errors=True,
+        )
 
         # Use enhanced validation method with comprehensive error collection
         model = self.validate_properties_and_return_model(
@@ -2600,6 +2622,7 @@ class SamGraphQLApi(SamResourceMacro):
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
+        check_python_314_compatibility(aws_serverless_graphqlapi, "GraphQLApi")
         model = self.validate_properties_and_return_model(aws_serverless_graphqlapi.Properties)
 
         appsync_api, cloudwatch_role, auth_connectors = self._construct_appsync_api_resources(model)
