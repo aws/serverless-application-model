@@ -10,7 +10,7 @@ from samtranslator.validator.value_validator import sam_expect
 class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
     """
     This plugin provides Implicit API shorthand syntax in the SAM Spec.
-    https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+    https://github.com/aws/serverless-application-model/blob/master/versions/2016-10-31.md#api
 
     Implicit API syntax is just a syntactic sugar, which will be translated to AWS::Serverless::Api resource.
     This is the only event source implemented as a plugin. Other event sources are not plugins because,

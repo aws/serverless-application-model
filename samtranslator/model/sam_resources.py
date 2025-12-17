@@ -198,6 +198,7 @@ class SamFunction(SamResourceMacro):
         "VersionDeletionPolicy": PropertyType(False, IS_STR_ENUM(["Delete", "Retain"])),
         "PublishToLatestPublished": PassThroughProperty(False),
         "TenancyConfig": PassThroughProperty(False),
+        "DurableConfig": PropertyType(False, IS_DICT),
     }
 
     FunctionName: Optional[Intrinsicable[str]]
@@ -247,6 +248,7 @@ class SamFunction(SamResourceMacro):
     PublishToLatestPublished: Optional[PassThrough]
     VersionDeletionPolicy: Optional[Intrinsicable[str]]
     TenancyConfig: Optional[Dict[str, Any]]
+    DurableConfig: Optional[Dict[str, Any]]
 
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -690,6 +692,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.LoggingConfig = self.LoggingConfig
         lambda_function.TenancyConfig = self.TenancyConfig
         lambda_function.RecursiveLoop = self.RecursiveLoop
+        lambda_function.DurableConfig = self.DurableConfig
 
         # Transform capacity provider configuration
         if self.CapacityProviderConfig:
@@ -786,7 +789,11 @@ class SamFunction(SamResourceMacro):
             else IAMRolePolicies.lambda_assume_role_policy()
         )
 
-        managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
+        managed_policy_arns = (
+            [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicDurableExecutionRolePolicy")]
+            if self.DurableConfig
+            else [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
+        )
 
         tracing = intrinsics_resolver.resolve_parameter_refs(self.Tracing)
 
@@ -1461,7 +1468,7 @@ class SamCapacityProvider(SamResourceMacro):
         "PropagateTags": Property(False, IS_BOOL),
         "InstanceRequirements": Property(False, IS_DICT),
         "ScalingConfig": Property(False, IS_DICT),
-        "KMSKeyArn": Property(False, one_of(IS_STR, IS_DICT)),
+        "KmsKeyArn": Property(False, one_of(IS_STR, IS_DICT)),
     }
 
     CapacityProviderName: Optional[Intrinsicable[str]]
@@ -1471,7 +1478,7 @@ class SamCapacityProvider(SamResourceMacro):
     PropagateTags: Optional[bool]
     InstanceRequirements: Optional[Dict[str, Any]]
     ScalingConfig: Optional[Dict[str, Any]]
-    KMSKeyArn: Optional[Intrinsicable[str]]
+    KmsKeyArn: Optional[Intrinsicable[str]]
 
     # Validation rules
     __validation_rules__ = [
@@ -1501,8 +1508,8 @@ class SamCapacityProvider(SamResourceMacro):
             instance_requirements=(
                 model.InstanceRequirements.dict(exclude_none=True) if model.InstanceRequirements else None
             ),
-            scaling_config=model.ScalingConfig.dict() if model.ScalingConfig else None,
-            kms_key_arn=passthrough_value(model.KMSKeyArn),
+            scaling_config=model.ScalingConfig.dict(exclude_none=True) if model.ScalingConfig else None,
+            kms_key_arn=passthrough_value(model.KmsKeyArn),
             depends_on=self.depends_on,
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),

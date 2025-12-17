@@ -57,6 +57,7 @@ class Globals:
             "RecursiveLoop",
             "SourceKMSKeyArn",
             "TenancyConfig",
+            "DurableConfig",
             "CapacityProviderConfig",
             "FunctionScalingConfig",
             "PublishToLatestPublished",
@@ -109,7 +110,7 @@ class Globals:
             "Tags",
             "InstanceRequirements",
             "ScalingConfig",
-            "KMSKeyArn",
+            "KmsKeyArn",
             "PropagateTags",
         ],
     }
@@ -117,6 +118,7 @@ class Globals:
     unreleased_properties: Dict[str, List[str]] = {
         SamResourceType.Function.value: [
             "TenancyConfig",
+            "DurableConfig",
             "CapacityProviderConfig",
             "FunctionScalingConfig",
             "PublishToLatestPublished",
@@ -315,15 +317,15 @@ class GlobalProperties:
       ```
       Global:
         Function:
-          Runtime: nodejs
+          Runtime: nodejs24.x
 
       Function:
-         Runtime: python
+         Runtime: python3.14
       ```
 
     After processing, Function resource will contain:
       ```
-      Runtime: python
+      Runtime: python3.14
       ```
 
     **Different data types**

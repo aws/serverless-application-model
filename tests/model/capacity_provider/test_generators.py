@@ -96,7 +96,7 @@ class TestCapacityProviderGenerator(TestCase):
             properties["VpcConfig"], {"SubnetIds": ["subnet-123", "subnet-456"], "SecurityGroupIds": ["sg-123"]}
         )
         self.assertEqual(properties["PermissionsConfig"]["CapacityProviderOperatorRoleArn"], operator_role)
-        self.assertEqual(properties["KMSKeyArn"], self.kms_key_arn)
+        self.assertEqual(properties["KmsKeyArn"], self.kms_key_arn)
 
     def test_to_cloudformation_with_auto_generated_permissions(self):
         """Test to_cloudformation with auto-generated operator role"""
