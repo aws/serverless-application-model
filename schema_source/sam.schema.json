@@ -5138,7 +5138,7 @@
           "markdownDescription": "Instance requirements for the capacity provider.\n*Type*: [InstanceRequirements](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-capacityprovider-instancerequirements.html)\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`InstanceRequirements`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-instancerequirements) property of an `AWS::Lambda::CapacityProvider` resource.",
           "title": "InstanceRequirements"
         },
-        "KMSKeyArn": {
+        "KmsKeyArn": {
           "$ref": "#/definitions/PassThroughProp"
         },
         "OperatorRole": {
@@ -5197,7 +5197,7 @@
           "markdownDescription": "Instance requirements for the capacity provider.\n*Type*: [InstanceRequirements](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-capacityprovider-instancerequirements.html)\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`InstanceRequirements`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-capacityprovider.html#cfn-lambda-capacityprovider-instancerequirements) property of an `AWS::Lambda::CapacityProvider` resource.",
           "title": "InstanceRequirements"
         },
-        "KMSKeyArn": {
+        "KmsKeyArn": {
           "$ref": "#/definitions/PassThroughProp"
         },
         "OperatorRole": {

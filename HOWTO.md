@@ -3,7 +3,7 @@ The AWS Serverless Application Model (AWS SAM) allows you to easily create and
 manage resources used in your serverless application using AWS CloudFormation. 
 You can define your serverless application as a SAM template - a JSON or YAML 
 configuration file that describes Lambda function, API endpoints and
-other resources in your application. Using a variety of [nifty commands](https://github.com/awslabs/aws-sam-cli#usage), you upload this 
+other resources in your application. Using a variety of [nifty commands](https://github.com/aws/aws-sam-cli#usage), you upload this
 template to CloudFormation, which in turn creates all the individual resources and
 groups them into a *CloudFormation Stack* for ease of management. 
 When you update your SAM template, you will re-deploy the changes to 
@@ -18,10 +18,10 @@ deploy them via AWS CloudFormation.
 Check out the [latest specification](versions/2016-10-31.md) for details on how to write a SAM template
 
 
-You could also use the [aws-sam-cli](https://github.com/awslabs/aws-sam-cli) to get started 
+You could also use the [aws-sam-cli](https://github.com/aws/aws-sam-cli) to get started
 
 ```shell
-$ sam init --runtime python3.8
+$ sam init --runtime python3.14
 ```
 ## Packing Artifacts
 Before you can deploy a SAM template, you should first upload your Lambda 
@@ -108,7 +108,7 @@ $ sam deploy \
     --capabilities CAPABILITY_IAM
 ```
 
-Refer to the [cloudformation documentation](http://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy/index.html) and [samcli](https://github.com/awslabs/aws-sam-cli) for more details.
+Refer to the [cloudformation documentation](http://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy.html) and [SAM CLI](https://github.com/aws/aws-sam-cli) for more details.
 
 ## Using Intrinsic Functions
 CloudFormation provides handy functions that you can use to generate values at runtime. These are called [Intrinsic Functions](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html). Since SAM is deployed using CloudFormation, you can use these intrinsic functions within SAM as well. Here are some examples:
@@ -130,7 +130,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Handler: index.handler
-            Runtime: nodejs12.x
+            Runtime: nodejs24.x
             CodeUri:
                 # !Ref function allows you to fetch value 
                 # of parameters and other resources at runtime
@@ -158,7 +158,7 @@ Resources:
             FunctionName: !Sub "mylambda-${FunctionNameSuffix}"
 
             Handler: index.handler
-            Runtime: nodejs12.x
+            Runtime: nodejs24.x
             CodeUri: s3://bucket/key
 ```
 
