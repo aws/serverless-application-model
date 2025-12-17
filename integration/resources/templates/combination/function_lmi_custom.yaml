@@ -1,0 +1,87 @@
+Parameters:
+  SubnetId:
+    Type: String
+  SecurityGroup:
+    Type: String
+  KMSKeyArn:
+    Type: String
+
+Resources:
+  MyCapacityProviderCustomRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: CapacityProviderOperatorRolePolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - ec2:TerminateInstances
+            - ec2:AttachNetworkInterface
+            - ec2:RunInstances
+            - ec2:CreateTags
+            Resource:
+            - !Sub arn:${AWS::Partition}:ec2:*:*:instance/*
+            - !Sub arn:${AWS::Partition}:ec2:*:*:network-interface/*
+            - !Sub arn:${AWS::Partition}:ec2:*:*:volume/*
+            Condition:
+              StringEquals:
+                ec2:ManagedResourceOperator: scaler.lambda.amazonaws.com
+          - Effect: Allow
+            Action:
+            - ec2:DescribeAvailabilityZones
+            - ec2:DescribeCapacityReservations
+            - ec2:DescribeInstanceTypes
+            - ec2:DescribeInstanceTypeOfferings
+            - ec2:DescribeSecurityGroups
+            - ec2:DescribeSubnets
+            - ec2:DescribeInstances
+            - ec2:DescribeInstanceStatus
+            Resource: '*'
+          - Effect: Allow
+            Action:
+            - ec2:RunInstances
+            - ec2:CreateNetworkInterface
+            Resource:
+            - !Sub arn:${AWS::Partition}:ec2:*:*:subnet/*
+            - !Sub arn:${AWS::Partition}:ec2:*:*:security-group/*
+          - Effect: Allow
+            Action:
+            - ec2:RunInstances
+            Resource:
+            - !Sub arn:${AWS::Partition}:ec2:*:*:image/*
+            Condition:
+              Bool:
+                ec2:Public: 'true'
+
+  MyCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: !Sub "${AWS::StackName}-cp"
+      VpcConfig:
+        SubnetIds:
+        - !Ref SubnetId
+        SecurityGroupIds:
+        - !Ref SecurityGroup
+      OperatorRole: !GetAtt MyCapacityProviderCustomRole.Arn
+      KmsKeyArn: !Ref KMSKeyArn
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      Handler: index.handler
+      CodeUri: ${codeuri}
+      CapacityProviderConfig:
+        Arn: !GetAtt MyCapacityProvider.Arn
+
+Metadata:
+  SamTransformTest: true
