@@ -1486,7 +1486,7 @@ class SamCapacityProvider(SamResourceMacro):
         "PropagateTags": Property(False, IS_BOOL),
         "InstanceRequirements": Property(False, IS_DICT),
         "ScalingConfig": Property(False, IS_DICT),
-        "KMSKeyArn": Property(False, one_of(IS_STR, IS_DICT)),
+        "KmsKeyArn": Property(False, one_of(IS_STR, IS_DICT)),
     }
 
     CapacityProviderName: Optional[Intrinsicable[str]]
@@ -1496,7 +1496,7 @@ class SamCapacityProvider(SamResourceMacro):
     PropagateTags: Optional[bool]
     InstanceRequirements: Optional[Dict[str, Any]]
     ScalingConfig: Optional[Dict[str, Any]]
-    KMSKeyArn: Optional[Intrinsicable[str]]
+    KmsKeyArn: Optional[Intrinsicable[str]]
 
     # Validation rules
     __validation_rules__ = [
@@ -1531,7 +1531,7 @@ class SamCapacityProvider(SamResourceMacro):
                 model.InstanceRequirements.dict(exclude_none=True) if model.InstanceRequirements else None
             ),
             scaling_config=model.ScalingConfig.dict(exclude_none=True) if model.ScalingConfig else None,
-            kms_key_arn=passthrough_value(model.KMSKeyArn),
+            kms_key_arn=passthrough_value(model.KmsKeyArn),
             depends_on=self.depends_on,
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
