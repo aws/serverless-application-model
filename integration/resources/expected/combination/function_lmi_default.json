@@ -1,0 +1,18 @@
+[
+  {
+    "LogicalResourceId": "MyCapacityProvider",
+    "ResourceType": "AWS::Lambda::CapacityProvider"
+  },
+  {
+    "LogicalResourceId": "MyCapacityProviderOperatorRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
+]

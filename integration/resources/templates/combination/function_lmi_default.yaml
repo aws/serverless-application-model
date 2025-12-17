@@ -1,0 +1,31 @@
+Parameters:
+  SubnetId:
+    Type: String
+  SecurityGroup:
+    Type: String
+  KMSKeyArn:
+    Type: String
+
+Resources:
+  MyCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: !Sub "${AWS::StackName}-cp"
+      VpcConfig:
+        SubnetIds:
+        - !Ref SubnetId
+        SecurityGroupIds:
+        - !Ref SecurityGroup
+      KmsKeyArn: !Ref KMSKeyArn
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      Handler: index.handler
+      CodeUri: ${codeuri}
+      CapacityProviderConfig:
+        Arn: !GetAtt MyCapacityProvider.Arn
+
+Metadata:
+  SamTransformTest: true
