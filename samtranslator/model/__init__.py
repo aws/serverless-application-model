@@ -824,7 +824,7 @@ class ResourceTypeResolver:
 
 
 class ResourceResolver:
-    def __init__(self, resources: Dict[str, Any]) -> None:
+    def __init__(self, resources: Dict[str, Dict[str, Any]]) -> None:
         """
         Instantiate the resolver
         :param dict resources: Map of resource
@@ -832,7 +832,6 @@ class ResourceResolver:
 
         if not isinstance(resources, dict):
             raise TypeError("'Resources' is either null or not a valid dictionary.")
-
         self.resources = resources
 
     def get_all_resources(self) -> Dict[str, Any]:
@@ -850,7 +849,6 @@ class ResourceResolver:
         """
         if not isinstance(_input, str):
             raise TypeError(f"Invalid logical ID '{_input}'. Expected a string.")
-
         return self.resources.get(_input, None)
 
 
