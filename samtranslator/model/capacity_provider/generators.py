@@ -133,13 +133,13 @@ class CapacityProviderGenerator:
         """
         instance_requirements = {}
 
-        if "Architectures" in self.instance_requirements:
+        if self.instance_requirements.get("Architectures") is not None:
             instance_requirements["Architectures"] = self.instance_requirements["Architectures"]
 
-        if "AllowedTypes" in self.instance_requirements:
+        if self.instance_requirements.get("AllowedTypes") is not None:
             instance_requirements["AllowedInstanceTypes"] = self.instance_requirements["AllowedTypes"]
 
-        if "ExcludedTypes" in self.instance_requirements:
+        if self.instance_requirements.get("ExcludedTypes") is not None:
             instance_requirements["ExcludedInstanceTypes"] = self.instance_requirements["ExcludedTypes"]
 
         return instance_requirements
@@ -150,11 +150,11 @@ class CapacityProviderGenerator:
         """
         scaling_config = {}
 
-        if "MaxVCpuCount" in self.scaling_config:
+        if self.scaling_config.get("MaxVCpuCount") is not None:
             scaling_config["MaxVCpuCount"] = self.scaling_config["MaxVCpuCount"]
 
         # Handle AverageCPUUtilization structure
-        if "AverageCPUUtilization" in self.scaling_config:
+        if self.scaling_config.get("AverageCPUUtilization") is not None:
             scaling_config["ScalingMode"] = "Manual"
             scaling_policies = []
 
