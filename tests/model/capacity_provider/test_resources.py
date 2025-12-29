@@ -32,7 +32,7 @@ class TestLambdaCapacityProvider(TestCase):
                 {"PredefinedMetricType": "LambdaCapacityProviderAverageCPUUtilization", "TargetValue": 70.0}
             ],
         }
-        capacity_provider.KMSKeyArn = "arn:aws:kms:us-west-2:123456789012:key/abcd1234-ab12-cd34-ef56-abcdef123456"
+        capacity_provider.KmsKeyArn = "arn:aws:kms:us-west-2:123456789012:key/abcd1234-ab12-cd34-ef56-abcdef123456"
 
         # Verify properties
         self.assertEqual(capacity_provider.CapacityProviderName, "test-provider")
@@ -64,7 +64,7 @@ class TestLambdaCapacityProvider(TestCase):
             },
         )
         self.assertEqual(
-            capacity_provider.KMSKeyArn, "arn:aws:kms:us-west-2:123456789012:key/abcd1234-ab12-cd34-ef56-abcdef123456"
+            capacity_provider.KmsKeyArn, "arn:aws:kms:us-west-2:123456789012:key/abcd1234-ab12-cd34-ef56-abcdef123456"
         )
 
     def test_runtime_attributes(self):

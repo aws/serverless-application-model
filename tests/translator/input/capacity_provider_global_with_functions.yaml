@@ -48,7 +48,7 @@ Globals:
     InstanceRequirements:
       Architectures:
       - x86_64
-    KMSKeyArn: some-kms-arn
+    KmsKeyArn: some-kms-arn
 
   Function:
     Runtime: python3.12
@@ -131,8 +131,6 @@ Resources:
     Properties:
       CapacityProviderName: !Sub "${AWS::StackName}-${Environment}-capacity-provider"
       InstanceRequirements:
-        Architectures:
-        - arm64
         ExcludedTypes:
         - t2.micro
         - t2.small

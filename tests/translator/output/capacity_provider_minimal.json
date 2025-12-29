@@ -19,6 +19,9 @@
           }
         ],
         "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678"
+          ],
           "SubnetIds": [
             "subnet-12345678"
           ]
