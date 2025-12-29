@@ -401,14 +401,9 @@ class SamFunction(SamResourceMacro):
         elif is_intrinsic_if(lambda_function.Role):
             role_changes = self._make_lambda_role(lambda_function, intrinsics_resolver, execution_role)
 
-            if role_changes["should_append_role"]:
-                resources.append(execution_role)
-
             if role_changes["lambda_role_value"] is not None:
                 lambda_function.Role = role_changes["lambda_role_value"]
-
-            if role_changes["execution_role_condition"] is not None:
-                execution_role.set_resource_attribute("Condition", role_changes["execution_role_condition"])
+                resources.append(execution_role)
 
             if role_changes["new_condition"] is not None:
                 conditions.update(role_changes["new_condition"])
@@ -440,46 +435,40 @@ class SamFunction(SamResourceMacro):
 
         Returns:
             Dict containing:
-                - 'should_append_role': bool - whether to append execution_role to resources
                 - 'lambda_role_value': Any - value to set for lambda_function.Role
-                - 'execution_role_condition': str|None - condition to set on execution_role
                 - 'new_condition': Dict|None - new condition to add to conditions dict
         """
         lambda_role = lambda_function.Role
         execution_role_arn = execution_role.get_runtime_attr("arn")
 
-        result: Dict[str, Any] = {
-            "should_append_role": False,
-            "lambda_role_value": None,
-            "execution_role_condition": None,
-            "new_condition": None,
-        }
+        lambda_role_value = None
+        new_condition = None
 
         # We need to create and if else condition here
         role_resolved_value = intrinsics_resolver.resolve_parameter_refs(lambda_role)
         role_condition, role_if, role_else = role_resolved_value.get("Fn::If")
 
         if is_intrinsic_no_value(role_if) and is_intrinsic_no_value(role_else):
-            result["lambda_role_value"] = execution_role_arn
-            result["should_append_role"] = True
+            lambda_role_value = execution_role_arn
 
         # first value is none so we should create condition ? create : [2]
         # create a condition for IAM role to only create on if case
         elif is_intrinsic_no_value(role_if):
-            result["lambda_role_value"] = make_conditional(role_condition, execution_role_arn, role_else)
-            result["execution_role_condition"] = f"{role_condition}"
-            result["should_append_role"] = True
+            lambda_role_value = make_conditional(role_condition, execution_role_arn, role_else)
+            execution_role.set_resource_attribute("Condition", role_condition)
 
         # second value is none so we should create condition ? [1] : create
         # create a condition for IAM role to only create on else case
         # with top level condition that negates the condition passed
         elif is_intrinsic_no_value(role_else):
-            result["lambda_role_value"] = make_conditional(role_condition, role_if, execution_role_arn)
-            result["execution_role_condition"] = f"NOT{role_condition}"
-            result["new_condition"] = {f"NOT{role_condition}": make_not_conditional(role_condition)}
-            result["should_append_role"] = True
+            lambda_role_value = make_conditional(role_condition, role_if, execution_role_arn)
+            execution_role.set_resource_attribute("Condition", f"NOT{role_condition}")
+            new_condition = {f"NOT{role_condition}": make_not_conditional(role_condition)}
 
-        return result
+        return {
+            "lambda_role_value": lambda_role_value,
+            "new_condition": new_condition,
+        }
 
     def _construct_event_invoke_config(  # noqa: PLR0913
         self,
