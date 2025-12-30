@@ -9,3 +9,5 @@ Resources:
       VpcConfig:
         SubnetIds:
         - subnet-12345678
+        SecurityGroupIds:
+        - sg-12345678

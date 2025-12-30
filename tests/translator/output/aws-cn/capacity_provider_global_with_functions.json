@@ -217,15 +217,14 @@
         },
         "InstanceRequirements": {
           "Architectures": [
-            "x86_64",
-            "arm64"
+            "x86_64"
           ],
           "ExcludedInstanceTypes": [
             "t2.micro",
             "t2.small"
           ]
         },
-        "KMSKeyArn": "some-kms-arn",
+        "KmsKeyArn": "some-kms-arn",
         "PermissionsConfig": {
           "CapacityProviderOperatorRoleArn": {
             "Fn::GetAtt": [

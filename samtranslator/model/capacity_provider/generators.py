@@ -107,9 +107,9 @@ class CapacityProviderGenerator:
         if self.scaling_config:
             capacity_provider.CapacityProviderScalingConfig = self._transform_scaling_config()
 
-        # Set the KMSKeyArn if provided
+        # Set the KmsKeyArn if provided
         if self.kms_key_arn:
-            capacity_provider.KMSKeyArn = self.kms_key_arn
+            capacity_provider.KmsKeyArn = self.kms_key_arn
 
         # Pass through resource attributes
         if self.passthrough_resource_attributes:

@@ -44,7 +44,7 @@ following questions in the issue that you create:
 ## Adding features to AWS SAM
 
 We welcome pull requests to add new features to AWS SAM. Take a look at the
-backlog of [Feature Requests](https://github.com/awslabs/serverless-application-specification/labels/feature-request) and pick an item that you find interesting. If the requirements have been well-scoped, feel free to make the change and send a pull request.
+backlog of [Feature Requests](https://github.com/aws/serverless-application-model/issues?q=state%3Aopen%20label%3Atype%2Ffeature) and pick an item that you find interesting. If the requirements have been well-scoped, feel free to make the change and send a pull request.
 
 If you don't find an item tracking what you have in mind, start a conversation with your plan for implementing
 the feature. When defining your feature, keep in mind that one of the core
@@ -97,7 +97,7 @@ Here are some questions that you should answer in your plan:
 
 We welcome you to use the GitHub issue tracker to report bugs or suggest features.
 
-When filing an issue, please check [existing open](https://github.com/awslabs/serverless-application-model/issues), or [recently closed](https://github.com/awslabs/serverless-application-model/issues?utf8=%E2%9C%93&q=is%3Aissue%20is%3Aclosed%20), issues to make sure somebody else hasn't already
+When filing an issue, please check [existing open](https://github.com/aws/serverless-application-model/issues), or [recently closed](https://github.com/aws/serverless-application-model/issues?utf8=%E2%9C%93&q=is%3Aissue%20is%3Aclosed%20), issues to make sure somebody else hasn't already
 reported the issue. Please try to include as much information as you can. Details like these are incredibly useful:
 
 - A reproducible test case or series of steps
@@ -127,7 +127,7 @@ GitHub provides additional document on [forking a repository](https://help.githu
 
 ## Finding contributions to work on
 
-Looking at the existing issues is a great way to find something to contribute on. As our projects, by default, use the default GitHub issue labels ((enhancement/bug/duplicate/help wanted/invalid/question/wontfix), looking at any ['help wanted'](https://github.com/awslabs/PRIVATE-aws-sam-development/labels/help%20wanted) issues is a great place to start.
+Looking at the existing issues is a great way to find something to contribute on. Looking at any ['contributors/welcome'](https://github.com/aws/serverless-application-model/issues?q=state%3Aopen%20label%3Acontributors%2Fwelcome) issues is a great place to start.
 
 ## Code of Conduct
 
@@ -139,6 +139,6 @@ If you discover a potential security issue in this project we ask that you notif
 
 ## Licensing
 
-See the [LICENSE](https://github.com/awslabs/PRIVATE-aws-sam-development/blob/master/LICENSE) file for our project's licensing. We will ask you to confirm the licensing of your contribution.
+See the [LICENSE](https://github.com/aws/serverless-application-model/blob/master/LICENSE) file for our project's licensing. We will ask you to confirm the licensing of your contribution.
 
 We may ask you to sign a [Contributor License Agreement (CLA)](http://en.wikipedia.org/wiki/Contributor_License_Agreement) for larger changes.

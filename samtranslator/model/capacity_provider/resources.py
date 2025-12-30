@@ -22,7 +22,7 @@ class LambdaCapacityProvider(Resource):
         "Tags": GeneratedProperty(),
         "InstanceRequirements": GeneratedProperty(),
         "CapacityProviderScalingConfig": GeneratedProperty(),
-        "KMSKeyArn": GeneratedProperty(),
+        "KmsKeyArn": GeneratedProperty(),
     }
 
     CapacityProviderName: Optional[Intrinsicable[str]]
@@ -31,7 +31,7 @@ class LambdaCapacityProvider(Resource):
     Tags: Optional[List[Dict[str, Any]]]
     InstanceRequirements: Optional[Dict[str, Any]]
     CapacityProviderScalingConfig: Optional[Dict[str, Any]]
-    KMSKeyArn: Optional[Intrinsicable[str]]
+    KmsKeyArn: Optional[Intrinsicable[str]]
 
     runtime_attrs = {
         "name": lambda self: ref(self.logical_id),
