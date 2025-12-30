@@ -403,7 +403,7 @@ class SamFunction(SamResourceMacro):
 
             if role_changes["lambda_role_value"] is not None:
                 lambda_function.Role = role_changes["lambda_role_value"]
-                resources.append(execution_role)
+                resources.append(role_changes["iam_role_resource"])
 
             if role_changes["new_condition"] is not None:
                 conditions.update(role_changes["new_condition"])
@@ -437,6 +437,7 @@ class SamFunction(SamResourceMacro):
             Dict containing:
                 - 'lambda_role_value': Any - value to set for lambda_function.Role
                 - 'new_condition': Dict|None - new condition to add to conditions dict
+                - 'iam_role_resource' : IAMRole - IAM Role used for Lambda execution
         """
         lambda_role = lambda_function.Role
         execution_role_arn = execution_role.get_runtime_attr("arn")
@@ -468,6 +469,7 @@ class SamFunction(SamResourceMacro):
         return {
             "lambda_role_value": lambda_role_value,
             "new_condition": new_condition,
+            "iam_role_resource": execution_role,
         }
 
     def _construct_event_invoke_config(  # noqa: PLR0913
