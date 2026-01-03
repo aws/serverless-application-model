@@ -16,7 +16,7 @@
     "ResourceType": "AWS::ApiGateway::RestApi"
   },
   {
-    "LogicalResourceId": "RecordSetGroupddfc299be2",
+    "LogicalResourceId": "RecordSetGroup303b65d470",
     "ResourceType": "AWS::Route53::RecordSetGroup"
   },
   {
@@ -28,7 +28,7 @@
     "ResourceType": "AWS::ApiGateway::BasePathMapping"
   },
   {
-    "LogicalResourceId": "ApiGatewayDomainName7898169271",
+    "LogicalResourceId": "ApiGatewayDomainNamec65e226806",
     "ResourceType": "AWS::ApiGateway::DomainName"
   },
   {
