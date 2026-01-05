@@ -1,7 +1,7 @@
 from unittest.case import skipIf
 
 from integration.config.service_names import CUSTOM_DOMAIN
-from integration.helpers.base_internal_test import BaseInternalTest, CUSTOM_DOMAIN_TOP_LEVEL
+from integration.helpers.base_internal_test import CUSTOM_DOMAIN_TOP_LEVEL, BaseInternalTest
 from integration.helpers.base_test import nonblocking
 from integration.helpers.resource import current_region_not_included
 
