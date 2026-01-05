@@ -293,7 +293,7 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(self.logical_id, e.message) from e
 
     @cw_timer
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0915
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0915, PLR0912
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
@@ -388,16 +388,25 @@ class SamFunction(SamResourceMacro):
         managed_policy_map = kwargs.get("managed_policy_map", {})
         get_managed_policy_map = kwargs.get("get_managed_policy_map")
 
-        execution_role = None
+        execution_role = self._construct_role(
+            managed_policy_map,
+            event_invoke_policies,
+            intrinsics_resolver,
+            get_managed_policy_map,
+        )
+
         if lambda_function.Role is None:
-            execution_role = self._construct_role(
-                managed_policy_map,
-                event_invoke_policies,
-                intrinsics_resolver,
-                get_managed_policy_map,
-            )
             lambda_function.Role = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
+        elif is_intrinsic_if(lambda_function.Role):
+            role_changes = self._make_lambda_role(lambda_function, intrinsics_resolver, execution_role)
+
+            if role_changes["lambda_role_value"] is not None:
+                lambda_function.Role = role_changes["lambda_role_value"]
+                resources.append(role_changes["iam_role_resource"])
+
+            if role_changes["new_condition"] is not None:
+                conditions.update(role_changes["new_condition"])
 
         try:
             resources += self._generate_event_resources(
@@ -414,6 +423,54 @@ class SamFunction(SamResourceMacro):
         self.propagate_tags(resources, self.Tags, self.PropagateTags)
 
         return resources
+
+    def _make_lambda_role(
+        self,
+        lambda_function: LambdaFunction,
+        intrinsics_resolver: IntrinsicsResolver,
+        execution_role: IAMRole,
+    ) -> Dict[str, Any]:
+        """
+        Analyzes lambda role requirements and returns the changes needed.
+
+        Returns:
+            Dict containing:
+                - 'lambda_role_value': Any - value to set for lambda_function.Role
+                - 'new_condition': Dict|None - new condition to add to conditions dict
+                - 'iam_role_resource' : IAMRole - IAM Role used for Lambda execution
+        """
+        lambda_role = lambda_function.Role
+        execution_role_arn = execution_role.get_runtime_attr("arn")
+
+        lambda_role_value = None
+        new_condition = None
+
+        # We need to create and if else condition here
+        role_resolved_value = intrinsics_resolver.resolve_parameter_refs(lambda_role)
+        role_condition, role_if, role_else = role_resolved_value.get("Fn::If")
+
+        if is_intrinsic_no_value(role_if) and is_intrinsic_no_value(role_else):
+            lambda_role_value = execution_role_arn
+
+        # first value is none so we should create condition ? create : [2]
+        # create a condition for IAM role to only create on if case
+        elif is_intrinsic_no_value(role_if):
+            lambda_role_value = make_conditional(role_condition, execution_role_arn, role_else)
+            execution_role.set_resource_attribute("Condition", role_condition)
+
+        # second value is none so we should create condition ? [1] : create
+        # create a condition for IAM role to only create on else case
+        # with top level condition that negates the condition passed
+        elif is_intrinsic_no_value(role_else):
+            lambda_role_value = make_conditional(role_condition, role_if, execution_role_arn)
+            execution_role.set_resource_attribute("Condition", f"NOT{role_condition}")
+            new_condition = {f"NOT{role_condition}": make_not_conditional(role_condition)}
+
+        return {
+            "lambda_role_value": lambda_role_value,
+            "new_condition": new_condition,
+            "iam_role_resource": execution_role,
+        }
 
     def _construct_event_invoke_config(  # noqa: PLR0913
         self,
