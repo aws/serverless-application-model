@@ -39,8 +39,7 @@ class TestFunctionWithCapacityProvider(BaseTest):
         self.assertEqual(len(iam_role_resources), 2, "Should create exactly two IAM roles")
 
     def test_function_with_capacity_provider_default_role(self):
-        """Test Lambda function with CapacityProviderConfig using default operator role.
-        """
+        """Test Lambda function with CapacityProviderConfig using default operator role."""
         # Phase 1: Prepare parameters from companion stack
         parameters = [
             self.generate_parameter("SubnetId", self.companion_stack_outputs["LMISubnetId"]),

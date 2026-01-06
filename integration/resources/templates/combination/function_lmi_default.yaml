@@ -24,7 +24,7 @@ Resources:
       CodeUri: ${codeuri}
       CapacityProviderConfig:
         Arn: !GetAtt SimpleCapacityProvider.Arn
-  
+
   AdvancedCapacityProvider:
     Type: AWS::Serverless::CapacityProvider
     Properties:
@@ -36,11 +36,11 @@ Resources:
         - !Ref SecurityGroup
       InstanceRequirements:
         Architectures:
-          - x86_64
+        - x86_64
         AllowedTypes:
-          - m5.large
-          - m5.xlarge
-          - m5.2xlarge
+        - m5.large
+        - m5.xlarge
+        - m5.2xlarge
       ScalingConfig:
         MaxVCpuCount: 64
         AverageCPUUtilization: 70
