@@ -40,9 +40,6 @@ class TestFunctionWithCapacityProvider(BaseTest):
 
     def test_function_with_capacity_provider_default_role(self):
         """Test Lambda function with CapacityProviderConfig using default operator role.
-
-        Note: This test is skipped until 12/01/2024 because the managed policy required for
-        the default operator role is not available until then.
         """
         # Phase 1: Prepare parameters from companion stack
         parameters = [
@@ -59,7 +56,7 @@ class TestFunctionWithCapacityProvider(BaseTest):
         self.assertEqual(len(lambda_resources), 1, "Should create exactly one Lambda function")
 
         capacity_provider_resources = self.get_stack_resources("AWS::Lambda::CapacityProvider")
-        self.assertEqual(len(capacity_provider_resources), 1, "Should create exactly one CapacityProvider")
+        self.assertEqual(len(capacity_provider_resources), 2, "Should create exactly two CapacityProviders")
 
         iam_role_resources = self.get_stack_resources("AWS::IAM::Role")
-        self.assertEqual(len(iam_role_resources), 2, "Should create exactly two IAM roles")
+        self.assertEqual(len(iam_role_resources), 3, "Should create exactly three IAM roles")

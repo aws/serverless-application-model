@@ -7,16 +7,14 @@ Parameters:
     Type: String
 
 Resources:
-  MyCapacityProvider:
+  SimpleCapacityProvider:
     Type: AWS::Serverless::CapacityProvider
     Properties:
-      CapacityProviderName: !Sub "${AWS::StackName}-cp"
       VpcConfig:
         SubnetIds:
         - !Ref SubnetId
         SecurityGroupIds:
         - !Ref SecurityGroup
-      KmsKeyArn: !Ref KMSKeyArn
 
   MyFunction:
     Type: AWS::Serverless::Function
@@ -25,7 +23,30 @@ Resources:
       Handler: index.handler
       CodeUri: ${codeuri}
       CapacityProviderConfig:
-        Arn: !GetAtt MyCapacityProvider.Arn
+        Arn: !GetAtt SimpleCapacityProvider.Arn
+  
+  AdvancedCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: !Sub "${AWS::StackName}-cp"
+      VpcConfig:
+        SubnetIds:
+        - !Ref SubnetId
+        SecurityGroupIds:
+        - !Ref SecurityGroup
+      InstanceRequirements:
+        Architectures:
+          - x86_64
+        AllowedTypes:
+          - m5.large
+          - m5.xlarge
+          - m5.2xlarge
+      ScalingConfig:
+        MaxVCpuCount: 64
+        AverageCPUUtilization: 70
+      KmsKeyArn: !Ref KMSKeyArn
+      Tags:
+        Environment: Test
 
 Metadata:
   SamTransformTest: true

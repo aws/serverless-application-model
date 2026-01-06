@@ -1,10 +1,18 @@
 [
   {
-    "LogicalResourceId": "MyCapacityProvider",
+    "LogicalResourceId": "SimpleCapacityProvider",
     "ResourceType": "AWS::Lambda::CapacityProvider"
   },
   {
-    "LogicalResourceId": "MyCapacityProviderOperatorRole",
+    "LogicalResourceId": "SimpleCapacityProviderOperatorRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "AdvancedCapacityProvider",
+    "ResourceType": "AWS::Lambda::CapacityProvider"
+  },
+  {
+    "LogicalResourceId": "AdvancedCapacityProviderOperatorRole",
     "ResourceType": "AWS::IAM::Role"
   },
   {
