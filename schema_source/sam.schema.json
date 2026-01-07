@@ -1686,49 +1686,70 @@
       "additionalProperties": false,
       "properties": {
         "AllowedTypes": {
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object"
+                  }
+                ]
               },
-              {
-                "type": "object"
-              }
-            ]
-          },
+              "type": "array"
+            }
+          ],
           "markdownDescription": "The allowed instance types.\n*Type*: List of String\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`AllowedInstanceTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-instancerequirements.html#cfn-lambda-capacityprovider-instancerequirements-allowedinstancetypes) property of the `AWS::Lambda::CapacityProvider` `InstanceRequirements` data type.",
-          "title": "AllowedTypes",
-          "type": "array"
+          "title": "AllowedTypes"
         },
         "Architectures": {
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object"
+                  }
+                ]
               },
-              {
-                "type": "object"
-              }
-            ]
-          },
+              "type": "array"
+            }
+          ],
           "markdownDescription": "The CPU architecture for the instances.\n*Type*: List of String\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`Architecture`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-instancerequirements.html#cfn-lambda-capacityprovider-instancerequirements-architecture) property of the `AWS::Lambda::CapacityProvider` `InstanceRequirements` data type.",
-          "title": "Architectures",
-          "type": "array"
+          "title": "Architectures"
         },
         "ExcludedTypes": {
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object"
+                  }
+                ]
               },
-              {
-                "type": "object"
-              }
-            ]
-          },
+              "type": "array"
+            }
+          ],
           "markdownDescription": "The excluded instance types.\n*Type*: List of String\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`ExcludedInstanceTypes`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-instancerequirements.html#cfn-lambda-capacityprovider-instancerequirements-excludedinstancetypes) property of the `AWS::Lambda::CapacityProvider` `InstanceRequirements` data type.",
-          "title": "ExcludedTypes",
-          "type": "array"
+          "title": "ExcludedTypes"
         }
       },
       "title": "InstanceRequirements",
@@ -3649,34 +3670,48 @@
       "additionalProperties": false,
       "properties": {
         "SecurityGroupIds": {
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object"
+                  }
+                ]
               },
-              {
-                "type": "object"
-              }
-            ]
-          },
+              "type": "array"
+            }
+          ],
           "markdownDescription": "A list of VPC security group IDs.\n*Type*: List of String\n*Required*: No\n*AWS CloudFormation compatibility*: This property is passed directly to the [`SecurityGroupIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-vpcconfig.html#cfn-lambda-capacityprovider-vpcconfig-securitygroupids) property of the `AWS::Lambda::CapacityProvider` `VpcConfig` data type.",
-          "title": "SecurityGroupIds",
-          "type": "array"
+          "title": "SecurityGroupIds"
         },
         "SubnetIds": {
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object"
+                  }
+                ]
               },
-              {
-                "type": "object"
-              }
-            ]
-          },
+              "type": "array"
+            }
+          ],
           "markdownDescription": "A list of VPC subnet IDs.\n*Type*: List of String\n*Required*: Yes\n*AWS CloudFormation compatibility*: This property is passed directly to the [`SubnetIds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-capacityprovider-vpcconfig.html#cfn-lambda-capacityprovider-vpcconfig-subnetids) property of the `AWS::Lambda::CapacityProvider` `VpcConfig` data type.",
-          "title": "SubnetIds",
-          "type": "array"
+          "title": "SubnetIds"
         }
       },
       "required": [
