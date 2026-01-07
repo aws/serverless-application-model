@@ -1,0 +1,595 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "IsProd": {
+      "Fn::Equals": [
+        {
+          "Ref": "Environment"
+        },
+        "prod"
+      ]
+    }
+  },
+  "Description": "CapacityProvider with Globals and intrinsic functions test",
+  "Outputs": {
+    "CapacityProviderArn": {
+      "Description": "ARN of the created capacity provider",
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-CapacityProviderArn"
+        }
+      },
+      "Value": {
+        "Fn::GetAtt": [
+          "GlobalCapacityProvider",
+          "Arn"
+        ]
+      }
+    },
+    "EnvironmentInfo": {
+      "Description": "Environment and team information",
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-EnvironmentInfo"
+        }
+      },
+      "Value": {
+        "Fn::Sub": "${Environment}-${Team}"
+      }
+    },
+    "Function1Name": {
+      "Description": "Name of Function 1",
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-Function1Name"
+        }
+      },
+      "Value": {
+        "Ref": "GlobalFunction1"
+      }
+    },
+    "Function2Name": {
+      "Description": "Name of Function 2",
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-Function2Name"
+        }
+      },
+      "Value": {
+        "Ref": "GlobalFunction2"
+      }
+    }
+  },
+  "Parameters": {
+    "Environment": {
+      "AllowedValues": [
+        "dev",
+        "staging",
+        "prod"
+      ],
+      "Default": "dev",
+      "Type": "String"
+    },
+    "MaxConcurrency": {
+      "Default": 100,
+      "Type": "Number"
+    },
+    "MemoryGiBPerVCpu": {
+      "Default": 2.5,
+      "Type": "Number"
+    },
+    "SecurityGroupId": {
+      "Default": "sg-12345678",
+      "Type": "String"
+    },
+    "SubnetId": {
+      "Default": "subnet-12345678",
+      "Type": "String"
+    },
+    "Team": {
+      "Default": "serverless-team",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "CustomPermissionsCapacityProviderOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ec2:TerminateInstances",
+                    "ec2:RunInstances",
+                    "ec2:DescribeInstanceStatus",
+                    "ec2:DescribeInstances",
+                    "ec2:CreateTags"
+                  ],
+                  "Condition": {
+                    "StringEquals": {
+                      "ec2:ManagedResourceOperator": "scaler.lambda.amazonaws.com"
+                    }
+                  },
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:instance/*"
+                    },
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+                    },
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:volume/*"
+                    }
+                  ]
+                },
+                {
+                  "Action": [
+                    "ec2:DescribeAvailabilityZones",
+                    "ec2:DescribeCapacityReservations",
+                    "ec2:DescribeInstanceTypeOfferings",
+                    "ec2:DescribeInstanceTypes",
+                    "ec2:DescribeSecurityGroups",
+                    "ec2:DescribeSubnets"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                },
+                {
+                  "Action": [
+                    "ec2:RunInstances",
+                    "ec2:CreateNetworkInterface"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:subnet/*"
+                    },
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:security-group/*"
+                    }
+                  ]
+                },
+                {
+                  "Action": [
+                    "ec2:RunInstances"
+                  ],
+                  "Condition": {
+                    "Bool": {
+                      "ec2:Public": "true"
+                    }
+                  },
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:ec2:*:*:image/*"
+                    }
+                  ]
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "CapacityProviderOperatorRolePolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "GlobalCapacityProvider": {
+      "Properties": {
+        "CapacityProviderName": {
+          "Fn::Sub": "${AWS::StackName}-${Environment}-capacity-provider"
+        },
+        "CapacityProviderScalingConfig": {
+          "MaxVCpuCount": {
+            "Fn::If": [
+              "IsProd",
+              20,
+              10
+            ]
+          },
+          "ScalingMode": "Manual",
+          "ScalingPolicies": [
+            {
+              "PredefinedMetricType": "LambdaCapacityProviderAverageCPUUtilization",
+              "TargetValue": {
+                "Fn::If": [
+                  "IsProd",
+                  80.0,
+                  70.0
+                ]
+              }
+            }
+          ]
+        },
+        "InstanceRequirements": {
+          "Architectures": [
+            "x86_64"
+          ],
+          "ExcludedInstanceTypes": [
+            "t2.micro",
+            "t2.small"
+          ]
+        },
+        "KmsKeyArn": "some-kms-arn",
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "CustomPermissionsCapacityProviderOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": {
+              "Ref": "Environment"
+            }
+          },
+          {
+            "Key": "Team",
+            "Value": {
+              "Ref": "Team"
+            }
+          },
+          {
+            "Key": "ManagedBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Ref": "SecurityGroupId"
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Ref": "SubnetId"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "GlobalFunction1": {
+      "Properties": {
+        "CapacityProviderConfig": {
+          "LambdaManagedInstancesCapacityProviderConfig": {
+            "CapacityProviderArn": {
+              "Fn::GetAtt": [
+                "GlobalCapacityProvider",
+                "Arn"
+              ]
+            },
+            "ExecutionEnvironmentMemoryGiBPerVCpu": {
+              "Ref": "MemoryGiBPerVCpu"
+            },
+            "PerExecutionEnvironmentMaxConcurrency": {
+              "Ref": "MaxConcurrency"
+            }
+          }
+        },
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": {
+          "Fn::Sub": "Function 1 in ${Environment} environment managed by ${Team}"
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "Environment"
+            },
+            "TEAM": {
+              "Ref": "Team"
+            }
+          }
+        },
+        "FunctionName": {
+          "Fn::Sub": "${AWS::StackName}-${Environment}-function-1"
+        },
+        "FunctionScalingConfig": {
+          "MaxExecutionEnvironments": {
+            "Fn::If": [
+              "IsProd",
+              50,
+              10
+            ]
+          },
+          "MinExecutionEnvironments": {
+            "Fn::If": [
+              "IsProd",
+              2,
+              1
+            ]
+          }
+        },
+        "Handler": "index.handler",
+        "MemorySize": 512,
+        "Role": {
+          "Fn::GetAtt": [
+            "GlobalFunction1Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Environment",
+            "Value": {
+              "Ref": "Environment"
+            }
+          },
+          {
+            "Key": "Team",
+            "Value": {
+              "Ref": "Team"
+            }
+          },
+          {
+            "Key": "ManagedBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 30
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "GlobalFunction1Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Environment",
+            "Value": {
+              "Ref": "Environment"
+            }
+          },
+          {
+            "Key": "Team",
+            "Value": {
+              "Ref": "Team"
+            }
+          },
+          {
+            "Key": "ManagedBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "GlobalFunction2": {
+      "Properties": {
+        "CapacityProviderConfig": {
+          "LambdaManagedInstancesCapacityProviderConfig": {
+            "CapacityProviderArn": {
+              "Fn::GetAtt": [
+                "GlobalCapacityProvider",
+                "Arn"
+              ]
+            },
+            "ExecutionEnvironmentMemoryGiBPerVCpu": 4,
+            "PerExecutionEnvironmentMaxConcurrency": {
+              "Ref": "MaxConcurrency"
+            }
+          }
+        },
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": {
+          "Fn::Sub": [
+            "Function 2 in ${env} for ${team} team with provider ${provider}",
+            {
+              "env": {
+                "Ref": "Environment"
+              },
+              "provider": {
+                "Ref": "GlobalCapacityProvider"
+              },
+              "team": {
+                "Ref": "Team"
+              }
+            }
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "Environment"
+            },
+            "TEAM": {
+              "Ref": "Team"
+            }
+          }
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              {
+                "Ref": "Environment"
+              },
+              "function",
+              "2"
+            ]
+          ]
+        },
+        "FunctionScalingConfig": {
+          "MaxExecutionEnvironments": {
+            "Fn::If": [
+              "IsProd",
+              50,
+              10
+            ]
+          },
+          "MinExecutionEnvironments": 3
+        },
+        "Handler": "index.handler",
+        "MemorySize": 512,
+        "Role": {
+          "Fn::GetAtt": [
+            "GlobalFunction2Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Environment",
+            "Value": {
+              "Ref": "Environment"
+            }
+          },
+          {
+            "Key": "Team",
+            "Value": {
+              "Ref": "Team"
+            }
+          },
+          {
+            "Key": "ManagedBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 30
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "GlobalFunction2AliasDevelopment": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GlobalFunction2"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "GlobalFunction2Versione5501c4cce",
+            "Version"
+          ]
+        },
+        "Name": "Development"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "GlobalFunction2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          },
+          {
+            "Key": "Environment",
+            "Value": {
+              "Ref": "Environment"
+            }
+          },
+          {
+            "Key": "Team",
+            "Value": {
+              "Ref": "Team"
+            }
+          },
+          {
+            "Key": "ManagedBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "GlobalFunction2Versione5501c4cce": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GlobalFunction2"
+        },
+        "FunctionScalingConfig": {
+          "MaxExecutionEnvironments": {
+            "Fn::If": [
+              "IsProd",
+              50,
+              10
+            ]
+          },
+          "MinExecutionEnvironments": 3
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    }
+  }
+}

@@ -20,7 +20,7 @@ T = TypeVar("T", bound=Union[Type[OpenApiEditor], Type[SwaggerEditor]])
 class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
     """
     This plugin provides Implicit API shorthand syntax in the SAM Spec.
-    https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+    https://github.com/aws/serverless-application-model/blob/master/versions/2016-10-31.md#api
 
     Implicit API syntax is just a syntactic sugar, which will be translated to AWS::Serverless::Api resource.
     This is the only event source implemented as a plugin. Other event sources are not plugins because,
@@ -305,7 +305,7 @@ class ImplicitApiPlugin(BasePlugin, Generic[T], metaclass=ABCMeta):
             else:
                 # If multiple functions with multiple different conditions reference the Implicit Api, we need to
                 # aggregate those conditions in order to conditionally create the Implicit Api. See RFC:
-                # https://github.com/awslabs/serverless-application-model/issues/758
+                # https://github.com/aws/serverless-application-model/issues/758
                 implicit_api_resource["Condition"] = self.IMPLICIT_API_CONDITION
                 self._add_combined_condition_to_template(  # type: ignore[no-untyped-call]
                     template_dict, self.IMPLICIT_API_CONDITION, all_resource_method_conditions

@@ -69,6 +69,7 @@ class SamResourceType(Enum):
     LambdaLayerVersion = "AWS::Serverless::LayerVersion"
     HttpApi = "AWS::Serverless::HttpApi"
     StateMachine = "AWS::Serverless::StateMachine"
+    CapacityProvider = "AWS::Serverless::CapacityProvider"
 
     @classmethod
     def has_value(cls, value: str) -> bool:

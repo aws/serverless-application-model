@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: CapacityProvider with Globals and intrinsic functions test
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+  Team:
+    Type: String
+    Default: serverless-team
+
+  MemoryGiBPerVCpu:
+    Type: Number
+    Default: 2.5
+
+  MaxConcurrency:
+    Type: Number
+    Default: 100
+
+  SecurityGroupId:
+    Type: String
+    Default: sg-12345678
+
+  SubnetId:
+    Type: String
+    Default: subnet-12345678
+
+Conditions:
+  IsProd: !Equals [!Ref Environment, prod]
+
+Globals:
+  CapacityProvider:
+    VpcConfig:
+      SecurityGroupIds:
+      - !Ref SecurityGroupId
+      SubnetIds:
+      - !Ref SubnetId
+    ScalingConfig:
+      AverageCPUUtilization: !If [IsProd, 80.0, 70.0]
+    Tags:
+      Environment: !Ref Environment
+      Team: !Ref Team
+      ManagedBy: SAM
+    OperatorRole: !GetAtt CustomPermissionsCapacityProviderOperatorRole.Arn
+    PropagateTags: true
+    InstanceRequirements:
+      Architectures:
+      - x86_64
+    KmsKeyArn: some-kms-arn
+
+  Function:
+    Runtime: python3.12
+    Handler: index.handler
+    MemorySize: 512
+    Timeout: 30
+    CapacityProviderConfig:
+      Arn: !GetAtt GlobalCapacityProvider.Arn
+      ExecutionEnvironmentMemoryGiBPerVCpu: !Ref MemoryGiBPerVCpu
+      PerExecutionEnvironmentMaxConcurrency: !Ref MaxConcurrency
+    FunctionScalingConfig:
+      MinExecutionEnvironments: !If [IsProd, 2, 1]
+      MaxExecutionEnvironments: !If [IsProd, 50, 10]
+    Tags:
+      Environment: !Ref Environment
+      Team: !Ref Team
+      ManagedBy: SAM
+    Environment:
+      Variables:
+        ENV: !Ref Environment
+        TEAM: !Ref Team
+
+Resources:
+  CustomPermissionsCapacityProviderOperatorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: CapacityProviderOperatorRolePolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - ec2:TerminateInstances
+            - ec2:RunInstances
+            - ec2:DescribeInstanceStatus
+            - ec2:DescribeInstances
+            - ec2:CreateTags
+            Resource:
+            - !Sub arn:${AWS::Partition}:ec2:*:*:instance/*
+            - !Sub arn:${AWS::Partition}:ec2:*:*:network-interface/*
+            - !Sub arn:${AWS::Partition}:ec2:*:*:volume/*
+            Condition:
+              StringEquals:
+                ec2:ManagedResourceOperator: scaler.lambda.amazonaws.com
+          - Effect: Allow
+            Action:
+            - ec2:DescribeAvailabilityZones
+            - ec2:DescribeCapacityReservations
+            - ec2:DescribeInstanceTypeOfferings
+            - ec2:DescribeInstanceTypes
+            - ec2:DescribeSecurityGroups
+            - ec2:DescribeSubnets
+            Resource: '*'
+          - Effect: Allow
+            Action:
+            - ec2:RunInstances
+            - ec2:CreateNetworkInterface
+            Resource:
+            - !Sub arn:${AWS::Partition}:ec2:*:*:subnet/*
+            - !Sub arn:${AWS::Partition}:ec2:*:*:security-group/*
+          - Effect: Allow
+            Action:
+            - ec2:RunInstances
+            Resource:
+            - !Sub arn:${AWS::Partition}:ec2:*:*:image/*
+            Condition:
+              Bool:
+                ec2:Public: 'true'
+  # Global Capacity Provider with reduced properties since globals handle common ones
+  GlobalCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: !Sub "${AWS::StackName}-${Environment}-capacity-provider"
+      InstanceRequirements:
+        ExcludedTypes:
+        - t2.micro
+        - t2.small
+      ScalingConfig:
+        MaxVCpuCount: !If [IsProd, 20, 10] # Support addition
+
+  # Function that uses the capacity provider with intrinsic references
+  GlobalFunction1:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-${Environment}-function-1"
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Description: !Sub "Function 1 in ${Environment} environment managed by ${Team}"
+
+  # Second function with different configuration
+  GlobalFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Join ['-', [!Ref AWS::StackName, !Ref Environment, function,
+          '2']]
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Description: !Sub
+      - Function 2 in ${env} for ${team} team with provider ${provider}
+      - env: !Ref Environment
+        team: !Ref Team
+        provider: !Ref GlobalCapacityProvider
+      CapacityProviderConfig:
+        ExecutionEnvironmentMemoryGiBPerVCpu: 4 # support partial override
+      FunctionScalingConfig:
+        MinExecutionEnvironments: 3 # support partial override
+      AutoPublishAlias: Development
+
+Outputs:
+  CapacityProviderArn:
+    Description: ARN of the created capacity provider
+    Value: !GetAtt GlobalCapacityProvider.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-CapacityProviderArn"
+  Function1Name:
+    Description: Name of Function 1
+    Value: !Ref GlobalFunction1
+    Export:
+      Name: !Sub "${AWS::StackName}-Function1Name"
+  Function2Name:
+    Description: Name of Function 2
+    Value: !Ref GlobalFunction2
+    Export:
+      Name: !Sub "${AWS::StackName}-Function2Name"
+  EnvironmentInfo:
+    Description: Environment and team information
+    Value: !Sub "${Environment}-${Team}"
+    Export:
+      Name: !Sub "${AWS::StackName}-EnvironmentInfo"

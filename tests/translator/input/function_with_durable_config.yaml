@@ -1,0 +1,10 @@
+Resources:
+  FunctionWithDurableConfig:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.9
+      DurableConfig:
+        ExecutionTimeout: 3600
+        RetentionPeriodInDays: 45

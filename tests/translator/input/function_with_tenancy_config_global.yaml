@@ -1,0 +1,18 @@
+Globals:
+  Function:
+    Runtime: python3.8
+    Handler: hello.handler
+    TenancyConfig:
+      TenantIsolationMode: PER_TENANT
+
+Resources:
+  MinimalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+
+  FunctionWithOverride:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/world.zip
+      Runtime: nodejs18.x

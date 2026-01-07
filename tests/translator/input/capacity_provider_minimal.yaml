@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Minimal CapacityProvider configuration test
+
+Resources:
+  MinimalCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-12345678
+        SecurityGroupIds:
+        - sg-12345678

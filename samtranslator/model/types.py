@@ -9,7 +9,7 @@ the Permissions property is an ARN or list of ARNs. In this situation, we valida
 either a string or a list of strings, but do not validate whether the string(s) are valid IAM policy ARNs.
 """
 
-from typing import Any, Callable, Type, Union
+from typing import Any, Callable, List, Type, Union
 
 import samtranslator.model.exceptions
 from samtranslator.internal.deprecation_control import deprecated
@@ -135,6 +135,36 @@ def any_type() -> Validator:
     def validate(value: Any, should_raise: bool = False) -> bool:
         return True
 
+    return validate
+
+
+def IS_STR_ENUM(valid_values: List[str]) -> Validator:
+    """Returns a validator function that succeeds only if the input is a string matching one of the valid enum values.
+
+    :param list valid_values: the valid string values for the enum
+    :returns: a function which returns True if input is one of the valid string values, and raises TypeError otherwise
+    :rtype: callable
+    """
+
+    def validate(value: Any, should_raise: bool = True) -> bool:
+        if not isinstance(value, str):
+            if should_raise:
+                valid_values_str = ", ".join(f"'{v}'" for v in valid_values)
+                raise TypeError(
+                    f"Expected a string value from [{valid_values_str}], but got type {type(value).__name__}."
+                )
+            return False
+
+        if value not in valid_values:
+            if should_raise:
+                valid_values_str = ", ".join(f"'{v}'" for v in valid_values)
+                raise TypeError(f"Expected one of [{valid_values_str}], but got '{value}'.")
+            return False
+
+        return True
+
+    # Attach enum values as an attribute for PropertyType to use
+    validate.enum_values = valid_values  # type: ignore[attr-defined]
     return validate
 
 

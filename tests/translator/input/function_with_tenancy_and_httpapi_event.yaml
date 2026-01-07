@@ -1,0 +1,19 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.11
+      Handler: index.handler
+      InlineCode: |
+        def handler(event, context):
+            return {'statusCode': 200, 'body': 'Hello'}
+      TenancyConfig:
+        TenantIsolationMode: PER_TENANT
+      Events:
+        MyHttpApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /hello
+            Method: get

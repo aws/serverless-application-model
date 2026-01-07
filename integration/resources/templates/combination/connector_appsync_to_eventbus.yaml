@@ -117,7 +117,7 @@ Resources:
           API_KEY: !GetAtt ApiKey.ApiKey
           GRAPHQL_URL: !GetAtt AppSyncApi.GraphQLUrl
           EventBusName: !Ref EventBus
-      Runtime: nodejs16.x
+      Runtime: nodejs22.x
       Handler: index.handler
       InlineCode: |
         const https = require("https");

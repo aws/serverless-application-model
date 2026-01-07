@@ -1,0 +1,162 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CapacityProvider with intrinsic functions test",
+  "Parameters": {
+    "AllowedInstanceType": {
+      "Default": "c5.xlarge",
+      "Type": "String"
+    },
+    "Architecture": {
+      "Default": "arm64",
+      "Type": "String"
+    },
+    "CapacityProviderName": {
+      "Default": "intrinsic-capacity-provider",
+      "Type": "String"
+    },
+    "ExcludedInstanceType": {
+      "Default": "t2.micro",
+      "Type": "String"
+    },
+    "KmsKeyArn": {
+      "Default": "arn:aws:kms:us-east-1:123456789012:key/abcd1234-ef56-gh78-ij90-klmnopqrstuv",
+      "Type": "String"
+    },
+    "MaxVCpuCount": {
+      "Default": 10,
+      "Type": "Number"
+    },
+    "SecurityGroupId": {
+      "Default": "sg-12345678",
+      "Type": "String"
+    },
+    "SubnetId": {
+      "Default": "subnet-12345678",
+      "Type": "String"
+    },
+    "TargetCPU": {
+      "Default": 75.0,
+      "Type": "Number"
+    },
+    "TargetMemory": {
+      "Default": 81.2,
+      "Type": "Number"
+    }
+  },
+  "Resources": {
+    "IntrinsicCapacityProvider": {
+      "Properties": {
+        "CapacityProviderName": {
+          "Ref": "CapacityProviderName"
+        },
+        "CapacityProviderScalingConfig": {
+          "MaxVCpuCount": {
+            "Ref": "MaxVCpuCount"
+          },
+          "ScalingMode": "Manual",
+          "ScalingPolicies": [
+            {
+              "PredefinedMetricType": "LambdaCapacityProviderAverageCPUUtilization",
+              "TargetValue": {
+                "Ref": "TargetCPU"
+              }
+            }
+          ]
+        },
+        "InstanceRequirements": {
+          "AllowedInstanceTypes": [
+            {
+              "Ref": "AllowedInstanceType"
+            },
+            {
+              "Fn::Join": [
+                ".",
+                [
+                  "c5",
+                  "2xlarge"
+                ]
+              ]
+            }
+          ],
+          "Architectures": [
+            {
+              "Ref": "Architecture"
+            }
+          ]
+        },
+        "KmsKeyArn": {
+          "Ref": "KmsKeyArn"
+        },
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "IntrinsicCapacityProviderOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-environment"
+            }
+          },
+          {
+            "Key": "Team",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-team"
+            }
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Ref": "SecurityGroupId"
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Ref": "SubnetId"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "IntrinsicCapacityProviderOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

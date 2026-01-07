@@ -16,7 +16,6 @@ class TestFunctionWithSelfManagedKafka(BaseTest):
     @pytest.mark.flaky(reruns=5)
     @parameterized.expand(
         [
-            "combination/function_with_self_managed_kafka",
             "combination/function_with_self_managed_kafka_intrinsics",
         ]
     )
@@ -30,3 +29,29 @@ class TestFunctionWithSelfManagedKafka(BaseTest):
         event_source_mapping_result = lambda_client.get_event_source_mapping(UUID=event_source_mapping_id)
         event_source_mapping_function_arn = event_source_mapping_result["FunctionArn"]
         self.assertEqual(event_source_mapping_function_arn, lambda_function_arn)
+
+    @parameterized.expand(["combination/function_with_self_managed_kafka"])
+    def test_function_with_self_managed_kafka_with_provisioned_mode(self, file_name):
+        self.create_and_verify_stack(file_name)
+        # Get the notification configuration and make sure Lambda Function connection is added
+        lambda_client = self.client_provider.lambda_client
+        function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
+        lambda_function_arn = lambda_client.get_function_configuration(FunctionName=function_name)["FunctionArn"]
+        event_source_mapping_id = self.get_physical_id_by_type("AWS::Lambda::EventSourceMapping")
+        event_source_mapping_result = lambda_client.get_event_source_mapping(UUID=event_source_mapping_id)
+        event_source_mapping_function_arn = event_source_mapping_result["FunctionArn"]
+        self.assertEqual(event_source_mapping_function_arn, lambda_function_arn)
+
+        # Verify error handling properties are correctly set
+        self.assertTrue(event_source_mapping_result.get("BisectBatchOnFunctionError"))
+        self.assertEqual(event_source_mapping_result.get("MaximumRecordAgeInSeconds"), 3600)
+        self.assertEqual(event_source_mapping_result.get("MaximumRetryAttempts"), 3)
+        self.assertEqual(event_source_mapping_result.get("FunctionResponseTypes"), ["ReportBatchItemFailures"])
+        # Uncomment this once SDK is updated.
+        # provisioned_poller_config = event_source_mapping_result["ProvisionedPollerConfig"]
+        # actual_poller_group_name = provisioned_poller_config["PollerGroupName"]
+        # self.assertEqual(
+        #     actual_poller_group_name,
+        #     "test1",
+        #     f"Expected PollerGroupName to be 'test1' but got '{actual_poller_group_name}'",
+        # )

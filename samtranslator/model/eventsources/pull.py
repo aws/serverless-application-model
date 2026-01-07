@@ -205,10 +205,10 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
             if destination_type:
                 # delete this field as its used internally for SAM to determine the policy
                 del on_failure["Type"]
-                # the values 'SQS', 'SNS', and 'S3' are allowed. No intrinsics are allowed
-                if destination_type not in ["SQS", "SNS", "S3"]:
+                # the values 'SQS', 'SNS', 'S3', and 'Kafka' are allowed. No intrinsics are allowed
+                if destination_type not in ["SQS", "SNS", "S3", "Kafka"]:
                     raise InvalidEventException(
-                        self.logical_id, "The only valid values for 'Type' are 'SQS', 'SNS', and 'S3'"
+                        self.logical_id, "The only valid values for 'Type' are 'SQS', 'SNS', 'S3', and 'Kafka'"
                     )
                 if destination_type == "SQS":
                     queue_arn = on_failure.get("Destination")
@@ -225,6 +225,9 @@ class PullEventSource(ResourceMacro, metaclass=ABCMeta):
                     destination_config_policy = IAMRolePolicies().s3_send_event_payload_role_policy(
                         s3_arn, self.logical_id
                     )
+                elif destination_type == "Kafka":
+                    # No policy generation for Kafka destinations - pass through
+                    pass
 
             lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig
 

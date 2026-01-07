@@ -1,0 +1,27 @@
+Globals:
+  Function:
+    Runtime: python3.11
+    Handler: index.handler
+    DurableConfig:
+      ExecutionTimeout: 3600
+      RetentionPeriodInDays: 30
+
+Resources:
+  DurableFunctionWithGlobals:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://my-bucket/my-function.zip
+
+  DurableFunctionWithOverride:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://my-bucket/my-function.zip
+      DurableConfig:
+        ExecutionTimeout: 7200
+        RetentionPeriodInDays: 7
+
+  RegularFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://my-bucket/my-function.zip
+      # This function should inherit the global DurableConfig

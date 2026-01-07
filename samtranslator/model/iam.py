@@ -18,6 +18,16 @@ class IAMRole(Resource):
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
 
+class IAMInstanceProfile(Resource):
+    resource_type = "AWS::IAM::InstanceProfile"
+    property_types = {
+        "Path": GeneratedProperty(),
+        "Roles": GeneratedProperty(),
+    }
+
+    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
+
+
 class IAMManagedPolicy(Resource):
     resource_type = "AWS::IAM::ManagedPolicy"
     property_types = {

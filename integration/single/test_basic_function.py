@@ -392,3 +392,24 @@ class TestBasicFunction(BaseTest):
     def _verify_get_request(self, url, expected_text):
         response = self.verify_get_request_response(url, 200)
         self.assertEqual(response.text, expected_text)
+
+    # @skipIf(current_region_does_not_support([MULTI_TENANCY]), "Multi-tenancy is not supported in this testing region")
+    @skipIf(True, "Multi-tenancy feature is not available to test yet")
+    def test_basic_function_with_tenancy_config(self):
+        """
+        Creates a basic lambda function with TenancyConfig
+        """
+        self.create_and_verify_stack("single/basic_function_with_tenancy_config")
+
+        lambda_client = self.client_provider.lambda_client
+        function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
+
+        # Get function configuration
+        function_config = lambda_client.get_function_configuration(FunctionName=function_name)
+
+        # Verify TenancyConfig is set correctly
+        self.assertEqual(
+            function_config["TenancyConfig"]["TenantIsolationMode"],
+            "PER_TENANT",
+            "Expected TenantIsolationMode to be PER_TENANT",
+        )
