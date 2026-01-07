@@ -1,0 +1,86 @@
+{
+  "Conditions": {
+    "CreateRole": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            "",
+            {
+              "Ref": "iamRoleArn"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "Parameters": {
+    "iamRoleArn": {
+      "Description": "The ARN of an IAM role to use as this function's execution role. If a role isn't specified, one is created for you with a logical ID of <function-logical-id>Role.",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "MinimalFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::If": [
+            "CreateRole",
+            {
+              "Fn::GetAtt": [
+                "MinimalFunctionRole",
+                "Arn"
+              ]
+            },
+            {
+              "Ref": "iamRoleArn"
+            }
+          ]
+        },
+        "Runtime": "python3.10",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MinimalFunctionRole": {
+      "Condition": "CreateRole",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}
