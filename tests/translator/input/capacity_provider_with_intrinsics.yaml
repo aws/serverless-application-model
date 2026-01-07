@@ -25,15 +25,15 @@ Parameters:
 
   ExcludedInstanceTypeList:
     Type: List<String>
-    Default: t2.micro, c5.xlarge
+    Default: t2.micro,c5.xlarge
 
   SecurityGroupIdList:
     Type: List<AWS::EC2::SecurityGroup::Id>
-    Default: sg-0a1e1457229da0f74
+    Default: sg-0a1e1457229da0f74,sg-3b1f1457229da0f92
 
   SubnetIdList:
     Type: List<AWS::EC2::Subnet::Id>
-    Default: subnet-01e6344879fd06036
+    Default: subnet-01e6344879fd06036,subnet-0136378879fd07039
 
   ArchitecturesList:
     Type: List<String>

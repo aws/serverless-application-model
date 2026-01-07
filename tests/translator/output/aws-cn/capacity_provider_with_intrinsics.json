@@ -19,7 +19,7 @@
       "Type": "String"
     },
     "ExcludedInstanceTypeList": {
-      "Default": "t2.micro, c5.xlarge",
+      "Default": "t2.micro,c5.xlarge",
       "Type": "List<String>"
     },
     "KmsKeyArn": {
@@ -35,7 +35,7 @@
       "Type": "String"
     },
     "SecurityGroupIdList": {
-      "Default": "sg-0a1e1457229da0f74",
+      "Default": "sg-0a1e1457229da0f74,sg-3b1f1457229da0f92",
       "Type": "List<AWS::EC2::SecurityGroup::Id>"
     },
     "SubnetId": {
@@ -43,7 +43,7 @@
       "Type": "String"
     },
     "SubnetIdList": {
-      "Default": "subnet-01e6344879fd06036",
+      "Default": "subnet-01e6344879fd06036,subnet-0136378879fd07039",
       "Type": "List<AWS::EC2::Subnet::Id>"
     },
     "TargetCPU": {
