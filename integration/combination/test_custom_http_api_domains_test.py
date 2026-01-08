@@ -1,7 +1,7 @@
 from unittest.case import skipIf
 
 from integration.config.service_names import CUSTOM_DOMAIN
-from integration.helpers.base_internal_test import BaseInternalTest
+from integration.helpers.base_internal_test import CUSTOM_DOMAIN_TOP_LEVEL, BaseInternalTest
 from integration.helpers.base_test import nonblocking
 from integration.helpers.resource import current_region_not_included
 
@@ -26,7 +26,7 @@ class TestCustomHttpApiDomains(BaseInternalTest):
         if "FeatureToggle" in self.pipeline_prefix:
             self.assertEqual("httpapi.ftl.sam-gamma-regional.com", result["DomainName"])
         else:
-            self.assertEqual("httpapi.sam-gamma-regional.com", result["DomainName"])
+            self.assertEqual(f"httpapi-sam-gamma-regional.{CUSTOM_DOMAIN_TOP_LEVEL}", result["DomainName"])
 
         mtls_auth_config = result["MutualTlsAuthentication"]
         self.assertEqual(self.file_to_s3_uri_map["MTLSCert.pem"]["uri"], mtls_auth_config["TruststoreUri"])
