@@ -31,13 +31,13 @@ class VpcConfig(BaseModel):
 
 class InstanceRequirements(BaseModel):
     # Optional list of CPU architectures - maps to CFN InstanceRequirements.Architecture
-    # Uses List[SamIntrinsicable[str]] to support intrinsic functions like !Ref for dynamic architecture values
+    # Uses SamIntrinsicable[List[SamIntrinsicable[str]]] to support intrinsic functions like !Ref for both list and list item
     Architectures: Optional[SamIntrinsicable[List[SamIntrinsicable[str]]]] = instancerequirements("Architectures")
     # Optional list of allowed EC2 instance types - maps to CFN InstanceRequirements.AllowedInstanceTypes
-    # Uses List[SamIntrinsicable[str]] to support intrinsic functions like !Ref for dynamic instance types
+    # Uses SamIntrinsicable[List[SamIntrinsicable[str]]] to support intrinsic functions like !Ref for both list and list item
     AllowedTypes: Optional[SamIntrinsicable[List[SamIntrinsicable[str]]]] = instancerequirements("AllowedTypes")
     # Optional list of excluded EC2 instance types - maps to CFN InstanceRequirements.ExcludedInstanceTypes
-    # Uses List[SamIntrinsicable[str]] to support intrinsic functions like !Ref for dynamic instance types
+    # Uses SamIntrinsicable[List[SamIntrinsicable[str]]] to support intrinsic functions like !Ref for both list and list item
     ExcludedTypes: Optional[SamIntrinsicable[List[SamIntrinsicable[str]]]] = instancerequirements("ExcludedTypes")
 
 
