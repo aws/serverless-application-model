@@ -1,0 +1,16 @@
+{
+  "ResourceTypes": {
+    "AWS::ARCRegionSwitch::Plan": {
+      "Properties": {
+        "Tags": {
+          "Documentation": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-arcregionswitch-plan.html#cfn-arcregionswitch-plan-tags",
+          "UpdateType": "Mutable",
+          "Required": false,
+          "Type": "Map",
+          "PrimitiveItemType": "String"
+        }
+      }
+    }
+  },
+  "PropertyTypes": {}
+}
