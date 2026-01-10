@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 from samtranslator.model.api.api_generator import ApiGenerator
 
@@ -29,9 +29,7 @@ class TestApiGeneratorSecurityPolicy(TestCase):
         }
 
     def test_security_policy_tls_1_3(self):
-        api_generator = ApiGenerator(
-            **self.default_args, security_policy="SecurityPolicy_TLS13_1_3_2025_09"
-        )
+        api_generator = ApiGenerator(**self.default_args, security_policy="SecurityPolicy_TLS13_1_3_2025_09")
 
         rest_api = api_generator._construct_rest_api()
 
