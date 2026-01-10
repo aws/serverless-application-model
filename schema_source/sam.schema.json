@@ -4267,6 +4267,25 @@
           "title": "Propagatetags",
           "type": "boolean"
         },
+        "SecurityPolicy": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The Transport Layer Security (TLS) version + cipher suite for this RestApi. \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SecurityPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-securitypolicy) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "SecurityPolicy"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "SecurityPolicy"
+        },
         "TracingEnabled": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
@@ -4639,6 +4658,25 @@
         "PropagateTags": {
           "title": "Propagatetags",
           "type": "boolean"
+        },
+        "SecurityPolicy": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The Transport Layer Security (TLS) version + cipher suite for this RestApi. \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SecurityPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-securitypolicy) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "SecurityPolicy"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "SecurityPolicy"
         },
         "StageName": {
           "anyOf": [

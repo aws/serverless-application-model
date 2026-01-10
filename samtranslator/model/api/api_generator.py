@@ -221,6 +221,7 @@ class ApiGenerator:
         always_deploy: Optional[bool] = False,
         feature_toggle: Optional[FeatureToggle] = None,
         policy: Optional[Union[Dict[str, Any], Intrinsicable[str]]] = None,
+        security_policy: Optional[Intrinsicable[str]] = None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -279,6 +280,7 @@ class ApiGenerator:
         self.always_deploy = always_deploy
         self.feature_toggle = feature_toggle
         self.policy = policy
+        self.security_policy = security_policy
 
     def _construct_rest_api(self) -> ApiGatewayRestApi:
         """Constructs and returns the ApiGateway RestApi.
@@ -334,6 +336,9 @@ class ApiGenerator:
 
         if self.policy:
             rest_api.Policy = self.policy
+
+        if self.security_policy:
+            rest_api.SecurityPolicy = self.security_policy
 
         return rest_api
 
