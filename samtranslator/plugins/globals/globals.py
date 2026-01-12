@@ -116,16 +116,9 @@ class Globals:
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {
-        SamResourceType.Function.value: [
-            "TenancyConfig",
-            "DurableConfig",
-            "CapacityProviderConfig",
-            "FunctionScalingConfig",
-            "PublishToLatestPublished",
-            "VersionDeletionPolicy",
-        ],
+        SamResourceType.Function.value: [],
     }
-    unreleased_resource_types: List[str] = [SamResourceType.CapacityProvider.value]
+    unreleased_resource_types: List[str] = []
 
     def __init__(self, template: Dict[str, Any]) -> None:
         """
