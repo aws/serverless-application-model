@@ -4,6 +4,8 @@ import pytest
 
 from integration.helpers.base_test import BaseTest
 
+CUSTOM_DOMAIN_TOP_LEVEL = "tooling.lambda.aws.dev"
+
 
 class BaseInternalTest(BaseTest):
     """
