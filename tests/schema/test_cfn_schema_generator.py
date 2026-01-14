@@ -1,119 +1,345 @@
 #!/usr/bin/env python3
 """
-Tests for CloudFormation Schema Generator
+Tests for CloudFormation Schema Generator V2
 """
 
 import json
 import os
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
+
 from parameterized import parameterized
-from schema_source.cfn_schema_generator import CloudFormationSchemaGenerator
-
-
-class TestCloudFormationSchemaGeneratorUnit(unittest.TestCase):
-    """Unit tests for CloudFormation Schema Generator"""
-    
-    def setUp(self):
-        self.generator = CloudFormationSchemaGenerator()
-    
-    def test_generate_property_schema_polymorphic(self):
-        """Test polymorphic property schema generation"""
-        # Test polymorphic with PrimitiveTypes
-        prop = {"PrimitiveTypes": ["String", "Integer"]}
-        result = self.generator._generate_property_schema(prop, "AWS::Test::Resource")
-        expected = {"anyOf": [{"type": ["string", "integer"]}]}
-        self.assertEqual(result, expected)
-        
-        # Test polymorphic with no PrimitiveTypes (fallback)
-        prop = {"ItemTypes": ["Type1", "Type2"]}
-        result = self.generator._generate_property_schema(prop, "AWS::Test::Resource")
-        expected = {"type": "object"}
-        self.assertEqual(result, expected)
-    
-    def test_is_polymorphic(self):
-        """Test polymorphic property detection"""
-        # Test non-polymorphic property
-        prop = {"PrimitiveType": "String"}
-        self.assertFalse(self.generator._is_polymorphic(prop))
-        
-        # Test polymorphic properties
-        prop = {"PrimitiveTypes": ["String", "Integer"]}
-        self.assertTrue(self.generator._is_polymorphic(prop))
-        
-        prop = {"ItemTypes": ["Type1", "Type2"]}
-        self.assertTrue(self.generator._is_polymorphic(prop))
-        
-        prop = {"Types": ["Type1", "Type2"]}
-        self.assertTrue(self.generator._is_polymorphic(prop))
-    
-    def test_main_function_execution(self):
-        """Test main function execution"""
-        with patch('schema_source.cfn_schema_generator.CloudFormationSchemaGenerator') as mock_class:
-            mock_instance = Mock()
-            mock_class.return_value = mock_instance
-            
-            # Execute the main block by importing the module
-            import sys
-            if 'schema_source.cfn_schema_generator' in sys.modules:
-                del sys.modules['schema_source.cfn_schema_generator']
-            
-            # Mock __name__ to be '__main__'
-            with patch('schema_source.cfn_schema_generator.__name__', '__main__'):
-                import schema_source.cfn_schema_generator
-            
-            mock_class.assert_called_once()
-            mock_instance.generate.assert_called_once()
+from schema_source.cfn_schema_generator import CFN_SCHEMA_URL, CloudFormationSchemaGenerator
 
 
 class TestCloudFormationSchemaGenerator(unittest.TestCase):
-    """Parameterized tests using input/output file pairs"""
-    
+    """Unit tests for CloudFormation Schema Generator"""
+
     def setUp(self):
         self.generator = CloudFormationSchemaGenerator()
-        self.input_folder = "tests/schema/cfn_schema_generator/input_spec"
-        self.output_folder = "tests/schema/cfn_schema_generator/output_schema"
-    
-    @staticmethod
-    def _get_test_cases():
-        """Get all test case files from input folder"""
-        input_folder = "tests/schema/cfn_schema_generator/input_spec"
-        if not os.path.exists(input_folder):
-            return []
-        
-        test_cases = []
-        for filename in os.listdir(input_folder):
-            if filename.endswith('.json'):
-                case_name = os.path.splitext(filename)[0]
-                test_cases.append((case_name,))
-        return test_cases
-    
-    @parameterized.expand(_get_test_cases(), skip_on_empty=True)
-    def test_schema_generation(self, case_name):
-        """Test schema generation for a specific case"""
-        input_file = os.path.join(self.input_folder, f"{case_name}.json")
-        expected_output_file = os.path.join(self.output_folder, f"{case_name}.json")
-        
+
+    @parameterized.expand(
+        [
+            ("template_properties",),
+            ("resources_with_creation_policy",),
+            ("resources_with_update_policy",),
+            ("parameter_types",),
+        ]
+    )
+    def test_initialization_with_defaults(self, attr_name):
+        """Test generator initializes with default configuration"""
+        generator = CloudFormationSchemaGenerator()
+        self.assertIsNotNone(getattr(generator, attr_name))
+
+    def test_initialization_schema_url_is_constant(self):
+        """Test that schema URL is always the official AWS endpoint"""
+
+        generator = CloudFormationSchemaGenerator()
+        self.assertEqual(generator.schema_url, CFN_SCHEMA_URL)
+        self.assertEqual(
+            generator.schema_url, "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip"
+        )
+
+    @parameterized.expand(
+        [
+            ("template_properties", {"CustomProp": {"type": "string"}}),
+            ("resources_with_creation_policy", {"AWS::Custom::Resource"}),
+            ("resources_with_update_policy", {"AWS::Custom::Resource"}),
+            ("parameter_types", ["String", "Number"]),
+        ]
+    )
+    def test_initialization_with_custom_config(self, param_name, custom_value):
+        """Test generator accepts custom configuration"""
+        kwargs = {param_name: custom_value}
+        generator = CloudFormationSchemaGenerator(**kwargs)
+        self.assertEqual(getattr(generator, param_name), custom_value)
+
+    def test_wrap_resource_schema_basic(self):
+        """Test wrapping a basic resource schema"""
+        type_name = "AWS::Test::Resource"
+        schema = {
+            "typeName": type_name,
+            "properties": {"Name": {"type": "string"}, "Value": {"type": "integer"}},
+            "required": ["Name"],
+            "additionalProperties": False,
+        }
+
+        result = self.generator._wrap_resource_schema(type_name, schema)
+
+        # Verify structure
+        self.assertEqual(result["type"], "object")
+        self.assertFalse(result["additionalProperties"])
+        self.assertIn("properties", result)
+        self.assertIn("required", result)
+
+        # Verify Type property
+        self.assertEqual(result["properties"]["Type"]["enum"], [type_name])
+
+        # Verify Properties are preserved
+        self.assertEqual(result["properties"]["Properties"]["properties"], schema["properties"])
+        self.assertEqual(result["properties"]["Properties"]["required"], ["Name"])
+
+    @parameterized.expand(
+        [
+            ("AWS::AutoScaling::AutoScalingGroup", "CreationPolicy"),
+            ("AWS::EC2::Instance", "CreationPolicy"),
+            ("AWS::CloudFormation::WaitCondition", "CreationPolicy"),
+        ]
+    )
+    def test_wrap_resource_schema_with_creation_policy(self, type_name, policy_name):
+        """Test wrapping resource that supports CreationPolicy"""
+        schema = {"typeName": type_name, "properties": {}, "additionalProperties": False}
+        result = self.generator._wrap_resource_schema(type_name, schema)
+
+        self.assertIn(policy_name, result["properties"])
+        self.assertEqual(result["properties"][policy_name]["type"], "object")
+
+    @parameterized.expand(
+        [
+            ("AWS::AutoScaling::AutoScalingGroup", "UpdatePolicy"),
+        ]
+    )
+    def test_wrap_resource_schema_with_update_policy(self, type_name, policy_name):
+        """Test wrapping resource that supports UpdatePolicy"""
+        schema = {"typeName": type_name, "properties": {}, "additionalProperties": False}
+        result = self.generator._wrap_resource_schema(type_name, schema)
+
+        self.assertIn(policy_name, result["properties"])
+        self.assertEqual(result["properties"][policy_name]["type"], "object")
+
+    @parameterized.expand(
+        [
+            ("String",),
+            ("Number",),
+            ("AWS::EC2::Instance::Id",),
+            ("List<String>",),
+            ("AWS::SSM::Parameter::Name",),
+        ]
+    )
+    def test_get_parameter_schema_includes_type(self, param_type):
+        """Test parameter schema includes specific parameter types"""
+        result = self.generator._get_parameter_schema()
+        param_types = result["properties"]["Type"]["enum"]
+        self.assertIn(param_type, param_types)
+
+    def test_get_parameter_schema_structure(self):
+        """Test parameter schema has correct structure using ANY matcher"""
+        result = self.generator._get_parameter_schema()
+
+        expected_structure = {
+            "type": "object",
+            "properties": {
+                "Type": {"type": ANY, "enum": ANY},
+                "AllowedPattern": ANY,
+                "AllowedValues": ANY,
+                "ConstraintDescription": ANY,
+                "Default": ANY,
+                "Description": ANY,
+                "MaxLength": ANY,
+                "MaxValue": ANY,
+                "MinLength": ANY,
+                "MinValue": ANY,
+                "NoEcho": ANY,
+            },
+            "additionalProperties": False,
+            "required": ["Type"],
+        }
+
+        # Compare key structure elements
+        self.assertEqual(result["type"], expected_structure["type"])
+        self.assertEqual(result["required"], expected_structure["required"])
+        self.assertEqual(result["additionalProperties"], expected_structure["additionalProperties"])
+        self.assertIn("Type", result["properties"])
+        self.assertIn("enum", result["properties"]["Type"])
+
+    @parameterized.expand(
+        [
+            ("type", "object"),
+            ("additionalProperties", False),
+        ]
+    )
+    def test_get_custom_resource_schema_properties(self, key, expected_value):
+        """Test custom resource schema properties"""
+        result = self.generator._get_custom_resource_schema()
+        self.assertEqual(result[key], expected_value)
+
+    def test_get_custom_resource_schema_structure(self):
+        """Test custom resource schema structure using ANY matcher"""
+        result = self.generator._get_custom_resource_schema()
+
+        expected_structure = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["Type", "Properties"],
+            "properties": {
+                "Type": {"pattern": "^Custom::[a-zA-Z_@-]+$", "type": ANY},
+                "Properties": {
+                    "additionalProperties": ANY,
+                    "properties": {"ServiceToken": ANY},
+                    "required": ["ServiceToken"],
+                    "type": ANY,
+                },
+            },
+        }
+
+        # Compare structure
+        self.assertEqual(result["type"], expected_structure["type"])
+        self.assertEqual(result["required"], expected_structure["required"])
+        self.assertEqual(result["additionalProperties"], expected_structure["additionalProperties"])
+        self.assertEqual(result["properties"]["Type"]["pattern"], expected_structure["properties"]["Type"]["pattern"])
+        self.assertEqual(
+            result["properties"]["Properties"]["required"], expected_structure["properties"]["Properties"]["required"]
+        )
+
+    @parameterized.expand(
+        [
+            ("AWSTemplateFormatVersion",),
+            ("Description",),
+            ("Parameters",),
+            ("Resources",),
+            ("Outputs",),
+            ("Conditions",),
+            ("Mappings",),
+            ("Metadata",),
+            ("Transform",),
+        ]
+    )
+    def test_get_template_properties_includes_section(self, section_name):
+        """Test template properties includes required sections"""
+        resource_refs = [{"$ref": "#/definitions/AWS::Test::Resource"}]
+        result = self.generator._get_template_properties(resource_refs)
+        self.assertIn(section_name, result)
+
+    def test_get_template_properties_version(self):
+        """Test template properties has correct version"""
+        resource_refs = [{"$ref": "#/definitions/AWS::Test::Resource"}]
+        result = self.generator._get_template_properties(resource_refs)
+        self.assertEqual(result["AWSTemplateFormatVersion"]["enum"], ["2010-09-09"])
+
+    def test_get_template_properties_resources_refs(self):
+        """Test template properties includes resource references"""
+        resource_refs = [{"$ref": "#/definitions/AWS::Test::Resource"}]
+        result = self.generator._get_template_properties(resource_refs)
+        self.assertEqual(result["Resources"]["patternProperties"]["^[a-zA-Z0-9]+$"]["anyOf"], resource_refs)
+
+    @parameterized.expand(
+        [
+            ("type", "object"),
+            ("required", ["Resources"]),
+        ]
+    )
+    def test_generate_unified_schema_structure_properties(self, key, expected_value):
+        """Test unified schema structure properties"""
+        resource_schemas = {
+            "AWS::Test::Resource": {
+                "typeName": "AWS::Test::Resource",
+                "properties": {"Name": {"type": "string"}},
+                "definitions": {"TestType": {"type": "object"}},
+            }
+        }
+        result = self.generator._generate_unified_schema(resource_schemas)
+        self.assertEqual(result[key], expected_value)
+
+    @parameterized.expand(
+        [
+            ("AWS::Test::Resource",),
+            ("AWS::Test::Resource.TestType",),
+            ("Parameter",),
+            ("CustomResource",),
+        ]
+    )
+    def test_generate_unified_schema_includes_definition(self, definition_name):
+        """Test unified schema includes expected definitions"""
+        resource_schemas = {
+            "AWS::Test::Resource": {
+                "typeName": "AWS::Test::Resource",
+                "properties": {"Name": {"type": "string"}},
+                "definitions": {"TestType": {"type": "object"}},
+            }
+        }
+        result = self.generator._generate_unified_schema(resource_schemas)
+        self.assertIn(definition_name, result["definitions"])
+
+    @patch.object(CloudFormationSchemaGenerator, "_download_and_extract_schemas")
+    @patch.object(CloudFormationSchemaGenerator, "_write_schema")
+    def test_generate_end_to_end(self, mock_write, mock_download):
+        """Test end-to-end generation flow"""
+        # Mock download
+        mock_download.return_value = {
+            "AWS::Test::Resource": {
+                "typeName": "AWS::Test::Resource",
+                "properties": {"Name": {"type": "string"}},
+            }
+        }
+
+        # Test
+        output_file = ".tmp/test-schema.json"
+        self.generator.generate(output_file)
+
+        # Verify download was called
+        mock_download.assert_called_once()
+
+        # Verify write was called with schema
+        mock_write.assert_called_once()
+        call_args = mock_write.call_args
+        schema = call_args[0][0]
+        output_path = call_args[0][1]
+
+        self.assertEqual(output_path, output_file)
+        self.assertIn("definitions", schema)
+        self.assertIn("AWS::Test::Resource", schema["definitions"])
+
+
+class TestCloudFormationSchemaGeneratorIntegration(unittest.TestCase):
+    """Integration test using real CloudFormation schema zip file"""
+
+    def setUp(self):
+        self.generator = CloudFormationSchemaGenerator()
+        self.input_file = "tests/schema/cfn_schema_generator/input/CloudformationSchema.zip"
+        self.expected_output_file = "tests/schema/cfn_schema_generator/output_schema/cloudformation.schema.json"
+
+    def test_schema_generation_from_zip(self):
+        """Test schema generation from CloudformationSchema.zip matches expected output"""
         # Skip if files don't exist
-        if not os.path.exists(input_file):
-            self.skipTest(f"Input file {input_file} not found")
-        if not os.path.exists(expected_output_file):
-            self.skipTest(f"Expected output file {expected_output_file} not found")
-        
-        # Load input spec
-        with open(input_file, 'r') as f:
-            spec = json.load(f)
-        
-        # Generate schema
-        result = self.generator._generate_schema(spec)
-        
+        if not os.path.exists(self.input_file):
+            self.skipTest(f"Input file {self.input_file} not found")
+        if not os.path.exists(self.expected_output_file):
+            self.skipTest(f"Expected output file {self.expected_output_file} not found")
+
+        # Read the zip file content
+        with open(self.input_file, "rb") as f:
+            zip_content = f.read()
+
+        # Mock the HTTP request to use local file instead
+        with patch("schema_source.cfn_schema_generator.requests.get") as mock_get:
+            mock_response = Mock()
+            mock_response.content = zip_content
+            mock_response.raise_for_status = Mock()
+            mock_get.return_value = mock_response
+
+            # Generate schema to temporary location
+            test_output_file = ".tmp/test-cloudformation.schema.json"
+            self.generator.generate(test_output_file)
+
+        # Load generated schema
+        with open(test_output_file) as f:
+            generated_schema = json.load(f)
+
         # Load expected output
-        with open(expected_output_file, 'r') as f:
-            expected = json.load(f)
-        
-        # Compare results
-        self.assertEqual(result, expected, f"Generated schema for {case_name} does not match expected output")
+        with open(self.expected_output_file) as f:
+            expected_schema = json.load(f)
+
+        # Compare schemas - they should be identical
+        self.assertEqual(
+            generated_schema,
+            expected_schema,
+            "Generated schema does not match expected output",
+        )
+
+        # Clean up test output
+        if os.path.exists(test_output_file):
+            os.remove(test_output_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
