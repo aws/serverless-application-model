@@ -1,0 +1,276 @@
+{
+  "$id": "http://json-schema.org/draft-04/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "AWS::ACMPCA::Certificate": {
+      "additionalProperties": false,
+      "properties": {
+        "Condition": {
+          "type": "string"
+        },
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "TemplateArn": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::ACMPCA::Certificate"
+          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "type": "object"
+    },
+    "CustomResource": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "additionalProperties": true,
+          "properties": {
+            "ServiceToken": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "ServiceToken"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "pattern": "^Custom::[a-zA-Z_@-]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "Parameter": {
+      "additionalProperties": false,
+      "properties": {
+        "AllowedPattern": {
+          "type": "string"
+        },
+        "AllowedValues": {
+          "type": "array"
+        },
+        "ConstraintDescription": {
+          "type": "string"
+        },
+        "Default": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "MaxLength": {
+          "type": "string"
+        },
+        "MaxValue": {
+          "type": "string"
+        },
+        "MinLength": {
+          "type": "string"
+        },
+        "MinValue": {
+          "type": "string"
+        },
+        "NoEcho": {
+          "type": [
+            "string",
+            "boolean"
+          ]
+        },
+        "Type": {
+          "enum": [
+            "String",
+            "Number",
+            "List<Number>",
+            "CommaDelimitedList",
+            "AWS::EC2::AvailabilityZone::Name",
+            "AWS::EC2::Image::Id",
+            "AWS::EC2::Instance::Id",
+            "AWS::EC2::KeyPair::KeyName",
+            "AWS::EC2::SecurityGroup::GroupName",
+            "AWS::EC2::SecurityGroup::Id",
+            "AWS::EC2::Subnet::Id",
+            "AWS::EC2::Volume::Id",
+            "AWS::EC2::VPC::Id",
+            "AWS::Route53::HostedZone::Id",
+            "List<AWS::EC2::AvailabilityZone::Name>",
+            "List<AWS::EC2::Image::Id>",
+            "List<AWS::EC2::Instance::Id>",
+            "List<AWS::EC2::SecurityGroup::GroupName>",
+            "List<AWS::EC2::SecurityGroup::Id>",
+            "List<AWS::EC2::Subnet::Id>",
+            "List<AWS::EC2::Volume::Id>",
+            "List<AWS::EC2::VPC::Id>",
+            "List<AWS::Route53::HostedZone::Id>",
+            "List<String>",
+            "AWS::SSM::Parameter::Name",
+            "AWS::SSM::Parameter::Value<String>",
+            "AWS::SSM::Parameter::Value<List<String>>",
+            "AWS::SSM::Parameter::Value<CommaDelimitedList>",
+            "AWS::SSM::Parameter::Value<AWS::EC2::AvailabilityZone::Name>",
+            "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+            "AWS::SSM::Parameter::Value<AWS::EC2::Instance::Id>",
+            "AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::GroupName>",
+            "AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::Id>",
+            "AWS::SSM::Parameter::Value<AWS::EC2::Subnet::Id>",
+            "AWS::SSM::Parameter::Value<AWS::EC2::Volume::Id>",
+            "AWS::SSM::Parameter::Value<AWS::EC2::VPC::Id>",
+            "AWS::SSM::Parameter::Value<AWS::Route53::HostedZone::Id>",
+            "AWS::SSM::Parameter::Value<List<AWS::EC2::AvailabilityZone::Name>>",
+            "AWS::SSM::Parameter::Value<List<AWS::EC2::Image::Id>>",
+            "AWS::SSM::Parameter::Value<List<AWS::EC2::Instance::Id>>",
+            "AWS::SSM::Parameter::Value<List<AWS::EC2::SecurityGroup::GroupName>>",
+            "AWS::SSM::Parameter::Value<List<AWS::EC2::SecurityGroup::Id>>",
+            "AWS::SSM::Parameter::Value<List<AWS::EC2::Subnet::Id>>",
+            "AWS::SSM::Parameter::Value<List<AWS::EC2::Volume::Id>>",
+            "AWS::SSM::Parameter::Value<List<AWS::EC2::VPC::Id>>",
+            "AWS::SSM::Parameter::Value<List<AWS::Route53::HostedZone::Id>>"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "AWSTemplateFormatVersion": {
+      "enum": [
+        "2010-09-09"
+      ],
+      "type": "string"
+    },
+    "Conditions": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Description": {
+      "description": "Template description",
+      "maxLength": 1024,
+      "type": "string"
+    },
+    "Mappings": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Metadata": {
+      "type": "object"
+    },
+    "Outputs": {
+      "additionalProperties": false,
+      "maxProperties": 60,
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Parameters": {
+      "additionalProperties": false,
+      "maxProperties": 50,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "$ref": "#/definitions/Parameter"
+        }
+      },
+      "type": "object"
+    },
+    "Resources": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/AWS::ACMPCA::Certificate"
+            },
+            {
+              "$ref": "#/definitions/CustomResource"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "Transform": {
+      "oneOf": [
+        {
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ]
+    }
+  },
+  "required": [
+    "Resources"
+  ],
+  "type": "object"
+}

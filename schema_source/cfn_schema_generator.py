@@ -1,52 +1,15 @@
 #!/usr/bin/env python3
 """
-CloudFormation Schema Generator
-Downloads CloudFormation schemas from the official AWS zip archive.
-
-Schema Construction Flow:
-========================
-1. Download CloudformationSchema.zip from AWS
-   ↓
-2. Extract individual resource schema files
-   ↓
-3. Merge schemas with minimal transformation:
-   - Wrap resource properties in CloudFormation template structure
-   - Add template-level properties (Parameters, Resources, etc.)
-   - Preserve all AWS schema definitions as-is
+CloudFormation Schema Generator - Python Port
+Minimal working port of the Go goformation schema generator.
 """
 
+import gzip
 import json
-import logging
-import zipfile
-from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, cast
 
 import requests
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-# Configuration: AWS CloudFormation Schema URL
-# This is the official AWS endpoint for CloudFormation schemas
-# Source: https://docs.aws.amazon.com/cloudformation-cli/latest/userguide/resource-type-schema.html
-CFN_SCHEMA_URL = "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip"
-
-# Configuration: CloudFormation template wrapper properties
-CFN_TEMPLATE_PROPERTIES = {
-    "Type": {"type": "string"},
-    "Properties": {"type": "object"},
-    "Condition": {"type": "string"},
-    "DeletionPolicy": {"enum": ["Delete", "Retain", "Snapshot"], "type": "string"},
-    "DependsOn": {
-        "anyOf": [
-            {"pattern": "^[a-zA-Z0-9]+$", "type": "string"},
-            {"items": {"pattern": "^[a-zA-Z0-9]+$", "type": "string"}, "type": "array"},
-        ]
-    },
-    "Metadata": {"type": "object"},
-    "UpdateReplacePolicy": {"enum": ["Delete", "Retain", "Snapshot"], "type": "string"},
-}
 
 # Configuration: Resources that support additional policies
 # These are documented in CloudFormation but not in the schemas
@@ -121,243 +84,331 @@ CFN_PARAMETER_TYPES = [
     "AWS::SSM::Parameter::Value<List<AWS::Route53::HostedZone::Id>>",
 ]
 
+# Configuration: CloudFormation template wrapper properties
+CFN_TEMPLATE_PROPERTIES = {
+    "Type": {"type": "string"},
+    "Properties": {"type": "object"},
+    "Condition": {"type": "string"},
+    "DeletionPolicy": {"enum": ["Delete", "Retain", "Snapshot"], "type": "string"},
+    "DependsOn": {
+        "anyOf": [
+            {"pattern": "^[a-zA-Z0-9]+$", "type": "string"},
+            {"items": {"pattern": "^[a-zA-Z0-9]+$", "type": "string"}, "type": "array"},
+        ]
+    },
+    "Metadata": {"type": "object"},
+    "UpdateReplacePolicy": {"enum": ["Delete", "Retain", "Snapshot"], "type": "string"},
+}
+
+# Template: Base object schema
+BASE_OBJECT_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+}
+
+# Template: Parameter definition schema
+PARAMETER_SCHEMA_TEMPLATE = {
+    **BASE_OBJECT_SCHEMA,
+    "properties": {
+        "Type": {"type": "string", "enum": CFN_PARAMETER_TYPES},
+        "AllowedPattern": {"type": "string"},
+        "AllowedValues": {"type": "array"},
+        "ConstraintDescription": {"type": "string"},
+        "Default": {"type": "string"},
+        "Description": {"type": "string"},
+        "MaxLength": {"type": "string"},
+        "MaxValue": {"type": "string"},
+        "MinLength": {"type": "string"},
+        "MinValue": {"type": "string"},
+        "NoEcho": {"type": ["string", "boolean"]},
+    },
+    "required": ["Type"],
+}
+
+# Template: CustomResource definition schema
+CUSTOM_RESOURCE_SCHEMA_TEMPLATE = {
+    **BASE_OBJECT_SCHEMA,
+    "properties": {
+        "Properties": {
+            "type": "object",
+            "additionalProperties": True,
+            "properties": {"ServiceToken": {"type": "string"}},
+            "required": ["ServiceToken"],
+        },
+        "Type": {"pattern": "^Custom::[a-zA-Z_@-]+$", "type": "string"},
+    },
+    "required": ["Type", "Properties"],
+}
+
+# Template: Main CloudFormation schema structure
+MAIN_SCHEMA_TEMPLATE = {
+    "$id": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "AWSTemplateFormatVersion": {"type": "string", "enum": ["2010-09-09"]},
+        "Description": {"description": "Template description", "type": "string", "maxLength": 1024},
+        "Metadata": {"type": "object"},
+        "Transform": {"oneOf": [{"type": ["string"]}, {"type": "array", "items": {"type": "string"}}]},
+        "Parameters": {
+            "type": "object",
+            "patternProperties": {"^[a-zA-Z0-9]+$": {"$ref": "#/definitions/Parameter"}},
+            "maxProperties": 50,
+            "additionalProperties": False,
+        },
+        "Mappings": {
+            "type": "object",
+            "patternProperties": {"^[a-zA-Z0-9]+$": {"type": "object"}},
+            "additionalProperties": False,
+        },
+        "Conditions": {
+            "type": "object",
+            "patternProperties": {"^[a-zA-Z0-9]+$": {"type": "object"}},
+            "additionalProperties": False,
+        },
+        "Outputs": {
+            "type": "object",
+            "patternProperties": {"^[a-zA-Z0-9]+$": {"type": "object"}},
+            "minProperties": 1,
+            "maxProperties": 60,
+            "additionalProperties": False,
+        },
+        "Resources": {
+            "type": "object",
+            "patternProperties": {"^[a-zA-Z0-9]+$": {"anyOf": []}},  # Will be filled in
+            "additionalProperties": False,
+        },
+    },
+    "required": ["Resources"],
+    "definitions": {},  # Will be filled in
+}
+
+# Template: Array schema
+ARRAY_SCHEMA_TEMPLATE = {
+    "type": "array",
+    "items": {},  # Will be filled in
+}
+
+# Template: Map/Object schema with pattern properties
+MAP_SCHEMA_TEMPLATE = {
+    "type": "object",
+    "patternProperties": {"^[a-zA-Z0-9]+$": {}},  # Will be filled in
+    "additionalProperties": False,
+}
+
 
 class CloudFormationSchemaGenerator:
-    """CloudFormation schema generator using AWS's official schema zip archive
-
-    This generator is designed to be simple and data-driven:
-    - No type mapping (AWS provides correct types)
-    - No property transformation (AWS schemas are already JSON Schema)
-    - Minimal hardcoded logic (only CFN template wrapper)
-    - Parameter types from AWS documentation
-    """
+    """Python port of the Go CloudFormation schema generator"""
 
     def __init__(
         self,
-        template_properties: Optional[Dict[str, Any]] = None,
-        resources_with_creation_policy: Optional[Set[str]] = None,
-        resources_with_update_policy: Optional[Set[str]] = None,
-        parameter_types: Optional[List[str]] = None,
+        spec_url: str = "https://d1uauaxba7bl26.cloudfront.net/latest/gzip/CloudFormationResourceSpecification.json",
     ):
-        """Initialize generator with optional custom configuration
-
-        Args:
-            template_properties: Custom template wrapper properties (optional)
-            resources_with_creation_policy: Resources supporting CreationPolicy (optional)
-            resources_with_update_policy: Resources supporting UpdatePolicy (optional)
-            parameter_types: Custom parameter types list (optional)
-        """
-        self.schema_url = CFN_SCHEMA_URL
-        self.template_properties = template_properties or CFN_TEMPLATE_PROPERTIES
-        self.resources_with_creation_policy = resources_with_creation_policy or RESOURCES_WITH_CREATION_POLICY
-        self.resources_with_update_policy = resources_with_update_policy or RESOURCES_WITH_UPDATE_POLICY
-        self.parameter_types = parameter_types or CFN_PARAMETER_TYPES
+        self.spec_url = spec_url
+        self.type_map = {
+            "String": "string",
+            "Long": "number",
+            "Integer": "number",
+            "Double": "number",
+            "Boolean": "boolean",
+            "Timestamp": "string",
+            "Json": "object",
+            "Map": "object",
+        }
 
     def generate(self, output_file: str = ".tmp/cloudformation.schema.json") -> None:
-        """Generate CloudFormation JSON schema from AWS zip archive"""
-        # Download and extract schemas
-        resource_schemas = self._download_and_extract_schemas()
+        """Generate CloudFormation JSON schema"""
+        spec = self._download_spec()
 
-        # Generate unified schema
-        schema = self._generate_unified_schema(resource_schemas)
+        schema = self._generate_schema(spec)
 
-        # Write to file
-        self._write_schema(schema, output_file)
+        # Write to file with custom JSON encoder to match expected format
+        output_path = Path(output_file)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with output_path.open("w") as f:
+            # Convert to JSON string and replace < and > with Unicode escapes to match expected format
+            json_str = json.dumps(schema, indent=4, sort_keys=True)
+            json_str = json_str.replace("<", "\\u003c").replace(">", "\\u003e")
+            f.write(json_str)
 
-    def _download_and_extract_schemas(self) -> Dict[str, Dict[str, Any]]:
-        """Download zip file and extract all resource schemas
-
-        Returns:
-            Dict mapping resource type names to their schema definitions
-        """
-        response = requests.get(self.schema_url, timeout=60)
+    def _download_spec(self) -> Dict[str, Any]:
+        """Download and parse CloudFormation specification"""
+        response = requests.get(self.spec_url, timeout=30)
         response.raise_for_status()
 
-        resource_schemas: Dict[str, Dict[str, Any]] = {}
+        # Handle gzipped content - check if actually gzipped
+        content = response.content
+        if content.startswith(b"\x1f\x8b"):  # gzip magic number
+            content = gzip.decompress(content)
 
-        with zipfile.ZipFile(BytesIO(response.content)) as zip_file:
-            json_files = [name for name in zip_file.namelist() if name.endswith(".json")]
+        result: Dict[str, Any] = json.loads(content)
+        return result
 
-            for filename in json_files:
-                try:
-                    with zip_file.open(filename) as f:
-                        schema = json.load(f)
+    def _generate_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate JSON schema from CloudFormation specification"""
+        resources = spec.get("ResourceTypes", {})
+        properties = spec.get("PropertyTypes", {})
 
-                    type_name = schema.get("typeName")
-                    if type_name:
-                        resource_schemas[type_name] = schema
-                except Exception as e:
-                    # Skip invalid files - some files in the zip may not be valid JSON or resource schemas
-                    logger.warning(f"Skipping invalid schema file {filename}: {e}")
-                    continue
-
-        return resource_schemas
-
-    def _generate_unified_schema(self, resource_schemas: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
-        """Generate unified JSON schema from individual resource schemas
-
-        Strategy: Minimal transformation, maximum reuse of AWS schemas
-        """
-        # Build resource references
-        resource_refs = [{"$ref": f"#/definitions/{name}"} for name in sorted(resource_schemas.keys())]
+        # Build resource references for anyOf
+        resource_refs = [{"$ref": f"#/definitions/{name}"} for name in resources]
         resource_refs.append({"$ref": "#/definitions/CustomResource"})
 
-        # Build definitions
-        definitions: Dict[str, Any] = {
-            "Parameter": self._get_parameter_schema(),
-            "CustomResource": self._get_custom_resource_schema(),
+        # Start with main schema template and fill in the details
+        main_properties = cast(Dict[str, Any], MAIN_SCHEMA_TEMPLATE["properties"])
+        resources_property = cast(Dict[str, Any], main_properties["Resources"])
+
+        schema = {
+            **MAIN_SCHEMA_TEMPLATE,
+            "properties": {
+                **main_properties,
+                "Resources": {
+                    **resources_property,
+                    "patternProperties": {"^[a-zA-Z0-9]+$": {"anyOf": resource_refs}},
+                },
+            },
         }
 
-        # Process each resource schema
-        for type_name, schema in resource_schemas.items():
-            # Wrap resource schema in CloudFormation template structure
-            definitions[type_name] = self._wrap_resource_schema(type_name, schema)
+        # Build definitions from templates
+        definitions: Dict[str, Any] = {}
+        definitions["Parameter"] = PARAMETER_SCHEMA_TEMPLATE
+        definitions["CustomResource"] = CUSTOM_RESOURCE_SCHEMA_TEMPLATE
 
-            # Add nested definitions as-is (no transformation needed!)
-            for def_name, def_schema in schema.get("definitions", {}).items():
-                definitions[f"{type_name}.{def_name}"] = def_schema
+        # Add resource definitions
+        for name, resource in resources.items():
+            definitions[name] = self._generate_resource_schema(name, resource, False)
 
-        # Return unified schema
-        return {
-            "$id": "http://json-schema.org/draft-04/schema#",
-            "type": "object",
-            "additionalProperties": False,
-            "properties": self._get_template_properties(resource_refs),
-            "required": ["Resources"],
-            "definitions": definitions,
-        }
+        # Add property definitions
+        for name, prop in properties.items():
+            definitions[name] = self._generate_resource_schema(name, prop, True)
 
-    def _wrap_resource_schema(self, type_name: str, schema: Dict[str, Any]) -> Dict[str, Any]:
-        """Wrap AWS resource schema in CloudFormation template structure
+        schema["definitions"] = definitions
+        return schema
 
-        This is the only transformation we do - wrapping the AWS schema
-        in CloudFormation's Type/Properties structure.
-        """
-        # Extract schema components (use as-is!)
-        properties = schema.get("properties", {})
-        required = schema.get("required", [])
-        additional_properties = schema.get("additionalProperties", False)
+    def _generate_resource_schema(
+        self, name: str, resource: Dict[str, Any], is_custom_property: bool
+    ) -> Dict[str, Any]:
+        """Generate schema for a CloudFormation resource"""
+        properties = resource.get("Properties", {})
+        required = sorted([prop_name for prop_name, prop in properties.items() if prop.get("Required", False)])
 
-        # Build Properties schema (no transformation!)
-        properties_schema: Dict[str, Any] = {
-            "type": "object",
-            "properties": properties,
-            "additionalProperties": additional_properties,
+        prop_schemas = {}
+        for prop_name, prop in properties.items():
+            prop_schemas[prop_name] = self._generate_property_schema(prop_name, prop, name)
+
+        # For custom properties (nested property types), use simple object schema
+        if is_custom_property:
+            schema = {
+                **BASE_OBJECT_SCHEMA,
+                "properties": prop_schemas,
+            }
+            if required:
+                schema["required"] = required
+            return schema
+
+        # For resources, start with base object schema and build up
+        properties_schema = {
+            **BASE_OBJECT_SCHEMA,
+            "properties": prop_schemas,
         }
         if required:
             properties_schema["required"] = required
 
-        # Build resource wrapper
-        resource_properties: Dict[str, Any] = {
-            "Type": {"enum": [type_name], "type": "string"},
-            "Properties": properties_schema,
-        }
-        # Add template properties
-        for key, value in self.template_properties.items():
-            if key not in resource_properties:
-                resource_properties[key] = value
-
-        # Add optional policies based on configuration
-        if type_name in self.resources_with_creation_policy:
-            resource_properties["CreationPolicy"] = {"type": "object"}
-
-        if type_name in self.resources_with_update_policy:
-            resource_properties["UpdatePolicy"] = {"type": "object"}
-
-        return {
-            "type": "object",
-            "additionalProperties": False,
-            "properties": resource_properties,
+        # Build resource schema from template
+        resource_schema = {
+            **BASE_OBJECT_SCHEMA,
+            "properties": {
+                **CFN_TEMPLATE_PROPERTIES,
+                # Override with resource-specific values
+                "Type": {"enum": [name], "type": "string"},
+                "Properties": properties_schema,
+            },
             "required": ["Type", "Properties"] if required else ["Type"],
         }
 
-    def _get_template_properties(self, resource_refs: List[Dict[str, str]]) -> Dict[str, Any]:
-        """Get CloudFormation template top-level properties"""
-        return {
-            "AWSTemplateFormatVersion": {"type": "string", "enum": ["2010-09-09"]},
-            "Description": {"description": "Template description", "type": "string", "maxLength": 1024},
-            "Metadata": {"type": "object"},
-            "Transform": {"oneOf": [{"type": ["string"]}, {"type": "array", "items": {"type": "string"}}]},
-            "Parameters": {
-                "type": "object",
-                "patternProperties": {"^[a-zA-Z0-9]+$": {"$ref": "#/definitions/Parameter"}},
-                "maxProperties": 50,
-                "additionalProperties": False,
-            },
-            "Mappings": {
-                "type": "object",
-                "patternProperties": {"^[a-zA-Z0-9]+$": {"type": "object"}},
-                "additionalProperties": False,
-            },
-            "Conditions": {
-                "type": "object",
-                "patternProperties": {"^[a-zA-Z0-9]+$": {"type": "object"}},
-                "additionalProperties": False,
-            },
-            "Outputs": {
-                "type": "object",
-                "patternProperties": {"^[a-zA-Z0-9]+$": {"type": "object"}},
-                "minProperties": 1,
-                "maxProperties": 60,
-                "additionalProperties": False,
-            },
-            "Resources": {
-                "type": "object",
-                "patternProperties": {"^[a-zA-Z0-9]+$": {"anyOf": resource_refs}},
-                "additionalProperties": False,
-            },
-        }
+        # Add optional policies for specific resources
+        if name in RESOURCES_WITH_CREATION_POLICY:
+            properties_obj = cast(Dict[str, Any], resource_schema["properties"])
+            properties_obj["CreationPolicy"] = {"type": "object"}
 
-    def _get_parameter_schema(self) -> Dict[str, Any]:
-        """Get Parameter schema definition using configured parameter types"""
-        return {
-            "type": "object",
-            "properties": {
-                "Type": {
-                    "type": "string",
-                    "enum": self.parameter_types,
-                },
-                "AllowedPattern": {"type": "string"},
-                "AllowedValues": {"type": "array"},
-                "ConstraintDescription": {"type": "string"},
-                "Default": {"type": "string"},
-                "Description": {"type": "string"},
-                "MaxLength": {"type": "string"},
-                "MaxValue": {"type": "string"},
-                "MinLength": {"type": "string"},
-                "MinValue": {"type": "string"},
-                "NoEcho": {"type": ["string", "boolean"]},
-            },
-            "additionalProperties": False,
-            "required": ["Type"],
-        }
+        if name in RESOURCES_WITH_UPDATE_POLICY:
+            properties_obj = cast(Dict[str, Any], resource_schema["properties"])
+            properties_obj["UpdatePolicy"] = {"type": "object"}
 
-    def _get_custom_resource_schema(self) -> Dict[str, Any]:
-        """Get CustomResource schema definition"""
-        return {
-            "additionalProperties": False,
-            "properties": {
-                "Properties": {
+        return resource_schema
+
+    def _generate_property_schema(  # noqa: PLR0911
+        self, name: str, prop: Dict[str, Any], parent: str
+    ) -> Dict[str, Any]:
+        """Generate schema for a CloudFormation property"""
+        # Extract resource name from parent (e.g., "AWS::S3::Bucket" from "AWS::S3::Bucket.Property")
+        resource_name = parent.split(".")[0] if "." in parent else parent
+
+        # Handle polymorphic properties (simplified)
+        if self._is_polymorphic(prop):
+            any_of = []
+            if prop.get("PrimitiveTypes"):
+                any_of.append({"type": [self.type_map.get(pt, "string") for pt in prop["PrimitiveTypes"]]})
+            return {"anyOf": any_of} if any_of else {"type": "object"}
+
+        # Handle simple primitive types
+        if prop.get("PrimitiveType"):
+            return {"type": self.type_map.get(prop["PrimitiveType"], "string")}
+
+        # Handle lists
+        if prop.get("Type") == "List":
+            if prop.get("PrimitiveItemType"):
+                return {
+                    **ARRAY_SCHEMA_TEMPLATE,
+                    "items": {"type": self.type_map.get(prop["PrimitiveItemType"], "string")},
+                }
+            if prop.get("ItemType"):
+                item_type = prop["ItemType"]
+                # Use global reference for Tag type (matching Go template logic)
+                ref = "#/definitions/Tag" if item_type == "Tag" else f"#/definitions/{resource_name}.{item_type}"
+                return {
+                    **ARRAY_SCHEMA_TEMPLATE,
+                    "items": {"$ref": ref},
+                }
+
+        # Handle maps
+        if prop.get("Type") == "Map":
+            if prop.get("PrimitiveItemType"):
+                return {
+                    **MAP_SCHEMA_TEMPLATE,
+                    "patternProperties": {
+                        "^[a-zA-Z0-9]+$": {"type": self.type_map.get(prop["PrimitiveItemType"], "string")}
+                    },
                     "additionalProperties": True,
-                    "properties": {"ServiceToken": {"type": "string"}},
-                    "required": ["ServiceToken"],
-                    "type": "object",
-                },
-                "Type": {"pattern": "^Custom::[a-zA-Z_@-]+$", "type": "string"},
-            },
-            "required": ["Type", "Properties"],
-            "type": "object",
-        }
+                }
+            if prop.get("ItemType"):
+                item_type = prop["ItemType"]
+                # Use global reference for Tag type (matching Go template logic)
+                ref = "#/definitions/Tag" if item_type == "Tag" else f"#/definitions/{resource_name}.{item_type}"
+                return {
+                    **MAP_SCHEMA_TEMPLATE,
+                    "patternProperties": {"^[a-zA-Z0-9]+$": {"$ref": ref}},
+                }
 
-    def _write_schema(self, schema: Dict[str, Any], output_file: str) -> None:
-        """Write schema to file with proper formatting"""
-        output_path = Path(output_file)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
+        # Handle custom types
+        if prop.get("Type") and prop["Type"] not in ["List", "Map"]:
+            prop_type = prop["Type"]
+            # Use global reference for Tag type (matching Go template logic)
+            if prop_type == "Tag":
+                return {"$ref": "#/definitions/Tag"}
+            return {"$ref": f"#/definitions/{resource_name}.{prop_type}"}
 
-        # Convert to JSON string and replace < and > with Unicode escapes
-        json_str = json.dumps(schema, indent=4, sort_keys=True)
-        json_str = json_str.replace("<", "\\u003c").replace(">", "\\u003e")
-        output_path.write_text(json_str)
+        return {"type": "object"}
+
+    def _is_polymorphic(self, prop: Dict[str, Any]) -> bool:
+        """Check if property can be multiple different types"""
+        return bool(
+            prop.get("PrimitiveTypes")
+            or prop.get("PrimitiveItemTypes")
+            or prop.get("ItemTypes")
+            or prop.get("Types")
+            or prop.get("InclusivePrimitiveItemTypes")
+            or prop.get("InclusiveItemTypes")
+        )
 
 
 if __name__ == "__main__":

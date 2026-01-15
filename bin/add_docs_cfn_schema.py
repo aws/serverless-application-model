@@ -38,12 +38,6 @@ def main() -> None:
         if not re.match(r"^\w+::\w+::\w+(.\w+)?$", def_name):
             log(f"Skipping {def_name}: not expected format")
             continue
-
-        # Skip definitions that don't have properties (e.g., simple types like strings, arrays)
-        if "properties" not in def_schema:
-            log(f"Skipping {def_name}: no properties field (likely a simple type)")
-            continue
-
         # If e.g. AWS::S3::Bucket, we only look under Properties
         # TODO: Support resource attributes et al.
         props = def_schema["properties"] if "." in def_name else def_schema["properties"]["Properties"]["properties"]

@@ -1,0 +1,29 @@
+{
+  "PropertyTypes": {
+    "AWS::AIOps::InvestigationGroup.CrossAccountConfiguration": {
+      "Documentation": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-aiops-investigationgroup-crossaccountconfiguration.html",
+      "Properties": {
+        "SourceRoleArn": {
+          "Documentation": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-aiops-investigationgroup-crossaccountconfiguration.html#cfn-aiops-investigationgroup-crossaccountconfiguration-sourcerolearn",
+          "PrimitiveType": "String",
+          "Required": false,
+          "UpdateType": "Mutable"
+        }
+      }
+    }
+  },
+  "ResourceTypes": {
+    "AWS::AIOps::InvestigationGroup": {
+      "Properties": {
+        "CrossAccountConfigurations": {
+          "Documentation": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-aiops-investigationgroup.html#cfn-aiops-investigationgroup-crossaccountconfigurations",
+          "DuplicatesAllowed": false,
+          "ItemType": "CrossAccountConfiguration",
+          "Required": false,
+          "Type": "List",
+          "UpdateType": "Mutable"
+        }
+      }
+    }
+  }
+}
