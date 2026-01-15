@@ -11,6 +11,20 @@ from parameterized import parameterized
 from schema_source.cfn_schema_generator import CloudFormationSchemaGenerator
 
 
+def _get_test_cases_for_schema_generation():
+    """Get all test case files from input folder"""
+    input_folder = "tests/schema/cfn_schema_generator/input_spec"
+    if not os.path.exists(input_folder):
+        return []
+
+    test_cases = []
+    for filename in os.listdir(input_folder):
+        if filename.endswith(".json"):
+            case_name = os.path.splitext(filename)[0]
+            test_cases.append((case_name,))
+    return test_cases
+
+
 class TestCloudFormationSchemaGeneratorUnit(unittest.TestCase):
     """Unit tests for CloudFormation Schema Generator"""
 
@@ -64,21 +78,10 @@ class TestCloudFormationSchemaGenerator(unittest.TestCase):
         self.input_folder = "tests/schema/cfn_schema_generator/input_spec"
         self.output_folder = "tests/schema/cfn_schema_generator/output_schema"
 
-    @staticmethod
-    def _get_test_cases():
-        """Get all test case files from input folder"""
-        input_folder = "tests/schema/cfn_schema_generator/input_spec"
-        if not os.path.exists(input_folder):
-            return []
-
-        test_cases = []
-        for filename in os.listdir(input_folder):
-            if filename.endswith(".json"):
-                case_name = os.path.splitext(filename)[0]
-                test_cases.append((case_name,))
-        return test_cases
-
-    @parameterized.expand(_get_test_cases(), skip_on_empty=True)
+    @parameterized.expand(
+        lambda: _get_test_cases_for_schema_generation(),
+        skip_on_empty=True,
+    )
     def test_schema_generation(self, case_name):
         """Test schema generation for a specific case"""
         input_file = os.path.join(self.input_folder, f"{case_name}.json")
