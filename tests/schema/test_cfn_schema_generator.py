@@ -339,7 +339,3 @@ class TestCloudFormationSchemaGeneratorIntegration(unittest.TestCase):
         # Clean up test output
         if os.path.exists(test_output_file):
             os.remove(test_output_file)
-
-
-if __name__ == "__main__":
-    unittest.main()
