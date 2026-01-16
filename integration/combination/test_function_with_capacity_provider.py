@@ -23,6 +23,46 @@ class TestFunctionWithCapacityProvider(BaseTest):
             self.generate_parameter("KMSKeyArn", self.companion_stack_outputs["LMIKMSKeyArn"]),
         ]
 
+    def verify_capacity_provider_basic_config(self, cp_config, cp_name):
+        """Verify basic capacity provider configuration (state, existence)."""
+        self.assertIsNotNone(cp_config, f"{cp_name} should have configuration")
+        self.assertEqual(cp_config["State"], "Active", f"{cp_name} should be in Active state")
+
+    def verify_capacity_provider_vpc_config(self, vpc_config, cp_name):
+        """Verify capacity provider VPC configuration matches companion stack outputs."""
+        self.assertIsNotNone(vpc_config, f"{cp_name} should have VPC configuration")
+        self.assertIn(
+            self.companion_stack_outputs["LMISubnetId"],
+            vpc_config["SubnetIds"],
+            f"{cp_name} should use the correct subnet",
+        )
+        self.assertIn(
+            self.companion_stack_outputs["LMISecurityGroupId"],
+            vpc_config["SecurityGroupIds"],
+            f"{cp_name} should use the correct security group",
+        )
+
+    def verify_capacity_provider_permissions_config(self, permissions_config, cp_name):
+        """Verify capacity provider has permissions configuration with operator role."""
+        self.assertIsNotNone(permissions_config, f"{cp_name} should have permissions configuration")
+        operator_role_arn = permissions_config.get("CapacityProviderOperatorRoleArn")
+        self.assertIsNotNone(operator_role_arn, f"{cp_name} should have operator role ARN")
+        return operator_role_arn
+
+    def verify_function_capacity_provider_config(self, function_capacity_provider_config):
+        """Verify and extract capacity provider ARN from function configuration."""
+        self.assertIsNotNone(function_capacity_provider_config, "Function should have capacity provider configuration")
+        self.assertIn(
+            "LambdaManagedInstancesCapacityProviderConfig",
+            function_capacity_provider_config,
+            "Function should have LambdaManagedInstancesCapacityProviderConfig",
+        )
+
+        lmi_config = function_capacity_provider_config["LambdaManagedInstancesCapacityProviderConfig"]
+        function_capacity_provider_arn = lmi_config.get("CapacityProviderArn")
+        self.assertIsNotNone(function_capacity_provider_arn, "Function should reference a capacity provider ARN")
+        return function_capacity_provider_arn
+
     def test_function_with_capacity_provider_custom_role(self):
         """Test Lambda function with CapacityProviderConfig using custom operator role."""
         # Phase 1: Prepare parameters from companion stack
@@ -40,26 +80,17 @@ class TestFunctionWithCapacityProvider(BaseTest):
 
         # Phase 4: Validate function capacity provider configuration
         lambda_function = lambda_resources[0]
-        capacity_provider = capacity_provider_resources[0]
 
         function_capacity_provider_config = self.get_function_capacity_provider_config(
             lambda_function["PhysicalResourceId"]
         )
-        self.assertIsNotNone(function_capacity_provider_config, "Function should have capacity provider configuration")
-        self.assertIn(
-            "LambdaManagedInstancesCapacityProviderConfig",
-            function_capacity_provider_config,
-            "Function should have LambdaManagedInstancesCapacityProviderConfig",
+        function_capacity_provider_arn = self.verify_function_capacity_provider_config(
+            function_capacity_provider_config
         )
 
-        lmi_config = function_capacity_provider_config["LambdaManagedInstancesCapacityProviderConfig"]
-        function_capacity_provider_arn = lmi_config.get("CapacityProviderArn")
-        self.assertIsNotNone(function_capacity_provider_arn, "Function should reference a capacity provider ARN")
-
         # Phase 5: Validate capacity provider details
-        capacity_provider_config = self.get_lambda_capacity_provider_config(capacity_provider)
-        self.assertIsNotNone(capacity_provider_config, "Capacity provider should have configuration")
-        self.assertEqual(capacity_provider_config["State"], "Active", "Capacity provider should be in Active state")
+        capacity_provider_config = self.get_lambda_capacity_provider_config("MyCapacityProvider")
+        self.verify_capacity_provider_basic_config(capacity_provider_config, "MyCapacityProvider")
 
         # Verify the function uses the correct capacity provider ARN
         actual_capacity_provider_arn = capacity_provider_config.get("CapacityProviderArn")
@@ -71,11 +102,8 @@ class TestFunctionWithCapacityProvider(BaseTest):
 
         # Phase 6: Verify capacity provider uses custom operator role
         permissions_config = capacity_provider_config.get("PermissionsConfig")
-        self.assertIsNotNone(permissions_config, "Capacity provider should have permissions configuration")
-
-        capacity_provider_operator_role_arn = permissions_config.get("CapacityProviderOperatorRoleArn")
-        self.assertIsNotNone(
-            capacity_provider_operator_role_arn, "Capacity provider should have custom operator role ARN"
+        capacity_provider_operator_role_arn = self.verify_capacity_provider_permissions_config(
+            permissions_config, "MyCapacityProvider"
         )
 
         # Get the physical ID of the custom role using its logical ID
@@ -105,30 +133,14 @@ class TestFunctionWithCapacityProvider(BaseTest):
         self.assertEqual(len(capacity_provider_resources), 2, "Should create exactly two CapacityProviders")
 
         # Phase 4: Validate function capacity provider configuration
-        simple_capacity_provider = next(
-            r for r in capacity_provider_resources if r["LogicalResourceId"] == "SimpleCapacityProvider"
-        )
-        advanced_capacity_provider = next(
-            r for r in capacity_provider_resources if r["LogicalResourceId"] == "AdvancedCapacityProvider"
-        )
         my_function = lambda_resources[0]
 
         function_config = self.get_function_capacity_provider_config(my_function["PhysicalResourceId"])
-        self.assertIsNotNone(function_config, "Function should have capacity provider configuration")
-        self.assertIn(
-            "LambdaManagedInstancesCapacityProviderConfig",
-            function_config,
-            "Function should have LambdaManagedInstancesCapacityProviderConfig",
-        )
-
-        lmi_config = function_config["LambdaManagedInstancesCapacityProviderConfig"]
-        function_capacity_provider_arn = lmi_config.get("CapacityProviderArn")
-        self.assertIsNotNone(function_capacity_provider_arn, "Function should reference a capacity provider ARN")
+        function_capacity_provider_arn = self.verify_function_capacity_provider_config(function_config)
 
         # Phase 5: Validate SimpleCapacityProvider configuration
-        simple_cp_config = self.get_lambda_capacity_provider_config(simple_capacity_provider)
-        self.assertIsNotNone(simple_cp_config, "SimpleCapacityProvider should have configuration")
-        self.assertEqual(simple_cp_config["State"], "Active", "SimpleCapacityProvider should be in Active state")
+        simple_cp_config = self.get_lambda_capacity_provider_config("SimpleCapacityProvider")
+        self.verify_capacity_provider_basic_config(simple_cp_config, "SimpleCapacityProvider")
 
         # Verify the function uses SimpleCapacityProvider
         simple_cp_arn = simple_cp_config.get("CapacityProviderArn")
@@ -138,49 +150,23 @@ class TestFunctionWithCapacityProvider(BaseTest):
 
         # Verify SimpleCapacityProvider VPC configuration
         simple_vpc_config = simple_cp_config.get("VpcConfig")
-        self.assertIsNotNone(simple_vpc_config, "SimpleCapacityProvider should have VPC configuration")
-        self.assertIn(
-            self.companion_stack_outputs["LMISubnetId"],
-            simple_vpc_config["SubnetIds"],
-            "SimpleCapacityProvider should use the correct subnet",
-        )
-        self.assertIn(
-            self.companion_stack_outputs["LMISecurityGroupId"],
-            simple_vpc_config["SecurityGroupIds"],
-            "SimpleCapacityProvider should use the correct security group",
-        )
+        self.verify_capacity_provider_vpc_config(simple_vpc_config, "SimpleCapacityProvider")
 
         # Verify SimpleCapacityProvider uses SAM-generated default operator role
         simple_permissions_config = simple_cp_config.get("PermissionsConfig")
-        self.assertIsNotNone(simple_permissions_config, "SimpleCapacityProvider should have permissions configuration")
-        simple_operator_arn = simple_permissions_config.get("CapacityProviderOperatorRoleArn")
-        self.assertIsNotNone(simple_operator_arn, "SimpleCapacityProvider should have operator role ARN")
+        self.verify_capacity_provider_permissions_config(simple_permissions_config, "SimpleCapacityProvider")
 
         # Phase 6: Validate AdvancedCapacityProvider configuration
-        advanced_cp_config = self.get_lambda_capacity_provider_config(advanced_capacity_provider)
-        self.assertIsNotNone(advanced_cp_config, "AdvancedCapacityProvider should have configuration")
-        self.assertEqual(advanced_cp_config["State"], "Active", "AdvancedCapacityProvider should be in Active state")
+        advanced_cp_config = self.get_lambda_capacity_provider_config("AdvancedCapacityProvider")
+        self.verify_capacity_provider_basic_config(advanced_cp_config, "AdvancedCapacityProvider")
 
         # Verify AdvancedCapacityProvider VPC configuration
         advanced_vpc_config = advanced_cp_config.get("VpcConfig")
-        self.assertIsNotNone(advanced_vpc_config, "AdvancedCapacityProvider should have VPC configuration")
-        self.assertIn(
-            self.companion_stack_outputs["LMISubnetId"],
-            advanced_vpc_config["SubnetIds"],
-            "AdvancedCapacityProvider should use the correct subnet",
-        )
-        self.assertIn(
-            self.companion_stack_outputs["LMISecurityGroupId"],
-            advanced_vpc_config["SecurityGroupIds"],
-            "AdvancedCapacityProvider should use the correct security group",
-        )
+        self.verify_capacity_provider_vpc_config(advanced_vpc_config, "AdvancedCapacityProvider")
 
         # Verify AdvancedCapacityProvider permissions configuration
         advanced_permissions_config = advanced_cp_config.get("PermissionsConfig")
-        self.assertIsNotNone(
-            advanced_permissions_config,
-            "AdvancedCapacityProvider should have permissions configuration",
-        )
+        self.verify_capacity_provider_permissions_config(advanced_permissions_config, "AdvancedCapacityProvider")
 
         # Verify AdvancedCapacityProvider instance requirements
         instance_requirements = advanced_cp_config.get("InstanceRequirements")
@@ -238,16 +224,16 @@ class TestFunctionWithCapacityProvider(BaseTest):
             print(f"Error getting function capacity provider config: {e}")
             return None
 
-    def get_lambda_capacity_provider_config(self, capacity_provider_resource):
+    def get_lambda_capacity_provider_config(self, capacity_provider_logical_id):
         lambda_client = self.client_provider.lambda_client
 
         try:
-            # Extract capacity provider name from resource dict
-            capacity_provider_name = capacity_provider_resource["PhysicalResourceId"]
+            # Get the physical ID from the logical ID
+            capacity_provider_name = self.get_physical_id_by_logical_id(capacity_provider_logical_id)
             # Get the capacity provider configuration
             response = lambda_client.get_capacity_provider(CapacityProviderName=capacity_provider_name)
             return response.get("CapacityProvider")
         except Exception as e:
             # Log the error and return None for graceful handling
-            print(f"Error getting capacity provider config for {capacity_provider_resource}: {e}")
+            print(f"Error getting capacity provider config for {capacity_provider_logical_id}: {e}")
             return None
