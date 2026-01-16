@@ -24,9 +24,12 @@ class TestFunctionWithCapacityProvider(BaseTest):
         ]
 
     def verify_capacity_provider_basic_config(self, cp_config, cp_name):
-        """Verify basic capacity provider configuration (state, existence)."""
+        """Verify basic capacity provider configuration (state, existence) and return ARN."""
         self.assertIsNotNone(cp_config, f"{cp_name} should have configuration")
         self.assertEqual(cp_config["State"], "Active", f"{cp_name} should be in Active state")
+        capacity_provider_arn = cp_config.get("CapacityProviderArn")
+        self.assertIsNotNone(capacity_provider_arn, f"{cp_name} should have a capacity provider ARN")
+        return capacity_provider_arn
 
     def verify_capacity_provider_vpc_config(self, vpc_config, cp_name):
         """Verify capacity provider VPC configuration matches companion stack outputs."""
@@ -55,13 +58,23 @@ class TestFunctionWithCapacityProvider(BaseTest):
         self.assertIn(
             "LambdaManagedInstancesCapacityProviderConfig",
             function_capacity_provider_config,
-            "Function should have LambdaManagedInstancesCapacityProviderConfig",
+            "Function LambdaManagedInstancesCapacityProviderConfig should have LambdaManagedInstancesCapacityProviderConfig",
         )
 
         lmi_config = function_capacity_provider_config["LambdaManagedInstancesCapacityProviderConfig"]
         function_capacity_provider_arn = lmi_config.get("CapacityProviderArn")
-        self.assertIsNotNone(function_capacity_provider_arn, "Function should reference a capacity provider ARN")
+        self.assertIsNotNone(
+            function_capacity_provider_arn, "Function capacity provider config should have a capacity provider ARN"
+        )
         return function_capacity_provider_arn
+
+    def verify_capacity_provider_arn_match(self, function_capacity_provider_arn, capacity_provider_arn):
+        """Verify that the function references the correct capacity provider ARN."""
+        self.assertEqual(
+            function_capacity_provider_arn,
+            capacity_provider_arn,
+            "Function should reference the correct capacity provider ARN",
+        )
 
     def test_function_with_capacity_provider_custom_role(self):
         """Test Lambda function with CapacityProviderConfig using custom operator role."""
@@ -90,15 +103,12 @@ class TestFunctionWithCapacityProvider(BaseTest):
 
         # Phase 5: Validate capacity provider details
         capacity_provider_config = self.get_lambda_capacity_provider_config("MyCapacityProvider")
-        self.verify_capacity_provider_basic_config(capacity_provider_config, "MyCapacityProvider")
+        actual_capacity_provider_arn = self.verify_capacity_provider_basic_config(
+            capacity_provider_config, "MyCapacityProvider"
+        )
 
         # Verify the function uses the correct capacity provider ARN
-        actual_capacity_provider_arn = capacity_provider_config.get("CapacityProviderArn")
-        self.assertEqual(
-            function_capacity_provider_arn,
-            actual_capacity_provider_arn,
-            "Function should reference the correct capacity provider ARN",
-        )
+        self.verify_capacity_provider_arn_match(function_capacity_provider_arn, actual_capacity_provider_arn)
 
         # Phase 6: Verify capacity provider uses custom operator role
         permissions_config = capacity_provider_config.get("PermissionsConfig")
@@ -140,13 +150,10 @@ class TestFunctionWithCapacityProvider(BaseTest):
 
         # Phase 5: Validate SimpleCapacityProvider configuration
         simple_cp_config = self.get_lambda_capacity_provider_config("SimpleCapacityProvider")
-        self.verify_capacity_provider_basic_config(simple_cp_config, "SimpleCapacityProvider")
+        simple_cp_arn = self.verify_capacity_provider_basic_config(simple_cp_config, "SimpleCapacityProvider")
 
         # Verify the function uses SimpleCapacityProvider
-        simple_cp_arn = simple_cp_config.get("CapacityProviderArn")
-        self.assertEqual(
-            function_capacity_provider_arn, simple_cp_arn, "Function should reference SimpleCapacityProvider ARN"
-        )
+        self.verify_capacity_provider_arn_match(function_capacity_provider_arn, simple_cp_arn)
 
         # Verify SimpleCapacityProvider VPC configuration
         simple_vpc_config = simple_cp_config.get("VpcConfig")
