@@ -134,7 +134,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
             # There are three options:
             #   Managed Policy Name (string): Try to convert to Managed Policy ARN
             #   Managed Policy Arn (string): Insert it directly into the list
-            #   Intrinsic Function (dict): Insert it directly into the list
+            #   Intrinsic Function (dict): Try to convert each statement to Managed Policy Arn
             #
             # When you insert into managed_policy_arns list, de-dupe to prevent same ARN from showing up twice
             #
@@ -146,6 +146,17 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
                     managed_policy_map,
                     get_managed_policy_map,
                 )
+            elif is_intrinsic_if(policy_arn):
+                then_statement = policy_arn["Fn::If"][1]
+                else_statement = policy_arn["Fn::If"][2]
+
+                if not is_intrinsic_no_value(then_statement) and isinstance(then_statement, str):
+                    then_statement = _get_managed_policy_arn(then_statement, managed_policy_map, get_managed_policy_map)
+                    policy_arn["Fn::If"][1] = then_statement
+
+                if not is_intrinsic_no_value(else_statement) and isinstance(else_statement, str):
+                    else_statement = _get_managed_policy_arn(else_statement, managed_policy_map, get_managed_policy_map)
+                    policy_arn["Fn::If"][2] = else_statement
 
             # De-Duplicate managed policy arns before inserting. Mainly useful
             # when customer specifies a managed policy which is already inserted
