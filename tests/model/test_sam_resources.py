@@ -904,3 +904,76 @@ class TestSamCapacityProvider(TestCase):
                 tags = resource.Tags
                 self.assertEqual(sorted([tag["Key"] for tag in tags]), ["Environment", "Project", "lambda:createdBy"])
                 self.assertEqual(sorted([tag["Value"] for tag in tags]), ["Production", "SAM", "ServerlessApp"])
+
+
+class TestFunctionPolicy(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+        "resource_resolver": ResourceResolver({}),
+    }
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_managed_policy_name(self):
+        function = SamFunction("Foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        managedPolicyName = "foo"
+        function.Policies = [managedPolicyName]
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        iamRoles = [x for x in cfnResources if isinstance(x, IAMRole)]
+        self.assertEqual(iamRoles[0].ManagedPolicyArns[1], self.kwargs["managed_policy_map"][managedPolicyName])
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_unknown_policy_name(self):
+        function = SamFunction("Foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        unknownPolicyName = "bar"
+        function.Policies = [unknownPolicyName]
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        iamRoles = [x for x in cfnResources if isinstance(x, IAMRole)]
+        self.assertEqual(iamRoles[0].ManagedPolicyArns[1], unknownPolicyName)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_managed_policy_name_within_intrinsic_if_then(self):
+        function = SamFunction("Foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        managedPolicyName = "foo"
+        function.Policies = [{"Fn::If": ["Condition", managedPolicyName, {"Fn::Ref": "AWS::NoValue"}]}]
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        iamRoles = [x for x in cfnResources if isinstance(x, IAMRole)]
+
+        self.assertIn("Fn::If", iamRoles[0].ManagedPolicyArns[1])
+        self.assertEqual(iamRoles[0].ManagedPolicyArns[1]["Fn::If"][0], "Condition")
+        self.assertEqual(
+            iamRoles[0].ManagedPolicyArns[1]["Fn::If"][1], self.kwargs["managed_policy_map"][managedPolicyName]
+        )
+        self.assertDictEqual(iamRoles[0].ManagedPolicyArns[1]["Fn::If"][2], {"Fn::Ref": "AWS::NoValue"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_managed_policy_name_within_intrinsic_if_else(self):
+        function = SamFunction("Foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        managedPolicyName = "foo"
+        function.Policies = [{"Fn::If": ["Condition", {"Fn::Ref": "AWS::NoValue"}, managedPolicyName]}]
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        iamRoles = [x for x in cfnResources if isinstance(x, IAMRole)]
+
+        self.assertIn("Fn::If", iamRoles[0].ManagedPolicyArns[1])
+        self.assertEqual(iamRoles[0].ManagedPolicyArns[1]["Fn::If"][0], "Condition")
+        self.assertDictEqual(iamRoles[0].ManagedPolicyArns[1]["Fn::If"][1], {"Fn::Ref": "AWS::NoValue"})
+        self.assertEqual(
+            iamRoles[0].ManagedPolicyArns[1]["Fn::If"][2], self.kwargs["managed_policy_map"][managedPolicyName]
+        )

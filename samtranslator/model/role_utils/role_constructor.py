@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from samtranslator.internal.managed_policies import get_bundled_managed_policy_map
 from samtranslator.internal.types import GetManagedPolicyMap
@@ -60,6 +60,27 @@ def _get_managed_policy_arn(
     return name
 
 
+def _convert_intrinsic_if_values(
+    intrinsic_if: Dict[str, List[Any]], convert: Callable[[Any], Any]
+) -> Dict[str, List[Any]]:
+    """
+    Convert the true and false value of the intrinsic if function according to
+    `convert` function.
+    
+    :param intrinsic_if: A dict of the form {"Fn::If": [condition, value_if_true, value_if_false]}
+    :type intrinsic_if: Dict[str, List[Any]]
+    :param convert: The function used to make the conversion. If the value can't
+        be converted, return the parameter as is
+    :type convert: Callable[[Any], Any]
+    :return: The input dict with values converted
+    :rtype: Dict[str, List[Any]]
+    """
+    intrinsic_if["Fn::If"][1] = convert(intrinsic_if["Fn::If"][1])
+    intrinsic_if["Fn::If"][2] = convert(intrinsic_if["Fn::If"][2])
+
+    return intrinsic_if
+
+
 def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
     resource_logical_id,
     attributes,
@@ -102,23 +123,17 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
     for index, policy_entry in enumerate(resource_policies.get()):
         if policy_entry.type is PolicyTypes.POLICY_STATEMENT:
             if is_intrinsic_if(policy_entry.data):
-                intrinsic_if = policy_entry.data
-                then_statement = intrinsic_if["Fn::If"][1]
-                else_statement = intrinsic_if["Fn::If"][2]
-
-                if not is_intrinsic_no_value(then_statement):
-                    then_statement = {
-                        "PolicyName": execution_role.logical_id + "Policy" + str(index),
-                        "PolicyDocument": then_statement,
-                    }
-                    intrinsic_if["Fn::If"][1] = then_statement
-
-                if not is_intrinsic_no_value(else_statement):
-                    else_statement = {
-                        "PolicyName": execution_role.logical_id + "Policy" + str(index),
-                        "PolicyDocument": else_statement,
-                    }
-                    intrinsic_if["Fn::If"][2] = else_statement
+                intrinsic_if = _convert_intrinsic_if_values(
+                    policy_entry.data,
+                    lambda x: (
+                        {
+                            "PolicyName": execution_role.logical_id + "Policy" + str(index),  # noqa: B023
+                            "PolicyDocument": x,
+                        }
+                        if not is_intrinsic_no_value(x)
+                        else x
+                    ),
+                )
 
                 policy_documents.append(intrinsic_if)
 
@@ -147,16 +162,14 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
                     get_managed_policy_map,
                 )
             elif is_intrinsic_if(policy_arn):
-                then_statement = policy_arn["Fn::If"][1]
-                else_statement = policy_arn["Fn::If"][2]
-
-                if not is_intrinsic_no_value(then_statement) and isinstance(then_statement, str):
-                    then_statement = _get_managed_policy_arn(then_statement, managed_policy_map, get_managed_policy_map)
-                    policy_arn["Fn::If"][1] = then_statement
-
-                if not is_intrinsic_no_value(else_statement) and isinstance(else_statement, str):
-                    else_statement = _get_managed_policy_arn(else_statement, managed_policy_map, get_managed_policy_map)
-                    policy_arn["Fn::If"][2] = else_statement
+                policy_arn = _convert_intrinsic_if_values(
+                    policy_arn,
+                    lambda x: (
+                        _get_managed_policy_arn(x, managed_policy_map, get_managed_policy_map)
+                        if not is_intrinsic_no_value(x) and isinstance(x, str)
+                        else x
+                    ),
+                )
 
             # De-Duplicate managed policy arns before inserting. Mainly useful
             # when customer specifies a managed policy which is already inserted
