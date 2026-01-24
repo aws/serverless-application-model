@@ -66,7 +66,7 @@ def _convert_intrinsic_if_values(
     """
     Convert the true and false value of the intrinsic if function according to
     `convert` function.
-    
+
     :param intrinsic_if: A dict of the form {"Fn::If": [condition, value_if_true, value_if_false]}
     :type intrinsic_if: Dict[str, List[Any]]
     :param convert: The function used to make the conversion. If the value can't
