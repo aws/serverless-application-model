@@ -61,7 +61,7 @@ def _get_managed_policy_arn(
 
 
 def _convert_intrinsic_if_values(
-    intrinsic_if: Dict[str, List[Any]], convert: Callable[[Any], Any]
+    intrinsic_if: Dict[str, List[Any]], is_convertible: Callable[[Any], Any], convert: Callable[[Any], Any]
 ) -> Dict[str, List[Any]]:
     """
     Convert the true and false value of the intrinsic if function according to
@@ -69,14 +69,21 @@ def _convert_intrinsic_if_values(
 
     :param intrinsic_if: A dict of the form {"Fn::If": [condition, value_if_true, value_if_false]}
     :type intrinsic_if: Dict[str, List[Any]]
-    :param convert: The function used to make the conversion. If the value can't
-        be converted, return the parameter as is
+    :param is_convertible: The function used to decide if the value must be converted
+    :type convert: Callable[[Any], Any]
+    :param convert: The function used to make the conversion
     :type convert: Callable[[Any], Any]
     :return: The input dict with values converted
     :rtype: Dict[str, List[Any]]
     """
-    intrinsic_if["Fn::If"][1] = convert(intrinsic_if["Fn::If"][1])
-    intrinsic_if["Fn::If"][2] = convert(intrinsic_if["Fn::If"][2])
+    value_if_true = intrinsic_if["Fn::If"][1]
+    value_if_false = intrinsic_if["Fn::If"][2]
+
+    if is_convertible(value_if_true):
+        intrinsic_if["Fn::If"][1] = convert(value_if_true)
+
+    if is_convertible(value_if_false):
+        intrinsic_if["Fn::If"][2] = convert(value_if_false)
 
     return intrinsic_if
 
@@ -125,13 +132,12 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
             if is_intrinsic_if(policy_entry.data):
                 intrinsic_if = _convert_intrinsic_if_values(
                     policy_entry.data,
-                    lambda x: (
+                    lambda value: not is_intrinsic_no_value(value),
+                    lambda value: (
                         {
                             "PolicyName": execution_role.logical_id + "Policy" + str(index),  # noqa: B023
-                            "PolicyDocument": x,
+                            "PolicyDocument": value,
                         }
-                        if not is_intrinsic_no_value(x)
-                        else x
                     ),
                 )
 
@@ -164,11 +170,8 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
             elif is_intrinsic_if(policy_arn):
                 policy_arn = _convert_intrinsic_if_values(
                     policy_arn,
-                    lambda x: (
-                        _get_managed_policy_arn(x, managed_policy_map, get_managed_policy_map)
-                        if not is_intrinsic_no_value(x) and isinstance(x, str)
-                        else x
-                    ),
+                    lambda value: not is_intrinsic_no_value(value) and isinstance(value, str),
+                    lambda value: _get_managed_policy_arn(value, managed_policy_map, get_managed_policy_map),
                 )
 
             # De-Duplicate managed policy arns before inserting. Mainly useful
