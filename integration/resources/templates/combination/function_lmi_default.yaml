@@ -1,0 +1,52 @@
+Parameters:
+  SubnetId:
+    Type: String
+  SecurityGroup:
+    Type: String
+  KMSKeyArn:
+    Type: String
+
+Resources:
+  SimpleCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - !Ref SubnetId
+        SecurityGroupIds:
+        - !Ref SecurityGroup
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      Handler: index.handler
+      CodeUri: ${codeuri}
+      CapacityProviderConfig:
+        Arn: !GetAtt SimpleCapacityProvider.Arn
+
+  AdvancedCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: !Sub "${AWS::StackName}-cp"
+      VpcConfig:
+        SubnetIds:
+        - !Ref SubnetId
+        SecurityGroupIds:
+        - !Ref SecurityGroup
+      InstanceRequirements:
+        Architectures:
+        - x86_64
+        AllowedTypes:
+        - m5.large
+        - m5.xlarge
+        - m5.2xlarge
+      ScalingConfig:
+        MaxVCpuCount: 64
+        AverageCPUUtilization: 70
+      KmsKeyArn: !Ref KMSKeyArn
+      Tags:
+        Environment: Test
+
+Metadata:
+  SamTransformTest: true
