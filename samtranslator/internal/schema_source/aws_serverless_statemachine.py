@@ -10,6 +10,7 @@ from samtranslator.internal.schema_source.common import (
     ResourceAttributes,
     SamIntrinsicable,
     get_prop,
+    passthrough_prop,
 )
 
 properties = get_prop("sam-resource-statemachine")
@@ -47,7 +48,11 @@ class ScheduleEventProperties(BaseModel):
     Schedule: Optional[PassThroughProp] = scheduleeventproperties("Schedule")
     State: Optional[PassThroughProp] = scheduleeventproperties("State")
     Target: Optional[ScheduleTarget] = scheduleeventproperties("Target")
-    RoleArn: Optional[PassThroughProp]  # TODO: add doc
+    RoleArn: Optional[PassThroughProp] = passthrough_prop(
+        "sam-property-statemachine-statemachineschedule",
+        "RoleArn",
+        ["AWS::Scheduler::Schedule.Target", "RoleArn"],
+    )
 
 
 class ScheduleEvent(BaseModel):
@@ -71,7 +76,7 @@ class ScheduleV2EventProperties(BaseModel):
     ScheduleExpressionTimezone: Optional[PassThroughProp] = scheduleeventv2properties("ScheduleExpressionTimezone")
     StartDate: Optional[PassThroughProp] = scheduleeventv2properties("StartDate")
     State: Optional[PassThroughProp] = scheduleeventv2properties("State")
-    OmitName: Optional[bool]  # TODO: add doc
+    OmitName: Optional[bool] = scheduleeventv2properties("OmitName")
 
 
 class ScheduleV2Event(BaseModel):
@@ -118,7 +123,11 @@ class EventBridgeRuleEventProperties(BaseModel):
     RetryPolicy: Optional[PassThroughProp] = eventbridgeruleeventproperties("RetryPolicy")
     Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
     RuleName: Optional[PassThroughProp] = eventbridgeruleeventproperties("RuleName")
-    InputTransformer: Optional[PassThroughProp]  # TODO: add docs
+    InputTransformer: Optional[PassThroughProp] = passthrough_prop(
+        "sam-property-statemachine-statemachineeventbridgerule",
+        "InputTransformer",
+        ["AWS::Events::Rule.Target", "InputTransformer"],
+    )
 
 
 class EventBridgeRuleEvent(BaseModel):
@@ -169,7 +178,7 @@ class Properties(BaseModel):
     Role: Optional[PassThroughProp] = properties("Role")
     RolePath: Optional[PassThroughProp] = properties("RolePath")
     Tags: Optional[DictStrAny] = properties("Tags")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = properties("PropagateTags")
     Tracing: Optional[PassThroughProp] = properties("Tracing")
     Type: Optional[PassThroughProp] = properties("Type")
     AutoPublishAlias: Optional[PassThroughProp]
@@ -184,4 +193,4 @@ class Resource(ResourceAttributes):
 
 
 class Globals(BaseModel):
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = properties("PropagateTags")

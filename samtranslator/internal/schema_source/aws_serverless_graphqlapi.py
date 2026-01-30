@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Dict, List, Literal, Optional, Union
 
 from samtranslator.internal.schema_source.common import (
@@ -9,12 +11,28 @@ from samtranslator.internal.schema_source.common import (
     get_prop,
 )
 
+# All PassThroughProp properties in this file are passed directly to AWS::AppSync CloudFormation resources
+# and inherit their documentation from the CloudFormation schema.
+#
+# With `from __future__ import annotations`, complex type properties can now have documentation assigned
+# using the helper functions from sam-docs.json.
+
+PROPERTIES_STEM = "sam-resource-graphqlapi"
+
 AuthenticationTypes = Literal["AWS_IAM", "API_KEY", "AWS_LAMBDA", "OPENID_CONNECT", "AMAZON_COGNITO_USER_POOLS"]
 
-properties = get_prop("sam-resource-graphqlapi")
+properties = get_prop(PROPERTIES_STEM)
+authprovider = get_prop("sam-property-graphqlapi-auth-authprovider")
+auth = get_prop("sam-property-graphqlapi-auth")
+apikey = get_prop("sam-property-graphqlapi-apikeys")
+dynamodbdatasource = get_prop("sam-property-graphqlapi-datasource-dynamodb")
+lambdadatasource = get_prop("sam-property-graphqlapi-datasource-lambda")
+datasource = get_prop("sam-property-graphqlapi-datasource")
+function = get_prop("sam-property-graphqlapi-function")
+runtime = get_prop("sam-property-graphqlapi-function-runtime")
+resolver = get_prop("sam-property-graphqlapi-resolver")
 
 
-# TODO: add docs
 class LambdaAuthorizerConfig(BaseModel):
     AuthorizerResultTtlInSeconds: Optional[PassThroughProp]
     AuthorizerUri: PassThroughProp
@@ -36,20 +54,20 @@ class UserPoolConfig(BaseModel):
 
 
 class Authorizer(BaseModel):
-    Type: AuthenticationTypes
-    LambdaAuthorizer: Optional[LambdaAuthorizerConfig]
-    OpenIDConnect: Optional[OpenIDConnectConfig]
-    UserPool: Optional[UserPoolConfig]
+    Type: AuthenticationTypes = authprovider("Type")
+    LambdaAuthorizer: Optional[LambdaAuthorizerConfig] = authprovider("LambdaAuthorizer")
+    OpenIDConnect: Optional[OpenIDConnectConfig] = authprovider("OpenIDConnect")
+    UserPool: Optional[UserPoolConfig] = authprovider("UserPool")
 
 
 class Auth(Authorizer):
-    Additional: Optional[List[Authorizer]]
+    Additional: Optional[List[Authorizer]] = auth("Additional")
 
 
 class ApiKey(BaseModel):
-    ApiKeyId: Optional[PassThroughProp]
-    Description: Optional[PassThroughProp]
-    ExpiresOn: Optional[PassThroughProp]
+    ApiKeyId: Optional[PassThroughProp] = apikey("ApiKeyId")
+    Description: Optional[PassThroughProp] = apikey("Description")
+    ExpiresOn: Optional[PassThroughProp] = apikey("ExpiresOn")
 
 
 class Logging(BaseModel):
@@ -65,33 +83,33 @@ class DeltaSync(BaseModel):
 
 
 class DynamoDBDataSource(BaseModel):
-    TableName: PassThroughProp
-    ServiceRoleArn: Optional[PassThroughProp]
-    TableArn: Optional[PassThroughProp]
-    Permissions: Optional[PermissionsType]
-    Name: Optional[PassThroughProp]
-    Description: Optional[PassThroughProp]
-    Region: Optional[PassThroughProp]
-    DeltaSync: Optional[DeltaSync]
-    UseCallerCredentials: Optional[PassThroughProp]
-    Versioned: Optional[PassThroughProp]
+    TableName: PassThroughProp = dynamodbdatasource("TableName")
+    ServiceRoleArn: Optional[PassThroughProp] = dynamodbdatasource("ServiceRoleArn")
+    TableArn: Optional[PassThroughProp] = dynamodbdatasource("TableArn")
+    Permissions: Optional[PermissionsType] = dynamodbdatasource("Permissions")
+    Name: Optional[PassThroughProp] = dynamodbdatasource("Name")
+    Description: Optional[PassThroughProp] = dynamodbdatasource("Description")
+    Region: Optional[PassThroughProp] = dynamodbdatasource("Region")
+    DeltaSync: Optional[DeltaSync] = dynamodbdatasource("DeltaSync")
+    UseCallerCredentials: Optional[PassThroughProp] = dynamodbdatasource("UseCallerCredentials")
+    Versioned: Optional[PassThroughProp] = dynamodbdatasource("Versioned")
 
 
 class LambdaDataSource(BaseModel):
-    FunctionArn: PassThroughProp
-    ServiceRoleArn: Optional[PassThroughProp]
-    Name: Optional[PassThroughProp]
-    Description: Optional[PassThroughProp]
+    FunctionArn: PassThroughProp = lambdadatasource("FunctionArn")
+    ServiceRoleArn: Optional[PassThroughProp] = lambdadatasource("ServiceRoleArn")
+    Name: Optional[PassThroughProp] = lambdadatasource("Name")
+    Description: Optional[PassThroughProp] = lambdadatasource("Description")
 
 
 class DataSources(BaseModel):
-    DynamoDb: Optional[Dict[str, DynamoDBDataSource]]
-    Lambda: Optional[Dict[str, LambdaDataSource]]
+    DynamoDb: Optional[Dict[str, DynamoDBDataSource]] = datasource("DynamoDb")
+    Lambda: Optional[Dict[str, LambdaDataSource]] = datasource("Lambda")
 
 
 class Runtime(BaseModel):
-    Name: PassThroughProp
-    Version: PassThroughProp
+    Name: PassThroughProp = runtime("Name")
+    Version: PassThroughProp = runtime("Version")
 
 
 class LambdaConflictHandlerConfig(BaseModel):
@@ -105,15 +123,15 @@ class Sync(BaseModel):
 
 
 class Function(BaseModel):
-    DataSource: Optional[SamIntrinsicable[str]]
-    Runtime: Optional[Runtime]
-    InlineCode: Optional[PassThroughProp]
-    CodeUri: Optional[PassThroughProp]
-    Description: Optional[PassThroughProp]
-    MaxBatchSize: Optional[PassThroughProp]
-    Name: Optional[str]
-    Id: Optional[PassThroughProp]
-    Sync: Optional[Sync]
+    DataSource: Optional[SamIntrinsicable[str]] = function("DataSource")
+    Runtime: Optional[Runtime] = function("Runtime")
+    InlineCode: Optional[PassThroughProp] = function("InlineCode")
+    CodeUri: Optional[PassThroughProp] = function("CodeUri")
+    Description: Optional[PassThroughProp] = function("Description")
+    MaxBatchSize: Optional[PassThroughProp] = function("MaxBatchSize")
+    Name: Optional[str] = function("Name")
+    Id: Optional[PassThroughProp] = function("Id")
+    Sync: Optional[Sync] = function("Sync")
 
 
 class Caching(BaseModel):
@@ -122,16 +140,16 @@ class Caching(BaseModel):
 
 
 class Resolver(BaseModel):
-    FieldName: Optional[str]
-    Caching: Optional[Caching]
-    InlineCode: Optional[PassThroughProp]
-    CodeUri: Optional[PassThroughProp]
-    MaxBatchSize: Optional[PassThroughProp]
-    Pipeline: Optional[
-        List[str]
-    ]  # keeping it optional allows for easier validation in to_cloudformation with better error messages
-    Runtime: Optional[Runtime]
-    Sync: Optional[Sync]
+    FieldName: Optional[str] = resolver("FieldName")
+    Caching: Optional[Caching] = resolver("Caching")
+    InlineCode: Optional[PassThroughProp] = resolver("InlineCode")
+    CodeUri: Optional[PassThroughProp] = resolver("CodeUri")
+    MaxBatchSize: Optional[PassThroughProp] = resolver("MaxBatchSize")
+    Pipeline: Optional[List[str]] = resolver(
+        "Pipeline"
+    )  # keeping it optional allows for easier validation in to_cloudformation with better error messages
+    Runtime: Optional[Runtime] = resolver("Runtime")
+    Sync: Optional[Sync] = resolver("Sync")
 
 
 class DomainName(BaseModel):
@@ -149,24 +167,24 @@ class Cache(BaseModel):
 
 
 class Properties(BaseModel):
-    Auth: Auth
-    Tags: Optional[DictStrAny]
-    Name: Optional[PassThroughProp]
-    XrayEnabled: Optional[bool]
-    SchemaInline: Optional[PassThroughProp]
-    SchemaUri: Optional[PassThroughProp]
-    Logging: Optional[Union[Logging, bool]]
-    DataSources: Optional[DataSources]
-    Functions: Optional[Dict[str, Function]]
-    Resolvers: Optional[Dict[str, Dict[str, Resolver]]]
-    ApiKeys: Optional[Dict[str, ApiKey]]
-    DomainName: Optional[DomainName]
-    Cache: Optional[Cache]
-    Visibility: Optional[PassThroughProp]
-    OwnerContact: Optional[PassThroughProp]
-    IntrospectionConfig: Optional[PassThroughProp]
-    QueryDepthLimit: Optional[PassThroughProp]
-    ResolverCountLimit: Optional[PassThroughProp]
+    Auth: Auth = properties("Auth")
+    Tags: Optional[DictStrAny] = properties("Tags")
+    Name: Optional[PassThroughProp] = properties("Name")
+    XrayEnabled: Optional[bool] = properties("XrayEnabled")
+    SchemaInline: Optional[PassThroughProp] = properties("SchemaInline")
+    SchemaUri: Optional[PassThroughProp] = properties("SchemaUri")
+    Logging: Optional[Union[Logging, bool]] = properties("Logging")
+    DataSources: Optional[DataSources] = properties("DataSources")
+    Functions: Optional[Dict[str, Function]] = properties("Functions")
+    Resolvers: Optional[Dict[str, Dict[str, Resolver]]] = properties("Resolvers")
+    ApiKeys: Optional[Dict[str, ApiKey]] = properties("ApiKeys")
+    DomainName: Optional[DomainName] = properties("DomainName")
+    Cache: Optional[Cache] = properties("Cache")
+    Visibility: Optional[PassThroughProp]  # TODO: add documentation when available in sam-docs.json
+    OwnerContact: Optional[PassThroughProp]  # TODO: add documentation when available in sam-docs.json
+    IntrospectionConfig: Optional[PassThroughProp]  # TODO: add documentation when available in sam-docs.json
+    QueryDepthLimit: Optional[PassThroughProp]  # TODO: add documentation when available in sam-docs.json
+    ResolverCountLimit: Optional[PassThroughProp]  # TODO: add documentation when available in sam-docs.json
 
 
 class Resource(BaseModel):
