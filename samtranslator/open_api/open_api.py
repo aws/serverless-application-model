@@ -114,7 +114,14 @@ class OpenApiEditor(BaseEditor):
         return True
 
     def add_lambda_integration(  # type: ignore[no-untyped-def] # noqa: PLR0913
-        self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
+        self,
+        path,
+        method,
+        integration_uri,
+        method_auth_config=None,
+        api_auth_config=None,
+        condition=None,
+        invoke_mode=None,
     ):
         """
         Adds aws_proxy APIGW integration to the given path+method.
@@ -146,6 +153,9 @@ class OpenApiEditor(BaseEditor):
             path_item[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
             path_item[method][self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = "2.0"
             path_item[method][self._X_APIGW_INTEGRATION]["uri"] = integration_uri
+
+            if invoke_mode:
+                path_item[method][self._X_APIGW_INTEGRATION]["invokeMode"] = invoke_mode
 
             if path == self._DEFAULT_PATH and method == self._X_ANY_METHOD:
                 path_item[method]["isDefaultRoute"] = True

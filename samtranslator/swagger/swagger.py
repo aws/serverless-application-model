@@ -125,6 +125,7 @@ class SwaggerEditor(BaseEditor):
         method_auth_config: Dict[str, Any],
         api_auth_config: Dict[str, Any],
         condition: Optional[str] = None,
+        invoke_mode: Optional[Any] = None,
     ) -> None:
         """
         Adds aws_proxy APIGW integration to the given path+method.
@@ -149,6 +150,10 @@ class SwaggerEditor(BaseEditor):
             path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
             path_item[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
             path_item[method][self._X_APIGW_INTEGRATION]["uri"] = _integration_uri
+
+            # When using RESPONSE_STREAM invoke mode, set responseTransferMode to STREAM
+            if invoke_mode == "RESPONSE_STREAM":
+                path_item[method][self._X_APIGW_INTEGRATION]["responseTransferMode"] = "STREAM"
 
             if (
                 method_auth_config.get("Authorizer") == "AWS_IAM"
