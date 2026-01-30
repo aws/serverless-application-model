@@ -158,22 +158,10 @@
       "additionalProperties": false,
       "properties": {
         "LambdaAuthorizer": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/LambdaAuthorizerConfig"
-            }
-          ],
-          "markdownDescription": "Specify the optional authorization configuration for your AWS Lambda function authorizer. You can configure this optional property when `Type` is specified as `AWS_LAMBDA`.  \n*Type*: [ LambdaAuthorizerConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-graphqlapi.html#cfn-appsync-graphqlapi-lambdaauthorizerconfig)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `[ LambdaAuthorizerConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-lambdaauthorizerconfig.html)` property of an `AWS::AppSync::GraphQLApi` `[ AdditionalAuthenticationProvider](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-additionalauthenticationprovider.html)` object.",
-          "title": "LambdaAuthorizer"
+          "$ref": "#/definitions/LambdaAuthorizerConfig"
         },
         "OpenIDConnect": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/OpenIDConnectConfig"
-            }
-          ],
-          "markdownDescription": "Specify the optional authorization configuration for your OpenID Connect compliant service. You can configure this optional property when `Type` is specified as `OPENID_CONNECT`.  \n*Type*: [ OpenIDConnectConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-graphqlapi.html#cfn-appsync-graphqlapi-openidconnectconfig)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `[ OpenIDConnectConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-openidconnectconfig.html)` property of an `AWS::AppSync::GraphQLApi` `[ AdditionalAuthenticationProvider](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-additionalauthenticationprovider.html)` object.",
-          "title": "OpenIDConnect"
+          "$ref": "#/definitions/OpenIDConnectConfig"
         },
         "Type": {
           "enum": [
@@ -188,13 +176,7 @@
           "type": "string"
         },
         "UserPool": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/UserPoolConfig"
-            }
-          ],
-          "markdownDescription": "Specify the optional authorization configuration for using Amazon Cognito user pools. You can configure this optional property when `Type` is specified as `AMAZON_COGNITO_USER_POOLS`.  \n*Type*: [ UserPoolConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-graphqlapi.html#cfn-appsync-graphqlapi-userpoolconfig)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `[ UserPoolConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-userpoolconfig.html)` property of an `AWS::AppSync::GraphQLApi` `[ AdditionalAuthenticationProvider](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-additionalauthenticationprovider.html)` object.",
-          "title": "UserPool"
+          "$ref": "#/definitions/UserPoolConfig"
         }
       },
       "required": [
@@ -7987,22 +7969,10 @@
           "type": "array"
         },
         "LambdaAuthorizer": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/LambdaAuthorizerConfig"
-            }
-          ],
-          "markdownDescription": "Specify the optional authorization configuration for your AWS Lambda function authorizer. You can configure this optional property when `Type` is specified as `AWS_LAMBDA`.  \n*Type*: [ LambdaAuthorizerConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-graphqlapi.html#cfn-appsync-graphqlapi-lambdaauthorizerconfig)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `[ LambdaAuthorizerConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-lambdaauthorizerconfig.html)` property of an `AWS::AppSync::GraphQLApi` `[ AdditionalAuthenticationProvider](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-additionalauthenticationprovider.html)` object.",
-          "title": "LambdaAuthorizer"
+          "$ref": "#/definitions/LambdaAuthorizerConfig"
         },
         "OpenIDConnect": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/OpenIDConnectConfig"
-            }
-          ],
-          "markdownDescription": "Specify the optional authorization configuration for your OpenID Connect compliant service. You can configure this optional property when `Type` is specified as `OPENID_CONNECT`.  \n*Type*: [ OpenIDConnectConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-graphqlapi.html#cfn-appsync-graphqlapi-openidconnectconfig)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `[ OpenIDConnectConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-openidconnectconfig.html)` property of an `AWS::AppSync::GraphQLApi` `[ AdditionalAuthenticationProvider](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-additionalauthenticationprovider.html)` object.",
-          "title": "OpenIDConnect"
+          "$ref": "#/definitions/OpenIDConnectConfig"
         },
         "Type": {
           "enum": [
@@ -8017,13 +7987,7 @@
           "type": "string"
         },
         "UserPool": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/UserPoolConfig"
-            }
-          ],
-          "markdownDescription": "Specify the optional authorization configuration for using Amazon Cognito user pools. You can configure this optional property when `Type` is specified as `AMAZON_COGNITO_USER_POOLS`.  \n*Type*: [ UserPoolConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-graphqlapi.html#cfn-appsync-graphqlapi-userpoolconfig)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the `[ UserPoolConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-userpoolconfig.html)` property of an `AWS::AppSync::GraphQLApi` `[ AdditionalAuthenticationProvider](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-appsync-graphqlapi-additionalauthenticationprovider.html)` object.",
-          "title": "UserPool"
+          "$ref": "#/definitions/UserPoolConfig"
         }
       },
       "required": [

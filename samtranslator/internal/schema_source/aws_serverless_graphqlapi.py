@@ -14,8 +14,6 @@ from samtranslator.internal.schema_source.common import (
 # All PassThroughProp properties in this file are passed directly to AWS::AppSync CloudFormation resources
 # and inherit their documentation from the CloudFormation schema.
 #
-# With `from __future__ import annotations`, complex type properties can now have documentation assigned
-# using the helper functions from sam-docs.json.
 
 PROPERTIES_STEM = "sam-resource-graphqlapi"
 
@@ -34,12 +32,14 @@ resolver = get_prop("sam-property-graphqlapi-resolver")
 
 
 class LambdaAuthorizerConfig(BaseModel):
+    # Maps to AWS::AppSync::GraphQLApi.LambdaAuthorizerConfig
     AuthorizerResultTtlInSeconds: Optional[PassThroughProp]
     AuthorizerUri: PassThroughProp
     IdentityValidationExpression: Optional[PassThroughProp]
 
 
 class OpenIDConnectConfig(BaseModel):
+    # Maps to AWS::AppSync::GraphQLApi.OpenIDConnectConfig
     AuthTTL: Optional[PassThroughProp]
     ClientId: Optional[PassThroughProp]
     IatTTL: Optional[PassThroughProp]
@@ -47,6 +47,7 @@ class OpenIDConnectConfig(BaseModel):
 
 
 class UserPoolConfig(BaseModel):
+    # Maps to AWS::AppSync::GraphQLApi.UserPoolConfig
     AppIdClientRegex: Optional[PassThroughProp]
     AwsRegion: Optional[PassThroughProp]
     DefaultAction: Optional[PassThroughProp]
@@ -55,9 +56,10 @@ class UserPoolConfig(BaseModel):
 
 class Authorizer(BaseModel):
     Type: AuthenticationTypes = authprovider("Type")
-    LambdaAuthorizer: Optional[LambdaAuthorizerConfig] = authprovider("LambdaAuthorizer")
-    OpenIDConnect: Optional[OpenIDConnectConfig] = authprovider("OpenIDConnect")
-    UserPool: Optional[UserPoolConfig] = authprovider("UserPool")
+    # Maps to AWS::AppSync::GraphQLApi.AdditionalAuthenticationProvider
+    LambdaAuthorizer: Optional[LambdaAuthorizerConfig]
+    OpenIDConnect: Optional[OpenIDConnectConfig]
+    UserPool: Optional[UserPoolConfig]
 
 
 class Auth(Authorizer):
@@ -71,12 +73,14 @@ class ApiKey(BaseModel):
 
 
 class Logging(BaseModel):
+    # Maps to AWS::AppSync::GraphQLApi LogConfig
     CloudWatchLogsRoleArn: Optional[PassThroughProp]
     ExcludeVerboseContent: Optional[PassThroughProp]
     FieldLogLevel: Optional[PassThroughProp]
 
 
 class DeltaSync(BaseModel):
+    # Maps to AWS::AppSync::DataSource.DeltaSyncConfig
     BaseTableTTL: PassThroughProp
     DeltaSyncTableName: PassThroughProp
     DeltaSyncTableTTL: PassThroughProp
@@ -113,10 +117,12 @@ class Runtime(BaseModel):
 
 
 class LambdaConflictHandlerConfig(BaseModel):
+    # Maps to AWS::AppSync::FunctionConfiguration.LambdaConflictHandlerConfig
     LambdaConflictHandlerArn: PassThroughProp
 
 
 class Sync(BaseModel):
+    # Maps to AWS::AppSync::FunctionConfiguration.SyncConfig
     ConflictDetection: PassThroughProp
     ConflictHandler: Optional[PassThroughProp]
     LambdaConflictHandlerConfig: Optional[LambdaConflictHandlerConfig]
@@ -135,6 +141,7 @@ class Function(BaseModel):
 
 
 class Caching(BaseModel):
+    # Maps to AWS::AppSync::Resolver.CachingConfig
     Ttl: PassThroughProp
     CachingKeys: Optional[List[PassThroughProp]]
 
@@ -153,12 +160,14 @@ class Resolver(BaseModel):
 
 
 class DomainName(BaseModel):
+    # Maps to AWS::AppSync::DomainName
     CertificateArn: PassThroughProp
     DomainName: PassThroughProp
     Description: Optional[PassThroughProp]
 
 
 class Cache(BaseModel):
+    # Maps to AWS::AppSync::ApiCache
     ApiCachingBehavior: PassThroughProp
     Ttl: PassThroughProp
     Type: PassThroughProp
