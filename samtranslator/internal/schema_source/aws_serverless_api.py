@@ -414,7 +414,6 @@ class Globals(BaseModel):
     Domain: Optional[Domain] = properties("Domain")
     AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
     PropagateTags: Optional[bool] = properties("PropagateTags")
-    PropagateTags: Optional[bool]  # TODO: add docs
     SecurityPolicy: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,
         "SecurityPolicy",

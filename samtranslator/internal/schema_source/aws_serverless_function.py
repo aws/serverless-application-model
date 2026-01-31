@@ -451,8 +451,10 @@ class MSKEventProperties(BaseModel):
         "DestinationConfig",
         ["AWS::Lambda::EventSourceMapping", "Properties", "DestinationConfig"],
     )
-    ProvisionedPollerConfig: Optional[PassThroughProp]
-    SchemaRegistryConfig: Optional[PassThroughProp]
+    ProvisionedPollerConfig: Optional[PassThroughProp] = mskeventproperties("ProvisionedPollerConfig")
+    SchemaRegistryConfig: Optional[PassThroughProp] = mskeventproperties("SchemaRegistryConfig")
+    MetricsConfig: Optional[PassThroughProp] = mskeventproperties("MetricsConfig")
+    LoggingConfig: Optional[PassThroughProp] = mskeventproperties("LoggingConfig")
     BisectBatchOnFunctionError: Optional[PassThroughProp] = mskeventproperties("BisectBatchOnFunctionError")
     FunctionResponseTypes: Optional[PassThroughProp] = mskeventproperties("FunctionResponseTypes")
     MaximumRecordAgeInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumRecordAgeInSeconds")
@@ -503,8 +505,10 @@ class SelfManagedKafkaEventProperties(BaseModel):
     StartingPosition: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("StartingPosition")
     StartingPositionTimestamp: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("StartingPositionTimestamp")
     Topics: PassThroughProp = selfmanagedkafkaeventproperties("Topics")
-    ProvisionedPollerConfig: Optional[PassThroughProp]
-    SchemaRegistryConfig: Optional[PassThroughProp]
+    MetricsConfig: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("MetricsConfig")
+    ProvisionedPollerConfig: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("ProvisionedPollerConfig")
+    SchemaRegistryConfig: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("SchemaRegistryConfig")
+    LoggingConfig: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("LoggingConfig")
     BisectBatchOnFunctionError: Optional[PassThroughProp] = selfmanagedkafkaeventproperties(
         "BisectBatchOnFunctionError"
     )

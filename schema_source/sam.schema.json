@@ -2760,7 +2760,7 @@
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "A string that configures how events will be read from Kafka topics.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`AmazonManagedKafkaConfiguration`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html) property of an `AWS::Lambda::EventSourceMapping` resource.",
+          "markdownDescription": "A string that configures how events will be read from Kafka topics\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`AmazonManagedKafkaConfiguration`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "ConsumerGroupId"
         },
         "DestinationConfig": {
@@ -2828,13 +2828,22 @@
           "markdownDescription": "The Amazon Resource Name (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/ARN.html) of the key to encrypt information related to this event.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`KmsKeyArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-kmskeyarn) property of an `AWS::Lambda::EventSourceMapping` resource.",
           "title": "KmsKeyArn"
         },
+        "LoggingConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the logging configuration for the event source mapping\\.  \n*Type*: [LoggingConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-loggingconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`LoggingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-loggingconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "LoggingConfig"
+        },
         "MaximumBatchingWindowInSeconds": {
           "allOf": [
             {
               "$ref": "#/definitions/PassThroughProp"
             }
           ],
-          "markdownDescription": "The maximum amount of time to gather records before invoking the function, in seconds.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`MaximumBatchingWindowInSeconds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumbatchingwindowinseconds) property of an `AWS::Lambda::EventSourceMapping` resource.",
+          "markdownDescription": "The maximum amount of time to gather records before invoking the function, in seconds\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumBatchingWindowInSeconds`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumbatchingwindowinseconds) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "MaximumBatchingWindowInSeconds"
         },
         "MaximumRecordAgeInSeconds": {
@@ -2855,11 +2864,32 @@
           "markdownDescription": "The maximum number of times to retry when the function returns an error.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`MaximumRetryAttempts`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumretryattempts) property of an `AWS::Lambda::EventSourceMapping` resource.",
           "title": "MaximumRetryAttempts"
         },
+        "MetricsConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the metrics configuration for the event source mapping\\.  \n*Type*: [MetricsConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-metricsconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MetricsConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-metricsconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "MetricsConfig"
+        },
         "ProvisionedPollerConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "Configuration to increase the amount of pollers used to compute event source mappings. This configuration allows for a minimum of 1 poller and a maximum of 2000 pollers. For an example, refer to [ProvisionedPollerConfig example](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-function-msk-example-provisionedpollerconfig.html#sam-property-function-msk-example-provisionedpollerconfig).  \n*Type*: [ProvisionedPollerConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-provisionedpollerconfig)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ProvisionedPollerConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-provisionedpollerconfig) property of an `AWS::Lambda::EventSourceMapping` resource.",
+          "title": "ProvisionedPollerConfig"
         },
         "SchemaRegistryConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "Configuration for using a schema registry with the Kafka event source.  \nThis feature requires `ProvisionedPollerConfig` to be configured.\n*Type*: SchemaRegistryConfig  \n*Required*: No  \n*CloudFormation compatibility:* This property is passed directly to the [`AmazonManagedKafkaEventSourceConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-amazonmanagedkafkaeventsourceconfig) property of an `AWS::Lambda::EventSourceMapping` resource.",
+          "title": "SchemaRegistryConfig"
         },
         "SourceAccessConfigurations": {
           "allOf": [
@@ -3785,6 +3815,15 @@
           ],
           "title": "KmsKeyArn"
         },
+        "LoggingConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the logging configuration for the event source mapping\\.  \n*Type*: [LoggingConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-loggingconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`LoggingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-loggingconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "LoggingConfig"
+        },
         "MaximumRecordAgeInSeconds": {
           "allOf": [
             {
@@ -3803,11 +3842,32 @@
           "markdownDescription": "The maximum number of times to retry when the function returns an error.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`MaximumRetryAttempts`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumretryattempts) property of an `AWS::Lambda::EventSourceMapping` resource.",
           "title": "MaximumRetryAttempts"
         },
+        "MetricsConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the metrics configuration for the event source mapping\\.  \n*Type*: [MetricsConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-metricsconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MetricsConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-metricsconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "MetricsConfig"
+        },
         "ProvisionedPollerConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "Configuration to increase the amount of pollers used to compute event source mappings. This configuration allows for a minumum of 1 poller and a maximum of 2000 pollers. For an example, refer to [ProvisionedPollerConfig example](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/#sam-property-function-selfmanagedkafka-example-provisionedpollerconfig.html#sam-property-function-selfmanagedkafka-example-provisionedpollerconfig)  \n*Type*: [ProvisionedPollerConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-provisionedpollerconfig)  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`ProvisionedPollerConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-provisionedpollerconfig) property of an `AWS::Lambda::EventSourceMapping` resource.",
+          "title": "ProvisionedPollerConfig"
         },
         "SchemaRegistryConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "Configuration for using a schema registry with the self-managed Kafka event source.  \nThis feature requires `ProvisionedPollerConfig` to be configured.\n*Type*: SchemaRegistryConfig  \n*Required*: No  \n*CloudFormation compatibility:* This property is passed directly to the [`SelfManagedKafkaEventSourceConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-selfmanagedkafkaeventsourceconfig) property of an `AWS::Lambda::EventSourceMapping` resource.",
+          "title": "SchemaRegistryConfig"
         },
         "SourceAccessConfigurations": {
           "allOf": [

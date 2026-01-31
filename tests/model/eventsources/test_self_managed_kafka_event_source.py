@@ -709,3 +709,66 @@ class SelfManagedKafkaEventSource(TestCase):
         # Verify that ProvisionedPollerConfig is correctly set with all properties including PollerGroupName
         expected_config = {"MinimumPollers": 3, "MaximumPollers": 15, "PollerGroupName": "self-managed-poller-group"}
         self.assertEqual(event_source_mapping.ProvisionedPollerConfig, expected_config)
+
+    @parameterized.expand([("WARN",), ("INFO",), ("DEBUG",)])
+    def test_to_cloudformation_with_logging_config_different_levels(self, level):
+        # Set up the event source with required properties
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "BASIC_AUTH", "URI": "SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.LoggingConfig = {"SystemLogLevel": level}
+
+        # Set up mock function
+        function = Mock()
+        function.get_runtime_attr = Mock()
+        function.get_runtime_attr.return_value = "arn:aws:lambda:mock"
+        function.get_passthrough_resource_attributes = Mock()
+        function.get_passthrough_resource_attributes.return_value = {}
+
+        # Set up mock role with proper attributes
+        role = Mock()
+        role.ManagedPolicyArns = []
+        role.Policies = []
+
+        # Call to_cloudformation
+        resources = self.kafka_event_source.to_cloudformation(function=function, role=role)
+
+        # Verify that LoggingConfig is passed through correctly
+        self.assertEqual(len(resources), 1)
+        event_source_mapping = resources[0]
+        self.assertEqual(event_source_mapping.LoggingConfig, {"SystemLogLevel": level})
+
+    def test_to_cloudformation_with_metrics_config_multiple_metrics(self):
+        # Set up the event source with required properties and MetricsConfig containing multiple metrics including KafkaMetrics
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "BASIC_AUTH", "URI": "SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.MetricsConfig = {"Metrics": ["EventCount", "ErrorCount", "KafkaMetrics"]}
+
+        # Set up mock function
+        function = Mock()
+        function.get_runtime_attr = Mock()
+        function.get_runtime_attr.return_value = "arn:aws:lambda:mock"
+        function.get_passthrough_resource_attributes = Mock()
+        function.get_passthrough_resource_attributes.return_value = {}
+
+        # Set up mock role with proper attributes
+        role = Mock()
+        role.ManagedPolicyArns = []
+        role.Policies = []
+
+        # Call to_cloudformation
+        resources = self.kafka_event_source.to_cloudformation(function=function, role=role)
+
+        # Verify that MetricsConfig is passed through to EventSourceMapping
+        self.assertEqual(len(resources), 1)
+        event_source_mapping = resources[0]
+        self.assertEqual(event_source_mapping.MetricsConfig, {"Metrics": ["EventCount", "ErrorCount", "KafkaMetrics"]})
