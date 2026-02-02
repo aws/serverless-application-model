@@ -98,6 +98,7 @@ Currently, the following resources and properties are being supported:
       TracingEnabled:
       OpenApiVersion:
       Domain:
+      SecurityPolicy:
 
     HttpApi:
       # Properties of AWS::Serverless::HttpApi

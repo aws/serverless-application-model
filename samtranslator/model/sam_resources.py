@@ -1645,6 +1645,7 @@ class SamApi(SamResourceMacro):
         "ApiKeySourceType": PropertyType(False, IS_STR),
         "AlwaysDeploy": Property(False, IS_BOOL),
         "Policy": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "SecurityPolicy": PropertyType(False, IS_STR),
     }
 
     Name: Optional[Intrinsicable[str]]
@@ -1677,6 +1678,7 @@ class SamApi(SamResourceMacro):
     ApiKeySourceType: Optional[Intrinsicable[str]]
     AlwaysDeploy: Optional[bool]
     Policy: Optional[Union[Dict[str, Any], Intrinsicable[str]]]
+    SecurityPolicy: Optional[Intrinsicable[str]]
 
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
@@ -1745,6 +1747,7 @@ class SamApi(SamResourceMacro):
             always_deploy=self.AlwaysDeploy,
             feature_toggle=feature_toggle,
             policy=self.Policy,
+            security_policy=self.SecurityPolicy,
         )
 
         generated_resources = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)

@@ -2543,10 +2543,22 @@
           "title": "ConsumerGroupId"
         },
         "DestinationConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the destination of an event after Lambda processes it\\.  \nUse this property to specify the destination of failed invocations from the Amazon MSK event source\\.  \n*Type*: [DestinationConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-destinationconfig)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the `[ DestinationConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-destinationconfig.html)` property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "DestinationConfig"
         },
         "Enabled": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "Disables the event source mapping to pause polling and invocation\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`Enabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-enabled) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "Enabled"
         },
         "FilterCriteria": {
           "allOf": [
@@ -2567,7 +2579,22 @@
           "title": "FunctionResponseTypes"
         },
         "KmsKeyArn": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The ARN of the AWS Key Management Service \\(AWS KMS\\) customer managed key to use for encryption\\. Only the key ID or key ARN is supported\\. The key alias is not supported\\. If you don't specify a customer managed key, Lambda uses an AWS owned key for encryption\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`KMSKeyArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-kmskeyarn) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "KmsKeyArn"
+        },
+        "LoggingConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the logging configuration for the event source mapping\\.  \n*Type*: [LoggingConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-loggingconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`LoggingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-loggingconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "LoggingConfig"
         },
         "MaximumBatchingWindowInSeconds": {
           "allOf": [
@@ -2596,11 +2623,32 @@
           "markdownDescription": "The maximum number of times to retry when the function returns an error\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumRetryAttempts`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumretryattempts) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "MaximumRetryAttempts"
         },
+        "MetricsConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the metrics configuration for the event source mapping\\.  \n*Type*: [MetricsConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-metricsconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MetricsConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-metricsconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "MetricsConfig"
+        },
         "ProvisionedPollerConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the provisioned poller configuration for the event source mapping\\.  \n*Type*: [ProvisionedPollerConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-provisionedpollerconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedPollerConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-provisionedpollerconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "ProvisionedPollerConfig"
         },
         "SchemaRegistryConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the schema registry configuration for the event source mapping\\.  \n*Type*: [SchemaRegistryConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-schemaregistryconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SchemaRegistryConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-schemaregistryconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "SchemaRegistryConfig"
         },
         "SourceAccessConfigurations": {
           "allOf": [
@@ -3422,7 +3470,22 @@
           "type": "array"
         },
         "KmsKeyArn": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The ARN of the AWS Key Management Service \\(AWS KMS\\) customer managed key to use for encryption\\. Only the key ID or key ARN is supported\\. The key alias is not supported\\. If you don't specify a customer managed key, Lambda uses an AWS owned key for encryption\\.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`KMSKeyArn`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-kmskeyarn) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "KmsKeyArn"
+        },
+        "LoggingConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the logging configuration for the event source mapping\\.  \n*Type*: [LoggingConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-loggingconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`LoggingConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-loggingconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "LoggingConfig"
         },
         "MaximumRecordAgeInSeconds": {
           "allOf": [
@@ -3442,11 +3505,32 @@
           "markdownDescription": "The maximum number of times to retry when the function returns an error\\.  \n*Type*: Integer  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MaximumRetryAttempts`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-maximumretryattempts) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
           "title": "MaximumRetryAttempts"
         },
+        "MetricsConfig": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the metrics configuration for the event source mapping\\.  \n*Type*: [MetricsConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-metricsconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`MetricsConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-metricsconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "MetricsConfig"
+        },
         "ProvisionedPollerConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the provisioned poller configuration for the event source mapping\\.  \n*Type*: [ProvisionedPollerConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-provisionedpollerconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`ProvisionedPollerConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-provisionedpollerconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "ProvisionedPollerConfig"
         },
         "SchemaRegistryConfig": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "A configuration object that specifies the schema registry configuration for the event source mapping\\.  \n*Type*: [SchemaRegistryConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-schemaregistryconfig.html)  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SchemaRegistryConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-eventsourcemapping-schemaregistryconfig.html) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "SchemaRegistryConfig"
         },
         "SourceAccessConfigurations": {
           "allOf": [
@@ -3458,10 +3542,22 @@
           "title": "SourceAccessConfigurations"
         },
         "StartingPosition": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The position in a stream from which to start reading\\.  \n+ `AT_TIMESTAMP` \u2013 Specify a time from which to start reading records\\.\n+ `LATEST` \u2013 Read only new records\\.\n+ `TRIM_HORIZON` \u2013 Process all available records\\.\n*Valid values*: `AT_TIMESTAMP` \\| `LATEST` \\| `TRIM_HORIZON`  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPosition`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingposition) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "StartingPosition"
         },
         "StartingPositionTimestamp": {
-          "$ref": "#/definitions/PassThroughProp"
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The time from which to start reading, in Unix time seconds\\. Define `StartingPositionTimestamp` when `StartingPosition` is specified as `AT_TIMESTAMP`\\.  \n*Type*: Double  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`StartingPositionTimestamp`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-startingpositiontimestamp) property of an `AWS::Lambda::EventSourceMapping` resource\\.",
+          "title": "StartingPositionTimestamp"
         },
         "Topics": {
           "allOf": [
@@ -4267,6 +4363,25 @@
           "title": "Propagatetags",
           "type": "boolean"
         },
+        "SecurityPolicy": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The Transport Layer Security (TLS) version + cipher suite for this RestApi. \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SecurityPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-securitypolicy) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "SecurityPolicy"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "SecurityPolicy"
+        },
         "TracingEnabled": {
           "__samPassThrough": {
             "markdownDescriptionOverride": "Indicates whether active tracing with X\\-Ray is enabled for the stage\\. For more information about X\\-Ray, see [Tracing user requests to REST APIs using X\\-Ray](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html) in the *API Gateway Developer Guide*\\.  \n*Type*: Boolean  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`TracingEnabled`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-stage.html#cfn-apigateway-stage-tracingenabled) property of an `AWS::ApiGateway::Stage` resource\\.",
@@ -4639,6 +4754,25 @@
         "PropagateTags": {
           "title": "Propagatetags",
           "type": "boolean"
+        },
+        "SecurityPolicy": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The Transport Layer Security (TLS) version + cipher suite for this RestApi. \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`SecurityPolicy`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-securitypolicy) property of an `AWS::ApiGateway::RestApi` resource\\.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "SecurityPolicy"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "SecurityPolicy"
         },
         "StageName": {
           "anyOf": [

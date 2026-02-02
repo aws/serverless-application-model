@@ -412,18 +412,20 @@ class HttpApiEvent(BaseModel):
 
 class MSKEventProperties(BaseModel):
     ConsumerGroupId: Optional[PassThroughProp] = mskeventproperties("ConsumerGroupId")
-    Enabled: Optional[PassThroughProp]  # TODO: it doesn't show up in docs yet
+    Enabled: Optional[PassThroughProp] = mskeventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = mskeventproperties("FilterCriteria")
-    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp] = mskeventproperties("KmsKeyArn")
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumBatchingWindowInSeconds")
     StartingPosition: Optional[PassThroughProp] = mskeventproperties("StartingPosition")
     StartingPositionTimestamp: Optional[PassThroughProp] = mskeventproperties("StartingPositionTimestamp")
     Stream: PassThroughProp = mskeventproperties("Stream")
     Topics: PassThroughProp = mskeventproperties("Topics")
     SourceAccessConfigurations: Optional[PassThroughProp] = mskeventproperties("SourceAccessConfigurations")
-    DestinationConfig: Optional[PassThroughProp]  # TODO: add documentation
-    ProvisionedPollerConfig: Optional[PassThroughProp]
-    SchemaRegistryConfig: Optional[PassThroughProp]
+    DestinationConfig: Optional[PassThroughProp] = mskeventproperties("DestinationConfig")
+    ProvisionedPollerConfig: Optional[PassThroughProp] = mskeventproperties("ProvisionedPollerConfig")
+    SchemaRegistryConfig: Optional[PassThroughProp] = mskeventproperties("SchemaRegistryConfig")
+    MetricsConfig: Optional[PassThroughProp] = mskeventproperties("MetricsConfig")
+    LoggingConfig: Optional[PassThroughProp] = mskeventproperties("LoggingConfig")
     BisectBatchOnFunctionError: Optional[PassThroughProp] = mskeventproperties("BisectBatchOnFunctionError")
     FunctionResponseTypes: Optional[PassThroughProp] = mskeventproperties("FunctionResponseTypes")
     MaximumRecordAgeInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumRecordAgeInSeconds")
@@ -461,13 +463,15 @@ class SelfManagedKafkaEventProperties(BaseModel):
     KafkaBootstrapServers: Optional[List[SamIntrinsicable[str]]] = selfmanagedkafkaeventproperties(
         "KafkaBootstrapServers"
     )
-    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("KmsKeyArn")
     SourceAccessConfigurations: PassThroughProp = selfmanagedkafkaeventproperties("SourceAccessConfigurations")
-    StartingPosition: Optional[PassThroughProp]  # TODO: add documentation
-    StartingPositionTimestamp: Optional[PassThroughProp]  # TODO: add documentation
+    StartingPosition: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("StartingPosition")
+    StartingPositionTimestamp: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("StartingPositionTimestamp")
     Topics: PassThroughProp = selfmanagedkafkaeventproperties("Topics")
-    ProvisionedPollerConfig: Optional[PassThroughProp]
-    SchemaRegistryConfig: Optional[PassThroughProp]
+    MetricsConfig: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("MetricsConfig")
+    ProvisionedPollerConfig: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("ProvisionedPollerConfig")
+    SchemaRegistryConfig: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("SchemaRegistryConfig")
+    LoggingConfig: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("LoggingConfig")
     BisectBatchOnFunctionError: Optional[PassThroughProp] = selfmanagedkafkaeventproperties(
         "BisectBatchOnFunctionError"
     )

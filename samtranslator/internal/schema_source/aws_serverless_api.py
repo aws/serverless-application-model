@@ -326,6 +326,11 @@ class Properties(BaseModel):
     Tags: Optional[DictStrAny] = properties("Tags")
     Policy: Optional[PassThroughProp]  # TODO: add docs
     PropagateTags: Optional[bool]  # TODO: add docs
+    SecurityPolicy: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "SecurityPolicy",
+        ["AWS::ApiGateway::RestApi", "Properties", "SecurityPolicy"],
+    )
     TracingEnabled: Optional[TracingEnabled] = passthrough_prop(
         PROPERTIES_STEM,
         "TracingEnabled",
@@ -392,6 +397,11 @@ class Globals(BaseModel):
     Domain: Optional[Domain] = properties("Domain")
     AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
     PropagateTags: Optional[bool]  # TODO: add docs
+    SecurityPolicy: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "SecurityPolicy",
+        ["AWS::ApiGateway::RestApi", "Properties", "SecurityPolicy"],
+    )
 
 
 class Resource(ResourceAttributes):
