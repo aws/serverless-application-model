@@ -2745,6 +2745,25 @@
     "MSKEventProperties": {
       "additionalProperties": false,
       "properties": {
+        "BatchSize": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The maximum number of records in each batch that Lambda pulls from your stream or queue and sends to your function. Lambda passes all of the records in the batch to the function in a single call, up to the payload limit for synchronous invocation (6 MB).  \n*Default*: 100  \n*Valid Range*: Minimum value of 1. Maximum value of 10,000.  \n*Type*: Integer  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`BatchSize`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-batchsize) property of an `AWS::Lambda::EventSourceMapping` resource.",
+            "schemaPath": [
+              "definitions",
+              "AWS::Lambda::EventSourceMapping",
+              "properties",
+              "Properties",
+              "properties",
+              "BatchSize"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "BatchSize"
+        },
         "BisectBatchOnFunctionError": {
           "allOf": [
             {

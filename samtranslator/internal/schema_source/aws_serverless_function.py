@@ -432,6 +432,11 @@ class HttpApiEvent(BaseModel):
 
 
 class MSKEventProperties(BaseModel):
+    BatchSize : Optional[PassThroughProp] = passthrough_prop(
+        "sam-property-function-msk",
+        "BatchSize",
+        ["AWS::Lambda::EventSourceMapping", "Properties", "BatchSize"],
+    )
     ConsumerGroupId: Optional[PassThroughProp] = mskeventproperties("ConsumerGroupId")
     Enabled: Optional[PassThroughProp] = passthrough_prop(
         "sam-property-function-msk",
