@@ -35,7 +35,11 @@ SSESpecification = Optional[PassThroughProp]
 
 
 class Properties(BaseModel):
-    PointInTimeRecoverySpecification: Optional[PassThroughProp]  # TODO: add docs
+    PointInTimeRecoverySpecification: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "ProvisionedThroughput",
+        ["AWS::DynamoDB::Table", "Properties", "PointInTimeRecoverySpecification"],
+    )
     PrimaryKey: Optional[PrimaryKey] = properties("PrimaryKey")
     ProvisionedThroughput: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,

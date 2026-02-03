@@ -9,6 +9,7 @@ from samtranslator.internal.schema_source.common import (
     ResourceAttributes,
     SamIntrinsicable,
     get_prop,
+    passthrough_prop,
 )
 
 PROPERTIES_STEM = "sam-resource-capacityprovider"
@@ -52,15 +53,11 @@ class ScalingConfig(BaseModel):
 
 
 class Properties(BaseModel):
-    # TODO: Change back to passthrough_prop after CloudFormation schema is updated with AWS::Lambda::CapacityProvider
-    # Optional capacity provider name - passes through directly to CFN AWS::Lambda::CapacityProvider
-    # Uses PassThroughProp because it's a direct 1:1 mapping with no SAM transformation
-    # CapacityProviderName: Optional[PassThroughProp] = passthrough_prop(
-    #     PROPERTIES_STEM,
-    #     "CapacityProviderName",
-    #     ["AWS::Lambda::CapacityProvider", "Properties", "CapacityProviderName"],
-    # )
-    CapacityProviderName: Optional[PassThroughProp]  # TODO: add documentation
+    CapacityProviderName: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "CapacityProviderName",
+        ["AWS::Lambda::CapacityProvider", "Properties", "CapacityProviderName"],
+    )
 
     # Required VPC configuration - preserves CFN structure, required for EC2 instance networking
     # Uses custom VpcConfig class to validate required SubnetIds while maintaining passthrough behavior
@@ -85,15 +82,11 @@ class Properties(BaseModel):
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
     ScalingConfig: Optional[ScalingConfig] = properties("ScalingConfig")
 
-    # TODO: Change back to passthrough_prop after CloudFormation schema is updated with AWS::Lambda::CapacityProvider
-    # Optional KMS key ARN - passes through directly to CFN for encryption configuration
-    # Uses PassThroughProp because it's a direct 1:1 mapping with no SAM transformation
-    # KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
-    #     PROPERTIES_STEM,
-    #     "KmsKeyArn",
-    #     ["AWS::Lambda::CapacityProvider", "Properties", "KmsKeyArn"],
-    # )
-    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "KmsKeyArn",
+        ["AWS::Lambda::CapacityProvider", "Properties", "KmsKeyArn"],
+    )
 
 
 class Globals(BaseModel):
@@ -120,7 +113,11 @@ class Globals(BaseModel):
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
     ScalingConfig: Optional[ScalingConfig] = properties("ScalingConfig")
 
-    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "KmsKeyArn",
+        ["AWS::Lambda::CapacityProvider", "Properties", "KmsKeyArn"],
+    )
 
 
 class Resource(ResourceAttributes):

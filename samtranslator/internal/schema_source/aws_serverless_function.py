@@ -146,7 +146,11 @@ class SqsSubscription(BaseModel):
 
 class SNSEventProperties(BaseModel):
     FilterPolicy: Optional[PassThroughProp] = snseventproperties("FilterPolicy")
-    FilterPolicyScope: Optional[PassThroughProp]  # TODO: add documentation
+    FilterPolicyScope: Optional[PassThroughProp] = passthrough_prop(
+        "sam-property-function-sns",
+        "FilterPolicyScope",
+        ["AWS::SNS::Subscription", "Properties", "FilterPolicyScope"],
+    )
     Region: Optional[PassThroughProp] = snseventproperties("Region")
     SqsSubscription: Optional[Union[bool, SqsSubscription]] = snseventproperties("SqsSubscription")
     Topic: PassThroughProp = snseventproperties("Topic")
@@ -160,7 +164,7 @@ class SNSEvent(BaseModel):
 class FunctionUrlConfig(BaseModel):
     AuthType: SamIntrinsicable[str] = functionurlconfig("AuthType")
     Cors: Optional[PassThroughProp] = functionurlconfig("Cors")
-    InvokeMode: Optional[PassThroughProp]  # TODO: add to doc
+    InvokeMode: Optional[PassThroughProp] = functionurlconfig("InvokeMode")
 
 
 class KinesisEventProperties(BaseModel):
@@ -170,7 +174,11 @@ class KinesisEventProperties(BaseModel):
     Enabled: Optional[PassThroughProp] = kinesiseventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = kinesiseventproperties("FilterCriteria")
     FunctionResponseTypes: Optional[PassThroughProp] = kinesiseventproperties("FunctionResponseTypes")
-    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "KmsKeyArn",
+        ["AWS::Lambda::EventSourceMapping", "Properties", "KmsKeyArn"],
+    )
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = kinesiseventproperties("MaximumBatchingWindowInSeconds")
     MaximumRecordAgeInSeconds: Optional[PassThroughProp] = kinesiseventproperties("MaximumRecordAgeInSeconds")
     MaximumRetryAttempts: Optional[PassThroughProp] = kinesiseventproperties("MaximumRetryAttempts")
@@ -194,7 +202,11 @@ class DynamoDBEventProperties(BaseModel):
     Enabled: Optional[PassThroughProp] = dynamodbeventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = dynamodbeventproperties("FilterCriteria")
     FunctionResponseTypes: Optional[PassThroughProp] = dynamodbeventproperties("FunctionResponseTypes")
-    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "KmsKeyArn",
+        ["AWS::Lambda::EventSourceMapping", "Properties", "KmsKeyArn"],
+    )
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = dynamodbeventproperties(
         "MaximumBatchingWindowInSeconds"
     )
@@ -221,6 +233,11 @@ class DocumentDBEventProperties(BaseModel):
     Enabled: Optional[PassThroughProp] = documentdbeventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = documentdbeventproperties("FilterCriteria")
     FullDocument: Optional[PassThroughProp] = documentdbeventproperties("FullDocument")
+    KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "KmsKeyArn",
+        ["AWS::Lambda::EventSourceMapping", "Properties", "KmsKeyArn"],
+    )
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = documentdbeventproperties(
         "MaximumBatchingWindowInSeconds"
     )
@@ -240,7 +257,7 @@ class SQSEventProperties(BaseModel):
     Enabled: Optional[PassThroughProp] = sqseventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = sqseventproperties("FilterCriteria")
     FunctionResponseTypes: Optional[PassThroughProp] = sqseventproperties("FunctionResponseTypes")
-    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp] = sqseventproperties("KmsKeyArn")
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = sqseventproperties("MaximumBatchingWindowInSeconds")
     Queue: PassThroughProp = sqseventproperties("Queue")
     ScalingConfig: Optional[PassThroughProp]  # Update docs when live
@@ -259,7 +276,7 @@ class ApiAuth(BaseModel):
     InvokeRole: Optional[SamIntrinsicable[str]] = apiauth("InvokeRole")
     ResourcePolicy: Optional[ResourcePolicy] = apiauth("ResourcePolicy")
     # TODO explicitly mention in docs that intrinsics are not supported for OverrideApiAuth
-    OverrideApiAuth: Optional[bool]  # TODO Add Docs
+    OverrideApiAuth: Optional[bool] = apiauth("OverrideApiAuth")
 
 
 class RequestModel(BaseModel):
@@ -286,7 +303,11 @@ class ApiEventProperties(BaseModel):
     RequestModel: Optional[RequestModel] = apieventproperties("RequestModel")
     RequestParameters: Optional[RequestModelProperty] = apieventproperties("RequestParameters")
     RestApiId: Optional[Union[str, Ref]] = apieventproperties("RestApiId")
-    TimeoutInMillis: Optional[PassThroughProp]  # TODO: add doc
+    TimeoutInMillis: Optional[PassThroughProp] = passthrough_prop(
+        "sam-property-function-api",
+        "TimeoutInMillis",
+        ["AWS::ApiGateway::Method.Integration", "TimeoutInMillis"],
+    )
 
 
 class ApiEvent(BaseModel):
@@ -342,7 +363,7 @@ class EventBridgeRuleEventProperties(BaseModel):
     Pattern: PassThroughProp = eventbridgeruleeventproperties("Pattern")
     RetryPolicy: Optional[PassThroughProp] = eventbridgeruleeventproperties("RetryPolicy")
     Target: Optional[EventBridgeRuleTarget] = eventbridgeruleeventproperties("Target")
-    InputTransformer: Optional[PassThroughProp]  # TODO: add docs
+    InputTransformer: Optional[PassThroughProp] = eventbridgeruleeventproperties("InputTransformer")
     RuleName: Optional[PassThroughProp] = eventbridgeruleeventproperties("RuleName")
 
 
@@ -411,8 +432,17 @@ class HttpApiEvent(BaseModel):
 
 
 class MSKEventProperties(BaseModel):
+    BatchSize: Optional[PassThroughProp] = passthrough_prop(
+        "sam-property-function-msk",
+        "BatchSize",
+        ["AWS::Lambda::EventSourceMapping", "Properties", "BatchSize"],
+    )
     ConsumerGroupId: Optional[PassThroughProp] = mskeventproperties("ConsumerGroupId")
-    Enabled: Optional[PassThroughProp] = mskeventproperties("Enabled")
+    Enabled: Optional[PassThroughProp] = passthrough_prop(
+        "sam-property-function-msk",
+        "Enabled",
+        ["AWS::Lambda::EventSourceMapping", "Properties", "Enabled"],
+    )
     FilterCriteria: Optional[PassThroughProp] = mskeventproperties("FilterCriteria")
     KmsKeyArn: Optional[PassThroughProp] = mskeventproperties("KmsKeyArn")
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mskeventproperties("MaximumBatchingWindowInSeconds")
@@ -421,7 +451,11 @@ class MSKEventProperties(BaseModel):
     Stream: PassThroughProp = mskeventproperties("Stream")
     Topics: PassThroughProp = mskeventproperties("Topics")
     SourceAccessConfigurations: Optional[PassThroughProp] = mskeventproperties("SourceAccessConfigurations")
-    DestinationConfig: Optional[PassThroughProp] = mskeventproperties("DestinationConfig")
+    DestinationConfig: Optional[PassThroughProp] = passthrough_prop(
+        "sam-property-function-msk",
+        "DestinationConfig",
+        ["AWS::Lambda::EventSourceMapping", "Properties", "DestinationConfig"],
+    )
     ProvisionedPollerConfig: Optional[PassThroughProp] = mskeventproperties("ProvisionedPollerConfig")
     SchemaRegistryConfig: Optional[PassThroughProp] = mskeventproperties("SchemaRegistryConfig")
     MetricsConfig: Optional[PassThroughProp] = mskeventproperties("MetricsConfig")
@@ -443,7 +477,11 @@ class MQEventProperties(BaseModel):
     DynamicPolicyName: Optional[bool] = mqeventproperties("DynamicPolicyName")
     Enabled: Optional[PassThroughProp] = mqeventproperties("Enabled")
     FilterCriteria: Optional[PassThroughProp] = mqeventproperties("FilterCriteria")
-    KmsKeyArn: Optional[PassThroughProp]  # TODO: add documentation
+    KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "KmsKeyArn",
+        ["AWS::Lambda::EventSourceMapping", "Properties", "KmsKeyArn"],
+    )
     MaximumBatchingWindowInSeconds: Optional[PassThroughProp] = mqeventproperties("MaximumBatchingWindowInSeconds")
     Queues: PassThroughProp = mqeventproperties("Queues")
     SecretsManagerKmsKeyId: Optional[str] = mqeventproperties("SecretsManagerKmsKeyId")
@@ -463,7 +501,11 @@ class SelfManagedKafkaEventProperties(BaseModel):
     KafkaBootstrapServers: Optional[List[SamIntrinsicable[str]]] = selfmanagedkafkaeventproperties(
         "KafkaBootstrapServers"
     )
-    KmsKeyArn: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("KmsKeyArn")
+    KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "KmsKeyArn",
+        ["AWS::Lambda::EventSourceMapping", "Properties", "KmsKeyArn"],
+    )
     SourceAccessConfigurations: PassThroughProp = selfmanagedkafkaeventproperties("SourceAccessConfigurations")
     StartingPosition: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("StartingPosition")
     StartingPositionTimestamp: Optional[PassThroughProp] = selfmanagedkafkaeventproperties("StartingPositionTimestamp")
@@ -502,7 +544,8 @@ class ScheduleV2EventProperties(BaseModel):
     ScheduleExpressionTimezone: Optional[PassThroughProp] = schedulev2eventproperties("ScheduleExpressionTimezone")
     StartDate: Optional[PassThroughProp] = schedulev2eventproperties("StartDate")
     State: Optional[PassThroughProp] = schedulev2eventproperties("State")
-    OmitName: Optional[bool]  # TODO: add doc
+    # OmitName is a SAM-specific boolean property, not a CloudFormation pass-through property
+    OmitName: Optional[bool]
 
 
 class ScheduleV2Event(BaseModel):
@@ -534,7 +577,7 @@ Architectures = Optional[PassThroughProp]
 EphemeralStorage = Optional[PassThroughProp]
 SnapStart = Optional[PassThroughProp]  # TODO: check the type
 RuntimeManagementConfig = Optional[PassThroughProp]  # TODO: check the type
-LoggingConfig = Optional[PassThroughProp]  # TODO: add documentation
+LoggingConfig = Optional[PassThroughProp]  # Type alias - documentation added to Properties and Globals classes
 RecursiveLoop = Optional[PassThroughProp]
 SourceKMSKeyArn = Optional[PassThroughProp]
 TenancyConfig = Optional[PassThroughProp]
@@ -673,17 +716,43 @@ class Properties(BaseModel):
     Tracing: Optional[Tracing] = prop("Tracing")
     VersionDescription: Optional[PassThroughProp] = prop("VersionDescription")
     VpcConfig: Optional[VpcConfig] = prop("VpcConfig")
-    LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
-    RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
-    SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
-    CapacityProviderConfig: Optional[CapacityProviderConfig] = prop("CapacityProviderConfig")  # TODO: add documentation
-    FunctionScalingConfig: Optional[PassThroughProp]  # TODO: add documentation
-    VersionDeletionPolicy: Optional[SamIntrinsicable[Union[str, bool]]] = prop(
-        "VersionDeletionPolicy"
-    )  # TODO: add documentation
-    PublishToLatestPublished: Optional[SamIntrinsicable[Union[str, bool]]]  # TODO: add documentation
-    TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
-    DurableConfig: Optional[PassThroughProp]  # TODO: add documentation
+    LoggingConfig: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "LoggingConfig",
+        ["AWS::Lambda::Function", "Properties", "LoggingConfig"],
+    )
+    RecursiveLoop: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "RecursiveLoop",
+        ["AWS::Lambda::Function", "Properties", "RecursiveLoop"],
+    )
+    SourceKMSKeyArn: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "SourceKMSKeyArn",
+        ["AWS::Lambda::Function.Code", "SourceKMSKeyArn"],
+    )
+    CapacityProviderConfig: Optional[CapacityProviderConfig] = prop("CapacityProviderConfig")
+    FunctionScalingConfig: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "FunctionScalingConfig",
+        ["AWS::Lambda::Function", "Properties", "FunctionScalingConfig"],
+    )
+    VersionDeletionPolicy: Optional[SamIntrinsicable[Union[str, bool]]] = prop("VersionDeletionPolicy")
+    PublishToLatestPublished: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "PublishToLatestPublished",
+        ["AWS::Lambda::Function", "Properties", "PublishToLatestPublished"],
+    )
+    TenancyConfig: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "TenancyConfig",
+        ["AWS::Lambda::Function", "Properties", "TenancyConfig"],
+    )
+    DurableConfig: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "DurableConfig",
+        ["AWS::Lambda::Function", "Properties", "DurableConfig"],
+    )
 
 
 class Globals(BaseModel):
@@ -741,17 +810,43 @@ class Globals(BaseModel):
     )
     SnapStart: Optional[SnapStart] = prop("SnapStart")
     RuntimeManagementConfig: Optional[RuntimeManagementConfig] = prop("RuntimeManagementConfig")
-    LoggingConfig: Optional[PassThroughProp]  # TODO: add documentation
-    RecursiveLoop: Optional[PassThroughProp]  # TODO: add documentation
-    SourceKMSKeyArn: Optional[PassThroughProp]  # TODO: add documentation
-    CapacityProviderConfig: Optional[CapacityProviderConfig] = prop("CapacityProviderConfig")  # TODO: add documentation
-    FunctionScalingConfig: Optional[PassThroughProp]  # TODO: add documentation
-    VersionDeletionPolicy: Optional[SamIntrinsicable[Union[str, bool]]] = prop(
-        "VersionDeletionPolicy"
-    )  # TODO: add documentation
-    PublishToLatestPublished: Optional[SamIntrinsicable[Union[str, bool]]]  # TODO: add documentation
-    TenancyConfig: Optional[PassThroughProp]  # TODO: add documentation
-    DurableConfig: Optional[PassThroughProp]  # TODO: add documentation
+    LoggingConfig: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "LoggingConfig",
+        ["AWS::Lambda::Function", "Properties", "LoggingConfig"],
+    )
+    RecursiveLoop: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "RecursiveLoop",
+        ["AWS::Lambda::Function", "Properties", "RecursiveLoop"],
+    )
+    SourceKMSKeyArn: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "SourceKMSKeyArn",
+        ["AWS::Lambda::Function.Code", "SourceKMSKeyArn"],
+    )
+    CapacityProviderConfig: Optional[CapacityProviderConfig] = prop("CapacityProviderConfig")
+    FunctionScalingConfig: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "FunctionScalingConfig",
+        ["AWS::Lambda::Function", "Properties", "FunctionScalingConfig"],
+    )
+    VersionDeletionPolicy: Optional[SamIntrinsicable[Union[str, bool]]] = prop("VersionDeletionPolicy")
+    PublishToLatestPublished: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "PublishToLatestPublished",
+        ["AWS::Lambda::Function", "Properties", "PublishToLatestPublished"],
+    )
+    TenancyConfig: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "TenancyConfig",
+        ["AWS::Lambda::Function", "Properties", "TenancyConfig"],
+    )
+    DurableConfig: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "DurableConfig",
+        ["AWS::Lambda::Function", "Properties", "DurableConfig"],
+    )
 
 
 class Resource(ResourceAttributes):

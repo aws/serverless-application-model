@@ -10,6 +10,7 @@ from samtranslator.internal.schema_source.common import (
     ResourceAttributes,
     SamIntrinsicable,
     get_prop,
+    passthrough_prop,
 )
 
 oauth2authorizer = get_prop("sam-property-httpapi-oauth2authorizer")
@@ -45,7 +46,7 @@ class LambdaAuthorizer(BaseModel):
     EnableSimpleResponses: Optional[bool] = lambdaauthorizer("EnableSimpleResponses")
     FunctionArn: SamIntrinsicable[str] = lambdaauthorizer("FunctionArn")
     FunctionInvokeRole: Optional[SamIntrinsicable[str]] = lambdaauthorizer("FunctionInvokeRole")
-    EnableFunctionDefaultPermissions: Optional[bool]  # TODO: add docs
+    EnableFunctionDefaultPermissions: Optional[bool] = lambdaauthorizer("EnableFunctionDefaultPermissions")
     Identity: Optional[LambdaAuthorizerIdentity] = lambdaauthorizer("Identity")
 
 
@@ -85,8 +86,16 @@ class Route53(BaseModel):
     HostedZoneId: Optional[PassThroughProp] = route53("HostedZoneId")
     HostedZoneName: Optional[PassThroughProp] = route53("HostedZoneName")
     IpV6: Optional[bool] = route53("IpV6")
-    SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
-    Region: Optional[PassThroughProp]  # TODO: add docs
+    SetIdentifier: Optional[PassThroughProp] = passthrough_prop(
+        "sam-property-httpapi-route53configuration",
+        "SetIdentifier",
+        ["AWS::Route53::RecordSetGroup.RecordSet", "SetIdentifier"],
+    )
+    Region: Optional[PassThroughProp] = passthrough_prop(
+        "sam-property-httpapi-route53configuration",
+        "Region",
+        ["AWS::Route53::RecordSetGroup.RecordSet", "Region"],
+    )
 
 
 class Domain(BaseModel):
@@ -125,7 +134,7 @@ class Properties(BaseModel):
     StageName: Optional[PassThroughProp] = properties("StageName")
     StageVariables: Optional[StageVariables] = properties("StageVariables")
     Tags: Optional[Tags] = properties("Tags")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = properties("PropagateTags")
     Name: Optional[PassThroughProp] = properties("Name")
 
 
@@ -139,7 +148,7 @@ class Globals(BaseModel):
     Domain: Optional[Domain] = properties("Domain")
     CorsConfiguration: Optional[CorsConfigurationType] = properties("CorsConfiguration")
     DefaultRouteSettings: Optional[DefaultRouteSettings] = properties("DefaultRouteSettings")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = properties("PropagateTags")
 
 
 class Resource(ResourceAttributes):
