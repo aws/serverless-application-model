@@ -1,0 +1,152 @@
+{
+  "Resources": {
+    "KafkaSecret": {
+      "Properties": {
+        "Description": "Kafka SASL credentials",
+        "SecretString": {
+          "Fn::Sub": "{\n  \"username\": \"kafka-user\",\n  \"password\": \"kafka-password\"\n}"
+        }
+      },
+      "Type": "AWS::SecretsManager::Secret"
+    },
+    "LoggingConfigFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "loggingConfig.zip"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "LoggingConfigFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "LoggingConfigFunctionMSKEvent": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MSKCluster",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "LoggingConfigFunction"
+        },
+        "LoggingConfig": {
+          "SystemLogLevel": "DEBUG"
+        },
+        "StartingPosition": "LATEST",
+        "Topics": [
+          "my-topic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "LoggingConfigFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "secretsmanager:GetSecretValue"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "KafkaSecret"
+                  }
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "SelfManagedKafkaExecutionRolePolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "LoggingConfigFunctionSelfManagedKafkaEvent": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LoggingConfigFunction"
+        },
+        "LoggingConfig": {
+          "SystemLogLevel": "WARN"
+        },
+        "SelfManagedEventSource": {
+          "Endpoints": {
+            "KafkaBootstrapServers": [
+              "broker1:9092",
+              "broker2:9092"
+            ]
+          }
+        },
+        "SourceAccessConfigurations": [
+          {
+            "Type": "SASL_SCRAM_256_AUTH",
+            "URI": {
+              "Ref": "KafkaSecret"
+            }
+          }
+        ],
+        "Topics": [
+          "my-topic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MSKCluster": {
+      "Properties": {
+        "BrokerNodeGroupInfo": {
+          "ClientSubnets": [
+            "subnet-12345",
+            "subnet-67890"
+          ],
+          "InstanceType": "kafka.t3.small"
+        },
+        "ClusterName": "test-cluster",
+        "KafkaVersion": "2.8.0",
+        "NumberOfBrokerNodes": 2
+      },
+      "Type": "AWS::MSK::Cluster"
+    }
+  }
+}
