@@ -1308,6 +1308,8 @@ class SamFunction(SamResourceMacro):
             self.logical_id,
             self.DeploymentPreference,
             passthrough_resource_attributes.get("Condition"),
+            self.Tags,
+            self.PropagateTags,
         )
 
         if deployment_preference_collection.get(self.logical_id).enabled:

@@ -7,6 +7,7 @@ class CodeDeployApplication(Resource):
     property_types = {
         "ComputePlatform": GeneratedProperty(),
         "Tags": GeneratedProperty(),
+        "PropagateTags": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
@@ -23,6 +24,7 @@ class CodeDeployDeploymentGroup(Resource):
         "ServiceRoleArn": GeneratedProperty(),
         "TriggerConfigurations": GeneratedProperty(),
         "Tags": GeneratedProperty(),
+        "PropagateTags": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
