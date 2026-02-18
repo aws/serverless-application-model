@@ -140,7 +140,7 @@ class DeploymentPreferenceCollection:
 
         merged_tags: Dict[str, Any] = {}
         for preference in self._resource_preferences.values():
-            if preference.tags:
+            if preference.enabled and preference.propagate_tags and preference.tags:
                 merged_tags.update(preference.tags)
         if merged_tags:
             codedeploy_application_resource.Tags = get_tag_list(merged_tags)
@@ -150,14 +150,6 @@ class DeploymentPreferenceCollection:
             if len(conditions) <= 1:
                 condition_name = conditions.pop()
             codedeploy_application_resource.set_resource_attribute("Condition", condition_name)
-
-        merged_tags: Dict[str, Any] = {}
-        for preference in self._resource_preferences.values():
-            if preference.enabled and preference.propagate_tags and preference.tags:
-                merged_tags.update(preference.tags)
-        if merged_tags:
-            codedeploy_application_resource.Tags = get_tag_list(merged_tags)
-
         return codedeploy_application_resource
 
     def get_codedeploy_iam_role(self) -> IAMRole:
@@ -239,9 +231,6 @@ class DeploymentPreferenceCollection:
 
         if deployment_preference.condition:
             deployment_group.set_resource_attribute("Condition", deployment_preference.condition)
-
-        if deployment_preference.tags:
-            deployment_group.Tags = get_tag_list(deployment_preference.tags)
 
         return deployment_group
 
