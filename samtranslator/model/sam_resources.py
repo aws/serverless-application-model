@@ -1,4 +1,4 @@
-﻿"""SAM macro definitions"""
+"""SAM macro definitions"""
 
 import copy
 import re
