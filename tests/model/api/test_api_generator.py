@@ -62,7 +62,7 @@ class TestApiGenerator(TestCase):
                         "x-amazon-apigateway-integration": {
                             "type": "aws_proxy",
                             "httpMethod": "POST",
-                            "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/func/invocations"
+                            "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/func/invocations",
                         }
                     }
                 },
@@ -71,13 +71,13 @@ class TestApiGenerator(TestCase):
                         "x-amazon-apigateway-integration": {
                             "type": "aws_proxy",
                             "httpMethod": "POST",
-                            "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/func/invocations"
+                            "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/func/invocations",
                         }
                     }
-                }
-            }
+                },
+            },
         }
-        
+
         api_generator = ApiGenerator(
             logical_id="TestApi",
             cache_cluster_enabled=None,
@@ -112,19 +112,20 @@ class TestApiGenerator(TestCase):
             api_key_source_type=None,
             disable_execute_api_endpoint=None,
         )
-        
+
         # Call _add_cors which should normalize paths and avoid duplicates
         api_generator._add_cors()
-        
+
         # Check that OPTIONS method is not added to both /datasets and /datasets/
         # It should only be added once to avoid the duplicate OPTIONS error
         paths_with_options = [
-            path for path, methods in api_generator.definition_body["paths"].items()
+            path
+            for path, methods in api_generator.definition_body["paths"].items()
             if "options" in methods or "OPTIONS" in methods
         ]
-        
+
         # We should have only ONE path with OPTIONS method (the normalized one)
         # Both /datasets and /datasets/ normalize to /datasets
-        self.assertEqual(len(paths_with_options), 1, 
-                        "CORS should only add OPTIONS to one of the paths that differ by trailing slash")
-
+        self.assertEqual(
+            len(paths_with_options), 1, "CORS should only add OPTIONS to one of the paths that differ by trailing slash"
+        )
