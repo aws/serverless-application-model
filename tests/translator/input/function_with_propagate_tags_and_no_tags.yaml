@@ -6,7 +6,7 @@ Resources:
         exports.handler = async () => ‘Hello World!'
       Handler: index.handler
       Runtime: nodejs18.x
-      # PropagateTags: True
+      PropagateTags: true
       AutoPublishAlias: Live
       Events:
         CWEvent:

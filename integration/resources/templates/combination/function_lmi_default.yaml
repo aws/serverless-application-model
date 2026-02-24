@@ -28,7 +28,6 @@ Resources:
   AdvancedCapacityProvider:
     Type: AWS::Serverless::CapacityProvider
     Properties:
-      CapacityProviderName: !Sub "${AWS::StackName}-cp"
       VpcConfig:
         SubnetIds:
         - !Ref SubnetId

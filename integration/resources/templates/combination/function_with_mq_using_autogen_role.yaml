@@ -60,23 +60,23 @@ Resources:
       - IpProtocol: tcp
         FromPort: 8162
         ToPort: 8162
-        CidrIp: 0.0.0.0/0
+        CidrIp: 10.0.0.0/16
       - IpProtocol: tcp
         FromPort: 61617
         ToPort: 61617
-        CidrIp: 0.0.0.0/0
+        CidrIp: 10.0.0.0/16
       - IpProtocol: tcp
         FromPort: 5671
         ToPort: 5671
-        CidrIp: 0.0.0.0/0
+        CidrIp: 10.0.0.0/16
       - IpProtocol: tcp
         FromPort: 61614
         ToPort: 61614
-        CidrIp: 0.0.0.0/0
+        CidrIp: 10.0.0.0/16
       - IpProtocol: tcp
         FromPort: 8883
         ToPort: 8883
-        CidrIp: 0.0.0.0/0
+        CidrIp: 10.0.0.0/16
 
   MyMqBroker:
     Properties:
