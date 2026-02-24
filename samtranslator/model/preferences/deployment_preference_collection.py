@@ -14,6 +14,7 @@ from samtranslator.model.intrinsics import (
     ref,
     validate_intrinsic_if_items,
 )
+from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
 
@@ -52,7 +53,14 @@ class DeploymentPreferenceCollection:
         """
         self._resource_preferences: Dict[str, Any] = {}
 
-    def add(self, logical_id: str, deployment_preference_dict: Dict[str, Any], condition: Optional[str] = None) -> None:
+    def add(
+        self,
+        logical_id: str,
+        deployment_preference_dict: Dict[str, Any],
+        condition: Optional[str] = None,
+        tags: Optional[Dict[str, Any]] = None,
+        propagate_tags: Optional[bool] = False,
+    ) -> None:
         """
         Add this deployment preference to the collection
 
@@ -60,12 +68,14 @@ class DeploymentPreferenceCollection:
         :param logical_id: logical id of the resource where this deployment preference applies
         :param deployment_preference_dict: the input SAM template deployment preference mapping
         :param condition: the condition (if it exists) on the serverless function
+        :param tags: tags from the SAM resource to propagate to CodeDeploy resources
+        :param propagate_tags: whether to propagate tags to CodeDeploy resources
         """
         if logical_id in self._resource_preferences:
             raise ValueError(f"logical_id {logical_id} previously added to this deployment_preference_collection")
 
         self._resource_preferences[logical_id] = DeploymentPreference.from_dict(  # type: ignore[no-untyped-call]
-            logical_id, deployment_preference_dict, condition
+            logical_id, deployment_preference_dict, condition, tags, propagate_tags
         )
 
     def get(self, logical_id: str) -> DeploymentPreference:
@@ -127,6 +137,13 @@ class DeploymentPreferenceCollection:
     def get_codedeploy_application(self) -> CodeDeployApplication:
         codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         codedeploy_application_resource.ComputePlatform = "Lambda"
+
+        merged_tags: Dict[str, Any] = {}
+        for preference in self._resource_preferences.values():
+            if preference.enabled and preference.propagate_tags and preference.tags:
+                merged_tags.update(preference.tags)
+        if merged_tags:
+            codedeploy_application_resource.Tags = get_tag_list(merged_tags)
         if self.needs_resource_condition():
             conditions = self.get_all_deployment_conditions()
             condition_name = CODE_DEPLOY_CONDITION_NAME
@@ -165,6 +182,14 @@ class DeploymentPreferenceCollection:
             if len(conditions) <= 1:
                 condition_name = conditions.pop()
             iam_role.set_resource_attribute("Condition", condition_name)
+
+        merged_tags: Dict[str, Any] = {}
+        for preference in self._resource_preferences.values():
+            if preference.enabled and preference.propagate_tags and preference.tags:
+                merged_tags.update(preference.tags)
+        if merged_tags:
+            iam_role.Tags = get_tag_list(merged_tags)
+
         return iam_role
 
     def deployment_group(self, function_logical_id: str) -> CodeDeployDeploymentGroup:
@@ -200,6 +225,9 @@ class DeploymentPreferenceCollection:
 
         if deployment_preference.trigger_configurations:
             deployment_group.TriggerConfigurations = deployment_preference.trigger_configurations
+
+        if deployment_preference.tags:
+            deployment_group.Tags = get_tag_list(deployment_preference.tags)
 
         if deployment_preference.condition:
             deployment_group.set_resource_attribute("Condition", deployment_preference.condition)
