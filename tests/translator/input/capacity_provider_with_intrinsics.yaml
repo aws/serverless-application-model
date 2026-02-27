@@ -9,11 +9,11 @@ Parameters:
 
   SecurityGroupId:
     Type: String
-    Default: sg-12345678
+    Default: sg-0a1e1457229da0f74
 
   SubnetId:
     Type: String
-    Default: subnet-12345678
+    Default: subnet-01e6344879fd06036
 
   Architecture:
     Type: String
@@ -23,9 +23,21 @@ Parameters:
     Type: String
     Default: c5.xlarge
 
-  ExcludedInstanceType:
-    Type: String
-    Default: t2.micro
+  ExcludedInstanceTypeList:
+    Type: List<String>
+    Default: t2.micro,c5.xlarge
+
+  SecurityGroupIdList:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Default: sg-0a1e1457229da0f74,sg-3b1f1457229da0f92
+
+  SubnetIdList:
+    Type: List<AWS::EC2::Subnet::Id>
+    Default: subnet-01e6344879fd06036,subnet-0136378879fd07039
+
+  ArchitecturesList:
+    Type: List<String>
+    Default: x86_64
 
   MaxVCpuCount:
     Type: Number
@@ -39,7 +51,7 @@ Parameters:
     Type: Number
     Default: 81.2
 
-  KMSKeyArn:
+  KmsKeyArn:
     Type: String
     Default: arn:aws:kms:us-east-1:123456789012:key/abcd1234-ef56-gh78-ij90-klmnopqrstuv
 
@@ -62,7 +74,22 @@ Resources:
         AllowedTypes:
         - !Ref AllowedInstanceType
         - !Join [., [c5, 2xlarge]]
+        - c5.large
       ScalingConfig:
         MaxVCpuCount: !Ref MaxVCpuCount
         AverageCPUUtilization: !Ref TargetCPU
-      KMSKeyArn: !Ref KMSKeyArn
+      KmsKeyArn: !Ref KmsKeyArn
+
+  IntrinsicCapacityProviderTwo:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIdList
+        SubnetIds: !Ref SubnetIdList
+      InstanceRequirements:
+        Architectures: !Ref ArchitecturesList
+        ExcludedTypes: !Ref ExcludedInstanceTypeList
+      ScalingConfig:
+        MaxVCpuCount: !Ref MaxVCpuCount
+        AverageCPUUtilization: !Ref TargetCPU
+      KmsKeyArn: !Ref KmsKeyArn

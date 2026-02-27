@@ -1,0 +1,17 @@
+Globals:
+  Api:
+    SecurityPolicy: SecurityPolicy_TLS13_1_3_2025_09
+
+Resources:
+  # Inherits Globals (TLS 1.3)
+  ApiInheritGlobals:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+  # Top-level overrides Globals
+  ApiTopLevelOverride:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      SecurityPolicy: SecurityPolicy_TLS13_1_3_2025_09

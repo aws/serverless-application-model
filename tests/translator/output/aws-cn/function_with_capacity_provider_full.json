@@ -6,7 +6,7 @@
       "Properties": {
         "CapacityProviderConfig": {
           "LambdaManagedInstancesCapacityProviderConfig": {
-            "CapacityProviderArn": "arn:aws:lambda:us-east-1:123456789012:capacity-provider/test-capacity-provider",
+            "CapacityProviderArn": "arn:aws:lambda:us-east-1:123456789012:capacity-provider:test-capacity-provider",
             "ExecutionEnvironmentMemoryGiBPerVCpu": 4,
             "PerExecutionEnvironmentMaxConcurrency": 100
           }

@@ -9,7 +9,7 @@
           ]
         },
         "Code": "this is my epic code",
-        "DataSourceName": "some-cool-datasource",
+        "DataSourceName": "someCoolDataSource",
         "Name": "MyFunction",
         "Runtime": {
           "Name": "APPSYNC_JS",

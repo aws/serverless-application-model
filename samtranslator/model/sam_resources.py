@@ -1,8 +1,10 @@
-﻿"""SAM macro definitions"""
+"""SAM macro definitions"""
 
 import copy
 import re
+import sys
 from contextlib import suppress
+from types import ModuleType
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import samtranslator.model.eventsources
@@ -34,11 +36,19 @@ from samtranslator.internal.model.appsync import (
     SyncConfigType,
     UserPoolConfigType,
 )
-from samtranslator.internal.schema_source import (
-    aws_serverless_capacity_provider,
-    aws_serverless_function,
-    aws_serverless_graphqlapi,
-)
+
+# Pydantic 1 doesn't support Python 3.14 so these imports will fail until we migrate to v2
+try:
+    from samtranslator.internal.schema_source import (
+        aws_serverless_capacity_provider,
+        aws_serverless_function,
+        aws_serverless_graphqlapi,
+    )
+except RuntimeError:  # Pydantic fails when initializing the model classes with a RuntimeError in 3.14
+    aws_serverless_capacity_provider = cast(ModuleType, None)
+    aws_serverless_function = cast(ModuleType, None)
+    aws_serverless_graphqlapi = cast(ModuleType, None)
+
 from samtranslator.internal.schema_source.common import PermissionsType, SamIntrinsicable
 from samtranslator.internal.types import GetManagedPolicyMap
 from samtranslator.internal.utils.utils import passthrough_value, remove_none_values
@@ -141,6 +151,14 @@ from .s3_utils.uri_parser import construct_image_code_object, construct_s3_locat
 from .tags.resource_tagging import get_tag_list
 
 _CONDITION_CHAR_LIMIT = 255
+
+
+# Utility function to throw an error when using functionality that doesn't work in Python 3.14 (need migration to Pydantic v2)
+def check_python_314_compatibility(module: Optional[ModuleType], functionality: str) -> None:
+    if sys.version_info >= (3, 14) and module is None:
+        raise RuntimeError(
+            f"{functionality} functionalities are temporarily not supported when running SAM in Python 3.14"
+        )
 
 
 class SamFunction(SamResourceMacro):
@@ -293,7 +311,7 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(self.logical_id, e.message) from e
 
     @cw_timer
-    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0915
+    def to_cloudformation(self, **kwargs):  # type: ignore[no-untyped-def] # noqa: PLR0915, PLR0912
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
@@ -388,16 +406,25 @@ class SamFunction(SamResourceMacro):
         managed_policy_map = kwargs.get("managed_policy_map", {})
         get_managed_policy_map = kwargs.get("get_managed_policy_map")
 
-        execution_role = None
+        execution_role = self._construct_role(
+            managed_policy_map,
+            event_invoke_policies,
+            intrinsics_resolver,
+            get_managed_policy_map,
+        )
+
         if lambda_function.Role is None:
-            execution_role = self._construct_role(
-                managed_policy_map,
-                event_invoke_policies,
-                intrinsics_resolver,
-                get_managed_policy_map,
-            )
             lambda_function.Role = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
+        elif is_intrinsic_if(lambda_function.Role):
+            role_changes = self._make_lambda_role(lambda_function, intrinsics_resolver, execution_role)
+
+            if role_changes["lambda_role_value"] is not None:
+                lambda_function.Role = role_changes["lambda_role_value"]
+                resources.append(role_changes["iam_role_resource"])
+
+            if role_changes["new_condition"] is not None:
+                conditions.update(role_changes["new_condition"])
 
         try:
             resources += self._generate_event_resources(
@@ -414,6 +441,54 @@ class SamFunction(SamResourceMacro):
         self.propagate_tags(resources, self.Tags, self.PropagateTags)
 
         return resources
+
+    def _make_lambda_role(
+        self,
+        lambda_function: LambdaFunction,
+        intrinsics_resolver: IntrinsicsResolver,
+        execution_role: IAMRole,
+    ) -> Dict[str, Any]:
+        """
+        Analyzes lambda role requirements and returns the changes needed.
+
+        Returns:
+            Dict containing:
+                - 'lambda_role_value': Any - value to set for lambda_function.Role
+                - 'new_condition': Dict|None - new condition to add to conditions dict
+                - 'iam_role_resource' : IAMRole - IAM Role used for Lambda execution
+        """
+        lambda_role = lambda_function.Role
+        execution_role_arn = execution_role.get_runtime_attr("arn")
+
+        lambda_role_value = None
+        new_condition = None
+
+        # We need to create and if else condition here
+        role_resolved_value = intrinsics_resolver.resolve_parameter_refs(lambda_role)
+        role_condition, role_if, role_else = role_resolved_value.get("Fn::If")
+
+        if is_intrinsic_no_value(role_if) and is_intrinsic_no_value(role_else):
+            lambda_role_value = execution_role_arn
+
+        # first value is none so we should create condition ? create : [2]
+        # create a condition for IAM role to only create on if case
+        elif is_intrinsic_no_value(role_if):
+            lambda_role_value = make_conditional(role_condition, execution_role_arn, role_else)
+            execution_role.set_resource_attribute("Condition", role_condition)
+
+        # second value is none so we should create condition ? [1] : create
+        # create a condition for IAM role to only create on else case
+        # with top level condition that negates the condition passed
+        elif is_intrinsic_no_value(role_else):
+            lambda_role_value = make_conditional(role_condition, role_if, execution_role_arn)
+            execution_role.set_resource_attribute("Condition", f"NOT{role_condition}")
+            new_condition = {f"NOT{role_condition}": make_not_conditional(role_condition)}
+
+        return {
+            "lambda_role_value": lambda_role_value,
+            "new_condition": new_condition,
+            "iam_role_resource": execution_role,
+        }
 
     def _construct_event_invoke_config(  # noqa: PLR0913
         self,
@@ -731,6 +806,7 @@ class SamFunction(SamResourceMacro):
 
         # Validate CapacityProviderConfig using Pydantic model directly for comprehensive error collection
         try:
+            check_python_314_compatibility(aws_serverless_function, "Capacity Provider")
             validated_model = aws_serverless_function.CapacityProviderConfig.parse_obj(self.CapacityProviderConfig)
         except Exception as e:
             raise InvalidResourceException(self.logical_id, f"Invalid CapacityProviderConfig: {e!s}") from e
@@ -1232,6 +1308,8 @@ class SamFunction(SamResourceMacro):
             self.logical_id,
             self.DeploymentPreference,
             passthrough_resource_attributes.get("Condition"),
+            self.Tags,
+            self.PropagateTags,
         )
 
         if deployment_preference_collection.get(self.logical_id).enabled:
@@ -1459,7 +1537,6 @@ class SamCapacityProvider(SamResourceMacro):
     """
 
     resource_type = "AWS::Serverless::CapacityProvider"
-    resource_property_schema = aws_serverless_capacity_provider.Properties
     property_types = {
         "CapacityProviderName": Property(False, one_of(IS_STR, IS_DICT)),
         "VpcConfig": Property(True, IS_DICT),
@@ -1468,7 +1545,7 @@ class SamCapacityProvider(SamResourceMacro):
         "PropagateTags": Property(False, IS_BOOL),
         "InstanceRequirements": Property(False, IS_DICT),
         "ScalingConfig": Property(False, IS_DICT),
-        "KMSKeyArn": Property(False, one_of(IS_STR, IS_DICT)),
+        "KmsKeyArn": Property(False, one_of(IS_STR, IS_DICT)),
     }
 
     CapacityProviderName: Optional[Intrinsicable[str]]
@@ -1478,7 +1555,7 @@ class SamCapacityProvider(SamResourceMacro):
     PropagateTags: Optional[bool]
     InstanceRequirements: Optional[Dict[str, Any]]
     ScalingConfig: Optional[Dict[str, Any]]
-    KMSKeyArn: Optional[Intrinsicable[str]]
+    KmsKeyArn: Optional[Intrinsicable[str]]
 
     # Validation rules
     __validation_rules__ = [
@@ -1492,7 +1569,11 @@ class SamCapacityProvider(SamResourceMacro):
         """
         Transform the SAM CapacityProvider resource to CloudFormation
         """
-        self.validate_before_transform(schema_class=self.resource_property_schema, collect_all_errors=True)
+        check_python_314_compatibility(aws_serverless_capacity_provider, "Capacity Provider")
+        self.validate_before_transform(
+            schema_class=aws_serverless_capacity_provider.Properties,
+            collect_all_errors=True,
+        )
 
         # Use enhanced validation method with comprehensive error collection
         model = self.validate_properties_and_return_model(
@@ -1509,7 +1590,7 @@ class SamCapacityProvider(SamResourceMacro):
                 model.InstanceRequirements.dict(exclude_none=True) if model.InstanceRequirements else None
             ),
             scaling_config=model.ScalingConfig.dict(exclude_none=True) if model.ScalingConfig else None,
-            kms_key_arn=passthrough_value(model.KMSKeyArn),
+            kms_key_arn=passthrough_value(model.KmsKeyArn),
             depends_on=self.depends_on,
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
@@ -1566,6 +1647,7 @@ class SamApi(SamResourceMacro):
         "ApiKeySourceType": PropertyType(False, IS_STR),
         "AlwaysDeploy": Property(False, IS_BOOL),
         "Policy": PropertyType(False, one_of(IS_STR, IS_DICT)),
+        "SecurityPolicy": PropertyType(False, IS_STR),
     }
 
     Name: Optional[Intrinsicable[str]]
@@ -1598,6 +1680,7 @@ class SamApi(SamResourceMacro):
     ApiKeySourceType: Optional[Intrinsicable[str]]
     AlwaysDeploy: Optional[bool]
     Policy: Optional[Union[Dict[str, Any], Intrinsicable[str]]]
+    SecurityPolicy: Optional[Intrinsicable[str]]
 
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
@@ -1666,6 +1749,7 @@ class SamApi(SamResourceMacro):
             always_deploy=self.AlwaysDeploy,
             feature_toggle=feature_toggle,
             policy=self.Policy,
+            security_policy=self.SecurityPolicy,
         )
 
         generated_resources = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
@@ -2600,6 +2684,7 @@ class SamGraphQLApi(SamResourceMacro):
 
     @cw_timer
     def to_cloudformation(self, **kwargs: Any) -> List[Resource]:
+        check_python_314_compatibility(aws_serverless_graphqlapi, "GraphQLApi")
         model = self.validate_properties_and_return_model(aws_serverless_graphqlapi.Properties)
 
         appsync_api, cloudwatch_role, auth_connectors = self._construct_appsync_api_resources(model)

@@ -18,6 +18,7 @@ DOMAIN_STEM = "sam-property-api-domainconfiguration"
 ROUTE53_STEM = "sam-property-api-route53configuration"
 ENDPOINT_CONFIGURATION_STEM = "sam-property-api-endpointconfiguration"
 DEFINITION_URI_STEM = "sam-property-api-apidefinition"
+ACCESS_ASSOCIATION_STEM = "sam-property-api-domainaccessassociation"
 
 resourcepolicy = get_prop("sam-property-api-resourcepolicystatement")
 cognitoauthorizeridentity = get_prop("sam-property-api-cognitoauthorizationidentity")
@@ -103,7 +104,7 @@ class UsagePlan(BaseModel):
 
 class Auth(BaseModel):
     AddDefaultAuthorizerToCorsPreflight: Optional[bool] = auth("AddDefaultAuthorizerToCorsPreflight")
-    AddApiKeyRequiredToCorsPreflight: Optional[bool]  # TODO Add Docs
+    AddApiKeyRequiredToCorsPreflight: Optional[bool] = auth("AddApiKeyRequiredToCorsPreflight")
     ApiKeyRequired: Optional[bool] = auth("ApiKeyRequired")
     Authorizers: Optional[
         Dict[
@@ -151,15 +152,35 @@ class Route53(BaseModel):
         ["AWS::Route53::RecordSetGroup.RecordSet", "HostedZoneName"],
     )
     IpV6: Optional[bool] = route53("IpV6")
-    SetIdentifier: Optional[PassThroughProp]  # TODO: add docs
-    Region: Optional[PassThroughProp]  # TODO: add docs
-    SeparateRecordSetGroup: Optional[bool]  # TODO: add docs
-    VpcEndpointDomainName: Optional[PassThroughProp]  # TODO: add docs
-    VpcEndpointHostedZoneId: Optional[PassThroughProp]  # TODO: add docs
+    SetIdentifier: Optional[PassThroughProp] = passthrough_prop(
+        ROUTE53_STEM,
+        "SetIdentifier",
+        ["AWS::Route53::RecordSetGroup.RecordSet", "SetIdentifier"],
+    )
+    Region: Optional[PassThroughProp] = passthrough_prop(
+        ROUTE53_STEM,
+        "Region",
+        ["AWS::Route53::RecordSetGroup.RecordSet", "Region"],
+    )
+    SeparateRecordSetGroup: Optional[bool]  # SAM-specific property - not yet documented in sam-docs.json
+    VpcEndpointDomainName: Optional[PassThroughProp] = passthrough_prop(
+        ROUTE53_STEM,
+        "VpcEndpointDomainName",
+        ["AWS::Route53::RecordSet.AliasTarget", "DNSName"],
+    )
+    VpcEndpointHostedZoneId: Optional[PassThroughProp] = passthrough_prop(
+        ROUTE53_STEM,
+        "VpcEndpointHostedZoneId",
+        ["AWS::Route53::RecordSet.AliasTarget", "HostedZoneId"],
+    )
 
 
 class AccessAssociation(BaseModel):
-    VpcEndpointId: PassThroughProp  # TODO: add docs
+    VpcEndpointId: PassThroughProp = passthrough_prop(
+        ACCESS_ASSOCIATION_STEM,
+        "VpcEndpointId",
+        ["AWS::ApiGateway::DomainNameAccessAssociation", "Properties", "AccessAssociationSource"],
+    )
 
 
 class Domain(BaseModel):
@@ -175,11 +196,7 @@ class Domain(BaseModel):
     EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE", "PRIVATE"]]] = domain(
         "EndpointConfiguration"
     )
-    IpAddressType: Optional[PassThroughProp] = passthrough_prop(
-        DOMAIN_STEM,
-        "IpAddressType",
-        ["AWS::ApiGateway::DomainName.EndpointConfiguration", "IpAddressType"],
-    )
+    IpAddressType: Optional[PassThroughProp]  # TODO: add documentation; currently unavailable
     MutualTlsAuthentication: Optional[PassThroughProp] = passthrough_prop(
         DOMAIN_STEM,
         "MutualTlsAuthentication",
@@ -228,11 +245,7 @@ class EndpointConfiguration(BaseModel):
         "VPCEndpointIds",
         ["AWS::ApiGateway::RestApi.EndpointConfiguration", "VpcEndpointIds"],
     )
-    IpAddressType: Optional[PassThroughProp] = passthrough_prop(
-        ENDPOINT_CONFIGURATION_STEM,
-        "IpAddressType",
-        ["AWS::ApiGateway::RestApi.EndpointConfiguration", "IpAddressType"],
-    )
+    IpAddressType: Optional[PassThroughProp]  # TODO: add documentation; currently unavailable
 
 
 Name = Optional[PassThroughProp]
@@ -324,8 +337,17 @@ class Properties(BaseModel):
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
     StageName: SamIntrinsicable[str] = properties("StageName")
     Tags: Optional[DictStrAny] = properties("Tags")
-    Policy: Optional[PassThroughProp]  # TODO: add docs
-    PropagateTags: Optional[bool]  # TODO: add docs
+    Policy: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "Policy",
+        ["AWS::ApiGateway::RestApi", "Properties", "Policy"],
+    )
+    PropagateTags: Optional[bool] = properties("PropagateTags")
+    SecurityPolicy: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "SecurityPolicy",
+        ["AWS::ApiGateway::RestApi", "Properties", "SecurityPolicy"],
+    )
     TracingEnabled: Optional[TracingEnabled] = passthrough_prop(
         PROPERTIES_STEM,
         "TracingEnabled",
@@ -391,7 +413,12 @@ class Globals(BaseModel):
     OpenApiVersion: Optional[OpenApiVersion] = properties("OpenApiVersion")
     Domain: Optional[Domain] = properties("Domain")
     AlwaysDeploy: Optional[AlwaysDeploy] = properties("AlwaysDeploy")
-    PropagateTags: Optional[bool]  # TODO: add docs
+    PropagateTags: Optional[bool] = properties("PropagateTags")
+    SecurityPolicy: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "SecurityPolicy",
+        ["AWS::ApiGateway::RestApi", "Properties", "SecurityPolicy"],
+    )
 
 
 class Resource(ResourceAttributes):

@@ -88,6 +88,7 @@ class Globals:
             "Domain",
             "AlwaysDeploy",
             "PropagateTags",
+            "SecurityPolicy",
         ],
         SamResourceType.HttpApi.value: [
             "Auth",
@@ -110,22 +111,15 @@ class Globals:
             "Tags",
             "InstanceRequirements",
             "ScalingConfig",
-            "KMSKeyArn",
+            "KmsKeyArn",
             "PropagateTags",
         ],
     }
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {
-        SamResourceType.Function.value: [
-            "TenancyConfig",
-            "DurableConfig",
-            "CapacityProviderConfig",
-            "FunctionScalingConfig",
-            "PublishToLatestPublished",
-            "VersionDeletionPolicy",
-        ],
+        SamResourceType.Function.value: [],
     }
-    unreleased_resource_types: List[str] = [SamResourceType.CapacityProvider.value]
+    unreleased_resource_types: List[str] = []
 
     def __init__(self, template: Dict[str, Any]) -> None:
         """
@@ -317,15 +311,15 @@ class GlobalProperties:
       ```
       Global:
         Function:
-          Runtime: nodejs
+          Runtime: nodejs24.x
 
       Function:
-         Runtime: python
+         Runtime: python3.14
       ```
 
     After processing, Function resource will contain:
       ```
-      Runtime: python
+      Runtime: python3.14
       ```
 
     **Different data types**

@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from samtranslator.internal.managed_policies import get_bundled_managed_policy_map
 from samtranslator.internal.types import GetManagedPolicyMap
@@ -60,6 +60,34 @@ def _get_managed_policy_arn(
     return name
 
 
+def _convert_intrinsic_if_values(
+    intrinsic_if: Dict[str, List[Any]], is_convertible: Callable[[Any], Any], convert: Callable[[Any], Any]
+) -> Dict[str, List[Any]]:
+    """
+    Convert the true and false value of the intrinsic if function according to
+    `convert` function.
+
+    :param intrinsic_if: A dict of the form {"Fn::If": [condition, value_if_true, value_if_false]}
+    :type intrinsic_if: Dict[str, List[Any]]
+    :param is_convertible: The function used to decide if the value must be converted
+    :type convert: Callable[[Any], Any]
+    :param convert: The function used to make the conversion
+    :type convert: Callable[[Any], Any]
+    :return: The input dict with values converted
+    :rtype: Dict[str, List[Any]]
+    """
+    value_if_true = intrinsic_if["Fn::If"][1]
+    value_if_false = intrinsic_if["Fn::If"][2]
+
+    if is_convertible(value_if_true):
+        intrinsic_if["Fn::If"][1] = convert(value_if_true)
+
+    if is_convertible(value_if_false):
+        intrinsic_if["Fn::If"][2] = convert(value_if_false)
+
+    return intrinsic_if
+
+
 def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
     resource_logical_id,
     attributes,
@@ -102,23 +130,16 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
     for index, policy_entry in enumerate(resource_policies.get()):
         if policy_entry.type is PolicyTypes.POLICY_STATEMENT:
             if is_intrinsic_if(policy_entry.data):
-                intrinsic_if = policy_entry.data
-                then_statement = intrinsic_if["Fn::If"][1]
-                else_statement = intrinsic_if["Fn::If"][2]
-
-                if not is_intrinsic_no_value(then_statement):
-                    then_statement = {
-                        "PolicyName": execution_role.logical_id + "Policy" + str(index),
-                        "PolicyDocument": then_statement,
-                    }
-                    intrinsic_if["Fn::If"][1] = then_statement
-
-                if not is_intrinsic_no_value(else_statement):
-                    else_statement = {
-                        "PolicyName": execution_role.logical_id + "Policy" + str(index),
-                        "PolicyDocument": else_statement,
-                    }
-                    intrinsic_if["Fn::If"][2] = else_statement
+                intrinsic_if = _convert_intrinsic_if_values(
+                    policy_entry.data,
+                    lambda value: not is_intrinsic_no_value(value),
+                    lambda value: (
+                        {
+                            "PolicyName": execution_role.logical_id + "Policy" + str(index),  # noqa: B023
+                            "PolicyDocument": value,
+                        }
+                    ),
+                )
 
                 policy_documents.append(intrinsic_if)
 
@@ -134,7 +155,7 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
             # There are three options:
             #   Managed Policy Name (string): Try to convert to Managed Policy ARN
             #   Managed Policy Arn (string): Insert it directly into the list
-            #   Intrinsic Function (dict): Insert it directly into the list
+            #   Intrinsic Function (dict): Try to convert each statement to Managed Policy Arn
             #
             # When you insert into managed_policy_arns list, de-dupe to prevent same ARN from showing up twice
             #
@@ -145,6 +166,12 @@ def construct_role_for_resource(  # type: ignore[no-untyped-def] # noqa: PLR0913
                     policy_arn,
                     managed_policy_map,
                     get_managed_policy_map,
+                )
+            elif is_intrinsic_if(policy_arn):
+                policy_arn = _convert_intrinsic_if_values(
+                    policy_arn,
+                    lambda value: not is_intrinsic_no_value(value) and isinstance(value, str),
+                    lambda value: _get_managed_policy_arn(value, managed_policy_map, get_managed_policy_map),
                 )
 
             # De-Duplicate managed policy arns before inserting. Mainly useful

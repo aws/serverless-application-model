@@ -1,0 +1,26 @@
+[
+  {
+    "LogicalResourceId": "SimpleCapacityProvider",
+    "ResourceType": "AWS::Lambda::CapacityProvider"
+  },
+  {
+    "LogicalResourceId": "SimpleCapacityProviderOperatorRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "AdvancedCapacityProvider",
+    "ResourceType": "AWS::Lambda::CapacityProvider"
+  },
+  {
+    "LogicalResourceId": "AdvancedCapacityProviderOperatorRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  }
+]

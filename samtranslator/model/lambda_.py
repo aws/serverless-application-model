@@ -135,6 +135,7 @@ class LambdaEventSourceMapping(Resource):
         "ScalingConfig": GeneratedProperty(),
         "ProvisionedPollerConfig": GeneratedProperty(),
         "MetricsConfig": GeneratedProperty(),
+        "LoggingConfig": GeneratedProperty(),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}

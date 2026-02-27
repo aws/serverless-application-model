@@ -48,4 +48,4 @@ Please note that in either case you will see metric gaps between the time CloudF
 How to deploy Lambda\@Edge functions with SAM?
 ----------------------------------------------
 
-At present, SAM doesn't support `Lambda@Edge <https://aws.amazon.com/lambda/edge/>`_ as a native event. However you can follow this example to ease deployment: `Lambda Edge Example <https://github.com/awslabs/serverless-application-model/tree/master/examples/2016-10-31/lambda_edge>`_.
+At present, SAM doesn't support `Lambda@Edge <https://aws.amazon.com/lambda/edge/>`_ as a native event. However you can follow this example to ease deployment: `Lambda Edge Example <https://github.com/aws/serverless-application-model/tree/c00b8a3/examples/2016-10-31/lambda_edge>`_.

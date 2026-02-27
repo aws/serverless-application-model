@@ -30,6 +30,7 @@ class ApiGatewayRestApi(Resource):
         "ApiKeySourceType": GeneratedProperty(),
         "Tags": GeneratedProperty(),
         "Policy": GeneratedProperty(),
+        "SecurityPolicy": GeneratedProperty(),
     }
 
     Body: Optional[Dict[str, Any]]
@@ -46,6 +47,7 @@ class ApiGatewayRestApi(Resource):
     ApiKeySourceType: Optional[PassThrough]
     Tags: Optional[PassThrough]
     Policy: Optional[PassThrough]
+    SecurityPolicy: Optional[PassThrough]
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
 
@@ -522,7 +524,7 @@ class ApiGatewayAuthorizer:
         if not self.identity or not self.identity.get("Header"):
             return "Authorization"
 
-        return self.identity.get("Header")
+        return self.identity.get("Header")  # type: ignore[no-any-return]
 
     def _get_reauthorize_every(self) -> Optional[PassThrough]:
         if not self.identity:

@@ -37,6 +37,33 @@ Resources:
             FilterCriteria:
               Filters:
               - Pattern: '{"name": "value"}'
+        MSKEvent:
+          Type: MSK
+          Properties:
+            Stream: !GetAtt MSKCluster.Arn
+            StartingPosition: LATEST
+            MetricsConfig:
+              Metrics:
+              - EventCount
+              - ErrorCount
+              - KafkaMetrics
+            Topics:
+            - my-topic
+        SelfManagedKafkaEvent:
+          Type: SelfManagedKafka
+          Properties:
+            KafkaBootstrapServers:
+            - broker1:9092
+            - broker2:9092
+            Topics:
+            - my-topic
+            SourceAccessConfigurations:
+            - Type: SASL_SCRAM_256_AUTH
+              URI: !Ref KafkaSecret
+            MetricsConfig:
+              Metrics:
+              - ErrorCount
+              - KafkaMetrics
 
   KinesisStream:
     Type: AWS::Kinesis::Stream
@@ -56,3 +83,25 @@ Resources:
 
   MySqsQueue:
     Type: AWS::SQS::Queue
+
+  MSKCluster:
+    Type: AWS::MSK::Cluster
+    Properties:
+      ClusterName: test-cluster
+      KafkaVersion: 2.8.0
+      NumberOfBrokerNodes: 2
+      BrokerNodeGroupInfo:
+        InstanceType: kafka.t3.small
+        ClientSubnets:
+        - subnet-12345
+        - subnet-67890
+
+  KafkaSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Kafka SASL credentials
+      SecretString: !Sub |
+        {
+          "username": "kafka-user",
+          "password": "kafka-password"
+        }

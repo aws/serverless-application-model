@@ -92,6 +92,31 @@
       },
       "Type": "AWS::Lambda::EventSourceMapping"
     },
+    "FilteredEventsFunctionMSKEvent": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MSKCluster",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        },
+        "MetricsConfig": {
+          "Metrics": [
+            "EventCount",
+            "ErrorCount",
+            "KafkaMetrics"
+          ]
+        },
+        "StartingPosition": "LATEST",
+        "Topics": [
+          "my-topic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
     "FilteredEventsFunctionMySqsQueue": {
       "Properties": {
         "EventSourceArn": {
@@ -140,7 +165,27 @@
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "secretsmanager:GetSecretValue"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "KafkaSecret"
+                  }
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "SelfManagedKafkaExecutionRolePolicy"
+          }
         ],
         "Tags": [
           {
@@ -151,11 +196,68 @@
       },
       "Type": "AWS::IAM::Role"
     },
+    "FilteredEventsFunctionSelfManagedKafkaEvent": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        },
+        "MetricsConfig": {
+          "Metrics": [
+            "ErrorCount",
+            "KafkaMetrics"
+          ]
+        },
+        "SelfManagedEventSource": {
+          "Endpoints": {
+            "KafkaBootstrapServers": [
+              "broker1:9092",
+              "broker2:9092"
+            ]
+          }
+        },
+        "SourceAccessConfigurations": [
+          {
+            "Type": "SASL_SCRAM_256_AUTH",
+            "URI": {
+              "Ref": "KafkaSecret"
+            }
+          }
+        ],
+        "Topics": [
+          "my-topic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "KafkaSecret": {
+      "Properties": {
+        "Description": "Kafka SASL credentials",
+        "SecretString": {
+          "Fn::Sub": "{\n  \"username\": \"kafka-user\",\n  \"password\": \"kafka-password\"\n}\n"
+        }
+      },
+      "Type": "AWS::SecretsManager::Secret"
+    },
     "KinesisStream": {
       "Properties": {
         "ShardCount": 1
       },
       "Type": "AWS::Kinesis::Stream"
+    },
+    "MSKCluster": {
+      "Properties": {
+        "BrokerNodeGroupInfo": {
+          "ClientSubnets": [
+            "subnet-12345",
+            "subnet-67890"
+          ],
+          "InstanceType": "kafka.t3.small"
+        },
+        "ClusterName": "test-cluster",
+        "KafkaVersion": "2.8.0",
+        "NumberOfBrokerNodes": 2
+      },
+      "Type": "AWS::MSK::Cluster"
     },
     "MySqsQueue": {
       "Type": "AWS::SQS::Queue"
