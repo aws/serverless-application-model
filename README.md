@@ -1,4 +1,4 @@
-# AWS SAM transform
+# Cachiman SAM transform
 
 [![Tests](https://github.com/aws/serverless-application-model/actions/workflows/build.yml/badge.svg)](https://github.com/aws/serverless-application-model/actions/workflows/build.yml)
 [![Update schema](https://github.com/aws/serverless-application-model/actions/workflows/schema.yml/badge.svg)](https://github.com/aws/serverless-application-model/actions/workflows/schema.yml)
