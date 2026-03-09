@@ -308,6 +308,7 @@ class ApiEventProperties(BaseModel):
         "TimeoutInMillis",
         ["AWS::ApiGateway::Method.Integration", "TimeoutInMillis"],
     )
+    ResponseTransferMode: Optional[PassThroughProp] = apieventproperties("ResponseTransferMode")
 
 
 class ApiEvent(BaseModel):

@@ -6103,6 +6103,15 @@
           "title": "RequestParameters",
           "type": "array"
         },
+        "ResponseTransferMode": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "markdownDescription": "The response transfer mode for the Lambda function integration. Set to `RESPONSE_STREAM` to enable Lambda response streaming through API Gateway, allowing the function to stream responses back to clients. When set to `RESPONSE_STREAM`, API Gateway uses the Lambda InvokeWithResponseStreaming API.  \n*Type*: String  \n*Required*: No  \n*Valid values*: `BUFFERED` \\| `RESPONSE_STREAM`  \n*CloudFormation compatibility*: This property is passed directly to the [`ResponseTransferMode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-apigateway-method-integration.html#cfn-apigateway-method-integration-responsetransfermode) property of an `AWS::ApiGateway::Method Integration`\\.",
+          "title": "ResponseTransferMode"
+        },
         "RestApiId": {
           "anyOf": [
             {

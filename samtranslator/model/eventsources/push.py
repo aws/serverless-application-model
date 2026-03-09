@@ -689,6 +689,7 @@ class Api(PushEventSource):
         "RequestModel": PropertyType(False, IS_DICT),
         "RequestParameters": PropertyType(False, IS_LIST),
         "TimeoutInMillis": PropertyType(False, IS_INT),
+        "ResponseTransferMode": PropertyType(False, IS_STR),
     }
 
     Path: str
@@ -699,6 +700,7 @@ class Api(PushEventSource):
     RequestModel: Optional[Dict[str, Any]]
     RequestParameters: Optional[List[Any]]
     TimeoutInMillis: Optional[PassThrough]
+    ResponseTransferMode: Optional[PassThrough]
 
     def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -863,7 +865,7 @@ class Api(PushEventSource):
             swagger_body = SwaggerEditor.gen_skeleton()
 
         partition = ArnGenerator.get_partition_name()
-        uri = _build_apigw_integration_uri(function, partition)  # type: ignore[no-untyped-call]
+        uri = _build_apigw_integration_uri(function, partition, self.ResponseTransferMode)  # type: ignore[no-untyped-call]
 
         editor = SwaggerEditor(swagger_body)
 
@@ -882,7 +884,15 @@ class Api(PushEventSource):
         sam_expect(method_auth, self.relative_id, "Auth", is_sam_event=True).to_be_a_map()
         api_auth = api.get("Auth") or Py27Dict()
         sam_expect(api_auth, api_id, "Auth").to_be_a_map()
-        editor.add_lambda_integration(self.Path, self.Method, uri, method_auth, api_auth, condition=condition)
+        editor.add_lambda_integration(
+            self.Path,
+            self.Method,
+            uri,
+            method_auth,
+            api_auth,
+            condition=condition,
+            invoke_mode=self.ResponseTransferMode,
+        )
 
         # self.Stage is not None as it is set in _get_permissions()
         # before calling this method.
@@ -1550,14 +1560,23 @@ class HttpApi(PushEventSource):
         editor.add_auth_to_method(api=api, path=self._path, method_name=self._method, auth=self.Auth)  # type: ignore[no-untyped-call]
 
 
-def _build_apigw_integration_uri(function, partition):  # type: ignore[no-untyped-def]
+def _build_apigw_integration_uri(function, partition, response_transfer_mode=None):  # type: ignore[no-untyped-def]
     function_arn = function.get_runtime_attr("arn")
+    # Use response-streaming-invocations path when ResponseTransferMode is RESPONSE_STREAM
+    # See: https://aws.amazon.com/blogs/compute/building-responsive-apis-with-amazon-api-gateway-response-streaming/
+    if response_transfer_mode == "RESPONSE_STREAM":
+        api_version = "2021-11-15"
+        invocation_path = "/response-streaming-invocations"
+    else:
+        api_version = "2015-03-31"
+        invocation_path = "/invocations"
+
     arn = (
         "arn:"
         + partition
-        + ":apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/"
+        + f":apigateway:${{AWS::Region}}:lambda:path/{api_version}/functions/"
         + make_shorthand(function_arn)
-        + "/invocations"
+        + invocation_path
     )
     # function_arn is always of the form {"Fn::GetAtt": ["<function_logical_id>", "Arn"]}.
     # We only want to check if the function logical id is a Py27UniStr instance.
