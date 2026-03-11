@@ -996,7 +996,7 @@ class ApiGenerator:
 
             try:
                 editor.add_cors(  # type: ignore[no-untyped-call]
-                    normalized_path,
+                    path,
                     properties.AllowOrigin,
                     properties.AllowHeaders,
                     properties.AllowMethods,
