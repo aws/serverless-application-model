@@ -20,6 +20,7 @@
 """
 AWS SAM Serverless Application Model
 """
+
 import io
 import os
 import re

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Automatically create transform tests input and output files given an input template."""
+
 import argparse
 import json
 import shutil
@@ -54,8 +55,9 @@ def generate_transform_test_output_files(input_file_path: Path, file_basename: s
     }
 
     for _, (region, output_path) in transform_test_output_paths.items():
-        with patch("samtranslator.translator.arn_generator._get_region_from_session", return_value=region), patch(
-            "boto3.session.Session.region_name", region
+        with (
+            patch("samtranslator.translator.arn_generator._get_region_from_session", return_value=region),
+            patch("boto3.session.Session.region_name", region),
         ):
             # Implicit API Plugin may alter input template file, thus passing a copy here.
             output_fragment = transform(deepcopy(manifest), {}, ManagedPolicyLoader(iam_client))

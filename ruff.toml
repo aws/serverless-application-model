@@ -31,8 +31,8 @@ lint.select = [
 ]
 
 lint.ignore = [
-    "UP006", # TODO: can be enabled now that min version is 3.10+ (use builtin generics like list[] instead of List[])
-    "UP007", # TODO: can be enabled now that min version is 3.10+ (use X | Y union syntax instead of Union[X, Y])
+    "UP006", # https://github.com/charliermarsh/ruff/pull/4427
+    "UP007", # https://github.com/charliermarsh/ruff/pull/4427
     # Mutable class attributes should be annotated with `typing.ClassVar`
     # Too many violations
     "RUF012",

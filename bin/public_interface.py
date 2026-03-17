@@ -7,6 +7,7 @@ so we assume anything public by convention unless it is prefixed with "_".
 (see https://peps.python.org/pep-0008/#descriptive-naming-styles)
 This CLI tool helps automate the detection of compatibility-breaking changes.
 """
+
 import argparse
 import ast
 import importlib

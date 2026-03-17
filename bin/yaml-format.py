@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """JSON file formatter (without prettier)."""
+
 import sys
 from pathlib import Path
 from textwrap import dedent
@@ -75,11 +76,9 @@ class YAMLFormatter(FileFormatter):
         cls.arg_parser.add_argument(
             "--add-test-metadata",
             action="store_true",
-            help=dedent(
-                """\
+            help=dedent("""\
                 Add the testing metadata to yaml file if it doesn't exist:
-                "Metadata: SamTransformTest: true" """
-            ),
+                "Metadata: SamTransformTest: true" """),
         )
 
 

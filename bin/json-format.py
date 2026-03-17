@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """JSON file formatter (without prettier)."""
+
 import sys
 from pathlib import Path
 

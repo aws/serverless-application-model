@@ -5,6 +5,7 @@ Transform test error JSON file formatter (without prettier).
 It makes error json easier to review by breaking down "errorMessage"
 into list of strings (delimiter: ". ").
 """
+
 import sys
 from pathlib import Path
 
