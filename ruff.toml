@@ -1,8 +1,8 @@
 # black formatter takes care of the line length
 line-length = 999
 
-# Mininal python version we support is 3.8
-target-version = "py38"
+# Minimal python version we support is 3.10
+target-version = "py310"
 
 lint.select = [
     "E",  # pycodestyle
@@ -31,8 +31,8 @@ lint.select = [
 ]
 
 lint.ignore = [
-    "UP006", # https://github.com/charliermarsh/ruff/pull/4427
-    "UP007", # https://github.com/charliermarsh/ruff/pull/4427
+    "UP006", # TODO: can be enabled now that min version is 3.10+ (use builtin generics like list[] instead of List[])
+    "UP007", # TODO: can be enabled now that min version is 3.10+ (use X | Y union syntax instead of Union[X, Y])
     # Mutable class attributes should be annotated with `typing.ClassVar`
     # Too many violations
     "RUF012",
