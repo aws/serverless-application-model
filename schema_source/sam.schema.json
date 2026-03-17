@@ -1858,10 +1858,10 @@
               "items": {
                 "anyOf": [
                   {
-                    "type": "string"
+                    "type": "object"
                   },
                   {
-                    "type": "object"
+                    "type": "string"
                   }
                 ]
               },
@@ -1880,10 +1880,10 @@
               "items": {
                 "anyOf": [
                   {
-                    "type": "string"
+                    "type": "object"
                   },
                   {
-                    "type": "object"
+                    "type": "string"
                   }
                 ]
               },
@@ -1902,10 +1902,10 @@
               "items": {
                 "anyOf": [
                   {
-                    "type": "string"
+                    "type": "object"
                   },
                   {
-                    "type": "object"
+                    "type": "string"
                   }
                 ]
               },
@@ -3804,10 +3804,10 @@
           "items": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "object"
               },
               {
-                "type": "object"
+                "type": "string"
               }
             ]
           },
@@ -4130,10 +4130,10 @@
               "items": {
                 "anyOf": [
                   {
-                    "type": "string"
+                    "type": "object"
                   },
                   {
-                    "type": "object"
+                    "type": "string"
                   }
                 ]
               },
@@ -4152,10 +4152,10 @@
               "items": {
                 "anyOf": [
                   {
-                    "type": "string"
+                    "type": "object"
                   },
                   {
-                    "type": "object"
+                    "type": "string"
                   }
                 ]
               },

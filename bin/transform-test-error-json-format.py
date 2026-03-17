@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 import json
-from typing import Final, Type
+from typing import Final
 
 from bin._file_formatter import FileFormatter
 
@@ -42,7 +42,7 @@ class TransformTestErrorJSONFormatter(FileFormatter):
         return json.dumps(obj, indent=2, sort_keys=True) + "\n"
 
     @staticmethod
-    def decode_exception() -> Type[Exception]:
+    def decode_exception() -> type[Exception]:
         return json.JSONDecodeError
 
     @staticmethod

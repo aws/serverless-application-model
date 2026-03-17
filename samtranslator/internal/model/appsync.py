@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, TypedDict, Union
+from typing import Any, TypedDict, Union
 
 from typing_extensions import Required
 
@@ -53,7 +53,7 @@ class DeltaSyncConfigType(TypedDict):
 
 
 class DynamoDBConfigType(TypedDict, total=False):
-    AwsRegion: Union[str, Dict[str, str]]
+    AwsRegion: Union[str, dict[str, str]]
     TableName: str
     UseCallerCredentials: bool
     Versioned: bool
@@ -93,12 +93,12 @@ class SyncConfigType(TypedDict, total=False):
 
 
 class CachingConfigType(TypedDict, total=False):
-    CachingKeys: List[str]
+    CachingKeys: list[str]
     Ttl: float
 
 
 class PipelineConfigType(TypedDict, total=False):
-    Functions: List[Intrinsicable[str]]
+    Functions: list[Intrinsicable[str]]
 
 
 class GraphQLApi(Resource):
@@ -122,18 +122,18 @@ class GraphQLApi(Resource):
 
     Name: str
     AuthenticationType: str
-    LambdaAuthorizerConfig: Optional[LambdaAuthorizerConfigType]
-    OpenIDConnectConfig: Optional[OpenIDConnectConfigType]
-    UserPoolConfig: Optional[UserPoolConfigType]
-    AdditionalAuthenticationProviders: Optional[List[AdditionalAuthenticationProviderType]]
-    Tags: Optional[List[Dict[str, Any]]]
-    XrayEnabled: Optional[bool]
-    LogConfig: Optional[LogConfigType]
-    Visibility: Optional[str]
-    OwnerContact: Optional[str]
-    IntrospectionConfig: Optional[str]
-    QueryDepthLimit: Optional[int]
-    ResolverCountLimit: Optional[int]
+    LambdaAuthorizerConfig: LambdaAuthorizerConfigType | None
+    OpenIDConnectConfig: OpenIDConnectConfigType | None
+    UserPoolConfig: UserPoolConfigType | None
+    AdditionalAuthenticationProviders: list[AdditionalAuthenticationProviderType] | None
+    Tags: list[dict[str, Any]] | None
+    XrayEnabled: bool | None
+    LogConfig: LogConfigType | None
+    Visibility: str | None
+    OwnerContact: str | None
+    IntrospectionConfig: str | None
+    QueryDepthLimit: int | None
+    ResolverCountLimit: int | None
 
     runtime_attrs = {"api_id": lambda self: fnGetAtt(self.logical_id, "ApiId")}
 
@@ -147,8 +147,8 @@ class GraphQLSchema(Resource):
     }
 
     ApiId: Intrinsicable[str]
-    Definition: Optional[str]
-    DefinitionS3Location: Optional[str]
+    Definition: str | None
+    DefinitionS3Location: str | None
 
 
 class DataSource(Resource):
@@ -164,12 +164,12 @@ class DataSource(Resource):
     }
 
     ApiId: Intrinsicable[str]
-    Description: Optional[str]
+    Description: str | None
     Name: str
     Type: str
     ServiceRoleArn: str
-    DynamoDBConfig: Optional[DynamoDBConfigType]
-    LambdaConfig: Optional[LambdaConfigType]
+    DynamoDBConfig: DynamoDBConfigType | None
+    LambdaConfig: LambdaConfigType | None
 
     runtime_attrs = {
         "arn": lambda self: fnGetAtt(self.logical_id, "DataSourceArn"),
@@ -194,12 +194,12 @@ class FunctionConfiguration(Resource):
     ApiId: Intrinsicable[str]
     DataSourceName: Intrinsicable[str]
     Name: str
-    Code: Optional[str]
-    CodeS3Location: Optional[str]
-    Description: Optional[str]
-    MaxBatchSize: Optional[int]
-    Runtime: Optional[AppSyncRuntimeType]
-    SyncConfig: Optional[SyncConfigType]
+    Code: str | None
+    CodeS3Location: str | None
+    Description: str | None
+    MaxBatchSize: int | None
+    Runtime: AppSyncRuntimeType | None
+    SyncConfig: SyncConfigType | None
 
     runtime_attrs = {"function_id": lambda self: fnGetAtt(self.logical_id, "FunctionId")}
 
@@ -222,16 +222,16 @@ class Resolver(Resource):
     }
 
     ApiId: Intrinsicable[str]
-    CachingConfig: Optional[CachingConfigType]
-    Code: Optional[str]
-    CodeS3Location: Optional[str]
-    DataSourceName: Optional[str]
+    CachingConfig: CachingConfigType | None
+    Code: str | None
+    CodeS3Location: str | None
+    DataSourceName: str | None
     FieldName: str
-    Kind: Optional[str]
-    MaxBatchSize: Optional[int]
-    PipelineConfig: Optional[PipelineConfigType]
-    Runtime: Optional[AppSyncRuntimeType]
-    SyncConfig: Optional[SyncConfigType]
+    Kind: str | None
+    MaxBatchSize: int | None
+    PipelineConfig: PipelineConfigType | None
+    Runtime: AppSyncRuntimeType | None
+    SyncConfig: SyncConfigType | None
     TypeName: str
 
 
@@ -245,9 +245,9 @@ class ApiKey(Resource):
     }
 
     ApiId: Intrinsicable[str]
-    ApiKeyId: Optional[str]
-    Description: Optional[str]
-    Expires: Optional[float]
+    ApiKeyId: str | None
+    Description: str | None
+    Expires: float | None
 
 
 class DomainName(Resource):
@@ -260,7 +260,7 @@ class DomainName(Resource):
 
     CertificateArn: str
     DomainName: str
-    Description: Optional[str]
+    Description: str | None
 
     runtime_attrs = {"domain_name": lambda self: ref(self.logical_id)}
 
@@ -291,5 +291,5 @@ class ApiCache(Resource):
     ApiId: Intrinsicable[str]
     Type: str
     Ttl: float
-    AtRestEncryptionEnabled: Optional[bool]
-    TransitEncryptionEnabled: Optional[bool]
+    AtRestEncryptionEnabled: bool | None
+    TransitEncryptionEnabled: bool | None

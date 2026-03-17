@@ -1,11 +1,11 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from samtranslator.utils.actions import Action
 
 
 def traverse(
     input_value: Any,
-    actions: List[Action],
+    actions: list[Action],
 ) -> Any:
     """
     Driver method that performs the actual traversal of input and calls the execute method of the provided actions.
@@ -13,7 +13,7 @@ def traverse(
     Traversal Algorithm:
 
     Imagine the input dictionary/list as a tree. We are doing a Pre-Order tree traversal here where we first
-    process the root node before going to its children. Dict and Lists are the only two iterable nodes.
+    process the root node before going to its children. dict and Lists are the only two iterable nodes.
     Everything else is a leaf node.
 
     :param input_value: Any primitive type  (dict, array, string etc) whose value might contain a changed value
@@ -34,8 +34,8 @@ def traverse(
 
 
 def _traverse_dict(
-    input_dict: Dict[str, Any],
-    actions: List[Action],
+    input_dict: dict[str, Any],
+    actions: list[Action],
 ) -> Any:
     """
     Traverse a dictionary to resolves changed values on every value
@@ -51,13 +51,13 @@ def _traverse_dict(
 
 
 def _traverse_list(
-    input_list: List[Any],
-    actions: List[Action],
+    input_list: list[Any],
+    actions: list[Action],
 ) -> Any:
     """
     Traverse a list to resolve changed values on every element
 
-    :param input_list: List of input
+    :param input_list: list of input
     :param actions: This is just to pass it to the template partition
     :return: Modified list with values functions resolved
     """

@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
@@ -54,29 +54,29 @@ class SchedulerEventSource(ResourceMacro):
 
     # Below are type hints, must maintain consistent with properties_types
     # - pass-through to generated IAM role
-    PermissionsBoundary: Optional[str]
+    PermissionsBoundary: str | None
     # - pass-through to AWS::Scheduler::Schedule
     ScheduleExpression: str
-    FlexibleTimeWindow: Optional[Dict[str, Any]]
-    Name: Optional[PassThrough]
-    State: Optional[PassThrough]
-    Description: Optional[PassThrough]
-    StartDate: Optional[PassThrough]
-    EndDate: Optional[PassThrough]
-    ScheduleExpressionTimezone: Optional[PassThrough]
-    GroupName: Optional[PassThrough]
-    KmsKeyArn: Optional[PassThrough]
+    FlexibleTimeWindow: dict[str, Any] | None
+    Name: PassThrough | None
+    State: PassThrough | None
+    Description: PassThrough | None
+    StartDate: PassThrough | None
+    EndDate: PassThrough | None
+    ScheduleExpressionTimezone: PassThrough | None
+    GroupName: PassThrough | None
+    KmsKeyArn: PassThrough | None
     # - pass-through to AWS::Scheduler::Schedule's Target
-    Input: Optional[PassThrough]
-    RoleArn: Optional[PassThrough]
-    DeadLetterConfig: Optional[Dict[str, Any]]
-    RetryPolicy: Optional[PassThrough]
-    OmitName: Optional[bool]
+    Input: PassThrough | None
+    RoleArn: PassThrough | None
+    DeadLetterConfig: dict[str, Any] | None
+    RetryPolicy: PassThrough | None
+    OmitName: bool | None
 
     DEFAULT_FLEXIBLE_TIME_WINDOW = {"Mode": "OFF"}
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
-    def to_cloudformation(self, **kwargs: Dict[str, Any]) -> List[Resource]:
+    def to_cloudformation(self, **kwargs: dict[str, Any]) -> list[Resource]:
         """Returns the Scheduler Schedule and an IAM role.
 
         :param dict kwargs: no existing resources need to be modified
@@ -102,12 +102,12 @@ class SchedulerEventSource(ResourceMacro):
 
         passthrough_resource_attributes = target.get_passthrough_resource_attributes()
 
-        resources: List[Resource] = []
+        resources: list[Resource] = []
 
         scheduler_schedule = self._construct_scheduler_schedule_without_target(passthrough_resource_attributes)
         resources.append(scheduler_schedule)
 
-        dlq_queue_arn: Optional[str] = None
+        dlq_queue_arn: str | None = None
         if self.DeadLetterConfig is not None:
             # The dql config spec is the same as normal "Schedule" event,
             # so continue to use EventBridgeRuleUtils for validation.
@@ -119,7 +119,7 @@ class SchedulerEventSource(ResourceMacro):
             )
             resources.extend(dlq_resources)
 
-        execution_role_arn: Union[str, Dict[str, Any]] = self.RoleArn  # type: ignore[assignment]
+        execution_role_arn: Union[str, dict[str, Any]] = self.RoleArn  # type: ignore[assignment]
         if not execution_role_arn:
             execution_role = self._construct_execution_role(
                 target, target_type, passthrough_resource_attributes, dlq_queue_arn, self.PermissionsBoundary
@@ -132,7 +132,7 @@ class SchedulerEventSource(ResourceMacro):
         return resources
 
     def _construct_scheduler_schedule_without_target(
-        self, passthrough_resource_attributes: Dict[str, Any]
+        self, passthrough_resource_attributes: dict[str, Any]
     ) -> SchedulerSchedule:
         scheduler_schedule = SchedulerSchedule(self.logical_id, attributes=passthrough_resource_attributes)
         scheduler_schedule.ScheduleExpression = self.ScheduleExpression
@@ -167,9 +167,9 @@ class SchedulerEventSource(ResourceMacro):
         self,
         target: Resource,
         target_type: _SchedulerScheduleTargetType,
-        passthrough_resource_attributes: Dict[str, Any],
-        dlq_queue_arn: Optional[str],
-        permissions_boundary: Optional[str],
+        passthrough_resource_attributes: dict[str, Any],
+        dlq_queue_arn: str | None,
+        permissions_boundary: str | None,
     ) -> IAMRole:
         """Constructs the execution role for Scheduler Schedule."""
         if target_type == _SchedulerScheduleTargetType.FUNCTION:
@@ -195,8 +195,8 @@ class SchedulerEventSource(ResourceMacro):
         return execution_role
 
     def _construct_scheduler_schedule_target(
-        self, target: Resource, execution_role_arn: Union[str, Dict[str, Any]], dead_letter_queue_arn: Optional[Any]
-    ) -> Dict[str, Any]:
+        self, target: Resource, execution_role_arn: Union[str, dict[str, Any]], dead_letter_queue_arn: Any | None
+    ) -> dict[str, Any]:
         """Constructs the Target property for the Scheduler Schedule.
 
         :returns: the Target property
@@ -204,7 +204,7 @@ class SchedulerEventSource(ResourceMacro):
 
         Inspired by https://github.com/aws/serverless-application-model/blob/a25933379e1cad3d0df4b35729ee2ec335402fdf/samtranslator/model/eventsources/push.py#L157
         """
-        target_dict: Dict[str, Any] = {
+        target_dict: dict[str, Any] = {
             "Arn": target.get_runtime_attr("arn"),
             "RoleArn": execution_role_arn,
         }
@@ -220,8 +220,8 @@ class SchedulerEventSource(ResourceMacro):
         return target_dict
 
     def _get_dlq_queue_arn_and_resources(
-        self, dlq_config: Dict[str, Any], passthrough_resource_attributes: Optional[Dict[str, Any]]
-    ) -> Tuple[Any, List[Resource]]:
+        self, dlq_config: dict[str, Any], passthrough_resource_attributes: dict[str, Any] | None
+    ) -> tuple[Any, list[Resource]]:
         """
         Returns dlq queue arn and dlq_resources, assuming self.DeadLetterConfig has been validated.
 
@@ -236,7 +236,7 @@ class SchedulerEventSource(ResourceMacro):
                 self.logical_id,
                 "QueueLogicalId must be a string",
             )
-        dlq_resources: List[Resource] = []
+        dlq_resources: list[Resource] = []
         queue = SQSQueue(queue_logical_id or self.logical_id + "Queue", attributes=passthrough_resource_attributes)
         dlq_resources.append(queue)
 

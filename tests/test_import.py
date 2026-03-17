@@ -3,7 +3,6 @@ import pkgutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import List
 from unittest import TestCase
 
 from parameterized import parameterized
@@ -11,8 +10,8 @@ from parameterized import parameterized
 _PROJECT_ROOT = Path(__file__).parent.parent
 
 
-def scan_modules_recursively(module_name: str = "samtranslator") -> List[str]:
-    all_modules: List[str] = [module_name]
+def scan_modules_recursively(module_name: str = "samtranslator") -> list[str]:
+    all_modules: list[str] = [module_name]
     for submodule in pkgutil.iter_modules([os.path.join(_PROJECT_ROOT, module_name.replace(".", os.path.sep))]):
         submodule_name = module_name + "." + submodule.name
         all_modules += scan_modules_recursively(submodule_name)

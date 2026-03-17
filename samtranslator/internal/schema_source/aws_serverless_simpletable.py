@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Literal
 
 from samtranslator.internal.schema_source.aws_serverless_connector import EmbeddedConnector
 from samtranslator.internal.schema_source.common import (
@@ -31,36 +31,36 @@ class PrimaryKey(BaseModel):
     )
 
 
-SSESpecification = Optional[PassThroughProp]
+SSESpecification = PassThroughProp | None
 
 
 class Properties(BaseModel):
-    PointInTimeRecoverySpecification: Optional[PassThroughProp] = passthrough_prop(
+    PointInTimeRecoverySpecification: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "ProvisionedThroughput",
         ["AWS::DynamoDB::Table", "Properties", "PointInTimeRecoverySpecification"],
     )
-    PrimaryKey: Optional[PrimaryKey] = properties("PrimaryKey")
-    ProvisionedThroughput: Optional[PassThroughProp] = passthrough_prop(
+    PrimaryKey: PrimaryKey | None = properties("PrimaryKey")
+    ProvisionedThroughput: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "ProvisionedThroughput",
         ["AWS::DynamoDB::Table", "Properties", "ProvisionedThroughput"],
     )
-    SSESpecification: Optional[SSESpecification] = passthrough_prop(
+    SSESpecification: SSESpecification | None = passthrough_prop(
         PROPERTIES_STEM,
         "SSESpecification",
         ["AWS::DynamoDB::Table", "Properties", "SSESpecification"],
     )
-    TableName: Optional[PassThroughProp] = passthrough_prop(
+    TableName: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "TableName",
         ["AWS::DynamoDB::Table", "Properties", "TableName"],
     )
-    Tags: Optional[Dict[str, Any]] = properties("Tags")
+    Tags: dict[str, Any] | None = properties("Tags")
 
 
 class Globals(BaseModel):
-    SSESpecification: Optional[SSESpecification] = passthrough_prop(
+    SSESpecification: SSESpecification | None = passthrough_prop(
         PROPERTIES_STEM,
         "SSESpecification",
         ["AWS::DynamoDB::Table", "Properties", "SSESpecification"],
@@ -69,5 +69,5 @@ class Globals(BaseModel):
 
 class Resource(ResourceAttributes):
     Type: Literal["AWS::Serverless::SimpleTable"]
-    Properties: Optional[Properties]
-    Connectors: Optional[Dict[str, EmbeddedConnector]]
+    Properties: Properties | None
+    Connectors: dict[str, EmbeddedConnector] | None

@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict
+from typing import Any
 
 from samtranslator.model.exceptions import (
     InvalidDocumentException,
@@ -18,7 +18,7 @@ class Parser:
     def __init__(self) -> None:
         pass
 
-    def parse(self, sam_template: Dict[str, Any], parameter_values: Dict[str, Any], sam_plugins: SamPlugins) -> None:
+    def parse(self, sam_template: dict[str, Any], parameter_values: dict[str, Any], sam_plugins: SamPlugins) -> None:
         self._validate(sam_template, parameter_values)  # type: ignore[no-untyped-call]
         sam_plugins.act(LifeCycleEvents.before_transform_template, sam_template)
 

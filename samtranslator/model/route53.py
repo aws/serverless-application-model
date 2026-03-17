@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.utils.types import Intrinsicable
@@ -12,6 +12,6 @@ class Route53RecordSetGroup(Resource):
         "RecordSets": GeneratedProperty(),
     }
 
-    HostedZoneId: Optional[Intrinsicable[str]]
-    HostedZoneName: Optional[Intrinsicable[str]]
-    RecordSets: Optional[List[Any]]
+    HostedZoneId: Intrinsicable[str] | None
+    HostedZoneName: Intrinsicable[str] | None
+    RecordSets: list[Any] | None

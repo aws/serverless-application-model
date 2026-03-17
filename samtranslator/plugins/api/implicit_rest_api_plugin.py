@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Type
+from typing import Any
 
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
 from samtranslator.public.sdk.resource import SamResource, SamResourceType
@@ -7,7 +7,7 @@ from samtranslator.sdk.template import SamTemplate
 from samtranslator.validator.value_validator import sam_expect
 
 
-class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
+class ImplicitRestApiPlugin(ImplicitApiPlugin[type[SwaggerEditor]]):
     """
     This plugin provides Implicit API shorthand syntax in the SAM Spec.
     https://github.com/aws/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -35,14 +35,14 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
     SERVERLESS_API_RESOURCE_TYPE = SamResourceType.Api.value
     EDITOR_CLASS = SwaggerEditor
 
-    def _process_api_events(  # noqa: PLR0913
+    def _process_api_events(
         self,
         function: SamResource,
-        api_events: Dict[str, Dict[str, Any]],
+        api_events: dict[str, dict[str, Any]],
         template: SamTemplate,
-        condition: Optional[str] = None,
-        deletion_policy: Optional[str] = None,
-        update_replace_policy: Optional[str] = None,
+        condition: str | None = None,
+        deletion_policy: str | None = None,
+        update_replace_policy: str | None = None,
     ) -> None:
         """
         Actually process given API events. Iteratively adds the APIs to Swagger JSON in the respective Serverless::Api
@@ -77,13 +77,13 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin[Type[SwaggerEditor]]):
         # We could have made changes to the Events structure. Write it back to function
         function.properties["Events"].update(api_events)
 
-    def _generate_implicit_api_resource(self) -> Dict[str, Any]:
+    def _generate_implicit_api_resource(self) -> dict[str, Any]:
         """
         Uses the implicit API in this file to generate an Implicit API resource
         """
         return ImplicitApiResource().to_dict()
 
-    def _get_api_definition_from_editor(self, editor: SwaggerEditor) -> Dict[str, Any]:
+    def _get_api_definition_from_editor(self, editor: SwaggerEditor) -> dict[str, Any]:
         """
         Helper function to return the OAS definition from the editor
         """

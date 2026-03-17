@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Dict, Optional
+from typing import Any
 
 import boto3
 from boto3 import Session
@@ -12,7 +12,7 @@ class SamParameterValues:
     Class representing SAM parameter values.
     """
 
-    def __init__(self, parameter_values: Dict[Any, Any]) -> None:
+    def __init__(self, parameter_values: dict[Any, Any]) -> None:
         """
         Initialize the object given the parameter values as a dictionary
 
@@ -21,7 +21,7 @@ class SamParameterValues:
 
         self.parameter_values = copy.deepcopy(parameter_values)
 
-    def add_default_parameter_values(self, sam_template: Dict[str, Any]) -> Any:
+    def add_default_parameter_values(self, sam_template: dict[str, Any]) -> Any:
         """
         Method to read default values for template parameters and merge with user supplied values.
 
@@ -65,7 +65,7 @@ class SamParameterValues:
 
         return None
 
-    def add_pseudo_parameter_values(self, session: Optional[Session] = None) -> None:
+    def add_pseudo_parameter_values(self, session: Session | None = None) -> None:
         """
         Add pseudo parameter values
         :return: parameter values that have pseudo parameter in it

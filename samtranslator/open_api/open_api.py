@@ -1,7 +1,8 @@
 import copy
 import json
 import re
-from typing import Any, Callable, Dict, Optional, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Authorizer
@@ -40,9 +41,9 @@ class OpenApiEditor(BaseEditor):
     _DEFAULT_OPENAPI_TITLE = ref("AWS::StackName")
 
     # Attributes:
-    _doc: Dict[str, Any]
+    _doc: dict[str, Any]
 
-    def __init__(self, doc: Optional[Dict[str, Any]]) -> None:
+    def __init__(self, doc: dict[str, Any] | None) -> None:
         """
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
         modifications on this copy.
@@ -234,7 +235,7 @@ class OpenApiEditor(BaseEditor):
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
             method_definition[self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = payload_format_version
 
-    def add_authorizers_security_definitions(self, authorizers: Dict[str, ApiGatewayV2Authorizer]) -> None:
+    def add_authorizers_security_definitions(self, authorizers: dict[str, ApiGatewayV2Authorizer]) -> None:
         """
         Add Authorizer definitions to the securityDefinitions part of Swagger.
 
@@ -249,7 +250,7 @@ class OpenApiEditor(BaseEditor):
         self,
         path: str,
         default_authorizer: str,
-        authorizers: Dict[str, ApiGatewayV2Authorizer],
+        authorizers: dict[str, ApiGatewayV2Authorizer],
     ) -> None:
         """
         Adds the default_authorizer to the security block for each method on this path unless an Authorizer
@@ -260,7 +261,7 @@ class OpenApiEditor(BaseEditor):
         :param string path: Path name
         :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the
             authorizers param.
-        :param dict authorizers: Dict of Authorizer configurations defined on the related Api.
+        :param dict authorizers: dict of Authorizer configurations defined on the related Api.
         """
         for path_item in self.get_conditional_contents(self.paths.get(path)):
             BaseEditor.validate_path_item_is_dict(path_item, path)
@@ -361,7 +362,7 @@ class OpenApiEditor(BaseEditor):
             if security:
                 method_definition["security"] = security
 
-    def add_tags(self, tags: Dict[str, Intrinsicable[str]]) -> None:
+    def add_tags(self, tags: dict[str, Intrinsicable[str]]) -> None:
         """
         Adds tags to the OpenApi definition using an ApiGateway extension for tag values.
 
@@ -389,7 +390,7 @@ class OpenApiEditor(BaseEditor):
                 tag[self._X_APIGW_TAG_VALUE] = value
                 self.tags.append(tag)
 
-    def add_endpoint_config(self, disable_execute_api_endpoint: Optional[Intrinsicable[bool]]) -> None:
+    def add_endpoint_config(self, disable_execute_api_endpoint: Intrinsicable[bool] | None) -> None:
         """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG header in open api definition
 
         Following this guide:
@@ -418,7 +419,7 @@ class OpenApiEditor(BaseEditor):
 
         self._doc[self._SERVERS] = servers_configurations
 
-    def add_cors(  # type: ignore[no-untyped-def] # noqa: PLR0913
+    def add_cors(  # type: ignore[no-untyped-def]
         self,
         allow_origins,
         allow_headers=None,
@@ -508,12 +509,10 @@ class OpenApiEditor(BaseEditor):
         self.info["title"] = title
 
     def has_api_gateway_cors(self) -> bool:
-        if self._doc.get(self._X_APIGW_CORS):
-            return True
-        return False
+        return bool(self._doc.get(self._X_APIGW_CORS))
 
     @property
-    def openapi(self) -> Dict[str, Any]:
+    def openapi(self) -> dict[str, Any]:
         """
         Returns a **copy** of the OpenApi specification as a dictionary.
 

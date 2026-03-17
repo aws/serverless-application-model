@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Union, cast
 
 from samtranslator.model.codedeploy import CodeDeployApplication, CodeDeployDeploymentGroup
 from samtranslator.model.exceptions import InvalidResourceException
@@ -51,15 +51,15 @@ class DeploymentPreferenceCollection:
         This collection stores an internal dict of the deployment preferences for each function's
         deployment preference in the SAM Template.
         """
-        self._resource_preferences: Dict[str, Any] = {}
+        self._resource_preferences: dict[str, Any] = {}
 
     def add(
         self,
         logical_id: str,
-        deployment_preference_dict: Dict[str, Any],
-        condition: Optional[str] = None,
-        tags: Optional[Dict[str, Any]] = None,
-        propagate_tags: Optional[bool] = False,
+        deployment_preference_dict: dict[str, Any],
+        condition: str | None = None,
+        tags: dict[str, Any] | None = None,
+        propagate_tags: bool | None = False,
     ) -> None:
         """
         Add this deployment preference to the collection
@@ -100,7 +100,7 @@ class DeploymentPreferenceCollection:
         """
         return all(preference.role or not preference.enabled for preference in self._resource_preferences.values())
 
-    def needs_resource_condition(self) -> Union[Dict[str, Any], bool]:
+    def needs_resource_condition(self) -> Union[dict[str, Any], bool]:
         """
         If all preferences have a condition, all code deploy resources need to be conditionally created
         :return: True, if a condition needs to be created
@@ -110,10 +110,10 @@ class DeploymentPreferenceCollection:
             not preference.condition and preference.enabled for preference in self._resource_preferences.values()
         )
 
-    def get_all_deployment_conditions(self) -> List[str]:
+    def get_all_deployment_conditions(self) -> list[str]:
         """
         Returns a list of all conditions associated with the deployment preference resources
-        :return: List of condition names
+        :return: list of condition names
         """
         conditions_set = {preference.condition for preference in self._resource_preferences.values()}
         if None in conditions_set:
@@ -121,14 +121,14 @@ class DeploymentPreferenceCollection:
             conditions_set.remove(None)
         return list(conditions_set)
 
-    def create_aggregate_deployment_condition(self) -> Union[None, Dict[str, Dict[str, List[Dict[str, Any]]]]]:
+    def create_aggregate_deployment_condition(self) -> Union[None, dict[str, dict[str, list[dict[str, Any]]]]]:
         """
         Creates an aggregate deployment condition if necessary
         :return: None if <2 conditions are found, otherwise a dictionary of new conditions to add to template
         """
         return make_combined_condition(self.get_all_deployment_conditions(), CODE_DEPLOY_CONDITION_NAME)
 
-    def enabled_logical_ids(self) -> List[str]:
+    def enabled_logical_ids(self) -> list[str]:
         """
         :return: only the logical id's for the deployment preferences in this collection which are enabled
         """
@@ -138,7 +138,7 @@ class DeploymentPreferenceCollection:
         codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         codedeploy_application_resource.ComputePlatform = "Lambda"
 
-        merged_tags: Dict[str, Any] = {}
+        merged_tags: dict[str, Any] = {}
         for preference in self._resource_preferences.values():
             if preference.enabled and preference.propagate_tags and preference.tags:
                 merged_tags.update(preference.tags)
@@ -183,7 +183,7 @@ class DeploymentPreferenceCollection:
                 condition_name = conditions.pop()
             iam_role.set_resource_attribute("Condition", condition_name)
 
-        merged_tags: Dict[str, Any] = {}
+        merged_tags: dict[str, Any] = {}
         for preference in self._resource_preferences.values():
             if preference.enabled and preference.propagate_tags and preference.tags:
                 merged_tags.update(preference.tags)

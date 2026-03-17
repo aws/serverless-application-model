@@ -1,4 +1,3 @@
-from typing import List
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -220,5 +219,5 @@ class TestCapacityProviderGenerator(TestCase):
             # Verify passthrough attributes
             self.assertEqual(role_dict[logical_id]["Condition"], "MyCondition")
 
-    def extract_resource(self, resource_array: List[Resource]):
+    def extract_resource(self, resource_array: list[Resource]):
         return {r.logical_id: r.to_dict()[r.logical_id] for r in resource_array}

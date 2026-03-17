@@ -1169,7 +1169,7 @@ def get_policy_mock():
 
 
 def get_deployment_key(fragment):
-    logical_id, value = get_resource_by_type(fragment, "AWS::ApiGateway::Deployment")
+    logical_id, _value = get_resource_by_type(fragment, "AWS::ApiGateway::Deployment")
     return logical_id
 
 

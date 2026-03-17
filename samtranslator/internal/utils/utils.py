@@ -1,15 +1,15 @@
-from typing import Any, Dict, Optional, cast
+from typing import Any, cast
 
 from samtranslator.internal.schema_source.common import PassThroughProp
 from samtranslator.model.types import PassThrough
 
 
-def remove_none_values(d: Dict[Any, Any]) -> Dict[Any, Any]:
+def remove_none_values(d: dict[Any, Any]) -> dict[Any, Any]:
     """Returns a copy of the dictionary with no items that have the value None."""
     return {k: v for k, v in d.items() if v is not None}
 
 
-def passthrough_value(v: Optional[PassThroughProp]) -> PassThrough:
+def passthrough_value(v: PassThroughProp | None) -> PassThrough:
     """
     Cast PassThroughProp values to PassThrough.
 

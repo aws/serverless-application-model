@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Type, cast
+from typing import Any, cast
 
 from samtranslator.model.intrinsics import make_conditional
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
@@ -8,7 +8,7 @@ from samtranslator.sdk.template import SamTemplate
 from samtranslator.validator.value_validator import sam_expect
 
 
-class ImplicitHttpApiPlugin(ImplicitApiPlugin[Type[OpenApiEditor]]):
+class ImplicitHttpApiPlugin(ImplicitApiPlugin[type[OpenApiEditor]]):
     """
     This plugin provides Implicit Http API shorthand syntax in the SAM Spec.
 
@@ -33,14 +33,14 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin[Type[OpenApiEditor]]):
     SERVERLESS_API_RESOURCE_TYPE = SamResourceType.HttpApi.value
     EDITOR_CLASS = OpenApiEditor
 
-    def _process_api_events(  # noqa: PLR0913
+    def _process_api_events(
         self,
         function: SamResource,
-        api_events: Dict[str, Dict[str, Any]],
+        api_events: dict[str, dict[str, Any]],
         template: SamTemplate,
-        condition: Optional[str] = None,
-        deletion_policy: Optional[str] = None,
-        update_replace_policy: Optional[str] = None,
+        condition: str | None = None,
+        deletion_policy: str | None = None,
+        update_replace_policy: str | None = None,
     ) -> None:
         """
         Actually process given HTTP API events. Iteratively adds the APIs to OpenApi JSON in the respective
@@ -86,20 +86,20 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin[Type[OpenApiEditor]]):
         # We could have made changes to the Events structure. Write it back to function
         function.properties["Events"].update(api_events)
 
-    def _generate_implicit_api_resource(self) -> Dict[str, Any]:
+    def _generate_implicit_api_resource(self) -> dict[str, Any]:
         """
         Uses the implicit API in this file to generate an Implicit API resource
         """
         return ImplicitHttpApiResource().to_dict()
 
-    def _get_api_definition_from_editor(self, editor: OpenApiEditor) -> Dict[str, Any]:
+    def _get_api_definition_from_editor(self, editor: OpenApiEditor) -> dict[str, Any]:
         """
         Helper function to return the OAS definition from the editor
         """
         return editor.openapi
 
     def _add_route_settings_to_api(
-        self, event_id: str, event_properties: Dict[str, Any], template: SamTemplate, condition: Optional[str]
+        self, event_id: str, event_properties: dict[str, Any], template: SamTemplate, condition: str | None
     ) -> None:
         """
         Adds the RouteSettings for this path/method from the given event to the RouteSettings configuration

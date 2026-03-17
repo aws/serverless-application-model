@@ -1,8 +1,8 @@
 __all__ = [
-    "StepFunctionsStateMachine",
-    "StepFunctionsStateMachineVersion",
-    "StepFunctionsStateMachineAlias",
     "StateMachineGenerator",
+    "StepFunctionsStateMachine",
+    "StepFunctionsStateMachineAlias",
+    "StepFunctionsStateMachineVersion",
     "events",
 ]
 

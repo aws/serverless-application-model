@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
+from collections.abc import Sequence
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Union
 
 
 class ExpectedType(Enum):
@@ -19,7 +20,7 @@ class ExceptionWithMessage(ABC, Exception):
         """Return the exception message."""
 
     @property
-    def metadata(self) -> Optional[Dict[str, Any]]:
+    def metadata(self) -> dict[str, Any] | None:
         """Return the exception metadata."""
 
 
@@ -43,7 +44,7 @@ class InvalidDocumentException(ExceptionWithMessage):
         return f"Invalid Serverless Application Specification document. Number of errors found: {len(self.causes)}."
 
     @property
-    def metadata(self) -> Dict[str, List[Any]]:
+    def metadata(self) -> dict[str, list[Any]]:
         # Merge metadata in each exception to one single metadata dictionary
         metadata_dict = defaultdict(list)
         for cause in self.causes:
@@ -100,9 +101,7 @@ class InvalidResourceException(ExceptionWithMessage):
         message -- explanation of the error
     """
 
-    def __init__(
-        self, logical_id: Union[str, List[str]], message: str, metadata: Optional[Dict[str, Any]] = None
-    ) -> None:
+    def __init__(self, logical_id: Union[str, list[str]], message: str, metadata: dict[str, Any] | None = None) -> None:
         self._logical_id = logical_id
         self._message = message
         self._metadata = metadata
@@ -115,7 +114,7 @@ class InvalidResourceException(ExceptionWithMessage):
         return f"Resource with id [{self._logical_id}] is invalid. {self._message}"
 
     @property
-    def metadata(self) -> Optional[Dict[str, Any]]:
+    def metadata(self) -> dict[str, Any] | None:
         return self._metadata
 
 
@@ -124,8 +123,8 @@ class InvalidResourcePropertyTypeException(InvalidResourceException):
         self,
         logical_id: str,
         key_path: str,
-        expected_type: Optional[ExpectedType],
-        message: Optional[str] = None,
+        expected_type: ExpectedType | None,
+        message: str | None = None,
     ) -> None:
         message = message or self._default_message(key_path, expected_type)
         super().__init__(logical_id, message)
@@ -139,7 +138,7 @@ class InvalidResourcePropertyTypeException(InvalidResourceException):
         return self.message
 
     @staticmethod
-    def _default_message(key_path: str, expected_type: Optional[ExpectedType]) -> str:
+    def _default_message(key_path: str, expected_type: ExpectedType | None) -> str:
         if expected_type:
             type_description, _ = expected_type.value
             return f"Property '{key_path}' should be a {type_description}."
@@ -151,14 +150,14 @@ class InvalidResourceAttributeTypeException(InvalidResourceException):
         self,
         logical_id: str,
         key_path: str,
-        expected_type: Optional[ExpectedType],
-        message: Optional[str] = None,
+        expected_type: ExpectedType | None,
+        message: str | None = None,
     ) -> None:
         message = message or self._default_message(logical_id, key_path, expected_type)
         super().__init__(logical_id, message)
 
     @staticmethod
-    def _default_message(logical_id: str, key_path: str, expected_type: Optional[ExpectedType]) -> str:
+    def _default_message(logical_id: str, key_path: str, expected_type: ExpectedType | None) -> str:
         if expected_type:
             type_description, _ = expected_type.value
             return f"Attribute '{key_path}' should be a {type_description}."
@@ -175,7 +174,7 @@ class InvalidEventException(ExceptionWithMessage):
     # Note: event_id should not be None, but currently there are too many
     # usage of this class with `event_id` being Optional.
     # TODO: refactor the code to make type correct.
-    def __init__(self, event_id: Optional[str], message: str) -> None:
+    def __init__(self, event_id: str | None, message: str) -> None:
         self._event_id = event_id
         self._message = message
 
@@ -194,5 +193,5 @@ def prepend(exception, message, end=": "):  # type: ignore[no-untyped-def]
     :returns: the exception
     """
     exception.args = exception.args or ("",)
-    exception.args = (message + end + exception.args[0],) + exception.args[1:]
+    exception.args = (message + end + exception.args[0], *exception.args[1:])
     return exception

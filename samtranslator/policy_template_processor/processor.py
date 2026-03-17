@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import jsonschema
 from jsonschema.exceptions import ValidationError
@@ -51,7 +51,7 @@ class PolicyTemplatesProcessor:
     # ./policy_templates.json
     DEFAULT_POLICY_TEMPLATES_FILE = policy_templates_data.POLICY_TEMPLATES_FILE
 
-    def __init__(self, policy_templates_dict: Dict[str, Any], schema: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, policy_templates_dict: dict[str, Any], schema: dict[str, Any] | None = None) -> None:
         """
         Initialize the class
 
@@ -103,9 +103,7 @@ class PolicyTemplatesProcessor:
         return template.to_statement(parameter_values)
 
     @staticmethod
-    def _is_valid_templates_dict(
-        policy_templates_dict: Dict[Any, Any], schema: Optional[Dict[Any, Any]] = None
-    ) -> bool:
+    def _is_valid_templates_dict(policy_templates_dict: dict[Any, Any], schema: dict[Any, Any] | None = None) -> bool:
         """
         Is this a valid policy template dictionary
 

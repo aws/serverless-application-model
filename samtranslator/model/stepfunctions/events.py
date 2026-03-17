@@ -1,6 +1,6 @@
 import json
 from abc import ABCMeta
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Union, cast
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import Property, PropertyType, Resource, ResourceMacro
@@ -32,7 +32,7 @@ class EventSource(ResourceMacro, metaclass=ABCMeta):
     principal: str = None  # type: ignore
     relative_id: str  # overriding the Optional[str]: for event, relative id is not None
 
-    Target: Optional[Dict[str, str]]
+    Target: dict[str, str] | None
 
     def _generate_logical_id(self, prefix, suffix, resource_type):  # type: ignore[no-untyped-def]
         """Helper utility to generate a logicial ID for a new resource
@@ -54,8 +54,8 @@ class EventSource(ResourceMacro, metaclass=ABCMeta):
     def _construct_role(
         self,
         resource: StepFunctionsStateMachine,
-        permissions_boundary: Optional[str],
-        prefix: Optional[str],
+        permissions_boundary: str | None,
+        prefix: str | None,
         suffix: str = "",
     ) -> IAMRole:
         """Constructs the IAM Role resource allowing the event service to invoke
@@ -104,15 +104,15 @@ class Schedule(EventSource):
     }
 
     Schedule: PassThrough
-    Input: Optional[PassThrough]
-    Enabled: Optional[bool]
-    State: Optional[PassThrough]
-    Name: Optional[PassThrough]
-    Description: Optional[PassThrough]
-    DeadLetterConfig: Optional[Dict[str, Any]]
-    RetryPolicy: Optional[PassThrough]
-    Target: Optional[PassThrough]
-    RoleArn: Optional[PassThrough]
+    Input: PassThrough | None
+    Enabled: bool | None
+    State: PassThrough | None
+    Name: PassThrough | None
+    Description: PassThrough | None
+    DeadLetterConfig: dict[str, Any] | None
+    RetryPolicy: PassThrough | None
+    Target: PassThrough | None
+    RoleArn: PassThrough | None
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
@@ -122,7 +122,7 @@ class Schedule(EventSource):
         :returns: a list of vanilla CloudFormation Resources, to which this Schedule event expands
         :rtype: list
         """
-        resources: List[Any] = []
+        resources: list[Any] = []
 
         permissions_boundary = kwargs.get("permissions_boundary")
 
@@ -144,7 +144,7 @@ class Schedule(EventSource):
         events_rule.Name = self.Name
         events_rule.Description = self.Description
 
-        role: Union[IAMRole, str, Dict[str, Any]]
+        role: Union[IAMRole, str, dict[str, Any]]
         if self.RoleArn is None:
             role = self._construct_role(resource, permissions_boundary, prefix=None)
             resources.append(role)
@@ -166,9 +166,9 @@ class Schedule(EventSource):
     def _construct_target(
         self,
         resource: StepFunctionsStateMachine,
-        role: Union[IAMRole, str, Dict[str, Any]],
-        dead_letter_queue_arn: Optional[str],
-    ) -> Dict[str, Any]:
+        role: Union[IAMRole, str, dict[str, Any]],
+        dead_letter_queue_arn: str | None,
+    ) -> dict[str, Any]:
         """_summary_
 
         Parameters
@@ -227,16 +227,16 @@ class CloudWatchEvent(EventSource):
         "InputTransformer": PropertyType(False, IS_DICT),
     }
 
-    EventBusName: Optional[PassThrough]
-    RuleName: Optional[PassThrough]
-    Pattern: Optional[PassThrough]
-    Input: Optional[PassThrough]
-    InputPath: Optional[PassThrough]
-    DeadLetterConfig: Optional[Dict[str, Any]]
-    RetryPolicy: Optional[PassThrough]
-    State: Optional[PassThrough]
-    Target: Optional[PassThrough]
-    InputTransformer: Optional[PassThrough]
+    EventBusName: PassThrough | None
+    RuleName: PassThrough | None
+    Pattern: PassThrough | None
+    Input: PassThrough | None
+    InputPath: PassThrough | None
+    DeadLetterConfig: dict[str, Any] | None
+    RetryPolicy: PassThrough | None
+    State: PassThrough | None
+    Target: PassThrough | None
+    InputTransformer: PassThrough | None
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):  # type: ignore[no-untyped-def]
@@ -247,7 +247,7 @@ class CloudWatchEvent(EventSource):
         :returns: a list of vanilla CloudFormation Resources, to which this CloudWatch Events/EventBridge event expands
         :rtype: list
         """
-        resources: List[Any] = []
+        resources: list[Any] = []
 
         permissions_boundary = kwargs.get("permissions_boundary")
 
@@ -340,11 +340,11 @@ class Api(EventSource):
     Path: str
     Method: str
     RestApiId: str
-    Stage: Optional[str]
-    Auth: Optional[Dict[str, Any]]
-    UnescapeMappingTemplate: Optional[bool]
+    Stage: str | None
+    Auth: dict[str, Any] | None
+    UnescapeMappingTemplate: bool | None
 
-    def resources_to_link(self, resources: Dict[str, Any]) -> Dict[str, Any]:
+    def resources_to_link(self, resources: dict[str, Any]) -> dict[str, Any]:
         """
         If this API Event Source refers to an explicit API resource, resolve the reference and grab
         necessary data from the explicit API
@@ -366,7 +366,7 @@ class Api(EventSource):
         :returns: a list of vanilla CloudFormation Resources, to which this Api event expands
         :rtype: list
         """
-        resources: List[Any] = []
+        resources: list[Any] = []
 
         intrinsics_resolver = kwargs.get("intrinsics_resolver")
         permissions_boundary = kwargs.get("permissions_boundary")
@@ -436,7 +436,7 @@ class Api(EventSource):
 
         api["DefinitionBody"] = editor.swagger
 
-    def _generate_request_template(self, resource: Resource) -> Dict[str, Any]:
+    def _generate_request_template(self, resource: Resource) -> dict[str, Any]:
         """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
 
@@ -457,7 +457,7 @@ class Api(EventSource):
             )
         }
 
-    def _generate_request_template_unescaped(self, resource: Resource) -> Dict[str, Any]:
+    def _generate_request_template_unescaped(self, resource: Resource) -> dict[str, Any]:
         """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
 

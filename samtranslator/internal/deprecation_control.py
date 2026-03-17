@@ -11,8 +11,9 @@ it is their responsibility to detect and remove them.
 """
 
 import warnings
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable, Optional, TypeVar
+from typing import TypeVar
 
 from typing_extensions import ParamSpec
 
@@ -20,14 +21,14 @@ PT = ParamSpec("PT")  # parameters
 RT = TypeVar("RT")  # return type
 
 
-def _make_message(message: str, replacement: Optional[str]) -> str:
+def _make_message(message: str, replacement: str | None) -> str:
     return f"{message}, please use {replacement}" if replacement else message
 
 
 # TODO: make @deprecated able to decorate a class
 
 
-def deprecated(replacement: Optional[str] = None) -> Callable[[Callable[PT, RT]], Callable[PT, RT]]:
+def deprecated(replacement: str | None = None) -> Callable[[Callable[PT, RT]], Callable[PT, RT]]:
     """
     Mark a function/method as deprecated.
 

@@ -2,7 +2,7 @@
 # This is essentially our Public API
 #
 
-__all__ = ["Translator", "ManagedPolicyLoader"]
+__all__ = ["ManagedPolicyLoader", "Translator"]
 
 from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
 from samtranslator.translator.translator import Translator

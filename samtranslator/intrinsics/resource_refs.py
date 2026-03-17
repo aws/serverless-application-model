@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 
 class SupportedResourceReferences:
@@ -11,7 +11,7 @@ class SupportedResourceReferences:
     def __init__(self) -> None:
         # This is a two level map like:
         # { "LogicalId": {"Property": "Value"} }
-        self._refs: Dict[str, Dict[str, Any]] = {}
+        self._refs: dict[str, dict[str, Any]] = {}
 
     def add(self, logical_id, property_name, value):  # type: ignore[no-untyped-def]
         """

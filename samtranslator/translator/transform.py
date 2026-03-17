@@ -1,5 +1,5 @@
-from functools import lru_cache
-from typing import Any, Dict, Optional
+from functools import cache
+from typing import Any
 
 from samtranslator.feature_toggle.feature_toggle import FeatureToggle
 from samtranslator.parser.parser import Parser
@@ -9,12 +9,12 @@ from samtranslator.utils.py27hash_fix import to_py27_compatible_template, undo_m
 
 
 def transform(
-    input_fragment: Dict[str, Any],
-    parameter_values: Dict[str, Any],
+    input_fragment: dict[str, Any],
+    parameter_values: dict[str, Any],
     managed_policy_loader: ManagedPolicyLoader,
-    feature_toggle: Optional[FeatureToggle] = None,
-    passthrough_metadata: Optional[bool] = False,
-) -> Dict[str, Any]:
+    feature_toggle: FeatureToggle | None = None,
+    passthrough_metadata: bool | None = False,
+) -> dict[str, Any]:
     """Translates the SAM manifest provided in the and returns the translation to CloudFormation.
 
     :param dict input_fragment: the SAM template to transform
@@ -30,8 +30,8 @@ def transform(
         sam_parser,
     )
 
-    @lru_cache(maxsize=None)
-    def get_managed_policy_map() -> Dict[str, str]:
+    @cache
+    def get_managed_policy_map() -> dict[str, str]:
         return managed_policy_loader.load()
 
     transformed = translator.translate(

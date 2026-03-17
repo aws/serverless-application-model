@@ -9,7 +9,8 @@ the Permissions property is an ARN or list of ARNs. In this situation, we valida
 either a string or a list of strings, but do not validate whether the string(s) are valid IAM policy ARNs.
 """
 
-from typing import Any, Callable, List, Type, Union
+from collections.abc import Callable
+from typing import Any, Union
 
 import samtranslator.model.exceptions
 from samtranslator.internal.deprecation_control import deprecated
@@ -23,7 +24,7 @@ from samtranslator.internal.deprecation_control import deprecated
 Validator = Callable[..., bool]
 
 
-def is_type(valid_type: Type[Any]) -> Validator:
+def is_type(valid_type: type[Any]) -> Validator:
     """Returns a validator function that succeeds only for inputs of the provided valid_type.
 
     :param type valid_type: the type that should be considered valid for the validator
@@ -48,7 +49,7 @@ IS_LIST = is_type(list)
 IS_INT = is_type(int)
 
 
-def list_of(validate_item: Union[Type[Any], Validator]) -> Validator:
+def list_of(validate_item: Union[type[Any], Validator]) -> Validator:
     """Returns a validator function that succeeds only if the input is a list, and each item in the list passes as input
     to the provided validator validate_item.
 
@@ -138,7 +139,7 @@ def any_type() -> Validator:
     return validate
 
 
-def IS_STR_ENUM(valid_values: List[str]) -> Validator:
+def IS_STR_ENUM(valid_values: list[str]) -> Validator:
     """Returns a validator function that succeeds only if the input is a string matching one of the valid enum values.
 
     :param list valid_values: the valid string values for the enum

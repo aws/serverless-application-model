@@ -1,7 +1,7 @@
 import json
 from functools import partial
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
+from typing import Any, Literal, TypeVar, Union
 
 from samtranslator.compat import pydantic
 from samtranslator.model.types import PassThrough
@@ -19,13 +19,13 @@ class PassThroughProp(pydantic.BaseModel):
 
 # Intrinsic resolvable by the SAM transform
 T = TypeVar("T")
-SamIntrinsicable = Union[Dict[str, Any], T]
-SamIntrinsic = Dict[str, Any]
+SamIntrinsicable = Union[dict[str, Any], T]
+SamIntrinsic = dict[str, Any]
 
 # TODO: Get rid of this in favor of proper types
-Unknown = Optional[Any]
+Unknown = Any | None
 
-DictStrAny = Dict[str, Any]
+DictStrAny = dict[str, Any]
 
 LenientBaseModel = pydantic.BaseModel
 
@@ -34,14 +34,14 @@ _DOCS = json.loads((_docdir / "sam-docs.json").read_bytes())
 
 
 # Connector Permissions
-PermissionsType = List[Literal["Read", "Write"]]
+PermissionsType = list[Literal["Read", "Write"]]
 
 
 def get_prop(stem: str) -> Any:
     return partial(_get_prop, stem)
 
 
-def passthrough_prop(sam_docs_stem: str, sam_docs_name: str, prop_path: List[str]) -> Any:
+def passthrough_prop(sam_docs_stem: str, sam_docs_name: str, prop_path: list[str]) -> Any:
     """
     Specifies a pass-through field, where resource_type is the CloudFormation
     resource type, and path is the list of keys to the property.
@@ -92,9 +92,9 @@ class Ref(BaseModel):
 
 
 class ResourceAttributes(BaseModel):
-    DependsOn: Optional[PassThroughProp]
-    DeletionPolicy: Optional[PassThroughProp]
-    Metadata: Optional[PassThroughProp]
-    UpdateReplacePolicy: Optional[PassThroughProp]
-    Condition: Optional[PassThroughProp]
-    IgnoreGlobals: Optional[Union[str, List[str]]]
+    DependsOn: PassThroughProp | None
+    DeletionPolicy: PassThroughProp | None
+    Metadata: PassThroughProp | None
+    UpdateReplacePolicy: PassThroughProp | None
+    Condition: PassThroughProp | None
+    IgnoreGlobals: Union[str, list[str]] | None

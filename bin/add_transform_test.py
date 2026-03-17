@@ -8,7 +8,7 @@ import subprocess
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import patch
 
 import boto3
@@ -32,12 +32,12 @@ parser.add_argument(
 CLI_OPTIONS = parser.parse_args()
 
 
-def read_json_file(file_path: Path) -> Dict[str, Any]:
-    template: Dict[str, Any] = json.loads(file_path.read_text(encoding="utf-8"))
+def read_json_file(file_path: Path) -> dict[str, Any]:
+    template: dict[str, Any] = json.loads(file_path.read_text(encoding="utf-8"))
     return template
 
 
-def write_json_file(obj: Dict[str, Any], file_path: Path) -> None:
+def write_json_file(obj: dict[str, Any], file_path: Path) -> None:
     with file_path.open("w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2, sort_keys=True)
 

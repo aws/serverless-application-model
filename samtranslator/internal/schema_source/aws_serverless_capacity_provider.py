@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Literal, Optional
+from typing import Literal
 
 from samtranslator.internal.schema_source.common import (
     BaseModel,
@@ -25,35 +25,35 @@ scalingconfig = get_prop(SCALING_CONFIG_STEM)
 
 class VpcConfig(BaseModel):
     # Optional list of security group IDs - supports intrinsic functions for dynamic references
-    SecurityGroupIds: Optional[SamIntrinsicable[List[SamIntrinsicable[str]]]] = vpcconfig("SecurityGroupIds")
+    SecurityGroupIds: SamIntrinsicable[list[SamIntrinsicable[str]]] | None = vpcconfig("SecurityGroupIds")
     # Required list of subnet IDs - supports intrinsic functions for dynamic VPC configuration
-    SubnetIds: SamIntrinsicable[List[SamIntrinsicable[str]]] = vpcconfig("SubnetIds")
+    SubnetIds: SamIntrinsicable[list[SamIntrinsicable[str]]] = vpcconfig("SubnetIds")
 
 
 class InstanceRequirements(BaseModel):
     # Optional list of CPU architectures - maps to CFN InstanceRequirements.Architecture
-    # Uses SamIntrinsicable[List[SamIntrinsicable[str]]] to support intrinsic functions like !Ref for both list and list item
-    Architectures: Optional[SamIntrinsicable[List[SamIntrinsicable[str]]]] = instancerequirements("Architectures")
+    # Uses SamIntrinsicable[list[SamIntrinsicable[str]]] to support intrinsic functions like !Ref for both list and list item
+    Architectures: SamIntrinsicable[list[SamIntrinsicable[str]]] | None = instancerequirements("Architectures")
     # Optional list of allowed EC2 instance types - maps to CFN InstanceRequirements.AllowedInstanceTypes
-    # Uses SamIntrinsicable[List[SamIntrinsicable[str]]] to support intrinsic functions like !Ref for both list and list item
-    AllowedTypes: Optional[SamIntrinsicable[List[SamIntrinsicable[str]]]] = instancerequirements("AllowedTypes")
+    # Uses SamIntrinsicable[list[SamIntrinsicable[str]]] to support intrinsic functions like !Ref for both list and list item
+    AllowedTypes: SamIntrinsicable[list[SamIntrinsicable[str]]] | None = instancerequirements("AllowedTypes")
     # Optional list of excluded EC2 instance types - maps to CFN InstanceRequirements.ExcludedInstanceTypes
-    # Uses SamIntrinsicable[List[SamIntrinsicable[str]]] to support intrinsic functions like !Ref for both list and list item
-    ExcludedTypes: Optional[SamIntrinsicable[List[SamIntrinsicable[str]]]] = instancerequirements("ExcludedTypes")
+    # Uses SamIntrinsicable[list[SamIntrinsicable[str]]] to support intrinsic functions like !Ref for both list and list item
+    ExcludedTypes: SamIntrinsicable[list[SamIntrinsicable[str]]] | None = instancerequirements("ExcludedTypes")
 
 
 class ScalingConfig(BaseModel):
     # Optional maximum instance count - maps to CFN CapacityProviderScalingConfig.MaxVCpuCount
     # Uses SamIntrinsicable[int] to support dynamic scaling limits via parameters/conditions
-    MaxVCpuCount: Optional[SamIntrinsicable[int]] = scalingconfig("MaxVCpuCount")
+    MaxVCpuCount: SamIntrinsicable[int] | None = scalingconfig("MaxVCpuCount")
     # Average CPU utilization target (0-100) - maps to CFN ScalingPolicies with CPU metric type
     # When specified, automatically sets ScalingMode to "Manual"
     # Uses SamIntrinsicable[float] to support dynamic scaling targets via parameters/conditions
-    AverageCPUUtilization: Optional[SamIntrinsicable[float]] = scalingconfig("AverageCPUUtilization")
+    AverageCPUUtilization: SamIntrinsicable[float] | None = scalingconfig("AverageCPUUtilization")
 
 
 class Properties(BaseModel):
-    CapacityProviderName: Optional[PassThroughProp] = passthrough_prop(
+    CapacityProviderName: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "CapacityProviderName",
         ["AWS::Lambda::CapacityProvider", "Properties", "CapacityProviderName"],
@@ -64,25 +64,25 @@ class Properties(BaseModel):
     VpcConfig: VpcConfig = properties("VpcConfig")
 
     # Optional operator role ARN - if not provided, SAM auto-generates one with EC2 management permissions
-    OperatorRole: Optional[PassThroughProp] = properties("OperatorRole")
+    OperatorRole: PassThroughProp | None = properties("OperatorRole")
 
     # Optional tags - SAM transforms key-value pairs to CFN Tag objects before passing to CFN
     # Uses DictStrAny to support flexible tag structure with string keys and any values
-    Tags: Optional[DictStrAny] = properties("Tags")
+    Tags: DictStrAny | None = properties("Tags")
 
     # Optional flag to propagate tags to resources created by this capacity provider
     # When true, all tags defined on the capacity provider will be propagated to generated resources
-    PropagateTags: Optional[bool] = properties("PropagateTags")
+    PropagateTags: bool | None = properties("PropagateTags")
 
     # Optional instance requirements - maps to CFN InstanceRequirements with property name shortening
     # Uses custom InstanceRequirements class because SAM shortens names
-    InstanceRequirements: Optional[InstanceRequirements] = properties("InstanceRequirements")
+    InstanceRequirements: InstanceRequirements | None = properties("InstanceRequirements")
 
     # Optional scaling configuration - maps to CFN CapacityProviderScalingConfig
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
-    ScalingConfig: Optional[ScalingConfig] = properties("ScalingConfig")
+    ScalingConfig: ScalingConfig | None = properties("ScalingConfig")
 
-    KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
+    KmsKeyArn: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "KmsKeyArn",
         ["AWS::Lambda::CapacityProvider", "Properties", "KmsKeyArn"],
@@ -92,28 +92,28 @@ class Properties(BaseModel):
 class Globals(BaseModel):
     # Global VPC configuration - can be inherited by capacity providers if not overridden
     # Uses custom VpcConfig class to validate required SubnetIds while maintaining passthrough behavior
-    VpcConfig: Optional[VpcConfig] = properties("VpcConfig")
+    VpcConfig: VpcConfig | None = properties("VpcConfig")
 
     # Global operator role ARN - can be inherited by capacity providers if not overridden
-    OperatorRole: Optional[PassThroughProp] = properties("OperatorRole")
+    OperatorRole: PassThroughProp | None = properties("OperatorRole")
 
     # Global tags - can be inherited and merged with resource-specific tags
     # Uses DictStrAny to support flexible tag structure with string keys and any values
-    Tags: Optional[DictStrAny] = properties("Tags")
+    Tags: DictStrAny | None = properties("Tags")
 
     # Global flag to propagate tags to resources created by capacity providers
     # When true, all tags defined on capacity providers will be propagated to generated resources
-    PropagateTags: Optional[bool] = properties("PropagateTags")
+    PropagateTags: bool | None = properties("PropagateTags")
 
     # Global instance requirements - can be inherited by capacity providers if not overridden
     # Uses custom InstanceRequirements class because SAM shortens names
-    InstanceRequirements: Optional[InstanceRequirements] = properties("InstanceRequirements")
+    InstanceRequirements: InstanceRequirements | None = properties("InstanceRequirements")
 
     # Global scaling configuration - can be inherited by capacity providers if not overridden
     # Uses custom ScalingConfig class because SAM renames construct (CapacityProviderScalingConfig→ScalingConfig)
-    ScalingConfig: Optional[ScalingConfig] = properties("ScalingConfig")
+    ScalingConfig: ScalingConfig | None = properties("ScalingConfig")
 
-    KmsKeyArn: Optional[PassThroughProp] = passthrough_prop(
+    KmsKeyArn: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "KmsKeyArn",
         ["AWS::Lambda::CapacityProvider", "Properties", "KmsKeyArn"],

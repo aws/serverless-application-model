@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.model.types import IS_STR
@@ -13,9 +13,9 @@ class SamResource:
     """
 
     type = None
-    properties: Dict[str, Any] = {}  # TODO: Replace `Any` with something more specific
+    properties: dict[str, Any] = {}  # TODO: Replace `Any` with something more specific
 
-    def __init__(self, resource_dict: Dict[str, Any]) -> None:
+    def __init__(self, resource_dict: dict[str, Any]) -> None:
         """
         Initialize the object given the resource as a dictionary
 
@@ -27,7 +27,7 @@ class SamResource:
         self.condition = resource_dict.get("Condition")
         self.deletion_policy = resource_dict.get("DeletionPolicy")
         self.update_replace_policy = resource_dict.get("UpdateReplacePolicy")
-        self.ignore_globals: Optional[Union[str, List[str]]] = resource_dict.get("IgnoreGlobals")
+        self.ignore_globals: Union[str, list[str]] | None = resource_dict.get("IgnoreGlobals")
 
         # Properties is *not* required. Ex: SimpleTable resource has no required properties
         self.properties = resource_dict.get("Properties", {})
@@ -47,7 +47,7 @@ class SamResource:
         # TODO: should we raise exception if `self.type` is not a string?
         return isinstance(self.type, str) and SamResourceType.has_value(self.type)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         if self.valid():
             # Touch a resource dictionary ONLY if it is valid
             # Modify only Type & Properties section to preserve CloudFormation properties like DependsOn, Conditions etc

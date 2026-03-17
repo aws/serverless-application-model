@@ -2,7 +2,7 @@
 AWS::Lambda::CapacityProvider resources for SAM
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
@@ -25,13 +25,13 @@ class LambdaCapacityProvider(Resource):
         "KmsKeyArn": GeneratedProperty(),
     }
 
-    CapacityProviderName: Optional[Intrinsicable[str]]
-    VpcConfig: Dict[str, Any]
-    PermissionsConfig: Dict[str, Any]
-    Tags: Optional[List[Dict[str, Any]]]
-    InstanceRequirements: Optional[Dict[str, Any]]
-    CapacityProviderScalingConfig: Optional[Dict[str, Any]]
-    KmsKeyArn: Optional[Intrinsicable[str]]
+    CapacityProviderName: Intrinsicable[str] | None
+    VpcConfig: dict[str, Any]
+    PermissionsConfig: dict[str, Any]
+    Tags: list[dict[str, Any]] | None
+    InstanceRequirements: dict[str, Any] | None
+    CapacityProviderScalingConfig: dict[str, Any] | None
+    KmsKeyArn: Intrinsicable[str] | None
 
     runtime_attrs = {
         "name": lambda self: ref(self.logical_id),

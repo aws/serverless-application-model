@@ -79,7 +79,7 @@ class TestCloudFormationSchemaGenerator(unittest.TestCase):
         self.output_folder = "tests/schema/cfn_schema_generator/output_schema"
 
     @parameterized.expand(
-        lambda: _get_test_cases_for_schema_generation(),
+        _get_test_cases_for_schema_generation,
         skip_on_empty=True,
     )
     def test_schema_generation(self, case_name):

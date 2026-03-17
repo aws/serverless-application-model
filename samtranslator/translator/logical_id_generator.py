@@ -1,6 +1,6 @@
 import hashlib
 import json
-from typing import Any, Optional
+from typing import Any
 
 
 class LogicalIdGenerator:
@@ -8,7 +8,7 @@ class LogicalIdGenerator:
     #       given by this class
     HASH_LENGTH = 10
 
-    def __init__(self, prefix: str, data_obj: Optional[Any] = None, data_hash: Optional[str] = None) -> None:
+    def __init__(self, prefix: str, data_obj: Any | None = None, data_hash: str | None = None) -> None:
         """
         Generate logical IDs for resources that are stable, deterministic and platform independent
 

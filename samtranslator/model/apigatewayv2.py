@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException
@@ -26,7 +26,7 @@ class ApiGatewayV2HttpApi(Resource):
 
     runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}
 
-    def assign_tags(self, tags: Dict[str, Any]) -> None:
+    def assign_tags(self, tags: dict[str, Any]) -> None:
         """Overriding default 'assign_tags' function in Resource class
 
         Function to assign tags to the resource
@@ -53,9 +53,9 @@ class ApiGatewayV2Stage(Resource):
     }
 
     runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
-    Tags: Optional[PassThrough]
+    Tags: PassThrough | None
 
-    def assign_tags(self, tags: Dict[str, Any]) -> None:
+    def assign_tags(self, tags: dict[str, Any]) -> None:
         """Overriding default 'assign_tags' function in Resource class
 
         Function to assign tags to the resource
@@ -76,11 +76,11 @@ class ApiGatewayV2DomainName(Resource):
     }
 
     DomainName: Intrinsicable[str]
-    DomainNameConfigurations: Optional[List[Dict[str, Any]]]
-    MutualTlsAuthentication: Optional[Dict[str, Any]]
-    Tags: Optional[PassThrough]
+    DomainNameConfigurations: list[dict[str, Any]] | None
+    MutualTlsAuthentication: dict[str, Any] | None
+    Tags: PassThrough | None
 
-    def assign_tags(self, tags: Dict[str, Any]) -> None:
+    def assign_tags(self, tags: dict[str, Any]) -> None:
         """Overriding default 'assign_tags' function in Resource class
 
         Function to assign tags to the resource
@@ -103,7 +103,7 @@ class ApiGatewayV2ApiMapping(Resource):
 
 # https://docs.aws.amazon.com/apigatewayv2/latest/api-reference/apis-apiid-authorizers-authorizerid.html#apis-apiid-authorizers-authorizerid-model-jwtconfiguration
 # Change to TypedDict when we don't have to support Python 3.7
-JwtConfiguration = Dict[str, Union[str, List[str]]]
+JwtConfiguration = dict[str, Union[str, list[str]]]
 
 
 class ApiGatewayV2Authorizer:
@@ -128,9 +128,7 @@ class ApiGatewayV2Authorizer:
         self.api_logical_id = api_logical_id
         self.name = name
         self.authorization_scopes = authorization_scopes
-        self.jwt_configuration: Optional[JwtConfiguration] = self._get_jwt_configuration(
-            jwt_configuration, api_logical_id
-        )
+        self.jwt_configuration: JwtConfiguration | None = self._get_jwt_configuration(jwt_configuration, api_logical_id)
         self.id_source = id_source
         self.function_arn = function_arn
         self.function_invoke_role = function_invoke_role
@@ -234,12 +232,12 @@ class ApiGatewayV2Authorizer:
                 self.api_logical_id, f"{self.name} Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
             )
 
-    def generate_openapi(self) -> Dict[str, Any]:
+    def generate_openapi(self) -> dict[str, Any]:
         """
         Generates OAS for the securitySchemes section
         """
         authorizer_type = self._get_auth_type()
-        openapi: Dict[str, Any]
+        openapi: dict[str, Any]
 
         if authorizer_type == "AWS_IAM":
             openapi = {
@@ -307,13 +305,13 @@ class ApiGatewayV2Authorizer:
             raise ValueError(f"Unexpected authorizer_type: {authorizer_type}")
         return openapi
 
-    def _get_function_invoke_role(self) -> Optional[PassThrough]:
+    def _get_function_invoke_role(self) -> PassThrough | None:
         if not self.function_invoke_role or self.function_invoke_role == "NONE":
             return None
 
         return self.function_invoke_role
 
-    def _get_identity_source(self, auth_identity: Dict[str, Any]) -> List[str]:
+    def _get_identity_source(self, auth_identity: dict[str, Any]) -> list[str]:
         """
         Generate the list of identitySource using authorizer's Identity config by flatting them.
         For the format of identitySource, see:
@@ -325,7 +323,7 @@ class ApiGatewayV2Authorizer:
         - prefix "$stageVariables." to all values in "StageVariables"
         - prefix "$context." to all values in "Context"
         """
-        identity_source: List[str] = []
+        identity_source: list[str] = []
 
         identity_property_path = f"Authorizers.{self.name}.Identity"
 
@@ -346,8 +344,8 @@ class ApiGatewayV2Authorizer:
 
     @staticmethod
     def _get_jwt_configuration(
-        props: Optional[Dict[str, Union[str, List[str]]]], api_logical_id: str
-    ) -> Optional[JwtConfiguration]:
+        props: dict[str, Union[str, list[str]]] | None, api_logical_id: str
+    ) -> JwtConfiguration | None:
         """Make sure that JWT configuration dict keys are lower case.
 
         ApiGatewayV2Authorizer doesn't create `AWS::ApiGatewayV2::Authorizer` but generates

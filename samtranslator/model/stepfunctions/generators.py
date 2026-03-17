@@ -1,6 +1,6 @@
 import json
 from copy import deepcopy
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
@@ -74,7 +74,7 @@ class StateMachineGenerator:
         :param role_path: The file path of the execution role
         :param state_machine_type: Type of the State Machine
         :param tracing: Tracing configuration for the State Machine
-        :param events: List of event sources for the State Machine
+        :param events: list of event sources for the State Machine
         :param event_resources: Event resources to link
         :param event_resolver: Resolver that maps Event types to Event classes
         :param tags: Tags to be associated with the State Machine resource
@@ -122,7 +122,7 @@ class StateMachineGenerator:
         :returns: a list of resources including the State Machine resource.
         :rtype: list
         """
-        resources: List[Any] = [self.state_machine]
+        resources: list[Any] = [self.state_machine]
 
         # Defaulting to {} will add the DefinitionSubstitutions field on the transform output even when it is not relevant
         if self.definition_substitutions:
@@ -173,7 +173,7 @@ class StateMachineGenerator:
 
         return resources
 
-    def _construct_definition_uri(self) -> Dict[str, Any]:
+    def _construct_definition_uri(self) -> dict[str, Any]:
         """
         Constructs the State Machine's `DefinitionS3 property`_, from the SAM State Machines's DefinitionUri property.
 
@@ -247,11 +247,11 @@ class StateMachineGenerator:
             get_managed_policy_map=self.get_managed_policy_map,
         )
 
-    def _construct_tag_list(self) -> List[Dict[str, Any]]:
+    def _construct_tag_list(self) -> list[dict[str, Any]]:
         """
         Transforms the SAM defined Tags into the form CloudFormation is expecting.
 
-        :returns: List of Tag Dictionaries
+        :returns: list of Tag Dictionaries
         :rtype: list
         """
         sam_tag = {self._SAM_KEY: self._SAM_VALUE}
@@ -309,7 +309,7 @@ class StateMachineGenerator:
 
     def _generate_managed_traffic_shifting_resources(
         self,
-    ) -> List[Any]:
+    ) -> list[Any]:
         """Generates and returns the version and alias resources associated with this state machine's managed traffic shifting.
 
         :returns: a list containing the state machine's version and alias resources
@@ -329,7 +329,7 @@ class StateMachineGenerator:
         state_machine_version = self._construct_version()
         return [state_machine_version, self._construct_alias(state_machine_version)]
 
-    def _generate_event_resources(self) -> List[Dict[str, Any]]:
+    def _generate_event_resources(self) -> list[dict[str, Any]]:
         """Generates and returns the resources associated with this state machine's event sources.
 
         :returns: a list containing the state machine's event resources
@@ -365,7 +365,7 @@ class StateMachineGenerator:
 
         :param _input: Input dictionary in which the dynamic values need to be replaced with substitutions
 
-        :returns: List of substitution to dynamic value mappings
+        :returns: list of substitution to dynamic value mappings
         :rtype: dict
         """
         substitution_map = {}
@@ -384,7 +384,7 @@ class StateMachineGenerator:
 
         :param _input: Input dictionary to find paths to dynamic values in
         :param path: Optional list to keep track of the path to the input dictionary
-        :returns list: List of keys that defines the path to a dynamic value within the input dictionary
+        :returns list: list of keys that defines the path to a dynamic value within the input dictionary
         """
         if path is None:
             path = []
@@ -404,7 +404,7 @@ class StateMachineGenerator:
 
         return dynamic_value_paths
 
-    def _generate_substitution(self) -> Tuple[str, str]:
+    def _generate_substitution(self) -> tuple[str, str]:
         """
         Generates a name and key for a new substitution.
 

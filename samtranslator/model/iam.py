@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
@@ -43,7 +43,7 @@ class IAMManagedPolicy(Resource):
 
 class IAMRolePolicies:
     @classmethod
-    def construct_assume_role_policy_for_service_principal(cls, service_principal: str) -> Dict[str, Any]:
+    def construct_assume_role_policy_for_service_principal(cls, service_principal: str) -> dict[str, Any]:
         return {
             "Version": "2012-10-17",
             "Statement": [
@@ -65,7 +65,7 @@ class IAMRolePolicies:
         }
 
     @classmethod
-    def stepfunctions_assume_role_policy(cls) -> Dict[str, Any]:
+    def stepfunctions_assume_role_policy(cls) -> dict[str, Any]:
         return {
             "Version": "2012-10-17",
             "Statement": [
@@ -78,7 +78,7 @@ class IAMRolePolicies:
         }
 
     @classmethod
-    def cloud_watch_log_assume_role_policy(cls) -> Dict[str, Any]:
+    def cloud_watch_log_assume_role_policy(cls) -> dict[str, Any]:
         return {
             "Version": "2012-10-17",
             "Statement": [
@@ -91,7 +91,7 @@ class IAMRolePolicies:
         }
 
     @classmethod
-    def scheduler_assume_role_policy(cls) -> Dict[str, Any]:
+    def scheduler_assume_role_policy(cls) -> dict[str, Any]:
         return {
             "Version": "2012-10-17",
             "Statement": [
@@ -100,7 +100,7 @@ class IAMRolePolicies:
         }
 
     @classmethod
-    def lambda_assume_role_policy(cls) -> Dict[str, Any]:
+    def lambda_assume_role_policy(cls) -> dict[str, Any]:
         return {
             "Version": "2012-10-17",
             "Statement": [
@@ -109,10 +109,10 @@ class IAMRolePolicies:
         }
 
     @classmethod
-    def dead_letter_queue_policy(cls, action: Any, resource: Any) -> Dict[str, Any]:
+    def dead_letter_queue_policy(cls, action: Any, resource: Any) -> dict[str, Any]:
         """Return the DeadLetterQueue Policy to be added to the LambdaRole
         :returns: Policy for the DeadLetterQueue
-        :rtype: Dict
+        :rtype: dict
         """
         return {
             "PolicyName": "DeadLetterQueuePolicy",
@@ -123,21 +123,21 @@ class IAMRolePolicies:
         }
 
     @classmethod
-    def sqs_send_message_role_policy(cls, queue_arn: Any, logical_id: str) -> Dict[str, Any]:
+    def sqs_send_message_role_policy(cls, queue_arn: Any, logical_id: str) -> dict[str, Any]:
         return {
             "PolicyName": logical_id + "SQSPolicy",
             "PolicyDocument": {"Statement": [{"Action": "sqs:SendMessage", "Effect": "Allow", "Resource": queue_arn}]},
         }
 
     @classmethod
-    def sns_publish_role_policy(cls, topic_arn: Any, logical_id: str) -> Dict[str, Any]:
+    def sns_publish_role_policy(cls, topic_arn: Any, logical_id: str) -> dict[str, Any]:
         return {
             "PolicyName": logical_id + "SNSPolicy",
             "PolicyDocument": {"Statement": [{"Action": "sns:publish", "Effect": "Allow", "Resource": topic_arn}]},
         }
 
     @classmethod
-    def s3_send_event_payload_role_policy(cls, s3_arn: Any, logical_id: str) -> Dict[str, Any]:
+    def s3_send_event_payload_role_policy(cls, s3_arn: Any, logical_id: str) -> dict[str, Any]:
         s3_arn_with_wild_card = {"Fn::Join": ["/", [s3_arn, "*"]]}
         return {
             "PolicyName": logical_id + "S3Policy",
@@ -150,7 +150,7 @@ class IAMRolePolicies:
         }
 
     @classmethod
-    def event_bus_put_events_role_policy(cls, event_bus_arn: Any, logical_id: str) -> Dict[str, Any]:
+    def event_bus_put_events_role_policy(cls, event_bus_arn: Any, logical_id: str) -> dict[str, Any]:
         return {
             "PolicyName": logical_id + "EventBridgePolicy",
             "PolicyDocument": {
@@ -159,7 +159,7 @@ class IAMRolePolicies:
         }
 
     @classmethod
-    def lambda_invoke_function_role_policy(cls, function_arn: Any, logical_id: str) -> Dict[str, Any]:
+    def lambda_invoke_function_role_policy(cls, function_arn: Any, logical_id: str) -> dict[str, Any]:
         return {
             "PolicyName": logical_id + "LambdaPolicy",
             "PolicyDocument": {

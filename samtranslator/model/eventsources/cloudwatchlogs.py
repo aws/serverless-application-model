@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType
@@ -40,7 +40,7 @@ class CloudWatchLogs(PushEventSource):
         subscription_filter = self.get_subscription_filter(function, permission)  # type: ignore[no-untyped-call]
         return [permission, subscription_filter]
 
-    def get_source_arn(self) -> Dict[str, Any]:
+    def get_source_arn(self) -> dict[str, Any]:
         resource = "log-group:${__LogGroupName__}:*"
         partition = ArnGenerator.get_partition_name()
 
