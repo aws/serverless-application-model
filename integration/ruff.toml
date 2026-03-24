@@ -24,5 +24,4 @@ lint.select = [
 "**/*.py" = [
     "S101", # Use of `assert` detected
     "PLR", # pylint-refactor
-    "E721", # Use `is` and `is not` for type comparisons
 ]
