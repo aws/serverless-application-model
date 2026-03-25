@@ -306,6 +306,11 @@ class Properties(BaseModel):
     )
     DisableExecuteApiEndpoint: Optional[PassThroughProp] = properties("DisableExecuteApiEndpoint")
     Domain: Optional[Domain] = properties("Domain")
+    EndpointAccessMode: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "EndpointAccessMode",
+        ["AWS::ApiGateway::RestApi", "Properties", "EndpointAccessMode"],
+    )
     EndpointConfiguration: Optional[EndpointConfigurationType] = properties("EndpointConfiguration")
     FailOnWarnings: Optional[PassThroughProp] = passthrough_prop(
         PROPERTIES_STEM,
@@ -418,6 +423,11 @@ class Globals(BaseModel):
         PROPERTIES_STEM,
         "SecurityPolicy",
         ["AWS::ApiGateway::RestApi", "Properties", "SecurityPolicy"],
+    )
+    EndpointAccessMode: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "EndpointAccessMode",
+        ["AWS::ApiGateway::RestApi", "Properties", "EndpointAccessMode"],
     )
 
 

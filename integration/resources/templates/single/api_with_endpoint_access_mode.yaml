@@ -1,0 +1,12 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: ${definitionuri}
+      SecurityPolicy: SecurityPolicy_TLS13_1_3_2025_09
+      EndpointAccessMode: STRICT
+      EndpointConfiguration:
+        Type: REGIONAL
+Metadata:
+  SamTransformTest: true

@@ -31,6 +31,7 @@ class ApiGatewayRestApi(Resource):
         "Tags": GeneratedProperty(),
         "Policy": GeneratedProperty(),
         "SecurityPolicy": GeneratedProperty(),
+        "EndpointAccessMode": GeneratedProperty(),
     }
 
     Body: Optional[Dict[str, Any]]
@@ -48,6 +49,7 @@ class ApiGatewayRestApi(Resource):
     Tags: Optional[PassThrough]
     Policy: Optional[PassThrough]
     SecurityPolicy: Optional[PassThrough]
+    EndpointAccessMode: Optional[PassThrough]
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
 

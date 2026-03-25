@@ -1,0 +1,17 @@
+Globals:
+  Api:
+    EndpointAccessMode: BASIC
+
+Resources:
+  # Inherits Globals
+  ApiInheritGlobals:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+  # Top-level overrides Globals
+  ApiTopLevelOverride:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      EndpointAccessMode: STRICT

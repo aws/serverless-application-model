@@ -99,6 +99,7 @@ Currently, the following resources and properties are being supported:
       OpenApiVersion:
       Domain:
       SecurityPolicy:
+      EndpointAccessMode:
 
     HttpApi:
       # Properties of AWS::Serverless::HttpApi
