@@ -440,14 +440,14 @@ if TYPE_CHECKING:
 
 def make_implicit_rest_api_plugin() -> "ImplicitRestApiPlugin":
     # This is necessary to prevent a circular dependency on imports when loading package
-    from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin
+    from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin  # noqa: PLC0415
 
     return ImplicitRestApiPlugin()
 
 
 def make_implicit_http_api_plugin() -> "ImplicitHttpApiPlugin":
     # This is necessary to prevent a circular dependency on imports when loading package
-    from samtranslator.plugins.api.implicit_http_api_plugin import ImplicitHttpApiPlugin
+    from samtranslator.plugins.api.implicit_http_api_plugin import ImplicitHttpApiPlugin  # noqa: PLC0415
 
     return ImplicitHttpApiPlugin()
 

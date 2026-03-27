@@ -153,7 +153,7 @@ class Py27LongInt(long_int_type):
         return self  # primitive types (ints) are immutable
 
 
-class Py27Keys:
+class Py27Keys:  # noqa: PLW1641
     """
     A class for tracking keys based on based on Python 2.7 order.
     Based on https://github.com/python/cpython/blob/v2.7.18/Objects/dictobject.c.

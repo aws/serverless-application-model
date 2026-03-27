@@ -38,13 +38,6 @@ lint.ignore = [
     "RUF012",
     # Logging statement uses f-string
     "G004",
-    # `import` should be at the top-level of a file
-    # Used intentionally to avoid circular imports
-    "PLC0415",
-    # Object does not implement `__hash__` method
-    # Intentional in py27hash_fix.py
-    "PLW1641",
-    "PTH208",
 ]
 
 [lint.per-file-ignores]
@@ -58,10 +51,6 @@ lint.ignore = [
     # T201 `print` found
     # print() is allowed in bin/ as they are dev tools.
     "T201",
-]
-"samtranslator/internal/schema_source/aws_serverless_function.py" = [
-    # E501: Line too long - unavoidable due to large Union type
-    "E501",
 ]
 
 [lint.pylint]
