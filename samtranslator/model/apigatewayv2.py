@@ -165,54 +165,48 @@ class ApiGatewayV2Authorizer:
             return "JWT"
         return "REQUEST"
 
+    # Maps each authorizer type to the set of properties it accepts
+    ALLOWED_PROPERTIES = {
+        "JWT": {"authorization_scopes", "jwt_configuration", "id_source"},
+        "REQUEST": {
+            "function_arn",
+            "function_invoke_role",
+            "identity",
+            "authorizer_payload_format_version",
+            "enable_simple_responses",
+            "enable_function_default_permissions",
+        },
+        "AWS_IAM": set(),
+    }
+
+    # Maps internal attr name to (display name, error hint)
+    PROPERTY_DISPLAY = {
+        "authorization_scopes": ("AuthorizationScopes", "OAuth2 Authorizer"),
+        "jwt_configuration": ("JwtConfiguration", "OAuth2 Authorizer"),
+        "id_source": (
+            "IdentitySource",
+            "OAuth2 Authorizer. For Lambda Authorizer, use the 'Identity' property instead",
+        ),
+        "function_arn": ("FunctionArn", "Lambda Authorizer"),
+        "function_invoke_role": ("FunctionInvokeRole", "Lambda Authorizer"),
+        "identity": ("Identity", "Lambda Authorizer"),
+        "authorizer_payload_format_version": ("AuthorizerPayloadFormatVersion", "Lambda Authorizer"),
+        "enable_simple_responses": ("EnableSimpleResponses", "Lambda Authorizer"),
+        "enable_function_default_permissions": ("EnableFunctionDefaultPermissions", "Lambda Authorizer"),
+    }
+
     def _validate_input_parameters(self) -> None:
         authorizer_type = self._get_auth_type()
 
         if self.authorization_scopes is not None and not isinstance(self.authorization_scopes, list):
             raise InvalidResourceException(self.api_logical_id, "AuthorizationScopes must be a list.")
 
-        if self.authorization_scopes is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(
-                self.api_logical_id, "AuthorizationScopes must be defined only for OAuth2 Authorizer."
-            )
-
-        if self.jwt_configuration is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(
-                self.api_logical_id, "JwtConfiguration must be defined only for OAuth2 Authorizer."
-            )
-
-        if self.id_source is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(
-                self.api_logical_id, "IdentitySource must be defined only for OAuth2 Authorizer."
-            )
-
-        if self.function_arn is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
-                self.api_logical_id, "FunctionArn must be defined only for Lambda Authorizer."
-            )
-
-        if self.function_invoke_role is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
-                self.api_logical_id, "FunctionInvokeRole must be defined only for Lambda Authorizer."
-            )
-
-        if self.identity is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(self.api_logical_id, "Identity must be defined only for Lambda Authorizer.")
-
-        if self.authorizer_payload_format_version is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
-                self.api_logical_id, "AuthorizerPayloadFormatVersion must be defined only for Lambda Authorizer."
-            )
-
-        if self.enable_simple_responses is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
-                self.api_logical_id, "EnableSimpleResponses must be defined only for Lambda Authorizer."
-            )
-
-        if self.enable_function_default_permissions is not None and authorizer_type != "REQUEST":
-            raise InvalidResourceException(
-                self.api_logical_id, "EnableFunctionDefaultPermissions must be defined only for Lambda Authorizer."
-            )
+        allowed = self.ALLOWED_PROPERTIES.get(authorizer_type, set())
+        for attr, (display_name, allowed_for) in self.PROPERTY_DISPLAY.items():
+            if getattr(self, attr) is not None and attr not in allowed:
+                raise InvalidResourceException(
+                    self.api_logical_id, f"{display_name} is only supported for {allowed_for}."
+                )
 
     def _validate_jwt_authorizer(self) -> None:
         if not self.jwt_configuration:
