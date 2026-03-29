@@ -1,6 +1,7 @@
 Globals:
   Api:
     EndpointAccessMode: BASIC
+    SecurityPolicy: SecurityPolicy_TLS13_1_3_2025_09
 
 Resources:
   # Inherits Globals
@@ -15,3 +16,4 @@ Resources:
     Properties:
       StageName: Prod
       EndpointAccessMode: STRICT
+      SecurityPolicy: SecurityPolicy_TLS13_1_3_2025_09

@@ -12,7 +12,27 @@ class TestApiWithEndpointAccessMode(BaseTest):
     """
 
     def test_api_with_endpoint_access_mode(self):
-        self.create_and_verify_stack("single/api_with_endpoint_access_mode")
+        # Create stack with STRICT
+        parameters = [
+            {"ParameterKey": "SecurityPolicyValue", "ParameterValue": "SecurityPolicy_TLS13_1_3_2025_09"},
+            {"ParameterKey": "EndpointAccessModeValue", "ParameterValue": "STRICT"},
+        ]
+        self.create_and_verify_stack("single/api_with_endpoint_access_mode", parameters)
 
-        rest_api_resources = self.get_stack_resources("AWS::ApiGateway::RestApi")
-        self.assertEqual(len(rest_api_resources), 1)
+        rest_api_id = self.get_physical_id_by_type("AWS::ApiGateway::RestApi")
+        rest_api = self.client_provider.api_client.get_rest_api(restApiId=rest_api_id)
+
+        self.assertEqual(rest_api["securityPolicy"], "SecurityPolicy_TLS13_1_3_2025_09")
+        self.assertEqual(rest_api["endpointAccessMode"], "STRICT")
+
+        # Update stack with BASIC
+        update_parameters = [
+            {"ParameterKey": "SecurityPolicyValue", "ParameterValue": "SecurityPolicy_TLS13_1_3_2025_09"},
+            {"ParameterKey": "EndpointAccessModeValue", "ParameterValue": "BASIC"},
+        ]
+        self.update_stack(parameters=update_parameters)
+
+        rest_api = self.client_provider.api_client.get_rest_api(restApiId=rest_api_id)
+
+        self.assertEqual(rest_api["securityPolicy"], "SecurityPolicy_TLS13_1_3_2025_09")
+        self.assertEqual(rest_api["endpointAccessMode"], "BASIC")

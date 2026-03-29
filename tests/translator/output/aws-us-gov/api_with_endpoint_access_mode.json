@@ -20,7 +20,8 @@
         },
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
-        }
+        },
+        "SecurityPolicy": "SecurityPolicy_TLS13_1_3_2025_09"
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
@@ -66,7 +67,8 @@
         },
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
-        }
+        },
+        "SecurityPolicy": "SecurityPolicy_TLS13_1_3_2025_09"
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
