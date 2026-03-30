@@ -121,7 +121,7 @@ class GeneratedProperty(PropertyType):
 
 
 class Resource(ABC):
-    """A Resource object represents an abstract entity that contains a type and a Properties object. They map well to
+    """A Resource object represents an abstract entity that contains a Type and a Properties object. They map well to
     CloudFormation resources as well sub-types like AWS::Lambda::Function or `Events` section of
     AWS::Serverless::Function.
 
@@ -221,7 +221,7 @@ class Resource(ABC):
 
         :param str logical_id: The logical id of this Resource
         :param dict resource_dict: The value associated with this logical id in the CloudFormation template, a mapping \
-        containing the resource's type and Properties.
+        containing the resource's Type and Properties.
         :param str relative_id: The logical id of this resource relative to the logical_id. This is useful
                                 to identify sub-resources.
         :param samtranslator.plugins.SamPlugins sam_plugins: Optional plugins object to help enhance functionality of
@@ -276,7 +276,7 @@ class Resource(ABC):
 
     @classmethod
     def _validate_resource_dict(cls, logical_id: str, resource_dict: dict[str, Any]) -> None:
-        """Validates that the provided resource dict contains the correct type string, and the required Properties dict.
+        """Validates that the provided resource dict contains the correct Type string, and the required Properties dict.
 
         :param dict resource_dict: the resource dict to validate
         :returns: True if the resource dict has the expected format
@@ -288,7 +288,7 @@ class Resource(ABC):
         if resource_dict["Type"] != cls.resource_type:
             raise InvalidResourceException(
                 logical_id,
-                "Resource has incorrect type; expected '{expected}', "
+                "Resource has incorrect Type; expected '{expected}', "
                 "got '{actual}'".format(expected=cls.resource_type, actual=resource_dict["Type"]),
             )
 
@@ -815,7 +815,7 @@ class ResourceTypeResolver:
         """
         if not self.can_resolve(resource_dict):
             raise TypeError(
-                "Resource dict has missing or invalid value for key type. Event type is: {}.".format(
+                "Resource dict has missing or invalid value for key Type. Event Type is: {}.".format(
                     resource_dict.get("Type")
                 )
             )
