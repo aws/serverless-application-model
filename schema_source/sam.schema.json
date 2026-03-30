@@ -4387,6 +4387,25 @@
           ],
           "title": "DomainName"
         },
+        "EndpointAccessMode": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The endpoint access mode for the custom domain name.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`EndpointAccessMode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-endpointaccessmode) property of an `AWS::ApiGateway::DomainName` resource, or to `AWS::ApiGateway::DomainNameV2` when `EndpointConfiguration` is set to `PRIVATE`.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::DomainName",
+              "properties",
+              "Properties",
+              "properties",
+              "EndpointAccessMode"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "EndpointAccessMode"
+        },
         "EndpointConfiguration": {
           "anyOf": [
             {

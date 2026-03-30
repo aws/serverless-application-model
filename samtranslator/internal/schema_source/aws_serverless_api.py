@@ -196,6 +196,11 @@ class Domain(BaseModel):
     EndpointConfiguration: Optional[SamIntrinsicable[Literal["REGIONAL", "EDGE", "PRIVATE"]]] = domain(
         "EndpointConfiguration"
     )
+    EndpointAccessMode: Optional[PassThroughProp] = passthrough_prop(
+        DOMAIN_STEM,
+        "EndpointAccessMode",
+        ["AWS::ApiGateway::DomainName", "Properties", "EndpointAccessMode"],
+    )
     IpAddressType: Optional[PassThroughProp]  # TODO: add documentation; currently unavailable
     MutualTlsAuthentication: Optional[PassThroughProp] = passthrough_prop(
         DOMAIN_STEM,

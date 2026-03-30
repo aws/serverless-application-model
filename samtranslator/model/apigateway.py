@@ -221,6 +221,7 @@ class ApiGatewayDomainName(Resource):
         "EndpointConfiguration": GeneratedProperty(),
         "MutualTlsAuthentication": GeneratedProperty(),
         "SecurityPolicy": GeneratedProperty(),
+        "EndpointAccessMode": GeneratedProperty(),
         "CertificateArn": GeneratedProperty(),
         "Tags": GeneratedProperty(),
         "OwnershipVerificationCertificateArn": GeneratedProperty(),
@@ -231,6 +232,7 @@ class ApiGatewayDomainName(Resource):
     EndpointConfiguration: Optional[PassThrough]
     MutualTlsAuthentication: Optional[Dict[str, Any]]
     SecurityPolicy: Optional[PassThrough]
+    EndpointAccessMode: Optional[PassThrough]
     CertificateArn: Optional[PassThrough]
     Tags: Optional[PassThrough]
     OwnershipVerificationCertificateArn: Optional[PassThrough]
@@ -242,6 +244,7 @@ class ApiGatewayDomainNameV2(Resource):
         "DomainName": GeneratedProperty(),
         "EndpointConfiguration": GeneratedProperty(),
         "SecurityPolicy": GeneratedProperty(),
+        "EndpointAccessMode": GeneratedProperty(),
         "CertificateArn": GeneratedProperty(),
         "Tags": GeneratedProperty(),
         "Policy": GeneratedProperty(),
@@ -250,6 +253,7 @@ class ApiGatewayDomainNameV2(Resource):
     DomainName: PassThrough
     EndpointConfiguration: Optional[PassThrough]
     SecurityPolicy: Optional[PassThrough]
+    EndpointAccessMode: Optional[PassThrough]
     CertificateArn: Optional[PassThrough]
     Tags: Optional[PassThrough]
     Policy: Optional[PassThrough]

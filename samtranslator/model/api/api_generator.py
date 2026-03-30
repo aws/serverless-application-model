@@ -744,6 +744,8 @@ class ApiGenerator:
             return
         if self.domain.get("SecurityPolicy", None):
             domain.SecurityPolicy = self.domain["SecurityPolicy"]
+        if self.domain.get("EndpointAccessMode", None):
+            domain.EndpointAccessMode = self.domain["EndpointAccessMode"]
         if self.domain.get("Policy", None):
             domain.Policy = self.domain["Policy"]
         if self.domain.get("OwnershipVerificationCertificateArn", None):

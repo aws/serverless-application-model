@@ -1,0 +1,205 @@
+{
+  "Metadata": {
+    "SamTransformTest": true
+  },
+  "Parameters": {
+    "HostedZoneId": {
+      "Type": "String"
+    },
+    "MyCertificateArn": {
+      "Type": "String"
+    },
+    "MyDomainName": {
+      "Type": "String"
+    },
+    "VpcEndpointDomainName": {
+      "Type": "String"
+    },
+    "VpcEndpointHostedZoneId": {
+      "Type": "String"
+    },
+    "VpcEndpointId": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "Api": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": "MockApi",
+            "version": "1.0"
+          },
+          "paths": {
+            "/get": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "200 response"
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "requestTemplates": {
+                    "application/json": "{\"statusCode\": 200}"
+                  },
+                  "responses": {
+                    "default": {
+                      "responseTemplates": {
+                        "application/json": "{\"message\": \"Hello World\"}"
+                      },
+                      "statusCode": "200"
+                    }
+                  },
+                  "type": "mock"
+                }
+              }
+            }
+          },
+          "swagger": "2.0",
+          "x-amazon-apigateway-policy": {
+            "Statement": [
+              {
+                "Action": "execute-api:Invoke",
+                "Condition": {
+                  "StringEquals": {
+                    "aws:SourceVpce": {
+                      "Ref": "VpcEndpointId"
+                    }
+                  }
+                },
+                "Effect": "Allow",
+                "Principal": "*",
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+              }
+            ],
+            "Version": "2012-10-17"
+          }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "PRIVATE"
+          ],
+          "VpcEndpointIds": [
+            {
+              "Ref": "VpcEndpointId"
+            }
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "PRIVATE"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ApiBasePathMapping": {
+      "Properties": {
+        "DomainNameArn": {
+          "Ref": "ApiGatewayDomainNameV2e12ae193a4"
+        },
+        "RestApiId": {
+          "Ref": "Api"
+        },
+        "Stage": {
+          "Ref": "ApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGateway::BasePathMappingV2"
+    },
+    "ApiDeployment201b5a52ed": {
+      "Properties": {
+        "Description": "RestApi deployment id: 201b5a52ed6f40089c7e4d46db54f63bdd4dd157",
+        "RestApiId": {
+          "Ref": "Api"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ApiGatewayDomainNameV2e12ae193a4": {
+      "Properties": {
+        "CertificateArn": {
+          "Ref": "MyCertificateArn"
+        },
+        "DomainName": {
+          "Ref": "MyDomainName"
+        },
+        "EndpointAccessMode": "STRICT",
+        "EndpointConfiguration": {
+          "Types": [
+            "PRIVATE"
+          ]
+        },
+        "Policy": {
+          "Statement": [
+            {
+              "Action": "execute-api:Invoke",
+              "Condition": {
+                "StringEquals": {
+                  "aws:SourceVpce": {
+                    "Ref": "VpcEndpointId"
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Principal": "*",
+              "Resource": "execute-api:/*/*/*"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "SecurityPolicy": "SecurityPolicy_TLS13_1_3_2025_09"
+      },
+      "Type": "AWS::ApiGateway::DomainNameV2"
+    },
+    "ApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ApiDeployment201b5a52ed"
+        },
+        "RestApiId": {
+          "Ref": "Api"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "DomainNameAccessAssociationf4f910dee7": {
+      "Properties": {
+        "AccessAssociationSource": {
+          "Ref": "VpcEndpointId"
+        },
+        "AccessAssociationSourceType": "VPCE",
+        "DomainNameArn": {
+          "Ref": "ApiGatewayDomainNameV2e12ae193a4"
+        }
+      },
+      "Type": "AWS::ApiGateway::DomainNameAccessAssociation"
+    },
+    "RecordSetGroup1194dea82a": {
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "HostedZoneId"
+        },
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Ref": "VpcEndpointDomainName"
+              },
+              "HostedZoneId": {
+                "Ref": "VpcEndpointHostedZoneId"
+              }
+            },
+            "Name": {
+              "Ref": "MyDomainName"
+            },
+            "Type": "A"
+          }
+        ]
+      },
+      "Type": "AWS::Route53::RecordSetGroup"
+    }
+  }
+}
