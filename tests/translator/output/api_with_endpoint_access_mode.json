@@ -1,0 +1,82 @@
+{
+  "Resources": {
+    "ApiInheritGlobals": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {},
+          "swagger": "2.0"
+        },
+        "EndpointAccessMode": "BASIC",
+        "SecurityPolicy": "SecurityPolicy_TLS13_1_3_2025_09"
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ApiInheritGlobalsDeployment5332c373d4": {
+      "Properties": {
+        "Description": "RestApi deployment id: 5332c373d45c69e6c0f562b4a419aa8eb311adc7",
+        "RestApiId": {
+          "Ref": "ApiInheritGlobals"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ApiInheritGlobalsProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ApiInheritGlobalsDeployment5332c373d4"
+        },
+        "RestApiId": {
+          "Ref": "ApiInheritGlobals"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "ApiTopLevelOverride": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {},
+          "swagger": "2.0"
+        },
+        "EndpointAccessMode": "STRICT",
+        "SecurityPolicy": "SecurityPolicy_TLS13_1_3_2025_09"
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ApiTopLevelOverrideDeployment5332c373d4": {
+      "Properties": {
+        "Description": "RestApi deployment id: 5332c373d45c69e6c0f562b4a419aa8eb311adc7",
+        "RestApiId": {
+          "Ref": "ApiTopLevelOverride"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ApiTopLevelOverrideProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ApiTopLevelOverrideDeployment5332c373d4"
+        },
+        "RestApiId": {
+          "Ref": "ApiTopLevelOverride"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    }
+  }
+}

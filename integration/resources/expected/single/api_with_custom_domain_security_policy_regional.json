@@ -1,0 +1,26 @@
+[
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  },
+  {
+    "LogicalResourceId": "MyApiDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "MyApiProdStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "ApiGatewayDomainName",
+    "ResourceType": "AWS::ApiGateway::DomainName"
+  },
+  {
+    "LogicalResourceId": "MyApiBasePathMapping",
+    "ResourceType": "AWS::ApiGateway::BasePathMapping"
+  },
+  {
+    "LogicalResourceId": "RecordSetGroup",
+    "ResourceType": "AWS::Route53::RecordSetGroup"
+  }
+]

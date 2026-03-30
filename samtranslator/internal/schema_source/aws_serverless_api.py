@@ -186,6 +186,11 @@ class Domain(BaseModel):
         "DomainName",
         ["AWS::ApiGateway::DomainName", "Properties", "DomainName"],
     )
+    EndpointAccessMode: Optional[PassThroughProp] = passthrough_prop(
+        DOMAIN_STEM,
+        "EndpointAccessMode",
+        ["AWS::ApiGateway::DomainName", "Properties", "EndpointAccessMode"],
+    )
     EndpointConfiguration: SamIntrinsicable[Literal["REGIONAL", "EDGE", "PRIVATE"]] | None = domain(
         "EndpointConfiguration"
     )
@@ -299,12 +304,17 @@ class Properties(BaseModel):
     )
     DisableExecuteApiEndpoint: PassThroughProp | None = properties("DisableExecuteApiEndpoint")
     Domain: Domain | None = properties("Domain")
-    EndpointConfiguration: EndpointConfigurationType | None = properties("EndpointConfiguration")
-    FailOnWarnings: PassThroughProp | None = passthrough_prop(
+    EndpointAccessMode: PassThroughProp | None = passthrough_prop(
+        PROPERTIES_STEM,
+        "EndpointAccessMode",
+        ["AWS::ApiGateway::RestApi", "Properties", "EndpointAccessMode"],
+    )
         PROPERTIES_STEM,
         "FailOnWarnings",
         ["AWS::ApiGateway::RestApi", "Properties", "FailOnWarnings"],
     )
+    EndpointConfiguration: EndpointConfigurationType | None = properties("EndpointConfiguration")
+    FailOnWarnings: PassThroughProp | None = passthrough_prop(
     GatewayResponses: GatewayResponses | None = properties("GatewayResponses")
     MethodSettings: MethodSettings | None = passthrough_prop(
         PROPERTIES_STEM,
@@ -411,6 +421,11 @@ class Globals(BaseModel):
         PROPERTIES_STEM,
         "SecurityPolicy",
         ["AWS::ApiGateway::RestApi", "Properties", "SecurityPolicy"],
+    )
+    EndpointAccessMode: Optional[PassThroughProp] = passthrough_prop(
+        PROPERTIES_STEM,
+        "EndpointAccessMode",
+        ["AWS::ApiGateway::RestApi", "Properties", "EndpointAccessMode"],
     )
 
 

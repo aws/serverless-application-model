@@ -4387,6 +4387,25 @@
           ],
           "title": "DomainName"
         },
+        "EndpointAccessMode": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The endpoint access mode for the custom domain name.  \n*Type*: String  \n*Required*: No  \n*CloudFormation compatibility*: This property is passed directly to the [`EndpointAccessMode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-domainname.html#cfn-apigateway-domainname-endpointaccessmode) property of an `AWS::ApiGateway::DomainName` resource, or to `AWS::ApiGateway::DomainNameV2` when `EndpointConfiguration` is set to `PRIVATE`.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::DomainName",
+              "properties",
+              "Properties",
+              "properties",
+              "EndpointAccessMode"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "EndpointAccessMode"
+        },
         "EndpointConfiguration": {
           "anyOf": [
             {
@@ -4623,6 +4642,25 @@
           ],
           "markdownDescription": "Configures a custom domain for this API Gateway API.  \n*Type*: [DomainConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-domainconfiguration.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
           "title": "Domain"
+        },
+        "EndpointAccessMode": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The endpoint access mode for the RestApi.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EndpointAccessMode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-endpointaccessmode) property of an `AWS::ApiGateway::RestApi` resource.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "EndpointAccessMode"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "EndpointAccessMode"
         },
         "EndpointConfiguration": {
           "allOf": [
@@ -4957,6 +4995,25 @@
           ],
           "markdownDescription": "Configures a custom domain for this API Gateway API.  \n*Type*: [DomainConfiguration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-domainconfiguration.html)  \n*Required*: No  \n*CloudFormation compatibility*: This property is unique to AWS SAM and doesn't have an CloudFormation equivalent.",
           "title": "Domain"
+        },
+        "EndpointAccessMode": {
+          "__samPassThrough": {
+            "markdownDescriptionOverride": "The endpoint access mode for the RestApi.  \n*Type*: String  \n*Required*: No  \n*AWS CloudFormation compatibility*: This property is passed directly to the [`EndpointAccessMode`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-endpointaccessmode) property of an `AWS::ApiGateway::RestApi` resource.",
+            "schemaPath": [
+              "definitions",
+              "AWS::ApiGateway::RestApi",
+              "properties",
+              "Properties",
+              "properties",
+              "EndpointAccessMode"
+            ]
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/PassThroughProp"
+            }
+          ],
+          "title": "EndpointAccessMode"
         },
         "EndpointConfiguration": {
           "anyOf": [

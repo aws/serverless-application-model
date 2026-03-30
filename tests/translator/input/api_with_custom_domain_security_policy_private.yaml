@@ -1,0 +1,78 @@
+Parameters:
+  MyDomainName:
+    Type: String
+  MyCertificateArn:
+    Type: String
+  HostedZoneId:
+    Type: String
+  VpcEndpointId:
+    Type: String
+  VpcEndpointDomainName:
+    Type: String
+  VpcEndpointHostedZoneId:
+    Type: String
+
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+          - Effect: Allow
+            Action: execute-api:Invoke
+            Resource:
+            - execute-api:/*/*/*
+            Principal: '*'
+            Condition:
+              StringEquals:
+                aws:SourceVpce: !Ref VpcEndpointId
+      EndpointConfiguration:
+        Type: PRIVATE
+        VPCEndpointIds:
+        - !Ref VpcEndpointId
+      Domain:
+        DomainName: !Ref MyDomainName
+        CertificateArn: !Ref MyCertificateArn
+        EndpointConfiguration: PRIVATE
+        SecurityPolicy: SecurityPolicy_TLS13_1_3_2025_09
+        EndpointAccessMode: STRICT
+        Route53:
+          HostedZoneId: !Ref HostedZoneId
+          VpcEndpointDomainName: !Ref VpcEndpointDomainName
+          VpcEndpointHostedZoneId: !Ref VpcEndpointHostedZoneId
+        AccessAssociation:
+          VpcEndpointId: !Ref VpcEndpointId
+        Policy:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: execute-api:Invoke
+            Resource: execute-api:/*/*/*
+            Condition:
+              StringEquals:
+                aws:SourceVpce: !Ref VpcEndpointId
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: MockApi
+          version: '1.0'
+        paths:
+          /get:
+            get:
+              responses:
+                '200':
+                  description: 200 response
+              x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                responses:
+                  default:
+                    statusCode: '200'
+                    responseTemplates:
+                      application/json: '{"message": "Hello World"}'
+Metadata:
+  SamTransformTest: true

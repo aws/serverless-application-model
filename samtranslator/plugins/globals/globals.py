@@ -89,6 +89,7 @@ class Globals:
             "AlwaysDeploy",
             "PropagateTags",
             "SecurityPolicy",
+            "EndpointAccessMode",
         ],
         SamResourceType.HttpApi.value: [
             "Auth",

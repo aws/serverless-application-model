@@ -31,6 +31,7 @@ class ApiGatewayRestApi(Resource):
         "Tags": GeneratedProperty(),
         "Policy": GeneratedProperty(),
         "SecurityPolicy": GeneratedProperty(),
+        "EndpointAccessMode": GeneratedProperty(),
     }
 
     Body: dict[str, Any] | None
@@ -48,6 +49,7 @@ class ApiGatewayRestApi(Resource):
     Tags: PassThrough | None
     Policy: PassThrough | None
     SecurityPolicy: PassThrough | None
+    EndpointAccessMode: PassThrough | None
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
 
@@ -219,6 +221,7 @@ class ApiGatewayDomainName(Resource):
         "EndpointConfiguration": GeneratedProperty(),
         "MutualTlsAuthentication": GeneratedProperty(),
         "SecurityPolicy": GeneratedProperty(),
+        "EndpointAccessMode": GeneratedProperty(),
         "CertificateArn": GeneratedProperty(),
         "Tags": GeneratedProperty(),
         "OwnershipVerificationCertificateArn": GeneratedProperty(),
@@ -240,6 +243,7 @@ class ApiGatewayDomainNameV2(Resource):
         "DomainName": GeneratedProperty(),
         "EndpointConfiguration": GeneratedProperty(),
         "SecurityPolicy": GeneratedProperty(),
+        "EndpointAccessMode": GeneratedProperty(),
         "CertificateArn": GeneratedProperty(),
         "Tags": GeneratedProperty(),
         "Policy": GeneratedProperty(),
