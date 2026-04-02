@@ -11,10 +11,12 @@ fi
 
 "${VENV}/bin/python" -m pip install cfn-lint --upgrade --quiet
 # update cfn schema with retry logic (can fail due to network issues)
+# --regions us-east-1 avoids a cfn-lint bug where updating all regions causes a
+# multiprocessing pickle error. See https://github.com/aws-cloudformation/cfn-lint/issues/4379
 MAX_RETRIES=3
 RETRY_COUNT=0
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if "${VENV}/bin/cfn-lint" -u; then
+    if "${VENV}/bin/cfn-lint" -u --regions us-east-1; then
         echo "Successfully updated cfn-lint schema"
         break
     else
