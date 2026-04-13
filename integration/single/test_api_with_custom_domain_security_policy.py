@@ -1,14 +1,14 @@
 from unittest.case import skipIf
 
-from integration.config.service_names import CUSTOM_DOMAIN
+from integration.config.service_names import CUSTOM_DOMAIN, SECURITY_POLICY_REST_API
 from integration.helpers.base_internal_test import BaseInternalTest
 from integration.helpers.base_test import nonblocking
-from integration.helpers.resource import current_region_not_included
+from integration.helpers.resource import current_region_does_not_support, current_region_not_included
 
 
 @skipIf(
-    current_region_not_included([CUSTOM_DOMAIN]),
-    "Custom domain is not supported in this testing region",
+    current_region_not_included([CUSTOM_DOMAIN]) or current_region_does_not_support([SECURITY_POLICY_REST_API]),
+    "Custom domain or SecurityPolicy are not supported in this testing region",
 )
 @nonblocking
 class TestApiWithCustomDomainSecurityPolicy(BaseInternalTest):
