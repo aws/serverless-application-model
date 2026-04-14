@@ -7,7 +7,7 @@ import botocore
 import pytest
 from botocore.exceptions import ClientError
 
-from integration.config.service_names import MSK, MQ
+from integration.config.service_names import MQ, MSK
 from integration.helpers.base_test import S3_BUCKET_PREFIX
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.deployer.exceptions.exceptions import S3DoesNotExistException, ThrottlingError

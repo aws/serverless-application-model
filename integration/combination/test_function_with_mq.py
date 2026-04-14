@@ -25,7 +25,9 @@ class TestFunctionWithMq(BaseTest):
         companion_stack_outputs = self.companion_stack_outputs
         parameters = [
             self.generate_parameter("PreCreatedMqBrokerArn", companion_stack_outputs["PreCreatedMqBrokerArn"]),
-            self.generate_parameter("PreCreatedMqBrokerSecretArn", companion_stack_outputs["PreCreatedMqBrokerSecretArn"]),
+            self.generate_parameter(
+                "PreCreatedMqBrokerSecretArn", companion_stack_outputs["PreCreatedMqBrokerSecretArn"]
+            ),
         ]
 
         self.create_and_verify_stack(file_name, parameters)

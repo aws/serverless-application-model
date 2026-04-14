@@ -171,7 +171,7 @@ Resources:
           EBSStorageInfo:
             VolumeSize: 1
       ClusterName: !Sub "${AWS::StackName}-msk"
-      KafkaVersion: '3.8.x'
+      KafkaVersion: 3.8.x
       NumberOfBrokerNodes: 2
 
   MQRouteTable:
