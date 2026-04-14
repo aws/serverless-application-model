@@ -145,10 +145,16 @@ def _get_region():
     return region
 
 
+_TMP_CONFIG_DIR = Path("/tmp/integration/config")
+
+
 def read_test_config_file(filename):
     """Reads test config file and returns the contents"""
     tests_integ_dir = Path(__file__).resolve().parents[1]
     test_config_file_path = Path(tests_integ_dir, "config", filename)
+    tmp_path = Path(_TMP_CONFIG_DIR, filename)
+    if not test_config_file_path.is_file() and tmp_path.is_file():
+        test_config_file_path = tmp_path
     if not test_config_file_path.is_file():
         return {}
     test_config = load_yaml(str(test_config_file_path))
@@ -156,10 +162,9 @@ def read_test_config_file(filename):
 
 
 def write_test_config_file_to_json(filename, input):
-    """Reads test config file and returns the contents"""
-    tests_integ_dir = Path(__file__).resolve().parents[1]
-    test_config_file_path = Path(tests_integ_dir, "config", filename)
-    with open(test_config_file_path, "w") as f:
+    """Writes test config file as JSON to /tmp for portability across environments."""
+    _TMP_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    with open(Path(_TMP_CONFIG_DIR, filename), "w") as f:
         json.dump(input, f)
 
 

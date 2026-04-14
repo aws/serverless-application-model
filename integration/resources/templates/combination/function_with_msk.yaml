@@ -1,9 +1,5 @@
 Parameters:
-  PreCreatedSubnetOne:
-    Type: String
-  PreCreatedSubnetTwo:
-    Type: String
-  MskClusterName:
+  PreCreatedMskClusterArn:
     Type: String
 
 Resources:
@@ -32,22 +28,6 @@ Resources:
       Tags:
       - {Value: SAM, Key: lambda:createdBy}
 
-  MyMskCluster:
-    Type: AWS::MSK::Cluster
-    Properties:
-      BrokerNodeGroupInfo:
-        ClientSubnets:
-        - Ref: PreCreatedSubnetOne
-        - Ref: PreCreatedSubnetTwo
-        InstanceType: kafka.t3.small
-        StorageInfo:
-          EBSStorageInfo:
-            VolumeSize: 1
-      ClusterName:
-        Ref: MskClusterName
-      KafkaVersion: 3.8.x
-      NumberOfBrokerNodes: 2
-
   MyMskStreamProcessor:
     Type: AWS::Serverless::Function
     Properties:
@@ -63,7 +43,7 @@ Resources:
             Enabled: false
             StartingPosition: LATEST
             Stream:
-              Ref: MyMskCluster
+              Ref: PreCreatedMskClusterArn
             Topics:
             - MyDummyTestTopic
 

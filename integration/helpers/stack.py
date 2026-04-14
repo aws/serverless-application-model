@@ -19,10 +19,10 @@ class Stack:
         self.stack_description = None
         self.stack_resources = None
 
-    def create_or_update(self, update):
+    def create_or_update(self, update, parameters=None):
         output_template_path = self._generate_output_file_path(self.template_path, self.output_dir)
         transform_template(self.template_path, output_template_path)
-        self._deploy_stack(output_template_path, update)
+        self._deploy_stack(output_template_path, update, parameters)
 
     def delete(self):
         self.cfn_client.delete_stack(StackName=self.stack_name)
