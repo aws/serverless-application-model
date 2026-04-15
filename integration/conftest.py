@@ -64,7 +64,7 @@ def clean_all_integ_buckets():
 
 @pytest.fixture()
 def setup_companion_stack_once(tmpdir_factory, get_prefix):
-    # When COMPANION_STACK_NAME is set via env var, the stack is pre-created (e.g. Hydra bootstrap stack)
+    # When COMPANION_STACK_NAME is set via env var, the stack is pre-created by the test platform
     if os.environ.get("COMPANION_STACK_NAME"):
         return
     tests_integ_dir = Path(__file__).resolve().parents[1]
