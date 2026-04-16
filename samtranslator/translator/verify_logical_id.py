@@ -32,5 +32,10 @@ def verify_unique_logical_id(resource: Resource, existing_resources: dict[str, A
     # new resource logicalid is in  the do_not_resolve list
     return bool(
         resource.resource_type in do_not_verify
-        and existing_resources[resource.logical_id]["Type"] in do_not_verify[resource.resource_type]
+        and existing_resources[resource.logical_id]["Type"]
+        in (
+            do_not_verify[resource.resource_type]
+            if isinstance(do_not_verify[resource.resource_type], list)
+            else [do_not_verify[resource.resource_type]]
+        )
     )
