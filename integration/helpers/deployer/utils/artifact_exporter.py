@@ -18,7 +18,6 @@ This was ported over from the sam-cli repo
 
 import os
 import tempfile
-import uuid
 from contextlib import contextmanager
 from urllib.parse import parse_qs, urlparse
 
@@ -45,11 +44,10 @@ def parse_s3_url(url, bucket_name_property="Bucket", object_key_property="Key", 
 
 @contextmanager
 def mktempfile():
-    directory = tempfile.gettempdir()
-    filename = os.path.join(directory, uuid.uuid4().hex)
+    fd, filename = tempfile.mkstemp()
 
     try:
-        with open(filename, "w+") as handle:
+        with os.fdopen(fd, "w+") as handle:
             yield handle
     finally:
         if os.path.exists(filename):
