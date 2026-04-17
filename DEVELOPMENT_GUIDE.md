@@ -26,7 +26,7 @@ Environment setup
 -----------------
 ### 1. Install Python versions
 
-Our officially supported Python versions are 3.10, 3.11, 3.12, 3.13
+Our officially supported Python versions are 3.10, 3.11, 3.12, 3.13, 3.14
 Our CI/CD pipeline is setup to run unit tests against Python 3 versions. Make sure you test it before sending a Pull Request.
 See [Unit testing with multiple Python versions](#unit-testing-with-multiple-python-versions).
 

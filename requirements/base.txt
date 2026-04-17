@@ -3,4 +3,4 @@ jsonschema<5,>=4.23
 typing_extensions>=4.4
 
 # resource validation & schema generation
-pydantic~=2.12.5
+pydantic~=2.13.2
