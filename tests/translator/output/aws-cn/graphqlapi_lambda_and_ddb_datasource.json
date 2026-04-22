@@ -72,7 +72,7 @@
           "TableName": "some-table"
         },
         "Name": "MyDataSource",
-        "ServiceRoleArn": "my-ddb-role",
+        "ServiceRoleArn": "arn:aws:iam::123456789012:role/my-ddb-role",
         "Type": "AMAZON_DYNAMODB"
       },
       "Type": "AWS::AppSync::DataSource"
@@ -89,7 +89,7 @@
           "LambdaFunctionArn": "blah"
         },
         "Name": "MyDataSource",
-        "ServiceRoleArn": "my-lambda-role",
+        "ServiceRoleArn": "arn:aws:iam::123456789012:role/my-lambda-role",
         "Type": "AWS_LAMBDA"
       },
       "Type": "AWS::AppSync::DataSource"

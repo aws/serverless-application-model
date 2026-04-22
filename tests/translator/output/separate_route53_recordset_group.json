@@ -62,9 +62,9 @@
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
     },
-    "ApiGatewayAdminOneDeploymentdd3f545183": {
+    "ApiGatewayAdminOneDeployment5f4fcb9347": {
       "Properties": {
-        "Description": "RestApi deployment id: dd3f545183668c401e771fd9a377cfeadcf88a35",
+        "Description": "RestApi deployment id: 5f4fcb9347315a0decaa8f0140aae89cde47f8d1",
         "RestApiId": {
           "Ref": "ApiGatewayAdminOne"
         },
@@ -75,7 +75,7 @@
     "ApiGatewayAdminOneProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiGatewayAdminOneDeploymentdd3f545183"
+          "Ref": "ApiGatewayAdminOneDeployment5f4fcb9347"
         },
         "MethodSettings": [
           {
@@ -130,9 +130,9 @@
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
     },
-    "ApiGatewayAdminThreeDeploymentc2e9ae5463": {
+    "ApiGatewayAdminThreeDeployment6688e0289c": {
       "Properties": {
-        "Description": "RestApi deployment id: c2e9ae5463d31ad96611e5aab9b4ddd4fd7bde73",
+        "Description": "RestApi deployment id: 6688e0289c1446101169a6ba165a416cecf813b6",
         "RestApiId": {
           "Ref": "ApiGatewayAdminThree"
         },
@@ -143,7 +143,7 @@
     "ApiGatewayAdminThreeProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiGatewayAdminThreeDeploymentc2e9ae5463"
+          "Ref": "ApiGatewayAdminThreeDeployment6688e0289c"
         },
         "MethodSettings": [
           {
@@ -200,10 +200,10 @@
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
     },
-    "ApiGatewayAdminTwoDeployment2a68098964": {
+    "ApiGatewayAdminTwoDeploymente4496c9f53": {
       "Condition": "CreateProdResources",
       "Properties": {
-        "Description": "RestApi deployment id: 2a6809896451eb172efffcdcd18396e1a83df12a",
+        "Description": "RestApi deployment id: e4496c9f5342d32f9172f98949d461d993b1c008",
         "RestApiId": {
           "Ref": "ApiGatewayAdminTwo"
         },
@@ -215,7 +215,7 @@
       "Condition": "CreateProdResources",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiGatewayAdminTwoDeployment2a68098964"
+          "Ref": "ApiGatewayAdminTwoDeploymente4496c9f53"
         },
         "MethodSettings": [
           {
@@ -241,7 +241,7 @@
             "REGIONAL"
           ]
         },
-        "RegionalCertificateArn": "arn::cert::abc"
+        "RegionalCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc"
       },
       "Type": "AWS::ApiGateway::DomainName"
     },
@@ -253,7 +253,7 @@
             "REGIONAL"
           ]
         },
-        "RegionalCertificateArn": "arn::cert::abc"
+        "RegionalCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc"
       },
       "Type": "AWS::ApiGateway::DomainName"
     },
@@ -265,7 +265,7 @@
             "REGIONAL"
           ]
         },
-        "RegionalCertificateArn": "arn::cert::abc"
+        "RegionalCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc"
       },
       "Type": "AWS::ApiGateway::DomainName"
     },

@@ -4,7 +4,7 @@
       "Properties": {
         "AuthenticationType": "AWS_IAM",
         "LogConfig": {
-          "CloudWatchLogsRoleArn": "some-arn",
+          "CloudWatchLogsRoleArn": "arn:aws:iam::123456789012:role/some-role",
           "ExcludeVerboseContent": true,
           "FieldLogLevel": "ERROR"
         },

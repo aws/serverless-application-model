@@ -33,7 +33,7 @@ Resources:
       StageName: Prod
       Domain:
         DomainName: api-example.com
-        CertificateArn: my-api-cert-arn
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/my-api-cert
         EndpointConfiguration: EDGE
         BasePath: [/get, /fetch]
         Route53:

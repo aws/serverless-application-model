@@ -36,7 +36,7 @@
         ],
         "Handler": "hello.handler",
         "KmsKeyArn": {
-          "Fn::Sub": "arn:${AWS::Partition}:key:key"
+          "Fn::Sub": "arn:${AWS::Partition}:kms:us-east-1:123456789012:key/my-key"
         },
         "Layers": [
           {
@@ -74,7 +74,7 @@
         },
         "FunctionVersion": {
           "Fn::GetAtt": [
-            "HashChangeFunctionVersiona1a9d4d1e4",
+            "HashChangeFunctionVersioncfc41a568e",
             "Version"
           ]
         },
@@ -82,7 +82,7 @@
       },
       "Type": "AWS::Lambda::Alias"
     },
-    "HashChangeFunctionVersiona1a9d4d1e4": {
+    "HashChangeFunctionVersioncfc41a568e": {
       "DeletionPolicy": "Retain",
       "Properties": {
         "Description": "sam-testing",
@@ -117,7 +117,7 @@
         ],
         "Handler": "hello.handler",
         "KmsKeyArn": {
-          "Fn::Sub": "arn:${AWS::Partition}:key:key"
+          "Fn::Sub": "arn:${AWS::Partition}:kms:us-east-1:123456789012:key/my-key"
         },
         "Layers": [
           {

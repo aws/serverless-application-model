@@ -120,8 +120,3 @@ ignore_checks:
   - W2001 # Parameter not used
   - E3006 # Resource type check; we have some Foo Bar resources
   - W3037 # Ignore cfn-lint check for non existing IAM permissions
-  - E1041 # Ref/GetAtt format mismatch; test fixtures use refs that resolve correctly at deploy time
-  - E1156 # Invalid IAM Role ARN format; test fixtures use placeholder values
-  - E1157 # Invalid KMS Key ARN format; test fixtures use placeholder values
-  - E1159 # Invalid ACM Certificate ARN format; test fixtures use placeholder values
-  - W1031 # Fn::Sub resolved value format mismatch; test fixtures use simplified ARN patterns

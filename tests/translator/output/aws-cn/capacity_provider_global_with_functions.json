@@ -224,7 +224,7 @@
             "t2.small"
           ]
         },
-        "KmsKeyArn": "some-kms-arn",
+        "KmsKeyArn": "arn:aws:kms:us-east-1:123456789012:key/some-kms-key",
         "PermissionsConfig": {
           "CapacityProviderOperatorRoleArn": {
             "Fn::GetAtt": [

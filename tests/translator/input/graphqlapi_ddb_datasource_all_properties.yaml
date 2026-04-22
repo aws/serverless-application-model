@@ -18,7 +18,7 @@ Resources:
         DynamoDb:
           MyDataSource:
             TableName: some-table
-            ServiceRoleArn: some-arn
+            ServiceRoleArn: arn:aws:iam::123456789012:role/some-role
             Name: AwesomeDataSourceName
             Description: This data source is special to me
             Region: na-west-2

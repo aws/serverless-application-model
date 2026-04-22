@@ -7,7 +7,7 @@
           "S3Key": "hello.zip"
         },
         "Handler": "hello.handler",
-        "KmsKeyArn": "thisIsaKey",
+        "KmsKeyArn": "arn:aws:kms:us-east-1:123456789012:key/this-is-a-key",
         "Role": {
           "Fn::GetAtt": [
             "FunctionWithKeyArnRole",
@@ -62,7 +62,10 @@
         },
         "Handler": "hello.handler",
         "KmsKeyArn": {
-          "Ref": "myKey"
+          "Fn::GetAtt": [
+            "myKey",
+            "Arn"
+          ]
         },
         "Role": {
           "Fn::GetAtt": [

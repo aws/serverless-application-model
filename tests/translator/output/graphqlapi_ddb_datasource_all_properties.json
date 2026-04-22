@@ -78,7 +78,7 @@
           "Versioned": true
         },
         "Name": "AwesomeDataSourceName",
-        "ServiceRoleArn": "some-arn",
+        "ServiceRoleArn": "arn:aws:iam::123456789012:role/some-role",
         "Type": "AMAZON_DYNAMODB"
       },
       "Type": "AWS::AppSync::DataSource"

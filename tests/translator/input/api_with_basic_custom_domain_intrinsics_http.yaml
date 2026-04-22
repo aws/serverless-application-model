@@ -6,7 +6,7 @@ Conditions:
 Parameters:
   MyDomainCert:
     Type: String
-    Default: another-api-arn
+    Default: arn:aws:acm:us-east-1:123456789012:certificate/another-api-cert
 
   EndpointConf:
     Type: String

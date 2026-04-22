@@ -4,7 +4,7 @@ Parameters:
     Default: example.com
   ACMCertificateArn:
     Type: String
-    Default: cert-arn-in-us-east-1
+    Default: arn:aws:acm:us-east-1:123456789012:certificate/abc123
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function

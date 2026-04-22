@@ -60,7 +60,7 @@ Resources:
         key1: value1
         key2: value2
       Logging:
-        CloudWatchLogsRoleArn: some-arn
+        CloudWatchLogsRoleArn: arn:aws:iam::123456789012:role/some-role
         FieldLogLevel: ERROR
         ExcludeVerboseContent: true
         NotSupposedToBeHere: yo
@@ -137,7 +137,7 @@ Resources:
         DynamoDb:
           InternalDataSource:
             TableName: SomeTable
-            ServiceRoleArn: SomeRoleArn
+            ServiceRoleArn: arn:aws:iam::123456789012:role/SomeRole
       Functions:
         UnknownDataSource:
           CodeUri: my-code

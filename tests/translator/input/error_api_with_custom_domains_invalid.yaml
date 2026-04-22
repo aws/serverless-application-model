@@ -5,7 +5,7 @@ Parameters:
 
   MyDomainCert:
     Type: String
-    Default: another-api-arn
+    Default: arn:aws:acm:us-east-1:123456789012:certificate/another-api-cert
 
 Globals:
   Api:
@@ -58,7 +58,7 @@ Resources:
       StageName: Prod
       Domain:
         DomainName: api-example.com
-        CertificateArn: my-api-cert-arn
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/my-api-cert
         EndpointConfiguration: Invalid
         BasePath: [/get, /fetch]
 
@@ -85,6 +85,6 @@ Resources:
       StageName: Prod
       Domain:
         DomainName: api-example.com
-        CertificateArn: my-api-cert-arn
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/my-api-cert
         BasePath:
         - 3 # this should not be a number

@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "MyDomainCert": {
-      "Default": "another-api-arn",
+      "Default": "arn:aws:acm:us-east-1:123456789012:certificate/another-api-cert",
       "Type": "String"
     },
     "MyDomainName": {
@@ -12,7 +12,7 @@
   "Resources": {
     "ApiGatewayDomainName23cdccdf9c": {
       "Properties": {
-        "CertificateArn": "my-api-cert-arn",
+        "CertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/my-api-cert",
         "DomainName": "api-example.com",
         "EndpointConfiguration": {
           "Types": [
@@ -35,7 +35,7 @@
             "REGIONAL"
           ]
         },
-        "RegionalCertificateArn": "another-api-arn"
+        "RegionalCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/another-api-cert"
       },
       "Type": "AWS::ApiGateway::DomainName"
     },
@@ -89,9 +89,9 @@
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
     },
-    "MyAnotherApiDeployment989ae20f23": {
+    "MyAnotherApiDeployment3cfc497b28": {
       "Properties": {
-        "Description": "RestApi deployment id: 989ae20f23c53c333389afc4e570683e5665c797",
+        "Description": "RestApi deployment id: 3cfc497b28e6ce997c6b38e7e075d279472a251d",
         "RestApiId": {
           "Ref": "MyAnotherApi"
         }
@@ -101,7 +101,7 @@
     "MyAnotherApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyAnotherApiDeployment989ae20f23"
+          "Ref": "MyAnotherApiDeployment3cfc497b28"
         },
         "RestApiId": {
           "Ref": "MyAnotherApi"
@@ -158,9 +158,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiDeployment92d6d51a5e": {
+    "MyApiDeploymentba363842ba": {
       "Properties": {
-        "Description": "RestApi deployment id: 92d6d51a5e324a2836c79d3645d7e678f063037e",
+        "Description": "RestApi deployment id: ba363842ba3082ecc43b3a2192a1ddcbee7d0d3b",
         "RestApiId": {
           "Ref": "MyApi"
         }
@@ -170,7 +170,7 @@
     "MyApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment92d6d51a5e"
+          "Ref": "MyApiDeploymentba363842ba"
         },
         "RestApiId": {
           "Ref": "MyApi"
@@ -395,9 +395,9 @@
       },
       "Type": "AWS::ApiGateway::BasePathMapping"
     },
-    "ServerlessRestApiDeployment6aef2b756e": {
+    "ServerlessRestApiDeployment3692d3fb7e": {
       "Properties": {
-        "Description": "RestApi deployment id: 6aef2b756ee814f8722e71ca5e3f0d187e05aed5",
+        "Description": "RestApi deployment id: 3692d3fb7e66521c849d5791227bd3a08afc01f9",
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
@@ -408,7 +408,7 @@
     "ServerlessRestApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment6aef2b756e"
+          "Ref": "ServerlessRestApiDeployment3692d3fb7e"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
