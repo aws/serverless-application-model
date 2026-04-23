@@ -13,7 +13,7 @@ Conditions:
     Fn::Equals: [!Ref CreateMskCluster, 'true']
   ShouldCreateMq:
     Fn::Equals: [!Ref CreateMqBroker, 'true']
-  IsAkl:
+  HasNewMqInstanceTypes:
     Fn::Equals: [!Ref "AWS::Region", ap-southeast-6]
 
 Resources:
@@ -218,7 +218,7 @@ Resources:
       DeploymentMode: SINGLE_INSTANCE
       EngineType: ACTIVEMQ
       EngineVersion: '5.18'
-      HostInstanceType: !If [IsAkl, mq.m7i.large, mq.t3.micro]
+      HostInstanceType: !If [HasNewMqInstanceTypes, mq.m7i.large, mq.t3.micro]
       Logs: {Audit: true, General: true}
       PubliclyAccessible: true
       AutoMinorVersionUpgrade: true
