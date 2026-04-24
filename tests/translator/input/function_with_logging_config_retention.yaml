@@ -1,0 +1,11 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.12
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      LoggingConfig:
+        LogFormat: JSON
+        LogGroup: /aws/lambda/my-custom-log-group
+        RetentionInDays: 30

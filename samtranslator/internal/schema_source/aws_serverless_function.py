@@ -570,7 +570,17 @@ Architectures = PassThroughProp | None
 EphemeralStorage = PassThroughProp | None
 SnapStart = PassThroughProp | None  # TODO: check the type
 RuntimeManagementConfig = PassThroughProp | None  # TODO: check the type
-LoggingConfig = PassThroughProp | None  # Type alias - documentation added to Properties and Globals classes
+loggingconfig = get_prop("sam-property-function-loggingconfig")
+
+
+class LoggingConfig(BaseModel):
+    ApplicationLogLevel: SamIntrinsicable[str] | None = loggingconfig("ApplicationLogLevel")
+    LogFormat: SamIntrinsicable[str] | None = loggingconfig("LogFormat")
+    LogGroup: SamIntrinsicable[str] | None = loggingconfig("LogGroup")
+    SystemLogLevel: SamIntrinsicable[str] | None = loggingconfig("SystemLogLevel")
+    RetentionInDays: SamIntrinsicable[int] | None = loggingconfig("RetentionInDays")
+
+
 RecursiveLoop = PassThroughProp | None
 SourceKMSKeyArn = PassThroughProp | None
 TenancyConfig = PassThroughProp | None
@@ -710,11 +720,7 @@ class Properties(BaseModel):
     Tracing: Tracing | None = prop("Tracing")
     VersionDescription: PassThroughProp | None = prop("VersionDescription")
     VpcConfig: VpcConfig | None = prop("VpcConfig")
-    LoggingConfig: PassThroughProp | None = passthrough_prop(
-        PROPERTIES_STEM,
-        "LoggingConfig",
-        ["AWS::Lambda::Function", "Properties", "LoggingConfig"],
-    )
+    LoggingConfig: LoggingConfig | None = prop("LoggingConfig")
     RecursiveLoop: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "RecursiveLoop",
@@ -804,11 +810,7 @@ class Globals(BaseModel):
     )
     SnapStart: SnapStart | None = prop("SnapStart")
     RuntimeManagementConfig: RuntimeManagementConfig | None = prop("RuntimeManagementConfig")
-    LoggingConfig: PassThroughProp | None = passthrough_prop(
-        PROPERTIES_STEM,
-        "LoggingConfig",
-        ["AWS::Lambda::Function", "Properties", "LoggingConfig"],
-    )
+    LoggingConfig: LoggingConfig | None = prop("LoggingConfig")
     RecursiveLoop: PassThroughProp | None = passthrough_prop(
         PROPERTIES_STEM,
         "RecursiveLoop",

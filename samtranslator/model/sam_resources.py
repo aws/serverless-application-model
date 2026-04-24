@@ -113,6 +113,7 @@ from samtranslator.model.lambda_ import (
     LambdaUrl,
     LambdaVersion,
 )
+from samtranslator.model.log import LogGroup
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
 from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
@@ -195,7 +196,7 @@ class SamFunction(SamResourceMacro):
         "SnapStart": PropertyType(False, IS_DICT),
         "FunctionUrlConfig": PropertyType(False, IS_DICT),
         "RuntimeManagementConfig": PassThroughProperty(False),
-        "LoggingConfig": PassThroughProperty(False),
+        "LoggingConfig": PropertyType(False, IS_DICT),
         "RecursiveLoop": PassThroughProperty(False),
         "SourceKMSKeyArn": PassThroughProperty(False),
         "CapacityProviderConfig": PropertyType(False, IS_DICT),
@@ -325,6 +326,10 @@ class SamFunction(SamResourceMacro):
 
         lambda_function = self._construct_lambda_function(intrinsics_resolver)
         resources.append(lambda_function)
+
+        log_group = self._construct_log_group(lambda_function)
+        if log_group:
+            resources.append(log_group)
 
         if self.ProvisionedConcurrencyConfig and not self.AutoPublishAlias:
             raise InvalidResourceException(
@@ -751,7 +756,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.CodeSigningConfigArn = self.CodeSigningConfigArn
 
         lambda_function.RuntimeManagementConfig = self.RuntimeManagementConfig  # type: ignore[attr-defined]
-        lambda_function.LoggingConfig = self.LoggingConfig
+        lambda_function.LoggingConfig = self._get_lambda_logging_config()
         lambda_function.TenancyConfig = self.TenancyConfig
         lambda_function.RecursiveLoop = self.RecursiveLoop
         lambda_function.DurableConfig = self.DurableConfig
@@ -770,6 +775,37 @@ class SamFunction(SamResourceMacro):
 
         self._validate_package_type(lambda_function)
         return lambda_function
+
+    def _get_lambda_logging_config(self) -> dict[str, Any] | None:
+        """Return LoggingConfig for the Lambda function, or None if SAM manages the log group."""
+        if not self.LoggingConfig:
+            return self.LoggingConfig
+        # When RetentionInDays is set, SAM creates a dedicated LogGroup resource.
+        # Don't pass LoggingConfig to Lambda — it would auto-create a competing log group.
+        if "RetentionInDays" in self.LoggingConfig:
+            return None
+        return self.LoggingConfig
+
+    def _construct_log_group(self, lambda_function: LambdaFunction) -> LogGroup | None:
+        """Construct an AWS::Logs::LogGroup if RetentionInDays is set in LoggingConfig."""
+        if not self.LoggingConfig or "RetentionInDays" not in self.LoggingConfig:
+            return None
+
+        retention = self.LoggingConfig["RetentionInDays"]
+
+        # Determine the log group name
+        log_group_name: Any
+        if "LogGroup" in self.LoggingConfig:
+            log_group_name = self.LoggingConfig["LogGroup"]
+        elif lambda_function.FunctionName:
+            log_group_name = fnSub("/aws/lambda/${FunctionName}", {"FunctionName": lambda_function.FunctionName})
+        else:
+            log_group_name = fnSub("/aws/lambda/${LambdaFunction}", {"LambdaFunction": ref(self.logical_id)})
+
+        log_group = LogGroup(f"{self.logical_id}LogGroup", attributes=self.get_passthrough_resource_attributes())
+        log_group.LogGroupName = log_group_name
+        log_group.RetentionInDays = retention
+        return log_group
 
     def _transform_capacity_provider_config(self) -> dict[str, Any]:
         """

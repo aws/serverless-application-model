@@ -1,0 +1,10 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.12
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      LoggingConfig:
+        LogFormat: JSON
+        RetentionInDays: 14
