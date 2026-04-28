@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 import pytest
+from parameterized import parameterized
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model import InvalidResourceException, ResourceResolver
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestApi, ApiGatewayStage
@@ -846,6 +847,51 @@ class TestSamFunctionRoleResolver(TestCase):
         lambda_function = next(r for r in cfn_resources if r.resource_type == "AWS::Lambda::Function")
 
         self.assertEqual(lambda_function.Role, role_get_att)
+
+    @parameterized.expand(
+        [
+            # 2-arg Fn::If (missing false value)
+            ({"Fn::If": ["Condition", "arn:aws:iam::123456789012:role/existing-role"]},),
+            # 4-arg Fn::If (extra value)
+            ({"Fn::If": ["Condition", "role_a", "role_b", "role_c"]},),
+        ]
+    )
+    def test_role_fn_if_invalid_arity_raises_invalid_resource_exception(self, malformed_role):
+        """Fn::If must have exactly 3 items: [Condition, TrueValue, FalseValue].
+        Any other arity used to crash SAM-T with a raw ValueError/IndexError,
+        which CloudFormation surfaced as "Internal transform failure".
+        It must now raise a user-facing InvalidResourceException instead.
+        """
+        self.function.Role = malformed_role
+
+        with pytest.raises(InvalidResourceException) as excinfo:
+            self.function.to_cloudformation(**self.kwargs)
+
+        msg = str(excinfo.value)
+        self.assertIn("foo", msg)  # logical id
+        self.assertIn("Role", msg)
+        self.assertIn("Fn::If", msg)
+
+    @parameterized.expand(
+        [
+            # 2-arg Fn::If (missing false value)
+            ({"Fn::If": ["SomeCondition", "queue-arn"]},),
+            # 4-arg Fn::If (extra value)
+            ({"Fn::If": ["SomeCondition", "a", "b", "c"]},),
+        ]
+    )
+    def test_destination_fn_if_invalid_arity_raises_invalid_resource_exception(self, malformed):
+        """EventInvokeConfig.DestinationConfig.{OnSuccess,OnFailure}.Destination
+        also supports Fn::If. Any list arity other than 3 previously crashed the
+        transform with IndexError in _get_or_make_condition.
+        """
+        with pytest.raises(InvalidResourceException) as excinfo:
+            self.function._get_or_make_condition(malformed, "DestLogicalId", {})
+
+        msg = str(excinfo.value)
+        self.assertIn("DestLogicalId", msg)
+        self.assertIn("Destination", msg)
+        self.assertIn("Fn::If", msg)
 
 
 class TestSamCapacityProvider(TestCase):

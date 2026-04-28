@@ -14,7 +14,17 @@ def parse_s3_uri(uri: Any) -> dict[str, Any] | None:
     if not isinstance(uri, str):
         return None
 
-    url = urlparse(uri)
+    try:
+        url = urlparse(uri)
+    except ValueError:
+        # Python's urllib validates bracketed host segments ("[...]") against
+        # RFC 3986 IPv6/IPv4 grammars since the CVE-2024-11168 fix. Unresolved
+        # CDK tokens (for example "s3://[TOKEN.25]/key") or other malformed
+        # URIs therefore raise ValueError here. Treating the input as "not a
+        # valid S3 URI" lets the caller raise the existing, user-friendly
+        # InvalidResourceException with the resource logical id and property
+        # name, instead of surfacing an opaque "Internal transform failure".
+        return None
     query = parse_qs(url.query)
 
     if url.scheme == "s3" and url.netloc and url.path:

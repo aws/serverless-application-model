@@ -1,0 +1,31 @@
+Parameters:
+  IsProd:
+    Type: String
+    Default: 'true'
+
+Conditions:
+  IsProdCondition: !Equals [!Ref IsProd, 'true']
+
+Resources:
+  MyQueue:
+    Type: AWS::SQS::Queue
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.12
+      Handler: index.handler
+      InlineCode: |
+        def handler(event, context):
+            return 'hi'
+      EventInvokeConfig:
+        MaximumRetryAttempts: 2
+        DestinationConfig:
+          OnSuccess:
+            Type: SQS
+            # Malformed Fn::If: only 2 elements instead of [Condition, TrueValue, FalseValue].
+            # Previously this crashed the transform with an IndexError in
+            # _get_or_make_condition, which CloudFormation surfaced as
+            # "Internal transform failure". It must now raise a user-facing
+            # InvalidResourceException naming the offending resource.
+            Destination: !If [IsProdCondition, !GetAtt MyQueue.Arn]

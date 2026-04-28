@@ -102,6 +102,7 @@ from samtranslator.model.intrinsics import (
     make_conditional,
     make_not_conditional,
     ref,
+    validate_intrinsic_if_items,
 )
 from samtranslator.model.lambda_ import (
     LAMBDA_TRACING_CONFIG_DISABLED,
@@ -452,7 +453,17 @@ class SamFunction(SamResourceMacro):
 
         # We need to create and if else condition here
         role_resolved_value = intrinsics_resolver.resolve_parameter_refs(lambda_role)
-        role_condition, role_if, role_else = role_resolved_value.get("Fn::If")
+        if_items = role_resolved_value.get("Fn::If")
+        try:
+            validate_intrinsic_if_items(if_items)
+        except ValueError as e:
+            # Surface a user-facing error instead of letting a ValueError propagate
+            # all the way out of the transform macro as "Internal transform failure".
+            raise InvalidResourceException(
+                self.logical_id,
+                f"Malformed 'Role' property: {e!s}.",
+            ) from e
+        role_condition, role_if, role_else = if_items
 
         if is_intrinsic_no_value(role_if) and is_intrinsic_no_value(role_else):
             lambda_role_value = execution_role_arn
@@ -627,6 +638,15 @@ class SamFunction(SamResourceMacro):
             return None, None
         if is_intrinsic_if(destination):
             dest_list = destination.get("Fn::If")
+            try:
+                validate_intrinsic_if_items(dest_list)
+            except ValueError as e:
+                # Surface a user-facing error instead of letting an IndexError
+                # propagate out of the transform macro as "Internal transform failure".
+                raise InvalidResourceException(
+                    logical_id,
+                    f"Malformed 'Destination' property: {e!s}.",
+                ) from e
             if is_intrinsic_no_value(dest_list[1]) and is_intrinsic_no_value(dest_list[2]):
                 return None, None
             if is_intrinsic_no_value(dest_list[1]):
