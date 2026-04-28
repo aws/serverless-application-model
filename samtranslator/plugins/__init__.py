@@ -1,7 +1,6 @@
 import logging
 from abc import ABC
 from enum import Enum
-from typing import Optional
 
 LOG = logging.getLogger(__name__)
 
@@ -21,9 +20,9 @@ class BasePlugin(ABC):
     Base class for a NoOp plugin that implements all available hooks
     """
 
-    _custom_name: Optional[str]
+    _custom_name: str | None
 
-    def __init__(self, name: Optional[str] = None) -> None:
+    def __init__(self, name: str | None = None) -> None:
         """
         Initialize the plugin with optional given name.
 

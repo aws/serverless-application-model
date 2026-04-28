@@ -1,0 +1,38 @@
+Parameters:
+  PayloadFormatVersion:
+    Default: '1.0'
+    Type: String
+
+Globals:
+  WebSocketApi:
+    RouteSettings:
+      $default:
+        DataTraceEnabled: true
+        ThrottlingBurstLimit: 100
+
+Resources:
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs20.x
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      AccessLogSettings:
+        DestinationArn: arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName
+        Format: $context.requestId
+      Name: MyApi
+      StageName: Prod
+      StageVariables:
+        VarName: VarValue
+      RouteSettings:
+        $default:
+          LoggingLevel: INFO
+          ThrottlingBurstLimit: 300
+          ThrottlingRateLimit: 0.7
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt ConnectFunction.Arn

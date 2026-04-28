@@ -1,0 +1,197 @@
+# Based partially on a starter template found in an AWS WebSocket tutorial
+Resources:
+  ConnectionsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: connectionId
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ConnectionsTable
+      InlineCode: |-
+        const {DynamoDBClient} = require("@aws-sdk/client-dynamodb")
+                const {DynamoDBDocumentClient, PutCommand } = require("@aws-sdk/lib-dynamodb")
+                exports.handler = async function(event) {
+                
+                const client = new DynamoDBClient({});
+                const docClient = DynamoDBDocumentClient.from(client);
+                const command = new PutCommand({
+                    TableName: process.env.TABLE_NAME,
+                    Item: {
+                       connectionId: event.requestContext.connectionId,
+                    },
+                  });
+                
+                try {
+                  await docClient.send(command)
+                  } catch (err) {
+                    console.log(err)
+                    return {
+                      statusCode: 500
+                    };
+                  }
+                    return {
+                    statusCode: 200,
+                  };
+                }
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Policies:
+      - AmazonDynamoDBFullAccess
+  DisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ConnectionsTable
+      InlineCode: |-
+        const {DynamoDBClient} = require("@aws-sdk/client-dynamodb")
+              const {DynamoDBDocumentClient, DeleteCommand } = require("@aws-sdk/lib-dynamodb")
+              exports.handler = async function(event) {
+              
+              const client = new DynamoDBClient({});
+              const docClient = DynamoDBDocumentClient.from(client);
+              const command = new DeleteCommand({
+                  TableName: process.env.TABLE_NAME,
+                  Key: {
+                      connectionId: event.requestContext.connectionId,
+                  },
+                });
+              
+              try {
+                await docClient.send(command)
+                } catch (err) {
+                  console.log(err)
+                  return {
+                    statusCode: 500
+                  };
+                }
+                  return {
+                  statusCode: 200,
+                };
+              }
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Policies:
+      - AmazonDynamoDBFullAccess
+  SendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ConnectionsTable
+      InlineCode: |-
+        const {DynamoDBClient} = require("@aws-sdk/client-dynamodb")
+        const {DynamoDBDocumentClient, ScanCommand } = require("@aws-sdk/lib-dynamodb")
+        const {ApiGatewayManagementApiClient, PostToConnectionCommand} = require("@aws-sdk/client-apigatewaymanagementapi")
+        exports.handler = async function(event) {
+          const client = new DynamoDBClient({});
+          const docClient = DynamoDBDocumentClient.from(client);
+          const ddbcommand = new ScanCommand({
+            TableName: process.env.TABLE_NAME
+            })
+
+          let connections;
+          try { connections = await docClient.send(ddbcommand);
+          } catch (err) {
+          console.log(err)
+          return {
+            statusCode: 500,
+          };
+          }
+
+          const callbackAPI = new ApiGatewayManagementApiClient({
+          apiVersion: '2018-11-29',
+          endpoint: 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage,
+          });
+
+          const message = JSON.parse(event.body).message;
+
+          const sendMessages = connections.Items.map(async ({connectionId}) => {
+          if (connectionId !== event.requestContext.connectionId) {
+            try {
+              await callbackAPI.send(new PostToConnectionCommand(
+                { ConnectionId: connectionId, Data: message, }
+              ));
+            } catch (e) {
+            console.log(e);
+            }
+          }
+          });
+
+          try {
+          await Promise.all(sendMessages)
+          } catch (e) {
+          console.log(e);
+          return {
+            statusCode: 500,
+          };
+          }
+
+          return{statusCode: 200};
+        };
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Policies:
+      - AmazonAPIGatewayInvokeFullAccess
+      - AmazonDynamoDBFullAccess
+  DefaultFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |-
+        const {ApiGatewayManagementApiClient, PostToConnectionCommand, GetConnectionCommand} = require("@aws-sdk/client-apigatewaymanagementapi")
+              exports.handler = async function(event) {
+                let connectionInfo;
+                let connectionId = event.requestContext.connectionId;
+              
+                const callbackAPI = new ApiGatewayManagementApiClient({
+                  apiVersion: '2018-11-29',
+                  endpoint: 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage
+                }); 
+
+                try {
+                  connectionInfo = await callbackAPI.send(new GetConnectionCommand(
+                    {ConnectionId: event.requestContext.connectionId }
+                  ));
+                } catch (e) {
+                  console.log(e);
+                }
+              
+                connectionInfo.connectionID = connectionId;
+              
+                await callbackAPI.send(new PostToConnectionCommand(
+                  {ConnectionId: event.requestContext.connectionId,
+                    Data:
+                      'Use the send route to send a message. Your info:' +
+                      JSON.stringify(connectionInfo)}
+                ));
+                return {
+                  statusCode: 200,
+                };
+              };
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Policies:
+      - AmazonAPIGatewayInvokeFullAccess
+      - AmazonDynamoDBFullAccess
+  SimpleChatApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Name: SimpleChatApi
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt ConnectFunction.Arn
+        $disconnect:
+          FunctionArn: !GetAtt DisconnectFunction.Arn
+        send:
+          FunctionArn: !GetAtt SendFunction.Arn
+        $default:
+          FunctionArn: !GetAtt DefaultFunction.Arn

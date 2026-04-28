@@ -1,0 +1,50 @@
+Parameters:
+  MyDomainName:
+    Type: String
+  MyDomainCert:
+    Type: String
+  HostedZoneId:
+    Type: String
+
+Globals:
+  WebSocketApi:
+    Domain:
+      DomainName:
+        Ref: MyDomainName
+      CertificateArn:
+        Ref: MyDomainCert
+      EndpointConfiguration: REGIONAL
+      SecurityPolicy: TLS_1_2
+      BasePath:
+      - /get
+      - /post
+      Route53:
+        HostedZoneId:
+          Ref: HostedZoneId
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async(event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs20.x
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Name: MyApi
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $default:
+          FunctionArn: !GetAtt MyFunction.Arn
+      StageName: Prod
+
+Metadata:
+  SamTransformTest: true

@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test typos in property names for CapacityProvider
+
+Resources:
+  CapacityProviderTypoProperties:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-12345678
+      CapacityProviderNam: test-capacity-provider # Typo: missing 'e'
+      VPCConfig: # Typo: should be VpcConfig
+        SubnetIds:
+        - subnet-87654321
+      ScalingConfg: # Typo: missing 'i'
+        MaxVCpuCount: 10
+      KMSKeyArn: arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012 # Typo: should be KmsKeyArn
+# This test will actually fail only with the first error, so the rest are just ignored

@@ -4,6 +4,7 @@
 
 Known limitations: cannot transform CodeUri pointing at local directory.
 """
+
 import argparse
 import json
 import logging
@@ -12,7 +13,6 @@ import subprocess
 import sys
 from functools import reduce
 from pathlib import Path
-from typing import List
 
 import boto3
 
@@ -71,7 +71,7 @@ else:
     logging.basicConfig()
 
 
-def execute_command(command: str, args: List[str]) -> None:
+def execute_command(command: str, args: list[str]) -> None:
     try:
         aws_cmd = "aws" if platform.system().lower() != "windows" else "aws.cmd"
         command_with_args = [aws_cmd, "cloudformation", command, *list(args)]

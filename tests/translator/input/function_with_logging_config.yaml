@@ -1,0 +1,52 @@
+Resources:
+  LoggingConfigFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/loggingConfig.zip
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Events:
+        MSKEvent:
+          Type: MSK
+          Properties:
+            Stream: !GetAtt MSKCluster.Arn
+            StartingPosition: LATEST
+            Topics:
+            - my-topic
+            LoggingConfig:
+              SystemLogLevel: DEBUG
+        SelfManagedKafkaEvent:
+          Type: SelfManagedKafka
+          Properties:
+            KafkaBootstrapServers:
+            - broker1:9092
+            - broker2:9092
+            Topics:
+            - my-topic
+            SourceAccessConfigurations:
+            - Type: SASL_SCRAM_256_AUTH
+              URI: !Ref KafkaSecret
+            LoggingConfig:
+              SystemLogLevel: WARN
+
+  MSKCluster:
+    Type: AWS::MSK::Cluster
+    Properties:
+      ClusterName: test-cluster
+      KafkaVersion: 2.8.0
+      NumberOfBrokerNodes: 2
+      BrokerNodeGroupInfo:
+        InstanceType: kafka.t3.small
+        ClientSubnets:
+        - subnet-12345
+        - subnet-67890
+
+  KafkaSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Kafka SASL credentials
+      SecretString: !Sub |-
+        {
+          "username": "kafka-user",
+          "password": "kafka-password"
+        }

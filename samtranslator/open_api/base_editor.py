@@ -1,7 +1,8 @@
 """Base class for OpenApiEditor and SwaggerEditor."""
 
 import re
-from typing import Any, Dict, Iterator, List, Optional, Union
+from collections.abc import Iterator
+from typing import Any, Union
 
 from samtranslator.model.apigateway import ApiGatewayAuthorizer
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Authorizer
@@ -21,11 +22,11 @@ class BaseEditor:
     _OPENAPI_VERSION_3_REGEX = r"\A3(\.\d)(\.\d)?$"
 
     # attributes:
-    _doc: Dict[str, Any]
-    paths: Dict[str, Any]
+    _doc: dict[str, Any]
+    paths: dict[str, Any]
 
     @staticmethod
-    def get_conditional_contents(item: Any) -> List[Any]:
+    def get_conditional_contents(item: Any) -> list[Any]:
         """
         Returns the contents of the given item.
         If a conditional block has been used inside the item, returns a list of the content
@@ -47,7 +48,7 @@ class BaseEditor:
         return contents
 
     @staticmethod
-    def method_definition_has_integration(method_definition: Dict[str, Any]) -> bool:
+    def method_definition_has_integration(method_definition: dict[str, Any]) -> bool:
         """
         Checks a method definition to make sure it has an apigw integration
 
@@ -56,7 +57,7 @@ class BaseEditor:
         """
         return bool(method_definition.get(BaseEditor._X_APIGW_INTEGRATION))
 
-    def method_has_integration(self, raw_method_definition: Dict[str, Any], path: str, method: str) -> bool:
+    def method_has_integration(self, raw_method_definition: dict[str, Any], path: str, method: str) -> bool:
         """
         Returns true if the given method contains a valid method definition.
         This uses the get_conditional_contents function to handle conditionals.
@@ -110,7 +111,7 @@ class BaseEditor:
             return BaseEditor._X_ANY_METHOD
         return method
 
-    def has_path(self, path: str, method: Optional[str] = None) -> bool:
+    def has_path(self, path: str, method: str | None = None) -> bool:
         """
         Returns True if this Swagger has the given path and optional method
         For paths with conditionals, only returns true if both items (true case, and false case) have the method.
@@ -153,7 +154,7 @@ class BaseEditor:
         # Integration present and non-empty
         return True
 
-    def add_path(self, path: str, method: Optional[str] = None) -> None:
+    def add_path(self, path: str, method: str | None = None) -> None:
         """
         Adds the path/method combination to the Swagger, if not already present
 
@@ -174,7 +175,7 @@ class BaseEditor:
         for path_item in self.get_conditional_contents(path_dict):
             path_item.setdefault(method, Py27Dict())
 
-    def add_timeout_to_method(self, api: Dict[str, Any], path: str, method_name: str, timeout: int) -> None:
+    def add_timeout_to_method(self, api: dict[str, Any], path: str, method_name: str, timeout: int) -> None:
         """
         Adds a timeout to the path/method.
 
@@ -189,7 +190,7 @@ class BaseEditor:
 
     @staticmethod
     def _get_authorization_scopes(
-        authorizers: Union[Dict[str, ApiGatewayAuthorizer], Dict[str, ApiGatewayV2Authorizer]], default_authorizer: str
+        authorizers: Union[dict[str, ApiGatewayAuthorizer], dict[str, ApiGatewayV2Authorizer]], default_authorizer: str
     ) -> Any:
         """
         Returns auth scopes for an authorizer if present
@@ -203,7 +204,7 @@ class BaseEditor:
 
     def iter_on_method_definitions_for_path_at_method(
         self, path_name: str, method_name: str, skip_methods_without_apigw_integration: bool = True
-    ) -> Iterator[Dict[str, Any]]:
+    ) -> Iterator[dict[str, Any]]:
         """
         Yields all the method definitions for the path+method combinations if path and/or method have IF conditionals.
         If there are no conditionals, will just yield the single method definition at the given path and method name.
@@ -251,7 +252,7 @@ class BaseEditor:
         )
 
     @staticmethod
-    def validate_method_definition_is_dict(method_definition: Optional[Any], path: str, method: str) -> None:
+    def validate_method_definition_is_dict(method_definition: Any | None, path: str, method: str) -> None:
         BaseEditor.validate_is_dict(
             method_definition, f"Definition of method '{method}' for path '{path}' should be a map."
         )

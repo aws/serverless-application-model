@@ -1,3 +1,21 @@
+Parameters:
+  CreateMskCluster:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+  CreateMqBroker:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+
+Conditions:
+  ShouldCreateMsk:
+    Fn::Equals: [!Ref CreateMskCluster, 'true']
+  ShouldCreateMq:
+    Fn::Equals: [!Ref CreateMqBroker, 'true']
+  HasNewMqInstanceTypes:
+    Fn::Equals: [!Ref "AWS::Region", ap-southeast-6]
+
 Resources:
   PreCreatedVpc:
     Type: AWS::EC2::VPC
@@ -41,6 +59,203 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
 
+  LMIKMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: KMS Key for Lambda Capacity Provider Resource
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: Enable IAM User Permissions
+          Effect: Allow
+          Principal:
+            AWS: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:root"
+          Action: kms:*
+          Resource: '*'
+        - Sid: Allow Lambda service
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action:
+          - kms:Decrypt
+          - kms:DescribeKey
+          Resource: '*'    # Lambda Managed Instances (LMI) VPC Resources
+
+  LMIVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+      - Key: Name
+        Value: !Sub "${AWS::StackName}-VPC"
+
+  LMIPrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref LMIVpc
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+      - Key: Name
+        Value: !Sub "${AWS::StackName}-PrivateSubnet"
+
+  LMIPrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref LMIVpc
+      Tags:
+      - Key: Name
+        Value: !Sub "${AWS::StackName}-PrivateRT"
+
+  LMIPrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref LMIPrivateSubnet
+      RouteTableId: !Ref LMIPrivateRouteTable
+
+  LMISecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for capacity provider Lambda functions
+      VpcId: !Ref LMIVpc
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 10.0.0.0/16
+        Description: Allow HTTPS within VPC
+      Tags:
+      - Key: Name
+        Value: !Sub "${AWS::StackName}-LambdaSG"
+
+  VPCEndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for VPC endpoints
+      VpcId: !Ref LMIVpc
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 10.0.0.0/16
+        Description: Allow HTTPS from within VPC
+      Tags:
+      - Key: Name
+        Value: !Sub "${AWS::StackName}-VPCEndpointSG"
+
+  CloudWatchLogsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref LMIVpc
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.logs'
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+      - !Ref LMIPrivateSubnet
+      SecurityGroupIds:
+      - !Ref VPCEndpointSecurityGroup
+      Tags:
+      - Key: Name
+        Value: !Sub "${AWS::StackName}-CloudWatchLogsEndpoint"
+
+  PreCreatedMskCluster:
+    Type: AWS::MSK::Cluster
+    Condition: ShouldCreateMsk
+    Properties:
+      BrokerNodeGroupInfo:
+        ClientSubnets:
+        - !Ref PreCreatedSubnetOne
+        - !Ref PreCreatedSubnetTwo
+        InstanceType: kafka.t3.small
+        StorageInfo:
+          EBSStorageInfo:
+            VolumeSize: 1
+      ClusterName: !Sub "${AWS::StackName}-msk"
+      KafkaVersion: 3.8.x
+      NumberOfBrokerNodes: 2
+
+  MQRouteTable:
+    Type: AWS::EC2::RouteTable
+    Condition: ShouldCreateMq
+    Properties:
+      VpcId: !Ref PreCreatedVpc
+
+  MQRoute:
+    Type: AWS::EC2::Route
+    Condition: ShouldCreateMq
+    Properties:
+      RouteTableId: !Ref MQRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref PreCreatedInternetGateway
+
+  MQSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: ShouldCreateMq
+    Properties:
+      SubnetId: !Ref PreCreatedSubnetOne
+      RouteTableId: !Ref MQRouteTable
+
+  MQSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: ShouldCreateMq
+    Properties:
+      GroupDescription: Security group for Amazon MQ broker
+      VpcId: !Ref PreCreatedVpc
+      SecurityGroupIngress:
+      - {IpProtocol: tcp, FromPort: 8162, ToPort: 8162, CidrIp: 10.0.0.0/16}
+      - {IpProtocol: tcp, FromPort: 61617, ToPort: 61617, CidrIp: 10.0.0.0/16}
+      - {IpProtocol: tcp, FromPort: 5671, ToPort: 5671, CidrIp: 10.0.0.0/16}
+      - {IpProtocol: tcp, FromPort: 61614, ToPort: 61614, CidrIp: 10.0.0.0/16}
+      - {IpProtocol: tcp, FromPort: 8883, ToPort: 8883, CidrIp: 10.0.0.0/16}
+
+  PreCreatedMqBroker:
+    Type: AWS::AmazonMQ::Broker
+    Condition: ShouldCreateMq
+    Properties:
+      BrokerName: !Sub "${AWS::StackName}-mq"
+      DeploymentMode: SINGLE_INSTANCE
+      EngineType: ACTIVEMQ
+      EngineVersion: '5.18'
+      HostInstanceType: !If [HasNewMqInstanceTypes, mq.m7i.large, mq.t3.micro]
+      Logs: {Audit: true, General: true}
+      PubliclyAccessible: true
+      AutoMinorVersionUpgrade: true
+      SecurityGroups: [!Ref MQSecurityGroup]
+      SubnetIds: [!Ref PreCreatedSubnetOne]
+      Users:
+      - ConsoleAccess: true
+        Groups: [admin]
+        Username: testBrokerUser
+        Password: testBrokerPassword
+
+  PreCreatedMqBrokerSecret:
+    Type: AWS::SecretsManager::Secret
+    Condition: ShouldCreateMq
+    Properties:
+      Name: !Sub "${AWS::StackName}-mq-secret"
+      SecretString: '{"username":"testBrokerUser","password":"testBrokerPassword"}'
+      Description: SecretsManager Secret for pre-created MQ broker
+
+  ApiGatewayLoggingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: apigateway.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+
+  ApiGatewayAccount:
+    Type: AWS::ApiGateway::Account
+    DependsOn: ApiGatewayLoggingRole
+    Properties:
+      CloudWatchRoleArn: !GetAtt ApiGatewayLoggingRole.Arn
 Outputs:
   PreCreatedVpc:
     Description: Pre-created VPC that can be used inside other tests
@@ -66,5 +281,26 @@ Outputs:
     Description: Pre-created S3 Bucket that can be used inside other tests
     Value:
       Ref: PreCreatedS3Bucket
+  LMISubnetId:
+    Description: Private subnet ID for Lambda functions
+    Value: !Ref LMIPrivateSubnet
+  LMISecurityGroupId:
+    Description: Security group ID for Lambda functions
+    Value: !Ref LMISecurityGroup
+  LMIKMSKeyArn:
+    Description: ARN of the KMS key for Capacity Provider
+    Value: !GetAtt LMIKMSKey.Arn
+  PreCreatedMskClusterArn:
+    Condition: ShouldCreateMsk
+    Description: ARN of the pre-created MSK cluster
+    Value: !Ref PreCreatedMskCluster
+  PreCreatedMqBrokerArn:
+    Condition: ShouldCreateMq
+    Description: ARN of the pre-created MQ broker
+    Value: !GetAtt PreCreatedMqBroker.Arn
+  PreCreatedMqBrokerSecretArn:
+    Condition: ShouldCreateMq
+    Description: ARN of the MQ broker credentials secret
+    Value: !Ref PreCreatedMqBrokerSecret
 Metadata:
   SamTransformTest: true

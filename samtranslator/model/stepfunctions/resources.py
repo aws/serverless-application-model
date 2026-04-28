@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
@@ -19,16 +19,16 @@ class StepFunctionsStateMachine(Resource):
         "TracingConfiguration": GeneratedProperty(),
     }
 
-    Definition: Optional[Dict[str, Any]]
-    DefinitionString: Optional[str]
-    DefinitionS3Location: Optional[Dict[str, Any]]
-    LoggingConfiguration: Optional[Dict[str, Any]]
+    Definition: dict[str, Any] | None
+    DefinitionString: str | None
+    DefinitionS3Location: dict[str, Any] | None
+    LoggingConfiguration: dict[str, Any] | None
     RoleArn: str
-    StateMachineName: Optional[str]
-    StateMachineType: Optional[str]
-    Tags: Optional[List[Dict[str, Any]]]
-    DefinitionSubstitutions: Optional[Dict[str, Any]]
-    TracingConfiguration: Optional[Dict[str, Any]]
+    StateMachineName: str | None
+    StateMachineType: str | None
+    Tags: list[dict[str, Any]] | None
+    DefinitionSubstitutions: dict[str, Any] | None
+    TracingConfiguration: dict[str, Any] | None
 
     runtime_attrs = {
         "arn": lambda self: ref(self.logical_id),

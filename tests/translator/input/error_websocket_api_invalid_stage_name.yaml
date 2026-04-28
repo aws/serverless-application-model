@@ -1,0 +1,16 @@
+Resources:
+  Func:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.14
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+  WSApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Name: WSApi
+      StageName: $default
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt Func.Arn
+      RouteSelectionExpression: $request.body.action

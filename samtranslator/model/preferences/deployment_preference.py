@@ -22,6 +22,8 @@ from samtranslator.model.exceptions import InvalidResourceException
 :param enabled: Whether this deployment preference is enabled (true by default)
 :param trigger_configurations: Information about triggers associated with the deployment group. Duplicates are
     not allowed.
+:param tags: Tags to propagate to CodeDeploy resources when propagate_tags is enabled
+:param propagate_tags: Whether to propagate tags to CodeDeploy resources
 """
 DeploymentPreferenceTuple = namedtuple(
     "DeploymentPreferenceTuple",
@@ -34,6 +36,8 @@ DeploymentPreferenceTuple = namedtuple(
         "role",
         "trigger_configurations",
         "condition",
+        "tags",
+        "propagate_tags",
     ],
 )
 
@@ -46,18 +50,20 @@ class DeploymentPreference(DeploymentPreferenceTuple):
     """
 
     @classmethod
-    def from_dict(cls, logical_id, deployment_preference_dict, condition=None):  # type: ignore[no-untyped-def]
+    def from_dict(cls, logical_id, deployment_preference_dict, condition=None, tags=None, propagate_tags=False):  # type: ignore[no-untyped-def]
         """
         :param logical_id: the logical_id of the resource that owns this deployment preference
         :param deployment_preference_dict: the dict object taken from the SAM template
         :param condition: condition on this deployment preference
+        :param tags: tags from the SAM resource to propagate to CodeDeploy resources
+        :param propagate_tags: whether to propagate tags to CodeDeploy resources
         :return:
         """
         enabled = deployment_preference_dict.get("Enabled", True)
         enabled = False if enabled in ["false", "False"] else enabled
 
         if not enabled:
-            return DeploymentPreference(None, None, None, None, False, None, None, None)
+            return DeploymentPreference(None, None, None, None, False, None, None, None, None, None)
 
         if "Type" not in deployment_preference_dict:
             raise InvalidResourceException(logical_id, "'DeploymentPreference' is missing required Property 'Type'")
@@ -85,4 +91,6 @@ class DeploymentPreference(DeploymentPreferenceTuple):
             role,
             trigger_configurations,
             condition if passthrough_condition else None,
+            tags if propagate_tags and tags else None,
+            propagate_tags,
         )

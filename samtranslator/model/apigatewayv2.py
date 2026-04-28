@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 from samtranslator.model import GeneratedProperty, Resource
 from samtranslator.model.exceptions import ExpectedType, InvalidResourceException
@@ -11,8 +11,13 @@ from samtranslator.validator.value_validator import sam_expect
 APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
 
 
-class ApiGatewayV2HttpApi(Resource):
+class ApiGatewayV2Api(Resource):
     resource_type = "AWS::ApiGatewayV2::Api"
+    property_types = {}
+    runtime_attrs = {}
+
+
+class ApiGatewayV2HttpApi(ApiGatewayV2Api):
     property_types = {
         "Body": GeneratedProperty(),
         "BodyS3Location": GeneratedProperty(),
@@ -26,7 +31,7 @@ class ApiGatewayV2HttpApi(Resource):
 
     runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}
 
-    def assign_tags(self, tags: Dict[str, Any]) -> None:
+    def assign_tags(self, tags: dict[str, Any]) -> None:
         """Overriding default 'assign_tags' function in Resource class
 
         Function to assign tags to the resource
@@ -35,6 +40,33 @@ class ApiGatewayV2HttpApi(Resource):
         """
         # Tags are already defined in Body so they do not need to be assigned here
         return
+
+
+class ApiGatewayV2WebSocketApi(ApiGatewayV2Api):
+    property_types = {
+        "ApiKeySelectionExpression": GeneratedProperty(),
+        "Description": GeneratedProperty(),
+        "DisableExecuteApiEndpoint": GeneratedProperty(),
+        "DisableSchemaValidation": GeneratedProperty(),
+        "FailOnWarnings": GeneratedProperty(),
+        "IpAddressType": GeneratedProperty(),
+        "Name": GeneratedProperty(),
+        "ProtocolType": GeneratedProperty(),
+        "RouteSelectionExpression": GeneratedProperty(),
+        "Tags": GeneratedProperty(),
+    }
+
+    runtime_attrs = {"websocket_api_id": lambda self: ref(self.logical_id)}
+
+    def assign_tags(self, tags: dict[str, Any]) -> None:
+        """Overriding default 'assign_tags' function in Resource class
+
+        Function to assign tags to the resource
+        :param tags: Tags to be assigned to the resource
+
+        """
+        if tags is not None and "Tags" in self.property_types:
+            self.Tags = tags
 
 
 class ApiGatewayV2Stage(Resource):
@@ -49,13 +81,13 @@ class ApiGatewayV2Stage(Resource):
         "StageName": GeneratedProperty(),
         "Tags": GeneratedProperty(),
         "StageVariables": GeneratedProperty(),
-        "AutoDeploy": GeneratedProperty(),
+        "AutoDeploy": GeneratedProperty(),  # SAM sets this to true, which is why DeploymentId isn't here
     }
 
     runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
-    Tags: Optional[PassThrough]
+    Tags: PassThrough | None
 
-    def assign_tags(self, tags: Dict[str, Any]) -> None:
+    def assign_tags(self, tags: dict[str, Any]) -> None:
         """Overriding default 'assign_tags' function in Resource class
 
         Function to assign tags to the resource
@@ -76,11 +108,11 @@ class ApiGatewayV2DomainName(Resource):
     }
 
     DomainName: Intrinsicable[str]
-    DomainNameConfigurations: Optional[List[Dict[str, Any]]]
-    MutualTlsAuthentication: Optional[Dict[str, Any]]
-    Tags: Optional[PassThrough]
+    DomainNameConfigurations: list[dict[str, Any]] | None
+    MutualTlsAuthentication: dict[str, Any] | None
+    Tags: PassThrough | None
 
-    def assign_tags(self, tags: Dict[str, Any]) -> None:
+    def assign_tags(self, tags: dict[str, Any]) -> None:
         """Overriding default 'assign_tags' function in Resource class
 
         Function to assign tags to the resource
@@ -101,9 +133,54 @@ class ApiGatewayV2ApiMapping(Resource):
     }
 
 
+class ApiGatewayV2Route(Resource):
+    resource_type = "AWS::ApiGatewayV2::Route"
+    property_types = {
+        "ApiId": GeneratedProperty(),
+        "ApiKeyRequired": GeneratedProperty(),  # AuthorizationScopes not present because JWT not supported by WebSockets
+        "AuthorizationType": GeneratedProperty(),
+        "AuthorizerId": GeneratedProperty(),
+        "ModelSelectionExpression": GeneratedProperty(),
+        "OperationName": GeneratedProperty(),
+        "RequestModels": GeneratedProperty(),
+        "RequestParameters": GeneratedProperty(),
+        "RouteKey": GeneratedProperty(),
+        "RouteResponseSelectionExpression": GeneratedProperty(),
+        "Target": GeneratedProperty(),
+    }
+
+
 # https://docs.aws.amazon.com/apigatewayv2/latest/api-reference/apis-apiid-authorizers-authorizerid.html#apis-apiid-authorizers-authorizerid-model-jwtconfiguration
 # Change to TypedDict when we don't have to support Python 3.7
-JwtConfiguration = Dict[str, Union[str, List[str]]]
+JwtConfiguration = dict[str, Union[str, list[str]]]
+
+
+class ApiGatewayV2Integration(Resource):
+    resource_type = "AWS::ApiGatewayV2::Integration"
+    property_types = {
+        "ApiId": GeneratedProperty(),
+        "IntegrationType": GeneratedProperty(),
+        "IntegrationUri": GeneratedProperty(),
+        "TimeoutInMillis": GeneratedProperty(),
+    }
+
+
+class ApiGatewayV2WSAuthorizer(Resource):
+    """
+    The ApiGatewayV2Authorizer was created for HTTP APIs and as a result turns the auth to part of the OpenAPI
+    definition, which WebSockets don't have. As a result, separate classes.
+    """
+
+    resource_type = "AWS::ApiGatewayV2::Authorizer"
+    property_types = {
+        "ApiId": GeneratedProperty(),
+        "AuthorizerCredentialsArn": GeneratedProperty(),
+        "AuthorizerPayloadFormatVersion": GeneratedProperty(),
+        "AuthorizerType": GeneratedProperty(),
+        "AuthorizerUri": GeneratedProperty(),
+        "IdentitySource": GeneratedProperty(),
+        "Name": GeneratedProperty(),
+    }
 
 
 class ApiGatewayV2Authorizer:
@@ -123,14 +200,12 @@ class ApiGatewayV2Authorizer:
         enable_function_default_permissions=None,
     ):
         """
-        Creates an authorizer for use in V2 Http Apis
+        Creates an authorizer for use in V2 Http Apis and WebSocket Apis
         """
         self.api_logical_id = api_logical_id
         self.name = name
         self.authorization_scopes = authorization_scopes
-        self.jwt_configuration: Optional[JwtConfiguration] = self._get_jwt_configuration(
-            jwt_configuration, api_logical_id
-        )
+        self.jwt_configuration: JwtConfiguration | None = self._get_jwt_configuration(jwt_configuration, api_logical_id)
         self.id_source = id_source
         self.function_arn = function_arn
         self.function_invoke_role = function_invoke_role
@@ -165,54 +240,48 @@ class ApiGatewayV2Authorizer:
             return "JWT"
         return "REQUEST"
 
+    # Maps each authorizer type to the set of properties it accepts
+    ALLOWED_PROPERTIES = {
+        "JWT": {"authorization_scopes", "jwt_configuration", "id_source"},
+        "REQUEST": {
+            "function_arn",
+            "function_invoke_role",
+            "identity",
+            "authorizer_payload_format_version",
+            "enable_simple_responses",
+            "enable_function_default_permissions",
+        },
+        "AWS_IAM": set(),
+    }
+
+    # Maps internal attr name to (display name, error hint)
+    PROPERTY_DISPLAY = {
+        "authorization_scopes": ("AuthorizationScopes", "OAuth2 Authorizer"),
+        "jwt_configuration": ("JwtConfiguration", "OAuth2 Authorizer"),
+        "id_source": (
+            "IdentitySource",
+            "OAuth2 Authorizer. For Lambda Authorizer, use the 'Identity' property instead",
+        ),
+        "function_arn": ("FunctionArn", "Lambda Authorizer"),
+        "function_invoke_role": ("FunctionInvokeRole", "Lambda Authorizer"),
+        "identity": ("Identity", "Lambda Authorizer"),
+        "authorizer_payload_format_version": ("AuthorizerPayloadFormatVersion", "Lambda Authorizer"),
+        "enable_simple_responses": ("EnableSimpleResponses", "Lambda Authorizer"),
+        "enable_function_default_permissions": ("EnableFunctionDefaultPermissions", "Lambda Authorizer"),
+    }
+
     def _validate_input_parameters(self) -> None:
         authorizer_type = self._get_auth_type()
 
         if self.authorization_scopes is not None and not isinstance(self.authorization_scopes, list):
             raise InvalidResourceException(self.api_logical_id, "AuthorizationScopes must be a list.")
 
-        if self.authorization_scopes is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(
-                self.api_logical_id, "AuthorizationScopes must be defined only for OAuth2 Authorizer."
-            )
-
-        if self.jwt_configuration is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(
-                self.api_logical_id, "JwtConfiguration must be defined only for OAuth2 Authorizer."
-            )
-
-        if self.id_source is not None and not authorizer_type == "JWT":
-            raise InvalidResourceException(
-                self.api_logical_id, "IdentitySource must be defined only for OAuth2 Authorizer."
-            )
-
-        if self.function_arn is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
-                self.api_logical_id, "FunctionArn must be defined only for Lambda Authorizer."
-            )
-
-        if self.function_invoke_role is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
-                self.api_logical_id, "FunctionInvokeRole must be defined only for Lambda Authorizer."
-            )
-
-        if self.identity is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(self.api_logical_id, "Identity must be defined only for Lambda Authorizer.")
-
-        if self.authorizer_payload_format_version is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
-                self.api_logical_id, "AuthorizerPayloadFormatVersion must be defined only for Lambda Authorizer."
-            )
-
-        if self.enable_simple_responses is not None and not authorizer_type == "REQUEST":
-            raise InvalidResourceException(
-                self.api_logical_id, "EnableSimpleResponses must be defined only for Lambda Authorizer."
-            )
-
-        if self.enable_function_default_permissions is not None and authorizer_type != "REQUEST":
-            raise InvalidResourceException(
-                self.api_logical_id, "EnableFunctionDefaultPermissions must be defined only for Lambda Authorizer."
-            )
+        allowed = self.ALLOWED_PROPERTIES.get(authorizer_type, set())
+        for attr, (display_name, allowed_for) in self.PROPERTY_DISPLAY.items():
+            if getattr(self, attr) is not None and attr not in allowed:
+                raise InvalidResourceException(
+                    self.api_logical_id, f"{display_name} is only supported for {allowed_for}."
+                )
 
     def _validate_jwt_authorizer(self) -> None:
         if not self.jwt_configuration:
@@ -234,12 +303,12 @@ class ApiGatewayV2Authorizer:
                 self.api_logical_id, f"{self.name} Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
             )
 
-    def generate_openapi(self) -> Dict[str, Any]:
+    def generate_openapi(self) -> dict[str, Any]:
         """
         Generates OAS for the securitySchemes section
         """
         authorizer_type = self._get_auth_type()
-        openapi: Dict[str, Any]
+        openapi: dict[str, Any]
 
         if authorizer_type == "AWS_IAM":
             openapi = {
@@ -307,13 +376,13 @@ class ApiGatewayV2Authorizer:
             raise ValueError(f"Unexpected authorizer_type: {authorizer_type}")
         return openapi
 
-    def _get_function_invoke_role(self) -> Optional[PassThrough]:
+    def _get_function_invoke_role(self) -> PassThrough | None:
         if not self.function_invoke_role or self.function_invoke_role == "NONE":
             return None
 
         return self.function_invoke_role
 
-    def _get_identity_source(self, auth_identity: Dict[str, Any]) -> List[str]:
+    def _get_identity_source(self, auth_identity: dict[str, Any]) -> list[str]:
         """
         Generate the list of identitySource using authorizer's Identity config by flatting them.
         For the format of identitySource, see:
@@ -325,7 +394,7 @@ class ApiGatewayV2Authorizer:
         - prefix "$stageVariables." to all values in "StageVariables"
         - prefix "$context." to all values in "Context"
         """
-        identity_source: List[str] = []
+        identity_source: list[str] = []
 
         identity_property_path = f"Authorizers.{self.name}.Identity"
 
@@ -346,8 +415,8 @@ class ApiGatewayV2Authorizer:
 
     @staticmethod
     def _get_jwt_configuration(
-        props: Optional[Dict[str, Union[str, List[str]]]], api_logical_id: str
-    ) -> Optional[JwtConfiguration]:
+        props: dict[str, Union[str, list[str]]] | None, api_logical_id: str
+    ) -> JwtConfiguration | None:
         """Make sure that JWT configuration dict keys are lower case.
 
         ApiGatewayV2Authorizer doesn't create `AWS::ApiGatewayV2::Authorizer` but generates

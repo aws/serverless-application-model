@@ -1,0 +1,216 @@
+{
+  "Resources": {
+    "ApiGatewayDomainNameV25fe29fe649": {
+      "Properties": {
+        "DomainName": "admin.one.amazon.com",
+        "DomainNameConfigurations": [
+          {
+            "CertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc",
+            "EndpointType": "REGIONAL"
+          }
+        ],
+        "Tags": {
+          "TagKey1": "Value1",
+          "TagKey2": "Value2",
+          "websocketapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::DomainName"
+    },
+    "DefaultFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "foo"
+        },
+        "Handler": "bar",
+        "Role": {
+          "Fn::GetAtt": [
+            "DefaultFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs20.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "DefaultFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyApi": {
+      "Properties": {
+        "Name": "MyApi",
+        "ProtocolType": "WEBSOCKET",
+        "RouteSelectionExpression": "$request.body.action",
+        "Tags": {
+          "TagKey1": "Value1",
+          "TagKey2": "Value2",
+          "websocketapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "MyApiApiMapping": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        },
+        "DomainName": {
+          "Ref": "ApiGatewayDomainNameV25fe29fe649"
+        },
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::ApiMapping"
+    },
+    "MyApiDefaultIntegration": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FunctionArn}/invocations",
+            {
+              "FunctionArn": {
+                "Fn::GetAtt": [
+                  "DefaultFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Integration"
+    },
+    "MyApiDefaultPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "DefaultFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${MyApi.ApiId}/Prod/$default"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "MyApiDefaultRoute": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        },
+        "RouteKey": "$default",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "MyApiDefaultIntegration"
+              }
+            ]
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Route"
+    },
+    "MyApiProdStage": {
+      "DependsOn": [
+        "MyApiDefaultRoute"
+      ],
+      "Properties": {
+        "AccessLogSettings": {
+          "DestinationArn": "random-arn",
+          "Format": "$context.requestId"
+        },
+        "ApiId": {
+          "Ref": "MyApi"
+        },
+        "AutoDeploy": true,
+        "RouteSettings": {
+          "$default": {
+            "DataTraceEnabled": true,
+            "ThrottlingBurstLimit": 200,
+            "ThrottlingRateLimit": 0.7
+          }
+        },
+        "StageName": "Prod",
+        "StageVariables": {
+          "VarName": "VarValue"
+        },
+        "Tags": {
+          "TagKey1": "Value1",
+          "TagKey2": "Value2",
+          "websocketapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    },
+    "RecordSetGroup370194ff6e": {
+      "Properties": {
+        "HostedZoneId": "abc123456",
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV25fe29fe649",
+                  "RegionalDomainName"
+                ]
+              },
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV25fe29fe649",
+                  "RegionalHostedZoneId"
+                ]
+              }
+            },
+            "Name": "admin.one.amazon.com",
+            "Type": "A"
+          }
+        ]
+      },
+      "Type": "AWS::Route53::RecordSetGroup"
+    }
+  }
+}

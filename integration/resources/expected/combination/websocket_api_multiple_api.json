@@ -1,0 +1,50 @@
+[
+  {
+    "LogicalResourceId": "DefaultFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "DefaultFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "Api1",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "Api1DefaultIntegration",
+    "ResourceType": "AWS::ApiGatewayV2::Integration"
+  },
+  {
+    "LogicalResourceId": "Api1DefaultPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "Api1DefaultRoute",
+    "ResourceType": "AWS::ApiGatewayV2::Route"
+  },
+  {
+    "LogicalResourceId": "Api1DefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  },
+  {
+    "LogicalResourceId": "Api2",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "Api2DefaultIntegration",
+    "ResourceType": "AWS::ApiGatewayV2::Integration"
+  },
+  {
+    "LogicalResourceId": "Api2DefaultPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "Api2DefaultRoute",
+    "ResourceType": "AWS::ApiGatewayV2::Route"
+  },
+  {
+    "LogicalResourceId": "Api2DefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  }
+]

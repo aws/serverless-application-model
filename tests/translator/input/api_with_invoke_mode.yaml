@@ -1,0 +1,20 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/stream.zip
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Events:
+        StreamApi:
+          Type: Api
+          Properties:
+            Path: /stream
+            Method: post
+            ResponseTransferMode: RESPONSE_STREAM
+        BufferedApi:
+          Type: Api
+          Properties:
+            Path: /buffered
+            Method: get
+            ResponseTransferMode: BUFFERED

@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional, Union
+from typing import Literal, Union
 
 from samtranslator.internal.schema_source.common import (
     BaseModel,
@@ -14,20 +14,20 @@ sourcereference = get_prop("sam-property-connector-sourcereference")
 
 
 class ResourceReference(BaseModel):
-    Id: Optional[str] = resourcereference("Id")
-    Arn: Optional[PassThroughProp] = resourcereference("Arn")
-    Name: Optional[PassThroughProp] = resourcereference("Name")
-    Qualifier: Optional[PassThroughProp] = resourcereference("Qualifier")
-    QueueUrl: Optional[PassThroughProp] = resourcereference("QueueUrl")
-    ResourceId: Optional[PassThroughProp] = resourcereference("ResourceId")
-    RoleName: Optional[PassThroughProp] = resourcereference("RoleName")
-    Type: Optional[str] = resourcereference("Type")
+    Id: str | None = resourcereference("Id")
+    Arn: PassThroughProp | None = resourcereference("Arn")
+    Name: PassThroughProp | None = resourcereference("Name")
+    Qualifier: PassThroughProp | None = resourcereference("Qualifier")
+    QueueUrl: PassThroughProp | None = resourcereference("QueueUrl")
+    ResourceId: PassThroughProp | None = resourcereference("ResourceId")
+    RoleName: PassThroughProp | None = resourcereference("RoleName")
+    Type: str | None = resourcereference("Type")
 
 
 class Properties(BaseModel):
     Source: ResourceReference = properties("Source")
-    Destination: Union[ResourceReference, List[ResourceReference]] = properties("Destination")
-    Permissions: List[Literal["Read", "Write"]] = properties("Permissions")
+    Destination: Union[ResourceReference, list[ResourceReference]] = properties("Destination")
+    Permissions: list[Literal["Read", "Write"]] = properties("Permissions")
 
 
 class Resource(ResourceAttributes):
@@ -36,12 +36,12 @@ class Resource(ResourceAttributes):
 
 
 class SourceReferenceProperties(BaseModel):
-    Qualifier: Optional[PassThroughProp] = sourcereference("Qualifier")
+    Qualifier: PassThroughProp | None = sourcereference("Qualifier")
 
 
 class EmbeddedConnectorProperties(BaseModel):
-    SourceReference: Optional[SourceReferenceProperties] = properties("SourceReference")
-    Destination: Union[ResourceReference, List[ResourceReference]] = properties("Destination")
+    SourceReference: SourceReferenceProperties | None = properties("SourceReference")
+    Destination: Union[ResourceReference, list[ResourceReference]] = properties("Destination")
     Permissions: PermissionsType = properties("Permissions")
 
 

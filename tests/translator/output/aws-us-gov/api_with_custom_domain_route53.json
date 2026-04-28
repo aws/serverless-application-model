@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "ACMCertificateArn": {
-      "Default": "cert-arn-in-us-east-1",
+      "Default": "arn:aws:acm:us-east-1:123456789012:certificate/abc123",
       "Type": "String"
     },
     "DomainName": {
@@ -12,7 +12,7 @@
   "Resources": {
     "ApiGatewayDomainName0caaf24ab1": {
       "Properties": {
-        "CertificateArn": "cert-arn-in-us-east-1",
+        "CertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc123",
         "DomainName": "example.com",
         "EndpointConfiguration": {
           "Types": [
@@ -58,9 +58,9 @@
       },
       "Type": "AWS::ApiGateway::RestApi"
     },
-    "MyApiDeployment1deeaff693": {
+    "MyApiDeployment1e82db2ccf": {
       "Properties": {
-        "Description": "RestApi deployment id: 1deeaff6933b892391de7a35e4cf92e79a47aea9",
+        "Description": "RestApi deployment id: 1e82db2ccf426c056a3e51fbe83470a63946f7df",
         "RestApiId": {
           "Ref": "MyApi"
         }
@@ -70,7 +70,7 @@
     "MyApiProdStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment1deeaff693"
+          "Ref": "MyApiDeployment1e82db2ccf"
         },
         "RestApiId": {
           "Ref": "MyApi"

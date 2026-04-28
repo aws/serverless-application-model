@@ -26,7 +26,7 @@ Environment setup
 -----------------
 ### 1. Install Python versions
 
-Our officially supported Python versions are 3.8, 3.9 and 3.10. 
+Our officially supported Python versions are 3.10, 3.11, 3.12, 3.13, 3.14
 Our CI/CD pipeline is setup to run unit tests against Python 3 versions. Make sure you test it before sending a Pull Request.
 See [Unit testing with multiple Python versions](#unit-testing-with-multiple-python-versions).
 
@@ -40,11 +40,13 @@ easily setup multiple Python versions. For
 1.  Install PyEnv -
     `curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash`
 1. Restart shell so the path changes take effect - `exec $SHELL`
-1.  `pyenv install 3.8.16`
-1.  `pyenv install 3.9.16`
-1.  `pyenv install 3.10.9`
+1.  `pyenv install 3.10.20`
+1.  `pyenv install 3.11.15`
+1.  `pyenv install 3.12.13`
+1.  `pyenv install 3.13.12`
+1.  `pyenv install 3.14.3`
 3.  Make Python versions available in the project:
-    `pyenv local 3.8.16 3.9.16 3.10.9`
+    `pyenv local 3.10.20 3.11.15 3.12.13 3.13.12 3.14.3`
 
 Note: also make sure the following lines were written into your `.bashrc` (or `.zshrc`, depending on which shell you are using):
 ```
@@ -65,7 +67,7 @@ can be found [here](https://black.readthedocs.io/en/stable/integrations/editors.
 Since black is installed in virtualenv, when you follow [this instruction](https://black.readthedocs.io/en/stable/integrations/editors.html), `which black` might give you this
 
 ```bash
-(sam38) $ where black
+(sam310) $ where black
 /Users/<username>/.pyenv/shims/black
 ```
 
@@ -76,11 +78,11 @@ and this will happen:
 pyenv: black: command not found
 
 The `black' command exists in these Python versions:
-  3.8.16/envs/sam38
-  sam38
+  3.10.16/envs/sam310
+  sam310
 ``` 
 
-A simple workaround is to use `/Users/<username>/.pyenv/versions/sam38/bin/black` 
+A simple workaround is to use `/Users/<username>/.pyenv/versions/sam310/bin/black` 
 instead of `/Users/<username>/.pyenv/shims/black`.
 
 #### Pre-commit
@@ -98,15 +100,15 @@ handy plugin that can create virtualenv.
 Depending on the python version, the following commands would change to
 be the appropriate python version.
 
-1.  Create Virtualenv `sam38` for Python3.8: `pyenv virtualenv 3.8.16 sam38`
-1.  Activate Virtualenv: `pyenv activate sam38`
+1.  Create Virtualenv `sam310` for Python3.10: `pyenv virtualenv 3.10.16 sam310`
+1.  Activate Virtualenv: `pyenv activate sam310`
 
 ### 4. Install dev version of SAM transform
 
 We will install a development version of SAM transform from source into the
 virtualenv.
 
-1.  Activate Virtualenv: `pyenv activate sam38`
+1.  Activate Virtualenv: `pyenv activate sam310`
 1.  Install dev version of SAM transform: `make init`
 
 Running tests
@@ -120,10 +122,10 @@ Run `make test` or `make test-fast`. Once all tests pass make sure to run
 
 ### Unit testing with multiple Python versions
 
-Currently, our officially supported Python versions are 3.8, 3.9 and 3.10. For the most
-part, code that works in Python3.8 will work in Pythons 3.9 and 3.10. You only run into problems if you are
-trying to use features released in a higher version (for example features introduced into Python3.10
-will not work in Python3.9). If you want to test in many versions, you can create a virtualenv for
+Currently, our officially supported Python versions are 3.10, 3.11, 3.12, 3.13 and 3.14. For the most
+part, code that works in Python 3.10 will work in later versions. You only run into problems if you are
+trying to use features released in a higher version (for example features introduced into Python 3.13
+will not work in Python 3.12). If you want to test in many versions, you can create a virtualenv for
 each version and flip between them (sourcing the activate script). Typically, we run all tests in
 one python version locally and then have our ci (appveyor) run all supported versions.
 

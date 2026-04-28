@@ -1,0 +1,233 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Full CapacityProvider configuration test",
+  "Resources": {
+    "CapacityProviderTwo": {
+      "Properties": {
+        "CapacityProviderName": "customized-capacity-provider2",
+        "CapacityProviderScalingConfig": {
+          "ScalingMode": "Manual",
+          "ScalingPolicies": [
+            {
+              "PredefinedMetricType": "LambdaCapacityProviderAverageCPUUtilization",
+              "TargetValue": 75.0
+            }
+          ]
+        },
+        "KmsKeyArn": "arn:aws:kms:us-east-1:123456789012:key/abcd1234-ef56-gh78-ij90-klmnopqrstuv",
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "CapacityProviderTwoOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678",
+            "sg-87654321"
+          ],
+          "SubnetIds": [
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "CapacityProviderTwoOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "FullCapacityProvider": {
+      "Properties": {
+        "CapacityProviderName": "customized-capacity-provider",
+        "CapacityProviderScalingConfig": {
+          "MaxVCpuCount": 10,
+          "ScalingMode": "Manual",
+          "ScalingPolicies": [
+            {
+              "PredefinedMetricType": "LambdaCapacityProviderAverageCPUUtilization",
+              "TargetValue": 75.0
+            }
+          ]
+        },
+        "InstanceRequirements": {
+          "AllowedInstanceTypes": [
+            "c5.xlarge",
+            "c5.2xlarge"
+          ],
+          "Architectures": [
+            "arm64"
+          ]
+        },
+        "KmsKeyArn": "arn:aws:kms:us-east-1:123456789012:key/abcd1234-ef56-gh78-ij90-klmnopqrstuv",
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "FullCapacityProviderOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "Production"
+          },
+          {
+            "Key": "Team",
+            "Value": "Tooling"
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678",
+            "sg-87654321"
+          ],
+          "SubnetIds": [
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "FullCapacityProviderOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "PartialCapacityProviderThree": {
+      "Properties": {
+        "CapacityProviderScalingConfig": {
+          "MaxVCpuCount": 10,
+          "ScalingMode": "Auto"
+        },
+        "InstanceRequirements": {
+          "AllowedInstanceTypes": [
+            "c5.xlarge"
+          ]
+        },
+        "KmsKeyArn": "arn:aws:kms:us-east-1:123456789012:key/abcd1234-ef56-gh78-ij90-klmnopqrstuv",
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "PartialCapacityProviderThreeOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Team",
+            "Value": "Tooling"
+          },
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678"
+          ],
+          "SubnetIds": [
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "PartialCapacityProviderThreeOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

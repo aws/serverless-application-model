@@ -1,0 +1,16 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.11
+      Handler: index.handler
+      InlineCode: |
+        def handler(event, context):
+            return {}
+      TenancyConfig:
+        TenantIsolationMode: PER_TENANT
+      AutoPublishAlias: live
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 5

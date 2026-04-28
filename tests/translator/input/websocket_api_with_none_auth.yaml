@@ -1,0 +1,17 @@
+Resources:
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: '# placeholder'
+      Handler: hello.handler
+      Runtime: nodejs20.x
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Auth:
+        AuthType: NONE
+      Name: MyApi
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt ConnectFunction.Arn
+      RouteSelectionExpression: $request.body.action

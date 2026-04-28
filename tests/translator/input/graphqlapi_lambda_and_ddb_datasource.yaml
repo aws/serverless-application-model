@@ -18,9 +18,9 @@ Resources:
         Lambda:
           MyDataSource:
             FunctionArn: blah
-            ServiceRoleArn: my-lambda-role
+            ServiceRoleArn: arn:aws:iam::123456789012:role/my-lambda-role
         DynamoDb:
           MyDataSource:
             TableName: some-table
             TableArn: big-arn
-            ServiceRoleArn: my-ddb-role
+            ServiceRoleArn: arn:aws:iam::123456789012:role/my-ddb-role

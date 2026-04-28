@@ -58,6 +58,7 @@ SKIPPED_TESTS = [
     # TODO: Support globals (e.g. somehow make all fields of a model optional only for Globals)
     "api_with_custom_base_path",
     "function_with_tracing",  # TODO: intentionally skip this tests to cover incorrect scenarios
+    "capacity_provider_global_with_functions",  # Skip for Global case since customers can define partial field for global
 ]
 
 

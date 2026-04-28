@@ -1,0 +1,15 @@
+{
+  "PropertyTypes": {},
+  "ResourceTypes": {
+    "AWS::ACMPCA::Certificate": {
+      "Properties": {
+        "TemplateArn": {
+          "Documentation": "http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-acmpca-certificate.html#cfn-acmpca-certificate-templatearn",
+          "PrimitiveType": "String",
+          "Required": false,
+          "UpdateType": "Immutable"
+        }
+      }
+    }
+  }
+}

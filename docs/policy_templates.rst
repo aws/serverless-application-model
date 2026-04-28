@@ -73,5 +73,5 @@ folder.
     Policies:
       - CloudWatchPutMetricPolicy: {}      
 
-.. _policy_templates.json: https://github.com/awslabs/serverless-application-model/blob/develop/samtranslator/policy_templates_data/policy_templates.json
-.. _all_policy_templates.yaml: https://github.com/awslabs/serverless-application-model/blob/develop/tests/translator/input/all_policy_templates.yaml
+.. _policy_templates.json: https://github.com/aws/serverless-application-model/blob/develop/samtranslator/policy_templates_data/policy_templates.json
+.. _all_policy_templates.yaml: https://github.com/aws/serverless-application-model/blob/develop/tests/translator/input/all_policy_templates.yaml

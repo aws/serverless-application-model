@@ -1,11 +1,12 @@
 import re
 from abc import ABC
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from collections.abc import Callable
+from typing import Any
 
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 
 
-def _get_parameter_value(parameters: Dict[str, Any], param_name: str, default: Any = None) -> Any:
+def _get_parameter_value(parameters: dict[str, Any], param_name: str, default: Any = None) -> Any:
     """
     Get parameter value from parameters dict, but return default (None) if
     - it's a CloudFormation internal placeholder.
@@ -42,25 +43,23 @@ class Action(ABC):
     _resource_ref_separator = "."
     intrinsic_name: str
 
-    def resolve_parameter_refs(  # noqa: B027
-        self, input_dict: Optional[Any], parameters: Dict[str, Any]
-    ) -> Optional[Any]:
+    def resolve_parameter_refs(self, input_dict: Any | None, parameters: dict[str, Any]) -> Any | None:  # noqa: B027
         """
         Subclass optionally implement this method to resolve the intrinsic function
         TODO: input_dict should not be None.
         """
 
     def resolve_resource_refs(  # noqa: B027
-        self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
-    ) -> Optional[Any]:
+        self, input_dict: Any | None, supported_resource_refs: dict[str, Any]
+    ) -> Any | None:
         """
         Subclass optionally implement this method to resolve resource references
         TODO: input_dict should not be None.
         """
 
     def resolve_resource_id_refs(  # noqa: B027
-        self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
-    ) -> Optional[Any]:
+        self, input_dict: Any | None, supported_resource_id_refs: dict[str, Any]
+    ) -> Any | None:
         """
         Subclass optionally implement this method to resolve resource references
         TODO: input_dict should not be None.
@@ -77,7 +76,7 @@ class Action(ABC):
         return isinstance(input_dict, dict) and len(input_dict) == 1 and self.intrinsic_name in input_dict
 
     @classmethod
-    def _parse_resource_reference(cls, ref_value: Any) -> Tuple[Optional[str], Optional[str]]:
+    def _parse_resource_reference(cls, ref_value: Any) -> tuple[str | None, str | None]:
         """
         Splits a resource reference of structure "LogicalId.Property" and returns the "LogicalId" and "Property"
         separately.
@@ -109,7 +108,7 @@ class Action(ABC):
 class RefAction(Action):
     intrinsic_name = "Ref"
 
-    def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
+    def resolve_parameter_refs(self, input_dict: Any | None, parameters: dict[str, Any]) -> Any | None:
         """
         Resolves references that are present in the parameters and returns the value. If it is not in parameters,
         this method simply returns the input unchanged.
@@ -132,9 +131,7 @@ class RefAction(Action):
         # It returns the original input unchanged if the parameter is a CloudFormation internal placeholder
         return _get_parameter_value(parameters, param_name, input_dict)
 
-    def resolve_resource_refs(
-        self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
-    ) -> Optional[Any]:
+    def resolve_resource_refs(self, input_dict: Any | None, supported_resource_refs: dict[str, Any]) -> Any | None:
         """
         Resolves references to some property of a resource. These are runtime properties which can't be converted
         to a value here. Instead we output another reference that will more actually resolve to the value when
@@ -166,8 +163,8 @@ class RefAction(Action):
         return {self.intrinsic_name: resolved_value}
 
     def resolve_resource_id_refs(
-        self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
-    ) -> Optional[Any]:
+        self, input_dict: Any | None, supported_resource_id_refs: dict[str, Any]
+    ) -> Any | None:
         """
         Updates references to the old logical id of a resource to the new (generated) logical id.
 
@@ -198,7 +195,7 @@ class RefAction(Action):
 class SubAction(Action):
     intrinsic_name = "Fn::Sub"
 
-    def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
+    def resolve_parameter_refs(self, input_dict: Any | None, parameters: dict[str, Any]) -> Any | None:
         """
         Substitute references found within the string of `Fn::Sub` intrinsic function
 
@@ -224,9 +221,7 @@ class SubAction(Action):
 
         return self._handle_sub_action(input_dict, do_replacement)
 
-    def resolve_resource_refs(
-        self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
-    ) -> Optional[Any]:
+    def resolve_resource_refs(self, input_dict: Any | None, supported_resource_refs: dict[str, Any]) -> Any | None:
         """
         Resolves reference to some property of a resource. Inside string to be substituted, there could be either a
         "Ref" or a "GetAtt" usage of this property. They have to be handled differently.
@@ -286,8 +281,8 @@ class SubAction(Action):
         return self._handle_sub_action(input_dict, do_replacement)
 
     def resolve_resource_id_refs(
-        self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
-    ) -> Optional[Any]:
+        self, input_dict: Any | None, supported_resource_id_refs: dict[str, Any]
+    ) -> Any | None:
         """
         Resolves reference to some property of a resource. Inside string to be substituted, there could be either a
         "Ref" or a "GetAtt" usage of this property. They have to be handled differently.
@@ -343,9 +338,7 @@ class SubAction(Action):
 
         return self._handle_sub_action(input_dict, do_replacement)
 
-    def _handle_sub_action(
-        self, input_dict: Optional[Dict[Any, Any]], handler: Callable[[str, str], str]
-    ) -> Optional[Any]:
+    def _handle_sub_action(self, input_dict: dict[Any, Any] | None, handler: Callable[[str, str], str]) -> Any | None:
         """
         Handles resolving replacements in the Sub action based on the handler that is passed as an input.
 
@@ -436,13 +429,11 @@ class GetAttAction(Action):
 
     _MIN_NUM_ARGUMENTS = 2
 
-    def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
+    def resolve_parameter_refs(self, input_dict: Any | None, parameters: dict[str, Any]) -> Any | None:
         # Parameters can never be referenced within GetAtt value
         return input_dict
 
-    def resolve_resource_refs(
-        self, input_dict: Optional[Any], supported_resource_refs: Dict[str, Any]
-    ) -> Optional[Any]:
+    def resolve_resource_refs(self, input_dict: Any | None, supported_resource_refs: dict[str, Any]) -> Any | None:
         """
         Resolve resource references within a GetAtt dict.
 
@@ -496,8 +487,8 @@ class GetAttAction(Action):
         return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)
 
     def resolve_resource_id_refs(
-        self, input_dict: Optional[Any], supported_resource_id_refs: Dict[str, Any]
-    ) -> Optional[Any]:
+        self, input_dict: Any | None, supported_resource_id_refs: dict[str, Any]
+    ) -> Any | None:
         """
         Resolve resource references within a GetAtt dict.
 
@@ -549,8 +540,8 @@ class GetAttAction(Action):
         return all(isinstance(item, str) for item in value)
 
     def _get_resolved_dictionary(
-        self, input_dict: Optional[Dict[str, Any]], key: str, resolved_value: Optional[str], remaining: List[str]
-    ) -> Optional[Any]:
+        self, input_dict: dict[str, Any] | None, key: str, resolved_value: str | None, remaining: list[str]
+    ) -> Any | None:
         """
         Resolves the function and returns the updated dictionary
 
@@ -576,7 +567,7 @@ class FindInMapAction(Action):
 
     _NUM_ARGUMENTS = 3
 
-    def resolve_parameter_refs(self, input_dict: Optional[Any], parameters: Dict[str, Any]) -> Optional[Any]:
+    def resolve_parameter_refs(self, input_dict: Any | None, parameters: dict[str, Any]) -> Any | None:
         """
         Recursively resolves "Fn::FindInMap"references that are present in the mappings and returns the value.
         If it is not in mappings, this method simply returns the input unchanged.

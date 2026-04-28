@@ -13,7 +13,7 @@
       "Type": "String"
     },
     "MyDomainCert": {
-      "Default": "another-api-arn",
+      "Default": "arn:aws:acm:us-east-1:123456789012:certificate/another-api-cert",
       "Type": "String"
     },
     "MyMTLSUriHTTP": {
@@ -34,7 +34,7 @@
         },
         "DomainNameConfigurations": [
           {
-            "CertificateArn": "another-api-arn",
+            "CertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/another-api-cert",
             "EndpointType": "REGIONAL",
             "SecurityPolicy": "TLS_1_2"
           }

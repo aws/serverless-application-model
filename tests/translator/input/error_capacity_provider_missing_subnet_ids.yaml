@@ -1,0 +1,12 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test missing SubnetIds in VpcConfig for CapacityProvider
+
+Resources:
+  CapacityProviderMissingSubnetIds:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        - sg-87654321

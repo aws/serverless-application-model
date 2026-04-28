@@ -1,0 +1,17 @@
+Resources:
+  WebSocketApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Name: WebSocketApi
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt ConnectFunction.Arn
+      Description: Lorem Ipsum
+
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.10
+      Handler: index.handler
+      CodeUri: s3://bucket/key

@@ -1,0 +1,26 @@
+Resources:
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: '# placeholder'
+      Handler: hello.handler
+      Runtime: nodejs20.x
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Name: MyApi
+      Routes:
+        $connect:
+          ApiKeyRequired: true
+          FunctionArn: !GetAtt ConnectFunction.Arn
+          IntegrationTimeout: 15000
+          ModelSelectionExpression: foo1
+          OperationName: Connect
+          RequestModels:
+            rq1: rp1
+            rq2: rp2
+          RequestParameters:
+            param1: v1
+            param2: v2
+          RouteResponseSelectionExpression: foo2
+      RouteSelectionExpression: $request.body.action

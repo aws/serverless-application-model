@@ -1,0 +1,28 @@
+Resources:
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        print("hello")
+      Handler: hello.handler
+      Runtime: nodejs24.x
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Auth:
+        AuthType: CUSTOM
+        AuthArn: !GetAtt MyAuthFn.Arn
+      Name: MyApi
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt ConnectFunction.Arn
+      RouteSelectionExpression: $request.body.action
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        print("hello")
+      Handler: authorizer.handler
+      Runtime: nodejs24.x
+Metadata:
+  SamTransformTest: true

@@ -1,5 +1,4 @@
 import json
-import os
 import re
 from pathlib import Path
 from typing import Any
@@ -38,11 +37,11 @@ class SamTemplateValidator:
         schema_store = {}
         definitions_dir = sam_schema.SCHEMA_DIR / "definitions"
 
-        for sub_schema in os.listdir(definitions_dir):
-            if sub_schema.endswith(".json"):
-                with (definitions_dir / sub_schema).open(encoding="utf-8") as f:
+        for sub_schema_path in definitions_dir.iterdir():
+            if sub_schema_path.name.endswith(".json"):
+                with sub_schema_path.open(encoding="utf-8") as f:
                     schema_content = f.read()
-                schema_store[sub_schema] = json.loads(schema_content)
+                schema_store[sub_schema_path.name] = json.loads(schema_content)
 
         resolver = jsonschema.RefResolver.from_schema(schema, store=schema_store)  # type: ignore[no-untyped-call]
 

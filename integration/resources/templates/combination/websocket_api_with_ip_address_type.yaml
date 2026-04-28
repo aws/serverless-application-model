@@ -1,0 +1,26 @@
+Parameters:
+  IpAddressType:
+    Type: String
+    AllowedValues: [ipv4, dualstack]
+
+Resources:
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      IpAddressType: !Ref IpAddressType
+      Name: MyApi
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt ConnectFunction.Arn
+Outputs:
+  ApiId:
+    Value: !Ref MyApi
+Metadata:
+  SamTransformTest: true

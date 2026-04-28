@@ -1,0 +1,41 @@
+Globals:
+  WebSocketApi:
+    RouteSettings:
+      $default:
+        DataTraceEnabled: true
+        ThrottlingBurstLimit: 100
+Resources:
+  DefaultFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: foo
+      Handler: bar
+      Runtime: nodejs20.x
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      AccessLogSettings:
+        DestinationArn: random-arn
+        Format: $context.requestId
+      Domain:
+        DomainName: admin.one.amazon.com
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: abc123456
+      PropagateTags: true
+      Name: MyApi
+      RouteSettings:
+        $default:
+          ThrottlingBurstLimit: 200
+          ThrottlingRateLimit: 0.7
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $default:
+          FunctionArn: !GetAtt DefaultFunction.Arn
+      StageName: Prod
+      StageVariables:
+        VarName: VarValue
+      Tags:
+        TagKey1: Value1
+        TagKey2: Value2

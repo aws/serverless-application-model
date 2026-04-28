@@ -1,0 +1,102 @@
+[
+  {
+    "LogicalResourceId": "ConnectFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "ConnectFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "DisconnectFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "DisconnectFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "DefaultFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "DefaultFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "SendFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "SendFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "MyApiConnectRoute",
+    "ResourceType": "AWS::ApiGatewayV2::Route"
+  },
+  {
+    "LogicalResourceId": "MyApiConnectIntegration",
+    "ResourceType": "AWS::ApiGatewayV2::Integration"
+  },
+  {
+    "LogicalResourceId": "MyApiConnectPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApiDisconnectRoute",
+    "ResourceType": "AWS::ApiGatewayV2::Route"
+  },
+  {
+    "LogicalResourceId": "MyApiDisconnectIntegration",
+    "ResourceType": "AWS::ApiGatewayV2::Integration"
+  },
+  {
+    "LogicalResourceId": "MyApiDisconnectPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultRoute",
+    "ResourceType": "AWS::ApiGatewayV2::Route"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultIntegration",
+    "ResourceType": "AWS::ApiGatewayV2::Integration"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApiSendRoute",
+    "ResourceType": "AWS::ApiGatewayV2::Route"
+  },
+  {
+    "LogicalResourceId": "MyApiSendIntegration",
+    "ResourceType": "AWS::ApiGatewayV2::Integration"
+  },
+  {
+    "LogicalResourceId": "MyApiSendPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApiNonsenseRoute",
+    "ResourceType": "AWS::ApiGatewayV2::Route"
+  },
+  {
+    "LogicalResourceId": "MyApiNonsenseIntegration",
+    "ResourceType": "AWS::ApiGatewayV2::Integration"
+  },
+  {
+    "LogicalResourceId": "MyApiNonsensePermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  }
+]

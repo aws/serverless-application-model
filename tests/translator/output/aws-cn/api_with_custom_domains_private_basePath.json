@@ -15,7 +15,7 @@
   },
   "Parameters": {
     "CertificateArn": {
-      "Default": "another-api-arn",
+      "Default": "arn:aws:acm:us-east-1:123456789012:certificate/another-api-cert",
       "Description": "ARN of the ACM certificate for the domain",
       "Type": "String"
     },
@@ -33,7 +33,7 @@
   "Resources": {
     "ApiGatewayDomainNameV27c603ed871": {
       "Properties": {
-        "CertificateArn": "another-api-arn",
+        "CertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/another-api-cert",
         "DomainName": "private.example.com",
         "EndpointConfiguration": {
           "Types": [
@@ -125,9 +125,9 @@
       },
       "Type": "AWS::ApiGateway::BasePathMappingV2"
     },
-    "MyApiDeploymente37f6c9943": {
+    "MyApiDeployment09c01d5525": {
       "Properties": {
-        "Description": "RestApi deployment id: e37f6c9943b5e1213efecf302864c9e775fcf695",
+        "Description": "RestApi deployment id: 09c01d5525be5534dba547e7bc84bad514d39efa",
         "RestApiId": {
           "Ref": "MyApi"
         },
@@ -153,7 +153,7 @@
     "MyApiprodStage": {
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymente37f6c9943"
+          "Ref": "MyApiDeployment09c01d5525"
         },
         "RestApiId": {
           "Ref": "MyApi"

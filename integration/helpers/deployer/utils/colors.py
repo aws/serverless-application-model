@@ -3,7 +3,7 @@ Wrapper to generated colored messages for printing in Terminal
 This was ported over from the sam-cli repo
 """
 
-from typing import Dict, Literal
+from typing import Literal
 
 SupportedColor = Literal["red", "green", "yellow"]
 
@@ -21,8 +21,8 @@ def cprint(text: str, color: SupportedColor) -> None:
 
 class DeployColor:
     def __init__(self):
-        self.changeset_color_map: Dict[str, SupportedColor] = {"Add": "green", "Modify": "yellow", "Remove": "red"}
-        self.status_color_map: Dict[str, SupportedColor] = {
+        self.changeset_color_map: dict[str, SupportedColor] = {"Add": "green", "Modify": "yellow", "Remove": "red"}
+        self.status_color_map: dict[str, SupportedColor] = {
             "CREATE_COMPLETE": "green",
             "CREATE_FAILED": "red",
             "CREATE_IN_PROGRESS": "yellow",

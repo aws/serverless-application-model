@@ -311,7 +311,17 @@
             "DeploymentRole",
             "Arn"
           ]
-        }
+        },
+        "Tags": [
+          {
+            "Key": "Key1",
+            "Value": "Value1"
+          },
+          {
+            "Key": "Key2",
+            "Value": "Value2"
+          }
+        ]
       },
       "Type": "AWS::CodeDeploy::DeploymentGroup"
     },
@@ -520,7 +530,17 @@
     },
     "ServerlessDeploymentApplication": {
       "Properties": {
-        "ComputePlatform": "Lambda"
+        "ComputePlatform": "Lambda",
+        "Tags": [
+          {
+            "Key": "Key1",
+            "Value": "Value1"
+          },
+          {
+            "Key": "Key2",
+            "Value": "Value2"
+          }
+        ]
       },
       "Type": "AWS::CodeDeploy::Application"
     },

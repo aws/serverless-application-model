@@ -6,6 +6,7 @@
 
 ### Checklist
 
+- [ ] Review the [generative AI contribution guidelines](https://github.com/aws/serverless-application-model/blob/develop/CONTRIBUTING.md#ai-usage)
 - [ ] Adheres to the [development guidelines](https://github.com/aws/serverless-application-model/blob/develop/DEVELOPMENT_GUIDE.md#development-guidelines)
 - [ ] Add/update [transform tests](https://github.com/aws/serverless-application-model/blob/develop/DEVELOPMENT_GUIDE.md#unit-testing-with-multiple-python-versions)
     - [ ] Using correct values

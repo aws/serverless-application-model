@@ -2,8 +2,9 @@ import json
 import random
 import re
 import string
+from collections.abc import Callable, Iterator
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, Set
+from typing import Any
 
 import boto3
 from botocore.exceptions import NoRegionError
@@ -144,10 +145,16 @@ def _get_region():
     return region
 
 
+_TMP_CONFIG_DIR = Path("/tmp/integration/config")
+
+
 def read_test_config_file(filename):
     """Reads test config file and returns the contents"""
     tests_integ_dir = Path(__file__).resolve().parents[1]
     test_config_file_path = Path(tests_integ_dir, "config", filename)
+    tmp_path = Path(_TMP_CONFIG_DIR, filename)
+    if not test_config_file_path.is_file() and tmp_path.is_file():
+        test_config_file_path = tmp_path
     if not test_config_file_path.is_file():
         return {}
     test_config = load_yaml(str(test_config_file_path))
@@ -155,10 +162,9 @@ def read_test_config_file(filename):
 
 
 def write_test_config_file_to_json(filename, input):
-    """Reads test config file and returns the contents"""
-    tests_integ_dir = Path(__file__).resolve().parents[1]
-    test_config_file_path = Path(tests_integ_dir, "config", filename)
-    with open(test_config_file_path, "w") as f:
+    """Writes test config file as JSON to /tmp for portability across environments."""
+    _TMP_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    with open(Path(_TMP_CONFIG_DIR, filename), "w") as f:
         json.dump(input, f)
 
 
@@ -187,7 +193,7 @@ def current_region_does_not_support(services):
     return bool(set(services).intersection(set(region_exclude_services["regions"][region])))
 
 
-def _resource_using_inline_statemachine_definition(resource: Dict[str, Any]) -> bool:
+def _resource_using_inline_statemachine_definition(resource: dict[str, Any]) -> bool:
     resource_type = resource.get("Type")
     properties = resource.get("Properties", {})
     if resource_type == "AWS::StepFunctions::StateMachine" and properties.get("DefinitionString"):
@@ -197,23 +203,23 @@ def _resource_using_inline_statemachine_definition(resource: Dict[str, Any]) -> 
     return False
 
 
-def _resource_using_s3_events(resource: Dict[str, Any]) -> bool:
+def _resource_using_s3_events(resource: dict[str, Any]) -> bool:
     resource_type = resource.get("Type")
     properties = resource.get("Properties", {})
     return resource_type == "AWS::S3::Bucket" and properties.get("NotificationConfiguration")
 
 
-def _get_all_event_sources(template_dict: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
+def _get_all_event_sources(template_dict: dict[str, Any]) -> Iterator[dict[str, Any]]:
     resources = template_dict.get("Resources", {}).values()
     for resource in resources:
         yield from resource.get("Properties", {}).get("Events", {}).values()
 
 
-def _event_using_sns_filter_policy_scope(event: Dict[str, Any]) -> bool:
+def _event_using_sns_filter_policy_scope(event: dict[str, Any]) -> bool:
     return event["Type"] == "SNS" and "FilterPolicyScope" in event.get("Properties", {})
 
 
-SERVICE_DETECTORS: Dict[str, Callable[[Dict[str, Any], Set[str]], bool]] = {
+SERVICE_DETECTORS: dict[str, Callable[[dict[str, Any], set[str]], bool]] = {
     HTTP_API: lambda template_dict, cfn_resource_types: "AWS::ApiGatewayV2::Api" in cfn_resource_types,
     REST_API: lambda template_dict, cfn_resource_types: "AWS::ApiGateway::RestApi" in cfn_resource_types,
     SQS: lambda template_dict, cfn_resource_types: "AWS::SQS::Queue" in cfn_resource_types,
@@ -234,7 +240,7 @@ SERVICE_DETECTORS: Dict[str, Callable[[Dict[str, Any], Set[str]], bool]] = {
 }
 
 
-def detect_services(template_dict: Dict[str, Any], cfn_resource_types: Set[str]):
+def detect_services(template_dict: dict[str, Any], cfn_resource_types: set[str]):
     """
     Detect which services are used in the template.
 

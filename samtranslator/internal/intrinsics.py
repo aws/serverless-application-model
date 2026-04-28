@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any, Union
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model.exceptions import InvalidResourceException
@@ -7,9 +7,9 @@ from samtranslator.model.exceptions import InvalidResourceException
 def resolve_string_parameter_in_resource(
     logical_id: str,
     intrinsics_resolver: IntrinsicsResolver,
-    parameter_value: Optional[Union[str, Dict[str, Any]]],
+    parameter_value: Union[str, dict[str, Any]] | None,
     parameter_name: str,
-) -> Optional[Union[str, Dict[str, Any]]]:
+) -> Union[str, dict[str, Any]] | None:
     """Try to resolve values in a resource from template parameters."""
     if not parameter_value:
         return parameter_value

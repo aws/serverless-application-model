@@ -1,0 +1,42 @@
+Resources:
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+  DisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+  DefaultFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+  SendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt ConnectFunction.Arn
+        $disconnect:
+          FunctionArn: !GetAtt DisconnectFunction.Arn
+        $default:
+          FunctionArn: !GetAtt DefaultFunction.Arn
+        send:
+          FunctionArn: !GetAtt SendFunction.Arn
+        nonsense:
+          FunctionArn: !GetAtt DefaultFunction.Arn
+Metadata:
+  SamTransformTest: true

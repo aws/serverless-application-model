@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Full CapacityProvider configuration test
+
+Resources:
+  FullCapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: customized-capacity-provider
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        - sg-87654321
+        SubnetIds:
+        - subnet-12345678
+      Tags:
+        Environment: Production
+        Team: Tooling
+      InstanceRequirements:
+        Architectures:
+        - arm64
+        AllowedTypes:
+        - c5.xlarge
+        - c5.2xlarge
+      ScalingConfig:
+        MaxVCpuCount: 10
+        AverageCPUUtilization: 75.0
+      KmsKeyArn: arn:aws:kms:us-east-1:123456789012:key/abcd1234-ef56-gh78-ij90-klmnopqrstuv
+
+  CapacityProviderTwo:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: customized-capacity-provider2
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        - sg-87654321
+        SubnetIds:
+        - subnet-12345678
+      ScalingConfig:
+        AverageCPUUtilization: 75.0
+      KmsKeyArn: arn:aws:kms:us-east-1:123456789012:key/abcd1234-ef56-gh78-ij90-klmnopqrstuv
+
+  PartialCapacityProviderThree:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-12345678
+        SubnetIds:
+        - subnet-12345678
+      Tags:
+        Team: Tooling
+      PropagateTags: false
+      InstanceRequirements:
+        AllowedTypes:
+        - c5.xlarge
+      ScalingConfig:
+        MaxVCpuCount: 10
+      KmsKeyArn: arn:aws:kms:us-east-1:123456789012:key/abcd1234-ef56-gh78-ij90-klmnopqrstuv

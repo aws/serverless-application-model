@@ -1,4 +1,6 @@
-from typing import Dict, List, Literal, Optional, Union
+from __future__ import annotations
+
+from typing import Literal, Union
 
 from samtranslator.internal.schema_source.common import (
     BaseModel,
@@ -9,164 +11,189 @@ from samtranslator.internal.schema_source.common import (
     get_prop,
 )
 
+# All PassThroughProp properties in this file are passed directly to AWS::AppSync CloudFormation resources
+# and inherit their documentation from the CloudFormation schema.
+#
+
+PROPERTIES_STEM = "sam-resource-graphqlapi"
+
 AuthenticationTypes = Literal["AWS_IAM", "API_KEY", "AWS_LAMBDA", "OPENID_CONNECT", "AMAZON_COGNITO_USER_POOLS"]
 
-properties = get_prop("sam-resource-graphqlapi")
+properties = get_prop(PROPERTIES_STEM)
+authprovider = get_prop("sam-property-graphqlapi-auth-authprovider")
+auth = get_prop("sam-property-graphqlapi-auth")
+apikey = get_prop("sam-property-graphqlapi-apikeys")
+dynamodbdatasource = get_prop("sam-property-graphqlapi-datasource-dynamodb")
+lambdadatasource = get_prop("sam-property-graphqlapi-datasource-lambda")
+datasource = get_prop("sam-property-graphqlapi-datasource")
+function = get_prop("sam-property-graphqlapi-function")
+runtime = get_prop("sam-property-graphqlapi-function-runtime")
+resolver = get_prop("sam-property-graphqlapi-resolver")
 
 
-# TODO: add docs
 class LambdaAuthorizerConfig(BaseModel):
-    AuthorizerResultTtlInSeconds: Optional[PassThroughProp]
+    # Maps to AWS::AppSync::GraphQLApi.LambdaAuthorizerConfig
+    AuthorizerResultTtlInSeconds: PassThroughProp | None
     AuthorizerUri: PassThroughProp
-    IdentityValidationExpression: Optional[PassThroughProp]
+    IdentityValidationExpression: PassThroughProp | None
 
 
 class OpenIDConnectConfig(BaseModel):
-    AuthTTL: Optional[PassThroughProp]
-    ClientId: Optional[PassThroughProp]
-    IatTTL: Optional[PassThroughProp]
-    Issuer: Optional[PassThroughProp]
+    # Maps to AWS::AppSync::GraphQLApi.OpenIDConnectConfig
+    AuthTTL: PassThroughProp | None
+    ClientId: PassThroughProp | None
+    IatTTL: PassThroughProp | None
+    Issuer: PassThroughProp | None
 
 
 class UserPoolConfig(BaseModel):
-    AppIdClientRegex: Optional[PassThroughProp]
-    AwsRegion: Optional[PassThroughProp]
-    DefaultAction: Optional[PassThroughProp]
+    # Maps to AWS::AppSync::GraphQLApi.UserPoolConfig
+    AppIdClientRegex: PassThroughProp | None
+    AwsRegion: PassThroughProp | None
+    DefaultAction: PassThroughProp | None
     UserPoolId: PassThroughProp
 
 
 class Authorizer(BaseModel):
-    Type: AuthenticationTypes
-    LambdaAuthorizer: Optional[LambdaAuthorizerConfig]
-    OpenIDConnect: Optional[OpenIDConnectConfig]
-    UserPool: Optional[UserPoolConfig]
+    Type: AuthenticationTypes = authprovider("Type")
+    # Maps to AWS::AppSync::GraphQLApi.AdditionalAuthenticationProvider
+    LambdaAuthorizer: LambdaAuthorizerConfig | None
+    OpenIDConnect: OpenIDConnectConfig | None
+    UserPool: UserPoolConfig | None
 
 
 class Auth(Authorizer):
-    Additional: Optional[List[Authorizer]]
+    Additional: list[Authorizer] | None = auth("Additional")
 
 
 class ApiKey(BaseModel):
-    ApiKeyId: Optional[PassThroughProp]
-    Description: Optional[PassThroughProp]
-    ExpiresOn: Optional[PassThroughProp]
+    ApiKeyId: PassThroughProp | None = apikey("ApiKeyId")
+    Description: PassThroughProp | None = apikey("Description")
+    ExpiresOn: PassThroughProp | None = apikey("ExpiresOn")
 
 
 class Logging(BaseModel):
-    CloudWatchLogsRoleArn: Optional[PassThroughProp]
-    ExcludeVerboseContent: Optional[PassThroughProp]
-    FieldLogLevel: Optional[PassThroughProp]
+    # Maps to AWS::AppSync::GraphQLApi LogConfig
+    CloudWatchLogsRoleArn: PassThroughProp | None
+    ExcludeVerboseContent: PassThroughProp | None
+    FieldLogLevel: PassThroughProp | None
 
 
 class DeltaSync(BaseModel):
+    # Maps to AWS::AppSync::DataSource.DeltaSyncConfig
     BaseTableTTL: PassThroughProp
     DeltaSyncTableName: PassThroughProp
     DeltaSyncTableTTL: PassThroughProp
 
 
 class DynamoDBDataSource(BaseModel):
-    TableName: PassThroughProp
-    ServiceRoleArn: Optional[PassThroughProp]
-    TableArn: Optional[PassThroughProp]
-    Permissions: Optional[PermissionsType]
-    Name: Optional[PassThroughProp]
-    Description: Optional[PassThroughProp]
-    Region: Optional[PassThroughProp]
-    DeltaSync: Optional[DeltaSync]
-    UseCallerCredentials: Optional[PassThroughProp]
-    Versioned: Optional[PassThroughProp]
+    TableName: PassThroughProp = dynamodbdatasource("TableName")
+    ServiceRoleArn: PassThroughProp | None = dynamodbdatasource("ServiceRoleArn")
+    TableArn: PassThroughProp | None = dynamodbdatasource("TableArn")
+    Permissions: PermissionsType | None = dynamodbdatasource("Permissions")
+    Name: PassThroughProp | None = dynamodbdatasource("Name")
+    Description: PassThroughProp | None = dynamodbdatasource("Description")
+    Region: PassThroughProp | None = dynamodbdatasource("Region")
+    DeltaSync: DeltaSync | None = dynamodbdatasource("DeltaSync")
+    UseCallerCredentials: PassThroughProp | None = dynamodbdatasource("UseCallerCredentials")
+    Versioned: PassThroughProp | None = dynamodbdatasource("Versioned")
 
 
 class LambdaDataSource(BaseModel):
-    FunctionArn: PassThroughProp
-    ServiceRoleArn: Optional[PassThroughProp]
-    Name: Optional[PassThroughProp]
-    Description: Optional[PassThroughProp]
+    FunctionArn: PassThroughProp = lambdadatasource("FunctionArn")
+    ServiceRoleArn: PassThroughProp | None = lambdadatasource("ServiceRoleArn")
+    Name: PassThroughProp | None = lambdadatasource("Name")
+    Description: PassThroughProp | None = lambdadatasource("Description")
 
 
 class DataSources(BaseModel):
-    DynamoDb: Optional[Dict[str, DynamoDBDataSource]]
-    Lambda: Optional[Dict[str, LambdaDataSource]]
+    DynamoDb: dict[str, DynamoDBDataSource] | None = datasource("DynamoDb")
+    Lambda: dict[str, LambdaDataSource] | None = datasource("Lambda")
 
 
 class Runtime(BaseModel):
-    Name: PassThroughProp
-    Version: PassThroughProp
+    Name: PassThroughProp = runtime("Name")
+    Version: PassThroughProp = runtime("Version")
 
 
 class LambdaConflictHandlerConfig(BaseModel):
+    # Maps to AWS::AppSync::FunctionConfiguration.LambdaConflictHandlerConfig
     LambdaConflictHandlerArn: PassThroughProp
 
 
 class Sync(BaseModel):
+    # Maps to AWS::AppSync::FunctionConfiguration.SyncConfig
     ConflictDetection: PassThroughProp
-    ConflictHandler: Optional[PassThroughProp]
-    LambdaConflictHandlerConfig: Optional[LambdaConflictHandlerConfig]
+    ConflictHandler: PassThroughProp | None
+    LambdaConflictHandlerConfig: LambdaConflictHandlerConfig | None
 
 
 class Function(BaseModel):
-    DataSource: Optional[SamIntrinsicable[str]]
-    Runtime: Optional[Runtime]
-    InlineCode: Optional[PassThroughProp]
-    CodeUri: Optional[PassThroughProp]
-    Description: Optional[PassThroughProp]
-    MaxBatchSize: Optional[PassThroughProp]
-    Name: Optional[str]
-    Id: Optional[PassThroughProp]
-    Sync: Optional[Sync]
+    DataSource: SamIntrinsicable[str] | None = function("DataSource")
+    Runtime: Runtime | None = function("Runtime")
+    InlineCode: PassThroughProp | None = function("InlineCode")
+    CodeUri: PassThroughProp | None = function("CodeUri")
+    Description: PassThroughProp | None = function("Description")
+    MaxBatchSize: PassThroughProp | None = function("MaxBatchSize")
+    Name: str | None = function("Name")
+    Id: PassThroughProp | None = function("Id")
+    Sync: Sync | None = function("Sync")
 
 
 class Caching(BaseModel):
+    # Maps to AWS::AppSync::Resolver.CachingConfig
     Ttl: PassThroughProp
-    CachingKeys: Optional[List[PassThroughProp]]
+    CachingKeys: list[PassThroughProp] | None
 
 
 class Resolver(BaseModel):
-    FieldName: Optional[str]
-    Caching: Optional[Caching]
-    InlineCode: Optional[PassThroughProp]
-    CodeUri: Optional[PassThroughProp]
-    MaxBatchSize: Optional[PassThroughProp]
-    Pipeline: Optional[
-        List[str]
-    ]  # keeping it optional allows for easier validation in to_cloudformation with better error messages
-    Runtime: Optional[Runtime]
-    Sync: Optional[Sync]
+    FieldName: str | None = resolver("FieldName")
+    Caching: Caching | None = resolver("Caching")
+    InlineCode: PassThroughProp | None = resolver("InlineCode")
+    CodeUri: PassThroughProp | None = resolver("CodeUri")
+    MaxBatchSize: PassThroughProp | None = resolver("MaxBatchSize")
+    Pipeline: list[str] | None = resolver(
+        "Pipeline"
+    )  # keeping it optional allows for easier validation in to_cloudformation with better error messages
+    Runtime: Runtime | None = resolver("Runtime")
+    Sync: Sync | None = resolver("Sync")
 
 
 class DomainName(BaseModel):
+    # Maps to AWS::AppSync::DomainName
     CertificateArn: PassThroughProp
     DomainName: PassThroughProp
-    Description: Optional[PassThroughProp]
+    Description: PassThroughProp | None
 
 
 class Cache(BaseModel):
+    # Maps to AWS::AppSync::ApiCache
     ApiCachingBehavior: PassThroughProp
     Ttl: PassThroughProp
     Type: PassThroughProp
-    AtRestEncryptionEnabled: Optional[PassThroughProp]
-    TransitEncryptionEnabled: Optional[PassThroughProp]
+    AtRestEncryptionEnabled: PassThroughProp | None
+    TransitEncryptionEnabled: PassThroughProp | None
 
 
 class Properties(BaseModel):
-    Auth: Auth
-    Tags: Optional[DictStrAny]
-    Name: Optional[PassThroughProp]
-    XrayEnabled: Optional[bool]
-    SchemaInline: Optional[PassThroughProp]
-    SchemaUri: Optional[PassThroughProp]
-    Logging: Optional[Union[Logging, bool]]
-    DataSources: Optional[DataSources]
-    Functions: Optional[Dict[str, Function]]
-    Resolvers: Optional[Dict[str, Dict[str, Resolver]]]
-    ApiKeys: Optional[Dict[str, ApiKey]]
-    DomainName: Optional[DomainName]
-    Cache: Optional[Cache]
-    Visibility: Optional[PassThroughProp]
-    OwnerContact: Optional[PassThroughProp]
-    IntrospectionConfig: Optional[PassThroughProp]
-    QueryDepthLimit: Optional[PassThroughProp]
-    ResolverCountLimit: Optional[PassThroughProp]
+    Auth: Auth = properties("Auth")
+    Tags: DictStrAny | None = properties("Tags")
+    Name: PassThroughProp | None = properties("Name")
+    XrayEnabled: bool | None = properties("XrayEnabled")
+    SchemaInline: PassThroughProp | None = properties("SchemaInline")
+    SchemaUri: PassThroughProp | None = properties("SchemaUri")
+    Logging: Union[Logging, bool] | None = properties("Logging")
+    DataSources: DataSources | None = properties("DataSources")
+    Functions: dict[str, Function] | None = properties("Functions")
+    Resolvers: dict[str, dict[str, Resolver]] | None = properties("Resolvers")
+    ApiKeys: dict[str, ApiKey] | None = properties("ApiKeys")
+    DomainName: DomainName | None = properties("DomainName")
+    Cache: Cache | None = properties("Cache")
+    Visibility: PassThroughProp | None  # TODO: add documentation when available in sam-docs.json
+    OwnerContact: PassThroughProp | None  # TODO: add documentation when available in sam-docs.json
+    IntrospectionConfig: PassThroughProp | None  # TODO: add documentation when available in sam-docs.json
+    QueryDepthLimit: PassThroughProp | None  # TODO: add documentation when available in sam-docs.json
+    ResolverCountLimit: PassThroughProp | None  # TODO: add documentation when available in sam-docs.json
 
 
 class Resource(BaseModel):

@@ -1,0 +1,46 @@
+[
+  {
+    "LogicalResourceId": "ApiGatewayDomainNameV2",
+    "ResourceType": "AWS::ApiGatewayV2::DomainName"
+  },
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultIntegration",
+    "ResourceType": "AWS::ApiGatewayV2::Integration"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultRoute",
+    "ResourceType": "AWS::ApiGatewayV2::Route"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  },
+  {
+    "LogicalResourceId": "MyApigetApiMapping",
+    "ResourceType": "AWS::ApiGatewayV2::ApiMapping"
+  },
+  {
+    "LogicalResourceId": "MyApipostApiMapping",
+    "ResourceType": "AWS::ApiGatewayV2::ApiMapping"
+  },
+  {
+    "LogicalResourceId": "MyFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "RecordSetGroup",
+    "ResourceType": "AWS::Route53::RecordSetGroup"
+  }
+]

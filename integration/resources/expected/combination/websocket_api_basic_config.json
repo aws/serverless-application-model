@@ -1,0 +1,30 @@
+[
+  {
+    "LogicalResourceId": "DefaultFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "DefaultFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultIntegration",
+    "ResourceType": "AWS::ApiGatewayV2::Integration"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultRoute",
+    "ResourceType": "AWS::ApiGatewayV2::Route"
+  },
+  {
+    "LogicalResourceId": "MyApiDefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  }
+]

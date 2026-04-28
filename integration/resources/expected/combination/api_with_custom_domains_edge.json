@@ -1,6 +1,6 @@
 [
   {
-    "LogicalResourceId": "RecordSetGroup1b7eeb359e",
+    "LogicalResourceId": "RecordSetGroup",
     "ResourceType": "AWS::Route53::RecordSetGroup"
   },
   {
@@ -8,7 +8,7 @@
     "ResourceType": "AWS::ApiGateway::Deployment"
   },
   {
-    "LogicalResourceId": "ApiGatewayDomainName1101a94567",
+    "LogicalResourceId": "ApiGatewayDomainName",
     "ResourceType": "AWS::ApiGateway::DomainName"
   },
   {

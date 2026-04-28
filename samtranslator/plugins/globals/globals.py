@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 from samtranslator.model.exceptions import ExceptionWithMessage, InvalidResourceAttributeTypeException
 from samtranslator.public.intrinsics import is_intrinsics
@@ -56,6 +56,12 @@ class Globals:
             "LoggingConfig",
             "RecursiveLoop",
             "SourceKMSKeyArn",
+            "TenancyConfig",
+            "DurableConfig",
+            "CapacityProviderConfig",
+            "FunctionScalingConfig",
+            "PublishToLatestPublished",
+            "VersionDeletionPolicy",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
@@ -82,6 +88,8 @@ class Globals:
             "Domain",
             "AlwaysDeploy",
             "PropagateTags",
+            "SecurityPolicy",
+            "EndpointAccessMode",
         ],
         SamResourceType.HttpApi.value: [
             "Auth",
@@ -98,31 +106,59 @@ class Globals:
         SamResourceType.SimpleTable.value: ["SSESpecification"],
         SamResourceType.StateMachine.value: ["PropagateTags"],
         SamResourceType.LambdaLayerVersion.value: ["PublishLambdaVersion"],
+        SamResourceType.CapacityProvider.value: [
+            "VpcConfig",
+            "OperatorRole",
+            "Tags",
+            "InstanceRequirements",
+            "ScalingConfig",
+            "KmsKeyArn",
+            "PropagateTags",
+        ],
+        SamResourceType.WebSocketApi.value: [
+            "AccessLogSettings",
+            "ApiKeySelectionExpression",
+            "DefaultRouteSettings",
+            "DisableExecuteApiEndpoint",
+            "DisableSchemaValidation",
+            "Domain",
+            "FailOnWarnings",
+            "IpAddressType",
+            "PropagateTags",
+            "RouteSelectionExpression",
+            "RouteSettings",
+            "StageVariables",
+            "Tags",
+        ],
     }
     # unreleased_properties *must be* part of supported_properties too
-    unreleased_properties: Dict[str, List[str]] = {
-        SamResourceType.Function.value: ["RuntimeManagementConfig", "RecursiveLoop", "SourceKMSKeyArn"],
+    unreleased_properties: dict[str, list[str]] = {
+        SamResourceType.Function.value: [],
     }
 
-    def __init__(self, template: Dict[str, Any]) -> None:
+    unreleased_resource_types: list[str] = []
+
+    def __init__(self, template: dict[str, Any]) -> None:
         """
         Constructs an instance of this object
 
         :param dict template: SAM template to be parsed
         """
         self.supported_resource_section_names = [
-            x.replace(self._RESOURCE_PREFIX, "") for x in self.supported_properties
+            x.replace(self._RESOURCE_PREFIX, "")
+            for x in self.supported_properties
+            if x not in self.unreleased_resource_types
         ]
         # Sort the names for stability in list ordering
         self.supported_resource_section_names.sort()
 
-        self.template_globals: Dict[str, GlobalProperties] = {}
+        self.template_globals: dict[str, GlobalProperties] = {}
 
         if self._KEYWORD in template:
             self.template_globals = self._parse(template[self._KEYWORD])  # type: ignore[no-untyped-call]
 
     def get_template_globals(
-        self, logical_id: str, resource_type: str, ignore_globals: Optional[Union[str, List[str]]]
+        self, logical_id: str, resource_type: str, ignore_globals: Union[str, list[str]] | None
     ) -> "GlobalProperties":
         """
         Get template globals but remove globals based on IgnoreGlobals attribute.
@@ -163,9 +199,9 @@ class Globals:
     def merge(
         self,
         resource_type: str,
-        resource_properties: Dict[str, Any],
+        resource_properties: dict[str, Any],
         logical_id: str = "",
-        ignore_globals: Optional[Union[str, List[str]]] = None,
+        ignore_globals: Union[str, list[str]] | None = None,
     ) -> Any:
         """
         Adds global properties to the resource, if necessary. This method is a no-op if there are no global properties
@@ -185,7 +221,7 @@ class Globals:
         return global_props.merge(resource_properties)  # type: ignore[no-untyped-call]
 
     @classmethod
-    def del_section(cls, template: Dict[str, Any]) -> None:
+    def del_section(cls, template: dict[str, Any]) -> None:
         """
         Helper method to delete the Globals section altogether from the template
 
@@ -197,7 +233,7 @@ class Globals:
             del template[cls._KEYWORD]
 
     @classmethod
-    def fix_openapi_definitions(cls, template: Dict[str, Any]) -> None:
+    def fix_openapi_definitions(cls, template: dict[str, Any]) -> None:
         """
         Helper method to postprocess the resources to make sure the swagger doc version matches
         the one specified on the resource with flag OpenApiVersion.
@@ -292,15 +328,15 @@ class GlobalProperties:
       ```
       Global:
         Function:
-          Runtime: nodejs
+          Runtime: nodejs24.x
 
       Function:
-         Runtime: python
+         Runtime: python3.14
       ```
 
     After processing, Function resource will contain:
       ```
-      Runtime: python
+      Runtime: python3.14
       ```
 
     **Different data types**
@@ -440,7 +476,7 @@ class GlobalProperties:
 
     def _merge_lists(self, global_list, local_list):  # type: ignore[no-untyped-def]
         """
-        Merges the global list with the local list. List merging is simply a concatenation = global + local
+        Merges the global list with the local list. list merging is simply a concatenation = global + local
 
         :param global_list: Global value list
         :param local_list: Local value list

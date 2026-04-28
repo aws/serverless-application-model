@@ -43,7 +43,7 @@ Resources:
       EphemeralStorage:
         Size: 1024
       Role: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/role1
-      KmsKeyArn: !Sub arn:${AWS::Partition}:key:key
+      KmsKeyArn: !Sub arn:${AWS::Partition}:kms:us-east-1:123456789012:key/my-key
       FileSystemConfigs:
       - Arn: !GetAtt AccessPoint.Arn
         LocalMountPath: /mnt/EFS
@@ -73,7 +73,7 @@ Resources:
       EphemeralStorage:
         Size: 1024
       Role: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/role1
-      KmsKeyArn: !Sub arn:${AWS::Partition}:key:key
+      KmsKeyArn: !Sub arn:${AWS::Partition}:kms:us-east-1:123456789012:key/my-key
       FileSystemConfigs:
       - Arn: !GetAtt AccessPoint.Arn
         LocalMountPath: /mnt/EFS

@@ -1,0 +1,285 @@
+{
+  "Resources": {
+    "Api1": {
+      "Properties": {
+        "ApiKeySelectionExpression": "Api.RouteSelectionExpression",
+        "DisableExecuteApiEndpoint": true,
+        "DisableSchemaValidation": true,
+        "Name": "Api1",
+        "ProtocolType": "WEBSOCKET",
+        "RouteSelectionExpression": "$request.body.action",
+        "Tags": {
+          "tag1": "val1",
+          "tag2": "val2",
+          "websocketapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "Api1ConnectIntegration": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "Api1"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FunctionArn}/invocations",
+            {
+              "FunctionArn": {
+                "Fn::GetAtt": [
+                  "Connect1",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Integration"
+    },
+    "Api1ConnectPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "Connect1",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api1.ApiId}/default/$connect"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "Api1ConnectRoute": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "Api1"
+        },
+        "RouteKey": "$connect",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Api1ConnectIntegration"
+              }
+            ]
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Route"
+    },
+    "Api1DefaultStage": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "Api1"
+        },
+        "AutoDeploy": true,
+        "StageName": "default",
+        "Tags": {
+          "tag1": "val1",
+          "tag2": "val2",
+          "websocketapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    },
+    "Api2": {
+      "Properties": {
+        "ApiKeySelectionExpression": "Integration.TemplateSelectionExpression",
+        "DisableExecuteApiEndpoint": false,
+        "DisableSchemaValidation": false,
+        "Name": "Api2",
+        "ProtocolType": "WEBSOCKET",
+        "RouteSelectionExpression": "$request.body.message",
+        "Tags": {
+          "tag1": "val1",
+          "tag2": "val4",
+          "tag3": "val3",
+          "websocketapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "Api2ConnectIntegration": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "Api2"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FunctionArn}/invocations",
+            {
+              "FunctionArn": {
+                "Fn::GetAtt": [
+                  "Connect2",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Integration"
+    },
+    "Api2ConnectPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "Connect2",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api2.ApiId}/default/$connect"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "Api2ConnectRoute": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "Api2"
+        },
+        "RouteKey": "$connect",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Api2ConnectIntegration"
+              }
+            ]
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Route"
+    },
+    "Api2DefaultStage": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "Api2"
+        },
+        "AutoDeploy": true,
+        "StageName": "default",
+        "Tags": {
+          "websocketapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    },
+    "Connect1": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "# placeholder"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "Connect1Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs20.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "Connect1Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "Connect2": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "# placeholder"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "Connect2Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs20.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "Connect2Role": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

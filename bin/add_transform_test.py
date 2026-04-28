@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Automatically create transform tests input and output files given an input template."""
+
 import argparse
 import json
 import shutil
@@ -7,7 +8,7 @@ import subprocess
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import patch
 
 import boto3
@@ -31,12 +32,12 @@ parser.add_argument(
 CLI_OPTIONS = parser.parse_args()
 
 
-def read_json_file(file_path: Path) -> Dict[str, Any]:
-    template: Dict[str, Any] = json.loads(file_path.read_text(encoding="utf-8"))
+def read_json_file(file_path: Path) -> dict[str, Any]:
+    template: dict[str, Any] = json.loads(file_path.read_text(encoding="utf-8"))
     return template
 
 
-def write_json_file(obj: Dict[str, Any], file_path: Path) -> None:
+def write_json_file(obj: dict[str, Any], file_path: Path) -> None:
     with file_path.open("w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2, sort_keys=True)
 
@@ -54,8 +55,9 @@ def generate_transform_test_output_files(input_file_path: Path, file_basename: s
     }
 
     for _, (region, output_path) in transform_test_output_paths.items():
-        with patch("samtranslator.translator.arn_generator._get_region_from_session", return_value=region), patch(
-            "boto3.session.Session.region_name", region
+        with (
+            patch("samtranslator.translator.arn_generator._get_region_from_session", return_value=region),
+            patch("boto3.session.Session.region_name", region),
         ):
             # Implicit API Plugin may alter input template file, thus passing a copy here.
             output_fragment = transform(deepcopy(manifest), {}, ManagedPolicyLoader(iam_client))

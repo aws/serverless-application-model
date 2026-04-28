@@ -1,6 +1,6 @@
 from collections import namedtuple
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any
 
 from samtranslator.model.exceptions import InvalidTemplateException
 from samtranslator.model.intrinsics import (
@@ -29,7 +29,7 @@ class ResourcePolicies:
 
     POLICIES_PROPERTY_NAME = "Policies"
 
-    def __init__(self, resource_properties: Dict[str, Any], policy_template_processor: Any = None) -> None:
+    def __init__(self, resource_properties: dict[str, Any], policy_template_processor: Any = None) -> None:
         """
         Initialize with policies data from resource's properties
 
@@ -56,7 +56,7 @@ class ResourcePolicies:
     def __len__(self):  # type: ignore[no-untyped-def]
         return len(self.policies)
 
-    def _get_policies(self, resource_properties: Dict[str, Any]) -> List[Any]:
+    def _get_policies(self, resource_properties: dict[str, Any]) -> list[Any]:
         """
         Returns a list of policies from the resource properties. This method knows how to interpret and handle
         polymorphic nature of the policies property.
@@ -64,16 +64,16 @@ class ResourcePolicies:
         Policies can be one of the following:
 
             * Managed policy name: string
-            * List of managed policy names: list of strings
+            * list of managed policy names: list of strings
             * IAM Policy document: dict containing Statement key
-            * List of IAM Policy documents: list of IAM Policy Document
+            * list of IAM Policy documents: list of IAM Policy Document
             * Policy Template: dict with only one key where key is in list of supported policy template names
-            * List of Policy Templates: list of Policy Template
+            * list of Policy Templates: list of Policy Template
 
 
         :param dict resource_properties: Dictionary of resource properties containing the policies property.
             It is assumed that this is already a dictionary and contains policies key.
-        :return list of PolicyEntry: List of policies, where each item is an instance of named tuple `PolicyEntry`
+        :return list of PolicyEntry: list of policies, where each item is an instance of named tuple `PolicyEntry`
         """
 
         policies = None

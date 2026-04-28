@@ -1,0 +1,5 @@
+regions:
+  us-east-1:
+  - CustomDomain
+Metadata:
+  SamTransformTest: true

@@ -1,10 +1,12 @@
-""" CloudFormation Resource serialization, deserialization, and validation """
+"""CloudFormation Resource serialization, deserialization, and validation"""
 
 import inspect
 import re
 from abc import ABC, ABCMeta, abstractmethod
+from collections.abc import Callable
 from contextlib import suppress
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
+from enum import Enum
+from typing import Any, TypeVar
 
 from samtranslator.compat import pydantic
 from samtranslator.model.exceptions import (
@@ -17,6 +19,23 @@ from samtranslator.model.types import IS_DICT, IS_STR, PassThrough, Validator, a
 from samtranslator.plugins import LifeCycleEvents
 
 RT = TypeVar("RT", bound=pydantic.BaseModel)  # return type
+
+
+class StringEnumExpectedType:
+    """Expected type wrapper for string enum validators."""
+
+    def __init__(self, enum_values: list[str]):
+        # Format description based on number of values
+        num_values = len(enum_values)
+        if num_values == 1:
+            description = f"the string '{enum_values[0]}'"
+        elif num_values == 2:  # noqa: PLR2004
+            description = f"one of the strings: '{enum_values[0]}' or '{enum_values[1]}'"
+        else:
+            quoted_values = [f"'{v}'" for v in enum_values]
+            description = f"one of the strings: {', '.join(quoted_values[:-1])}, or {quoted_values[-1]}"
+
+        self.value = (description, str)
 
 
 class PropertyType:
@@ -47,7 +66,16 @@ class PropertyType:
         self.required = required
         self.validate = validate
         self.supports_intrinsics = supports_intrinsics
-        self.expected_type = self.EXPECTED_TYPE_BY_VALIDATOR.get(validate)
+        self.expected_type = self._resolve_expected_type(validate)
+
+    def _resolve_expected_type(self, validate: Validator) -> Any | None:
+        """Resolve expected_type from validator attribute or default mapping."""
+        # Check if validator has enum_values attribute (from IS_STR_ENUM)
+        if hasattr(validate, "enum_values"):
+            return StringEnumExpectedType(validate.enum_values)
+
+        # Default mapping for standard validators
+        return self.EXPECTED_TYPE_BY_VALIDATOR.get(validate)
 
 
 class Property(PropertyType):
@@ -111,7 +139,7 @@ class Resource(ABC):
     # two lines to avoid any potential behavior change.
     # TODO: Make `Resource` an abstract class and not giving `resource_type`/`property_types` initial value.
     resource_type: str = None  # type: ignore
-    property_types: Dict[str, PropertyType] = None  # type: ignore
+    property_types: dict[str, PropertyType] = None  # type: ignore
     _keywords = {"logical_id", "relative_id", "depends_on", "resource_attributes"}
 
     # For attributes in this list, they will be passed into the translated template for the same resource itself.
@@ -127,20 +155,20 @@ class Resource(ABC):
     # attrs = {
     #   "arn": fnGetAtt(self.logical_id, "Arn")
     # }
-    runtime_attrs: Dict[str, Callable[["Resource"], Any]] = {}  # TODO: replace Any with something more explicit
+    runtime_attrs: dict[str, Callable[["Resource"], Any]] = {}  # TODO: replace Any with something more explicit
 
     # When "validate_setattr" is True, we cannot change the value of any class variables after instantiation unless they
     # are in "property_types" or "_keywords". We can set this to False in the inheriting class definition so we can
     # update other class variables as well after instantiation.
     validate_setattr: bool = True
-    Tags: Optional[PassThrough]
+    Tags: PassThrough | None
 
     def __init__(
         self,
-        logical_id: Optional[Any],
-        relative_id: Optional[str] = None,
-        depends_on: Optional[List[str]] = None,
-        attributes: Optional[Dict[str, Any]] = None,
+        logical_id: Any | None,
+        relative_id: str | None = None,
+        depends_on: list[str] | None = None,
+        attributes: dict[str, Any] | None = None,
     ) -> None:
         """Initializes a Resource object with the given logical id.
 
@@ -157,13 +185,13 @@ class Resource(ABC):
         for name, _ in self.property_types.items():
             setattr(self, name, None)
 
-        self.resource_attributes: Dict[str, Any] = {}
+        self.resource_attributes: dict[str, Any] = {}
         if attributes is not None:
             for attr, value in attributes.items():
                 self.set_resource_attribute(attr, value)
 
     @classmethod
-    def get_supported_resource_attributes(cls):  # type: ignore[no-untyped-def]
+    def get_supported_resource_attributes(cls) -> tuple[str, ...]:
         """
         A getter method for the supported resource attributes
         returns: a tuple that contains the name of all supported resource attributes
@@ -171,7 +199,7 @@ class Resource(ABC):
         return tuple(cls._supported_resource_attributes)
 
     @classmethod
-    def get_pass_through_attributes(cls) -> Tuple[str, ...]:
+    def get_pass_through_attributes(cls) -> tuple[str, ...]:
         """
         A getter method for the resource attributes to be passed to auto-generated resources
         returns: a tuple that contains the name of all pass through attributes
@@ -179,7 +207,7 @@ class Resource(ABC):
         return tuple(cls._pass_through_attributes)
 
     @classmethod
-    def from_dict(cls, logical_id: str, resource_dict: Dict[str, Any], relative_id: Optional[str] = None, sam_plugins=None) -> "Resource":  # type: ignore[no-untyped-def]
+    def from_dict(cls, logical_id: str, resource_dict: dict[str, Any], relative_id: str | None = None, sam_plugins=None) -> "Resource":  # type: ignore[no-untyped-def]
         """Constructs a Resource object with the given logical id, based on the given resource dict. The resource dict
         is the value associated with the logical id in a CloudFormation template's Resources section, and takes the
         following format. ::
@@ -205,7 +233,7 @@ class Resource(ABC):
 
         resource = cls(logical_id, relative_id=relative_id)
 
-        resource._validate_resource_dict(logical_id, resource_dict)  # type: ignore[no-untyped-call]
+        resource._validate_resource_dict(logical_id, resource_dict)
 
         # Default to empty properties dictionary. If customers skip the Properties section, an empty dictionary
         # accurately captures the intent.
@@ -230,7 +258,7 @@ class Resource(ABC):
         return resource
 
     @staticmethod
-    def _validate_logical_id(logical_id: Optional[Any]) -> str:
+    def _validate_logical_id(logical_id: Any | None) -> str:
         """Validates that the provided logical id is an alphanumeric string.
 
         :param str logical_id: the logical id to validate
@@ -247,7 +275,7 @@ class Resource(ABC):
         raise InvalidResourceException(str(logical_id), "Logical ids must be alphanumeric.")
 
     @classmethod
-    def _validate_resource_dict(cls, logical_id, resource_dict):  # type: ignore[no-untyped-def]
+    def _validate_resource_dict(cls, logical_id: str, resource_dict: dict[str, Any]) -> None:
         """Validates that the provided resource dict contains the correct Type string, and the required Properties dict.
 
         :param dict resource_dict: the resource dict to validate
@@ -267,7 +295,7 @@ class Resource(ABC):
         if "Properties" in resource_dict and not isinstance(resource_dict["Properties"], dict):
             raise InvalidResourceException(logical_id, "Properties of a resource must be an object.")
 
-    def to_dict(self) -> Dict[str, Dict[str, Any]]:
+    def to_dict(self) -> dict[str, dict[str, Any]]:
         """Validates that the required properties for this Resource have been provided, then returns a dict
         corresponding to the given Resource object. This dict will take the format of a single entry in the Resources
         section of a CloudFormation template, and will take the following format. ::
@@ -294,14 +322,14 @@ class Resource(ABC):
 
         return {self.logical_id: resource_dict}
 
-    def _generate_resource_dict(self) -> Dict[str, Any]:
+    def _generate_resource_dict(self) -> dict[str, Any]:
         """Generates the resource dict for this Resource, the value associated with the logical id in a CloudFormation
         template's Resources section.
 
         :returns: the resource dict for this Resource
         :rtype: dict
         """
-        resource_dict: Dict[str, Any] = {"Type": self.resource_type}
+        resource_dict: dict[str, Any] = {"Type": self.resource_type}
 
         if self.depends_on:
             resource_dict["DependsOn"] = self.depends_on
@@ -335,21 +363,81 @@ class Resource(ABC):
         )
 
     # Note: For compabitliy issue, we should ONLY use this with new abstraction/resources.
-    def validate_properties_and_return_model(self, cls: Type[RT]) -> RT:
+    def validate_properties_and_return_model(self, cls: type[RT], collect_all_errors: bool = False) -> RT:
         """
         Given a resource properties, return a typed object from the definitions of SAM schema model
 
-        param:
-            resource_properties: properties from input template
+        Args:
             cls: schema models
+            collect_all_errors: If True, collect all validation errors. If False (default), only first error.
         """
         try:
             return cls.parse_obj(self._generate_resource_dict()["Properties"])
         except pydantic.error_wrappers.ValidationError as e:
+            if collect_all_errors:
+                # Comprehensive error collection with union type consolidation
+                error_messages = self._format_all_errors(e.errors())  # type: ignore[arg-type]
+                raise InvalidResourceException(self.logical_id, " ".join(error_messages)) from e
             error_properties: str = ""
             with suppress(KeyError):
                 error_properties = ".".join(str(x) for x in e.errors()[0]["loc"])
             raise InvalidResourceException(self.logical_id, f"Property '{error_properties}' is invalid.") from e
+
+    def _format_all_errors(self, errors: list[dict[str, Any]]) -> list[str]:
+        """Format all validation errors, consolidating union type errors in single pass."""
+        type_mapping = {
+            "not a valid dict": "dictionary",
+            "not a valid int": "integer",
+            "not a valid float": "number",
+            "not a valid list": "list",
+            "not a valid str": "string",
+        }
+
+        # Group errors by path in a single pass
+        path_to_errors: dict[str, dict[str, Any]] = {}
+
+        for error in errors:
+            property_path = ".".join(str(x) for x in error["loc"])
+            raw_message = error.get("msg", "")
+
+            # Extract type for union consolidation
+            extracted_type = None
+            for pattern, type_name in type_mapping.items():
+                if pattern in raw_message:
+                    extracted_type = type_name
+                    break
+
+            if property_path not in path_to_errors:
+                path_to_errors[property_path] = {"types": [], "error": error}
+
+            if extracted_type:
+                path_to_errors[property_path]["types"].append(extracted_type)
+
+        # Format messages based on collected data
+        result = []
+        for path, data in path_to_errors.items():
+            unique_types = list(dict.fromkeys(data["types"]))  # Remove duplicates, preserve order
+
+            if len(unique_types) > 1:
+                # Multiple types - consolidate with union
+                type_text = " or ".join(unique_types)
+                result.append(f"Property '{path}' value must be {type_text}.")
+            else:
+                # Single or no types - format normally
+                result.append(self._format_single_error(data["error"]))
+
+        return result
+
+    def _format_single_error(self, error: dict[str, Any]) -> str:
+        """Format a single Pydantic error into user-friendly message."""
+        property_path = ".".join(str(x) for x in error["loc"])
+        raw_message = error["msg"]
+
+        if error["type"] == "value_error.missing":
+            return f"Property '{property_path}' is required."
+        if "extra fields not permitted" in raw_message:
+            return f"Property '{property_path}' is an invalid property."
+        return f"Property '{property_path}' {raw_message.lower()}."
 
     def validate_properties(self) -> None:
         """Validates that the required properties for this Resource have been populated, and that all properties have
@@ -424,7 +512,7 @@ class Resource(ABC):
 
         return self.runtime_attrs[attr_name](self)
 
-    def get_passthrough_resource_attributes(self) -> Dict[str, Any]:
+    def get_passthrough_resource_attributes(self) -> dict[str, Any]:
         """
         Returns a dictionary of resource attributes of the ResourceMacro that should be passed through from the main
         vanilla CloudFormation resource to its children. Currently only Condition is copied.
@@ -437,7 +525,7 @@ class Resource(ABC):
                 attributes[resource_attribute] = self.resource_attributes.get(resource_attribute)
         return attributes
 
-    def assign_tags(self, tags: Dict[str, Any]) -> None:
+    def assign_tags(self, tags: dict[str, Any]) -> None:
         """
         Assigns tags to the resource. This function assumes that generated resources always have
         the tags property called `Tags` that takes a list of key-value objects.
@@ -471,7 +559,7 @@ class ResourceMacro(Resource, metaclass=ABCMeta):
         return {}
 
     @abstractmethod
-    def to_cloudformation(self, **kwargs: Any) -> List[Any]:
+    def to_cloudformation(self, **kwargs: Any) -> list[Any]:
         """Returns a list of Resource instances, representing vanilla CloudFormation resources, to which this macro
         expands. The caller should be able to update their template with the expanded resources by calling
         :func:`to_dict` on each resource returned, then updating their "Resources" mapping with the results.
@@ -479,6 +567,16 @@ class ResourceMacro(Resource, metaclass=ABCMeta):
         :param dict kwargs
         :returns: a list of vanilla CloudFormation Resource instances, to which this macro expands
         """
+
+
+class ValidationRule(Enum):
+    MUTUALLY_EXCLUSIVE = "mutually_exclusive"
+    MUTUALLY_INCLUSIVE = "mutually_inclusive"
+    CONDITIONAL_REQUIREMENT = "conditional_requirement"
+
+
+# Simple tuple-based rules: (rule_type, [property_names])
+PropertyRule = tuple[ValidationRule, list[str]]
 
 
 class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
@@ -495,7 +593,7 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
     # resources, there is a separate process that associates this property with LogicalId of the generated CFN resource
     # of the given type.
 
-    referable_properties: Dict[str, str] = {}
+    referable_properties: dict[str, str] = {}
 
     # Each resource can optionally override this tag:
     _SAM_KEY = "lambda:createdBy"
@@ -514,7 +612,7 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
         by to_cloudformation() on this SAM resource. Each SAM resource must provide a map of properties that it
         supports and the type of CFN resource this property resolves to.
 
-        :param list of Resource object generated_cfn_resources: List of CloudFormation resources generated by this
+        :param list of Resource object generated_cfn_resources: list of CloudFormation resources generated by this
             SAM resource
         :param samtranslator.intrinsics.resource_refs.SupportedResourceReferences supported_resource_refs: Object
             holding the mapping between property names and LogicalId of the generated CFN resource it maps to
@@ -534,16 +632,16 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
         return supported_resource_refs
 
     def _construct_tag_list(
-        self, tags: Optional[Dict[str, Any]], additional_tags: Optional[Dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
-        if not bool(tags):
-            tags = {}
+        self, tags: dict[str, Any] | None, additional_tags: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
+        tags_dict: dict[str, Any] = tags or {}
 
         if additional_tags is None:
             additional_tags = {}
 
+        # At this point tags is guaranteed to be a dict[str, Any] since we set it to {} if it was falsy
         for tag in self._RESERVED_TAGS:
-            self._check_tag(tag, tags)  # type: ignore[no-untyped-call]
+            self._check_tag(tag, tags_dict)
 
         sam_tag = {self._SAM_KEY: self._SAM_VALUE}
 
@@ -554,14 +652,48 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
         return get_tag_list(sam_tag) + get_tag_list(additional_tags) + get_tag_list(tags)
 
     @staticmethod
+    def propagate_tags_combine(
+        resources: list[Resource], tags: dict[str, Any] | None, propagate_tags: bool | None = False
+    ) -> None:
+        """
+        Propagates tags to the resources
+        Similar to propagate_tags() method but this method will combine provided tags with existing resource tags.
+
+        Note:
+            - This method created after propagate_tags() to combine propagate tags with resource tags create during to_cloudformation()
+            - Create this method because updating propagate_tags() will cause regression issue;
+            - Use this method for new resource if you want to assign combined tags, not replace.
+
+        :param propagate_tags: Whether we should pass the tags to generated resources.
+        :param resources: list of generated resources
+        :param tags: dictionary of tags to propagate to the resources.
+
+        :return: None
+        """
+        if not propagate_tags or not tags:
+            return
+
+        for resource in resources:
+            if hasattr(resource, "Tags"):
+                if resource.Tags:
+                    propagated_tags = get_tag_list(tags)
+                    combined_tags = [
+                        {"Key": k, "Value": v}
+                        for k, v in {tag["Key"]: tag["Value"] for tag in resource.Tags + propagated_tags}.items()
+                    ]
+                    resource.Tags = combined_tags
+                else:
+                    resource.assign_tags(tags)
+
+    @staticmethod
     def propagate_tags(
-        resources: List[Resource], tags: Optional[Dict[str, Any]], propagate_tags: Optional[bool] = False
+        resources: list[Resource], tags: dict[str, Any] | None, propagate_tags: bool | None = False
     ) -> None:
         """
         Propagates tags to the resources.
 
         :param propagate_tags: Whether we should pass the tags to generated resources.
-        :param resources: List of generated resources
+        :param resources: list of generated resources
         :param tags: dictionary of tags to propagate to the resources.
 
         :return: None
@@ -572,7 +704,7 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
         for resource in resources:
             resource.assign_tags(tags)
 
-    def _check_tag(self, reserved_tag_name, tags):  # type: ignore[no-untyped-def]
+    def _check_tag(self, reserved_tag_name: str, tags: dict[str, Any]) -> None:
         if reserved_tag_name in tags:
             raise InvalidResourceException(
                 self.logical_id,
@@ -581,6 +713,71 @@ class SamResourceMacro(ResourceMacro, metaclass=ABCMeta):
                 "Please change the tag key in the "
                 "input.",
             )
+
+    def validate_before_transform(self, schema_class: type[RT] | None, collect_all_errors: bool = False) -> None:
+        if not hasattr(self, "__validation_rules__"):
+            return
+
+        rules = self.__validation_rules__
+        validated_model = (
+            self.validate_properties_and_return_model(schema_class, collect_all_errors) if schema_class else None
+        )
+
+        error_messages = []
+
+        for rule_type, properties in rules:
+            present = [prop for prop in properties if self._get_property_value(prop, validated_model) is not None]
+            if rule_type == ValidationRule.MUTUALLY_EXCLUSIVE:
+                # Check if more than one property exists
+                if len(present) > 1:
+                    prop_names = [f"'{p}'" for p in present]
+                    error_messages.append(f"Cannot specify {self._combine_string(prop_names)} together.")
+
+            elif rule_type == ValidationRule.MUTUALLY_INCLUSIVE:
+                # If any property in the group is present, then all properties in the group must be present
+                # Check if some but not all properties from the group are present
+                missing_some_properties = 0 < len(present) < len(properties)
+                if missing_some_properties:
+                    error_messages.append(f"Properties must be used together: {self._combine_string(properties)}.")
+
+            elif (
+                rule_type == ValidationRule.CONDITIONAL_REQUIREMENT
+                and self._get_property_value(properties[0], validated_model) is not None
+                and self._get_property_value(properties[1], validated_model) is None
+            ):
+                # First property requires second property
+                error_messages.append(f"'{properties[0]}' requires '{properties[1]}'.")
+
+        # If there are any validation errors, raise a single exception with all error messages
+        if error_messages:
+            raise InvalidResourceException(self.logical_id, "\n".join(error_messages))
+
+    def _combine_string(self, words: list[str]) -> str:
+        return ", ".join(words[:-1]) + (" and " + words[-1] if len(words) > 1 else words[0] if words else "")
+
+    def _get_property_value(self, prop: str, validated_model: Any = None) -> Any:
+        """Original property value getter. Supports nested properties with dot notation."""
+        if "." not in prop:
+            # Simple property - use existing logic for direct attributes
+            return getattr(self, prop, None)
+
+        # Nested property - use validated model
+        if validated_model is None:
+            return None
+
+        try:
+            # Navigate through nested properties using dot notation
+            value = validated_model
+            for part in prop.split("."):
+                if hasattr(value, part):
+                    value = getattr(value, part)
+                    if value is None:
+                        return None
+                else:
+                    return None
+            return value
+        except Exception:
+            return None
 
 
 class ResourceTypeResolver:
@@ -603,13 +800,13 @@ class ResourceTypeResolver:
             ):
                 self.resource_types[resource_class.resource_type] = resource_class
 
-    def can_resolve(self, resource_dict: Dict[str, Any]) -> bool:
+    def can_resolve(self, resource_dict: dict[str, Any]) -> bool:
         if not isinstance(resource_dict, dict) or not isinstance(resource_dict.get("Type"), str):
             return False
 
         return resource_dict["Type"] in self.resource_types
 
-    def resolve_resource_type(self, resource_dict: Dict[str, Any]) -> Any:
+    def resolve_resource_type(self, resource_dict: dict[str, Any]) -> Any:
         """Returns the Resource class corresponding to the 'Type' key in the given resource dict.
 
         :param dict resource_dict: the resource dict to resolve
@@ -628,7 +825,7 @@ class ResourceTypeResolver:
 
 
 class ResourceResolver:
-    def __init__(self, resources: Dict[str, Any]) -> None:
+    def __init__(self, resources: dict[str, dict[str, Any]]) -> None:
         """
         Instantiate the resolver
         :param dict resources: Map of resource
@@ -636,14 +833,13 @@ class ResourceResolver:
 
         if not isinstance(resources, dict):
             raise TypeError("'Resources' is either null or not a valid dictionary.")
-
         self.resources = resources
 
-    def get_all_resources(self) -> Dict[str, Any]:
+    def get_all_resources(self) -> dict[str, Any]:
         """Return a dictionary of all resources from the SAM template."""
         return self.resources
 
-    def get_resource_by_logical_id(self, _input: str) -> Dict[str, Any]:
+    def get_resource_by_logical_id(self, _input: str) -> dict[str, Any] | None:
         """
         Recursively find resource with matching Logical ID that are present in the template and returns the value.
         If it is not in template, this method simply returns the input unchanged.
@@ -654,23 +850,22 @@ class ResourceResolver:
         """
         if not isinstance(_input, str):
             raise TypeError(f"Invalid logical ID '{_input}'. Expected a string.")
-
         return self.resources.get(_input, None)
 
 
-__all__: List[str] = [
+__all__: list[str] = [
     "IS_DICT",
     "IS_STR",
+    "MutatedPassThroughProperty",
+    "PassThroughProperty",
+    "Property",
+    "PropertyType",
+    "Resource",
+    "ResourceMacro",
+    "ResourceResolver",
+    "ResourceTypeResolver",
+    "SamResourceMacro",
     "Validator",
     "any_type",
     "is_type",
-    "PropertyType",
-    "Property",
-    "PassThroughProperty",
-    "MutatedPassThroughProperty",
-    "Resource",
-    "ResourceMacro",
-    "SamResourceMacro",
-    "ResourceTypeResolver",
-    "ResourceResolver",
 ]

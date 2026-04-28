@@ -1,0 +1,27 @@
+Metadata:
+  SamTransformTest: true
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      RouteSelectionExpression: $request.body.action
+      RouteSettings:
+        sendMessage:
+          ThrottlingBurstLimit: 200
+      Routes:
+        $default:
+          FunctionArn: !GetAtt MyFunction.Arn
+        sendMessage:
+          FunctionArn: !GetAtt MyFunction.Arn
+
+Outputs:
+  ApiId:
+    Value: !Ref MyApi

@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Any, Dict
+from typing import Any
 
 from samtranslator.model.intrinsics import ref
 
@@ -22,7 +22,7 @@ CodeDeploy resources.
 
 
 class UpdatePolicy(CodeDeployLambdaAliasUpdate):
-    def to_dict(self) -> Dict[str, Dict[str, Any]]:
+    def to_dict(self) -> dict[str, dict[str, Any]]:
         """
         :return: a dict that can be used as part of a cloudformation template
         """

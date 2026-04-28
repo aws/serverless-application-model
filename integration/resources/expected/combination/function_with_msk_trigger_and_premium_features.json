@@ -1,0 +1,18 @@
+[
+  {
+    "LogicalResourceId": "MyMskStreamProcessor",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaExecutionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyMskStreamProcessorMyMskEvent",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  },
+  {
+    "LogicalResourceId": "PreCreatedS3Bucket",
+    "ResourceType": "AWS::S3::Bucket"
+  }
+]

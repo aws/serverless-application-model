@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Test unknown properties for CapacityProvider
+
+Resources:
+  CapacityProviderUnknownProperties:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      VpcConfig:
+        SubnetIds:
+        - subnet-12345678
+        UnknownVpcProperty: invalid # Unknown property in VpcConfig
+      UnknownProperty: some-value # Unknown property
+      InvalidConfig: # Unknown nested property
+        SomeNestedValue: test
+      ScalingConfig:
+        MaxVCpuCount: 10
+        InvalidScalingProperty: test # Unknown property in ScalingConfig
+      OperatorRole: dfasd

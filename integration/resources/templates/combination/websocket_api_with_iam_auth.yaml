@@ -1,0 +1,19 @@
+Resources:
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Auth:
+        AuthType: AWS_IAM
+      Name: MyApi
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt ConnectFunction.Arn
+Metadata:
+  SamTransformTest: true

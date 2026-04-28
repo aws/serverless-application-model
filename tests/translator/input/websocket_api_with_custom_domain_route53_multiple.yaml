@@ -1,0 +1,61 @@
+Resources:
+  Connect1:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.10
+      Handler: index1.handler
+      CodeUri: s3://bucket/key1
+  Connect2:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.10
+      Handler: index2.handler
+      CodeUri: s3://bucket/key2
+  Connect3:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.10
+      Handler: index3.handler
+      CodeUri: s3://bucket/key3
+  Api1:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Domain:
+        DomainName: admin.one.amazon.com
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: abc123456
+      Name: Api1
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt Connect1.Arn
+  Api2:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Domain:
+        DomainName: admin.two.amazon.com
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: abc123456
+      Name: Api2
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt Connect2.Arn
+  Api3:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Domain:
+        DomainName: admin.three.amazon.com
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: abc123456
+      Name: Api3
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt Connect3.Arn

@@ -1,0 +1,27 @@
+Resources:
+  DefaultFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      ApiKeySelectionExpression: $request.header.x-api-key
+      Description: Toy API
+      DisableExecuteApiEndpoint: false
+      DisableSchemaValidation: false
+      Name: MyApiName
+      RouteSelectionExpression: $request.body.action
+      Tags:
+        t1: v1
+        t2: v2
+      Routes:
+        $default:
+          FunctionArn: !GetAtt DefaultFunction.Arn
+Outputs:
+  ApiId:
+    Value: !Ref MyApi
+Metadata:
+  SamTransformTest: true

@@ -1,7 +1,7 @@
 """Type related utils."""
 
-from typing import Any, Dict, TypeVar, Union
+from typing import Any, TypeVar, Union
 
 T = TypeVar("T")
 
-Intrinsicable = Union[Dict[str, Any], T]
+Intrinsicable = Union[dict[str, Any], T]

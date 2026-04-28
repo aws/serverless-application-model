@@ -1,0 +1,516 @@
+{
+  "Resources": {
+    "ConnectFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const {DynamoDBClient} = require(\"@aws-sdk/client-dynamodb\")\n        const {DynamoDBDocumentClient, PutCommand } = require(\"@aws-sdk/lib-dynamodb\")\n        exports.handler = async function(event) {\n        \n        const client = new DynamoDBClient({});\n        const docClient = DynamoDBDocumentClient.from(client);\n        const command = new PutCommand({\n            TableName: process.env.TABLE_NAME,\n            Item: {\n               connectionId: event.requestContext.connectionId,\n            },\n          });\n        \n        try {\n          await docClient.send(command)\n          } catch (err) {\n            console.log(err)\n            return {\n              statusCode: 500\n            };\n          }\n            return {\n            statusCode: 200,\n          };\n        }"
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "ConnectionsTable"
+            }
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "ConnectFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs20.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "ConnectFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "ConnectionsTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "connectionId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "connectionId",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 5,
+          "WriteCapacityUnits": 5
+        }
+      },
+      "Type": "AWS::DynamoDB::Table"
+    },
+    "DefaultFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const {ApiGatewayManagementApiClient, PostToConnectionCommand, GetConnectionCommand} = require(\"@aws-sdk/client-apigatewaymanagementapi\")\n      exports.handler = async function(event) {\n        let connectionInfo;\n        let connectionId = event.requestContext.connectionId;\n      \n        const callbackAPI = new ApiGatewayManagementApiClient({\n          apiVersion: '2018-11-29',\n          endpoint: 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage\n        }); \n\n        try {\n          connectionInfo = await callbackAPI.send(new GetConnectionCommand(\n            {ConnectionId: event.requestContext.connectionId }\n          ));\n        } catch (e) {\n          console.log(e);\n        }\n      \n        connectionInfo.connectionID = connectionId;\n      \n        await callbackAPI.send(new PostToConnectionCommand(\n          {ConnectionId: event.requestContext.connectionId,\n            Data:\n              'Use the send route to send a message. Your info:' +\n              JSON.stringify(connectionInfo)}\n        ));\n        return {\n          statusCode: 200,\n        };\n      };"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "DefaultFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs20.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "DefaultFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess",
+          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "DisconnectFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const {DynamoDBClient} = require(\"@aws-sdk/client-dynamodb\")\n      const {DynamoDBDocumentClient, DeleteCommand } = require(\"@aws-sdk/lib-dynamodb\")\n      exports.handler = async function(event) {\n      \n      const client = new DynamoDBClient({});\n      const docClient = DynamoDBDocumentClient.from(client);\n      const command = new DeleteCommand({\n          TableName: process.env.TABLE_NAME,\n          Key: {\n              connectionId: event.requestContext.connectionId,\n          },\n        });\n      \n      try {\n        await docClient.send(command)\n        } catch (err) {\n          console.log(err)\n          return {\n            statusCode: 500\n          };\n        }\n          return {\n          statusCode: 200,\n        };\n      }"
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "ConnectionsTable"
+            }
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "DisconnectFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs20.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "DisconnectFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SendFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const {DynamoDBClient} = require(\"@aws-sdk/client-dynamodb\")\nconst {DynamoDBDocumentClient, ScanCommand } = require(\"@aws-sdk/lib-dynamodb\")\nconst {ApiGatewayManagementApiClient, PostToConnectionCommand} = require(\"@aws-sdk/client-apigatewaymanagementapi\")\nexports.handler = async function(event) {\n  const client = new DynamoDBClient({});\n  const docClient = DynamoDBDocumentClient.from(client);\n  const ddbcommand = new ScanCommand({\n    TableName: process.env.TABLE_NAME\n    })\n\n  let connections;\n  try { connections = await docClient.send(ddbcommand);\n  } catch (err) {\n  console.log(err)\n  return {\n    statusCode: 500,\n  };\n  }\n\n  const callbackAPI = new ApiGatewayManagementApiClient({\n  apiVersion: '2018-11-29',\n  endpoint: 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage,\n  });\n\n  const message = JSON.parse(event.body).message;\n\n  const sendMessages = connections.Items.map(async ({connectionId}) => {\n  if (connectionId !== event.requestContext.connectionId) {\n    try {\n      await callbackAPI.send(new PostToConnectionCommand(\n        { ConnectionId: connectionId, Data: message, }\n      ));\n    } catch (e) {\n    console.log(e);\n    }\n  }\n  });\n\n  try {\n  await Promise.all(sendMessages)\n  } catch (e) {\n  console.log(e);\n  return {\n    statusCode: 500,\n  };\n  }\n\n  return{statusCode: 200};\n};"
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "ConnectionsTable"
+            }
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "SendFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs20.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "SendFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess",
+          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "SimpleChatApi": {
+      "Properties": {
+        "Name": "SimpleChatApi",
+        "ProtocolType": "WEBSOCKET",
+        "RouteSelectionExpression": "$request.body.action",
+        "Tags": {
+          "websocketapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "SimpleChatApiConnectIntegration": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "SimpleChatApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FunctionArn}/invocations",
+            {
+              "FunctionArn": {
+                "Fn::GetAtt": [
+                  "ConnectFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Integration"
+    },
+    "SimpleChatApiConnectPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "ConnectFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/default/$connect"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "SimpleChatApiConnectRoute": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "SimpleChatApi"
+        },
+        "RouteKey": "$connect",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "SimpleChatApiConnectIntegration"
+              }
+            ]
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Route"
+    },
+    "SimpleChatApiDefaultIntegration": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "SimpleChatApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FunctionArn}/invocations",
+            {
+              "FunctionArn": {
+                "Fn::GetAtt": [
+                  "DefaultFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Integration"
+    },
+    "SimpleChatApiDefaultPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "DefaultFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/default/$default"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "SimpleChatApiDefaultRoute": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "SimpleChatApi"
+        },
+        "RouteKey": "$default",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "SimpleChatApiDefaultIntegration"
+              }
+            ]
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Route"
+    },
+    "SimpleChatApiDefaultStage": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "SimpleChatApi"
+        },
+        "AutoDeploy": true,
+        "StageName": "default",
+        "Tags": {
+          "websocketapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    },
+    "SimpleChatApiDisconnectIntegration": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "SimpleChatApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FunctionArn}/invocations",
+            {
+              "FunctionArn": {
+                "Fn::GetAtt": [
+                  "DisconnectFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Integration"
+    },
+    "SimpleChatApiDisconnectPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "DisconnectFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/default/$disconnect"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "SimpleChatApiDisconnectRoute": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "SimpleChatApi"
+        },
+        "RouteKey": "$disconnect",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "SimpleChatApiDisconnectIntegration"
+              }
+            ]
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Route"
+    },
+    "SimpleChatApiSendIntegration": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "SimpleChatApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FunctionArn}/invocations",
+            {
+              "FunctionArn": {
+                "Fn::GetAtt": [
+                  "SendFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Integration"
+    },
+    "SimpleChatApiSendPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "SendFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/default/send"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "SimpleChatApiSendRoute": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "SimpleChatApi"
+        },
+        "RouteKey": "send",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "SimpleChatApiSendIntegration"
+              }
+            ]
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Route"
+    }
+  }
+}

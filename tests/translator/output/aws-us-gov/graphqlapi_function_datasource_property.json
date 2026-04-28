@@ -85,7 +85,7 @@
           "TableName": "SomeTable"
         },
         "Name": "InternalDataSource",
-        "ServiceRoleArn": "SomeRoleArn",
+        "ServiceRoleArn": "arn:aws:iam::123456789012:role/SomeRole",
         "Type": "AMAZON_DYNAMODB"
       },
       "Type": "AWS::AppSync::DataSource"

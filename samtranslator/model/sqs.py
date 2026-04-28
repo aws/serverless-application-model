@@ -1,5 +1,3 @@
-from typing import Dict
-
 from samtranslator.model import GeneratedProperty, PropertyType, Resource
 from samtranslator.model.intrinsics import fnGetAtt, ref
 from samtranslator.model.types import PassThrough
@@ -7,7 +5,7 @@ from samtranslator.model.types import PassThrough
 
 class SQSQueue(Resource):
     resource_type = "AWS::SQS::Queue"
-    property_types: Dict[str, PropertyType] = {
+    property_types: dict[str, PropertyType] = {
         "FifoQueue": GeneratedProperty(),
         "Tags": GeneratedProperty(),
     }

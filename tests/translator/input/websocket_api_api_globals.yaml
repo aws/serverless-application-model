@@ -1,0 +1,46 @@
+Globals:
+  WebSocketApi:
+    ApiKeySelectionExpression: Api.RouteSelectionExpression
+    DisableExecuteApiEndpoint: true
+    DisableSchemaValidation: true
+    PropagateTags: true
+    Tags:
+      tag1: val1
+      tag2: val2
+
+Resources:
+  Connect1:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: '# placeholder'
+      Handler: hello.handler
+      Runtime: nodejs20.x
+  Connect2:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: '# placeholder'
+      Handler: hello.handler
+      Runtime: nodejs20.x
+  Api1:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Name: Api1
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt Connect1.Arn
+      RouteSelectionExpression: $request.body.action
+  Api2:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      ApiKeySelectionExpression: Integration.TemplateSelectionExpression
+      DisableExecuteApiEndpoint: false
+      DisableSchemaValidation: false
+      PropagateTags: false
+      Name: Api2
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt Connect2.Arn
+      RouteSelectionExpression: $request.body.message
+      Tags:
+        tag2: val4
+        tag3: val3

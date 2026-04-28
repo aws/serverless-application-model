@@ -1,0 +1,63 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Minimal CapacityProvider configuration test",
+  "Resources": {
+    "MinimalCapacityProvider": {
+      "Properties": {
+        "PermissionsConfig": {
+          "CapacityProviderOperatorRoleArn": {
+            "Fn::GetAtt": [
+              "MinimalCapacityProviderOperatorRole",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-12345678"
+          ],
+          "SubnetIds": [
+            "subnet-12345678"
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::CapacityProvider"
+    },
+    "MinimalCapacityProviderOperatorRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

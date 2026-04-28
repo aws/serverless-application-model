@@ -1,11 +1,11 @@
 from re import search
-from typing import Any, Dict, Optional, Union
+from typing import Any, Union
 from urllib.parse import parse_qs, urlparse
 
 from samtranslator.model.exceptions import InvalidResourceException
 
 
-def parse_s3_uri(uri: Any) -> Optional[Dict[str, Any]]:
+def parse_s3_uri(uri: Any) -> dict[str, Any] | None:
     """Parses a S3 Uri into a dictionary of the Bucket, Key, and VersionId
 
     :return: a BodyS3Location dict or None if not an S3 Uri
@@ -65,8 +65,8 @@ def construct_image_code_object(image_uri, logical_id, property_name):  # type: 
 
 
 def construct_s3_location_object(
-    location_uri: Union[str, Dict[str, Any]], logical_id: str, property_name: str
-) -> Dict[str, Any]:
+    location_uri: Union[str, dict[str, Any]], logical_id: str, property_name: str
+) -> dict[str, Any]:
     """Constructs a Lambda `Code` or `Content` property, from the SAM `CodeUri` or `ContentUri` property.
     This follows the current scheme for Lambda Functions and LayerVersions.
 

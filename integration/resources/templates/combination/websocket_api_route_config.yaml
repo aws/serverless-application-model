@@ -1,0 +1,27 @@
+Resources:
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Routes:
+        $connect:
+          ApiKeyRequired: false
+          FunctionArn: !GetAtt ConnectFunction.Arn
+          IntegrationTimeout: 15000
+          ModelSelectionExpression: $request.body.modelType
+          OperationName: connect
+          RequestParameters:
+            route.request.querystring.p1:
+              Required: true
+          RouteResponseSelectionExpression: $default
+      RouteSelectionExpression: $request.body.action
+Outputs:
+  ApiId:
+    Value: !Ref MyApi
+Metadata:
+  SamTransformTest: true

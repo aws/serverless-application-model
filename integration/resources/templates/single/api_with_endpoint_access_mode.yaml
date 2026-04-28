@@ -1,0 +1,20 @@
+Parameters:
+  SecurityPolicyValue:
+    Type: String
+    Default: SecurityPolicy_TLS13_1_3_2025_09
+  EndpointAccessModeValue:
+    Type: String
+    Default: STRICT
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: ${definitionuri}
+      SecurityPolicy: !Ref SecurityPolicyValue
+      EndpointAccessMode: !Ref EndpointAccessModeValue
+      EndpointConfiguration:
+        Type: REGIONAL
+Metadata:
+  SamTransformTest: true

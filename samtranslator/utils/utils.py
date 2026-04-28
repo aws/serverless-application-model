@@ -1,13 +1,13 @@
 import copy
-from typing import Any, List, Optional, Union, cast
+from typing import Any, Union, cast
 
 
-def as_array(x: Any) -> List[Any]:
+def as_array(x: Any) -> list[Any]:
     """Convert value to list if it already isn't."""
     return x if isinstance(x, list) else [x]
 
 
-def insert_unique(xs: Any, vs: Any) -> List[Any]:
+def insert_unique(xs: Any, vs: Any) -> list[Any]:
     """
     Return copy of `xs` extended with values of `vs` that do not exist in `xs`.
 
@@ -20,7 +20,7 @@ def insert_unique(xs: Any, vs: Any) -> List[Any]:
         if v not in xs:
             xs.append(v)
 
-    return cast(List[Any], xs)  # mypy doesn't recognize it
+    return cast(list[Any], xs)  # mypy doesn't recognize it
 
 
 class InvalidValueType(Exception):
@@ -31,7 +31,7 @@ class InvalidValueType(Exception):
             super().__init__("It should be a map")
 
 
-def dict_deep_get(d: Any, path: Union[str, List[str]]) -> Optional[Any]:
+def dict_deep_get(d: Any, path: Union[str, list[str]]) -> Any | None:
     """
     Get the value deep in the dict.
 

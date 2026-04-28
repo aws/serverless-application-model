@@ -1,0 +1,52 @@
+Parameters:
+  MyRestRegionalDomainName:
+    Type: String
+  MyRestRegionalDomainCert:
+    Type: String
+  HostedZoneId:
+    Type: String
+
+Globals:
+  WebSocketApi:
+    Domain:
+      DomainName:
+        Ref: MyRestRegionalDomainName
+      CertificateArn:
+        Ref: MyRestRegionalDomainCert
+      EndpointConfiguration: REGIONAL
+      SecurityPolicy: TLS_1_2
+      BasePath:
+      - /get
+      - /post
+      Route53:
+        HostedZoneId:
+          Ref: HostedZoneId
+        Region: eu-west-2
+        SetIdentifier: eu-west-2
+        IpV6: true
+
+Resources:
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs18.x
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Name: MyApi
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $connect:
+          FunctionArn: !GetAtt ConnectFunction.Arn
+
+Metadata:
+  SamTransformTest: true

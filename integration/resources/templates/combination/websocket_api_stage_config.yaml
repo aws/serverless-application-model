@@ -1,0 +1,28 @@
+Resources:
+  DefaultFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+  MyApi:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Name: MyApi
+      PropagateTags: true
+      Routes:
+        $default:
+          FunctionArn: !GetAtt DefaultFunction.Arn
+      RouteSelectionExpression: $request.body.action
+      StageName: Prod
+      StageVariables:
+        var1: val1
+        var2: val2
+      Tags:
+        t1: val1
+        t2: val2
+Outputs:
+  ApiId:
+    Value: !Ref MyApi
+Metadata:
+  SamTransformTest: true

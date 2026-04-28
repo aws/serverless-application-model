@@ -1,6 +1,6 @@
 """A plug-able validator to help raise exception when some value is unexpected."""
 
-from typing import Any, Dict, Generic, Optional, TypeVar, cast
+from typing import Any, Generic, TypeVar, cast
 
 from samtranslator.model.exceptions import (
     ExpectedType,
@@ -14,7 +14,7 @@ T = TypeVar("T")
 
 
 class _ResourcePropertyValueValidator(Generic[T]):
-    value: Optional[T]
+    value: T | None
     resource_id: str
     key_path: str
     is_sam_event: bool
@@ -22,7 +22,7 @@ class _ResourcePropertyValueValidator(Generic[T]):
 
     def __init__(
         self,
-        value: Optional[T],
+        value: T | None,
         resource_id: str,
         key_path: str,
         is_sam_event: bool = False,
@@ -35,14 +35,14 @@ class _ResourcePropertyValueValidator(Generic[T]):
         self.is_resource_attribute = is_resource_attribute
 
     @property
-    def resource_logical_id(self) -> Optional[str]:
+    def resource_logical_id(self) -> str | None:
         return None if self.is_sam_event else self.resource_id
 
     @property
-    def event_id(self) -> Optional[str]:
+    def event_id(self) -> str | None:
         return self.resource_id if self.is_sam_event else None
 
-    def to_be_a(self, expected_type: ExpectedType, message: Optional[str] = "") -> T:
+    def to_be_a(self, expected_type: ExpectedType, message: str | None = "") -> T:
         """
         Validate the type of the value and return the value if valid.
 
@@ -66,7 +66,7 @@ class _ResourcePropertyValueValidator(Generic[T]):
         # mypy is not smart to derive class from expected_type.value[1], ignore types:
         return self.value  # type: ignore
 
-    def to_not_be_none(self, message: Optional[str] = "") -> T:
+    def to_not_be_none(self, message: str | None = "") -> T:
         """
         Validate the value is not None and return the value if valid.
 
@@ -85,17 +85,17 @@ class _ResourcePropertyValueValidator(Generic[T]):
     #
     # alias methods:
     #
-    def to_be_a_map(self, message: Optional[str] = "") -> Dict[str, Any]:
+    def to_be_a_map(self, message: str | None = "") -> dict[str, Any]:
         """
-        Return the value with type hint "Dict[str, Any]".
+        Return the value with type hint "dict[str, Any]".
         Raise InvalidResourceException/InvalidEventException if the value is not.
         """
-        return cast(Dict[str, Any], self.to_be_a(ExpectedType.MAP, message))
+        return cast(dict[str, Any], self.to_be_a(ExpectedType.MAP, message))
 
-    def to_be_a_list(self, message: Optional[str] = "") -> T:
+    def to_be_a_list(self, message: str | None = "") -> T:
         return self.to_be_a(ExpectedType.LIST, message)
 
-    def to_be_a_list_of(self, expected_type: ExpectedType, message: Optional[str] = "") -> T:
+    def to_be_a_list_of(self, expected_type: ExpectedType, message: str | None = "") -> T:
         """
         Return the value with type hint "List[T]".
         Raise InvalidResourceException/InvalidEventException if the value is not.
@@ -107,21 +107,21 @@ class _ResourcePropertyValueValidator(Generic[T]):
             )
         return value
 
-    def to_be_a_string(self, message: Optional[str] = "") -> str:
+    def to_be_a_string(self, message: str | None = "") -> str:
         """
         Return the value with type hint "str".
         Raise InvalidResourceException/InvalidEventException if the value is not.
         """
         return cast(str, self.to_be_a(ExpectedType.STRING, message))
 
-    def to_be_an_integer(self, message: Optional[str] = "") -> int:
+    def to_be_an_integer(self, message: str | None = "") -> int:
         """
         Return the value with type hint "int".
         Raise InvalidResourceException/InvalidEventException if the value is not.
         """
         return cast(int, self.to_be_a(ExpectedType.INTEGER, message))
 
-    def to_be_a_bool(self, message: Optional[str] = "") -> bool:
+    def to_be_a_bool(self, message: str | None = "") -> bool:
         """
         Return the value with type hint "bool".
         Raise InvalidResourceException/InvalidEventException if the value is not.

@@ -4,8 +4,9 @@ Method decorator for execution latency collection
 
 import functools
 import logging
+from collections.abc import Callable
 from datetime import datetime
-from typing import Callable, Optional, TypeVar, Union, overload
+from typing import TypeVar, Union, overload
 
 from typing_extensions import ParamSpec
 
@@ -84,18 +85,16 @@ def _send_cw_metric(prefix, name, execution_time_ms, func, args):  # type: ignor
 
 @overload
 def cw_timer(
-    *, name: Optional[str] = None, prefix: Optional[str] = None
+    *, name: str | None = None, prefix: str | None = None
 ) -> Callable[[Callable[_PT, _RT]], Callable[_PT, _RT]]: ...
 
 
 @overload
-def cw_timer(
-    _func: Callable[_PT, _RT], name: Optional[str] = None, prefix: Optional[str] = None
-) -> Callable[_PT, _RT]: ...
+def cw_timer(_func: Callable[_PT, _RT], name: str | None = None, prefix: str | None = None) -> Callable[_PT, _RT]: ...
 
 
 def cw_timer(
-    _func: Optional[Callable[_PT, _RT]] = None, name: Optional[str] = None, prefix: Optional[str] = None
+    _func: Callable[_PT, _RT] | None = None, name: str | None = None, prefix: str | None = None
 ) -> Union[Callable[_PT, _RT], Callable[[Callable[_PT, _RT]], Callable[_PT, _RT]]]:
     """
     A method decorator, that will calculate execution time of the decorated method, and store this information as a

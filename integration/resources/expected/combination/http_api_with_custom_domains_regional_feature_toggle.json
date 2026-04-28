@@ -20,7 +20,7 @@
     "ResourceType": "AWS::ApiGatewayV2::Api"
   },
   {
-    "LogicalResourceId": "RecordSetGroupd17dced08c",
+    "LogicalResourceId": "RecordSetGroup",
     "ResourceType": "AWS::Route53::RecordSetGroup"
   },
   {
@@ -28,7 +28,7 @@
     "ResourceType": "AWS::ApiGatewayV2::Stage"
   },
   {
-    "LogicalResourceId": "ApiGatewayDomainNameV26198c55d75",
+    "LogicalResourceId": "ApiGatewayDomainNameV2",
     "ResourceType": "AWS::ApiGatewayV2::DomainName"
   },
   {

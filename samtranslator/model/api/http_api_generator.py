@@ -1,8 +1,8 @@
-import re
 from collections import namedtuple
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Union
 
 from samtranslator.metrics.method_decorator import cw_timer
+from samtranslator.model.api.apiv2_generator import ApiV2Generator
 from samtranslator.model.apigatewayv2 import (
     ApiGatewayV2ApiMapping,
     ApiGatewayV2Authorizer,
@@ -11,12 +11,11 @@ from samtranslator.model.apigatewayv2 import (
     ApiGatewayV2Stage,
 )
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.intrinsics import fnGetAtt, fnSub, is_intrinsic, is_intrinsic_no_value, ref
+from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value, ref
 from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
-from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.utils.types import Intrinsicable
 from samtranslator.utils.utils import InvalidValueType, dict_deep_get
@@ -34,28 +33,28 @@ DefaultStageName = "$default"
 HttpApiTagName = "httpapi:createdBy"
 
 
-class HttpApiGenerator:
+class HttpApiGenerator(ApiV2Generator):
     def __init__(  # noqa: PLR0913
         self,
         logical_id: str,
-        stage_variables: Optional[Dict[str, Intrinsicable[str]]],
-        depends_on: Optional[List[str]],
-        definition_body: Optional[Dict[str, Any]],
-        definition_uri: Optional[Intrinsicable[str]],
-        name: Optional[Any],
-        stage_name: Optional[Intrinsicable[str]],
-        tags: Optional[Dict[str, Intrinsicable[str]]] = None,
-        auth: Optional[Dict[str, Intrinsicable[str]]] = None,
-        cors_configuration: Optional[Union[bool, Dict[str, Any]]] = None,
-        access_log_settings: Optional[Dict[str, Intrinsicable[str]]] = None,
-        route_settings: Optional[Dict[str, Any]] = None,
-        default_route_settings: Optional[Dict[str, Any]] = None,
-        resource_attributes: Optional[Dict[str, Intrinsicable[str]]] = None,
-        passthrough_resource_attributes: Optional[Dict[str, Intrinsicable[str]]] = None,
-        domain: Optional[Dict[str, Any]] = None,
-        fail_on_warnings: Optional[Intrinsicable[bool]] = None,
-        description: Optional[Intrinsicable[str]] = None,
-        disable_execute_api_endpoint: Optional[Intrinsicable[bool]] = None,
+        stage_variables: dict[str, Intrinsicable[str]] | None,
+        depends_on: list[str] | None,
+        definition_body: dict[str, Any] | None,
+        definition_uri: Intrinsicable[str] | None,
+        name: Any | None,
+        stage_name: Intrinsicable[str] | None,
+        tags: dict[str, Intrinsicable[str]] | None = None,
+        auth: dict[str, Intrinsicable[str]] | None = None,
+        cors_configuration: Union[bool, dict[str, Any]] | None = None,
+        access_log_settings: dict[str, Intrinsicable[str]] | None = None,
+        route_settings: dict[str, Any] | None = None,
+        default_route_settings: dict[str, Any] | None = None,
+        resource_attributes: dict[str, Intrinsicable[str]] | None = None,
+        passthrough_resource_attributes: dict[str, Intrinsicable[str]] | None = None,
+        domain: dict[str, Any] | None = None,
+        fail_on_warnings: Intrinsicable[bool] | None = None,
+        description: Intrinsicable[str] | None = None,
+        disable_execute_api_endpoint: Intrinsicable[bool] | None = None,
     ) -> None:
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -72,27 +71,30 @@ class HttpApiGenerator:
         :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
         :param description: Description of the API Gateway resource
         """
-        self.logical_id = logical_id
-        self.stage_variables = stage_variables
-        self.depends_on = depends_on
+        super().__init__(
+            logical_id,
+            stage_variables,
+            depends_on,
+            access_log_settings,
+            default_route_settings,
+            description,
+            disable_execute_api_endpoint,
+            domain,
+            passthrough_resource_attributes,
+            resource_attributes,
+            route_settings,
+            tags,
+        )
         self.definition_body = definition_body
         self.definition_uri = definition_uri
-        self.stage_name = stage_name
+        self.fail_on_warnings = fail_on_warnings
         self.name = name
+        self.stage_name = stage_name
         if not self.stage_name:
             self.stage_name = DefaultStageName
         self.auth = auth
         self.cors_configuration = cors_configuration
-        self.tags = tags
-        self.access_log_settings = access_log_settings
-        self.route_settings = route_settings
-        self.default_route_settings = default_route_settings
-        self.resource_attributes = resource_attributes
-        self.passthrough_resource_attributes = passthrough_resource_attributes
-        self.domain = domain
-        self.fail_on_warnings = fail_on_warnings
-        self.description = description
-        self.disable_execute_api_endpoint = disable_execute_api_endpoint
+        self.default_tag_name = HttpApiTagName
 
     def _construct_http_api(self) -> ApiGatewayV2HttpApi:
         """Constructs and returns the ApiGatewayV2 HttpApi.
@@ -236,232 +238,9 @@ class HttpApiGenerator:
         #   Warnings found during import: Parse issue: attribute paths.
         #   Resource $default should start with / (Service: AmazonApiGatewayV2; Status Code: 400;
         # Deployment fails when FailOnWarnings is true: https://github.com/aws/serverless-application-model/issues/2297
-        paths: Dict[str, Any] = self.definition_body.get("paths", {})
+        paths: dict[str, Any] = self.definition_body.get("paths", {})
         if DefaultStageName in paths:
             paths[f"/{DefaultStageName}"] = paths.pop(DefaultStageName)
-
-    def _construct_api_domain(  # noqa: PLR0912, PLR0915
-        self, http_api: ApiGatewayV2HttpApi, route53_record_set_groups: Dict[str, Route53RecordSetGroup]
-    ) -> Tuple[
-        Optional[ApiGatewayV2DomainName],
-        Optional[List[ApiGatewayV2ApiMapping]],
-        Optional[Route53RecordSetGroup],
-    ]:
-        """
-        Constructs and returns the ApiGateway Domain and BasepathMapping
-        """
-        if self.domain is None:
-            return None, None, None
-
-        custom_domain_config = self.domain  # not creating a copy as we will mutate it
-        domain_name = custom_domain_config.get("DomainName")
-
-        domain_name_config = {}
-
-        certificate_arn = custom_domain_config.get("CertificateArn")
-        if domain_name is None or certificate_arn is None:
-            raise InvalidResourceException(
-                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn are provided."
-            )
-        domain_name_config["CertificateArn"] = certificate_arn
-
-        api_domain_name = "{}{}".format("ApiGatewayDomainNameV2", LogicalIdGenerator("", domain_name).gen())
-        custom_domain_config["ApiDomainName"] = api_domain_name
-
-        domain = ApiGatewayV2DomainName(api_domain_name, attributes=self.passthrough_resource_attributes)
-        domain.DomainName = domain_name
-        domain.Tags = self.tags
-
-        endpoint_config = custom_domain_config.get("EndpointConfiguration")
-        if endpoint_config is None:
-            endpoint_config = "REGIONAL"
-            # to make sure that default is always REGIONAL
-            custom_domain_config["EndpointConfiguration"] = "REGIONAL"
-        elif endpoint_config not in ["REGIONAL"]:
-            raise InvalidResourceException(
-                self.logical_id,
-                "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
-            )
-        domain_name_config["EndpointType"] = endpoint_config
-
-        ownership_verification_certificate_arn = custom_domain_config.get("OwnershipVerificationCertificateArn")
-        if ownership_verification_certificate_arn:
-            domain_name_config["OwnershipVerificationCertificateArn"] = ownership_verification_certificate_arn
-
-        security_policy = custom_domain_config.get("SecurityPolicy")
-        if security_policy:
-            domain_name_config["SecurityPolicy"] = security_policy
-
-        domain.DomainNameConfigurations = [domain_name_config]
-
-        mutual_tls_auth = custom_domain_config.get("MutualTlsAuthentication", None)
-        if mutual_tls_auth:
-            if isinstance(mutual_tls_auth, dict):
-                if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
-                    invalid_keys = []
-                    for key in mutual_tls_auth:
-                        if key not in {"TruststoreUri", "TruststoreVersion"}:
-                            invalid_keys.append(key)
-                    invalid_keys.sort()
-                    raise InvalidResourceException(
-                        ",".join(invalid_keys),
-                        "Available MutualTlsAuthentication fields are {}.".format(
-                            ["TruststoreUri", "TruststoreVersion"]
-                        ),
-                    )
-                domain.MutualTlsAuthentication = {}
-                if mutual_tls_auth.get("TruststoreUri", None):
-                    domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
-                if mutual_tls_auth.get("TruststoreVersion", None):
-                    domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
-            else:
-                raise InvalidResourceException(
-                    self.logical_id,
-                    "MutualTlsAuthentication must be a map with at least one of the following fields {}.".format(
-                        ["TruststoreUri", "TruststoreVersion"]
-                    ),
-                )
-
-        # Create BasepathMappings
-        basepaths: Optional[List[str]]
-        basepath_value = self.domain.get("BasePath")
-        if basepath_value and isinstance(basepath_value, str):
-            basepaths = [basepath_value]
-        elif basepath_value and isinstance(basepath_value, list):
-            basepaths = cast(Optional[List[str]], basepath_value)
-        else:
-            basepaths = None
-        basepath_resource_list = self._construct_basepath_mappings(basepaths, http_api, api_domain_name)
-
-        # Create the Route53 RecordSetGroup resource
-        record_set_group = self._construct_route53_recordsetgroup(
-            self.domain, route53_record_set_groups, api_domain_name
-        )
-
-        return domain, basepath_resource_list, record_set_group
-
-    def _construct_route53_recordsetgroup(
-        self,
-        custom_domain_config: Dict[str, Any],
-        route53_record_set_groups: Dict[str, Route53RecordSetGroup],
-        api_domain_name: str,
-    ) -> Optional[Route53RecordSetGroup]:
-        route53_config = custom_domain_config.get("Route53")
-        if route53_config is None:
-            return None
-        sam_expect(route53_config, self.logical_id, "Domain.Route53").to_be_a_map()
-        if route53_config.get("HostedZoneId") is None and route53_config.get("HostedZoneName") is None:
-            raise InvalidResourceException(
-                self.logical_id,
-                "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
-            )
-
-        logical_id_suffix = LogicalIdGenerator(
-            "", route53_config.get("HostedZoneId") or route53_config.get("HostedZoneName")
-        ).gen()
-        logical_id = "RecordSetGroup" + logical_id_suffix
-
-        matching_record_set_group = route53_record_set_groups.get(logical_id)
-        if matching_record_set_group:
-            record_set_group = matching_record_set_group
-        else:
-            record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
-            if "HostedZoneId" in route53_config:
-                record_set_group.HostedZoneId = route53_config.get("HostedZoneId")
-            elif "HostedZoneName" in route53_config:
-                record_set_group.HostedZoneName = route53_config.get("HostedZoneName")
-            record_set_group.RecordSets = []
-            route53_record_set_groups[logical_id] = record_set_group
-
-        if record_set_group.RecordSets is None:
-            record_set_group.RecordSets = []
-        record_set_group.RecordSets += self._construct_record_sets_for_domain(
-            custom_domain_config, route53_config, api_domain_name
-        )
-        return record_set_group
-
-    def _construct_basepath_mappings(
-        self, basepaths: Optional[List[str]], http_api: ApiGatewayV2HttpApi, api_domain_name: str
-    ) -> List[ApiGatewayV2ApiMapping]:
-        basepath_resource_list: List[ApiGatewayV2ApiMapping] = []
-
-        if basepaths is None:
-            basepath_mapping = ApiGatewayV2ApiMapping(
-                self.logical_id + "ApiMapping", attributes=self.passthrough_resource_attributes
-            )
-            basepath_mapping.DomainName = ref(api_domain_name)
-            basepath_mapping.ApiId = ref(http_api.logical_id)
-            basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
-            basepath_resource_list.extend([basepath_mapping])
-        else:
-            for path in basepaths:
-                # search for invalid characters in the path and raise error if there are
-                invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
-
-                if not isinstance(path, str):
-                    raise InvalidResourceException(self.logical_id, "Basepath must be a string.")
-
-                if re.search(invalid_regex, path) is not None:
-                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
-
-                logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-_/]+", "", path), "ApiMapping")
-                basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)
-                basepath_mapping.DomainName = ref(api_domain_name)
-                basepath_mapping.ApiId = ref(http_api.logical_id)
-                basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
-                # ignore leading and trailing `/` in the path name
-                basepath_mapping.ApiMappingKey = path.strip("/")
-                basepath_resource_list.extend([basepath_mapping])
-        return basepath_resource_list
-
-    def _construct_record_sets_for_domain(
-        self, custom_domain_config: Dict[str, Any], route53_config: Dict[str, Any], api_domain_name: str
-    ) -> List[Dict[str, Any]]:
-        recordset_list = []
-
-        recordset = {}
-        recordset["Name"] = custom_domain_config.get("DomainName")
-        recordset["Type"] = "A"
-        recordset["AliasTarget"] = self._construct_alias_target(custom_domain_config, route53_config, api_domain_name)
-        self._update_route53_routing_policy_properties(route53_config, recordset)
-        recordset_list.append(recordset)
-
-        if route53_config.get("IpV6") is not None and route53_config.get("IpV6") is True:
-            recordset_ipv6 = {}
-            recordset_ipv6["Name"] = custom_domain_config.get("DomainName")
-            recordset_ipv6["Type"] = "AAAA"
-            recordset_ipv6["AliasTarget"] = self._construct_alias_target(
-                custom_domain_config, route53_config, api_domain_name
-            )
-            self._update_route53_routing_policy_properties(route53_config, recordset_ipv6)
-            recordset_list.append(recordset_ipv6)
-
-        return recordset_list
-
-    @staticmethod
-    def _update_route53_routing_policy_properties(route53_config: Dict[str, Any], recordset: Dict[str, Any]) -> None:
-        if route53_config.get("Region") is not None:
-            recordset["Region"] = route53_config.get("Region")
-        if route53_config.get("SetIdentifier") is not None:
-            recordset["SetIdentifier"] = route53_config.get("SetIdentifier")
-
-    def _construct_alias_target(
-        self, domain_config: Dict[str, Any], route53_config: Dict[str, Any], api_domain_name: str
-    ) -> Dict[str, Any]:
-        alias_target = {}
-        target_health = route53_config.get("EvaluateTargetHealth")
-
-        if target_health is not None:
-            alias_target["EvaluateTargetHealth"] = target_health
-        if domain_config.get("EndpointConfiguration") == "REGIONAL":
-            alias_target["HostedZoneId"] = fnGetAtt(api_domain_name, "RegionalHostedZoneId")
-            alias_target["DNSName"] = fnGetAtt(api_domain_name, "RegionalDomainName")
-        else:
-            raise InvalidResourceException(
-                self.logical_id,
-                "Only REGIONAL endpoint is supported on HTTP APIs.",
-            )
-        return alias_target
 
     def _add_auth(self) -> None:
         """
@@ -515,7 +294,7 @@ class HttpApiGenerator:
 
         if not self.tags:
             self.tags = {}
-        self.tags[HttpApiTagName] = "SAM"
+        self.tags[self.default_tag_name] = "SAM"
 
         open_api_editor = OpenApiEditor(self.definition_body)
 
@@ -523,32 +302,7 @@ class HttpApiGenerator:
         open_api_editor.add_tags(self.tags)
         self.definition_body = open_api_editor.openapi
 
-    def _get_permission(
-        self, authorizer_name: str, authorizer_lambda_function_arn: str, api_arn: str
-    ) -> LambdaPermission:
-        """Constructs and returns the Lambda Permission resource allowing the Authorizer to invoke the function.
-
-        :returns: the permission resource
-        :rtype: model.lambda_.LambdaPermission
-        """
-
-        resource = "${__ApiId__}/authorizers/*"
-        source_arn = fnSub(
-            ArnGenerator.generate_arn(partition="${AWS::Partition}", service="execute-api", resource=resource),
-            {"__ApiId__": api_arn},
-        )
-
-        lambda_permission = LambdaPermission(
-            self.logical_id + authorizer_name + "AuthorizerPermission", attributes=self.passthrough_resource_attributes
-        )
-        lambda_permission.Action = "lambda:InvokeFunction"
-        lambda_permission.FunctionName = authorizer_lambda_function_arn
-        lambda_permission.Principal = "apigateway.amazonaws.com"
-        lambda_permission.SourceArn = source_arn
-
-        return lambda_permission
-
-    def _construct_authorizer_lambda_permission(self, http_api: ApiGatewayV2HttpApi) -> List[LambdaPermission]:
+    def _construct_authorizer_lambda_permission(self, http_api: ApiGatewayV2HttpApi) -> list[LambdaPermission]:
         if not self.auth:
             return []
 
@@ -558,7 +312,7 @@ class HttpApiGenerator:
         if not authorizers:
             return []
 
-        permissions: List[LambdaPermission] = []
+        permissions: list[LambdaPermission] = []
 
         for authorizer_name, authorizer in authorizers.items():
             # Construct permissions for Lambda Authorizers only
@@ -570,8 +324,10 @@ class HttpApiGenerator:
             ):
                 continue
 
-            permission = self._get_permission(
-                authorizer_name, authorizer.function_arn, http_api.get_runtime_attr("http_api_id")
+            permission = self._get_authorizer_permission(
+                self.logical_id + authorizer_name + "AuthorizerPermission",
+                authorizer.function_arn,
+                http_api.get_runtime_attr("http_api_id"),
             )
             permissions.append(permission)
 
@@ -580,8 +336,8 @@ class HttpApiGenerator:
     def _set_default_authorizer(
         self,
         open_api_editor: OpenApiEditor,
-        authorizers: Dict[str, ApiGatewayV2Authorizer],
-        default_authorizer: Optional[Any],
+        authorizers: dict[str, ApiGatewayV2Authorizer],
+        default_authorizer: Any | None,
     ) -> None:
         """
         Sets the default authorizer if one is given in the template
@@ -611,13 +367,13 @@ class HttpApiGenerator:
 
     def _get_authorizers(
         self, authorizers_config: Any, enable_iam_authorizer: bool = False
-    ) -> Dict[str, ApiGatewayV2Authorizer]:
+    ) -> dict[str, ApiGatewayV2Authorizer]:
         """
         Returns all authorizers for an API as an ApiGatewayV2Authorizer object
         :param authorizers_config: authorizer configuration from the API Auth section
         :param enable_iam_authorizer: if True add an "AWS_IAM" authorizer
         """
-        authorizers: Dict[str, ApiGatewayV2Authorizer] = {}
+        authorizers: dict[str, ApiGatewayV2Authorizer] = {}
 
         if enable_iam_authorizer is True:
             authorizers["AWS_IAM"] = ApiGatewayV2Authorizer(is_aws_iam_authorizer=True)  # type: ignore[no-untyped-call]
@@ -651,7 +407,7 @@ class HttpApiGenerator:
             )
         return authorizers
 
-    def _construct_body_s3_dict(self, definition_url: Union[str, Dict[str, Any]]) -> Dict[str, Any]:
+    def _construct_body_s3_dict(self, definition_url: Union[str, dict[str, Any]]) -> dict[str, Any]:
         """
         Constructs the HttpApi's `BodyS3Location property`, from the SAM Api's DefinitionUri property.
         :returns: a BodyS3Location dict, containing the S3 Bucket, Key, and Version of the OpenApi definition
@@ -681,7 +437,7 @@ class HttpApiGenerator:
             body_s3["Version"] = s3_pointer["Version"]
         return body_s3
 
-    def _construct_stage(self) -> Optional[ApiGatewayV2Stage]:
+    def _construct_stage(self) -> ApiGatewayV2Stage | None:
         """Constructs and returns the ApiGatewayV2 Stage.
 
         :returns: the Stage to which this SAM Api corresponds
@@ -777,13 +533,13 @@ class HttpApiGenerator:
         self.definition_body = open_api_editor.openapi
 
     @cw_timer(prefix="Generator", name="HttpApi")
-    def to_cloudformation(self, route53_record_set_groups: Dict[str, Route53RecordSetGroup]) -> Tuple[
+    def to_cloudformation(self, route53_record_set_groups: dict[str, Route53RecordSetGroup]) -> tuple[
         ApiGatewayV2HttpApi,
-        Optional[ApiGatewayV2Stage],
-        Optional[ApiGatewayV2DomainName],
-        Optional[List[ApiGatewayV2ApiMapping]],
-        Optional[Route53RecordSetGroup],
-        Optional[List[LambdaPermission]],
+        ApiGatewayV2Stage | None,
+        ApiGatewayV2DomainName | None,
+        list[ApiGatewayV2ApiMapping] | None,
+        Route53RecordSetGroup | None,
+        list[LambdaPermission] | None,
     ]:
         """Generates CloudFormation resources from a SAM HTTP API resource
 

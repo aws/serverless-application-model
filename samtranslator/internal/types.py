@@ -1,4 +1,4 @@
-from typing import Callable, Dict
+from collections.abc import Callable
 
 # Function to retrieve name-to-ARN managed policy map
-GetManagedPolicyMap = Callable[[], Dict[str, str]]
+GetManagedPolicyMap = Callable[[], dict[str, str]]

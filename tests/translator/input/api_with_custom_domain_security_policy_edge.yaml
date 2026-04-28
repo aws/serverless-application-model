@@ -1,0 +1,45 @@
+Parameters:
+  MyDomainName:
+    Type: String
+  MyCertificateArn:
+    Type: String
+  HostedZoneId:
+    Type: String
+
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      EndpointConfiguration:
+        Type: EDGE
+      Domain:
+        DomainName: !Ref MyDomainName
+        CertificateArn: !Ref MyCertificateArn
+        EndpointConfiguration: EDGE
+        SecurityPolicy: SecurityPolicy_TLS13_2025_EDGE
+        EndpointAccessMode: STRICT
+        Route53:
+          HostedZoneId: !Ref HostedZoneId
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: MockApi
+          version: '1.0'
+        paths:
+          /get:
+            get:
+              responses:
+                '200':
+                  description: 200 response
+              x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                responses:
+                  default:
+                    statusCode: '200'
+                    responseTemplates:
+                      application/json: '{"message": "Hello World"}'
+Metadata:
+  SamTransformTest: true

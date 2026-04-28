@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any
 
 
 class Action(ABC):
@@ -9,14 +9,14 @@ class Action(ABC):
     """
 
     @abstractmethod
-    def execute(self, template: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, template: dict[str, Any]) -> dict[str, Any]:
         pass
 
 
 class ResolveDependsOn(Action):
     DependsOn = "DependsOn"
 
-    def __init__(self, resolution_data: Dict[str, str]):
+    def __init__(self, resolution_data: dict[str, str]):
         """
         Initializes ResolveDependsOn. Where data necessary to resolve execute can be provided.
 
@@ -24,7 +24,7 @@ class ResolveDependsOn(Action):
         """
         self.resolution_data = resolution_data
 
-    def execute(self, template: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, template: dict[str, Any]) -> dict[str, Any]:
         """
         Resolve DependsOn when logical ids get changed when transforming (ex: AWS::Serverless::LayerVersion)
 
@@ -50,7 +50,7 @@ class ResolveDependsOn(Action):
                 template[self.DependsOn] = changed_logical_id
         return template
 
-    def _can_handle_depends_on(self, input_dict: Dict[str, Any]) -> bool:
+    def _can_handle_depends_on(self, input_dict: dict[str, Any]) -> bool:
         """
         Checks if the input dictionary is of length one and contains "DependsOn"
 

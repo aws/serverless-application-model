@@ -7,6 +7,7 @@ so we assume anything public by convention unless it is prefixed with "_".
 (see https://peps.python.org/pep-0008/#descriptive-naming-styles)
 This CLI tool helps automate the detection of compatibility-breaking changes.
 """
+
 import argparse
 import ast
 import importlib
@@ -17,17 +18,17 @@ import pkgutil
 import string
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Optional, Set, Union
+from typing import Any, NamedTuple, Union
 
 _ARGUMENT_SELF = {"kind": "POSITIONAL_OR_KEYWORD", "name": "self"}
 _PRINTABLE_CHARS = set(string.printable)
 
 
 class InterfaceScanner:
-    def __init__(self, skipped_modules: Optional[List[str]] = None) -> None:
-        self.signatures: Dict[str, Union[inspect.Signature]] = {}
-        self.variables: Set[str] = set()
-        self.skipped_modules: Set[str] = set(skipped_modules or [])
+    def __init__(self, skipped_modules: list[str] | None = None) -> None:
+        self.signatures: dict[str, Union[inspect.Signature]] = {}
+        self.variables: set[str] = set()
+        self.skipped_modules: set[str] = set(skipped_modules or [])
 
     def scan_interfaces_recursively(self, module_name: str) -> None:
         if module_name in self.skipped_modules:
@@ -63,7 +64,7 @@ class InterfaceScanner:
         else:
             module_path = module_path.with_suffix(".py")
         tree = ast.parse("".join([char for char in module_path.read_text() if char in _PRINTABLE_CHARS]))
-        assignments: List[ast.Assign] = [node for node in ast.iter_child_nodes(tree) if isinstance(node, ast.Assign)]
+        assignments: list[ast.Assign] = [node for node in ast.iter_child_nodes(tree) if isinstance(node, ast.Assign)]
         for assignment in assignments:
             for target in assignment.targets:
                 if not isinstance(target, ast.Name):
@@ -97,8 +98,8 @@ class InterfaceScanner:
             self.signatures[full_path] = inspect.signature(method)
 
 
-def _print(signature: Dict[str, inspect.Signature], variables: Set[str]) -> None:
-    result: Dict[str, Any] = {"routines": {}, "variables": sorted(variables)}
+def _print(signature: dict[str, inspect.Signature], variables: set[str]) -> None:
+    result: dict[str, Any] = {"routines": {}, "variables": sorted(variables)}
     for key, value in signature.items():
         result["routines"][key] = [
             (
@@ -116,23 +117,23 @@ def _print(signature: Dict[str, inspect.Signature], variables: Set[str]) -> None
 
 
 class _BreakingChanges(NamedTuple):
-    deleted_variables: List[str]
-    deleted_routines: List[str]
-    incompatible_routines: List[str]
+    deleted_variables: list[str]
+    deleted_routines: list[str]
+    incompatible_routines: list[str]
 
     def is_empty(self) -> bool:
         return not any([self.deleted_variables, self.deleted_routines, self.incompatible_routines])
 
     @staticmethod
-    def _argument_to_str(argument: Dict[str, Any]) -> str:
+    def _argument_to_str(argument: dict[str, Any]) -> str:
         if "default" in argument:
             return f'{argument["name"]}={argument["default"]}'
         return str(argument["name"])
 
     def print_markdown(
         self,
-        original_routines: Dict[str, List[Dict[str, Any]]],
-        routines: Dict[str, List[Dict[str, Any]]],
+        original_routines: dict[str, list[dict[str, Any]]],
+        routines: dict[str, list[dict[str, Any]]],
     ) -> None:
         """Print all breaking changes in markdown."""
         print("\n# Compatibility breaking changes:")
@@ -156,7 +157,7 @@ class _BreakingChanges(NamedTuple):
 
 
 def _only_new_optional_arguments_or_existing_arguments_optionalized_or_var_arguments(
-    original_arguments: List[Dict[str, Any]], arguments: List[Dict[str, Any]]
+    original_arguments: list[dict[str, Any]], arguments: list[dict[str, Any]]
 ) -> bool:
     if len(original_arguments) > len(arguments):
         return False
@@ -178,7 +179,7 @@ def _only_new_optional_arguments_or_existing_arguments_optionalized_or_var_argum
     )
 
 
-def _is_compatible(original_arguments: List[Dict[str, Any]], arguments: List[Dict[str, Any]]) -> bool:
+def _is_compatible(original_arguments: list[dict[str, Any]], arguments: list[dict[str, Any]]) -> bool:
     """
     If there is an argument change, it is compatible only when
     - new optional arguments are added or existing arguments become optional.
@@ -201,13 +202,13 @@ def _is_compatible(original_arguments: List[Dict[str, Any]], arguments: List[Dic
 
 
 def _detect_breaking_changes(
-    original_routines: Dict[str, List[Dict[str, Any]]],
-    original_variables: Set[str],
-    routines: Dict[str, List[Dict[str, Any]]],
-    variables: Set[str],
+    original_routines: dict[str, list[dict[str, Any]]],
+    original_variables: set[str],
+    routines: dict[str, list[dict[str, Any]]],
+    variables: set[str],
 ) -> _BreakingChanges:
-    deleted_routines: List[str] = []
-    incompatible_routines: List[str] = []
+    deleted_routines: list[str] = []
+    incompatible_routines: list[str] = []
     for routine_path, arguments in original_routines.items():
         if routine_path not in routines:
             deleted_routines.append(routine_path)

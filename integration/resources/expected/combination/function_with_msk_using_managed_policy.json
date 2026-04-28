@@ -8,10 +8,6 @@
     "ResourceType": "AWS::IAM::Role"
   },
   {
-    "LogicalResourceId": "MyMskCluster",
-    "ResourceType": "AWS::MSK::Cluster"
-  },
-  {
     "LogicalResourceId": "MyMskStreamProcessorMyMskEvent",
     "ResourceType": "AWS::Lambda::EventSourceMapping"
   }

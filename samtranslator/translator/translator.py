@@ -1,5 +1,5 @@
 import copy
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any
 
 from boto3 import Session
 
@@ -47,33 +47,33 @@ class Translator:
 
     def __init__(
         self,
-        managed_policy_map: Optional[Dict[str, str]],
+        managed_policy_map: dict[str, str] | None,
         sam_parser: Parser,
-        plugins: Optional[List[BasePlugin]] = None,
-        boto_session: Optional[Session] = None,
-        metrics: Optional[Metrics] = None,
+        plugins: list[BasePlugin] | None = None,
+        boto_session: Session | None = None,
+        metrics: Metrics | None = None,
     ) -> None:
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
-        :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to be installed in the translator,
+        :param list of samtranslator.plugins.BasePlugin plugins: list of plugins to be installed in the translator,
             in addition to the default ones.
         """
         self.managed_policy_map = managed_policy_map
         self.plugins = plugins
         self.sam_parser = sam_parser
-        self.feature_toggle: Optional[FeatureToggle] = None
+        self.feature_toggle: FeatureToggle | None = None
         self.boto_session = boto_session
         self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
         MetricsMethodWrapperSingleton.set_instance(self.metrics)
-        self.document_errors: List[ExceptionWithMessage] = []
+        self.document_errors: list[ExceptionWithMessage] = []
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
 
     def _get_function_names(
-        self, resource_dict: Dict[str, Any], intrinsics_resolver: IntrinsicsResolver
-    ) -> Dict[str, str]:
+        self, resource_dict: dict[str, Any], intrinsics_resolver: IntrinsicsResolver
+    ) -> dict[str, str]:
         """
         :param resource_dict: AWS::Serverless::Function resource is provided as input
         :param intrinsics_resolver: to resolve intrinsics for function_name
@@ -104,12 +104,12 @@ class Translator:
 
     def translate(  # noqa: PLR0912, PLR0915
         self,
-        sam_template: Dict[str, Any],
-        parameter_values: Dict[str, Any],
-        feature_toggle: Optional[FeatureToggle] = None,
-        passthrough_metadata: Optional[bool] = False,
-        get_managed_policy_map: Optional[GetManagedPolicyMap] = None,
-    ) -> Dict[str, Any]:
+        sam_template: dict[str, Any],
+        parameter_values: dict[str, Any],
+        feature_toggle: FeatureToggle | None = None,
+        passthrough_metadata: bool | None = False,
+        get_managed_policy_map: GetManagedPolicyMap | None = None,
+    ) -> dict[str, Any]:
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
@@ -127,7 +127,7 @@ class Translator:
         self.feature_toggle = feature_toggle or FeatureToggle(
             FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None
         )
-        self.function_names: Dict[str, List[str]] = {}
+        self.function_names: dict[Any, Any] = {}
         self.redeploy_restapi_parameters = {}
         sam_parameter_values = SamParameterValues(parameter_values)
         sam_parameter_values.add_default_parameter_values(sam_template)
@@ -161,7 +161,7 @@ class Translator:
         supported_resource_refs = SupportedResourceReferences()
         shared_api_usage_plan = SharedApiUsagePlan()
         changed_logical_ids = {}
-        route53_record_set_groups: Dict[Any, Any] = {}
+        route53_record_set_groups: dict[Any, Any] = {}
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
                 macro = macro_resolver.resolve_resource_type(resource_dict).from_dict(
@@ -248,8 +248,8 @@ class Translator:
 
     # private methods
     def _get_resources_to_iterate(
-        self, sam_template: Dict[str, Any], macro_resolver: ResourceTypeResolver
-    ) -> List[Tuple[str, Dict[str, Any]]]:
+        self, sam_template: dict[str, Any], macro_resolver: ResourceTypeResolver
+    ) -> list[tuple[str, dict[str, Any]]]:
         """
         Returns a list of resources to iterate, order them based on the following order:
 
@@ -264,7 +264,7 @@ class Translator:
 
         :param dict sam_template: SAM template
         :param macro_resolver: Resolver that knows if a resource can be processed or not
-        :return list: List containing tuple of (logicalId, resource_dict) in the order of processing
+        :return list: list containing tuple of (logicalId, resource_dict) in the order of processing
         """
 
         functions = []
@@ -284,7 +284,11 @@ class Translator:
                 functions.append(data)
             elif resource["Type"] == "AWS::Serverless::StateMachine":
                 statemachines.append(data)
-            elif resource["Type"] in ("AWS::Serverless::Api", "AWS::Serverless::HttpApi"):
+            elif resource["Type"] in (
+                "AWS::Serverless::Api",
+                "AWS::Serverless::HttpApi",
+                "AWS::Serverless::WebSocketApi",
+            ):
                 apis.append(data)
             elif resource["Type"] == "AWS::Serverless::Connector":
                 connectors.append(data)
@@ -294,26 +298,26 @@ class Translator:
         return functions + statemachines + apis + others + connectors
 
     @staticmethod
-    def _update_resources(connectors_list: List[Resource]) -> Dict[str, Any]:
+    def _update_resources(connectors_list: list[Resource]) -> dict[str, Any]:
         connector_resources = {}
         for connector in connectors_list:
             connector_resources.update(connector.to_dict())
         return connector_resources
 
     @staticmethod
-    def _delete_connectors_attribute(resources: Dict[str, Any]) -> None:
+    def _delete_connectors_attribute(resources: dict[str, Any]) -> None:
         for resource in resources.values():
             if "Connectors" not in resource:
                 continue
             del resource["Connectors"]
 
-    def _get_embedded_connectors(self, resources: Dict[str, Any]) -> List[Resource]:
+    def _get_embedded_connectors(self, resources: dict[str, Any]) -> list[Resource]:
         """
         Loops through the SAM Template resources to find any connectors that have been attached to the resources.
         Converts those attached connectors into Connector resources and returns a list of them
 
-        :param dict resources: Dict of resources from the SAM template
-        :return List[SamConnector]: List of the generated SAM Connectors
+        :param dict resources: dict of resources from the SAM template
+        :return list[SamConnector]: list of the generated SAM Connectors
         """
         connectors = []
 
@@ -363,7 +367,7 @@ class Translator:
         source_logical_id: str,
         full_connector_logical_id: str,
         connector_logical_id: str,
-        connector_dict: Dict[str, Any],
+        connector_dict: dict[str, Any],
     ) -> Resource:
         """
         Generates the connector resource from the embedded connector
@@ -402,12 +406,12 @@ class Translator:
         return SamConnector.from_dict(full_connector_logical_id, connector)
 
 
-def prepare_plugins(plugins: Optional[List[BasePlugin]], parameters: Optional[Dict[str, Any]] = None) -> SamPlugins:
+def prepare_plugins(plugins: list[BasePlugin] | None, parameters: dict[str, Any] | None = None) -> SamPlugins:
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
     we will also install a few "required" plugins that are necessary to provide complete support for SAM template spec.
 
-    :param plugins: list of samtranslator.plugins.BasePlugin plugins: List of plugins to install
+    :param plugins: list of samtranslator.plugins.BasePlugin plugins: list of plugins to install
     :param parameters: Dictionary of parameter values
     :return samtranslator.plugins.SamPlugins: Instance of `SamPlugins`
     """
@@ -440,14 +444,14 @@ if TYPE_CHECKING:
 
 def make_implicit_rest_api_plugin() -> "ImplicitRestApiPlugin":
     # This is necessary to prevent a circular dependency on imports when loading package
-    from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin
+    from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin  # noqa: PLC0415
 
     return ImplicitRestApiPlugin()
 
 
 def make_implicit_http_api_plugin() -> "ImplicitHttpApiPlugin":
     # This is necessary to prevent a circular dependency on imports when loading package
-    from samtranslator.plugins.api.implicit_http_api_plugin import ImplicitHttpApiPlugin
+    from samtranslator.plugins.api.implicit_http_api_plugin import ImplicitHttpApiPlugin  # noqa: PLC0415
 
     return ImplicitHttpApiPlugin()
 

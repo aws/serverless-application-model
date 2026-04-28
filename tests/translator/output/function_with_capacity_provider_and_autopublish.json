@@ -1,0 +1,174 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Function with capacity provider and AutoPublishAlias test",
+  "Resources": {
+    "CodeDeployServiceRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "codedeploy.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "LMIFunctionWithAutoPublish": {
+      "Properties": {
+        "CapacityProviderConfig": {
+          "LambdaManagedInstancesCapacityProviderConfig": {
+            "CapacityProviderArn": "arn:aws:lambda:us-east-1:123456789012:capacity-provider:test-capacity-provider",
+            "PerExecutionEnvironmentMaxConcurrency": 50
+          }
+        },
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": "Lambda function with capacity provider and auto publish alias",
+        "FunctionScalingConfig": {
+          "MaxExecutionEnvironments": 20,
+          "MinExecutionEnvironments": 2
+        },
+        "Handler": "hello.handler",
+        "MemorySize": 512,
+        "Role": {
+          "Fn::GetAtt": [
+            "LMIFunctionWithAutoPublishRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Timeout": 30
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "LMIFunctionWithAutoPublishAliasProduction": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LMIFunctionWithAutoPublish"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "LMIFunctionWithAutoPublishVersion89e69c9a8e",
+            "Version"
+          ]
+        },
+        "Name": "Production"
+      },
+      "Type": "AWS::Lambda::Alias",
+      "UpdatePolicy": {
+        "CodeDeployLambdaAliasUpdate": {
+          "ApplicationName": {
+            "Ref": "ServerlessDeploymentApplication"
+          },
+          "DeploymentGroupName": {
+            "Ref": "LMIFunctionWithAutoPublishDeploymentGroup"
+          }
+        }
+      }
+    },
+    "LMIFunctionWithAutoPublishDeploymentGroup": {
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "ServerlessDeploymentApplication"
+        },
+        "AutoRollbackConfiguration": {
+          "Enabled": true,
+          "Events": [
+            "DEPLOYMENT_FAILURE",
+            "DEPLOYMENT_STOP_ON_ALARM",
+            "DEPLOYMENT_STOP_ON_REQUEST"
+          ]
+        },
+        "DeploymentConfigName": {
+          "Fn::Sub": [
+            "CodeDeployDefault.Lambda${ConfigName}",
+            {
+              "ConfigName": "Linear10PercentEvery1Minute"
+            }
+          ]
+        },
+        "DeploymentStyle": {
+          "DeploymentOption": "WITH_TRAFFIC_CONTROL",
+          "DeploymentType": "BLUE_GREEN"
+        },
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "CodeDeployServiceRole",
+            "Arn"
+          ]
+        }
+      },
+      "Type": "AWS::CodeDeploy::DeploymentGroup"
+    },
+    "LMIFunctionWithAutoPublishRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "LMIFunctionWithAutoPublishVersion89e69c9a8e": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LMIFunctionWithAutoPublish"
+        },
+        "FunctionScalingConfig": {
+          "MaxExecutionEnvironments": 20,
+          "MinExecutionEnvironments": 2
+        }
+      },
+      "Type": "AWS::Lambda::Version"
+    },
+    "ServerlessDeploymentApplication": {
+      "Properties": {
+        "ComputePlatform": "Lambda"
+      },
+      "Type": "AWS::CodeDeploy::Application"
+    }
+  }
+}

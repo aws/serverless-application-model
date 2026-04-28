@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 
 import boto3
@@ -6,6 +7,7 @@ import botocore
 import pytest
 from botocore.exceptions import ClientError
 
+from integration.config.service_names import MQ, MSK
 from integration.helpers.base_test import S3_BUCKET_PREFIX
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.deployer.exceptions.exceptions import S3DoesNotExistException, ThrottlingError
@@ -20,7 +22,7 @@ from integration.helpers.yaml_utils import load_yaml
 
 LOG = logging.getLogger(__name__)
 
-COMPANION_STACK_NAME = "sam-integ-stack-companion"
+COMPANION_STACK_NAME = os.environ.get("COMPANION_STACK_NAME", "sam-integ-stack-companion")
 COMPANION_STACK_TEMPLATE = "companion-stack.yaml"
 SAR_APP_TEMPLATE = "example-sar-app.yaml"
 SAR_APP_NAME = "sam-integration-test-sar-app"
@@ -62,6 +64,9 @@ def clean_all_integ_buckets():
 
 @pytest.fixture()
 def setup_companion_stack_once(tmpdir_factory, get_prefix):
+    # When COMPANION_STACK_NAME is set via env var, the stack is pre-created by the test platform
+    if os.environ.get("COMPANION_STACK_NAME"):
+        return
     tests_integ_dir = Path(__file__).resolve().parents[1]
     template_folder = Path(tests_integ_dir, "integration", "setup")
     companion_stack_template_path = Path(template_folder, COMPANION_STACK_TEMPLATE)
@@ -69,7 +74,19 @@ def setup_companion_stack_once(tmpdir_factory, get_prefix):
     output_dir = tmpdir_factory.mktemp("data")
     stack_name = get_prefix + COMPANION_STACK_NAME
     companion_stack = Stack(stack_name, companion_stack_template_path, cfn_client, output_dir)
-    companion_stack.create_or_update(_stack_exists(stack_name))
+    parameters = _companion_stack_parameters()
+    companion_stack.create_or_update(_stack_exists(stack_name), parameters)
+
+
+def _companion_stack_parameters():
+    """Return companion stack parameters, disabling MSK/MQ in unsupported regions."""
+
+    params = []
+    if current_region_does_not_support([MSK]):
+        params.append({"ParameterKey": "CreateMskCluster", "ParameterValue": "false"})
+    if current_region_does_not_support([MQ]):
+        params.append({"ParameterKey": "CreateMqBroker", "ParameterValue": "false"})
+    return params
 
 
 @pytest.fixture()
@@ -155,6 +172,8 @@ def get_s3_uri(file_name, uri_type, bucket, region):
 
 @pytest.fixture()
 def delete_companion_stack_once(get_prefix):
+    if os.environ.get("COMPANION_STACK_NAME"):
+        return
     if not get_prefix:
         ClientProvider().cfn_client.delete_stack(StackName=COMPANION_STACK_NAME)
 
@@ -179,7 +198,11 @@ def get_stack_outputs(stack_description):
 
 @pytest.fixture()
 def get_companion_stack_outputs(get_prefix):
-    companion_stack_description = get_stack_description(get_prefix + COMPANION_STACK_NAME)
+    if os.environ.get("COMPANION_STACK_NAME"):
+        stack_name = COMPANION_STACK_NAME
+    else:
+        stack_name = get_prefix + COMPANION_STACK_NAME
+    companion_stack_description = get_stack_description(stack_name)
     return get_stack_outputs(companion_stack_description)
 
 

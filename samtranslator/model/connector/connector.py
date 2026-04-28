@@ -1,7 +1,6 @@
 from collections import namedtuple
-from typing import Any, Dict, Iterable, List, Optional
-
-from typing_extensions import TypeGuard
+from collections.abc import Iterable
+from typing import Any, TypeGuard
 
 from samtranslator.model import ResourceResolver
 from samtranslator.model.apigateway import ApiGatewayRestApi
@@ -66,7 +65,7 @@ def add_depends_on(logical_id: str, depends_on: str, resource_resolver: Resource
     resource["DependsOn"] = deps
 
 
-def replace_depends_on_logical_id(logical_id: str, replacement: List[str], resource_resolver: ResourceResolver) -> None:
+def replace_depends_on_logical_id(logical_id: str, replacement: list[str], resource_resolver: ResourceResolver) -> None:
     """
     For every resource's `DependsOn`, replace `logical_id` by `replacement`.
     """
@@ -100,7 +99,7 @@ def get_event_source_mappings(
                 yield logical_id
 
 
-def _is_valid_resource_reference(obj: Dict[str, Any]) -> bool:
+def _is_valid_resource_reference(obj: dict[str, Any]) -> bool:
     id_provided = "Id" in obj
     # Every property in ResourceReference can be implied using 'Id', except for 'Qualifier', so users should be able to combine 'Id' and 'Qualifier'
     non_id_provided = len([k for k in obj if k not in ["Id", "Qualifier"]]) > 0
@@ -109,7 +108,7 @@ def _is_valid_resource_reference(obj: Dict[str, Any]) -> bool:
 
 
 def get_resource_reference(
-    obj: Dict[str, Any], resource_resolver: ResourceResolver, connecting_obj: Dict[str, Any]
+    obj: dict[str, Any], resource_resolver: ResourceResolver, connecting_obj: dict[str, Any]
 ) -> ConnectorResourceReference:
     if not _is_valid_resource_reference(obj):
         raise ConnectorResourceError(
@@ -182,8 +181,8 @@ def get_resource_reference(
 
 
 def _get_events_rule_role(
-    connecting_obj_id: Optional[str], connecting_obj_arn: Optional[Any], properties: Dict[str, Any]
-) -> Optional[Any]:
+    connecting_obj_id: str | None, connecting_obj_arn: Any | None, properties: dict[str, Any]
+) -> Any | None:
     for target in properties.get("Targets", []):
         target_arn = target.get("Arn")
         target_logical_id = get_logical_id_from_intrinsic(target_arn)
@@ -195,10 +194,10 @@ def _get_events_rule_role(
 
 
 def _get_resource_role_property(
-    connecting_obj_id: Optional[str],
-    connecting_obj_arn: Optional[Any],
-    cfn_resource_properties: Dict[str, Any],
-    properties: Dict[str, Any],
+    connecting_obj_id: str | None,
+    connecting_obj_arn: Any | None,
+    cfn_resource_properties: dict[str, Any],
+    properties: dict[str, Any],
 ) -> Any:
     role_property = cfn_resource_properties.get("Inputs", {}).get("Role")
 
@@ -212,10 +211,10 @@ def _get_resource_role_property(
 
 
 def _get_resource_role_name(
-    connecting_obj_id: Optional[str],
-    connecting_obj_arn: Optional[Any],
-    cfn_resource_properties: Dict[str, Any],
-    properties: Dict[str, Any],
+    connecting_obj_id: str | None,
+    connecting_obj_arn: Any | None,
+    cfn_resource_properties: dict[str, Any],
+    properties: dict[str, Any],
 ) -> Any:
     role = _get_resource_role_property(connecting_obj_id, connecting_obj_arn, cfn_resource_properties, properties)
     if not role:
@@ -228,24 +227,24 @@ def _get_resource_role_name(
     return ref(logical_id)
 
 
-def _get_resource_queue_url(properties: Dict[str, Any]) -> Optional[Any]:
+def _get_resource_queue_url(properties: dict[str, Any]) -> Any | None:
     return properties.get("Url")
 
 
-def _get_resource_id(properties: Dict[str, Any]) -> Optional[Any]:
+def _get_resource_id(properties: dict[str, Any]) -> Any | None:
     return properties.get("Id")
 
 
-def _get_resource_name(properties: Dict[str, Any]) -> Optional[Any]:
+def _get_resource_name(properties: dict[str, Any]) -> Any | None:
     return properties.get("Name")
 
 
-def _get_resource_qualifier(properties: Dict[str, Any]) -> Optional[Any]:
+def _get_resource_qualifier(properties: dict[str, Any]) -> Any | None:
     # Qualifier is used as the execute-api ARN suffix; by default allow whole API
     return properties.get("Qualifier")
 
 
-def _get_resource_arn(properties: Dict[str, Any]) -> Any:
+def _get_resource_arn(properties: dict[str, Any]) -> Any:
     # according to documentation, Ref returns ARNs for these two resource types
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#aws-resource-stepfunctions-statemachine-return-values
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-topic.html#aws-resource-sns-topic-return-values

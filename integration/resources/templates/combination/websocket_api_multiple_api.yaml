@@ -1,0 +1,24 @@
+Resources:
+  DefaultFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs24.x
+      CodeUri: ${codeuri}
+  Api1:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $default:
+          FunctionArn: !GetAtt DefaultFunction.Arn
+  Api2:
+    Type: AWS::Serverless::WebSocketApi
+    Properties:
+      Name: Api2
+      RouteSelectionExpression: $request.body.action
+      Routes:
+        $default:
+          FunctionArn: !GetAtt DefaultFunction.Arn
+Metadata:
+  SamTransformTest: true

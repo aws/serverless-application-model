@@ -107,6 +107,7 @@
                       "AWS::Serverless::Application",
                       "AWS::Serverless::Function",
                       "AWS::Serverless::HttpApi",
+                      "AWS::Serverless::WebSocketApi",
                       "AWS::Serverless::LayerVersion",
                       "AWS::Serverless::SimpleTable",
                       "AWS::Serverless::StateMachine",
