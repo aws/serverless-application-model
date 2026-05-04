@@ -300,7 +300,12 @@
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
-          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/default/$connect"
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/${__StageName__}/$connect",
+            {
+              "__StageName__": "default"
+            }
+          ]
         }
       },
       "Type": "AWS::Lambda::Permission"
@@ -358,7 +363,12 @@
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
-          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/default/$default"
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/${__StageName__}/$default",
+            {
+              "__StageName__": "default"
+            }
+          ]
         }
       },
       "Type": "AWS::Lambda::Permission"
@@ -429,7 +439,12 @@
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
-          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/default/$disconnect"
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/${__StageName__}/$disconnect",
+            {
+              "__StageName__": "default"
+            }
+          ]
         }
       },
       "Type": "AWS::Lambda::Permission"
@@ -487,7 +502,12 @@
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
-          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/default/send"
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatApi.ApiId}/${__StageName__}/send",
+            {
+              "__StageName__": "default"
+            }
+          ]
         }
       },
       "Type": "AWS::Lambda::Permission"

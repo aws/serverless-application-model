@@ -42,10 +42,11 @@ class TestWebSocketApiGenerator(TestCase):
         kwargs = self.kwargs.copy()
         WebSocketApiGenerator(**kwargs)._construct_websocket_api()
         _, _, perm, _ = WebSocketApiGenerator(**kwargs)._construct_route_infr("$connect", kwargs["routes"]["$connect"])
-        self.assertEqual(
-            perm.SourceArn["Fn::Sub"],
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApiId.ApiId}/default/$connect",
-        )
+        fn_sub = perm.SourceArn["Fn::Sub"]
+        self.assertIsInstance(fn_sub, list)
+        self.assertIn("${__StageName__}", fn_sub[0])
+        self.assertIn("$connect", fn_sub[0])
+        self.assertEqual(fn_sub[1]["__StageName__"], "default")
 
     def test_perms_with_intrinsic_stage_name(self):
         """Test that _construct_permission handles intrinsic StageName without TypeError."""
