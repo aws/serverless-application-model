@@ -32,7 +32,7 @@ class WebSocketApiGenerator(ApiV2Generator):
     def __init__(  # noqa: PLR0913
         self,
         logical_id: str,
-        stage_name: str | None,
+        stage_name: Intrinsicable[str] | None,
         stage_variables: (
             dict[str, Intrinsicable[str]] | None
         ),  # I tried to keep presence of = None consistent with http
@@ -295,14 +295,23 @@ class WebSocketApiGenerator(ApiV2Generator):
         perms.Action = "lambda:InvokeFunction"
         perms.FunctionName = route_spec["FunctionArn"]
         perms.Principal = "apigateway.amazonaws.com"
-        perms.SourceArn = fnSub(
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${"
-            + self.logical_id
-            + ".ApiId}/"
-            + self.stage_name
-            + "/"
-            + route_key
-        )
+        if is_intrinsic(self.stage_name):
+            perms.SourceArn = fnSub(
+                "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${"
+                + self.logical_id
+                + ".ApiId}/${__StageName__}/"
+                + route_key,
+                {"__StageName__": self.stage_name},
+            )
+        else:
+            perms.SourceArn = fnSub(
+                "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${"
+                + self.logical_id
+                + ".ApiId}/"
+                + self.stage_name
+                + "/"
+                + route_key
+            )
         return perms
 
     def _construct_route_infr(self, route_key: str, route_spec: dict[str, Any]) -> tuple[

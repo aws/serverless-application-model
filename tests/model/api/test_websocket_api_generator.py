@@ -47,6 +47,16 @@ class TestWebSocketApiGenerator(TestCase):
             "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApiId.ApiId}/default/$connect",
         )
 
+    def test_perms_with_intrinsic_stage_name(self):
+        """Test that _construct_permission handles intrinsic StageName without TypeError."""
+        kwargs = self.kwargs.copy()
+        kwargs["stage_name"] = {"Ref": "StageName"}
+        _, _, perm, _ = WebSocketApiGenerator(**kwargs)._construct_route_infr("$connect", kwargs["routes"]["$connect"])
+        fn_sub = perm.SourceArn["Fn::Sub"]
+        self.assertIsInstance(fn_sub, list)
+        self.assertIn("${__StageName__}", fn_sub[0])
+        self.assertEqual(fn_sub[1]["__StageName__"], {"Ref": "StageName"})
+
     def test_none_auth_no_id(self):
         kwargs = self.kwargs.copy()
         kwargs["auth_config"] = {"AuthType": "NONE"}
