@@ -98,12 +98,7 @@
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
-          "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi.ApiId}/${__StageName__}/$connect",
-            {
-              "__StageName__": "default"
-            }
-          ]
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi.ApiId}/default/$connect"
         }
       },
       "Type": "AWS::Lambda::Permission"

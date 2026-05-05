@@ -130,12 +130,7 @@
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
-          "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${MyApi.ApiId}/${__StageName__}/$connect",
-            {
-              "__StageName__": "default"
-            }
-          ]
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${MyApi.ApiId}/default/$connect"
         }
       },
       "Type": "AWS::Lambda::Permission"

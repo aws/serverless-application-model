@@ -295,13 +295,23 @@ class WebSocketApiGenerator(ApiV2Generator):
         perms.Action = "lambda:InvokeFunction"
         perms.FunctionName = route_spec["FunctionArn"]
         perms.Principal = "apigateway.amazonaws.com"
-        perms.SourceArn = fnSub(
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${"
-            + self.logical_id
-            + ".ApiId}/${__StageName__}/"
-            + route_key,
-            {"__StageName__": self.stage_name},
-        )
+        if isinstance(self.stage_name, str):
+            perms.SourceArn = fnSub(
+                "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${"
+                + self.logical_id
+                + ".ApiId}/"
+                + self.stage_name
+                + "/"
+                + route_key
+            )
+        else:
+            perms.SourceArn = fnSub(
+                "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${"
+                + self.logical_id
+                + ".ApiId}/${__StageName__}/"
+                + route_key,
+                {"__StageName__": self.stage_name},
+            )
         return perms
 
     def _construct_route_infr(self, route_key: str, route_spec: dict[str, Any]) -> tuple[

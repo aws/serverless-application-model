@@ -58,12 +58,7 @@
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
-          "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api1.ApiId}/${__StageName__}/$connect",
-            {
-              "__StageName__": "default"
-            }
-          ]
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api1.ApiId}/default/$connect"
         }
       },
       "Type": "AWS::Lambda::Permission"
@@ -159,12 +154,7 @@
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
-          "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api2.ApiId}/${__StageName__}/$connect",
-            {
-              "__StageName__": "default"
-            }
-          ]
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api2.ApiId}/default/$connect"
         }
       },
       "Type": "AWS::Lambda::Permission"
