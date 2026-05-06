@@ -1910,7 +1910,7 @@ class SamWebSocketApi(SamResourceMacro):
         "Routes": PropertyType(True, IS_DICT),
         "RouteSettings": PropertyType(False, IS_DICT),
         "RouteSelectionExpression": PropertyType(True, IS_STR),
-        "StageName": PropertyType(False, IS_STR),
+        "StageName": PropertyType(False, one_of(IS_STR, IS_DICT)),
         "StageVariables": PropertyType(False, IS_DICT),
         "Tags": PropertyType(False, IS_DICT),
     }
@@ -1930,7 +1930,7 @@ class SamWebSocketApi(SamResourceMacro):
     Routes: dict[str, dict[str, Any]]
     RouteSettings: dict[str, Any] | None
     RouteSelectionExpression: str
-    StageName: str | None
+    StageName: Intrinsicable[str] | None
     StageVariables: dict[str, Intrinsicable[str]] | None
     Tags: dict[str, Any] | None
 
