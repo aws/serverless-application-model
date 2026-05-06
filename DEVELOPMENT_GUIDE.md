@@ -71,7 +71,7 @@ Since black is installed in virtualenv, when you follow [this instruction](https
 /Users/<username>/.pyenv/shims/black
 ```
 
-However, IDEs such PyChaim (using FileWatcher) will have a hard time invoking `/Users/<username>/.pyenv/shims/black` 
+However, IDEs such as PyCharm (using FileWatcher) will have a hard time invoking `/Users/<username>/.pyenv/shims/black` 
 and this will happen:
 
 ```
@@ -185,7 +185,7 @@ conventions are best practices that we have learnt over time.
     are raised by Python interpreter and usually signify a bug in your
     code. Your method must not explicitly raise these exceptions because
     the caller has no way of knowing whether it came from a bug or not.
-    Custom exceptions convey are must better at conveying the intent and
+    Custom exceptions convey intent much better and
     can be handled appropriately by the caller. In HTTP lingo, custom
     exceptions are equivalent to 4xx (user\'s fault) and built-in
     exceptions are equivalent to 5xx (Service Fault)
