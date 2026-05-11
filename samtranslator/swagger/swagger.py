@@ -475,6 +475,11 @@ class SwaggerEditor(BaseEditor):
         :param list authorizers: List of Authorizer configurations which get translated to securityDefinitions.
         """
         self.security_definitions = self.security_definitions or Py27Dict()
+        if not isinstance(self.security_definitions, dict):
+            # The user's DefinitionBody supplied securityDefinitions as a non-dict
+            # (e.g. a YAML list). Indexing self.security_definitions[name] below
+            # would raise an opaque TypeError; surface a user-facing error instead.
+            raise InvalidTemplateException("securityDefinitions must be a dictionary.")
 
         for authorizer_name, authorizer in authorizers.items():
             self.security_definitions[authorizer_name] = authorizer.generate_swagger()

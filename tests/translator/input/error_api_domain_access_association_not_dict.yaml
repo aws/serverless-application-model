@@ -1,0 +1,14 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Domain:
+        DomainName: example.com
+        CertificateArn: arn:aws:acm:us-east-1:111111111111:certificate/abcd
+        EndpointConfiguration: PRIVATE
+        # Malformed: AccessAssociation must be a map (with VpcEndpointId).
+        # Previously this crashed the transform with a Python
+        # `AttributeError: 'str' object has no attribute 'get'`, which
+        # CloudFormation surfaced as "Internal transform failure".
+        AccessAssociation: vpce-1234567890abcdef0
